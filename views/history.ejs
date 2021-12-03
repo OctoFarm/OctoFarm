@@ -854,9 +854,9 @@
             <div class="col-lg-6">
               <h6 class="d-inline-block">Current Most Successful Printers</h6> (<small id="dateRange-mostSuccessful"></small>)<hr>
               <ul id="longestRunningPrinters" class="list-group list-group-flush">
-                <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-6 text-center">Printer</small><small class="text-center col-lg-1">Time</small><small class="col-lg-1 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small> </li>
+                <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-6 text-center">Printer</small><small class="text-center col-lg-1">Time</small><small class="col-lg-2 text-center">Success Count</small><small class="col-lg-3 text-center">Success Rate</small> </li>
                 <% printStatistics.sortedTopSuccessPrinterList.slice(0, 6).forEach(printer =>  { %>
-                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-6 text-center text-truncate"><%= printer.printerName %></small><small class="text-center col-lg-1"><%= helpers.generateTime(printer.time) %></small><small class="col-lg-1 text-center"><%= printer.prints %></small><small class="col-lg-4 text-center">
+                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-6 text-center text-truncate"><%= printer.printerName %></small><small class="text-center col-lg-1"><%= helpers.generateTime(printer.time) %></small><small class="col-lg-2 text-center"><%= printer.successCount %></small><small class="col-lg-3 text-center">
                       <% const total = printer.failedCount + printer.cancelledCount + printer.successCount %>
                       <% const failedPercent = (printer.failedCount * 100 ) / total %>
                       <% const cancelledPercent = (printer.cancelledCount * 100) / total %>
@@ -938,7 +938,7 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-lg-12">
-            <h6 class="d-inline-block">Current Most Printed Files</h6> *<small id="dateRange-mostPrintedFile"></small>)<hr>
+            <h6 class="d-inline-block">Current Most Printed Files</h6> (<small id="dateRange-mostPrintedFile"></small>)<hr>
             <ul id="mostPrintedFiles" class="list-group list-group-flush">
               <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-6 text-center">File</small><small class="text-center col-lg-1">Time</small><small class="col-lg-1 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small> </li>
               <% printStatistics.sortedTopFilesList.slice(0, 6).forEach(printer =>  { %>

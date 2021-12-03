@@ -30,11 +30,11 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
-$("#currentStatistics").on("hidden.bs.modal", function (e) {});
+$("#currentStatistics").on("show.bs.modal", function (e) {});
 
 class History {
   static historyList;
-  static historyGraph;
+  static completionByDay;
   static overTimeGraph;
   static monthlySuccessRateGraph;
   static monthlyCompetionByDay;
@@ -44,7 +44,6 @@ class History {
   static cancelledSpark;
   static failedSpark;
   static listenersApplied;
-  static statistics;
 
   static loadNoData() {
     ELEMENTS.historyTable.innerHTML = `<tr><td>NO DATA</td></tr>`;
@@ -387,6 +386,7 @@ class History {
       chart: {
         type: "bar",
         stacked: true,
+        stackedPercent: true,
         width: "100%",
         height: "250px",
         animations: {
@@ -451,12 +451,27 @@ class History {
               }
             }
           }
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Failed Percent",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
         }
       ],
       xaxis: {
         categories: monthArray
       }
     };
+
     if (!this?.monthlySuccessRateGraph) {
       this.monthlySuccessRateGraph = new ApexCharts(
         document.querySelector("#monthlySuccessRate"),
@@ -464,7 +479,6 @@ class History {
       );
       this.monthlySuccessRateGraph.render();
     }
-
     this.monthlySuccessRateGraph.updateSeries([
       {
         name: "Success Percent",
