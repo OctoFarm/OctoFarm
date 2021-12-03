@@ -53,13 +53,6 @@ function handleEvent() {
 }
 
 window.onunhandledrejection = function (event) {
-  console.trace("UNHANDLED: ", event);
-  console.log("UNHANDLED: ", event);
   handleEvent(event.reason);
-  event.preventDefault();
-};
-window.onerror = function (message, source, lineno, colno, error) {
-  console.trace("HANDLED: ", JSON.stringify({ message, source, lineno, colno, error }));
-  handleEvent({ message, source, lineno, colno, error });
   event.preventDefault();
 };
