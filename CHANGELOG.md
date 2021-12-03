@@ -105,6 +105,8 @@ All notable changes to this project will be documented in this file.
   - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action. 
   - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value from OctoPrint which is often wildly inaccurate.
   - Completely reworked the history UI. 
+  - Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API. 
+  - 
 
 ### Removed
 
@@ -167,7 +169,7 @@ All notable changes to this project will be documented in this file.
   - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
   - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
   - Fixed history trying to capture timelapse, thumbnails and influxdb without been enabled...
-  - Fixed history not registering spools when cancelled in some situations. 
+  - Fixed history not registering spools when cancelled in some situations.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

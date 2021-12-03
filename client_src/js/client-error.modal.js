@@ -16,20 +16,20 @@ function returnErrorMessage(options) {
 }
 
 function returnModalDeveloperInfo(options) {
-  console.log(options.source);
   return `
     <code>
     <u>FILE INFO</u><br>
-    LINE: ${options?.lineno}<br>
-    COL: ${options?.colno}<br>
+    LINE: ${options?.lineNumber}<br>
+    COL: ${options?.columnNumber}<br>
    
-    ${options?.filename ? "FILE: " + options?.filename : ""}
+    ${options?.fileName ? "<b>FILE:</b><br>" + options?.fileName + "<br>" : ""}
+    ${options?.stack ? "<b>STACK:</b><br>" + options?.stack : ""}
     </code>
   `;
 }
 
 function openErrorModal(options) {
-  if (!options.statusCode) {
+  if (!options?.statusCode) {
     options.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
     options.name = ClientErrors.UNKNOWN_ERROR.type;
   }
@@ -52,13 +52,14 @@ function handleEvent() {
   }
 }
 
-// TODO fix this, it's not presenting the correct errors.l
 window.onunhandledrejection = function (event) {
-  // console.trace("UNHANDLED: ", JSON.stringify(event));
-  // handleEvent(event);
-  // event.preventDefault();
+  console.trace("UNHANDLED: ", event);
+  console.log("UNHANDLED: ", event);
+  handleEvent(event.reason);
+  event.preventDefault();
 };
 window.onerror = function (message, source, lineno, colno, error) {
-  // console.trace("HANDLED: ", JSON.stringify({ message, source, lineno, colno, error }));
-  // handleEvent({ message, source, lineno, colno, error });
+  console.trace("HANDLED: ", JSON.stringify({ message, source, lineno, colno, error }));
+  handleEvent({ message, source, lineno, colno, error });
+  event.preventDefault();
 };

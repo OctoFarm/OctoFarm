@@ -26,6 +26,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "ClientSettings",
     required: true
+  },
+  loginToken: {
+    type: String,
+    required: false
   }
 });
 

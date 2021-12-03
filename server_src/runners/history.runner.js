@@ -713,7 +713,6 @@ class HistoryCollection {
         await ScriptRunner.check(printer, "done", saveHistory._id);
       }
 
-      console.log(saveHistory);
       saveHistory.markModified("printHistory");
       await saveHistory.save();
       // Update cache after save
