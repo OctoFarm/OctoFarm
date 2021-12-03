@@ -670,7 +670,7 @@ class History {
         aria-valuenow="0%"
         aria-valuemin="0"
         aria-valuemax="100"
-        >${successPercent}%
+        >${successPercent.toFixed(0)}%
       </div>
         <div
             id="totalCancelledPercent"
@@ -681,7 +681,7 @@ class History {
             aria-valuemin="0"
             aria-valuemax="100"
         >
-          ${cancelledPercent}%
+          ${cancelledPercent.toFixed(2)}%
         </div>
         <div
             id="totalFailurePercent"
@@ -692,7 +692,7 @@ class History {
             aria-valuemin="0"
             aria-valuemax="100"
         >
-          ${failedPercent}%
+          ${failedPercent.toFixed(2)}%
         </div>
       </div>
       </small></li>
