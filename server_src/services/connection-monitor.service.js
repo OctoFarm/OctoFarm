@@ -5,7 +5,8 @@ const defaultConnectionMonitorLog = {
   lastResponseTimes: [],
   totalRequestsFailed: 0,
   totalRequestsSuccess: 0,
-  totalRetries: 0
+  totalRetries: 0,
+  totalPingPong: 0
 };
 
 const printerConnectionLogs = [];
@@ -15,13 +16,15 @@ class ConnectionMonitorService {
     REQUEST_KEYS.FAILED_RESPONSE,
     REQUEST_KEYS.SUCCESS_RESPONSE,
     REQUEST_KEYS.RETRY_REQUESTED,
-    REQUEST_KEYS.LAST_RESPONSE
+    REQUEST_KEYS.LAST_RESPONSE,
+    REQUEST_KEYS.TOTAL_PING_PONG
   ];
   static acceptedTypes = [
     REQUEST_TYPE.GET,
     REQUEST_TYPE.PATCH,
     REQUEST_TYPE.POST,
-    REQUEST_TYPE.WEBSOCKET
+    REQUEST_TYPE.WEBSOCKET,
+    REQUEST_TYPE.PING_PONG
   ];
 
   static updateOrAddResponse(url, type, key, value) {
@@ -30,7 +33,6 @@ class ConnectionMonitorService {
       throw new Error("Incorrect types supplied! Do not know... " + type);
     if (!this.acceptedKeys.includes(key))
       throw new Error("Incorrect key supplied! Do not know... " + key);
-
     const urlSplit = url.split("/");
 
     const printerURL = urlSplit[2];
@@ -65,6 +67,7 @@ class ConnectionMonitorService {
     connectionIndex = findIndex(printerConnectionLogs[printerIndex].connections, function (o) {
       return o.url === url;
     });
+
     if (key === REQUEST_KEYS.LAST_RESPONSE) {
       if (!value) throw new Error("No value supplied with " + REQUEST_KEYS.LAST_RESPONSE);
       printerConnectionLogs[printerIndex].connections[connectionIndex].log[

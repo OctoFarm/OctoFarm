@@ -49,6 +49,7 @@
             <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
             <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
             <th scope="col" class="sticky-table table-dark" style="">Retry Count</th>
+            <th scope="col" class="sticky-table table-dark" style="">WebSocket Ping/Pong Failure Count</th>
         </tr>
         </thead>
         <tbody id="" style="height:100%; overflow-y:auto;">
@@ -68,6 +69,7 @@
                         </div>
                     </th>
                     <th> <%= totalsArray[index].reduce( function(a, b){ return a + b["retryCount"] }, 0) %> </th>
+                    <th>  </th>
                 </tr>
                 <% currentPrinter.connections.forEach(con => { %>
                     <% let url = con.url %>
@@ -101,6 +103,7 @@
                             </div>
                         </th>
                         <th class="p-1"><%= log.totalRetries %></th>
+                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "" %></th>
                     </tr>
                 <% })%>
 

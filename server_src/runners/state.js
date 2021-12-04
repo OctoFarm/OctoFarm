@@ -92,7 +92,14 @@ const heartBeatInterval = setInterval(function ping() {
         //   "Active",
         //   farmPrinters[client.ws.index]._id
         // );
-        if (client.ws.isAlive === false) return client.ws.instance.terminate();
+        if (client.ws.isAlive === false) {
+          ConnectionMonitorService.updateOrAddResponse(
+            client.webSocketURL + "/sockjs/websocket",
+            REQUEST_TYPE.PING_PONG,
+            REQUEST_KEYS.TOTAL_PING_PONG
+          );
+          return client.ws.instance.terminate();
+        }
         const triggerStates = ["Offline", "Searching...", "Shutdown"];
         if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
           // Retry connecting if failed...
@@ -233,7 +240,7 @@ WebSocketClient.prototype.open = function (url, index) {
             new Date(),
             farmPrinters[index].printerURL,
             "Ping/Pong failed to get a response, attempting to reconnect... in 30000ms",
-            "Error",
+            "Offline",
             farmPrinters[index]._id
           );
           logger.debug(

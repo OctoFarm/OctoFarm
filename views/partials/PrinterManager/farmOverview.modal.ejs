@@ -19,7 +19,6 @@
             <tbody id="" style="height:100%; overflow-y:auto;">
             <% printersList.forEach(printer => { %>
                 <% const currentPrinter = printer.statistics; %>
-                  <%  console.log(currentPrinter) %>
                 <% const printTotal = currentPrinter.printSuccessTotal + currentPrinter.printCancelTotal + currentPrinter.printErrorTotal %>
                 <% const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal %>
                 <% const octoSysInfo = currentPrinter.octoPrintSystemInfo; %>

@@ -3,12 +3,14 @@ module.exports = {
     GET: "get",
     POST: "post",
     PATCH: "patch",
-    WEBSOCKET: "websocket"
+    WEBSOCKET: "websocket",
+    PING_PONG: "ping_pong"
   },
   REQUEST_KEYS: {
     LAST_RESPONSE: "lastResponseTimes",
     FAILED_RESPONSE: "totalRequestsFailed",
     SUCCESS_RESPONSE: "totalRequestsSuccess",
-    RETRY_REQUESTED: "totalRetries"
+    RETRY_REQUESTED: "totalRetries",
+    TOTAL_PING_PONG: "totalPingPong"
   }
 };
