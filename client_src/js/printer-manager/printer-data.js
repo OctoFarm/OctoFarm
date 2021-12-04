@@ -36,7 +36,7 @@ function updatePrinterInfoAndState(printer) {
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 
-  printerGroup.innerHTML = printer.groups.map((g) => g.name).join() || printer.group;
+  printerGroup.innerHTML = printer.group;
 
   UI.doesElementNeedUpdating(
     `tag badge badge-${printer.printerState.colour.name} badge-pill`,

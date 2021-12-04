@@ -239,4 +239,5 @@ router.get("/statistics/:id", ensureAuthenticated, async function (req, res) {
   let stats = await PrinterClean.generatePrinterStatistics(printerID);
   res.send(stats);
 });
+
 module.exports = router;

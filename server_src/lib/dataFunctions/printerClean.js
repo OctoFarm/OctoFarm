@@ -174,10 +174,8 @@ class PrinterClean {
 
     currentHistory.forEach((h) => {
       // Parse the date from history....
-      let dateSplit = h.endDate.split(" ");
-      let month = ALL_MONTHS.indexOf(dateSplit[1]);
-      let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
-      let dateParse = new Date(dateString);
+
+      let dateParse = new Date(h.endDate);
       if (h.printer === printerStatistics.printerName) {
         //Collate totals
         printerStatistics.filamentUsedWeightTotal.push(h.totalWeight);
@@ -347,7 +345,6 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription
         },
         group: farmPrinter.group,
-        groups: [], // TODO unfinished feature
         printerURL: farmPrinter.printerURL,
         webSocketURL: farmPrinter.webSocketURL,
         cameraURL: farmPrinter.camURL,

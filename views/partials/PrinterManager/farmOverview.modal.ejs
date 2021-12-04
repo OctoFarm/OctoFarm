@@ -1,0 +1,37 @@
+
+<div class="col-lg-12  table-responsive-sm table-responsive-md">
+        <table id="" class="table table-dark table-striped text-center">
+            <thead>
+            <tr>
+                <th scope="col" class="sticky-table table-dark" style="">Printer Name</th>
+                <th scope="col" class="sticky-table table-dark" style="">OctoPrint Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">Printer Firmware</th>
+                <th scope="col" class="sticky-table table-dark" style="">Python Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">pip Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS Platforms</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS Cores</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS ram</th>
+                <th scope="col" class="sticky-table table-dark" style="">Safe Mode Check</th>
+
+
+            </tr>
+            </thead>
+            <tbody id="" style="height:100%; overflow-y:auto;">
+            <% printersList.forEach(printer => { %>
+                <% const currentPrinter = printer.statistics; %>
+                <% const octoSysInfo = currentPrinter.octoPrintSystemInfo; %>
+                <tr>
+                    <th scope="row"><%= currentPrinter.printerName  %></th>
+                    <td><%= octoSysInfo["octoprint.version"]  %></td>
+                    <td><%= octoSysInfo["printer.firmware"]   %></td>
+                    <td><%= octoSysInfo["env.python.version"]   %></td>
+                    <td><%= octoSysInfo["env.python.pip"]   %></td>
+                    <td><%= octoSysInfo["env.os.platform"]   %></td>
+                    <td><%= octoSysInfo["env.hardware.cores"]   %></td>
+                    <td><%= octoSysInfo["env.hardware.ram"]   %></td>
+                    <td><%= octoSysInfo["octoprint.safe_mode"]   %></td>
+                </tr>
+            <% })%>
+            </tbody>
+        </table>
+</div>

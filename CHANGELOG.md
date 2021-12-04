@@ -106,7 +106,7 @@ All notable changes to this project will be documented in this file.
   - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value from OctoPrint which is often wildly inaccurate.
   - Completely reworked the history UI. 
   - Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API. 
-  - 
+  - OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the printer has been scanned online once!
 
 ### Removed
 

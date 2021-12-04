@@ -65,6 +65,14 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   const serverSettings = SettingsClean.returnSystemSettings();
+
+  const returnArray = [];
+  for (let i = 0; i < printers.length; i++) {
+    returnArray.push({
+      statistics: await PrinterClean.generatePrinterStatistics(printers[i]._id)
+    });
+  }
+
   res.render("printerManagement", {
     name: req.user.name,
     userGroup: req.user.group,
@@ -75,7 +83,8 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     helpers: prettyHelpers,
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
-    clientSettings: req.user.clientSettings
+    clientSettings: req.user.clientSettings,
+    printersList: returnArray
   });
 });
 // File Manager Page
