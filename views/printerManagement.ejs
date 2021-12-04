@@ -77,6 +77,13 @@ bodyFile:'./PrinterManager/farmOverview.modal.ejs'
 })
 %>
 <%- include(modal, {
+modal:{
+id:"connectionsOverview", title: "Connections Overview"
+},
+bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+})
+%>
+<%- include(modal, {
     modal:{
     id:"printerSettings", title:"Printer Settings: "
     },

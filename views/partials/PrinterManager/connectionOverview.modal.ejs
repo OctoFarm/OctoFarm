@@ -1,0 +1,110 @@
+
+<div class="col-lg-12">
+    <p>
+        <a class="btn btn-info float-left" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fas fa-info"></i> Help
+        </a>
+    </p>
+    <% const today = new Date() %>
+    <h5 class="float-right">Last Updated: <%= today.toLocaleTimeString() %></h5>
+</div>
+<div class="col-lg-12">
+    <div class="collapse" id="collapseExample">
+        <div class="alert alert-secondary" role="alert">
+            <p> This is to get a understanding into how well your network / OctoFarm is performing at keeping the printers connected. The table below will list your printer totals (blue bar) and then below (grey and dark grey bars) a break down of each request url. There is the Average response time, success percentage and retry count tracked whilst OctoFarm is running.</p>
+            <hr>
+            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. If your seeing response times higher than 1000ms (blue is total and can be ignored) you will want to increase OctoFarms default connection timeout and see if that helps. If you have a wired connection then it's a good indication there's some network congestion somewhere / If wireless your results may vary. The slowest of OctoPrints api endpoints is "api/settings" and this is a good one to base your API Initial Timeout on, just make sure API Secondary Timeout is higher than that.
+            <hr>
+            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests. This is a good indication that there are connection issues, especially with a high retry count. If your OctoPrint instances are usually offline and only turned on when printing it's probably safe to dis-regard this and Retry Counts as those both will increment as those connections are failing. </p>
+            <hr>
+            <b>Retry Counts: </b> <p>This is how many times any request was retried. This is a good indication that OctoFarms default timeout settings are too fast for your network or you have issues with the OctoPrint host. </p>
+        </div>
+    </div>
+</div>
+<% const totalsArray = []; %>
+<% printerConnectionStats.forEach((url, index) => { %>
+    <% const currentPrinter = url; %>
+    <% const toCalc = []; %>
+    <% currentPrinter.connections.forEach(con => { %>
+        <% const log = con.log; %>
+        <% const url = con.url; %>
+        <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
+        <% const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+        <% const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections %>
+        <% const failedPercent = (log.totalRequestsFailed * 100) / totalConnections %>
+        <% const retryCount = log.totalRetries %>
+
+        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount }%>
+
+        <% toCalc.push(toPush) %>
+    <% })%>
+    <% totalsArray[index] = toCalc %>
+<% })%>
+
+<div class="col-lg-12">
+    <table id="" class="table table-dark table-striped text-center">
+        <thead>
+        <tr>
+            <th scope="col" class="sticky-table table-dark" style="">URL</th>
+            <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
+            <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
+            <th scope="col" class="sticky-table table-dark" style="">Retry Count</th>
+        </tr>
+        </thead>
+        <tbody id="" style="height:100%; overflow-y:auto;">
+        <% printerConnectionStats.forEach((url, index) => { %>
+            <% const currentPrinter = url; %>
+            <% const totalSuccessPercent = totalsArray[index].reduce( function(a, b){ return a + b["successPercentage"] }, 0) %>
+            <% const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0) %>
+            <% const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length %>
+            <% const actualFailedPercent = totalFailedPercent / totalsArray[index].length %>
+                <tr class="bg-primary">
+                    <th scope="row"><%= currentPrinter.printerURL  %></th>
+                    <th> <%= helpers.generateMilisecondsTime(totalsArray[index].reduce( function(a, b){ return a + b["totalResponse"] }, 0)) %> </th>
+                    <th>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: <%=actualSuccessPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: <%=actualFailedPercent %>%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
+                        </div>
+                    </th>
+                    <th> <%= totalsArray[index].reduce( function(a, b){ return a + b["retryCount"] }, 0) %> </th>
+                </tr>
+                <% currentPrinter.connections.forEach(con => { %>
+                    <% let url = con.url %>
+                    <% const log = con.log %>
+                        <% if(url.includes("http")){ %>
+                        <%   if(url.includes("https")){ %>
+                        <%       url = url.replace("https://"+currentPrinter.printerURL, "") %>
+                        <%   }else{ %>
+                        <%        url = url.replace("http://"+currentPrinter.printerURL, "") %>
+                        <%    } %>
+                        <%}else if(url.includes("ws")){ %>
+                        <%   if(url.includes("wss")){ %>
+                        <%        url = url.replace("wss://"+currentPrinter.printerURL, "") %>
+                        <%    }else{ %>
+                        <%        url = url.replace("ws://"+currentPrinter.printerURL, "") %>
+                        <%    } %>
+                        <%} %>
+
+                    <% const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+                    <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
+                    <% const successPercent = (log.totalRequestsSuccess * 100) / totalConnections %>
+                    <% const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections %>
+                    <tr>
+                        <th class="p-1"><%= url %></th>
+
+                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCount) %></th>
+                        <th class="p-1">
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: <%=successPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=successPercent.toFixed(0) %>%</div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: <%=failedPercent %>%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><%=failedPercent.toFixed(0) %>%</div>
+                            </div>
+                        </th>
+                        <th class="p-1"><%= log.totalRetries %></th>
+                    </tr>
+                <% })%>
+
+        <% })%>
+        </tbody>
+    </table>
+</div>

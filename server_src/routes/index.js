@@ -15,7 +15,7 @@ const { AppConstants } = require("../app.constants");
 const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
-const { defaultPaginationOptions } = require("../constants/history-sort.constants");
+const ConnectionMonitorService = require("../services/connection-monitor.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -84,7 +84,8 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
     clientSettings: req.user.clientSettings,
-    printersList: returnArray
+    printersList: returnArray,
+    printerConnectionStats: ConnectionMonitorService.returnConnectionLogs()
   });
 });
 // File Manager Page
