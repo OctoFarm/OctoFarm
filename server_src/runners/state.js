@@ -264,13 +264,6 @@ WebSocketClient.prototype.open = function (url, index) {
       return "closed";
     });
     this.instance.on("error", (e) => {
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        this.url,
-        REQUEST_TYPE.WEBSOCKET,
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
       ConnectionMonitorService.updateOrAddResponse(
         this.url,
         REQUEST_TYPE.WEBSOCKET,

@@ -39,13 +39,6 @@ async function fetchApiTimeout(url, method, apiKey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
-        const endTime = ConnectionMonitorService.stopTimer();
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.LAST_RESPONSE,
-          ConnectionMonitorService.calculateTimer(startTime, endTime)
-        );
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -74,13 +67,6 @@ async function fetchApiTimeout(url, method, apiKey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
