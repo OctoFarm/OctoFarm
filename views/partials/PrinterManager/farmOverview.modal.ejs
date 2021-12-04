@@ -12,11 +12,16 @@
                 <th scope="col" class="sticky-table table-dark" style="">OS Cores</th>
                 <th scope="col" class="sticky-table table-dark" style="">OS ram</th>
                 <th scope="col" class="sticky-table table-dark" style="">Safe Mode Check</th>
+                <th scope="col" class="sticky-table table-dark" style="">Print Success Rate</th>
+                <th scope="col" class="sticky-table table-dark" style="">Resend Percentage</th>
             </tr>
             </thead>
             <tbody id="" style="height:100%; overflow-y:auto;">
             <% printersList.forEach(printer => { %>
                 <% const currentPrinter = printer.statistics; %>
+                  <%  console.log(currentPrinter) %>
+                <% const printTotal = currentPrinter.printSuccessTotal + currentPrinter.printCancelTotal + currentPrinter.printErrorTotal %>
+                <% const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal %>
                 <% const octoSysInfo = currentPrinter.octoPrintSystemInfo; %>
                     <% if(typeof octoSysInfo !== "undefined") { %>
                         <tr>
@@ -28,7 +33,9 @@
                             <td><%= octoSysInfo["env.os.platform"]   %></td>
                             <td><%= octoSysInfo["env.hardware.cores"]   %></td>
                             <td><%= helpers.generateBytes(octoSysInfo["env.hardware.ram"])   %></td>
-                            <td><%= octoSysInfo["octoprint.safe_mode"]   %></td>
+                            <td><%- (octoSysInfo["octoprint.safe_mode"]) ? '<i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>' : '<i title="Something maybe wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>'  %></td>
+                            <td><%= printerSuccessRate   %>%</td>
+                            <td><%= currentPrinter.printerResendRatioTotal  %>%</td>
                         </tr>
                 <% } %>
 
