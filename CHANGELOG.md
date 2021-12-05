@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file.
   - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
   - New columns setting for the Group Views, added in System -> Client -> Views. 
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
+    - Group view will action on Print/Pause/etc commands for all printers in the group. 
+    - There is a special cut down file list you can bring up that collates all available files on each printer in the group. You may start prints from here. Note: There is no folders and the list may get large. The file name becomes the path to halp see which file is which. Search isn't available yet. 
   - Added a quick setup button for Filament Manager Plugin in System. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
   - System manager can now view the running OctoFarm tasks.
@@ -43,8 +45,8 @@ All notable changes to this project will be documented in this file.
     - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
     - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
     - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
-  - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it will automatically choose this user to use.   
-  
+  - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it will automatically choose this user to use.
+
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
   - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
