@@ -1,29 +1,46 @@
-import { parse } from "flatted";
+import { asyncParse, debounce } from "./utils/sse.utils";
 
-let source = null;
+// reconnectFrequencySeconds doubles every retry
+let reconnectFrequencySeconds = 1;
+let evtSource;
 
-async function asyncParse(str) {
-  try {
-    const info = parse(str);
-    return info;
-  } catch (e) {
-    return false;
+const reconnectFunc = debounce(
+  function () {
+    setupEventSource();
+    // Double every attempt to avoid overwhelming server
+    reconnectFrequencySeconds *= 2;
+    // Max out at ~1 minute as a compromise between user experience and server load
+    if (reconnectFrequencySeconds >= 64) {
+      reconnectFrequencySeconds = 64;
+    }
+  },
+  function () {
+    return reconnectFrequencySeconds * 1000;
   }
-}
+);
 
-export function createNewEventSource(url) {
-  source = new EventSource(url);
-  source.onmessage = async function (e) {
+function setupEventSource(url) {
+  evtSource = new EventSource(url);
+  evtSource.onmessage = async function (e) {
     if (e.data != null) {
       const res = await asyncParse(e.data);
       postMessage(res);
     }
   };
-  source.onerror = function () {
-    postMessage(false);
+  evtSource.onopen = function (e) {
+    console.debug("Connected to " + url);
+    // Reset reconnect frequency upon successful connection
+    reconnectFrequencySeconds = 1;
   };
-  source.onclose = function () {
+  evtSource.onerror = async function (e) {
     postMessage(false);
+    evtSource.close();
+    reconnectFunc();
+  };
+  evtSource.onclose = async function () {
+    postMessage(false);
+    evtSource.close();
+    reconnectFunc();
   };
 }
 
@@ -31,7 +48,7 @@ self.addEventListener(
   "message",
   function (e) {
     const url = e.data.url;
-    createNewEventSource(url);
+    setupEventSource(url);
   },
   false
 );

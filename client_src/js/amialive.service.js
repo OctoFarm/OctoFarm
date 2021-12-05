@@ -1,4 +1,4 @@
-import { parse } from "flatted";
+import { asyncParse, debounce } from "./utils/sse.utils";
 
 const drawModal = async function () {
   $("#lostServerConnection").modal("show");
@@ -81,20 +81,28 @@ const closeModal = async function () {
 //     }
 //   }
 // }
-let source = null;
+// reconnectFrequencySeconds doubles every retry
+let reconnectFrequencySeconds = 1;
+let evtSource;
 
-async function asyncParse(str) {
-  try {
-    return parse(str);
-  } catch (e) {
-    return false;
+const reconnectFunc = debounce(
+  function () {
+    setupEventSource();
+    // Double every attempt to avoid overwhelming server
+    reconnectFrequencySeconds *= 2;
+    // Max out at ~1 minute as a compromise between user experience and server load
+    if (reconnectFrequencySeconds >= 64) {
+      reconnectFrequencySeconds = 64;
+    }
+  },
+  function () {
+    return reconnectFrequencySeconds * 1000;
   }
-}
+);
 
-export function createNewEventSource() {
-  const url = "/amialive";
-  source = new EventSource(url);
-  source.onmessage = async function (e) {
+function setupEventSource() {
+  evtSource = new EventSource("/amialive");
+  evtSource.onmessage = async function (e) {
     if (e.data != null) {
       await asyncParse(e.data);
       const lostServerConnectionModal = document.getElementById("lostServerConnection");
@@ -103,12 +111,22 @@ export function createNewEventSource() {
       }
     }
   };
-  source.onerror = async function () {
-    await drawModal();
+  evtSource.onopen = function (e) {
+    console.debug("Connected to servers Am I Alive stream...");
+    // Reset reconnect frequency upon successful connection
+    reconnectFrequencySeconds = 1;
   };
-  source.onclose = async function () {
+  evtSource.onerror = async function (e) {
+    console.debug("Server connection lost! Re-establishing...");
     await drawModal();
+    evtSource.close();
+    reconnectFunc();
+  };
+  evtSource.onclose = async function () {
+    console.debug("Server connection closed! Re-establishing...");
+    await drawModal();
+    evtSource.close();
+    reconnectFunc();
   };
 }
-
-createNewEventSource();
+setupEventSource();
