@@ -113,7 +113,6 @@ class HistoryCollection {
       );
     }
 
-    // TODO dynamic circular import to State/Runner
     const reSync = await FilamentManagerPlugin.filamentManagerReSync();
     // Return success
     logger.info(reSync);
@@ -249,19 +248,25 @@ class HistoryCollection {
                 );
                 //Clearing interval
                 clearInterval(interval);
-                const saveHistory = await History.findById(id);
-                saveHistory.printHistory.timelapse = lapse;
-                saveHistory.markModified("printHistory");
-                await saveHistory.save();
+                History.findByIdAndUpdate(id, { "printHistory.timelapse": lapse })
+                  .then((res) => {
+                    logger.debug("Successfully updated history records timelapse with: ", lapse);
+                  })
+                  .catch((e) => {
+                    console.error("Failed to update history record timelapse!", e);
+                  });
                 await getHistoryCache().initCache();
                 logger.info("Successfully grabbed timelapse!");
               } else {
-                const updateHistory = await History.findById(id);
-                updateHistory.printHistory.timelapse = "";
-                updateHistory.markModified("printHistory");
-                await updateHistory.save();
+                History.findByIdAndUpdate(id, { "printHistory.timelapse": "" })
+                  .then((res) => {
+                    logger.debug("Successfully updated history records timelapse with: ", snapshot);
+                  })
+                  .catch((e) => {
+                    console.error("Failed to update history record timelapse!", e);
+                  });
                 await getHistoryCache().initCache();
-                logger.info("Failed to grab a timelapse...");
+                logger.error("Failed to grab a timelapse...");
                 clearInterval(interval);
                 return null;
               }
@@ -656,76 +661,99 @@ class HistoryCollection {
       const saveHistory = new History({
         printHistory
       });
-      // Capture thumbnails if enabled
-      if (serverSettingsCache.history.thumbnails.onComplete && state) {
-        saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
-          payload,
-          files,
-          saveHistory._id,
-          printer
-        );
-      }
-      if (serverSettingsCache.history.thumbnails.onFailure && !state) {
-        saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
-          payload,
-          files,
-          saveHistory._id,
-          printer
-        );
-      }
+      // Save initial history
+      await saveHistory
+        .save()
+        .then(async (res) => {
+          // Capture thumbnails if enabled
+          if (serverSettingsCache.history.thumbnails.onComplete && state) {
+            const thumbnail = await HistoryCollection.thumbnailCheck(
+              payload,
+              files,
+              res._id,
+              printer
+            );
+            History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
+              .then((res) => {
+                logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
+              })
+              .catch((e) => {
+                console.error("Failed to update history record thumbnail!", e);
+              });
+          }
+          if (serverSettingsCache.history.thumbnails.onFailure && !state) {
+            const thumbnail = await HistoryCollection.thumbnailCheck(
+              payload,
+              files,
+              res._id,
+              printer
+            );
+            History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
+              .then((res) => {
+                logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
+              })
+              .catch((e) => {
+                console.error("Failed to update history record thumbnail!", e);
+              });
+          }
 
-      if (serverSettingsCache.history.snapshot.onComplete && state) {
-        saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
-          printer,
-          saveHistory._id,
-          payload
-        );
-      }
-      if (serverSettingsCache.history.snapshot.onFailure && !state) {
-        saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
-          printer,
-          saveHistory._id,
-          payload
-        );
-      }
+          if (serverSettingsCache.history.snapshot.onComplete && state) {
+            const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
+            History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
+              .then((res) => {
+                logger.debug("Successfully to update history record snapshot with: ", snapshot);
+              })
+              .catch((e) => {
+                console.error("Failed to update history record snapshot!", e);
+              });
+          }
+          if (serverSettingsCache.history.snapshot.onFailure && !state) {
+            const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
+            History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
+              .then((res) => {
+                logger.debug("Successfully to update history record snapshot with: ", snapshot);
+              })
+              .catch((e) => {
+                console.error("Failed to update history record snapshot!", e);
+              });
+          }
 
-      if (serverSettingsCache.history.timelapse.onComplete && state) {
-        await HistoryCollection.timelapseCheck(
-          printer,
-          payload.name,
-          payload.time,
-          saveHistory._id
-        );
-      }
-      if (serverSettingsCache.history.timelapse.onFailure && !state) {
-        await HistoryCollection.timelapseCheck(
-          printer,
-          payload.name,
-          payload.time,
-          saveHistory._id
-        );
-      }
-      printer.fileName = payload.display;
-      printer.filePath = payload.path;
-      if (!state) {
-        await ScriptRunner.check(printer, "failed", saveHistory._id);
-      } else {
-        await ScriptRunner.check(printer, "done", saveHistory._id);
-      }
+          if (serverSettingsCache.history.timelapse.onComplete && state) {
+            await HistoryCollection.timelapseCheck(printer, payload.name, payload.time, res._id);
+          }
+          if (serverSettingsCache.history.timelapse.onFailure && !state) {
+            await HistoryCollection.timelapseCheck(printer, payload.name, payload.time, res._id);
+          }
+          printer.fileName = payload.display;
+          printer.filePath = payload.path;
+          if (!state) {
+            await ScriptRunner.check(printer, "failed", saveHistory._id);
+          } else {
+            await ScriptRunner.check(printer, "done", saveHistory._id);
+          }
 
-      saveHistory.markModified("printHistory");
-      await saveHistory.save();
-      // Update cache after save
-      await getHistoryCache().initCache();
-      setTimeout(async function () {
-        // Re-D
-        await getHistoryCache().initCache();
-        if (serverSettingsCache.influxExport.active) {
-          await HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
-        }
-      }, 5000);
+          await res
+            .save()
+            .then(async (res) => {
+              // Update cache after save
+              await getHistoryCache().initCache();
+              setTimeout(async function () {
+                // Re-D
+                await getHistoryCache().initCache();
+                if (serverSettingsCache.influxExport.active) {
+                  await HistoryCollection.updateInfluxDB(res._id, "history", printer);
+                }
+              }, 5000);
+            })
+            .catch((e) => {
+              logger.error("Unable to save secondary history record!", e);
+            });
+        })
+        .catch((e) => {
+          logger.error("Unable to save initial history record!", e);
+        });
     } catch (e) {
-      logger.error("Unable to save history record!", e);
+      logger.error("Total catastrophic failure to save your history!", e);
     }
   }
 
