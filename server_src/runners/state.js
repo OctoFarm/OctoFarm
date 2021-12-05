@@ -946,7 +946,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[this.index].printerURL,
-            `Updating OctoPrint to ${data.plugin.data.data.version}`,
+            `Updating to ${data.plugin.data.data.version}`,
             "Active",
             farmPrinters[this.index]._id
           );

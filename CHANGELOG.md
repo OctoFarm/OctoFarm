@@ -173,6 +173,7 @@ All notable changes to this project will be documented in this file.
   - Fixed history not registering spools when cancelled in some situations.
   - Latest file re-syncs we're not saved to database.
   - Put an SSE event source re-connect using debounce function. If connections lost, every browser should attempt to reconnect now. Chrome didn't sometimes.
+  - Fixed an issue where SSE would lose the connection url if server connection lost.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

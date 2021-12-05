@@ -7,6 +7,8 @@ let tickerMessageBoxStatus = document.getElementById("printerManagementConnectio
  */
 export function checkIfLoaderExistsAndRemove(noLogs = false) {
   const loader = document.getElementById("printerTickerLoader");
+  console.log("LOADER", loader);
+  console.log("NO LOGS", noLogs);
   if (loader) {
     if (noLogs) {
       tickerMessageBox.innerText = "No logs received ❌";
@@ -17,8 +19,10 @@ export function checkIfLoaderExistsAndRemove(noLogs = false) {
       loader.remove();
     }
   } else {
-    if (tickerMessageBox.classList.contains("d-flex")) {
-      tickerMessageBox.classList.remove("d-flex");
+    if (!noLogs) {
+      if (tickerMessageBox.classList.contains("d-flex")) {
+        tickerMessageBox.classList.remove("d-flex");
+      }
     }
   }
 }
