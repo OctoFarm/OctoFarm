@@ -117,13 +117,13 @@ function setupEventSource() {
     reconnectFrequencySeconds = 1;
   };
   evtSource.onerror = async function (e) {
-    console.debug("Server connection lost! Re-establishing...");
+    console.debug("Server connection lost! Re-connecting in... " + reconnectFrequencySeconds + "s");
     await drawModal();
     evtSource.close();
     reconnectFunc();
   };
   evtSource.onclose = async function () {
-    console.debug("Server connection closed! Re-establishing...");
+    console.debug("Server connection closed! Re-establishing..." + reconnectFrequencySeconds + "s");
     await drawModal();
     evtSource.close();
     reconnectFunc();

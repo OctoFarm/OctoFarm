@@ -3,6 +3,7 @@ import { asyncParse, debounce } from "./utils/sse.utils";
 // reconnectFrequencySeconds doubles every retry
 let reconnectFrequencySeconds = 1;
 let evtSource;
+let evtURL;
 
 const reconnectFunc = debounce(
   function () {
@@ -20,6 +21,12 @@ const reconnectFunc = debounce(
 );
 
 function setupEventSource(url) {
+  if (url) {
+    evtURL = url;
+  } else {
+    url = evtURL;
+  }
+
   evtSource = new EventSource(url);
   evtSource.onmessage = async function (e) {
     if (e.data != null) {
