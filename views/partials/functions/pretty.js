@@ -60,6 +60,16 @@ const generateTime = function (seconds) {
   return string;
 };
 
+const returnProgressColour = function (percent, reverse) {
+  if (percent < 45) {
+    return reverse ? "bg-danger" : "bg-success";
+  } else if (percent < 75) {
+    return "bg-warning";
+  } else {
+    return reverse ? "bg-success" : "bg-danger";
+  }
+};
+
 const generateMilisecondsTime = function (miliseconds) {
   let seconds = miliseconds / 1000;
   let string = "";
@@ -111,5 +121,6 @@ module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
-  generateMilisecondsTime
+  generateMilisecondsTime,
+  returnProgressColour
 };

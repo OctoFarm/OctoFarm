@@ -1704,14 +1704,9 @@ class Runner {
       typeof farmPrinters[i].costSettings === "undefined" ||
       _.isEmpty(farmPrinters[i].costSettings)
     ) {
-      farmPrinters[i].costSettings = {
-        powerConsumption: 0.5,
-        electricityCosts: 0.15,
-        purchasePrice: 500,
-        estimateLifespan: 43800,
-        maintenanceCosts: 0.25
-      };
+      farmPrinters[i].costSettings = null;
     }
+    printer.octoPrintSystemInfo = farmPrinters[i].octoPrintSystemInfo;
     printer.octoPrintVersion = farmPrinters[i].octoPrintVersion;
     printer.printerName = farmPrinters[i].printerName;
     printer.camURL = farmPrinters[i].camURL;
@@ -2374,6 +2369,8 @@ class Runner {
           folderCount: printerLocations.length
         };
         farmPrinters[index].markModified("fileList");
+        farmPrinters[index].save();
+
         const currentFilament = await Runner.compileSelectedFilament(
           farmPrinters[index].selectedFilament,
           index
@@ -2608,6 +2605,9 @@ class Runner {
       })
       .then((res) => {
         farmPrinters[index].octoPrintSystemInfo = res.systeminfo;
+        Printers.findByIdAndUpdate(id, {
+          octoPrintSystemInfo: res.systemInfo
+        });
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2783,12 +2783,14 @@ class Runner {
 
           let piSupport = await this.octoPrintService.getPluginPiSupport(farmPrinters[index]);
           piSupport = await piSupport.json();
-
-          farmPrinters[index].octoPi = {
+          const octoPi = {
             model: piSupport.model,
             version: piSupport.octopi_version
           };
-
+          farmPrinters[index].octoPi = octoPi;
+          Printers.findByIdAndUpdate(id, {
+            octoPi: octoPi
+          });
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
@@ -2797,11 +2799,8 @@ class Runner {
             farmPrinters[index]._id
           );
         }
-        if (res.plugins["costestimation"]) {
-          if (
-            _.isEmpty(farmPrinters[index].costSettings) ||
-            farmPrinters[index].costSettings.powerConsumption === 0.5
-          ) {
+        if (farmPrinters[index].costSettings === null) {
+          if (res.plugins["costestimation"]) {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2816,9 +2815,6 @@ class Runner {
               estimateLifespan: res.plugins["costestimation"].lifespanOfPrinter,
               maintenanceCosts: res.plugins["costestimation"].maintenanceCosts
             };
-            const printer = await Printers.findById(id);
-
-            await printer.save();
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2826,14 +2822,21 @@ class Runner {
               "Complete",
               farmPrinters[index]._id
             );
+          } else {
+            farmPrinters[index].costSettings = {
+              powerConsumption: 0.5,
+              electricityCosts: 0.15,
+              purchasePrice: 500,
+              estimateLifespan: 43800,
+              maintenanceCosts: 0.25
+            };
           }
+          Printers.findByIdAndUpdate(id, {
+            costSettings: farmPrinters[index].costSettings
+          });
         }
-
-        if (res.plugins["psucontrol"]) {
-          if (
-            _.isEmpty(farmPrinters[index].powerSettings) &&
-            farmPrinters[index].powerSettings.powerOffCommand === ""
-          ) {
+        if (farmPrinters[index].powerSettings === null) {
+          if (res.plugins["psucontrol"]) {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2859,9 +2862,7 @@ class Runner {
                 MAC: ""
               }
             };
-            const printer = await Printers.findById(id);
 
-            await printer.save();
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2869,7 +2870,29 @@ class Runner {
               "Complete",
               farmPrinters[index]._id
             );
+          } else {
+            farmPrinters[i].powerSettings = {
+              powerOnCommand: "",
+              powerOnURL: "",
+              powerOffCommand: "",
+              powerOffURL: "",
+              powerToggleCommand: "",
+              powerToggleURL: "",
+              powerStatusCommand: "",
+              powerStatusURL: "",
+              wol: {
+                enabled: false,
+                ip: "255.255.255.0",
+                packets: "3",
+                port: "9",
+                interval: "100",
+                MAC: ""
+              }
+            };
           }
+          Printers.findByIdAndUpdate(id, {
+            powerSettings: farmPrinters[index].powerSettings
+          });
         }
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;

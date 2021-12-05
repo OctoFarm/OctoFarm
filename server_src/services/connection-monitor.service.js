@@ -67,7 +67,6 @@ class ConnectionMonitorService {
     connectionIndex = findIndex(printerConnectionLogs[printerIndex].connections, function (o) {
       return o.url === url;
     });
-
     if (key === REQUEST_KEYS.LAST_RESPONSE) {
       if (!value) throw new Error("No value supplied with " + REQUEST_KEYS.LAST_RESPONSE);
       printerConnectionLogs[printerIndex].connections[connectionIndex].log[
@@ -85,6 +84,9 @@ class ConnectionMonitorService {
     } else {
       printerConnectionLogs[printerIndex].connections[connectionIndex].log[key] =
         printerConnectionLogs[printerIndex].connections[connectionIndex].log[key] + 1;
+      if (key === REQUEST_KEYS.SUCCESS_RESPONSE) {
+        // Custom logic needs a good think...
+      }
     }
   }
 

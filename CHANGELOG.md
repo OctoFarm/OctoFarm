@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
     - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
     - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
 
+
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
   - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
@@ -170,6 +171,8 @@ All notable changes to this project will be documented in this file.
   - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
   - Fixed history trying to capture timelapse, thumbnails and influxdb without been enabled...
   - Fixed history not registering spools when cancelled in some situations.
+  - Latest file re-syncs we're not saved to database.
+  - Put an SSE event source re-connect using debounce function. If connections lost, every browser should attempt to reconnect now. Chrome didn't sometimes.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.
