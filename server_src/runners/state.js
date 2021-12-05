@@ -1235,13 +1235,13 @@ class Runner {
             for (let u = 0; u < users.users.length; u++) {
               const currentUser = users.users[u];
               if (currentUser.admin) {
-                // if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
-                //   farmPrinters[i].currentUser = currentUser.name;
-                //   farmPrinters[i].userList.push(currentUser.name);
-                //   farmPrinters[i].markModified("currentUser");
-                //   farmPrinters[i].updateOne();
-                //   break;
-                // }
+                if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
+                  farmPrinters[i].currentUser = currentUser.name;
+                  farmPrinters[i].userList.push(currentUser.name);
+                  farmPrinters[i].markModified("currentUser");
+                  farmPrinters[i].updateOne();
+                  break;
+                }
                 farmPrinters[i].currentUser = currentUser.name;
                 farmPrinters[i].userList.push(currentUser.name);
                 farmPrinters[i].markModified("currentUser");

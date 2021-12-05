@@ -241,12 +241,18 @@ router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = await PrinterClean.returnUniqueListOfOctoPrintPaths();
+  let uniqueFolderPaths = PrinterClean.returnUniqueListOfOctoPrintPaths();
   res.json(uniqueFolderPaths);
 });
 
 router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = await PrinterClean.returnUniqueListOfOctoPrintFiles();
+  let uniqueFolderPaths = PrinterClean.returnUniqueListOfOctoPrintFiles();
+  res.json(uniqueFolderPaths);
+});
+
+router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
+  const idList = JSON.parse(req.params.ids);
+  let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
   res.json(uniqueFolderPaths);
 });
 

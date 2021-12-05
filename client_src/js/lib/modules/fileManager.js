@@ -105,8 +105,28 @@ export default class FileManager {
       }
       progress.innerHTML = `${Math.floor(percentLoad)}%`;
       progress.style.width = `${percentLoad}%`;
-      if (percentLoad == 100) {
+      if (percentLoad === 100) {
         progress.classList = "progress-bar progress-bar-striped bg-success";
+      }
+    }
+
+    const viewProgressBarWrapper = document.getElementById("filesViewProgressWrapper-" + index);
+    if (viewProgressBarWrapper) {
+      if (viewProgressBarWrapper.classList.contains("d-none")) {
+        viewProgressBarWrapper.classList.remove("d-none");
+      }
+      const viewProgressBar = document.getElementById("filesViewProgressBar-" + index);
+      viewProgressBar.classList = "progress-bar progress-bar-striped bg-warning";
+      let percentLoad = (loaded / total) * 100;
+      if (isNaN(percentLoad)) {
+        percentLoad = 0;
+      }
+      viewProgressBar.innerHTML = `${Math.floor(percentLoad)}%`;
+      viewProgressBar.style.width = `${percentLoad}%`;
+      if (percentLoad === 100) {
+        if (!viewProgressBarWrapper.classList.contains("d-none")) {
+          viewProgressBarWrapper.classList.add("d-none");
+        }
       }
     }
   }
@@ -165,13 +185,13 @@ export default class FileManager {
           );
           setTimeout(async () => {
             let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-            FileManager.refreshFiles(updatePrinter, spinnerIcon);
+            await FileManager.refreshFiles(updatePrinter, spinnerIcon);
             setTimeout(async () => {
               let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-              FileManager.refreshFiles(updatePrinter, spinnerIcon);
+              await FileManager.refreshFiles(updatePrinter, spinnerIcon);
               setTimeout(async () => {
                 let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-                FileManager.refreshFiles(updatePrinter, "");
+                await FileManager.refreshFiles(updatePrinter, "");
               }, 5000);
             }, 5000);
           }, 5500);

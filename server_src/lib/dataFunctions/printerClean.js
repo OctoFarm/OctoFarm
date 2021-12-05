@@ -1471,6 +1471,43 @@ class PrinterClean {
     }
     return filePathsArray;
   }
+  static returnUnifiedListOfOctoPrintFiles(ids) {
+    const uniqueFilesListFromAllPrinters = [];
+    // Create unique list of files
+    ids.forEach((id) => {
+      const currentPrinter = this.getPrintersInformationById(id);
+      const fileList = currentPrinter?.fileList?.fileList;
+      if (fileList) {
+        for (let p = 0; p < fileList.length; p++) {
+          const index = _.findIndex(uniqueFilesListFromAllPrinters, function (o) {
+            return o.name == fileList[p].name;
+          });
+          if (index === -1) {
+            uniqueFilesListFromAllPrinters.push(fileList[p]);
+          }
+        }
+      }
+    });
+    const filesThatExistOnAllPrinters = [];
+    // Check if that file exists on all of the printers...
+    for (let f = 0; f < uniqueFilesListFromAllPrinters.length; f++) {
+      const fileToCheck = uniqueFilesListFromAllPrinters[f];
+      const fileChecks = [];
+      for (let p = 0; p < ids.length; p++) {
+        const currentPrinter = this.getPrintersInformationById(ids[p]);
+        const fileList = currentPrinter?.fileList?.fileList;
+        fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
+      }
+      if (
+        fileChecks.every(function (e) {
+          return e === true;
+        })
+      ) {
+        filesThatExistOnAllPrinters.push(fileToCheck);
+      }
+    }
+    return filesThatExistOnAllPrinters;
+  }
 }
 
 module.exports = {

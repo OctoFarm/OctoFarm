@@ -1,5 +1,7 @@
 import { ClientErrors } from "./exceptions/octofarm-client.exceptions";
+
 const octoFarmErrorModalElement = "#octofarmErrorModal";
+let dealingWithError = false;
 
 function returnErrorMessage(options) {
   let statusCode = `(${options?.statusCode})`;
@@ -53,6 +55,9 @@ function handleEvent() {
 }
 
 window.onunhandledrejection = function (event) {
-  handleEvent(event.reason);
+  if (!dealingWithError) {
+    handleEvent(event.reason);
+    dealingWithError = true;
+  }
   event.preventDefault();
 };

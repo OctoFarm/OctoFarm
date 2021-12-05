@@ -267,6 +267,9 @@ export function drawListView(printer, clientSettings) {
           <td class="py-auto">
           <p id="currentFile-${printer._id}" title="Loading..." class="mb-1 tag">
             <i class="fas fa-file-code"></i> No File Selected </p>
+            <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
+                <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
           </td>
           <td class="p-1">
           <span id="printTimeElapsed-${printer._id}">Loading...</span>
@@ -338,6 +341,9 @@ export function drawPanelView(printer, clientSettings) {
           </small>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
+          <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
+            <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
+          </div>
             <div class="d-none index">${printer.sortIndex}</div>
             <button
                     id="currentFile-${printer._id}"
@@ -552,7 +558,10 @@ export function drawCameraView(printer, clientSettings) {
               id="currentFile-${printer._id}"
             >
               <i class="fas fa-file-code"></i> Loading... 
-            </small><br>
+            </small>
+            <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
+                <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
           </div>
           
           <div class="camExtra">
@@ -800,6 +809,9 @@ export function drawCombinedView(printer, clientSettings) {
                         >
                             <i class="fas fa-file-code" ></i> No File Selected
                         </button>
+                        <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
+                            <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
                         <div class="row">
                         <div class="col-sm-12 col-md-6 col-lg-6 text-center">
                           <button
@@ -946,7 +958,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                      <div class="progress">
                         <div class="d-none percent">Loading...</div>
                         <div
-                          id="progress-${groupColumns}"
+                          id="progress-${cleanGroup}"
                           class="progress-bar progress-bar-striped percent"
                           role="progressbar"
                           style="width: 0%"
@@ -961,6 +973,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                 </div>
            
                 <div class="row">
+        
                     <div class="col-12 text-center">   
                       <button
                             title="Start your currently selected print"
@@ -1012,7 +1025,18 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                         >
                           <i class="fas fa-square"></i> Cancel
                         </button>
+                        <button
+                            title="Unified File Selection"
+                            id="unifiedFiles-${cleanGroup}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm float-right"
+                            role="button"
+                            data-toggle="modal" data-target="#unifiedFileListModal"
+                          >
+                            <i class="fas fa-file-code"></i> Files
+                          </button>
                     </div>
+
                 </div>
                 <div class="row" id="Group-${cleanGroup}">
       
@@ -1064,6 +1088,9 @@ export function drawGroupViewPrinters(printer, clientSettings) {
           <div id="panel-${printer._id}" class="card text-white bg-dark">
             <div class="card-header dashHeader">
                 <span id="name-${printer._id}" class="badge badge-secondary float-left ml-1 py-1">${printer.printerName}</span><br>
+                <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
+                    <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
                 <span id="state-${printer._id}" class="w-100 badge ${printer.printerState.colour.category} pl-0 text-wrap"> ${printer.printerState.state}</span>
             </div>
           </div>
