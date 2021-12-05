@@ -486,6 +486,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
     farmPrinters[this.index].hostDescription = "Host is Online";
     data = await JSON.parse(data);
+
     if (typeof data.connected !== "undefined") {
       farmPrinters[this.index].octoPrintVersion = data.connected.version;
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
@@ -496,8 +497,22 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         farmPrinters[this.index].webSocketDescription =
           "OctoPrint Version 1.4.1+ requires the use of an Application/User API key to connect, please update your instance with that";
       }
+      if (farmPrinters[this.index].userList.length > 1) {
+        farmPrinters[this.index].webSocket = "danger";
+        farmPrinters[this.index].webSocketDescription =
+          "Websocket Connected but in Tentative state until receiving data";
+        farmPrinters[this.index].state = "Offline";
+        farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        if (!farmPrinters[this.index]?.multiUserIssue) {
+          farmPrinters[this.index].multiUserIssue = true;
+        }
+      }
     }
     if (data.history) {
+      if (farmPrinters[this.index]?.multiUserIssue) {
+        farmPrinters[this.index].multiUserIssue = false;
+      }
+
       farmPrinters[this.index].webSocket = "warning";
       farmPrinters[this.index].webSocketDescription =
         "Websocket Connected but in Tentative state until receiving data";
@@ -1216,12 +1231,32 @@ class Runner {
             farmPrinters[i].markModified("currentUser");
             farmPrinters[i].updateOne();
           } else {
+            // Look for user named OctoFarm...
+            for (let u = 0; u < users.users.length; u++) {
+              const currentUser = users.users[u];
+              if (currentUser.admin) {
+                // if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
+                //   farmPrinters[i].currentUser = currentUser.name;
+                //   farmPrinters[i].userList.push(currentUser.name);
+                //   farmPrinters[i].markModified("currentUser");
+                //   farmPrinters[i].updateOne();
+                //   break;
+                // }
+                farmPrinters[i].currentUser = currentUser.name;
+                farmPrinters[i].userList.push(currentUser.name);
+                farmPrinters[i].markModified("currentUser");
+                farmPrinters[i].updateOne();
+              }
+            }
+
             users.users.forEach((user) => {
-              if (user.admin) {
+              console.log(user.name);
+              if (user.name === "octofarm" || user.name === "OctoFarm") {
                 farmPrinters[i].currentUser = user.name;
                 farmPrinters[i].userList.push(user.name);
                 farmPrinters[i].markModified("currentUser");
                 farmPrinters[i].updateOne();
+              } else {
               }
             });
           }

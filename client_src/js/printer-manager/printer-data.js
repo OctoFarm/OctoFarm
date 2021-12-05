@@ -155,6 +155,19 @@ function checkIfRestartRequired(printer) {
   }
 }
 
+function checkIfMultiUserIssueFlagged(printer) {
+  const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
+  if (printer?.multiUserIssue) {
+    if (multiUserIssueAlert.classList.contains("d-none")) {
+      multiUserIssueAlert.classList.remove("d-none");
+    }
+  } else {
+    if (!multiUserIssueAlert.classList.contains("d-none")) {
+      multiUserIssueAlert.classList.add("d-none");
+    }
+  }
+}
+
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
@@ -200,6 +213,8 @@ function updatePrinterRow(printer) {
     checkForApiErrors(printer);
 
     checkIfRestartRequired(printer);
+
+    checkIfMultiUserIssueFlagged(printer);
   }
 }
 

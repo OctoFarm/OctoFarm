@@ -70,12 +70,18 @@ export function returnPrinterTableRow(printer) {
                 <span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
                     ${printer.printerState.state}
                 </span><br>
-                <span title="A restart is required on your OctoPrint instance!"
-                 id="restartRequired-${printer._id}"
-                 class="tag badge badge-warning text-dark badge-pill d-none"
-                >
-                <i class="fas fa-power-off"></i> Restart Required!
-            </span>
+                    <span title="A restart is required on your OctoPrint instance!"
+                     id="restartRequired-${printer._id}"
+                     class="tag badge badge-warning text-dark badge-pill d-none"
+                    >
+                    <i class="fas fa-power-off"></i> Restart Required!
+                </span>
+                <span title="Multiple user issue detected! Please open settings and choose one..."
+                     id="multiUserIssue-${printer._id}"
+                     class="tag badge badge-warning text-dark badge-pill d-none"
+                    >
+                    <i class="fas fa-power-off"></i> Multi-User Issue!
+                </span>
             </small>
         </td>
         <td class="align-middle">

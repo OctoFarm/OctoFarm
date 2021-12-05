@@ -367,6 +367,10 @@ class PrinterClean {
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
+      if (farmPrinter?.multiUserIssue) {
+        sortedPrinter.multiUserIssue = farmPrinter.multiUserIssue;
+      }
+
       if (farmPrinter?.restartRequired) {
         sortedPrinter.restartRequired = farmPrinter.restartRequired;
       }

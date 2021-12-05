@@ -7,8 +7,6 @@ let tickerMessageBoxStatus = document.getElementById("printerManagementConnectio
  */
 export function checkIfLoaderExistsAndRemove(noLogs = false) {
   const loader = document.getElementById("printerTickerLoader");
-  console.log("LOADER", loader);
-  console.log("NO LOGS", noLogs);
   if (loader) {
     if (noLogs) {
       tickerMessageBox.innerText = "No logs received ❌";

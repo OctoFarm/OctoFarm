@@ -43,8 +43,8 @@ All notable changes to this project will be documented in this file.
     - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
     - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
     - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
-
-
+  - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it will automatically choose this user to use.   
+  
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
   - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
@@ -108,6 +108,7 @@ All notable changes to this project will be documented in this file.
   - Completely reworked the history UI. 
   - Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API. 
   - OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the printer has been scanned online once!
+  - If OctoFarm detects OctoPrint a multiple user setup then it will warn you rather than just producing a stale connection with no indication to what's happening. 
 
 ### Removed
 
