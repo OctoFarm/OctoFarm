@@ -30,7 +30,7 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
-$("#currentStatistics").on("show.bs.modal", function (e) {});
+// $("#currentStatistics").on("show.bs.modal", function (e) {});
 
 class History {
   static historyList;
@@ -1016,18 +1016,10 @@ class History {
       }
       return false;
     }
-    if (e.target.classList.value.includes("historyEdit")) {
-      document.getElementById("historySave").insertAdjacentHTML(
-        "afterbegin",
-        `
-      <button id="historyUpdateCostBtn" type="button" class="btn btn-warning" data-dismiss="modal">
-        Update Cost
-      </button>
-      <button id="historySaveBtn" type="button" class="btn btn-success" data-dismiss="modal">
-        Save Changes
-      </button>
-    `
-      );
+
+    if (e.target.classList.contains("historyEdit")) {
+      document.getElementById("saveHistoryBtns").innerHTML =
+        ' <button id="historyUpdateCostBtn" type="button" class="btn btn-warning" data-dismiss="modal">\n        Update Cost\n      </button>\n      <button id="historySaveBtn" type="button" class="btn btn-success" data-dismiss="modal">\n        Save Changes\n      </button>';
       document.getElementById("historySaveBtn").addEventListener("click", (f) => {
         History.save(e.target.id);
       });
@@ -1306,8 +1298,9 @@ class History {
   }
 
   static async updateCost(id) {
+    const split = id.split("-");
     const update = {
-      id
+      id: split[1]
     };
     let post = await OctoFarmClient.post("history/updateCostMatch", update);
     if (post) {
@@ -1317,20 +1310,12 @@ class History {
         3000,
         "clicked"
       );
-      document.getElementById(`printerCost-${id}`).innerHTML = Calc.returnPrintCost(
-        post.costSettings,
-        post.printTime
-      );
     } else {
       UI.createAlert(
         "warning",
         "Printer no longer exists in database, default cost applied.",
         3000,
         "clicked"
-      );
-      document.getElementById(`printerCost-${id}`).innerHTML = Calc.returnPrintCost(
-        post.costSettings,
-        post.printTime
       );
     }
   }
@@ -1341,9 +1326,9 @@ class History {
     filamentDrops.forEach((drop) => {
       filamentID.push(drop.value);
     });
-
+    const split = id.split("-");
     const update = {
-      id,
+      id: split[1],
       note: document.getElementById("notes").value,
       filamentId: filamentID
     };
@@ -1352,8 +1337,6 @@ class History {
 
     if (post) {
       UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
-      document.getElementById(`note-${id}`).innerHTML = update.note;
-      document.getElementById(`spool-${id}`).innerHTML = update.filamentId;
     }
   }
 
