@@ -224,7 +224,7 @@ router.post(
     res.redirect("/system");
   }
 );
-router.get("/server/get", ensureAuthenticated, ensureAdministrator, (req, res) => {
+router.get("/server/get", ensureAuthenticated, (req, res) => {
   ServerSettingsDB.find({}).then((checked) => {
     res.send(checked[0]);
   });
