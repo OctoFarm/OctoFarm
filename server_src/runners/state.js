@@ -1120,12 +1120,42 @@ class Runner {
       farmPrinters = await Printers.find({}, null, {
         sort: { sortIndex: 1 }
       });
-      const printers = await Runner.returnFarmPrinters();
-      const promises = [];
-      for (let i = 0; i < printers.length; i++) {
-        promises.push(Runner.setup(i));
+      for (let i = 0; i < farmPrinters.length; i++) {
+        const batchOfTenPromises = [];
+        if (i % 10 === 0) {
+          if (farmPrinters[i]) {
+            batchOfTenPromises.push(Runner.setup(i));
+          }
+          if (farmPrinters[i + 1]) {
+            batchOfTenPromises.push(Runner.setup(i + 1));
+          }
+          if (farmPrinters[i + 2]) {
+            batchOfTenPromises.push(Runner.setup(i + 2));
+          }
+          if (farmPrinters[i + 3]) {
+            batchOfTenPromises.push(Runner.setup(i + 3));
+          }
+          if (farmPrinters[i + 4]) {
+            batchOfTenPromises.push(Runner.setup(i + 4));
+          }
+          if (farmPrinters[i + 5]) {
+            batchOfTenPromises.push(Runner.setup(i + 5));
+          }
+          if (farmPrinters[i + 6]) {
+            batchOfTenPromises.push(Runner.setup(i + 6));
+          }
+          if (farmPrinters[i + 7]) {
+            batchOfTenPromises.push(Runner.setup(i + 7));
+          }
+          if (farmPrinters[i + 8]) {
+            batchOfTenPromises.push(Runner.setup(i + 8));
+          }
+          if (farmPrinters[i + 9]) {
+            batchOfTenPromises.push(Runner.setup(i + 9));
+          }
+        }
+        await Promise.allSettled(batchOfTenPromises);
       }
-      await Promise.all(promises);
     } catch (err) {
       const error = {
         err: err.message,
