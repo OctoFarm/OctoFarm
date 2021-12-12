@@ -208,6 +208,7 @@ function updateGroupFileListeners(printers) {
 function drawGroupFiles(fileList, currentGroupEncoded, printers) {
   try {
     const fileElem = document.getElementById("printFilesList");
+    fileElem.innerHTML = "";
     if (fileElem) {
       // Filter out files out of current folder scope
       const currentFileList = fileList;
@@ -1090,7 +1091,7 @@ async function updateGroupState(printers, clientSettings, view) {
         }, 0);
 
         const actualProgress = combinedProgress / groupedPrinters[key].length;
-        UI.doesElementNeedUpdating(actualProgress + "%", elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating(actualProgress.toFixed(0) + "%", elements.progress, "innerHTML");
         elements.progress.style.width = actualProgress + "%";
 
         if (actualProgress < 100) {

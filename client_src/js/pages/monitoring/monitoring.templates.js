@@ -327,18 +327,27 @@ export function drawPanelView(printer, clientSettings) {
         <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
-           <button
+          <div class="row">
+            <div class="col-6 text-truncate">
+              <button
                 id="name-${printer._id}"
                 type="button"
-                class="btn btn-secondary mb-0 btn-sm float-left"
+                class="btn btn-secondary mb-0 btn-sm float-left w-75"
                 role="button"
+                
                 disabled
               >
                 ${name}
               </button>
-          <small class="float-right" id="printerActionBtns-${printer._id}">
+            </div>
+            <div class="col-6">
+                <small class="float-right" id="printerActionBtns-${printer._id}">
 
-          </small>
+                </small>
+            </div>
+          </div>
+
+
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
           <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
@@ -355,7 +364,7 @@ export function drawPanelView(printer, clientSettings) {
             >
                 <i class="fas fa-file-code" ></i> No File Selected
             </button>
-            <div id="cameraContain-${printer._id}" class="noBlue">
+            <div id="cameraContain-${printer._id}" class="noBlue text-center">
                 ${cameraElement}
             </div>
             <div class="progress">
@@ -742,10 +751,12 @@ export function drawCombinedView(printer, clientSettings) {
         <div class="d-none index">${printer.sortIndex}</div>
         <div class="col-12">
             <div class="row">
-                
+             
                 <div class="${columns.cameraColumn}">
-                   <div id="cameraContain-${printer._id}" class="noBlue">
+                   <div id="cameraContain-${printer._id}" class="noBlue text-center">
+                      <div style="width:90%;" class=" m-auto">
                         ${cameraElement}
+                      </div>
                     </div>
                 </div>
                 <div class="${columns.mainColumn}">
@@ -1060,22 +1071,22 @@ export function drawGroupViewPrinters(printer, clientSettings) {
       let panelColumns = 12;
       switch (groupColumns) {
         case 12:
-          panelColumns = 2;
+          panelColumns = 1;
           break;
         case 6:
-          panelColumns = 4;
+          panelColumns = 2;
           break;
         case 4:
-          panelColumns = 6;
+          panelColumns = 3;
           break;
         case 3:
-          panelColumns = 6;
+          panelColumns = 4;
           break;
         case 5:
           panelColumns = 2;
           break;
         case 2:
-          panelColumns = 12;
+          panelColumns = 6;
           break;
         default:
           panelColumns = 6;
@@ -1086,7 +1097,7 @@ export function drawGroupViewPrinters(printer, clientSettings) {
           `
         <div class="col-sm-12 col-md-6 col-lg-${panelColumns}">
           <div id="panel-${printer._id}" class="card text-white bg-dark">
-            <div class="card-header dashHeader">
+            <div class="card-header dashHeader text-truncate">
                 <span id="name-${printer._id}" class="badge badge-secondary float-left ml-1 py-1">${printer.printerName}</span><br>
                 <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                     <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>

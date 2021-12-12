@@ -26,10 +26,9 @@ function setupEventSource(url) {
   } else {
     url = evtURL;
   }
-
   evtSource = new EventSource(url);
   evtSource.onmessage = async function (e) {
-    if (e.data != null) {
+    if (!!e.data) {
       const res = await asyncParse(e.data);
       postMessage(res);
     }
@@ -40,11 +39,13 @@ function setupEventSource(url) {
     reconnectFrequencySeconds = 1;
   };
   evtSource.onerror = async function (e) {
+    console.error("Issue with SSE connection... ");
     postMessage(false);
     evtSource.close();
     reconnectFunc();
   };
   evtSource.onclose = async function () {
+    console.error("Closed SSE connection... ");
     postMessage(false);
     evtSource.close();
     reconnectFunc();

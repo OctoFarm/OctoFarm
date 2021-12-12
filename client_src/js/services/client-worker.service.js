@@ -4,7 +4,6 @@ let worker = null;
 let savedWorkerEventFunction = null;
 let currentFileURL = null;
 const workerResource = "/assets/dist/sse.client.min.js";
-let ignoreFirstMessage = true;
 
 function webWorkerFunction(url, workerEventFunction) {
   worker = new Worker(workerResource);
@@ -18,15 +17,16 @@ function webWorkerFunction(url, workerEventFunction) {
 
 function handleVisibilityChange() {
   if (document.visibilityState === "hidden") {
-    if (worker !== null && !ignoreFirstMessage) {
+    if (worker !== null) {
       console.log("Screen Abandonded, closing web worker...");
       worker.terminate();
       worker = null;
-      ignoreFirstMessage = false;
     }
   } else {
     if (worker === null) {
       console.log("Screen resumed... opening web worker...");
+      console.log("HELLO");
+      console.log(currentFileURL);
       webWorkerFunction(currentFileURL, savedWorkerEventFunction);
     }
   }

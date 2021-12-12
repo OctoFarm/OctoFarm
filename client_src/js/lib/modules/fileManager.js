@@ -777,7 +777,6 @@ export default class FileManager {
       multiNewFolderNew.value = "";
       multiFolderInput.innerHTML = "";
       const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
-      console.log(uniqueFolderList);
       uniqueFolderList.forEach((path) => {
         multiFolderInput.insertAdjacentHTML(
           "beforeend",

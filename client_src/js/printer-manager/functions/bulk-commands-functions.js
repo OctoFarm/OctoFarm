@@ -41,6 +41,8 @@ import Queue from "../../lib/modules/clientQueue.js";
 import OctoPrintClient from "../../lib/octoprint";
 const fileUploads = new Queue();
 
+let selectedFolder = "";
+
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
   try {
@@ -186,7 +188,7 @@ export async function bulkConnectPrinters() {
   updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
-function setupSingleFileMode(printers, files = "No File", selectedFolder = "") {
+function setupSingleFileMode(printers, file = "No File", selectedFolder = "") {
   printers.forEach((printer) => {
     document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
       <small><i class="fas fa-file-code"></i> ${selectedFolder}/${file.name}</small>
@@ -283,7 +285,7 @@ function fileUpload(file) {
 
 export async function bulkPrintFileSetup() {
   document.getElementById("bpActionButtonElement").innerHTML =
-    "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
+    '<button id="bpActionButton" type="button" class="btn btn-success" disabled>Start Prints!</button>';
   document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
           <input type="file" accept=".gcode,.gco" class="custom-file-input" id="bpFileUpload" multiple>
           <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
@@ -296,7 +298,6 @@ export async function bulkPrintFileSetup() {
 
   const multiFolderInput = document.getElementById("multiNewFolder");
   const multiNewFolderNew = document.getElementById("multiNewFolderNew");
-  let selectedFolder;
   let uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
   uniqueFolderList.forEach((folder) => {
     multiFolderInput.insertAdjacentHTML(
@@ -324,8 +325,9 @@ export async function bulkPrintFileSetup() {
          <div class="card-header px-1 py-1">
            <small><i class="fas fa-print"></i> ${printer.printerName}</small> 
           </div>
-          <div class="card-body px-1 py-1" id="printerFileChoice-${printer._id}">
-            <small><i class="fas fa-spinner fa-pulse"></i> Awaiting file selection...</small>
+          <div class="card-body px-1 py-1" >
+          <div id="printerFolderChoice-${printer._id}"><small><i class="fas fa-spinner fa-pulse"></i> Awaiting folder selection...</small></div>
+            <div id="printerFileChoice-${printer._id}"><small><i class="fas fa-spinner fa-pulse"></i> Awaiting file selection...</small></div>
          </div>
         </div>
     `
@@ -351,7 +353,7 @@ export async function bulkPrintFileSetup() {
       if (selectedFiles.length === 1) {
         const doesFileExist = await OctoPrintClient.checkFile(
           currentPrinter,
-          selectedFiles[0].name
+          selectedFolder + selectedFiles[0].name
         );
         if (doesFileExist === 200) {
           const opt = {
@@ -360,8 +362,8 @@ export async function bulkPrintFileSetup() {
           };
           await OctoPrintClient.updateFeedAndFlow(currentPrinter);
           await OctoPrintClient.updateFilamentOffsets(currentPrinter);
-          console.log(selectedFolder);
-          const url = "files/local/" + selectedFiles[0].name.replaceAll(" ", "_");
+          console.log("RUN UPLOAD FOLDER", selectedFolder);
+          const url = "files/local/" + selectedFolder + selectedFiles[0].name.replaceAll(" ", "_");
           const file = await OctoPrintClient.post(currentPrinter, url, opt);
           if (file.status === 204) {
             updateTableRow(
@@ -382,7 +384,7 @@ export async function bulkPrintFileSetup() {
           newObject.file = selectedFiles[0];
           newObject.index = currentPrinter._id;
           newObject.printerInfo = currentPrinter;
-          newObject.currentFolder = "local/";
+          newObject.currentFolder = "local/" + selectedFolder;
           newObject.print = true;
           updateTableRow(
             currentPrinter._id,
@@ -472,16 +474,19 @@ export async function bulkPrintFileSetup() {
   }
 
   function setup() {
-    if (selectedFiles.length === 1) {
-      // Setup single file mode
-      bpActionButton.disabled = false;
-      setupSingleFileMode(printersToControl, selectedFiles[0], selectedFolder);
-    } else if (selectedFiles.length > 1) {
-      // Setup multiple file mode
-      bpActionButton.disabled = false;
-      setupMultiFileMode(printersToControl, selectedFiles, selectedFolder);
-    } else if (selectedFiles.length === 0) {
-      bpActionButton.disabled = true;
+    if (selectedFiles) {
+      updateSelectedFolder();
+      if (selectedFiles.length === 1) {
+        // Setup single file mode
+        bpActionButton.disabled = false;
+        setupSingleFileMode(printersToControl, selectedFiles[0], selectedFolder);
+      } else if (selectedFiles.length > 1) {
+        // Setup multiple file mode
+        bpActionButton.disabled = false;
+        setupMultiFileMode(printersToControl, selectedFiles, selectedFolder);
+      } else if (selectedFiles.length === 0) {
+        bpActionButton.disabled = true;
+      }
     }
   }
 
@@ -499,34 +504,53 @@ export async function bulkPrintFileSetup() {
     for (let i = 0; i < printersToControl.length; i++) {
       const currentPrinter = printersToControl[i];
 
+      if (selectedFolder[0] === "/") {
+        selectedFolder = selectedFolder.replace("/", "");
+      }
       const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
 
       if (doesFolderExist === 200) {
-        document.getElementById("printerFileChoice-" + currentPrinter._id).innerHTML =
-          "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
+        document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
+          '<i class="fas fa-folder-plus text-success"></i> Folder exists!';
         printersToControl[i].folderExists = true;
       } else {
-        document.getElementById("printerFileChoice-" + currentPrinter._id).innerHTML =
-          "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
+        document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
+          '<i class="fas fa-folder-minus text-warning"></i> Folder will be created!';
         printersToControl[i].folderExists = false;
       }
     }
   }
 
   async function updateSelectedFolder() {
-    console.log(multiFolderInput.value + "/" + multiNewFolderNew.value);
-    selectedFolder = multiFolderInput.value + "/" + multiNewFolderNew.value;
+    if (multiFolderInput.value !== "") {
+      selectedFolder = multiFolderInput.value;
+    }
+    if (multiNewFolderNew.value !== "") {
+      selectedFolder = multiNewFolderNew.value;
+    }
+    if (multiFolderInput.value !== "" && multiNewFolderNew.value !== "") {
+      selectedFolder = multiFolderInput.value + "/" + multiNewFolderNew.value;
+    }
 
     const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
     // validate the path
     if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
-      multiFolderInput.classList.add("is-invalid");
-      multiNewFolderNew.classList.add("is-invalid");
+      if (multiFolderInput.value !== "") {
+        multiFolderInput.classList.add("is-invalid");
+      }
+      if (multiNewFolderNew.value !== "") {
+        multiNewFolderNew.classList.add("is-invalid");
+      }
     } else {
-      multiNewFolderNew.classList.remove("is-invalid");
-      multiNewFolderNew.classList.add("is-valid");
-      multiFolderInput.classList.remove("is-invalid");
-      multiFolderInput.classList.add("is-valid");
+      if (multiFolderInput.value !== "") {
+        multiFolderInput.classList.remove("is-invalid");
+        multiFolderInput.classList.add("is-valid");
+      }
+      if (multiNewFolderNew.value !== "") {
+        multiNewFolderNew.classList.remove("is-invalid");
+        multiNewFolderNew.classList.add("is-valid");
+      }
+
       await checkIfPathExistsOnOctoPrint();
     }
   }
