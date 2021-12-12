@@ -1035,7 +1035,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
   }
 };
 WebSocketClient.prototype.onerror = function (e) {
-  console.log("FAILED");
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -1062,7 +1061,6 @@ WebSocketClient.prototype.onerror = function (e) {
   }
 };
 WebSocketClient.prototype.onclose = function (e) {
-  console.log("FAILED");
   if (typeof farmPrinters[this.index] !== "undefined") {
     PrinterTicker.addIssue(
       new Date(),
@@ -1280,7 +1278,6 @@ class Runner {
             }
 
             users.users.forEach((user) => {
-              console.log(user.name);
               if (user.name === "octofarm" || user.name === "OctoFarm") {
                 farmPrinters[i].currentUser = user.name;
                 farmPrinters[i].userList.push(user.name);
@@ -3759,6 +3756,7 @@ class Runner {
           }
         }) > -1
     );
+
     farmPrintersAssigned.forEach((printer) => {
       printer.selectedFilament[tool] = null;
     });

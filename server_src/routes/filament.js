@@ -102,11 +102,11 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   const serverSettings = await SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
-  logger.info("Request to change:", req.body.printerId + "selected filament");
+  logger.info("Request to change:", req.body.printerIds + "selected filament");
   if (filamentManager && req.body.spoolId != 0) {
     const printerList = Runner.returnFarmPrinters();
     const i = _.findIndex(printerList, function (o) {
-      return o._id == req.body.printerId;
+      return o._id == req.body.printerIds[0];
     });
     const printer = printerList[i];
     const spool = await Spool.findById(req.body.spoolId);
@@ -124,7 +124,11 @@ router.post("/assign", ensureAuthenticated, async (req, res) => {
       body: JSON.stringify({ selection })
     });
   }
-  const printerList = await Runner.assignSpool(req.body.printerId, req.body.spoolId, req.body.tool);
+  const printerList = await Runner.assignSpool(
+    req.body.printerIds,
+    req.body.spoolId,
+    req.body.tool
+  );
   FilamentClean.start(filamentManager);
   res.send({ status: 200 });
 });
@@ -314,7 +318,6 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       },
       body: JSON.stringify({ spool })
     });
-    console.log(updateFilamentManager);
   }
   if (spools.spools.name != newContent[0]) {
     spools.spools.name = newContent[0];
@@ -393,7 +396,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     });
     updateFilamentManager = await updateFilamentManager.json();
     const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
-    console.log(reSync);
+
     res.send({
       res: "success",
       dataProfile: reSync.newProfiles,
@@ -629,7 +632,6 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
         spools.status
     });
     // Again early bail out, cannot continue without spools/profiles
-    console.log("RES SEND");
     return res.send({ errors, warnings });
   }
 
