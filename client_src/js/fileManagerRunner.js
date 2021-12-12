@@ -32,8 +32,6 @@ class Manager {
     });
 
     onlinePrinterList.forEach((printer, index) => {
-      console.log(printer.storage);
-
       let storageWarning = "";
       if (printer?.storage) {
         const percentRemain = (printer.storage.free * 100) / printer.storage.total;

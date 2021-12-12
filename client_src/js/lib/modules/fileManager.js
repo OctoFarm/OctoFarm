@@ -768,8 +768,8 @@ export default class FileManager {
     await PrinterSelect.create(document.getElementById("multiPrinterSection"));
 
     async function chooseOrCreateFolder() {
-      const multiFolderInput = document.getElementById("multiNewFolder");
-      const multiNewFolderNew = document.getElementById("multiNewFolderNew");
+      const multiFolderInput = document.getElementById("multi-UploadFolderSelect");
+      const multiNewFolderNew = document.getElementById("multi-UploadNewFolderNew");
       multiNewFolderNew.classList.remove("is-invalid");
       multiNewFolderNew.classList.remove("is-valid");
       multiFolderInput.classList.remove("is-invalid");
@@ -777,7 +777,7 @@ export default class FileManager {
       multiNewFolderNew.value = "";
       multiFolderInput.innerHTML = "";
       const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
-
+      console.log(uniqueFolderList);
       uniqueFolderList.forEach((path) => {
         multiFolderInput.insertAdjacentHTML(
           "beforeend",
@@ -1148,7 +1148,7 @@ export class FileActions {
     if (loadFile) {
       OctoPrintClient.jobAction(printer, opts);
     } else {
-      UI.createAlert("error", "Could not select file", 3000, "clicked");
+      UI.createAlert("error", "Could not start file", 3000, "clicked");
     }
   }
 
