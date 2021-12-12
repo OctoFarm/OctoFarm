@@ -15,13 +15,6 @@ createClientSSEWorker(monitoringWorkerURL, async function (data) {
       data.currentOperations.count,
       data.printersInformation
     );
-  } else {
-    UI.createAlert(
-      "warning",
-      "Communication with the server has been suddenly lost, trying to re-establish connection...",
-      10000,
-      "Clicked"
-    );
   }
 });
 
@@ -127,7 +120,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
               current.index
             }">
                 <div id="currentOpCard-${current.index}"
-                class="card card-block text-white bg-secondary d-inline-block"
+                class="card card-block text-white bg-secondary d-inline-block  text-truncate"
                  style="width:100%;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">

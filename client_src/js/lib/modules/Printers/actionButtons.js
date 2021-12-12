@@ -15,7 +15,7 @@ function returnActionBtnTemplate(id) {
             <i class="fas fa-toggle-off"></i>
       </button>
       <button  
-         title="Re-Sync your printers connection"
+         title="Re-establish the OctoFarm -> OctoPrint Connection"
          id="printerSyncButton-${id}"
          type="button"
          class="tag btn btn-success btn-sm"
@@ -441,9 +441,9 @@ function checkGroupQuickConnectState(printers) {
         }
         const noConnectionOptions = groupedPrinters[key].filter(
           (obj) =>
-            obj.connectionOptions.portPreference === null ||
-            obj.connectionOptions.baudratePreference === null ||
-            obj.connectionOptions.printerProfilePreference === null
+            obj?.connectionOptions?.portPreference === null ||
+            obj?.connectionOptions?.baudratePreference === null ||
+            obj?.connectionOptions?.printerProfilePreference === null
         ).length;
         if (noConnectionOptions > 0) {
           document.getElementById("printerQuickConnect-" + currentGroupEncoded).disabled = true;

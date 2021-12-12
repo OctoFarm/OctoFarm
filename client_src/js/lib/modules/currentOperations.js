@@ -169,7 +169,7 @@ export default function currentOperations(currentOperations, currentOperationsCo
         "beforeend",
         `
                 <div id="currentOpCard-${current.index}"
-                class="card card-block text-white bg-secondary d-inline-block"
+                class="card card-block text-white bg-secondary d-inline-block  text-truncate"
                 style="min-width: 200px; max-width: 200px;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">

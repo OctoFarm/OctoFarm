@@ -1,10 +1,6 @@
 const Logger = require("../handlers/logger.js");
 const { JobValidationException } = require("../exceptions/job.exceptions");
-const {
-  ToadScheduler,
-  SimpleIntervalJob,
-  AsyncTask
-} = require("toad-scheduler");
+const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
 
 const logger = new Logger("OctoFarm-TaskManager");
 
@@ -14,7 +10,6 @@ const logger = new Logger("OctoFarm-TaskManager");
  */
 class TaskManager {
   static jobScheduler = new ToadScheduler();
-  static bootUpTasks = [];
   static taskStates = {};
 
   static validateInput(taskId, workload, schedulerOptions) {
@@ -79,11 +74,7 @@ class TaskManager {
    * Create a recurring job
    * Tip: use the options properties `runImmediately` and `seconds/milliseconds/minutes/hours/days`
    */
-  static registerJobOrTask({
-    id: taskID,
-    task: asyncTaskCallback,
-    preset: schedulerOptions
-  }) {
+  static registerJobOrTask({ id: taskID, task: asyncTaskCallback, preset: schedulerOptions }) {
     try {
       this.validateInput(taskID, asyncTaskCallback, schedulerOptions);
     } catch (e) {
@@ -93,18 +84,17 @@ class TaskManager {
     const timedTask = this.getSafeTimedTask(taskID, asyncTaskCallback);
 
     this.taskStates[taskID] = {
-      options: schedulerOptions
+      options: schedulerOptions,
+      task: timedTask
     };
 
     if (schedulerOptions.runOnce) {
       timedTask.execute();
     } else if (schedulerOptions.runDelayed) {
-      const delay =
-        (schedulerOptions.milliseconds || 0) +
-        (schedulerOptions.seconds || 0) * 1000;
+      const delay = (schedulerOptions.milliseconds || 0) + (schedulerOptions.seconds || 0) * 1000;
       this.runTimeoutTaskInstance(taskID, timedTask, delay);
     } else {
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask, taskID);
       this.jobScheduler.addSimpleIntervalJob(job);
     }
   }
@@ -118,7 +108,6 @@ class TaskManager {
     const asyncHandler = async () => {
       await this.timeTask(taskId, handler);
     };
-
     return new AsyncTask(taskId, asyncHandler, this.getErrorHandler(taskId));
   }
 
@@ -129,18 +118,21 @@ class TaskManager {
     await handler();
     taskState.duration = Date.now() - taskState.started;
 
-    if (
-      taskState.options?.logFirstCompletion !== false &&
-      !taskState?.firstCompletion
-    ) {
-      logger.info(
-        `Task '${taskId}' first completion. Duration ${taskState.duration}ms`
-      );
+    if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
+      logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
     }
+    if (taskState.options?.periodic) {
+      taskState.nextRun = new Date(Date.now() + taskState.options.milliseconds).getTime();
+    }
+    // Always log when the task was last executed
+    taskState.lastExecuted = Date.now();
   }
 
   static getTaskState(taskId) {
+    if (!taskId) {
+      return this.taskStates;
+    }
     return this.taskStates[taskId];
   }
 
@@ -163,6 +155,14 @@ class TaskManager {
    */
   static stopSchedulerTasks() {
     this.jobScheduler.stop();
+  }
+
+  /**
+   * Runs the tasks which were registered
+   */
+  static forceRunTask(taskId) {
+    if (!taskId) return;
+    this.taskStates[taskId].task.execute();
   }
 }
 

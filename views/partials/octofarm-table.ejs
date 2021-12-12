@@ -12,6 +12,12 @@
         </tr>
         </thead>
         <tbody id="<%= table.contentId %>" style="height:100%; overflow-y:auto;">
+            <% if (typeof bodyFile !== "undefined") { %>
+                <%# More complex card-body content %>
+                <%- include(bodyFile) %>
+            <% } else { %>
+
+            <% } %>
         </tbody>
     </table>
 </div>

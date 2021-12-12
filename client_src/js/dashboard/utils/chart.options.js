@@ -2,7 +2,7 @@ import { toFixedFormatter } from "./chart.utils";
 
 export const actualToolSeriesName = "Actual Tool";
 export const defaultTheme = "dark";
-export const defaultLoadingText = "Loading...";
+export const defaultLoadingText = "No Data to Display!";
 export const darkColor = "#303030";
 export const xAxisConnectionCategories = ["Active", "Complete", "Idle", "Disconnected", "Offline"];
 export const utilisationConnectionLabels = ["Active", "Idle", "Offline"];
@@ -36,6 +36,18 @@ export function succesCountSeries(show = true) {
   return {
     title: {
       text: "Count"
+    },
+    seriesName: "Success",
+    labels: {
+      formatter: toFixedFormatter
+    },
+    show
+  };
+}
+export function successRateSeries(show = true) {
+  return {
+    title: {
+      text: "Success Rate"
     },
     seriesName: "Success",
     labels: {

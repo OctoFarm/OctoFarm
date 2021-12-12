@@ -1,140 +1,134 @@
-import UI from "./lib/functions/ui";
-import Noty from "noty";
-
-let interval = false;
-let timer = false;
-const notificationMarkReadSessionKey = "octofarm-updatemsg-read";
-let pageReloadPersistedRead = false;
+import { asyncParse, debounce } from "./utils/sse.utils";
 
 const drawModal = async function () {
   $("#lostServerConnection").modal("show");
 };
-
-const reloadWindow = async function () {
-  if (location.href.includes("submitEnvironment")) {
-    const hostName = window.location.protocol + "//" + window.location.host + "";
-    window.location.replace(hostName);
-    return false;
-  } else {
-    window.location.reload();
-    return false;
-  }
+const closeModal = async function () {
+  $("#lostServerConnection").modal("hide");
 };
+//
+// const reloadWindow = async function () {
+//   if (location.href.includes("submitEnvironment")) {
+//     const hostName = window.location.protocol + "//" + window.location.host + "";
+//     window.location.replace(hostName);
+//     return false;
+//   } else {
+//     window.location.reload();
+//     return false;
+//   }
+// };
 
-function checkUpdateAndNotify(updateResponse) {
-  if (!!updateResponse?.update_available && !pageReloadPersistedRead) {
-    // Show the notification once per page load
-    pageReloadPersistedRead = true;
-    // Disregard notification if it it's version is already stored
-    let parsedStorageReleaseInfo;
-    try {
-      parsedStorageReleaseInfo = JSON.parse(localStorage.getItem(notificationMarkReadSessionKey));
-    } catch (e) {
-      parsedStorageReleaseInfo = null;
-    }
-    // If the update button is available, we are on the system page. React to available updates accordingly.
-    let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
-    if (updateOctoFarmBtn) {
-      updateOctoFarmBtn.disabled = false;
-    }
-    // Process the full notification or a shorter reminder
-    if (
-      !parsedStorageReleaseInfo ||
-      parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name
-    ) {
-      if (window.location?.href.includes("/system")) {
-        return;
-      }
+// function checkUpdateAndNotify(updateResponse) {
+//   if (!!updateResponse?.update_available && !pageReloadPersistedRead) {
+//     // Show the notification once per page load
+//     pageReloadPersistedRead = true;
+//     // Disregard notification if it it's version is already stored
+//     let parsedStorageReleaseInfo;
+//     try {
+//       parsedStorageReleaseInfo = JSON.parse(localStorage.getItem(notificationMarkReadSessionKey));
+//     } catch (e) {
+//       parsedStorageReleaseInfo = null;
+//     }
+//     // If the update button is available, we are on the system page. React to available updates accordingly.
+//     let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
+//     if (updateOctoFarmBtn) {
+//       updateOctoFarmBtn.disabled = false;
+//     }
+//     // Process the full notification or a shorter reminder
+//     if (
+//       !parsedStorageReleaseInfo ||
+//       parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name
+//     ) {
+//       if (window.location?.href.includes("/system")) {
+//         return;
+//       }
+//
+//       var n = new noty({
+//         type: "success",
+//         theme: "bootstrap-v4",
+//         layout: "bottomRight",
+//         text: updateResponse?.message,
+//         buttons: [
+//           noty.button(
+//             "UPDATE",
+//             "btn btn-success",
+//             function () {
+//               window.location = "/system";
+//             },
+//             { id: "button1", "data-status": "ok" }
+//           ),
+//           noty.button("Mark read", "btn btn-error", function () {
+//             // Update the stored version to become the newest
+//             localStorage.setItem(
+//               notificationMarkReadSessionKey,
+//               JSON.stringify(updateResponse.latestReleaseKnown)
+//             );
+//             n.close();
+//           }),
+//           noty.button("Later", "btn btn-error", function () {
+//             n.close();
+//           })
+//         ]
+//       });
+//       n.show();
+//     } else {
+//       UI.createAlert(
+//         "success",
+//         `A small reminder: OctoFarm update available from ${updateResponse.current_version} to ${updateResponse?.latestReleaseKnown?.tag_name} ;)`,
+//         1000,
+//         "clicked"
+//       );
+//     }
+//   }
+// }
+// reconnectFrequencySeconds doubles every retry
+let reconnectFrequencySeconds = 1;
+let evtSource;
 
-      var n = new noty({
-        type: "success",
-        theme: "bootstrap-v4",
-        layout: "bottomRight",
-        text: updateResponse?.message,
-        buttons: [
-          noty.button(
-            "UPDATE",
-            "btn btn-success",
-            function () {
-              window.location = "/system";
-            },
-            { id: "button1", "data-status": "ok" }
-          ),
-          noty.button("Mark read", "btn btn-error", function () {
-            // Update the stored version to become the newest
-            localStorage.setItem(
-              notificationMarkReadSessionKey,
-              JSON.stringify(updateResponse.latestReleaseKnown)
-            );
-            n.close();
-          }),
-          noty.button("Later", "btn btn-error", function () {
-            n.close();
-          })
-        ]
-      });
-      n.show();
-    } else {
-      UI.createAlert(
-        "success",
-        `A small reminder: OctoFarm update available from ${updateResponse.current_version} to ${updateResponse?.latestReleaseKnown?.tag_name} ;)`,
-        1000,
-        "clicked"
-      );
+const reconnectFunc = debounce(
+  function () {
+    setupEventSource();
+    // Double every attempt to avoid overwhelming server
+    reconnectFrequencySeconds *= 2;
+    // Max out at ~1 minute as a compromise between user experience and server load
+    if (reconnectFrequencySeconds >= 64) {
+      reconnectFrequencySeconds = 64;
     }
+  },
+  function () {
+    return reconnectFrequencySeconds * 1000;
   }
+);
+
+function setupEventSource() {
+  evtSource = new EventSource("/amialive");
+  evtSource.onmessage = async function (e) {
+    if (e.data != null) {
+      await asyncParse(e.data);
+      const lostServerConnectionModal = document.getElementById("lostServerConnection");
+      if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
+        await closeModal();
+      }
+    }
+  };
+  evtSource.onopen = function (e) {
+    console.debug("Connected to servers Am I Alive stream...");
+    // Reset reconnect frequency upon successful connection
+    reconnectFrequencySeconds = 1;
+  };
+  evtSource.onerror = async function (e) {
+    console.debug("Server connection lost! Re-connecting in... " + reconnectFrequencySeconds + "s");
+    console.debug(e);
+    await drawModal();
+    evtSource.close();
+    reconnectFunc();
+  };
+  evtSource.onclose = async function (e) {
+    console.debug("Server connection closed! Re-establishing..." + reconnectFrequencySeconds + "s");
+    console.debug(e);
+    await drawModal();
+    evtSource.close();
+    reconnectFunc();
+  };
 }
-
-const amialiveService = async function () {
-  if (!interval) {
-    interval = setInterval(async () => {
-      const modal = document.getElementById("lostServerConnection");
-      try {
-        let alive = await fetch("/serverChecks/amialive");
-        if (alive.status !== 200) throw "No Server Connection";
-        alive = await alive.json();
-
-        if (alive?.update && !alive.isDockerContainer) {
-          try {
-            checkUpdateAndNotify(alive.update);
-          } catch (e) {
-            console.warn("Could not successfully parse OctoFarm update notification");
-          }
-        }
-
-        if (modal.classList.contains("show")) {
-          //Connection recovered, re-load printer page
-          const spinner = document.getElementById("lostConnectionSpinner");
-          const text = document.getElementById("lostConnectionText");
-          spinner.className = "fas fa-spinner";
-          if (!timer) {
-            let countDown = 5;
-            timer = true;
-            setInterval(async () => {
-              text.innerHTML =
-                "Connection Restored! <br> Reloading the page automatically in " +
-                countDown +
-                " seconds...";
-              text.innerHTML = `Connection Restored! <br> Automatically reloading the page in ${countDown} seconds... <br><br>
-                                    <button id="reloadBtn" type="button" class="btn btn-success">Reload Now!</button>
-                                `;
-              document.getElementById("reloadBtn").addEventListener("click", reloadWindow());
-              countDown = countDown - 1;
-            }, 1000);
-            setTimeout(async () => {
-              reloadWindow();
-            }, 2500);
-          }
-        }
-      } catch (e) {
-        drawModal();
-        console.error(e);
-        clearInterval(interval);
-        interval = false;
-        amialiveService();
-      }
-    }, 5000);
-  }
-};
-
-amialiveService();
+setupEventSource();

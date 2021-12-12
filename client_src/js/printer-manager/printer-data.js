@@ -36,7 +36,7 @@ function updatePrinterInfoAndState(printer) {
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 
-  printerGroup.innerHTML = printer.groups.map((g) => g.name).join() || printer.group;
+  printerGroup.innerHTML = printer.group;
 
   UI.doesElementNeedUpdating(
     `tag badge badge-${printer.printerState.colour.name} badge-pill`,
@@ -155,6 +155,19 @@ function checkIfRestartRequired(printer) {
   }
 }
 
+function checkIfMultiUserIssueFlagged(printer) {
+  const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
+  if (printer?.multiUserIssue) {
+    if (multiUserIssueAlert.classList.contains("d-none")) {
+      multiUserIssueAlert.classList.remove("d-none");
+    }
+  } else {
+    if (!multiUserIssueAlert.classList.contains("d-none")) {
+      multiUserIssueAlert.classList.add("d-none");
+    }
+  }
+}
+
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
@@ -200,6 +213,8 @@ function updatePrinterRow(printer) {
     checkForApiErrors(printer);
 
     checkIfRestartRequired(printer);
+
+    checkIfMultiUserIssueFlagged(printer);
   }
 }
 

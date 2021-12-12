@@ -1,7 +1,8 @@
 import {
   dragAndDropEnable,
   dragCheck,
-  dragAndDropGroupEnable
+  dragAndDropGroupEnable,
+  dragAndDropEnableMultiplePrinters
 } from "../../lib/functions/dragAndDrop.js";
 import PrinterManager from "../../lib/modules/printerManager.js";
 import PrinterFileManager from "../../lib/modules/printerFileManager.js";
@@ -30,6 +31,7 @@ import {
 } from "./monitoring.templates";
 import PrinterTerminalManager from "../../lib/modules/printerTerminalManager";
 import { groupBy, mapValues } from "lodash";
+import { FileActions } from "../../lib/modules/fileManager";
 
 let elems = [];
 let groupElems = [];
@@ -172,6 +174,176 @@ function addListeners(printer) {
 
   return "done";
 }
+function updateGroupFileListeners(printers) {
+  const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
+  fileActionBtns.forEach((btn) => {
+    // Gate Keeper listener for file action buttons
+    const button = btn;
+    btn.addEventListener("click", async function (e) {
+      printers.forEach((printer) => {
+        const data = button.id.split("*");
+        const action = data[1];
+        const filePath = data[2];
+        if (action === "fileActionStart") {
+          FileActions.startPrint(printer, filePath, true);
+          UI.createAlert(
+            "success",
+            filePath + " has started to print on all printers!",
+            3000,
+            "clicked"
+          );
+        } else if (action === "fileActionSelect") {
+          FileActions.selectFile(printer, filePath, true);
+          UI.createAlert(
+            "success",
+            filePath + " has been selected on all printers!",
+            3000,
+            "clicked"
+          );
+        }
+      });
+    });
+  });
+}
+function drawGroupFiles(fileList, currentGroupEncoded, printers) {
+  try {
+    const fileElem = document.getElementById("printFilesList");
+    fileElem.innerHTML = "";
+    if (fileElem) {
+      // Filter out files out of current folder scope
+      const currentFileList = fileList;
+      // Show empty or filled list
+      if (currentFileList.length > 0) {
+        currentFileList.forEach((file) => {
+          let toolInfo = "";
+          file.toolUnits.forEach((unit, index) => {
+            toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+          });
+          let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+          if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
+            thumbnail = `<center><img src='${printers[0].printerURL}/${file.thumbnail}' width="100%"></center>`;
+          }
+          let fileDate = new Date(file.uploadDate * 1000);
+          const dateString = fileDate.toDateString();
+          const timeString = fileDate.toTimeString().substring(0, 8);
+          let bgColour = "bg-secondary";
+          if (file.last === true) {
+            bgColour = "bg-dark-success";
+          } else if (file.last === false) {
+            bgColour = "bg-dark-failed";
+          }
+          fileDate = `${dateString} ${timeString}`;
+          const f = ` <div
+            id="file-${file.fullPath}"
+            href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}"
+            style="display: block;
+            padding: 0.7rem 0.1rem;"
+            >
+            <div class="row">
+                <div
+                            id="fileThumbnail-${file.fullPath}"
+          class="col-lg-2"
+            style="display:flex; justify-content:center; align-items:center;"
+                >
+                ${thumbnail}
+                </div>
+                <div class="col-lg-10">
+                <div class="row">
+                <div class="col-12">
+                <h5 class="mb-1 name">${file.fullPath}</h5>              
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-12">
+                <p class="mb-1 float-right">
+                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${
+                  file.fullPath
+                }"><i class="fas fa-thumbs-up"></i> ${
+            file.success
+          } / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
+                <i class="fas fa-stopwatch"></i> 
+                <span class="time" id="fileTime-${file.fullPath}">
+                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
+                <i class="fas fa-dollar-sign"></i> 
+                <span title="Expected Printer Cost" class="cost" id="fileCost-${
+                  file.fullPath
+                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
+            <span title="Expected Filament Cost"> </span>
+
+                </p>
+                <p class="mb-1 float-left">
+                <i class="fas fa-clock"></i><span id="fileDateClean-${
+                  file.fullPath
+                }" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${
+            file.fullPath
+          }"> ${fileDate}</span><br>
+                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
+                  file.fullPath
+                }"> ${Calc.bytes(file.fileSize)}</span> <br>
+            <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
+              file.fullPath
+            }"> ${toolInfo} </span>
+
+                </p> 
+                </div>
+                </div>
+                </div>
+                <div class="col-lg-12">
+                <div
+          class="d-flex btn-group flex-wrap btn-group-sm"
+            role="group"
+            aria-label="Basic example"
+                >
+                <button           title="Start printing file"
+            id="${currentGroupEncoded._id}*fileActionStart*${
+            file.fullPath
+          }" type="button" class="btn btn-success">
+          <i class="fas fa-play"></i> Start
+              </button>
+              <button  title="Select file" id="${currentGroupEncoded._id}*fileActionSelect*${
+            file.fullPath
+          }" type="button" class="btn btn-info">
+        <i class="fas fa-file-upload"></i> Select
+            </button>
+      </div>
+      </div>
+      </div>
+      </div>
+      </div>`;
+          fileElem.insertAdjacentHTML("beforeend", f);
+        });
+      } else {
+        fileElem.insertAdjacentHTML(
+          "beforeend",
+          `
+            <div
+            id="noFilesToBeShown"
+            href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+            style="display: block;
+            padding: 0.7rem 0.1rem;"
+            >
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="row">
+                <div class="col-12">
+                <h5 class="mb-1 name">No files available...</h5>         
+                </div>
+                </div>
+      </div>
+      </div>
+      </div>
+            
+            `
+        );
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+  updateGroupFileListeners(printers);
+}
 
 function addGroupListeners(printers) {
   const groupedPrinters = mapValues(groupBy(printers, "group"));
@@ -266,6 +438,20 @@ function addGroupListeners(printers) {
           }
         });
       }
+      let filesBtn = document.getElementById("unifiedFiles-" + currentGroupEncoded);
+      if (filesBtn) {
+        filesBtn.addEventListener("click", async (e) => {
+          const idList = [];
+          for (let p = 0; p < groupedPrinters[key].length; p++) {
+            const printer = groupedPrinters[key][p];
+            idList.push(printer._id);
+          }
+          const fileList = await OctoFarmClient.get(
+            "printers/listUnifiedFiles/" + JSON.stringify(idList)
+          );
+          drawGroupFiles(fileList, currentGroupEncoded, groupedPrinters[key]);
+        });
+      }
     }
   }
 
@@ -314,7 +500,9 @@ function grabGroupElements(group) {
       pause: document.getElementById("pause-" + group),
       restart: document.getElementById("restart-" + group),
       resume: document.getElementById("resume-" + group),
-      state: document.getElementById("state-" + group)
+      state: document.getElementById("state-" + group),
+      progress: document.getElementById("progress-" + group),
+      unifiedFiles: document.getElementById("unifiedFiles-" + group)
     };
     return groupElems[group];
   }
@@ -895,8 +1083,30 @@ async function updateGroupState(printers, clientSettings, view) {
           (obj) => obj.printerState.state === "Pausing"
         ).length;
         const filesSelected = groupedPrinters[key].filter(
-          (obj) => obj.currentJob.fileName !== "No File Selected"
+          (obj) => obj?.currentJob?.fileName !== "No File Selected"
         ).length;
+
+        let combinedProgress = groupedPrinters[key].reduce(function (a, b) {
+          return a + b?.["currentJob"]?.["progress"];
+        }, 0);
+
+        const actualProgress = combinedProgress / groupedPrinters[key].length;
+        UI.doesElementNeedUpdating(actualProgress.toFixed(0) + "%", elements.progress, "innerHTML");
+        elements.progress.style.width = actualProgress + "%";
+
+        if (actualProgress < 100) {
+          UI.doesElementNeedUpdating(
+            "progress-bar progress-bar-striped bg-warning",
+            elements.progress,
+            "classList"
+          );
+        } else if (actualProgress === 100) {
+          UI.doesElementNeedUpdating(
+            "progress-bar progress-bar-striped bg-success",
+            elements.progress,
+            "classList"
+          );
+        }
 
         if (activePrinters === groupedPrinters[key].length) {
           //Set the buttons

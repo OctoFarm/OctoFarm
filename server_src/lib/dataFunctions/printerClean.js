@@ -174,10 +174,8 @@ class PrinterClean {
 
     currentHistory.forEach((h) => {
       // Parse the date from history....
-      let dateSplit = h.endDate.split(" ");
-      let month = ALL_MONTHS.indexOf(dateSplit[1]);
-      let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
-      let dateParse = new Date(dateString);
+
+      let dateParse = new Date(h.endDate);
       if (h.printer === printerStatistics.printerName) {
         //Collate totals
         printerStatistics.filamentUsedWeightTotal.push(h.totalWeight);
@@ -347,7 +345,6 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription
         },
         group: farmPrinter.group,
-        groups: [], // TODO unfinished feature
         printerURL: farmPrinter.printerURL,
         webSocketURL: farmPrinter.webSocketURL,
         cameraURL: farmPrinter.camURL,
@@ -369,6 +366,10 @@ class PrinterClean {
         order: farmPrinter.sortIndex,
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
+
+      if (farmPrinter?.multiUserIssue) {
+        sortedPrinter.multiUserIssue = farmPrinter.multiUserIssue;
+      }
 
       if (farmPrinter?.restartRequired) {
         sortedPrinter.restartRequired = farmPrinter.restartRequired;
@@ -1469,6 +1470,43 @@ class PrinterClean {
       }
     }
     return filePathsArray;
+  }
+  static returnUnifiedListOfOctoPrintFiles(ids) {
+    const uniqueFilesListFromAllPrinters = [];
+    // Create unique list of files
+    ids.forEach((id) => {
+      const currentPrinter = this.getPrintersInformationById(id);
+      const fileList = currentPrinter?.fileList?.fileList;
+      if (fileList) {
+        for (let p = 0; p < fileList.length; p++) {
+          const index = _.findIndex(uniqueFilesListFromAllPrinters, function (o) {
+            return o.name == fileList[p].name;
+          });
+          if (index === -1) {
+            uniqueFilesListFromAllPrinters.push(fileList[p]);
+          }
+        }
+      }
+    });
+    const filesThatExistOnAllPrinters = [];
+    // Check if that file exists on all of the printers...
+    for (let f = 0; f < uniqueFilesListFromAllPrinters.length; f++) {
+      const fileToCheck = uniqueFilesListFromAllPrinters[f];
+      const fileChecks = [];
+      for (let p = 0; p < ids.length; p++) {
+        const currentPrinter = this.getPrintersInformationById(ids[p]);
+        const fileList = currentPrinter?.fileList?.fileList;
+        fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
+      }
+      if (
+        fileChecks.every(function (e) {
+          return e === true;
+        })
+      ) {
+        filesThatExistOnAllPrinters.push(fileToCheck);
+      }
+    }
+    return filesThatExistOnAllPrinters;
   }
 }
 

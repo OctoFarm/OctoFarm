@@ -13,7 +13,7 @@ const { checkNested, checkNestedIndex } = require("./array.util");
  * @returns {string|*|number}
  */
 function calcSpoolWeightAsString(length, filament, completionRatio) {
-  // TODO ... this is not a weight being returned at all?
+  // TODO ... this is not a weight being returned at all? maths... yes it fucking is
   if (!length) {
     return length === 0 ? 0 : length;
   }

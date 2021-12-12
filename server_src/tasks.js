@@ -1,19 +1,17 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
-const { initHistoryCache } = require("./cache/history.cache");
+const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const serverSettings = require("./settings/serverSettings");
 
 const PRINTER_CLEAN_TASK = async () => {
-  const serverSettings = require("./settings/serverSettings");
+  const serverSettings = SettingsClean.returnSystemSettings();
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
-
   await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
@@ -27,9 +25,8 @@ const HISTORY_CACHE_TASK = async () => {
   });
 };
 
-// // TODO this runs without knowing about filament manager -_-
 const FILAMENT_CLEAN_TASK = async () => {
-  const serverSettings = require("./settings/serverSettings");
+  const serverSettings = SettingsClean.returnSystemSettings();
   await FilamentClean.start(serverSettings.filamentManager);
 };
 
@@ -41,6 +38,10 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
 
 const SYSTEM_INFO_CHECK_TASK = async () => {
   await SystemRunner.querySystemInfo();
+};
+
+const GENERATE_MONTHLY_HISTORY_STATS = async () => {
+  await getHistoryCache().generateMonthlyStats();
 };
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
@@ -161,8 +162,8 @@ const STATE_PRINTER_GENERATE_TASK = async () => {
 };
 
 const DATABASE_MIGRATIONS_TASK = async () => {
-  // const migrations = require("./migrations");
-  // console.log(migrations);
+  const migrations = require("./migrations");
+  console.log(migrations);
 };
 
 const INITITIALISE_PRINTERS = async () => {
@@ -170,7 +171,6 @@ const INITITIALISE_PRINTERS = async () => {
 };
 
 /**
- * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
  * @param preset
  * @param milliseconds optional parameter to quickly set milliseconds timing
@@ -179,6 +179,7 @@ const INITITIALISE_PRINTERS = async () => {
 // TODO, this is not a decent function name...
 function KsatLlorKcir(task, preset, milliseconds = 0) {
   preset.milliseconds = preset.milliseconds || milliseconds;
+
   return {
     id: task.name,
     task,
@@ -186,18 +187,17 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
   };
 }
 
-const HOUR_MS = 3600 * 1000;
-
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
+    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
   ];
 }
 

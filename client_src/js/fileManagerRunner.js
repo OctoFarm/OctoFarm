@@ -4,6 +4,7 @@ import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
 import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
+import gcodeScript from "./services/gcode-scripts.service";
 
 let lastId = null;
 
@@ -32,6 +33,23 @@ class Manager {
     });
 
     onlinePrinterList.forEach((printer, index) => {
+      let storageWarning = "";
+      if (printer?.storage) {
+        const percentRemain = (printer.storage.free * 100) / printer.storage.total;
+        if (percentRemain > 90) {
+          storageWarning = `<button type="button" class="btn btn-outline-danger text-left disabled btn-sm"
+                                   style="pointer-events: none" disabled>${percentRemain.toFixed(
+                                     0
+                                   )}% Space Left</button>`;
+        }
+        if (percentRemain > 80) {
+          storageWarning = `<button type="button" class="btn btn-outline-warning text-left disabled btn-sm"
+                                   style="pointer-events: none" disabled>${percentRemain.toFixed(
+                                     0
+                                   )}% Space Left</button>`;
+        }
+      }
+
       let extruderList = "";
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
@@ -71,6 +89,7 @@ class Manager {
               </div>
               <div class="col-lg-10">
                 <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0px; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
+                ${storageWarning}
                 <div
                   class="float-right btn-group flex-wrap btn-group-sm"
                   role="group"

@@ -15,6 +15,7 @@ const { AppConstants } = require("../app.constants");
 const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
+const ConnectionMonitorService = require("../services/connection-monitor.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -64,6 +65,14 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   const serverSettings = SettingsClean.returnSystemSettings();
+
+  const returnArray = [];
+  for (let i = 0; i < printers.length; i++) {
+    returnArray.push({
+      statistics: await PrinterClean.generatePrinterStatistics(printers[i]._id)
+    });
+  }
+
   res.render("printerManagement", {
     name: req.user.name,
     userGroup: req.user.group,
@@ -74,7 +83,9 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     helpers: prettyHelpers,
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
-    clientSettings: req.user.clientSettings
+    clientSettings: req.user.clientSettings,
+    printersList: returnArray,
+    printerConnectionStats: ConnectionMonitorService.returnConnectionLogs()
   });
 });
 // File Manager Page
@@ -101,21 +112,24 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
 // History Page
 router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = Runner.returnFarmPrinters();
-  const historyCache = getHistoryCache();
-  const history = historyCache.historyClean;
-  const statistics = historyCache.statisticsClean;
+
   const serverSettings = SettingsClean.returnSystemSettings();
+
+  const historyCache = getHistoryCache();
+  const { historyClean, statisticsClean, pagination } = historyCache;
 
   res.render("history", {
     name: req.user.name,
     userGroup: req.user.group,
     version,
     printerCount: printers.length,
-    history,
-    printStatistics: statistics,
     helpers: prettyHelpers,
+    history: historyClean,
+    printStatistics: statisticsClean,
+    pagination: pagination,
     page: "History",
     serverSettings,
+    monthlyStatistics: historyCache.monthlyStatistics,
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     clientSettings: req.user.clientSettings
   });

@@ -25,6 +25,7 @@ export default class PrinterLogs {
         let octoPrintCount = document.getElementById("octoPrintCount");
         let splitText = await text.split(/(\r\n|\n|\r)/gm);
         splitText = splitText.reverse();
+        splitText = splitText.slice(0, 1000);
         for (let i = 0; i < splitText.length; i++) {
           let colour = null;
           if (splitText[i].includes("INFO")) {
@@ -312,7 +313,6 @@ export default class PrinterLogs {
         printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
       }
     }
-
     if (stats.historyByDay.length === 0) {
       noHistoryMessage = `<div class='row'>
                     <div class="col-12"><h5>Sorry but your printer currently has no history captured. Please run some prints to generate information here.</h5></div>
@@ -421,7 +421,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (g)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedLengthTotal
+                    stats.filamentUsedWeightTotal
                   )}</p>
                 </div>
               </div>
@@ -432,7 +432,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (m)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedWeightTotal
+                    stats.filamentUsedLengthTotal
                   )}</p>
                 </div>
               </div>

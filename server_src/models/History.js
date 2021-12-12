@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const HistorySchema = new mongoose.Schema({
   printHistory: {
@@ -6,6 +7,8 @@ const HistorySchema = new mongoose.Schema({
     required: true
   }
 });
+
+HistorySchema.plugin(mongoosePaginate);
 
 const History = mongoose.model("History", HistorySchema);
 

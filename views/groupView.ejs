@@ -1,7 +1,7 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
-    <%- include('./partials/actionsBar.ejs') %>
     <% if(clientSettings.views.currentOperations){ %> <%-
     include('./partials/currentOperations.ejs') %> <% } %>
+    <%- include('./partials/actionsBar.ejs') %>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <div id="printerArea" class="row">
         </div>
@@ -13,16 +13,16 @@
 <% } %>
 
 <!-- Modal -->
-<div class="modal fade" id="quickActionsModal" tabindex="-1" role="dialog" aria-labelledby="quickActionsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="unifiedFileListModal" tabindex="-1" role="dialog" aria-labelledby="unifiedFileListModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="overflow-y: initial !important;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="quickActionsModalLabel">Quick Actions</h5>
+                <h5 class="modal-title" id="unifiedFileListModalLabel">Unified File List</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="height: 80vh; overflow-y: auto;">
                 <div id="printFilesList"></div>
             </div>
             <div class="modal-footer">

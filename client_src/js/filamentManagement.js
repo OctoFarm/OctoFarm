@@ -428,7 +428,7 @@ async function addSpool(
                   <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
                   <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
                    <td>
-                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" ${multiple}>
+                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" disabled="true" ${multiple} disabled>
 
                        </select>
                    </td>
@@ -526,9 +526,8 @@ async function cloneSpool(e) {
   });
 
   clonedSpools.push(clonedIndex);
-  await updatePrinterDrops();
-  await updateProfileDrop();
   document.getElementById(`spoolsProfile-${clonedIndex}`).value = selects[0].value;
+  await updateProfileDrop();
 }
 
 async function editSpool(e) {
@@ -539,6 +538,7 @@ async function editSpool(e) {
     edit.disabled = false;
     edit.value = edit.placeholder;
   });
+  document.getElementById(`spoolsPrinterAssignment-${id}`).disabled = false;
   document.getElementById(`spoolsProfile-${id}`).disabled = false;
   document.getElementById(`save-${id}`).classList.remove("d-none");
   document.getElementById(`edit-${id}`).classList.add("d-none");
@@ -592,10 +592,13 @@ async function saveSpool(e) {
   };
   let post = await OctoFarmClient.post("filament/edit/filament", data);
   if (post) {
+    document.getElementById(`spoolsPrinterAssignment-${id}`).disabled = true;
     document.getElementById(`spoolsProfile-${id}`).disabled = true;
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
   }
+
+  selectFilament(getSelectValues(document.getElementById(`spoolsPrinterAssignment-${id}`)), id);
   jplist.refresh();
 }
 
@@ -716,18 +719,7 @@ async function updatePrinterDrops() {
         drop.options[i].selected = true;
       }
     }
-    // Not needed until bring back selecting spool function server side
-    drop.addEventListener(
-      "change",
-      (e) => {
-        const meta = e.target.value.split("-");
-        const printerId = meta[0];
-        const tool = meta[1];
-        const spoolId = e.target.id.split("-");
-        selectFilament(getSelectValues(drop), spoolId[1], tool);
-      },
-      true
-    );
+    drop.disabled = true;
   });
   printerAssignments.forEach((text, index) => {
     text.innerHTML = "";
@@ -749,12 +741,24 @@ async function updatePrinterDrops() {
   });
 }
 
-async function selectFilament(printerId, spoolId, tool) {
-  await OctoFarmClient.post("/filament/assign", {
-    printerId,
-    spoolId,
-    tool
-  });
+async function selectFilament(spools, id) {
+  let printerIds = [];
+  for (let i = 0; i < spools.length; i++) {
+    const meta = spools[i].split("-");
+    const printerId = meta[0];
+    printerIds.push(printerId);
+  }
+
+  for (let i = 0; i < spools.length; i++) {
+    const meta = spools[i].split("-");
+    const tool = meta[1];
+    await OctoFarmClient.post("/filament/assign", {
+      printerIds: printerIds,
+      spoolId: id,
+      tool: tool
+    });
+  }
+
   await reRenderPageInformation();
   await updatePrinterDrops();
 }
@@ -764,41 +768,7 @@ async function init() {
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
 
-  let yAxisSeries = [];
-  usageOverTime.forEach((usage, index) => {
-    let obj = null;
-    if (index === 0) {
-      obj = {
-        title: {
-          text: "Weight"
-        },
-        seriesName: usageOverTime[0].name,
-        labels: {
-          formatter: function (val) {
-            if (!!val) {
-              return val.toFixed(0) + "g";
-            }
-          }
-        }
-      };
-    } else {
-      obj = {
-        show: false,
-        seriesName: usageOverTime[0].name,
-        labels: {
-          formatter: function (val) {
-            if (!!val) {
-              return val.toFixed(0) + "g";
-            }
-          }
-        }
-      };
-    }
-
-    yAxisSeries.push(obj);
-  });
-
-  dashboardOptions.filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
+  for (let i = 0; i < usageByDay.length; i++) {}
 
   if (typeof usageOverTime[0] !== "undefined") {
     let systemFarmTemp = new ApexCharts(

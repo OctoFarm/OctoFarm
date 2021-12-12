@@ -25,6 +25,8 @@ function handleVisibilityChange() {
   } else {
     if (worker === null) {
       console.log("Screen resumed... opening web worker...");
+      console.log("HELLO");
+      console.log(currentFileURL);
       webWorkerFunction(currentFileURL, savedWorkerEventFunction);
     }
   }

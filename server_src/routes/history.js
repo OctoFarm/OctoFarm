@@ -10,6 +10,7 @@ const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
+const { sortOptions } = require("../constants/history-sort.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
@@ -98,10 +99,95 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   });
   res.send("success");
 });
+
 router.get("/get", ensureAuthenticated, async (req, res) => {
+  const { page, limit, sort } = req.query;
+  let paginationOptions = {};
+
+  paginationOptions.page = page;
+
+  paginationOptions.limit = limit;
+
+  paginationOptions.sort = sortOptions[sort];
+
+  const {
+    firstDate,
+    lastDate,
+    fileFilter,
+    pathFilter,
+    spoolManuFilter,
+    spoolMatFilter,
+    fileSearch,
+    spoolSearch,
+    printerNameFilter,
+    printerGroupFilter,
+    printerSearch
+  } = req.query;
+
+  const findOptions = {
+    "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
+  };
+  if (fileFilter) {
+    findOptions["printHistory.fileName"] = fileFilter;
+  }
+
+  if (printerNameFilter) {
+    findOptions["printHistory.printerName"] = printerNameFilter;
+  }
+
+  if (printerGroupFilter) {
+    findOptions["printHistory.printerGroup"] = printerGroupFilter;
+  }
+
+  if (pathFilter) {
+    findOptions["printHistory.job.file.path"] = new RegExp(pathFilter, "g");
+  }
+  if (spoolManuFilter) {
+    findOptions["printHistory.filamentSelection.spools.profile.manufacturer"] = new RegExp(
+      spoolManuFilter.replace(/_/g, " "),
+      "g"
+    );
+  }
+  if (spoolMatFilter) {
+    findOptions["printHistory.filamentSelection.spools.profile.material"] = new RegExp(
+      spoolMatFilter.replace(/_/g, " "),
+      "g"
+    );
+  }
+
+  if (fileSearch) {
+    findOptions["printHistory.fileName"] = new RegExp(fileSearch.replace(/_/g, " "), "g");
+  }
+
+  if (printerSearch) {
+    findOptions["printHistory.printerName"] = new RegExp(printerSearch.replace(/_/g, " "), "g");
+  }
+
+  if (spoolSearch) {
+    findOptions["printHistory.filamentSelection.spools.name"] = new RegExp(
+      spoolSearch.replace(/_/g, " "),
+      "g"
+    );
+  }
+
   const historyCache = getHistoryCache();
-  res.send({ history: historyCache.historyClean });
+
+  const { historyClean, statisticsClean, pagination } = await historyCache.initCache(
+    findOptions,
+    paginationOptions
+  );
+
+  const historyFilterData = historyCache.generateHistoryFilterData(historyClean);
+
+  res.send({
+    history: historyClean,
+    statisticsClean,
+    pagination,
+    monthlyStatistics: historyCache.monthlyStatistics,
+    historyFilterData
+  });
 });
+
 router.get("/statisticsData", ensureAuthenticated, async (req, res) => {
   const historyCache = getHistoryCache();
   const stats = historyCache.generateStatistics();
@@ -115,7 +201,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   const historyEntity = await History.findOne({ _id: latest.id });
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
-    return o.settingsApperance.name == historyEntity.printHistory.printerName;
+    return o.settingsAppearance.name == historyEntity.printHistory.printerName;
   });
   if (printer > -1) {
     historyEntity.printHistory.costSettings = printers[printer].costSettings;
@@ -153,4 +239,5 @@ router.get("/statistics/:id", ensureAuthenticated, async function (req, res) {
   let stats = await PrinterClean.generatePrinterStatistics(printerID);
   res.send(stats);
 });
+
 module.exports = router;

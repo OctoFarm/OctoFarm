@@ -38,6 +38,14 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  octoPrintSystemInfo: {
+    type: Object,
+    require: false
+  },
+  octoPi: {
+    type: Object,
+    require: false
+  },
   // Non-essentials below
   powerSettings: {
     type: Object,

@@ -19,6 +19,7 @@ const fs = require("fs");
 const marked = require("marked");
 const { fetchUsers } = require("../services/user-service");
 const { returnPatreonData } = require("../services/patreon.service");
+const { TaskManager } = require("../runners/task.manager");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -64,16 +65,25 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       update: softwareUpdateNotification
     },
     patreonData: returnPatreonData(),
-    currentUsers
+    currentUsers,
+    taskManagerState: TaskManager.getTaskState()
   });
 });
 
 /**
  * Acquire system information from system info runner
  */
-router.get("/info", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.querySystemInfo();
+router.get("/info", ensureAuthenticated, (req, res) => {
+  TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
+  const systemInformation = SystemRunner.returnInfo();
+
   res.send(systemInformation);
+});
+
+router.get("/tasks", ensureAuthenticated, async (req, res) => {
+  const taskManagerState = TaskManager.getTaskState();
+
+  res.send(taskManagerState);
 });
 
 module.exports = router;

@@ -1,5 +1,8 @@
 const fetch = require("node-fetch");
 let patreonData = require("../patreon.constants");
+const Logger = require("../handlers/logger");
+
+const logger = new Logger("OctoFarm-Server");
 
 function returnPatreonData() {
   return patreonData;
@@ -12,8 +15,9 @@ async function grabLatestPatreonData() {
   if (latestPatreonData.status === 200) {
     const getJSON = latestPatreonData.json();
     patreonData = getJSON.patreons.applicationPledges;
+    logger.info("Successfully grabbed remote patreon data!");
   } else {
-    console.log("FAILED TO CHECK SERVER FOR PATREON DATA, FALLING BACK TO LOCAL");
+    logger.error("Falling back to local patreon data...");
   }
 }
 

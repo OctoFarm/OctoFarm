@@ -64,15 +64,21 @@
                     <i class="fas fa-wifi"></i> Scan
                 </button>
                 <button
-                        title="Re-Sync multiple Printers in your farm at once. This has no bearing on Active Prints!"
+                        title="Re-establish the OctoFarm -> OctoPrint connection"
                         id="searchOfflineBtn"
                         type="button"
                         class="btn btn-outline-info"
                         href="#"
                 >
-                    <i class="fas fa-redo fa-sm"></i> Re-Sync
+                    <i class="fas fa-redo fa-sm"></i> Re-Connect
                 </button>
                 <%- include('./octoPrintActionBtns.ejs') %>
+                <button type="button" class="btn btn-outline-info float-right mr-1" data-toggle="modal" data-target="#connectionsOverviewModal">
+                    <i class="fas fa-plug"></i> Connections Overview
+                </button>
+                <button type="button" class="btn btn-outline-success float-right mr-1" data-toggle="modal" data-target="#farmOverviewModal">
+                    <i class="fas fa-infinity"></i> Printer Overview
+                </button>
             </div>
         </div>
     </div>

@@ -18,7 +18,8 @@ import {
   updateOctoFarmCommand,
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
-  startUpdatePageRunner,
+  startUpdateTasksRunner,
+  startUpdateInfoRunner,
   renderSystemCharts,
   createNewUser,
   editUser,
@@ -69,7 +70,8 @@ if (serverActionsElements.LOG_DUMP_GENERATE) {
 }
 
 renderSystemCharts();
-startUpdatePageRunner();
+startUpdateTasksRunner();
+startUpdateInfoRunner();
 ClientSettings.init();
 
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {

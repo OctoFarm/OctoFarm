@@ -171,4 +171,100 @@ export default class UI {
       element.placeholder = element.value;
     });
   }
+
+  static generateTime(seconds) {
+    let string = "";
+    if (seconds === undefined || isNaN(seconds) || seconds === null) {
+      string = "No Time Estimate";
+    } else {
+      const days = Math.floor(seconds / (3600 * 24));
+
+      seconds -= days * 3600 * 24;
+      const hrs = Math.floor(seconds / 3600);
+
+      seconds -= hrs * 3600;
+      const mnts = Math.floor(seconds / 60);
+
+      seconds -= mnts * 60;
+      seconds = Math.floor(seconds);
+
+      string = `${days}d, ${hrs}h, ${mnts}m, ${seconds}s`;
+
+      if (mnts == 0) {
+        if (string.includes("0m")) {
+          string = string.replace(" 0m,", "");
+        }
+      }
+      if (hrs == 0) {
+        if (string.includes("0h")) {
+          string = string.replace(" 0h,", "");
+        }
+      }
+      if (days == 0) {
+        if (string.includes("0d")) {
+          string = string.replace("0d,", "");
+        }
+      }
+      if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
+        string = string.replace("0s", "Done");
+      }
+    }
+
+    return string;
+  }
+
+  static milisecondsToDays(miliseconds) {
+    if (!isNaN(miliseconds)) {
+      return Math.floor(miliseconds / (3600 * 24));
+    } else {
+      return 0;
+    }
+  }
+
+  static generateMilisecondsTime(miliseconds) {
+    let seconds = miliseconds / 1000;
+    let string = "";
+    if (seconds === undefined || isNaN(seconds) || seconds === null) {
+      string = "No Interval";
+    } else {
+      const days = Math.floor(seconds / (3600 * 24));
+
+      seconds -= days * 3600 * 24;
+      const hrs = Math.floor(seconds / 3600);
+
+      seconds -= hrs * 3600;
+      const mnts = Math.floor(seconds / 60);
+
+      seconds -= mnts * 60;
+      seconds = Math.floor(seconds);
+
+      string = `${days}d, ${hrs}h, ${mnts}m, ${seconds}s`;
+
+      if (mnts == 0) {
+        if (string.includes("0m")) {
+          string = string.replace(" 0m,", "");
+        }
+      }
+      if (hrs == 0) {
+        if (string.includes("0h")) {
+          string = string.replace(" 0h,", "");
+        }
+      }
+      if (days == 0) {
+        if (string.includes("0d")) {
+          string = string.replace("0d,", "");
+        }
+      }
+      if (seconds == 0) {
+        string = string.replace(", 0s", "");
+      }
+      if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
+        string = string.replace("0s", miliseconds + " ms");
+      }
+      if (!miliseconds) {
+        string = "No Interval";
+      }
+      return string;
+    }
+  }
 }

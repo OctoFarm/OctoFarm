@@ -1,6 +1,6 @@
 {
   "name": "@notexpectedyet/octofarm-client",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack",
@@ -58,6 +58,7 @@
     "jest": "^26.6.3",
     "jest-util": "^26.6.2",
     "jquery": "^3.5.1",
+    "litepicker": "^2.0.12",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^1.6.0",
     "noty": "^3.2.0-beta",

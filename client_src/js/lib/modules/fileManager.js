@@ -105,8 +105,28 @@ export default class FileManager {
       }
       progress.innerHTML = `${Math.floor(percentLoad)}%`;
       progress.style.width = `${percentLoad}%`;
-      if (percentLoad == 100) {
+      if (percentLoad === 100) {
         progress.classList = "progress-bar progress-bar-striped bg-success";
+      }
+    }
+
+    const viewProgressBarWrapper = document.getElementById("filesViewProgressWrapper-" + index);
+    if (viewProgressBarWrapper) {
+      if (viewProgressBarWrapper.classList.contains("d-none")) {
+        viewProgressBarWrapper.classList.remove("d-none");
+      }
+      const viewProgressBar = document.getElementById("filesViewProgressBar-" + index);
+      viewProgressBar.classList = "progress-bar progress-bar-striped bg-warning";
+      let percentLoad = (loaded / total) * 100;
+      if (isNaN(percentLoad)) {
+        percentLoad = 0;
+      }
+      viewProgressBar.innerHTML = `${Math.floor(percentLoad)}%`;
+      viewProgressBar.style.width = `${percentLoad}%`;
+      if (percentLoad === 100) {
+        if (!viewProgressBarWrapper.classList.contains("d-none")) {
+          viewProgressBarWrapper.classList.add("d-none");
+        }
       }
     }
   }
@@ -165,13 +185,13 @@ export default class FileManager {
           );
           setTimeout(async () => {
             let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-            FileManager.refreshFiles(updatePrinter, spinnerIcon);
+            await FileManager.refreshFiles(updatePrinter, spinnerIcon);
             setTimeout(async () => {
               let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-              FileManager.refreshFiles(updatePrinter, spinnerIcon);
+              await FileManager.refreshFiles(updatePrinter, spinnerIcon);
               setTimeout(async () => {
                 let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-                FileManager.refreshFiles(updatePrinter, "");
+                await FileManager.refreshFiles(updatePrinter, "");
               }, 5000);
             }, 5000);
           }, 5500);
@@ -254,7 +274,8 @@ export default class FileManager {
       setTimeout(flashReturn, 500);
     }
 
-    await this.updateFileList(printer._id);
+    printer.fileList = how;
+    FileSorting.loadSort(printer);
   }
 
   static async updateFileList(index) {
@@ -415,49 +436,51 @@ export default class FileManager {
   }
 
   static async refreshFiles(printer, spinnerIcon) {
-    for (let i = 0; i < printer.fileList.fileList.length; i++) {
-      const file = printer.fileList.fileList[i];
-      let currentFolder = document.getElementById("currentFolder")?.innerHTML;
-      if (!currentFolder) {
-        // Null-ref is tolerable
-        continue;
-      }
-      if (currentFolder.includes("local/")) {
-        currentFolder = currentFolder.replace("local/", "");
-      }
-      if (file.path === currentFolder) {
-        if (document.getElementById(`file-${file.fullPath}`)) {
-          let toolInfo = "";
-          if (file.toolUnits?.length) {
-            file.toolUnits.forEach((unit, index) => {
-              toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-            });
-          }
+    if (fileUploads.size() <= 1) {
+      for (let i = 0; i < printer.fileList.fileList.length; i++) {
+        const file = printer.fileList.fileList[i];
+        let currentFolder = document.getElementById("currentFolder")?.innerHTML;
+        if (!currentFolder) {
+          // Null-ref is tolerable
+          continue;
+        }
+        if (currentFolder.includes("local/")) {
+          currentFolder = currentFolder.replace("local/", "");
+        }
+        if (file.path === currentFolder) {
+          if (document.getElementById(`file-${file.fullPath}`)) {
+            let toolInfo = "";
+            if (file.toolUnits?.length) {
+              file.toolUnits.forEach((unit, index) => {
+                toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+              });
+            }
 
-          let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
-          if (!!file.thumbnail) {
-            thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
-          }
+            let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            if (!!file.thumbnail) {
+              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+            }
 
-          let fileDate = new Date(file.uploadDate * 1000);
-          const dateString = fileDate.toDateString();
-          const timeString = fileDate.toTimeString().substring(0, 8);
-          fileDate = `${dateString} ${timeString}`;
-          document.getElementById("fileHistoryRate-" + file.fullPath).innerHTML =
-            spinnerIcon +
-            '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
-          document.getElementById(`fileDate-${file.fullPath}`).innerHTML = ` ${fileDate}`;
-          document.getElementById(`fileSize-${file.fullPath}`).innerHTML = ` ${Calc.bytes(
-            file.fileSize
-          )}`;
-          document.getElementById(`fileTool-${file.fullPath}`).innerHTML = ` ${toolInfo}`;
-          document.getElementById(`fileTime-${file.fullPath}`).innerHTML = ` ${Calc.generateTime(
-            file.expectedPrintTime
-          )}`;
-          document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
-            " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
-          document.getElementById(`fileThumbnail-${file.fullPath}`).innerHTML = ` ${thumbnail}`;
-          document.getElementById(`fileDateClean-${file.fullPath}`).innerHTML = file.uploadDate;
+            let fileDate = new Date(file.uploadDate * 1000);
+            const dateString = fileDate.toDateString();
+            const timeString = fileDate.toTimeString().substring(0, 8);
+            fileDate = `${dateString} ${timeString}`;
+            document.getElementById("fileHistoryRate-" + file.fullPath).innerHTML =
+              spinnerIcon +
+              '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
+            document.getElementById(`fileDate-${file.fullPath}`).innerHTML = ` ${fileDate}`;
+            document.getElementById(`fileSize-${file.fullPath}`).innerHTML = ` ${Calc.bytes(
+              file.fileSize
+            )}`;
+            document.getElementById(`fileTool-${file.fullPath}`).innerHTML = ` ${toolInfo}`;
+            document.getElementById(`fileTime-${file.fullPath}`).innerHTML = ` ${Calc.generateTime(
+              file.expectedPrintTime
+            )}`;
+            document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
+              " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
+            document.getElementById(`fileThumbnail-${file.fullPath}`).innerHTML = ` ${thumbnail}`;
+            document.getElementById(`fileDateClean-${file.fullPath}`).innerHTML = file.uploadDate;
+          }
         }
       }
     }
@@ -745,8 +768,8 @@ export default class FileManager {
     await PrinterSelect.create(document.getElementById("multiPrinterSection"));
 
     async function chooseOrCreateFolder() {
-      const multiFolderInput = document.getElementById("multiNewFolder");
-      const multiNewFolderNew = document.getElementById("multiNewFolderNew");
+      const multiFolderInput = document.getElementById("multi-UploadFolderSelect");
+      const multiNewFolderNew = document.getElementById("multi-UploadNewFolderNew");
       multiNewFolderNew.classList.remove("is-invalid");
       multiNewFolderNew.classList.remove("is-valid");
       multiFolderInput.classList.remove("is-invalid");
@@ -754,7 +777,6 @@ export default class FileManager {
       multiNewFolderNew.value = "";
       multiFolderInput.innerHTML = "";
       const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
-
       uniqueFolderList.forEach((path) => {
         multiFolderInput.insertAdjacentHTML(
           "beforeend",
@@ -1125,7 +1147,7 @@ export class FileActions {
     if (loadFile) {
       OctoPrintClient.jobAction(printer, opts);
     } else {
-      UI.createAlert("error", "Could not select file", 3000, "clicked");
+      UI.createAlert("error", "Could not start file", 3000, "clicked");
     }
   }
 

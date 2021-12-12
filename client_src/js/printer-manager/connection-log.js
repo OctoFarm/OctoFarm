@@ -17,8 +17,10 @@ export function checkIfLoaderExistsAndRemove(noLogs = false) {
       loader.remove();
     }
   } else {
-    if (tickerMessageBox.classList.contains("d-flex")) {
-      tickerMessageBox.classList.remove("d-flex");
+    if (!noLogs) {
+      if (tickerMessageBox.classList.contains("d-flex")) {
+        tickerMessageBox.classList.remove("d-flex");
+      }
     }
   }
 }
