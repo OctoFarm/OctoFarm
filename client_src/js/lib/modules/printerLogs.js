@@ -421,7 +421,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (g)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedLengthTotal
+                    stats.filamentUsedWeightTotal
                   )}</p>
                 </div>
               </div>
@@ -432,7 +432,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (m)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedWeightTotal
+                    stats.filamentUsedLengthTotal
                   )}</p>
                 </div>
               </div>
