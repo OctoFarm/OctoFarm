@@ -589,7 +589,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     return res.send({ errors, warnings });
   }
 
-  const filamentManagerSettingsCheck = await checkFilamentManagerPluginSettings(onlinePrinterList);
+  const filamentManagerSettingsCheck = await n(onlinePrinterList);
   if (filamentManagerSettingsCheck.length > 0) {
     let message = "These instances don't have the plugin setup correctly... Cannot continue!";
     filamentManagerSettingsCheck.forEach((printer) => {
