@@ -15,6 +15,8 @@ const { ClientSettings } = require("./settings/clientSettings.js");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
 
+const logger = new Logger("OctoFarm-Server");
+
 function setupExpressServer() {
   let app = express();
 
@@ -118,9 +120,7 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
       startUpTasks.push(TaskManager.registerJobOrTask(task));
     }
     // TODO attempt to run in sequence
-    const bootTasks = await Promise.allSettled(startUpTasks);
-
-    console.log(bootTasks);
+    await Promise.all(startUpTasks);
 
     await optionalInfluxDatabaseSetup();
   }
@@ -129,8 +129,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
 
   return app;
 }
-
-const logger = new Logger("OctoFarm-Server");
 
 module.exports = {
   setupExpressServer,
