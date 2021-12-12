@@ -1082,11 +1082,11 @@ async function updateGroupState(printers, clientSettings, view) {
           (obj) => obj.printerState.state === "Pausing"
         ).length;
         const filesSelected = groupedPrinters[key].filter(
-          (obj) => obj.currentJob.fileName !== "No File Selected"
+          (obj) => obj?.currentJob?.fileName !== "No File Selected"
         ).length;
 
         let combinedProgress = groupedPrinters[key].reduce(function (a, b) {
-          return a + b["currentJob"]["progress"];
+          return a + b?.["currentJob"]?.["progress"];
         }, 0);
 
         const actualProgress = combinedProgress / groupedPrinters[key].length;
