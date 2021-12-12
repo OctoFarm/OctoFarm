@@ -106,7 +106,7 @@ function setupEventSource() {
     if (e.data != null) {
       await asyncParse(e.data);
       const lostServerConnectionModal = document.getElementById("lostServerConnection");
-      if (lostServerConnectionModal.className.includes("show")) {
+      if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
         await closeModal();
       }
     }
