@@ -92,7 +92,7 @@ router.get(
       await HistoryDB.deleteMany({});
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
-      await roomDataDB.deleteMany({});
+      await RoomDataDB.deleteMany({});
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});
@@ -101,19 +101,19 @@ router.get(
         message: "Successfully deleted databases, server will restart..."
       });
       logger.info("Database completely wiped.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     } else if (databaseName === "FilamentDB") {
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
       logger.info("Successfully deleted Filament database.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     } else {
       await eval(databaseName).deleteMany({});
       res.send({
         message: "Successfully deleted " + databaseName + ", server will restart..."
       });
       logger.info(databaseName + " successfully deleted.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     }
   }
 );

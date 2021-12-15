@@ -7,7 +7,7 @@ const serverDatabaseKeys = {
   PRINTERS: "Printers",
   ROOMDATA: "RoomData",
   SERVER: "ServerSettings",
-  USERS: "Users"
+  USERS: "User"
 };
 
 const serverActionsElements = {
