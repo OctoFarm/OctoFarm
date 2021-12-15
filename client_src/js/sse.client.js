@@ -35,6 +35,7 @@ function setupEventSource(url) {
   };
   evtSource.onopen = function (e) {
     console.debug("Connected to " + url);
+    console.debug("Connected to " + url);
     // Reset reconnect frequency upon successful connection
     reconnectFrequencySeconds = 1;
   };

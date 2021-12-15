@@ -7,6 +7,8 @@ const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
+const ConnectionMonitorService = require("./services/connection-monitor.service");
+const {REQUEST_TYPE, REQUEST_KEYS} = require("./constants/connection-monitor.constants");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -45,34 +47,34 @@ const GENERATE_MONTHLY_HISTORY_STATS = async () => {
 };
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
-  // farmPrinters.forEach(function each(client) {
-  //   if (
-  //     typeof client.ws !== "undefined" &&
-  //     typeof client.ws.isAlive !== "undefined"
-  //   ) {
-  //     if (
-  //       client.ws.instance.readyState !== 0 &&
-  //       client.ws.instance.readyState !== 2 &&
-  //       client.ws.instance.readyState !== 3
-  //     ) {
-  //       PrinterTicker.addIssue(
-  //         new Date(),
-  //         farmPrinters[client.ws.index].printerURL,
-  //         "Sending ping message to websocket...",
-  //         "Active",
-  //         farmPrinters[client.ws.index]._id
-  //       );
-  //       if (client.ws.isAlive === false) return client.ws.instance.terminate();
-  //
-  //       // Retry connecting if failed...
-  //       farmPrinters[client.ws.index].webSocket = "info";
-  //       farmPrinters[client.ws.index].webSocketDescription =
-  //         "Checking if Websocket is still alive";
-  //       client.ws.isAlive = false;
-  //       client.ws.instance.ping(noop);
-  //     }
-  //   }
-  // });
+    const farmPrinters = Runner.returnFarmPrinters();
+    farmPrinters.forEach(function each(client) {
+      if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
+        if (
+            client.ws.instance.readyState !== 0 &&
+            client.ws.instance.readyState !== 2 &&
+            client.ws.instance.readyState !== 3
+        ) {
+          if (client.ws.isAlive === false) {
+            ConnectionMonitorService.updateOrAddResponse(
+                client.webSocketURL + "/sockjs/websocket",
+                REQUEST_TYPE.PING_PONG,
+                REQUEST_KEYS.TOTAL_PING_PONG
+            );
+            return client.ws.instance.terminate();
+          }
+          const triggerStates = ["Offline", "Searching...", "Shutdown"];
+          if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
+            // Retry connecting if failed...
+            farmPrinters[client.ws.index].webSocket = "info";
+            farmPrinters[client.ws.index].webSocketDescription =
+                "Checking if Websocket is still alive";
+            client.ws.isAlive = false;
+            client.ws.instance.ping(function noop() {});
+          }
+        }
+      }
+    });
 };
 
 const SSE_TASK = () => {
@@ -144,23 +146,6 @@ const GRAB_LATEST_PATREON_DATA = async () => {
   await grabLatestPatreonData();
 };
 
-const STATE_SETUP_WEBSOCKETS = async () => {
-  // for (let i = 0; i < farmPrinters.length; i++) {
-  //   // Make sure runners are created ready for each printer to pass between...
-  //   await Runner.setupWebSocket(farmPrinters[i]._id);
-  //   PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
-  // }
-  // FilamentClean.start(systemSettings.filamentManager);
-};
-
-const STATE_PRINTER_GENERATE_TASK = async () => {
-  // for (let index = 0; index < farmPrinters.length; index++) {
-  //   if (typeof farmPrinters[index] !== "undefined") {
-  //     PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
-  //   }
-  // }
-};
-
 const DATABASE_MIGRATIONS_TASK = async () => {
   const migrations = require("./migrations");
   console.log(migrations);
@@ -193,6 +178,7 @@ class OctoFarmTasks {
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
+    KsatLlorKcir(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),

@@ -230,7 +230,7 @@ async function updateServerSettings() {
       combined: settingsElements.monitoringViews.combined.checked
     }
   };
-  console.log(opts);
+
   OctoFarmClient.post("settings/server/update", opts).then((res) => {
     UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
     if (res.restartRequired) {
@@ -366,7 +366,6 @@ function renderSystemCharts() {
   systemChartMemory.render();
 }
 
-//TODO: Move over to SSE
 function startUpdateInfoRunner() {
   setInterval(async function updateStatus() {
     const systemInformation = await OctoFarmClient.get("system/info");

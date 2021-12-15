@@ -1,6 +1,6 @@
 {
   "name": "octofarm",
-  "version": "1.2.0-rc6",
+  "version": "1.2.0-rc7",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "stop:delete": "pm2 delete OctoFarm",
     "release": "git archive -o octofarm.zip HEAD",
     "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
-    "dev": "nodemon --inspect ./app.js",
+    "dev": "nodemon ./app.js",
     "test": "jest --forceExit"
   },
   "repository": {
@@ -35,7 +35,7 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "@notexpectedyet/octofarm-client": "0.9.6",
+    "@notexpectedyet/octofarm-client": "0.9.7",
     "archiver": "^5.3.0",
     "awilix": "^6.0.0",
     "awilix-express": "^6.0.0",

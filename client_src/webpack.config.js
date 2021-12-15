@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const _ = require("lodash");
+const { fromPairs } = require("lodash");
 const WebpackBeforeBuildPlugin = require("before-build-webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -18,7 +18,7 @@ const insideBasePath = "../views/assets/";
 const buildDirProd = "./dist/";
 const buildDirDev = insideBasePath + "dist/";
 
-const webpackEntries = _.fromPairs(
+const webpackEntries = fromPairs(
   dirContents
     .filter((dirEntry) => dirEntry.isFile())
     .map((file) => {

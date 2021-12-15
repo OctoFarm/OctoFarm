@@ -19,6 +19,8 @@ const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js")
 
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
+const { TaskManager } = require("../runners/task.manager");
+
 const systemInformationFileName = "system_information.txt";
 
 /**
@@ -26,7 +28,7 @@ const systemInformationFileName = "system_information.txt";
  * @throws {String} If the SystemInformation object doesn't return
  */
 function generateSystemInformationContents() {
-  let systemInformationContents = "--- OctoFarm System Information ---\n\n";
+  let systemInformationContents = "--- OctoFarm Setup Information ---\n\n";
   systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
   const airGapped = "Are we connected to the internet?\n";
   const pm2 = "Are we running under pm2?\n";
@@ -114,12 +116,18 @@ function generateSystemInformationContents() {
     if (history.hasOwnProperty(key)) {
       if (history[key].onComplete) {
         systemInformationContents += `History ${key} on complete? \n${yes}`;
+      } else {
+        systemInformationContents += `History ${key} on complete? \n${no}`;
       }
       if (history[key].onFailure) {
         systemInformationContents += `History ${key} on failure? \n${yes}`;
+      } else {
+        systemInformationContents += `History ${key} on failure? \n${no}`;
       }
       if (history[key]?.deleteAfter) {
         systemInformationContents += `History ${key} delete after?\n ${yes}`;
+      } else {
+        systemInformationContents += `History ${key} delete after?\n ${no}`;
       }
     }
   }
@@ -133,8 +141,16 @@ function generateSystemInformationContents() {
   const printerVersions = PrinterClean.returnAllOctoPrintVersions();
 
   if (printerVersions) {
-    systemInformationContents += "--- OctoPrint Information ---\n\n";
+    systemInformationContents += "\n --- OctoPrint Information ---\n\n";
     systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}\n`;
+  }
+
+  const latestTaskState = TaskManager.getTaskState();
+
+  systemInformationContents += "--- OctoFarm Tasks ---\n\n";
+  for (let task in latestTaskState) {
+    const theTask = latestTaskState[task];
+    systemInformationContents += `${task}: duration: ${theTask.duration}ms \n`;
   }
 
   return systemInformationContents;
