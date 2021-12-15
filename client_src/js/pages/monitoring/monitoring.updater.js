@@ -756,7 +756,6 @@ async function updateState(printer, clientSettings, view, index) {
     for (let i = 0; i < printer.selectedFilament.length; i++) {
       const tool = document.getElementById(`${printer._id}-spool-${i}`);
       if (printer.selectedFilament[i] !== null) {
-        const filamentManager = await checkFilamentManager();
         if (tool) {
           tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
         }
