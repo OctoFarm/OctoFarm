@@ -39,8 +39,6 @@ function WebSocketClient() {
   this.autoReconnectInterval = timeout.webSocketRetry; // ms
 }
 
-function noop() {}
-
 function heartBeat(index) {
   if (farmPrinters[index].state === "Disconnected") {
     farmPrinters[index].webSocket = "warning";
@@ -52,36 +50,6 @@ function heartBeat(index) {
   }
   farmPrinters[index].ws.isAlive = true;
 }
-
-const heartBeatInterval = setInterval(function ping() {
-  farmPrinters.forEach(function each(client) {
-    if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
-      if (
-        client.ws.instance.readyState !== 0 &&
-        client.ws.instance.readyState !== 2 &&
-        client.ws.instance.readyState !== 3
-      ) {
-        if (client.ws.isAlive === false) {
-          ConnectionMonitorService.updateOrAddResponse(
-            client.webSocketURL + "/sockjs/websocket",
-            REQUEST_TYPE.PING_PONG,
-            REQUEST_KEYS.TOTAL_PING_PONG
-          );
-          return client.ws.instance.terminate();
-        }
-        const triggerStates = ["Offline", "Searching...", "Shutdown"];
-        if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
-          // Retry connecting if failed...
-          farmPrinters[client.ws.index].webSocket = "info";
-          farmPrinters[client.ws.index].webSocketDescription =
-            "Checking if Websocket is still alive";
-          client.ws.isAlive = false;
-          client.ws.instance.ping(noop);
-        }
-      }
-    }
-  });
-}, 10000);
 
 function setupReconnectionTimeout(that){
   if(!farmPrinters[that.index].apiTimeout){
@@ -571,7 +539,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             currentFilament[s].spools.profile = profile.profile;
           }
         }
-        JobClean.generate(farmPrinters[this.index], currentFilament);
+        await JobClean.generate(farmPrinters[this.index], currentFilament);
       } else {
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[this.index].selectedFilament)
@@ -593,7 +561,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             currentFilament[s].spools.profile = profile.profile;
           }
         }
-        JobClean.generate(farmPrinters[this.index], currentFilament);
+        await JobClean.generate(farmPrinters[this.index], currentFilament);
       }
 
       if (typeof data.current.logs !== undefined) {
