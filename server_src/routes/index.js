@@ -175,7 +175,7 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = await Runner.returnGroupList();
+  let printGroups = Runner.returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -199,13 +199,13 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
 });
 router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = await Runner.sortedIndex();
+  const sortedIndex = Runner.sortedIndex();
   const serverSettings = SettingsClean.returnSystemSettings();
 
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = await Runner.returnGroupList();
+  let printGroups = Runner.returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -229,7 +229,7 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 // List view  Page
 router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = await Runner.sortedIndex();
+  const sortedIndex = Runner.sortedIndex();
   const serverSettings = SettingsClean.returnSystemSettings();
   const clientSettings = SettingsClean.returnClientSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
@@ -261,7 +261,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 
 router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = await Runner.sortedIndex();
+  const sortedIndex = Runner.sortedIndex();
   const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
   const currentSort = getSorting();
@@ -292,7 +292,7 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
 
 router.get("/mon/currentOp", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = await Runner.sortedIndex();
+  const sortedIndex = Runner.sortedIndex();
   const serverSettings = SettingsClean.returnSystemSettings();
 
   res.render("currentOperationsView", {
