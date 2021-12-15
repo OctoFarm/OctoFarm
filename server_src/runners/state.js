@@ -79,7 +79,9 @@ WebSocketClient.prototype.open = function (url, index) {
     farmPrinters[this.index].webSocket = "warning";
     farmPrinters[this.index].webSocketDescription =
       "Websocket Connected but in Tentative state until receiving data";
-    this.instance = new WebSocket(this.url, { followRedirects: true });
+    if(!this?.instance){
+      this.instance = new WebSocket(this.url, { followRedirects: true });
+    }
     this.instance.on("open", () => {
       const endTime = ConnectionMonitorService.stopTimer();
       ConnectionMonitorService.updateOrAddResponse(
