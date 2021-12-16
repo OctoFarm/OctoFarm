@@ -1,31 +1,32 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureCurrentUserAndGroup } = require("../config/users");
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const HistoryDB = require("../models/History");
 const SpoolsDB = require("../models/Filament.js");
 const ProfilesDB = require("../models/Profiles.js");
-const roomDataDB = require("../models/roomData.js");
+const RoomDataDB = require("../models/RoomData.js");
 const UserDB = require("../models/User.js");
 const PrinterDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 const runner = require("../runners/state.js");
 const multer = require("multer");
+const { isEqual } = require("lodash");
 const { Runner } = runner;
-const { SystemRunner } = require("../runners/systemInfo.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
-
+const { fetchUsers } = require("../services/user-service");
 const {
   checkReleaseAndLogUpdate,
-  getUpdateNotificationIfAny,
-} = require("../runners/softwareUpdateChecker.js");
+  getUpdateNotificationIfAny
+} = require("../services/octofarm-update.service.js");
 
 module.exports = router;
 
@@ -38,16 +39,16 @@ const Storage = multer.diskStorage({
   },
   filename: function (req, file, callback) {
     callback(null, "bg.jpg");
-  },
+  }
 });
 
 const upload = multer({ storage: Storage });
 
-router.get("/server/logs", ensureAuthenticated, async (req, res) => {
+router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const serverLogs = await Logs.grabLogs();
   res.send(serverLogs);
 });
-router.get("/server/logs/:name", ensureAuthenticated, (req, res) => {
+router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.params.name;
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
@@ -55,22 +56,21 @@ router.get("/server/logs/:name", ensureAuthenticated, (req, res) => {
 router.post(
   "/server/logs/generateLogDump",
   ensureAuthenticated,
+  ensureAdministrator,
   async (req, res) => {
     // Will use in a future update to configure the dump.
     // let settings = req.body;
     // Generate the log package
     let zipDumpResponse = {
       status: "error",
-      msg:
-        "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
-      zipDumpPath: "",
+      msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
+      zipDumpPath: ""
     };
 
     try {
       zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
       zipDumpResponse.status = "success";
-      zipDumpResponse.msg =
-        "Successfully generated zip file, please click the download button.";
+      zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {
       logger.error("Error Generating Log Dump Zip File | ", e);
     }
@@ -82,6 +82,7 @@ router.post(
 router.get(
   "/server/delete/database/:name",
   ensureAuthenticated,
+  ensureAdministrator,
   async (req, res) => {
     const databaseName = req.params.name;
     await Runner.pause();
@@ -91,39 +92,35 @@ router.get(
       await HistoryDB.deleteMany({});
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
-      await roomDataDB.deleteMany({});
+      await RoomDataDB.deleteMany({});
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});
       await GcodeDB.deleteMany({});
       res.send({
-        message: "Successfully deleted databases, server will restart...",
+        message: "Successfully deleted databases, server will restart..."
       });
       logger.info("Database completely wiped.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     } else if (databaseName === "FilamentDB") {
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
-      logger.info(
-        "Successfully deleted Filament database.... Restarting server..."
-      );
-      SystemCommands.rebootOctoFarm();
+      logger.info("Successfully deleted Filament database.... Restarting server...");
+      await SystemCommands.rebootOctoFarm();
     } else {
       await eval(databaseName).deleteMany({});
       res.send({
-        message:
-          "Successfully deleted " + databaseName + ", server will restart...",
+        message: "Successfully deleted " + databaseName + ", server will restart..."
       });
-      logger.info(
-        databaseName + " successfully deleted.... Restarting server..."
-      );
-      SystemCommands.rebootOctoFarm();
+      logger.info(databaseName + " successfully deleted.... Restarting server...");
+      await SystemCommands.rebootOctoFarm();
     }
   }
 );
 router.get(
   "/server/get/database/:name",
   ensureAuthenticated,
+  ensureAdministrator,
   async (req, res) => {
     const databaseName = req.params.name;
     logger.info("Client requests export of " + databaseName);
@@ -138,7 +135,7 @@ router.get(
     res.send({ databases: returnedObjects });
   }
 );
-router.post("/server/restart", ensureAuthenticated, async (req, res) => {
+router.post("/server/restart", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let serviceRestarted = false;
   try {
     serviceRestarted = await SystemCommands.rebootOctoFarm();
@@ -151,11 +148,12 @@ router.post("/server/restart", ensureAuthenticated, async (req, res) => {
 router.post(
   "/server/update/octofarm",
   ensureAuthenticated,
+  ensureAdministrator,
   async (req, res) => {
     let clientResponse = {
       haveWeSuccessfullyUpdatedOctoFarm: false,
       statusTypeForUser: "error",
-      message: "",
+      message: ""
     };
     let force = req?.body;
     if (
@@ -164,60 +162,59 @@ router.post(
       typeof force?.doWeInstallPackages !== "boolean"
     ) {
       res.sendStatus(400);
-      throw new Error(
-        "forceCheck object not correctly provided or not boolean"
-      );
+      throw new Error("forceCheck object not correctly provided or not boolean");
     }
 
     try {
       clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        clientResponse, force
+        clientResponse,
+        force
       );
     } catch (e) {
-      clientResponse.message =
-        "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
+      clientResponse.message = "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
       // Log error with html tags removed if contained in response message
-      logger.error(
-        "Issue with updating | ",
-        e?.message.replace(/(<([^>]+)>)/gi, "")
-      );
+      logger.error("Issue with updating | ", e?.message.replace(/(<([^>]+)>)/gi, ""));
     } finally {
       res.send(clientResponse);
     }
   }
 );
-router.get("/server/update/check", ensureAuthenticated, async (req, res) => {
+router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   await checkReleaseAndLogUpdate();
   const softwareUpdateNotification = getUpdateNotificationIfAny();
   res.send(softwareUpdateNotification);
 });
-router.get("/client/get", ensureAuthenticated, (req, res) => {
-  ClientSettingsDB.find({}).then((checked) => {
-    res.send(checked[0]);
+router.get("/client/get", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
+  ClientSettingsDB.findById(req.user.clientSettings).then((checked) => {
+    res.send(checked);
   });
 });
-router.post("/client/update", ensureAuthenticated, (req, res) => {
-  ClientSettingsDB.find({}).then((checked) => {
-    const panelView = {
-      currentOp: req.body.panelView.currentOp,
-      hideOff: req.body.panelView.hideOff,
-      hideClosed: req.body.panelView.hideClosed,
-      hideIdle: req.body.panelView.hideIdle,
-      printerRows: req.body.cameraView.cameraRows,
-    };
-    checked[0].panelView = panelView;
-    checked[0].dashboard = req.body.dashboard;
-    checked[0].controlSettings = req.body.controlSettings;
-    checked[0].markModified("controlSettings");
-    checked[0].save().then(() => {
+router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, async (req, res) => {
+  const currentUserList = await fetchUsers();
+
+  // Patch to fill in user settings if it doesn't exist
+  for (let i = 0; i < currentUserList.length; i++) {
+    if (!currentUserList[i].clientSettings) {
+      currentUserList[i].clientSettings = new ClientSettingsDB();
+      currentUserList[i].clientSettings.save();
+      currentUserList[i].save();
+    }
+  }
+
+  ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
+    .then(async () => {
       SettingsClean.start();
+      await fetchUsers(true);
+      res.send({ msg: "Settings Saved" });
+    })
+    .catch((e) => {
+      res.send({ msg: "Settings Not Saved" });
     });
-    res.send({ msg: "Settings Saved" });
-  });
 });
 router.post(
   "/backgroundUpload",
   ensureAuthenticated,
+  ensureAdministrator,
   upload.single("myFile"),
   (req, res) => {
     const file = req.file;
@@ -232,15 +229,39 @@ router.get("/server/get", ensureAuthenticated, (req, res) => {
     res.send(checked[0]);
   });
 });
-router.post("/server/update", ensureAuthenticated, (req, res) => {
+router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   ServerSettingsDB.find({}).then(async (checked) => {
+    let restartRequired = false;
+
+    const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
+    const serverChanges = isEqual(checked[0].server, req.body.onlinePolling);
+    const timeoutChanges = isEqual(checked[0].timeout, req.body.onlinePolling);
+    const filamentChanges = isEqual(checked[0].filament, req.body.onlinePolling);
+    const historyChanges = isEqual(checked[0].history, req.body.onlinePolling);
+    const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
+
     checked[0].onlinePolling = req.body.onlinePolling;
-    Runner.updatePoll();
     checked[0].server = req.body.server;
     checked[0].timeout = req.body.timeout;
     checked[0].filament = req.body.filament;
     checked[0].history = req.body.history;
     checked[0].influxExport = req.body.influxExport;
+    checked[0].monitoringViews = req.body.monitoringViews;
+
+    if (
+      [
+        onlineChanges,
+        serverChanges,
+        timeoutChanges,
+        filamentChanges,
+        historyChanges,
+        influxExport
+      ].includes(false)
+    ) {
+      restartRequired = true;
+      await Runner.updatePoll();
+    }
+
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
@@ -270,33 +291,12 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     if (shouldDisableInflux) {
       res.send({
         msg: returnMsg,
-        status: "warning",
+        status: "warning"
       });
     } else {
-      res.send({ msg: "Settings Saved", status: "success" });
+      res.send({ msg: "Settings Saved", status: "success", restartRequired });
     }
   });
-});
-
-/**
- * Acquire system information from system info runner
- */
-router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.returnInfo();
-  let sysInfo = null;
-
-  if (!!systemInformation) {
-    sysInfo = {
-      osInfo: systemInformation.osInfo,
-      cpuInfo: systemInformation.cpuInfo,
-      cpuLoad: systemInformation.cpuLoad,
-      memoryInfo: systemInformation.memoryInfo,
-      sysUptime: systemInformation.sysUptime,
-      currentProcess: systemInformation.currentProcess,
-      processUptime: systemInformation.processUptime,
-    };
-  }
-  res.send(sysInfo);
 });
 
 router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
@@ -315,9 +315,12 @@ router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
   script.gcode = newObj.gcode;
   script.name = newObj.name;
   script.description = newObj.description;
+  script.printerIds = newObj.printerIds;
+  script.buttonColour = newObj.buttonColour;
   script.save();
   res.send(script);
 });
+
 router.post("/customGcode", ensureAuthenticated, async (req, res) => {
   let newScript = req.body;
   const saveScript = new GcodeDB(newScript);
@@ -326,7 +329,18 @@ router.post("/customGcode", ensureAuthenticated, async (req, res) => {
     .then(res.send(saveScript))
     .catch((e) => res.send(e));
 });
+
 router.get("/customGcode", ensureAuthenticated, async (req, res) => {
+  res.send(await GcodeDB.find());
+});
+router.get("/customGcode/:id", ensureAuthenticated, async (req, res) => {
+  const printerId = req.params.id;
   const all = await GcodeDB.find();
-  res.send(all);
+  let returnCode = [];
+  all.forEach((script) => {
+    if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
+      returnCode.push(script);
+    }
+  });
+  res.send(returnCode);
 });

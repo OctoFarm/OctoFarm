@@ -1,11 +1,11 @@
-import OctoFarmClient from "../octofarm.js";
+import OctoFarmClient from "../../services/octofarm-client.service";
 import UI from "../functions/ui.js";
 
 const editMessage = `
 <div class="alert alert-info" role="alert">
 Update any of the printer values below and press action when you've made your changes.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
  OctoFarm will then update only the changed printers.
 </div>
 `;
@@ -13,18 +13,31 @@ const deleteMessage = `
 <div class="alert alert-info" role="alert">
 Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
  This is unrecoverable! If you remove the database entry for your printer, any links in the database will be lost... i.e. History/Statistics. Unless you have a backup in place.
 </div>
+`;
+const multiPrintMessage = `
+  <div class="alert alert-info" role="alert">
+    Please select which printers you'd like to start printing on! Press action when you have selected all the printers you'd like.
+  </div>
+  <div class="alert alert-info" role="alert">
+    <p class="mb-0"><strong>Single-File Mode:</strong> This will distribute 1 file across all selected printers and action a print.</p>
+    <hr>
+    <p class="mb-0"><strong>Multi-File Mode:</strong> This will distribute the first file to the first selected printer, the second file goes to the second selected printer and so on.</p>
+  </div>
+  <div class="alert alert-warning text-dark" role="alert">
+    <strong>NOTE: </strong> Multi-File mode expects and equal number of printers and files... 
+  </div>
 `;
 const connectMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings from OctoPrint.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
 This can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan for OctoFarm to detect the changes if updated on OctoPrint.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
  If this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state. 
 </div>
 `;
@@ -32,7 +45,7 @@ const disconnectMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to disconnect from OctoPrint.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
 This will by default skip Active printers. This is not an emergency stop button!
 </div>
 
@@ -41,7 +54,7 @@ const pluginInstallMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
   Your plugin installation will be skipped if it's already installed...
 </div>
 `;
@@ -49,7 +62,7 @@ const powerOnOffMessage = `
 <div class="alert alert-info" role="alert">
 Please select your list of printers to action the power command on. You will be able to choose the actual command on the next pop up.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   These commands will run without user interaction... It will skip by default any active printers.
 </div>
 `;
@@ -57,7 +70,7 @@ const preHeatMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers to action the pre-heat command. You will configure the temperatures on the next pop up.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -66,7 +79,7 @@ const controlPrintersMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers you'd like to bulk control.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -75,10 +88,10 @@ const gcodePrintersMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers you'd like to send gcode commands to.
 </div>
-<div class="alert alert-info" role="alert">
+<div class="alert alert-info text-dark" role="alert">
   Commands split up by a new line will be sent sequentially to the terminal.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for gcode commands to be sent on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -106,7 +119,7 @@ const printersTable = `
           <option href="#" value="complete" data-path=".Complete">
             Complete
           </option>
-          <option href="#" value="disconnected"data-path=".Disconnected">
+          <option href="#" value="disconnected" data-path=".Disconnected">
             Disconnected
           </option>
         </select>
@@ -166,7 +179,7 @@ export default class PrinterSelect {
     <th scope="row">${printer.index}</th>
     <td>${printer.name}</td>
     <td class="${printer.state}">${printer.state}</td>
-    <td class="${printer.group.replace(/\s/g, "_")}">${printer.group}</td>
+    <td class="${printer.group.replace(/[^\w\-]+/g, "-").toLowerCase()}">${printer.group}</td>
     <td>${printer.spool}</td>
 </tr>
 `;
@@ -176,12 +189,32 @@ export default class PrinterSelect {
     return `
 <tr id="editPrinterCard-${printer.id}" class="${printer.state}" data-jplist-item>
   <th scope="row">${printer.index}</th>
-  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${
+      printer.name
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputURL-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.printerURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td class="${printer.state} d-none">${printer.state}</td>
-                          <td><input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputGroup-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.group
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.group
+                            .replace(/[^\w\-]+/g, "-")
+                            .toLowerCase()}"><input id="editInputCamera-${
+      printer.id
+    }" type="text" class="form-control Idle" placeholder="${
+      printer.cameraURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.apikey
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
     </tr>`;
   }
 
@@ -201,7 +234,7 @@ export default class PrinterSelect {
       saveEditsBtn.remove();
     }
     if (action) {
-      document.getElementById("printerEditLabel").innerHTML = action;
+      document.getElementById("printerSelectTitle").innerHTML = action;
     }
     //Setup elements
     element.innerHTML = "";
@@ -228,13 +261,14 @@ export default class PrinterSelect {
       messageBox.innerHTML = controlPrintersMessage;
     } else if (action === "Send Gcode to Printers") {
       messageBox.innerHTML = gcodePrintersMessage;
+    } else if (action === "Start a Bulk Print") {
+      messageBox.innerHTML = multiPrintMessage;
     }
-    const printersInfo = await OctoFarmClient.post("printers/printerInfo");
-    // const groups = await OctoFarmClient.get("groups/list");
 
-    const printers = await printersInfo.json();
     const groupList = [];
     const printerList = [];
+
+    const printers = await OctoFarmClient.listPrinters();
 
     printers.forEach((printer) => {
       if (
@@ -242,7 +276,7 @@ export default class PrinterSelect {
         this.isOffline(printer.printerState.colour.category, editable, override)
       ) {
         let spoolName = "";
-        if (printer.selectedFilament.length !== 0) {
+        if (printer.selectedFilament && printer.selectedFilament.length !== 0) {
           printer.selectedFilament.forEach((spool, index) => {
             if (spool !== null) {
               spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
@@ -262,20 +296,21 @@ export default class PrinterSelect {
           group: printer.group,
           spool: spoolName,
           cameraURL: printer.cameraURL,
-          apikey: printer.apikey,
+          apikey: printer.apikey
         };
         printerList.push(forList);
       }
       if (printer.group !== "") {
         const group = {
           display: printer.group,
-          tag: printer.group.replace(/\s/g, "_"),
+          tag: printer.group.replace(/[^\w\-]+/g, "-").toLowerCase()
         };
         groupList.push(group);
       }
     });
-
-    const groupListUnique = _.uniq(groupList, "tag");
+    const groupListUnique = _.uniqBy(groupList, function (e) {
+      return e.tag;
+    });
     if (printerList.length !== 0) {
       //Create printers table
 
@@ -289,17 +324,11 @@ export default class PrinterSelect {
         document.getElementById("urlColumn").classList.remove("d-none");
 
         printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML(
-            "beforeend",
-            this.getEditableList(printer)
-          );
+          tableBody.insertAdjacentHTML("beforeend", this.getEditableList(printer));
         });
       } else {
         printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML(
-            "beforeend",
-            this.getSelectableList(printer)
-          );
+          tableBody.insertAdjacentHTML("beforeend", this.getSelectableList(printer));
         });
       }
 
@@ -309,37 +338,31 @@ export default class PrinterSelect {
         "beforeend",
         '<option selected value="all" data-path="default">Filter</option>'
       );
+
       groupListUnique.forEach((group, index) => {
         printerGroupList.insertAdjacentHTML(
           "beforeend",
-          `<option value="${group.tag.toLowerCase()}" data-path=".${
-            group.tag
-          }">${group.display}</option>`
+          `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag.toLowerCase()}">${
+            group.display
+          }</option>`
         );
       });
 
       // Printer group dropdown
       printers.forEach((printer) => {
-        const printerGroupAssignSelect = document.getElementById(
-          `editInputGroup-${printer._id}`
-        );
+        const printerGroupAssignSelect = document.getElementById(`editInputGroup-${printer._id}`);
         if (!printerGroupAssignSelect) return;
 
         groupListUnique.forEach((group, index) => {
           printerGroupAssignSelect.insertAdjacentHTML(
             "beforeend",
-            `<option value="${group.tag.toLowerCase()}" data-path=".${
-              group.tag
-            }">${group.display}</option>`
+            `<option value="${group.tag}" data-path=".${group.tag}">${group.display}</option>`
           );
         });
       });
     } else {
       const tableBody = document.getElementById("printerSelectBody");
-      tableBody.insertAdjacentHTML(
-        "beforeend",
-        "<tr><td>No Online Printers</td></tr>"
-      );
+      tableBody.insertAdjacentHTML("beforeend", "<tr><td>No Online Printers</td></tr>");
     }
     PrinterSelect.addListeners(editable, callback);
   }
@@ -351,17 +374,13 @@ export default class PrinterSelect {
                     <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
             `;
       document.getElementById("selectAll").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll(
-          "input[type=\"checkbox\"]:not(:checked)"
-        );
+        const checkBoxes = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
         checkBoxes.forEach((box) => {
           box.checked = true;
         });
       });
       document.getElementById("selectNone").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll(
-          'input[type="checkbox"]:checked'
-        );
+        const checkBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
         checkBoxes.forEach((box) => {
           box.checked = false;
         });
@@ -376,17 +395,13 @@ export default class PrinterSelect {
                       <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
       `
       );
-      document
-        .getElementById("saveEditsBtn")
-        .addEventListener("click", callback);
+      document.getElementById("saveEditsBtn").addEventListener("click", callback);
     }
     jplist.init();
   }
 
   static getSelected() {
-    const checkedBoxes = document.querySelectorAll(
-      "input[type=\"checkbox\"]:checked"
-    );
+    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
     const printers = [];
     checkedBoxes.forEach((box) => {
       if (box.id.includes("checkBox")) {

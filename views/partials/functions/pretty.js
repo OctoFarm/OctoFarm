@@ -18,6 +18,7 @@ const calculatePercent = function (use, total) {
   const percent = (use / total) * 100;
   return Math.round(percent);
 };
+
 const generateTime = function (seconds) {
   let string = "";
   if (seconds === undefined || isNaN(seconds) || seconds === null) {
@@ -58,41 +59,68 @@ const generateTime = function (seconds) {
 
   return string;
 };
-const historyTotals = function (history) {
-  const historyFileNames = [];
-  const historyPrinterNames = [];
-  const historySpools = [];
-  const paths = [];
 
-  history.forEach((hist) => {
-    historyPrinterNames.push(hist.printer.replace(/ /g, "_"));
-    if (typeof hist.file !== "undefined") {
-      historyFileNames.push(hist.file.name.replace(".gcode", ""));
-      const path = hist.file.path.substring(0, hist.file.path.lastIndexOf("/"));
-      if (path != "") {
-        paths.push(path);
+const returnProgressColour = function (percent, reverse) {
+  if (percent < 45) {
+    return reverse ? "bg-danger" : "bg-success";
+  } else if (percent < 75) {
+    return "bg-warning";
+  } else {
+    return reverse ? "bg-success" : "bg-danger";
+  }
+};
+
+const generateMilisecondsTime = function (miliseconds) {
+  let seconds = miliseconds / 1000;
+  let string = "";
+  if (seconds === undefined || isNaN(seconds) || seconds === null) {
+    string = "No Interval";
+  } else {
+    const days = Math.floor(seconds / (3600 * 24));
+
+    seconds -= days * 3600 * 24;
+    const hrs = Math.floor(seconds / 3600);
+
+    seconds -= hrs * 3600;
+    const mnts = Math.floor(seconds / 60);
+
+    seconds -= mnts * 60;
+    seconds = Math.floor(seconds);
+
+    string = `${days}d, ${hrs}h, ${mnts}m, ${seconds}s`;
+
+    if (mnts == 0) {
+      if (string.includes("0m")) {
+        string = string.replace(" 0m,", "");
       }
     }
-  });
-  return {
-    pathList: paths.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    fileNames: historyFileNames.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    printerNames: historyPrinterNames.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    spools: historySpools.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-  };
+    if (hrs == 0) {
+      if (string.includes("0h")) {
+        string = string.replace(" 0h,", "");
+      }
+    }
+    if (days == 0) {
+      if (string.includes("0d")) {
+        string = string.replace("0d,", "");
+      }
+    }
+    if (seconds == 0) {
+      string = string.replace(", 0s", "");
+    }
+    if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
+      string = string.replace("0s", miliseconds + " ms");
+    }
+    if (!miliseconds) {
+      string = "No Interval";
+    }
+    return string;
+  }
 };
 
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
-  historyTotals: historyTotals,
+  generateMilisecondsTime,
+  returnProgressColour
 };

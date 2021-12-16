@@ -1,0 +1,56 @@
+
+<div class="col-lg-12  table-responsive-sm table-responsive-md">
+        <table id="" class="table table-dark table-striped text-center">
+            <thead>
+            <tr>
+                <th scope="col" class="sticky-table table-dark" style="">Printer Name</th>
+                <th scope="col" class="sticky-table table-dark" style="">OctoPrint Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">Printer Firmware</th>
+                <th scope="col" class="sticky-table table-dark" style="">Python Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">pip Version</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS Platforms</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS Cores</th>
+                <th scope="col" class="sticky-table table-dark" style="">OS ram</th>
+                <th scope="col" class="sticky-table table-dark" style="">Safe Mode Check</th>
+                <th scope="col" class="sticky-table table-dark" style="">Print Success Rate</th>
+                <th scope="col" class="sticky-table table-dark" style="">Activity Rate</th>
+                <th scope="col" class="sticky-table table-dark" style="">Resend Percentage</th>
+            </tr>
+            </thead>
+            <tbody id="" style="height:100%; overflow-y:auto;">
+            <% printersList.forEach(printer => { %>
+                <% const currentPrinter = printer.statistics; %>
+                <% const printTotal = currentPrinter.printSuccessTotal + currentPrinter.printCancelTotal + currentPrinter.printErrorTotal %>
+                <% const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0 %>
+                <% const printUtilisationTotal = currentPrinter.activeTimeTotal + currentPrinter.idleTimeTotal + currentPrinter.offlineTimeTotal %>
+                <% const printerActivityRate = (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0 %>
+                <% const octoSysInfo = currentPrinter.octoPrintSystemInfo; %>
+                    <% if(typeof octoSysInfo !== "undefined") { %>
+                        <tr>
+                            <th scope="row"><%= currentPrinter.printerName  %></th>
+                            <td><%= octoSysInfo["octoprint.version"]  %></td>
+                            <td><%= octoSysInfo["printer.firmware"]   %></td>
+                            <td><%= octoSysInfo["env.python.version"]   %></td>
+                            <td><%= octoSysInfo["env.python.pip"]   %></td>
+                            <td><%= octoSysInfo["env.os.platform"]   %></td>
+                            <td><%= octoSysInfo["env.hardware.cores"]   %></td>
+                            <td><%= helpers.generateBytes(octoSysInfo["env.hardware.ram"])   %></td>
+                            <td><%- (octoSysInfo["octoprint.safe_mode"]) ? '<i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>' : '<i title="Something maybe wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>'  %></td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar <%= helpers.returnProgressColour(printerSuccessRate, true)   %> progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: <%= printerSuccessRate   %>%"> <%= printerSuccessRate.toFixed(0)   %>% </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar <%= helpers.returnProgressColour(printerActivityRate)   %> progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: <%= printerActivityRate   %>%"> <%= printerActivityRate.toFixed(0)   %>% </div>
+                                </div>
+                            </td>
+                            <td><%= currentPrinter.printerResendRatioTotal  %>%</td>
+                        </tr>
+                <% } %>
+
+            <% })%>
+            </tbody>
+        </table>
+</div>

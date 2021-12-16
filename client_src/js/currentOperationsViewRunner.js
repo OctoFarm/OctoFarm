@@ -1,63 +1,22 @@
-import "@babel/polyfill";
 import Calc from "./lib/functions/calc.js";
-
 import OctoPrintClient from "./lib/octoprint.js";
+import { createClientSSEWorker } from "./services/client-worker.service";
+import { setViewType } from "./pages/monitoring/monitoring-view.state";
+import UI from "./lib/functions/ui";
 
-import UI from "./lib/functions/ui.js";
+// TODO dupe due to unwanted monitoring.update import causing missing element exceptions
+export const monitoringWorkerURL = "/monitoringInfo/get/";
 
-let worker = null;
-
-function createWebWorker() {
-  worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
-  worker.onmessage = async function (event) {
-    if (event.data != false) {
-      // /printerInfo === event.data.printersInformation
-      currentOperationsView(
-        event.data.currentOperations.operations,
-        event.data.currentOperations.count,
-        event.data.printersInformation
-      );
-    } else {
-      UI.createAlert(
-        "warning",
-        "Communication with the server has been suddenly lost, trying to re-establish connection...",
-        10000,
-        "Clicked"
-      );
-    }
-  };
-}
-function handleVisibilityChange() {
-  if (document.hidden) {
-    if (worker !== null) {
-      console.log("Screen Abandonded, closing web worker...");
-      worker.terminate();
-      worker = null;
-    }
-  } else {
-    if (worker === null) {
-      console.log("Screen resumed... opening web worker...");
-      createWebWorker();
-    }
+setViewType("current-ops");
+createClientSSEWorker(monitoringWorkerURL, async function (data) {
+  if (!!data) {
+    currentOperationsView(
+      data.currentOperations.operations,
+      data.currentOperations.count,
+      data.printersInformation
+    );
   }
-}
-
-document.addEventListener("visibilitychange", handleVisibilityChange, false);
-
-// Setup webWorker
-if (window.Worker) {
-  // Yes! Web worker support!
-  try {
-    if (worker === null) {
-      createWebWorker();
-    }
-  } catch (e) {
-    console.log(e);
-  }
-} else {
-  // Sorry! No Web Worker support..
-  console.log("Web workers not available... sorry!");
-}
+});
 
 let printers = [];
 const resetFile = function (id) {
@@ -80,20 +39,14 @@ currentHarvest.forEach((harvest) => {
     resetFile(id[1]);
   });
 });
-const currentRestartPrint = document.querySelectorAll(
-  "[id^='restartCurrentPrint-']"
-);
+const currentRestartPrint = document.querySelectorAll("[id^='restartCurrentPrint-']");
 currentRestartPrint.forEach((harvest) => {
   harvest.addEventListener("click", (e) => {
     const id = harvest.id.split("-");
     rePrint(id[1]);
   });
 });
-function currentOperationsView(
-  currentOperations,
-  currentOperationsCount,
-  printerInfo
-) {
+function currentOperationsView(currentOperations, currentOperationsCount, printerInfo) {
   printers = printerInfo;
   if (currentOperations.length === 0) {
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
@@ -104,21 +57,15 @@ function currentOperationsView(
 
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;
-  document.getElementById("idleCount").innerHTML =
-    "Idle: " + currentOperationsCount.idle;
-  document.getElementById("activeCount").innerHTML =
-    "Active: " + currentOperationsCount.active;
+  document.getElementById("idleCount").innerHTML = "Idle: " + currentOperationsCount.idle;
+  document.getElementById("activeCount").innerHTML = "Active: " + currentOperationsCount.active;
   document.getElementById("disconCount").innerHTML =
     "Disconnected: " + currentOperationsCount.disconnected;
 
-  document.getElementById("offlineCount").innerHTML =
-    "Offline: " + currentOperationsCount.offline;
+  document.getElementById("offlineCount").innerHTML = "Offline: " + currentOperationsCount.offline;
 
-  document.getElementById("farmProgress").innerHTML =
-    currentOperationsCount.farmProgress + "%";
-  document.getElementById(
-    "farmProgress"
-  ).style = `width: ${currentOperationsCount.farmProgress}%`;
+  document.getElementById("farmProgress").innerHTML = currentOperationsCount.farmProgress + "%";
+  document.getElementById("farmProgress").style = `width: ${currentOperationsCount.farmProgress}%`;
   document.getElementById(
     "farmProgress"
   ).classList = `progress-bar progress-bar-striped bg-${currentOperationsCount.farmProgressColour}`;
@@ -129,12 +76,8 @@ function currentOperationsView(
     // Generate future time
     let currentDate = new Date();
     currentDate = currentDate.getTime();
-    const futureDateString = new Date(
-      currentDate + current.timeRemaining * 1000
-    ).toDateString();
-    let futureTimeString = new Date(
-      currentDate + current.timeRemaining * 1000
-    ).toTimeString();
+    const futureDateString = new Date(currentDate + current.timeRemaining * 1000).toDateString();
+    let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString();
     futureTimeString = futureTimeString.substring(0, 8);
     const dateComplete = futureDateString + ": " + futureTimeString;
     const finishedPrint = `<button id='currentHarvest-${current.index}' type='button' title="Clear your finished print from current operations" class='tag btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
@@ -148,47 +91,24 @@ function currentOperationsView(
       }
     }
     if (document.getElementById("currentOpCard-" + current.index)) {
-      document.getElementById("viewPanel-" + current.index).style.display =
-        "inline-block";
+      document.getElementById("viewPanel-" + current.index).style.display = "inline-block";
       if (current.progress === 100) {
-        document
-          .getElementById("finishedPrint-" + current.index)
-          .classList.remove("d-none");
-        document
-          .getElementById("futureDate-" + current.index)
-          .classList.add("d-none");
-        document
-          .getElementById("currentRestart-" + current.index)
-          .classList.remove("d-none");
-        document
-          .getElementById("currentTime-" + current.index)
-          .classList.add("d-none");
-        document
-          .getElementById("currentProgressMain-" + current.index)
-          .classList.add("d-none");
+        document.getElementById("finishedPrint-" + current.index).classList.remove("d-none");
+        document.getElementById("futureDate-" + current.index).classList.add("d-none");
+        document.getElementById("currentRestart-" + current.index).classList.remove("d-none");
+        document.getElementById("currentTime-" + current.index).classList.add("d-none");
+        document.getElementById("currentProgressMain-" + current.index).classList.add("d-none");
       } else {
-        document
-          .getElementById("finishedPrint-" + current.index)
-          .classList.add("d-none");
-        document
-          .getElementById("futureDate-" + current.index)
-          .classList.remove("d-none");
-        document
-          .getElementById("currentRestart-" + current.index)
-          .classList.add("d-none");
-        document
-          .getElementById("currentTime-" + current.index)
-          .classList.remove("d-none");
-        document
-          .getElementById("currentProgressMain-" + current.index)
-          .classList.remove("d-none");
+        document.getElementById("finishedPrint-" + current.index).classList.add("d-none");
+        document.getElementById("futureDate-" + current.index).classList.remove("d-none");
+        document.getElementById("currentRestart-" + current.index).classList.add("d-none");
+        document.getElementById("currentTime-" + current.index).classList.remove("d-none");
+        document.getElementById("currentProgressMain-" + current.index).classList.remove("d-none");
       }
-      const progress = document.getElementById(
-        "currentProgress-" + current.index
+      const progress = document.getElementById("currentProgress-" + current.index);
+      document.getElementById("currentTime-" + current.index).innerHTML = Calc.generateTime(
+        current.timeRemaining
       );
-      document.getElementById(
-        "currentTime-" + current.index
-      ).innerHTML = Calc.generateTime(current.timeRemaining);
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
@@ -196,9 +116,11 @@ function currentOperationsView(
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
-            <div class="col-2 pt-0 pb-0" id="viewPanel-${current.index}">
+            <div class="col-sm-6 col-md-4 col-lg-2 col-xl-1 pt-0 pb-0" id="viewPanel-${
+              current.index
+            }">
                 <div id="currentOpCard-${current.index}"
-                class="card card-block text-white bg-secondary d-inline-block"
+                class="card card-block text-white bg-secondary d-inline-block  text-truncate"
                  style="width:100%;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">
@@ -221,13 +143,9 @@ function currentOperationsView(
         <h6 id="finishedPrint-${
           current.index
         }" class="pb-0 text-center d-none" style="font-size:0.6rem;"> ${finishedPrint} </h6>
-                    <div id="currentProgressMain-${
-                      current.index
-                    }" class="progress">
+                    <div id="currentProgressMain-${current.index}" class="progress">
                       <div id="currentProgress-${current.index}"
-                        class="progress-bar progress-bar-striped bg-${
-                          current.progressColour
-                        }"
+                        class="progress-bar progress-bar-striped bg-${current.progressColour}"
                         role="progressbar"
                         style="width: ${current.progress}%"
                         aria-valuenow="${current.progress}"
@@ -241,27 +159,19 @@ function currentOperationsView(
                 </div>
                 `
       );
-      document
-        .getElementById("currentHarvest-" + current.index)
-        .addEventListener("click", (e) => {
-          const id = document
-            .getElementById("currentHarvest-" + current.index)
-            .id.split("-");
-          resetFile(id[1]);
-        });
+      document.getElementById("currentHarvest-" + current.index).addEventListener("click", (e) => {
+        const id = document.getElementById("currentHarvest-" + current.index).id.split("-");
+        resetFile(id[1]);
+      });
       document
         .getElementById("restartCurrentPrint-" + current.index)
         .addEventListener("click", (e) => {
-          const id = document
-            .getElementById("restartCurrentPrint-" + current.index)
-            .id.split("-");
+          const id = document.getElementById("restartCurrentPrint-" + current.index).id.split("-");
           rePrint(id[1]);
         });
     }
 
-    document.getElementById(
-      "currentOpCard-" + current.index
-    ).style.order = index;
+    document.getElementById("currentOpCard-" + current.index).style.order = index;
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
     const curr = [];
     currentOperations.forEach((cur) => {
@@ -274,7 +184,7 @@ function currentOperationsView(
     });
     const remove = _.difference(cards, curr);
     remove.forEach((rem) => {
-      document.getElementById("viewPanel-" + rem).style.display = "none";
+      document.getElementById("viewPanel-" + rem).remove();
     });
   });
 }

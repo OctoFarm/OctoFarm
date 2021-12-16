@@ -1,17 +1,27 @@
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-
-const { SettingsClean } = settingsClean;
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 
 module.exports = {
   async ensureCurrentUserAndGroup(req, res, next) {
-    const serverSettings = await SettingsClean.returnSystemSettings();
+    const serverSettings = SettingsClean.returnSystemSettings();
+
+    let clientSettingsID = req?.user?.clientSettings?._id || null;
+
+    const clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
+
     // If login is not required, set default user and admin otherwise pass current user/group.
     if (!serverSettings?.server?.loginRequired) {
       req.user = {
-        name: "No User",
+        _id: null,
+        name: "",
         group: "Administrator",
+        clientSettings: clientSettings
       };
+    } else {
+      if (req?.user) {
+        req.user.clientSettings = clientSettings;
+      }
     }
+
     next();
-  },
+  }
 };

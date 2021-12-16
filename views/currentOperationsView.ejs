@@ -1,6 +1,7 @@
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
 
-<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
     <div class="row">
+
         <div
                 id="currentOperations"
                 class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
@@ -84,17 +85,12 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>
     <div class="row" id="currentOperationsBody">
-
     </div>
-
-
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>
 <% } %>
-<script src="/assets/js/currentOperationsViewRunner.min.js" type="module"></script>
+<script src="/assets/dist/currentOperationsViewRunner.min.js" type="module"></script>

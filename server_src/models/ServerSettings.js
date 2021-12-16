@@ -6,13 +6,13 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: String,
       default: "0.5",
       required: true
-    },
+    }
   },
   server: {
     port: {
       type: Number,
       default: 4000,
-      required: true,
+      required: true
     },
     loginRequired: {
       type: Boolean,
@@ -45,18 +45,33 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: Number,
       default: 5000,
       required: true
-    },
+    }
   },
   filamentManager: {
     type: Boolean,
     default: false,
-    required: false,
+    required: false
   },
   filament: {
     filamentCheck: {
       type: Boolean,
       default: false,
-      require: true,
+      required: true
+    },
+    downDateSuccess: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    downDateFailed: {
+      type: Boolean,
+      default: false,
+      required: true
+    },
+    hideEmpty: {
+      type: Boolean,
+      default: false,
+      required: true
     }
   },
   history: {
@@ -100,7 +115,7 @@ const ServerSettingsSchema = new mongoose.Schema({
         default: false,
         required: true
       }
-    },
+    }
   },
   influxExport: {
     active: {
@@ -127,8 +142,40 @@ const ServerSettingsSchema = new mongoose.Schema({
       defaultRet: {
         type: Boolean
       }
-    },
+    }
   },
+  monitoringViews: {
+    panel: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    list: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    camera: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    group: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    combined: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  }
 });
 
 const ServerSettings = mongoose.model("ServerSettings", ServerSettingsSchema);

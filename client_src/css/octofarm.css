@@ -3,7 +3,9 @@ html {
   height: 100%;
 }
 
-
+.dropdown-menu {
+  z-index: 9999;
+}
 
 .bg-colour-1 {
   background-color: #375a7f;
@@ -116,6 +118,11 @@ body {
   background-size: cover;
   background-position: center;
   color: grey;
+  height:100%;
+}
+.flex-stretch-octofarm {
+  display: flex;
+  align-items: stretch;
 }
 button > * {
   pointer-events: none;
@@ -276,16 +283,19 @@ a.notyet {
   padding: 5px;
   overflow-y: scroll;
   min-height: 65vh;
+  height: 65vh;
   max-height: 65vh;
 }
-
 .fileBody p {
   margin-bottom: 0px !important;
 }
-
+.printerSelected {
+  border-left: #f39c12 4px solid;
+}
 .fileFooter {
   padding: 5px;
 }
+
 .search-control:focus {
   border-width: 0;
   border-bottom-width: 1px;
@@ -353,10 +363,9 @@ a.notyet {
 /*  height: 90vh;*/
 /*}*/
 
-.camButtons {
+.camButtons{
   position: absolute;
-  bottom: 25px;
-  right: 7px;
+  bottom: 15px;
   z-index: 1000;
 }
 .camName {
@@ -424,13 +433,21 @@ a.notyet {
 }
 /* PRINTER MAP TILES */
 .printer-map-tile:hover {
-  opacity: 0.7;
+  border: 1px dashed lime;
+  /*opacity: 0.8;*/
+  /*border: 2px solid red;*/
+  /*margin: -2px;*/
 }
 .printer-map-tile-selected {
-  background-color: rgba(0, 132, 255, 0.8);
+  border: 1px solid lime !important;
+  margin: -5px;
 }
 .printer-map-tile-stub {
+  /*background: rgba(0, 0, 0, .3);*/
   opacity: 0.3;
+}
+.printer-map-idle {
+  background-color: #262626;
 }
 /*PRINTER MANAGER*/
 .terminal-window {
@@ -546,11 +563,6 @@ label {
     top: 40px;
     z-index: 1000;
   }
-
-}
-
-.bootbox-input-checkbox{
-
 }
 
 .carousel-item {
@@ -570,4 +582,32 @@ label {
 }
 .carousel-caption:hover {
   display: block !important;
+}
+
+
+.stuck {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 60px;
+  z-index: 1020;
+}
+
+.userpic {
+  height: 75px;
+  width: 75px;
+  clear: both;
+  margin: 0 auto;
+  display: block;
+  overflow: hidden;
+  border-radius: 100%;
+  box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+.userimg {
+  height: auto;
+  width: 100%;
+  border-radius: 100%;
 }

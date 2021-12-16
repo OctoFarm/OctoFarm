@@ -1,41 +1,62 @@
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
 const serverScripts = require("../lib/serverScripts.js");
 const Script = serverScripts.Script;
 const Alerts = require("../models/Alerts.js");
 
 class ScriptRunner {
+  /**
+   * Save alert - TODO Trigger, message and location validation lacking
+   * @param printer
+   * @param trigger
+   * @param message
+   * @param scriptLocation
+   * @returns {Promise<string>}
+   */
   static async save(printer, trigger, message, scriptLocation) {
     let alert = {
       active: true,
       trigger: trigger,
       message: message,
       scriptLocation: scriptLocation,
-      printers: printer,
+      printers: printer
     };
     let newAlert = await new Alerts(alert);
     logger.info("Saving: " + trigger + " " + scriptLocation + " " + message);
-    newAlert.save().then((e) => {
+    await newAlert.save().then((e) => {
       logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
     });
     return "saved";
   }
+
+  /**
+   * @param newAlert
+   * @returns {Promise<string|undefined>}
+   */
   static async edit(newAlert) {
     let old = await Alerts.findById(newAlert.id);
+    if (!old) return;
+
     old.active = newAlert.active;
     old.trigger = newAlert.trigger;
     old.scriptLocation = newAlert.scriptLocation;
     old.message = newAlert.message;
     old.save();
+
     return "saved";
   }
+
+  /**
+   *
+   * @param printer
+   * @param trigger
+   * @param historyID
+   * @returns {Promise<void>}
+   */
   static async check(printer, trigger, historyID) {
     let currentAlerts = await Alerts.find({});
     for (let i = 0; i < currentAlerts.length; i++) {
-      if (
-        currentAlerts[i].printer === printer._id ||
-        currentAlerts[i].printer.length === 0
-      ) {
+      if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
         if (currentAlerts[i].trigger === trigger && currentAlerts[i].active) {
           let newMessage = await ScriptRunner.convertMessage(
             printer,
@@ -43,21 +64,22 @@ class ScriptRunner {
             historyID
           );
 
-          ScriptRunner.fire(currentAlerts[i].scriptLocation, newMessage);
+          await ScriptRunner.fire(currentAlerts[i].scriptLocation, newMessage);
         }
       }
     }
   }
+
   static async test(scriptLocation, message) {
     logger.info("Testing Alerts: " + scriptLocation + " " + message);
-    let fire = await Script.fire(scriptLocation, JSON.stringify(message));
-    return fire;
+    return await Script.fire(scriptLocation, JSON.stringify(message));
   }
+
   static async fire(scriptLocation, message) {
     logger.info("Alert Fire: " + scriptLocation + " " + message);
-    let fire = await Script.fire(scriptLocation, message);
-    return fire;
+    return await Script.fire(scriptLocation, message);
   }
+
   static async convertMessage(printer, message, historyID) {
     let job = "";
     if (typeof printer.job != "undefined") {
@@ -67,25 +89,22 @@ class ScriptRunner {
         file: {
           name: "No File Selected",
           display: "No File Selected",
-          path: "No File Selected",
+          path: "No File Selected"
         },
         estimatedPrintTime: 0,
-        lastPrintTime: 0,
+        lastPrintTime: 0
       };
     }
     let progress = "";
 
-    if (
-      typeof printer.progress != "undefined" &&
-      printer.progress.completion != null
-    ) {
+    if (typeof printer.progress != "undefined" && printer.progress.completion != null) {
       progress = printer.progress;
     } else {
       progress = {
         completion: 0,
         filepos: 0,
         printTime: "No Time Left",
-        printTimeLeft: "No Time Left",
+        printTimeLeft: "No Time Left"
       };
     }
 
@@ -98,10 +117,7 @@ class ScriptRunner {
     }
     if (message.includes("[ETA]")) {
       let dateComplete = "No Active Print";
-      if (
-        typeof printer.progress !== "undefined" &&
-        printer.progress.printTimeLeft !== null
-      ) {
+      if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
         let currentDate = new Date();
         currentDate = currentDate.getTime();
         let futureDateString = new Date(
@@ -116,10 +132,7 @@ class ScriptRunner {
       message = message.replace(/\[ETA\]/g, dateComplete);
     }
     if (message.includes("[PrinterName]")) {
-      message = message.replace(
-        /\[PrinterName\]/g,
-        printer.settingsApperance.name
-      );
+      message = message.replace(/\[PrinterName\]/g, printer.settingsApperance.name);
     }
     if (message.includes("[PrinterURL]")) {
       message = message.replace(/\[PrinterURL\]/g, printer.printerURL);
@@ -128,23 +141,14 @@ class ScriptRunner {
       message = message.replace(/\[PrinterAPIKey\]/g, printer.apikey);
     }
     if (message.includes("[TimeRemaining]")) {
-      message = message.replace(
-        /\[TimeRemaining\]/g,
-        generateTime(progress.printTimeLeft)
-      );
+      message = message.replace(/\[TimeRemaining\]/g, generateTime(progress.printTimeLeft));
     }
     if (message.includes("[EstimatedTime]")) {
-      message = message.replace(
-        /\[EstimatedTime\]/g,
-        generateTime(job.estimatedPrintTime)
-      );
+      message = message.replace(/\[EstimatedTime\]/g, generateTime(job.estimatedPrintTime));
     }
     if (message.includes("[CurrentZ]")) {
       let current = "";
-      if (
-        typeof printer.currentZ === "undefined" ||
-        printer.currentZ === null
-      ) {
+      if (typeof printer.currentZ === "undefined" || printer.currentZ === null) {
         current = "No Current Z";
       } else {
         current = printer.currentZ + "mm";
@@ -153,15 +157,9 @@ class ScriptRunner {
     }
     if (message.includes("[PercentRemaining]")) {
       if (progress.completion === 0) {
-        message = message.replace(
-          /\[PercentRemaining\]/g,
-          progress.completion + "%"
-        );
+        message = message.replace(/\[PercentRemaining\]/g, progress.completion + "%");
       } else {
-        message = message.replace(
-          /\[PercentRemaining\]/g,
-          progress.completion.toFixed(2) + "%"
-        );
+        message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2) + "%");
       }
     }
     if (message.includes("[CurrentTime]")) {
@@ -202,12 +200,7 @@ class ScriptRunner {
       ) {
         message = message.replace(
           /\[BedTemp\]/g,
-          "T:" +
-            printer.temps[0].bed.target +
-            "°C" +
-            " / A:" +
-            printer.temps[0].bed.actual +
-            "°C"
+          "T:" + printer.temps[0].bed.target + "°C" + " / A:" + printer.temps[0].bed.actual + "°C"
         );
       } else {
         message = message.replace(/\[BedTemp\]/g, "No tool0 temperature");
@@ -215,10 +208,7 @@ class ScriptRunner {
     }
     if (message.includes("[Error!]")) {
       let errMess = "No Error";
-      if (
-        typeof printer.state !== "undefined" &&
-        printer.state.includes("Error")
-      ) {
+      if (typeof printer.state !== "undefined" && printer.state.includes("Error")) {
         errMess = printer.stateDescription;
       }
       message = message.replace(/\[Error!\]/g, errMess);
@@ -228,6 +218,7 @@ class ScriptRunner {
   }
 }
 
+// TODO replace with luxon formatter
 const generateTime = function (seconds) {
   let string = "";
   if (seconds === undefined || isNaN(seconds) || seconds === null) {
@@ -244,15 +235,7 @@ const generateTime = function (seconds) {
     seconds -= mnts * 60;
     seconds = Math.floor(seconds);
 
-    string =
-      days +
-      " Days, " +
-      hrs +
-      " Hrs, " +
-      mnts +
-      " Mins, " +
-      seconds +
-      " Seconds";
+    string = days + " Days, " + hrs + " Hrs, " + mnts + " Mins, " + seconds + " Seconds";
     if (mnts == 0) {
       if (string.includes("0 Mins")) {
         string = string.replace(" 0 Mins,", "");
@@ -274,6 +257,7 @@ const generateTime = function (seconds) {
   }
   return string;
 };
+
 module.exports = {
-  ScriptRunner: ScriptRunner,
+  ScriptRunner
 };

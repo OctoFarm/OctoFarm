@@ -1,23 +1,19 @@
 const PrinterGroup = require("../../server_src/models/PrinterGroup");
 
 describe("printer group", function () {
-  it("should be invalid if name is empty", function (done) {
+  it("should be invalid if name is empty", () => {
     const m = new PrinterGroup();
 
-    m.validate(function (err) {
-      expect(err.errors.name).toBeTruthy();
-      done();
-    });
+    const errors = m.validateSync();
+    expect(errors.name).toBeTruthy();
   });
 
-  it("should be valid if printers array is empty", function (done) {
+  it("should be valid if printers array is empty", () => {
     const m = new PrinterGroup({
-      name: "TestPrinterGroup",
+      name: "TestPrinterGroup"
     });
 
-    m.validate(function (err) {
-      expect(err).toBe(null);
-      done();
-    });
+    const errors = m.validateSync();
+    expect(errors).toBeFalsy();
   });
 });

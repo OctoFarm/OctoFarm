@@ -1,10 +1,12 @@
 import FileManager from "../modules/fileManager.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
+import { groupBy, mapValues } from "lodash";
+import OctoPrintClient from "../octoprint";
 
 let activeFile = false;
 
-export async function dragCheck() {
+export function dragCheck() {
   return activeFile;
 }
 
@@ -45,6 +47,7 @@ export function dragAndDropEnable(element, printer) {
     false
   );
 }
+
 export function dragAndDropEnableMultiplePrinters(element, printers) {
   const dropArea = document.getElementById(element.id);
   // Prevent default drag behaviors
@@ -77,48 +80,96 @@ export function dragAndDropEnableMultiplePrinters(element, printers) {
   dropArea.addEventListener(
     "drop",
     (event) => {
-      const selectedOnlyPrinters = printers.filter(p => !!p.isSelected);
+      const selectedOnlyPrinters = printers.filter((p) => !!p.isSelected);
       handleMassDrop(event, selectedOnlyPrinters);
     },
     false
   );
 }
+
+export function dragAndDropGroupEnable(printers) {
+  const groupedPrinters = mapValues(groupBy(printers, "group"));
+  for (const key in groupedPrinters) {
+    if (groupedPrinters.hasOwnProperty(key)) {
+      if (key !== "") {
+        const currentGroupEncoded = encodeURIComponent(key);
+        const dropArea = document.getElementById(`dropPanel-${currentGroupEncoded}`);
+
+        // Prevent default drag behaviors
+        ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(eventName, preventDefaults, false);
+          document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop area when item is dragged over it
+        ["dragenter", "dragover"].forEach((eventName) => {
+          dropArea.addEventListener(
+            eventName,
+            (event) => {
+              activeFile = true;
+              highlight(event, dropArea);
+            },
+            false
+          );
+        });
+        ["dragleave", "drop"].forEach((eventName) => {
+          dropArea.addEventListener(
+            eventName,
+            (event) => {
+              activeFile = false;
+              unhighlight(event, dropArea);
+            },
+            false
+          );
+        });
+        dropArea.addEventListener(
+          "drop",
+          (event) => {
+            handleMassDrop(event, groupedPrinters[key]);
+          },
+          false
+        );
+      }
+    }
+  }
+}
+
 function preventDefaults(e) {
   e.preventDefault();
   e.stopPropagation();
 }
+
 function highlight(e, currentElement) {
   currentElement.classList.add("highlight");
 }
+
 function unhighlight(e, currentElement) {
   currentElement.classList.remove("highlight");
 }
+
 function handleDrop(e, currentPrinter, currentElement) {
   const dt = e.dataTransfer;
   const { files } = dt;
   handleFiles(files, [currentPrinter], currentElement);
 }
+
 function handleMassDrop(e, printers, currentElement) {
   const dt = e.dataTransfer;
   const { files } = dt;
   handleFiles(files, printers, currentElement);
 }
+
 function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, printer) {
-  UI.createAlert(
-    "warning",
-    `${Validate.getName(printer)}: started upload`,
-    3000,
-    "Clicked"
-  );
+  UI.createAlert("warning", `${Validate.getName(printer)}: started upload`, 3000, "Clicked");
 
   // Only single files can be sent to be printed immediately after upload
   if (printAfterUpload && singleFileOnly) {
     FileManager.handleFiles(uploadableFiles, printer, "print");
-  }
-  else {
+  } else {
     FileManager.handleFiles(uploadableFiles, printer);
   }
 }
+
 export function handleFiles(uploadableFiles, printerArray) {
   if (!printerArray || printerArray.length === 0) {
     return;
@@ -130,21 +181,21 @@ export function handleFiles(uploadableFiles, printerArray) {
       buttons: {
         confirm: {
           label: "Yes",
-          className: "btn-success",
+          className: "btn-success"
         },
         cancel: {
           label: "No",
-          className: "btn-danger",
-        },
+          className: "btn-danger"
+        }
       },
       callback(bootBoxConfirmed) {
-        printerArray.forEach(printer => {
+        printerArray.forEach((printer) => {
           sendFilesToPrinter(true, bootBoxConfirmed, uploadableFiles, printer);
         });
-      },
+      }
     });
   } else {
-    printerArray.forEach(printer => {
+    printerArray.forEach((printer) => {
       sendFilesToPrinter(false, false, uploadableFiles, printer);
     });
   }

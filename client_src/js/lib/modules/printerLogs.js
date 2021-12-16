@@ -1,6 +1,7 @@
 import Calc from "../functions/calc.js";
-import OctoFarmClient from "../octofarm.js";
+import OctoFarmClient from "../../services/octofarm-client.service";
 import OctoPrintClient from "../octoprint.js";
+import ApexCharts from "apexcharts";
 
 let chart = null;
 let historyBarChart = null;
@@ -15,8 +16,8 @@ export default class PrinterLogs {
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": printer.apikey,
-        Range: "bytes=-500000",
-      },
+        Range: "bytes=-500000"
+      }
     })
       .then(async (resp) => resp.blob())
       .then(async (blob) => blob.text())
@@ -24,6 +25,7 @@ export default class PrinterLogs {
         let octoPrintCount = document.getElementById("octoPrintCount");
         let splitText = await text.split(/(\r\n|\n|\r)/gm);
         splitText = splitText.reverse();
+        splitText = splitText.slice(0, 1000);
         for (let i = 0; i < splitText.length; i++) {
           let colour = null;
           if (splitText[i].includes("INFO")) {
@@ -41,22 +43,18 @@ export default class PrinterLogs {
               "beforeend",
               `
                                 <tr class="${colour}">
-                                  <th scope="row">${splitText.length - i}: ${
-                splitText[i]
-              }</th>
+                                  <th scope="row">${splitText.length - i}: ${splitText[i]}</th>
                                 </tr>
                             `
             );
           }
         }
-        octoPrintCount.innerHTML =
-          "(" + (splitText.length / 2).toFixed(0) + ")";
+        octoPrintCount.innerHTML = "(" + (splitText.length / 2).toFixed(0) + ")";
       });
   }
   static loadLogs(printer, connectionLogs) {
     currentPrinter = printer;
-    document.getElementById("printerLogsLabel").innerHTML =
-      "Printer Logs: " + printer.printerName;
+    document.getElementById("printerLogsTitle").innerHTML = "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
     let printerErrorRows = document.getElementById("printerErrorLogRows");
     let octoprintLogsRows = document.getElementById("octoprintLogsRows");
@@ -70,10 +68,10 @@ export default class PrinterLogs {
     let logSelect = document.getElementById("octoPrintLogsSelect");
 
     logCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    errorCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
-    tempCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
-    octoCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
-    octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    errorCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    tempCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    octoCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
 
     printerRows.innerHTML = "";
     printerErrorRows.innerHTML = "";
@@ -89,7 +87,7 @@ export default class PrinterLogs {
         let orderedSelect = _.sortBy(res.files, [
           function (o) {
             return o.name;
-          },
+          }
         ]);
         logSelect.innerHTML = "";
         for (let i = 0; i < orderedSelect.length; i++) {
@@ -165,15 +163,15 @@ export default class PrinterLogs {
             width: "100%",
             height: "500px",
             animations: {
-              enabled: false,
+              enabled: false
             },
             toolbar: {
-              show: false,
+              show: false
             },
             zoom: {
-              enabled: false,
+              enabled: false
             },
-            background: "#303030",
+            background: "#303030"
           },
           colors: [
             "#fc2929",
@@ -191,34 +189,34 @@ export default class PrinterLogs {
             "#93fc29",
             "#2d4c0d",
             "#ff0084",
-            "#450124",
+            "#450124"
           ],
           stroke: {
-            curve: "smooth",
+            curve: "smooth"
           },
           toolbar: {
-            show: false,
+            show: false
           },
           theme: {
-            mode: "dark",
+            mode: "dark"
           },
           noData: {
-            text: "Loading...",
+            text: "Loading..."
           },
           series: [],
           yaxis: [
             {
               title: {
-                text: "Temperature",
+                text: "Temperature"
               },
               labels: {
                 formatter(value) {
                   if (value !== null) {
                     return `${value}°C`;
                   }
-                },
-              },
-            },
+                }
+              }
+            }
           ],
           xaxis: {
             //tickAmount: "dataPoints",
@@ -235,15 +233,11 @@ export default class PrinterLogs {
                 weekday[5] = "Fri";
                 weekday[6] = "Sat";
                 return (
-                  weekday[date.getDay()] +
-                  " " +
-                  date.getDate() +
-                  " " +
-                  date.toLocaleTimeString()
+                  weekday[date.getDay()] + " " + date.getDate() + " " + date.toLocaleTimeString()
                 );
-              },
-            },
-          },
+              }
+            }
+          }
         };
         if (connectionLogs.currentTempLogs.length === 0) {
           tempChart.innerHTML = "<div class=''>No Records to Show</div>";
@@ -267,19 +261,16 @@ export default class PrinterLogs {
       logSelect.addEventListener("change", (e) => {
         octologsLogsRows.innerHTML = "";
 
-        octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+        octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
         PrinterLogs.parseLogs(printer, e.target.value);
       });
-      document
-        .getElementById("system-refresh-list")
-        .addEventListener("click", async (e) => {
-          console.log("Refresh!", currentPrinter.printerURL);
-          let connectionLogs = await OctoFarmClient.get(
-            "printers/connectionLogs/" + currentPrinter._id
-          );
-          connectionLogs = await connectionLogs.json();
-          PrinterLogs.loadLogs(currentPrinter, connectionLogs);
-        });
+      document.getElementById("system-refresh-list").addEventListener("click", async (e) => {
+        console.log("Refresh!", currentPrinter.printerURL);
+        let connectionLogs = await OctoFarmClient.get(
+          "printers/connectionLogs/" + currentPrinter._id
+        );
+        PrinterLogs.loadLogs(currentPrinter, connectionLogs);
+      });
       eventListener = true;
     }
   }
@@ -287,24 +278,46 @@ export default class PrinterLogs {
     let display = "";
     let noHistoryMessage = "";
     let safeModeCheck = "";
-    if (stats.octoPrintSystemInfo["octoprint.safe_mode"]) {
-      safeModeCheck = `
-      <i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>
+
+    let printerFirmware = "Unknown";
+    let octoPrintVersion = "Unknown";
+    let pythonVersion = "Unknown";
+    let pythonPip = "Unknown";
+    let osPlatform = "Unknown";
+    let hardwareCores = "Unknown";
+    let hardwareRam = "Unknown";
+
+    if (stats.octoPrintSystemInfo) {
+      octoPrintVersion = stats.octoPrintSystemInfo["octoprint.version"];
+
+      pythonVersion = stats.octoPrintSystemInfo["env.python.version"];
+
+      pythonPip = stats.octoPrintSystemInfo["env.python.pip"];
+
+      osPlatform = stats.octoPrintSystemInfo["env.os.platform"];
+
+      hardwareCores = stats.octoPrintSystemInfo["env.hardware.cores"];
+
+      hardwareRam = stats.octoPrintSystemInfo["env.hardware.ram"];
+
+      if (stats.octoPrintSystemInfo["octoprint.safe_mode"]) {
+        safeModeCheck = `
+        <i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>
       `;
-    } else {
-      safeModeCheck = `
-      <i title="Something wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>
+      } else {
+        safeModeCheck = `
+        <i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-up text-success\"></i>
       `;
+      }
+      if (typeof stats?.octoPrintSystemInfo["printer.firmware"] !== "undefined") {
+        printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
+      }
     }
     if (stats.historyByDay.length === 0) {
       noHistoryMessage = `<div class='row'>
                     <div class="col-12"><h5>Sorry but your printer currently has no history captured. Please run some prints to generate information here.</h5></div>
                 </div>`;
       display = "d-none";
-    }
-    let printerFirmware = "Unknown";
-    if (typeof stats.octoPrintSystemInfo["printer.firmware"] !== "undefined") {
-      printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
     }
     return `
             <div class="col-md-12 col-lg-4">
@@ -314,39 +327,15 @@ export default class PrinterLogs {
                               <p class="card-text">
                               <div class="row">
                                 <div class="col-md-12 col-lg-6">
-                                   <small><b>OctoPrint Version:</b> ${
-                                     stats.octoPrintSystemInfo[
-                                       "octoprint.version"
-                                     ]
-                                   }</small><br>
+                                   <small><b>OctoPrint Version:</b> ${octoPrintVersion}</small><br>
                                     <small><b>Printer Firmware:</b> ${printerFirmware}</small><br>
-                                    <small><b>Python Version:</b> ${
-                                      stats.octoPrintSystemInfo[
-                                        "env.python.version"
-                                      ]
-                                    }</small>   <br>     
-                                       <small><b>pip Version:</b> ${
-                                         stats.octoPrintSystemInfo[
-                                           "env.python.pip"
-                                         ]
-                                       }</small>        <br>                          
+                                    <small><b>Python Version:</b> ${pythonVersion}</small>   <br>     
+                                       <small><b>pip Version:</b> ${pythonPip}</small>        <br>                          
                                 </div>
                                   <div class="col-md-12 col-lg-6">
-                                   <small><b>OS Platform:</b> ${
-                                     stats.octoPrintSystemInfo[
-                                       "env.os.platform"
-                                     ]
-                                   }</small><br>
-                                   <small><b>OS Cores:</b> ${
-                                     stats.octoPrintSystemInfo[
-                                       "env.hardware.cores"
-                                     ]
-                                   }</small><br>
-                                    <small><b>OS ram:</b> ${Calc.bytes(
-                                      stats.octoPrintSystemInfo[
-                                        "env.hardware.ram"
-                                      ]
-                                    )}</small><br>
+                                   <small><b>OS Platform:</b> ${osPlatform}</small><br>
+                                   <small><b>OS Cores:</b> ${hardwareCores}</small><br>
+                                    <small><b>OS ram:</b> ${Calc.bytes(hardwareRam)}</small><br>
                                      <small><b>Safe Mode Check:</b> ${safeModeCheck} </small><br>
                                 </div>
                               </div>
@@ -411,9 +400,7 @@ export default class PrinterLogs {
               <div class="card text-white bg-dark mb-3">
                 <div class="card-header">Age</div>
                 <div class="card-body">
-                  <p class="card-text">${Calc.generateTime(
-                    stats.timeTotal / 1000
-                  )}</p>
+                  <p class="card-text">${Calc.generateTime(stats.timeTotal / 1000)}</p>
                 </div>
               </div>
             </div>
@@ -434,7 +421,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (g)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedLengthTotal
+                    stats.filamentUsedWeightTotal
                   )}</p>
                 </div>
               </div>
@@ -445,7 +432,7 @@ export default class PrinterLogs {
                 <div class="card-header">Total Filament Usage (m)</div>
                 <div class="card-body">
                   <p class="card-text">                ${Calc.generateCost(
-                    stats.filamentUsedWeightTotal
+                    stats.filamentUsedLengthTotal
                   )}</p>
                 </div>
               </div>
@@ -613,7 +600,6 @@ export default class PrinterLogs {
   }
   static async loadStatistics(id) {
     let get = await OctoFarmClient.get("history/statistics/" + id);
-    get = await get.json();
     //Setup page
     let printerStatsWrapper = document.getElementById("printerStatistics");
     printerStatsWrapper.innerHTML = "";
@@ -632,23 +618,23 @@ export default class PrinterLogs {
           curve: "smooth",
           lineCap: "butt",
           width: 1,
-          dashArray: 0,
+          dashArray: 0
         },
         animations: {
-          enabled: true,
+          enabled: true
         },
         plotOptions: {
           bar: {
-            horizontal: false,
-          },
+            horizontal: false
+          }
         },
         toolbar: {
-          show: false,
+          show: false
         },
         zoom: {
-          enabled: false,
+          enabled: false
         },
-        background: "#303030",
+        background: "#303030"
       },
       dataLabels: {
         enabled: false,
@@ -659,13 +645,13 @@ export default class PrinterLogs {
           borderRadius: 2,
           borderWidth: 1,
           borderColor: "#fff",
-          opacity: 0.9,
+          opacity: 0.9
         },
         formatter: function (val, opts) {
           if (val !== null) {
             return val.toFixed(0) + "g";
           }
-        },
+        }
       },
       colors: [
         "#00bc8c",
@@ -676,22 +662,22 @@ export default class PrinterLogs {
         "#00b7ff",
         "#4400ff",
         "#8000ff",
-        "#ff00f2",
+        "#ff00f2"
       ],
       toolbar: {
-        show: false,
+        show: false
       },
       theme: {
-        mode: "dark",
+        mode: "dark"
       },
       noData: {
-        text: "Loading...",
+        text: "Loading..."
       },
       series: [],
       yaxis: [
         {
           title: {
-            text: "Count",
+            text: "Count"
           },
           seriesName: "Success",
           labels: {
@@ -699,12 +685,12 @@ export default class PrinterLogs {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            },
-          },
+            }
+          }
         },
         {
           title: {
-            text: "Count",
+            text: "Count"
           },
           seriesName: "Success",
           labels: {
@@ -712,13 +698,13 @@ export default class PrinterLogs {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            },
+            }
           },
-          show: false,
+          show: false
         },
         {
           title: {
-            text: "Count",
+            text: "Count"
           },
           seriesName: "Success",
           labels: {
@@ -726,10 +712,10 @@ export default class PrinterLogs {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            },
+            }
           },
-          show: false,
-        },
+          show: false
+        }
       ],
       xaxis: {
         type: "datetime",
@@ -738,9 +724,9 @@ export default class PrinterLogs {
           formatter: function (value, timestamp) {
             let dae = new Date(timestamp);
             return dae.toLocaleDateString(); // The formatter function overrides format property
-          },
-        },
-      },
+          }
+        }
+      }
     };
     if (historyBarChart !== null) {
       historyBarChart.destroy();
@@ -762,37 +748,37 @@ export default class PrinterLogs {
         width: "100%",
         height: "100%",
         animations: {
-          enabled: true,
+          enabled: true
         },
-        background: "#303030",
+        background: "#303030"
       },
       theme: {
-        mode: "dark",
+        mode: "dark"
       },
       plotOptions: {
         pie: {
           expandOnClick: false,
           dataLabels: {
             offset: 10,
-            minAngleToShowLabel: 15,
-          },
-        },
+            minAngleToShowLabel: 15
+          }
+        }
       },
       stroke: {
-        show: false,
+        show: false
       },
       tooltip: {
         y: {
           formatter(val) {
             return `${Math.round(val * 10) / 10}%`;
-          },
-        },
+          }
+        }
       },
       noData: {
-        text: "Loading...",
+        text: "Loading..."
       },
       dataLabels: {
-        enabled: false,
+        enabled: false
       },
       series: [],
       labels: ["Active", "Idle", "Offline"],
@@ -817,7 +803,7 @@ export default class PrinterLogs {
         offsetY: 0,
         labels: {
           colors: undefined,
-          useSeriesColors: false,
+          useSeriesColors: false
         },
         markers: {
           width: 9,
@@ -829,19 +815,19 @@ export default class PrinterLogs {
           customHTML: undefined,
           onClick: undefined,
           offsetX: 0,
-          offsetY: 0,
+          offsetY: 0
         },
         itemMargin: {
           horizontal: 1,
-          vertical: 0,
+          vertical: 0
         },
         onItemClick: {
-          toggleDataSeries: false,
+          toggleDataSeries: false
         },
         onItemHover: {
-          highlightDataSeries: false,
-        },
-      },
+          highlightDataSeries: false
+        }
+      }
     };
     if (historyPieChart !== null) {
       historyPieChart.destroy();
