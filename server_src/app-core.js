@@ -10,8 +10,7 @@ const { OctoFarmTasks } = require("./tasks");
 const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
-const { ServerSettings } = require("./settings/serverSettings.js");
-const { ClientSettings } = require("./settings/clientSettings.js");
+const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
 
@@ -72,8 +71,7 @@ async function ensureSystemSettingsInitiated() {
   });
 
   // Setup Settings as connection is established
-  const serverSettingsStatus = await ServerSettings.init();
-  ClientSettings.init();
+  const serverSettingsStatus = await SettingsClean.initialise();
 
   return serverSettingsStatus;
 }
@@ -110,9 +108,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
-
-    ClientSettings.init();
-
     const startUpTasks = [];
 
     for (let i = 0; i < OctoFarmTasks.BOOT_TASKS.length; i++) {

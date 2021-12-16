@@ -63,9 +63,25 @@ if (!!majorVersion && majorVersion < 14) {
       });
     })
     .catch(async (err) => {
+      const { SERVER_ISSUES } = require("server_src/constants/server-issues.constants");
       logger.error(err.stack);
-      const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
-      serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      if (
+        err.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL) ||
+        err.includes(SERVER_ISSUES.DATABASE_CONN_FAIL)
+      ) {
+        const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
+        serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      } else if (
+        err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_INIT) ||
+        err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_UPDATE) ||
+        err.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT) ||
+        err.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_UPDATE)
+      ) {
+        const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
+        serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      } else {
+        console.error("THIS IS MAJOR BROKEY");
+      }
     });
 
   bootAutoDiscovery();
