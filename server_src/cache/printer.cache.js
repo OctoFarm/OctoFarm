@@ -1,6 +1,7 @@
 const { PrinterClean } = require("../lib/dataFunctions/printerClean");
 
 let printerCleanState = new PrinterClean();
+console.log(printerCleanState);
 
 function getPrinterCache() {
   return printerCleanState;

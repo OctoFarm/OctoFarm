@@ -14,7 +14,6 @@ const softwareUpdateChecker = require("../services/octofarm-update.service");
 
 const { OctoprintApiClientService } = require("../services/octoprint/octoprint-api-client.service");
 const { HistoryCollection } = require("./history.runner.js");
-const { ServerSettings, filamentManager } = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");

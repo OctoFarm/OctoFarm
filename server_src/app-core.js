@@ -114,7 +114,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
       const task = OctoFarmTasks.BOOT_TASKS[i];
       startUpTasks.push(TaskManager.registerJobOrTask(task));
     }
-    // TODO attempt to run in sequence
     await Promise.all(startUpTasks);
 
     await optionalInfluxDatabaseSetup();

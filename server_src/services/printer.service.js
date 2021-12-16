@@ -16,7 +16,7 @@ const create = async (printer) => {
 /**
  * Lists the printers present in the database.
  */
-const list = async () => {
+const list = () => {
   return printerModel.find({});
 };
 
