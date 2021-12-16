@@ -78,9 +78,7 @@ WebSocketClient.prototype.open = function (url, index) {
     farmPrinters[this.index].webSocket = "warning";
     farmPrinters[this.index].webSocketDescription =
       "Websocket Connected but in Tentative state until receiving data";
-    if(!this?.instance){
-      this.instance = new WebSocket(this.url, { followRedirects: true });
-    }
+    this.instance = new WebSocket(this.url, { followRedirects: true });
     this.instance.on("open", () => {
       const endTime = ConnectionMonitorService.stopTimer();
       ConnectionMonitorService.updateOrAddResponse(
@@ -1122,7 +1120,10 @@ class Runner {
       errno: "999",
       code: "999"
     };
-    if (globalAPIKeyCheck.status === 200) {
+
+    const globalStatusCode = (globalAPIKeyCheck?.status) ? globalAPIKeyCheck?.status : " Connection timeout reached...";
+
+    if (globalStatusCode === 200) {
       //Safe to continue check
       const settingsData = await globalAPIKeyCheck.json();
       if (!settingsData) {
@@ -1142,7 +1143,7 @@ class Runner {
     } else {
       // Hard failure as can't contact api
       return {
-        message: "Could not Establish connection to OctoPrint Returned",
+        message: "Could not Establish connection to OctoPrint returned status: " + globalStatusCode,
         type: "system",
         errno: "503",
         code: "503"
@@ -2075,7 +2076,7 @@ class Runner {
           "Active",
           farmPrinters[index]._id
         );
-        await farmPrinters[index].ws.instance.terminate();
+        await farmPrinters[index].ws.instance.close();
         logger.info(`Closed websocket connection for: ${farmPrinters[index].printerURL}`);
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
@@ -2116,7 +2117,7 @@ class Runner {
           farmPrinters[index]._id
         );
         const { _id } = farmPrinters[index];
-        await farmPrinters[index].ws.instance.terminate();
+        await farmPrinters[index].ws.instance.close();
         await this.setupWebSocket(_id, skipAPI);
       }
     } else {
@@ -2160,7 +2161,7 @@ class Runner {
         typeof farmPrinters[i].ws !== "undefined" &&
         typeof farmPrinters[i].ws.instance !== "undefined"
       ) {
-        await farmPrinters[i].ws.instance.terminate();
+        await farmPrinters[i].ws.instance.close();
         logger.info(`Closed websocket connection for: ${farmPrinters[i].printerURL}`);
       }
     }
