@@ -15,9 +15,9 @@ class LoggerService {
   constructor(route, enableFileLogs = true, logFilterLevel) {
     const isProd = process.env.NODE_ENV === AppConstants.defaultProductionEnv;
     const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
-
     if (!logFilterLevel) {
-      logFilterLevel = isProd || isTest ? "warn" : "info";
+      logFilterLevel = isProd || isTest ? "warn" : "debug";
+      console.log(logFilterLevel);
     }
 
     this.log_data = null;
