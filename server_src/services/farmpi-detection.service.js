@@ -3,7 +3,7 @@ const Logger = require("../handlers/logger");
 
 const logger = new Logger("OctoFarm-Server");
 
-const fileLocation = "/etc/farmpi_version";
+const fileLocation = "./farmpi_version";
 
 let farmPiVersion = false;
 
@@ -15,6 +15,7 @@ const detectFarmPi = async () => {
   try {
     const fileContents = await readFileSync(fileLocation);
     farmPiVersion = fileContents.toString();
+    farmPiVersion.replace(/ /, "");
     logger.debug(
       "Found farmPi version file... we are on farmpi version : " + fileContents.toString()
     );
