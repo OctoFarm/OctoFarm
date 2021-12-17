@@ -87,10 +87,6 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  type: {
-    type: String,
-    required: false
-  },
   ip: {
     type: String,
     required: false

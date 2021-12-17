@@ -84,6 +84,7 @@ async function fetchApiTimeout(url, method, apiKey, fetchTimeout, bodyData = und
 class OctoprintApiService {
   timeout = undefined;
 
+
   constructor(timeoutSettings) {
     this.timeout = timeoutSettings;
   }

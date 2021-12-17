@@ -1554,7 +1554,7 @@ class Runner {
       "Active",
       farmPrinters[i]._id
     );
-    farmPrinters[i].apiTimeout = false;
+
     farmPrinters[i].state = "Setting Up";
     farmPrinters[i].stateColour = Runner.getColour("Offline");
     farmPrinters[i].hostState = "Setting Up";
@@ -1564,49 +1564,49 @@ class Runner {
     farmPrinters[i].hostDescription = "Setting up your Printer";
     farmPrinters[i].webSocketDescription = "Websocket is Offline";
     farmPrinters[i].stepRate = 10;
-    PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
-    farmPrinters[i].systemChecks = {
-      scanning: {
-        api: {
-          status: "danger",
-          date: null
-        },
-        files: {
-          status: "danger",
-          date: null
-        },
-        state: {
-          status: "danger",
-          date: null
-        },
-        profile: {
-          status: "danger",
-          date: null
-        },
-        settings: {
-          status: "danger",
-          date: null
-        },
-        system: {
-          status: "danger",
-          date: null
-        }
-      },
-      cleaning: {
-        information: {
-          status: "danger",
-          date: null
-        },
-        file: {
-          status: "danger",
-          date: null
-        },
-        job: {
-          status: "danger",
-          date: null
-        }
-      }
-    };
+    // PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+    // farmPrinters[i].systemChecks = {
+    //   scanning: {
+    //     api: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     files: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     state: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     profile: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     settings: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     system: {
+    //       status: "danger",
+    //       date: null
+    //     }
+    //   },
+    //   cleaning: {
+    //     information: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     file: {
+    //       status: "danger",
+    //       date: null
+    //     },
+    //     job: {
+    //       status: "danger",
+    //       date: null
+    //     }
+    //   }
+    // };
 
     if (typeof farmPrinters[i].dateAdded === "undefined") {
       let currentTime = new Date();
