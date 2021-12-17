@@ -4,6 +4,7 @@ const process = require("process");
 const Logger = require("../handlers/logger");
 const { bench } = require("../utils/benchmark.util");
 const logger = new Logger("OctoFarm-Server");
+const { farmPiStatus } = require("../services/farmpi-detection.service");
 
 const diskVeryFullWarning =
   "Warning your disk is getting full... Please clean up some space or move to a larger hard drive.";
@@ -130,6 +131,10 @@ class SystemRunner {
         benchmarkTimes: benchResults,
         networkIpAddresses: this.getIpAddressList()
       };
+
+      if (farmPiStatus()) {
+        systemInfo.osInfo.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
+      }
 
       return systemInfo;
     } catch (e) {

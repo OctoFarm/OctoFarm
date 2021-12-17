@@ -9,6 +9,7 @@ const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const ConnectionMonitorService = require("./services/connection-monitor.service");
 const {REQUEST_TYPE, REQUEST_KEYS} = require("./constants/connection-monitor.constants");
+const {detectFarmPi} = require("./services/farmpi-detection.service")
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -19,6 +20,10 @@ const PRINTER_CLEAN_TASK = async () => {
 
 const CRASH_TEST_TASK = async () => {
   throw new Error("big error");
+};
+
+const FARMPI_DETECTION_TASK = async () => {
+  await detectFarmPi()
 };
 
 const HISTORY_CACHE_TASK = async () => {
@@ -161,8 +166,7 @@ const INITITIALISE_PRINTERS = async () => {
  * @param milliseconds optional parameter to quickly set milliseconds timing
  * @returns {{task, id, preset}}
  */
-// TODO, this is not a decent function name...
-function KsatLlorKcir(task, preset, milliseconds = 0) {
+function TaskStart(task, preset, milliseconds = 0) {
   preset.milliseconds = preset.milliseconds || milliseconds;
 
   return {
@@ -174,16 +178,17 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
-    KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
-    KsatLlorKcir(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
-    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
+    TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
+    TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    // TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
+    TaskStart(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
+    TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
+    TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+    TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
+    TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
+    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
   ];
 }
 
