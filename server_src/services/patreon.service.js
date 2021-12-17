@@ -13,7 +13,7 @@ async function grabLatestPatreonData() {
     method: "GET"
   });
   if (latestPatreonData.status === 200) {
-    const getJSON = latestPatreonData.json();
+    const getJSON = await latestPatreonData.json();
     patreonData = getJSON.patreons.applicationPledges;
     logger.info("Successfully grabbed remote patreon data!");
   } else {
