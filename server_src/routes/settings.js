@@ -94,7 +94,7 @@ router.get(
       await ProfilesDB.deleteMany({});
       await RoomDataDB.deleteMany({});
       await UserDB.deleteMany({});
-      await PrinterDB.deleteMany({});
+      await PrintersDB.deleteMany({});
       await AlertsDB.deleteMany({});
       await GcodeDB.deleteMany({});
       res.send({
