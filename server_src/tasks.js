@@ -8,8 +8,9 @@ const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const ConnectionMonitorService = require("./services/connection-monitor.service");
-const {REQUEST_TYPE, REQUEST_KEYS} = require("./constants/connection-monitor.constants");
-const {detectFarmPi} = require("./services/farmpi-detection.service")
+const { REQUEST_TYPE, REQUEST_KEYS } = require("./constants/connection-monitor.constants");
+const { detectFarmPi } = require("./services/farmpi-detection.service");
+const { PrinterTicker } = require("./runners/printerTicker");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -23,7 +24,7 @@ const CRASH_TEST_TASK = async () => {
 };
 
 const FARMPI_DETECTION_TASK = async () => {
-  await detectFarmPi()
+  await detectFarmPi();
 };
 
 const HISTORY_CACHE_TASK = async () => {
@@ -52,34 +53,41 @@ const GENERATE_MONTHLY_HISTORY_STATS = async () => {
 };
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
-    const farmPrinters = Runner.returnFarmPrinters();
-    farmPrinters.forEach(function each(client) {
-      if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
-        if (
-            client.ws.instance.readyState !== 0 &&
-            client.ws.instance.readyState !== 2 &&
-            client.ws.instance.readyState !== 3
-        ) {
-          if (client.ws.isAlive === false) {
-            ConnectionMonitorService.updateOrAddResponse(
-                client.webSocketURL + "/sockjs/websocket",
-                REQUEST_TYPE.PING_PONG,
-                REQUEST_KEYS.TOTAL_PING_PONG
-            );
-            return client.ws.instance.terminate();
-          }
-          const triggerStates = ["Offline", "Searching...", "Shutdown"];
-          if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
-            // Retry connecting if failed...
-            farmPrinters[client.ws.index].webSocket = "info";
-            farmPrinters[client.ws.index].webSocketDescription =
-                "Checking if Websocket is still alive";
-            client.ws.isAlive = false;
-            client.ws.instance.ping(function noop() {});
-          }
+  const farmPrinters = Runner.returnFarmPrinters();
+  farmPrinters.forEach(function each(client) {
+    if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
+      if (
+        client.ws.instance.readyState !== 0 &&
+        client.ws.instance.readyState !== 2 &&
+        client.ws.instance.readyState !== 3
+      ) {
+        if (client.ws.isAlive === false) {
+          ConnectionMonitorService.updateOrAddResponse(
+            client.webSocketURL + "/sockjs/websocket",
+            REQUEST_TYPE.PING_PONG,
+            REQUEST_KEYS.TOTAL_PING_PONG
+          );
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[client.ws.index].printerURL,
+            "Ping/Pong check failed! Destroying printer and re-setting up!",
+            "Offline",
+            farmPrinters[client.ws.index]._id
+          );
+          return Runner.reScanOcto(farmPrinters[client.ws.index]._id);
+        }
+        const triggerStates = ["Offline", "Searching...", "Shutdown"];
+        if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
+          // Retry connecting if failed...
+          farmPrinters[client.ws.index].webSocket = "info";
+          farmPrinters[client.ws.index].webSocketDescription =
+            "Checking if Websocket is still alive";
+          client.ws.isAlive = false;
+          client.ws.instance.ping(function noop() {});
         }
       }
-    });
+    }
+  });
 };
 
 const SSE_TASK = () => {
@@ -181,7 +189,7 @@ class OctoFarmTasks {
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    // TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
+    TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
