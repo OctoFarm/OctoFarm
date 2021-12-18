@@ -92,7 +92,7 @@ const printerConnectionCheck = (currentConnection, connectionOptions) => {
   }
 
   if (connectionOptions?.portPreference) {
-    connectionDefaults.port = typeof connectionOptions.baudratePreference === "string";
+    connectionDefaults.port = typeof connectionOptions.portPreference === "string";
   }
 
   if (connectionOptions?.printerProfilePreference) {
@@ -110,13 +110,11 @@ const webcamChecks = (cameraURL, camSettings) => {
   const results = {
     camSetup: false,
     historySetup: {
-      ffmpegPath: false,
-      ffmpegVideoCodex: false,
-      timelapseEnabled: false
+      ffmpegPath: true,
+      ffmpegVideoCodex: true,
+      timelapseEnabled: true
     }
   };
-
-  if (typeof cameraURL === "undefined" || !camSettings) return results;
 
   if (cameraURL === "" || cameraURL === null) {
     //Blank URL, make sure cam settings are off!
@@ -124,22 +122,20 @@ const webcamChecks = (cameraURL, camSettings) => {
   }
 
   const { history } = SettingsClean.returnSystemSettings();
-  if (!results.camSetup) {
-    if (
-      history.snapshot.onComplete ||
-      history.snapshot.onFailure ||
-      history.timelapse.onComplete ||
-      history.timelapse.onFailure
-    ) {
-      if (typeof camSettings.ffmpegPath === "string") {
-        results.historySetup.ffmpegPath = true;
-      }
-      if (camSettings.ffmpegVideoCodec === "libx264") {
-        results.historySetup.ffmpegVideoCodex = true;
-      }
-      if (camSettings.timelapseEnabled) {
-        results.historySetup.timelapseEnabled = true;
-      }
+  if (
+    history.snapshot.onComplete ||
+    history.snapshot.onFailure ||
+    history.timelapse.onComplete ||
+    history.timelapse.onFailure
+  ) {
+    if (typeof camSettings.ffmpegPath !== "string") {
+      results.historySetup.ffmpegPath = false;
+    }
+    if (camSettings.ffmpegVideoCodec !== "libx264") {
+      results.historySetup.ffmpegVideoCodex = false;
+    }
+    if (!camSettings.timelapseEnabled) {
+      results.historySetup.timelapseEnabled = false;
     }
   }
 

@@ -289,6 +289,7 @@ export async function saveAllOnAddPrinterTable() {
 export async function loadPrinterHealthChecks() {
   const healthChecks = await OctoFarmClient.getHealthChecks();
   const table = document.getElementById("healthChecksTable");
+  table.innerHTML = "";
   healthChecks.forEach((check) => {
     table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
   });

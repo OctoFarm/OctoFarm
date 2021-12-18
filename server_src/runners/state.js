@@ -2185,8 +2185,6 @@ class Runner {
   static async updatePoll() {
     for (let i = 0; i < farmPrinters.length; i++) {
       // Update the server
-      const server = await ServerSettings.check();
-      systemSettings = server[0];
       const Polling = systemSettings.onlinePolling;
       const throt = {};
       logger.info(`Updating websock poll time: ${(Polling.seconds * 1000) / 500}`);

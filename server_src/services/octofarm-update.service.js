@@ -32,7 +32,7 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
   await getGithubReleasesPromise()
     .then((githubReleases) => {
       airGapped = !githubReleases;
-      if (githubReleases?.message.includes("API rate")) {
+      if (githubReleases?.message?.includes("API rate")) {
         logger.debug("Latest release check failed due to API rate limiting...");
         lastReleaseCheckFailed = true;
         return Promise.resolve(null);
