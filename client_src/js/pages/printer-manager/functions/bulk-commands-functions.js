@@ -1,18 +1,18 @@
 import { findIndex } from "lodash";
 
-import OctoFarmClient from "../../services/octofarm-client.service.js";
-import UI from "../../lib/functions/ui";
-import PrinterSelect from "../../lib/modules/printerSelect";
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
+import UI from "../../../lib/functions/ui";
+import PrinterSelect from "../../../lib/modules/printerSelect";
 import {
   octoPrintPluginInstallAction,
   updateOctoPrintPlugins
-} from "../../octoprint/octoprint-plugin-commands";
+} from "../../../octoprint/octoprint-plugin-commands";
 import {
   disconnectPrinterFromOctoPrint,
   quickConnectPrinterToOctoPrint,
   sendPowerCommandToOctoPrint,
   updateOctoPrintClient
-} from "../../octoprint/octoprint-client-commands";
+} from "../../../octoprint/octoprint-client-commands";
 import {
   printerPreHeatBed,
   printerPreHeatTool,
@@ -25,12 +25,12 @@ import {
   printerMoveAxis,
   printerHomeAxis,
   printerSendGcode
-} from "../../octoprint/octoprint-printer-commands";
+} from "../../../octoprint/octoprint-printer-commands";
 import {
   setupOctoPrintForFilamentManager,
   setupOctoPrintForVirtualPrinter
-} from "../../octoprint/octoprint-settings.actions";
-import CustomGenerator from "../../lib/modules/customScripts";
+} from "../../../octoprint/octoprint-settings.actions";
+import CustomGenerator from "../../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
 import {
@@ -41,9 +41,9 @@ import {
 } from "./bulk-actions-progress.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
-import Queue from "../../lib/modules/clientQueue.js";
-import OctoPrintClient from "../../lib/octoprint";
-import { filamentManagerPluginActionElements } from "../../system/server.options";
+import Queue from "../../../lib/modules/clientQueue.js";
+import OctoPrintClient from "../../../lib/octoprint";
+import { filamentManagerPluginActionElements } from "../../../system/server.options";
 const fileUploads = new Queue();
 
 let selectedFolder = "";

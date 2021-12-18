@@ -1,16 +1,16 @@
-import UI from "../../lib/functions/ui";
-import OctoFarmClient from "../../services/octofarm-client.service.js";
+import UI from "../../../lib/functions/ui";
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import { checkIfLoaderExistsAndRemove, updateConnectionLog } from "../connection-log";
 import { createOrUpdatePrinterTableRow } from "../printer-data";
-import PowerButton from "../../lib/modules/powerButton";
-import PrinterManager from "../../lib/modules/printerManager";
-import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
-import Validate from "../../lib/functions/validate";
+import PowerButton from "../../../lib/modules/powerButton";
+import PrinterManager from "../../../lib/modules/printerManager";
+import { updatePrinterSettingsModal } from "../../../lib/modules/printerSettings";
+import Validate from "../../../lib/functions/validate";
 import { PrintersManagement } from "../printer-constructor";
-import PrinterSelect from "../../lib/modules/printerSelect";
-import FileOperations from "../../lib/functions/file";
+import PrinterSelect from "../../../lib/modules/printerSelect";
+import FileOperations from "../../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
-import PrinterFileManager from "../../lib/modules/printerFileManager";
+import PrinterFileManager from "../../../lib/modules/printerFileManager";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -283,4 +283,9 @@ export async function saveAllOnAddPrinterTable() {
   UI.createAlert("success", "Successfully saved all your instances", 4000);
   saveAllBtn.disabled = false;
   deleteAllBtn.disabled = true;
+}
+
+export async function loadPrinterHealthChecks() {
+  const healthChecks = await OctoFarmClient.getHealthChecks();
+  console.log(healthChecks);
 }

@@ -114,7 +114,7 @@ class PrinterSettings {
       userDropDown.value = currentPrinter.currentUser;
     } else {
       userDropDown.disabled = true;
-      userDropDown.insertAdjacentHTML("beforeend", "<option value=\"0\">No users available</option>");
+      userDropDown.insertAdjacentHTML("beforeend", '<option value="0">No users available</option>');
       userDropDown.value = 0;
     }
 
@@ -1098,6 +1098,9 @@ class PrinterSettings {
           profileCheck: document.getElementById("profileCheck"),
           settingsCheck: document.getElementById("settingsCheck"),
           systemCheck: document.getElementById("systemCheck"),
+          systemInfoCheck: document.getElementById("systemInfoCheck"),
+          pluginsCheck: document.getElementById("pluginsCheck"),
+          updatesCheck: document.getElementById("updatesCheck"),
           apiClean: document.getElementById("apiClean"),
           filesClean: document.getElementById("filesClean"),
           stateClean: document.getElementById("stateClean"),
@@ -1134,7 +1137,7 @@ class PrinterSettings {
     pageElements.mainPage.socket.innerHTML = `<b>WebSocket Status</b><br>${currentPrinter.webSocketState.desc}`;
     pageElements.mainPage.socket.className = `btn btn-${currentPrinter.webSocketState.colour} mb-1 btn-block`;
 
-    pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-link"></i> <b>API Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+    pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-link"></i> <b>Users Check</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.scanning.api.date
     )}`;
     pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.api.status} mb-1 btn-block`;
@@ -1158,6 +1161,21 @@ class PrinterSettings {
       currentPrinter.systemChecks.scanning.system.date
     )}`;
     pageElements.connectPage.systemCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.system.status} mb-1 btn-block`;
+
+    pageElements.connectPage.systemInfoCheck.innerHTML = `<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.systemInfo.date
+    )}`;
+    pageElements.connectPage.systemInfoCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.systemInfo.status} mb-1 btn-block`;
+
+    pageElements.connectPage.pluginsCheck.innerHTML = `<i class="fas fa-plug"></i> <b>Plugins Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.plugins.date
+    )}`;
+    pageElements.connectPage.pluginsCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.plugins.status} mb-1 btn-block`;
+
+    pageElements.connectPage.updatesCheck.innerHTML = `<i class="fas fa-wrench"></i> <b>Updates Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.updates.date
+    )}`;
+    pageElements.connectPage.updatesCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.updates.status} mb-1 btn-block`;
 
     pageElements.connectPage.apiClean.innerHTML = `<i class="fas fa-server"></i> <b>Printer Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.cleaning.information.date

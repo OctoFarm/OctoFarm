@@ -1,5 +1,5 @@
-import OctoFarmClient from "../../services/octofarm-client.service";
-import Sortable from "../../vendor/sortable";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import Sortable from "../../../vendor/sortable";
 
 export function setupSortablePrintersTable() {
   // Setup drag and drop re-ordering listeners

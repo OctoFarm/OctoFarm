@@ -5,7 +5,7 @@ import {
   bulkOctoPrintPluginUpdate,
   bulkOctoPrintPluginAction,
   bulkEnableVirtualPrinter
-} from "./printer-manager/functions/bulk-commands-functions";
+} from "./pages/printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
   bulkDeletePrinters,
@@ -16,10 +16,11 @@ import {
   reSyncPrinters,
   saveAllOnAddPrinterTable,
   scanNetworkForDevices,
-  workerEventFunction
-} from "./printer-manager/functions/printer-manager.functions";
+  workerEventFunction,
+  loadPrinterHealthChecks
+} from "./pages/printer-manager/functions/printer-manager.functions";
 
-import { setupSortablePrintersTable } from "./printer-manager/functions/sortable-table";
+import { setupSortablePrintersTable } from "./pages/printer-manager/functions/sortable-table";
 
 const workerURL = "/printersInfo/get/";
 
@@ -104,6 +105,11 @@ deleteAllBtn.addEventListener("click", async (e) => {
 const saveAllBtn = document.getElementById("saveAllBtn");
 saveAllBtn.addEventListener("click", async (e) => {
   await saveAllOnAddPrinterTable();
+});
+
+const printerHealthCheckBtn = document.getElementById("printerHealthCheckBtn");
+printerHealthCheckBtn.addEventListener("click", async (e) => {
+  await loadPrinterHealthChecks();
 });
 
 createClientSSEWorker(workerURL, workerEventFunction);
