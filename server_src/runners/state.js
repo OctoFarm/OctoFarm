@@ -51,16 +51,18 @@ function heartBeat(index) {
   farmPrinters[index].ws.isAlive = true;
 }
 
-function setupReconnectionTimeout(that){
-  if(!farmPrinters[that.index].apiTimeout){
-    logger.error(farmPrinters[that.index].printerURL + ": Could not reconnect, destroying and re-setting up")
+function setupReconnectionTimeout(that) {
+  if (!farmPrinters[that.index].apiTimeout) {
+    logger.error(
+      farmPrinters[that.index].printerURL + ": Could not reconnect, destroying and re-setting up"
+    );
     farmPrinters[that.index].apiTimeout = setTimeout(async () => {
       await Runner.reScanOcto(farmPrinters[that.index]._id);
       logger.error("Error with websockets... resetting up!");
       farmPrinters[that.index].apiTimeout = false;
     }, 30000);
-  }else{
-    logger.debug(farmPrinters[that.index].printerURL + ": Has attempted multiple reconnects!")
+  } else {
+    logger.debug(farmPrinters[that.index].printerURL + ": Has attempted multiple reconnects!");
   }
 }
 
@@ -92,9 +94,9 @@ WebSocketClient.prototype.open = function (url, index) {
       try {
         this.onopen(this.index).then(() => {
           ConnectionMonitorService.updateOrAddResponse(
-              this.url,
-              REQUEST_TYPE.WEBSOCKET,
-              REQUEST_KEYS.SUCCESS_RESPONSE
+            this.url,
+            REQUEST_TYPE.WEBSOCKET,
+            REQUEST_KEYS.SUCCESS_RESPONSE
           );
         });
       } catch (e) {
@@ -381,7 +383,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-  if(!that.timeout){
+  if (!that.timeout) {
     that.timeout = setTimeout(async function () {
       farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
       farmPrinters[that.index].hostDescription = "Searching for Host";
@@ -452,6 +454,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       if (farmPrinters[this.index]?.multiUserIssue) {
         farmPrinters[this.index].multiUserIssue = false;
       }
+
+      farmPrinters[this.index].restartRequired = false;
 
       farmPrinters[this.index].webSocket = "warning";
       farmPrinters[this.index].webSocketDescription =
@@ -1046,10 +1050,10 @@ class Runner {
 
   static async init() {
     farmPrinters = [];
-    try{
+    try {
       await PrinterClean.removePrintersInformation();
-    }catch(e){
-      logger.debug("No printers information to remove")
+    } catch (e) {
+      logger.debug("No printers information to remove");
     }
 
     const server = await ServerSettings.check();
@@ -1122,7 +1126,9 @@ class Runner {
       code: "999"
     };
 
-    const globalStatusCode = (globalAPIKeyCheck?.status) ? globalAPIKeyCheck?.status : " Connection timeout reached...";
+    const globalStatusCode = globalAPIKeyCheck?.status
+      ? globalAPIKeyCheck?.status
+      : " Connection timeout reached...";
 
     if (globalStatusCode === 200) {
       //Safe to continue check
