@@ -119,7 +119,6 @@ WebSocketClient.prototype.open = function (url, index) {
       }
     });
     this.instance.on("close", (e) => {
-      console.log("CASE", e);
       switch (e) {
         case 1000: // CLOSE_NORMAL
           logger.info(`WebSocket: closed: ${this.index}: ${this.url}`);
@@ -619,6 +618,15 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             "Complete",
             farmPrinters[this.index]._id
           );
+        } else if (data.event.payload.username === null) {
+          //Authed from OctoFarm host...
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[this.index].printerURL,
+            "Someone has opened OctoPrints login page...",
+            "Active",
+            farmPrinters[this.index]._id
+          );
         } else {
           //Not authed from OctoFarm host
           PrinterTicker.addIssue(
@@ -979,7 +987,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       PrinterClean.generate(farmPrinters[this.index], filamentManager);
     }
   } catch (e) {
-    console.log("Safe to ignore", e);
+    logger.debug("Failed to parse event data", e);
   }
 };
 WebSocketClient.prototype.onerror = function (e) {
@@ -1116,7 +1124,6 @@ class Runner {
           "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
       };
       logger.error(err);
-      console.log(err);
     }
   }
 
@@ -2621,8 +2628,8 @@ class Runner {
           "Disconnected",
           farmPrinters[index]._id
         );
-        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
-        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        // farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        // farmPrinters[index].systemChecks.scanning.profile.date = new Date();
         logger.error(`Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `, err);
         return false;
       });
