@@ -11,6 +11,7 @@ import PrinterSelect from "../../../lib/modules/printerSelect";
 import FileOperations from "../../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
 import PrinterFileManager from "../../../lib/modules/printerFileManager";
+import { returnHealthCheckRow } from "../templates/health-checks-table-row.templates";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -287,5 +288,8 @@ export async function saveAllOnAddPrinterTable() {
 
 export async function loadPrinterHealthChecks() {
   const healthChecks = await OctoFarmClient.getHealthChecks();
-  console.log(healthChecks);
+  const table = document.getElementById("healthChecksTable");
+  healthChecks.forEach((check) => {
+    table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+  });
 }

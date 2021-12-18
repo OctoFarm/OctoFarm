@@ -1,18 +1,29 @@
-<div class="modal fade" id="healthChecksModal" tabindex="-1" role="dialog"
-     aria-labelledby="printerHealthChecksModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header px-3 pt-3 pb-2" id="printerHealthChecksTitle">
-                Printer Health Checks
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid" id="printerHealthChecksBody">
 
+                <div class="container-fluid" id="printerHealthChecksBody">
+                    <div class="col-lg-12 table-responsive-sm table-responsive-md">
+                        <table id="" class="table table-dark table-striped text-center">
+                            <thead>
+                            <tr>
+                                <th scope="col" class="sticky-table table-dark" style="">Printer Name</th>
+<!--                                Printer Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">Printer Settings</th>
+<!--                                Connection Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">Connection Settings</th>
+<!--                                API Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">API</th>
+<!--                                Websocket Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">Network Issues</th>
+<!--                                Connection Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">Printer Connection</th>
+<!--                                Profile Checks-->
+                                <th scope="col" class="sticky-table table-dark" style="">Printer Profile</th>
+<!--                                Webcam Settings-->
+                                <th scope="col" class="sticky-table table-dark" style="">Webcam Settings</th>
+                            </tr>
+                            </thead>
+                            <tbody id="healthChecksTable" style="height:100%; overflow-y:auto;">
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
