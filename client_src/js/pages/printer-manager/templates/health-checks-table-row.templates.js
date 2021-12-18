@@ -69,7 +69,7 @@ const returnNetworkConnection = (issues) => {
   });
 
   const collapse = `
-    <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#collapseTimeout" role="button" aria-expanded="false" aria-controls="collapseTimeout">
+    <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#${E.HISTORY_CUT_OFF+pClean}CollapseTimeout" role="button" aria-expanded="false" aria-controls="${E.HISTORY_CUT_OFF+pClean}CollapseTimeout">
     ${printerURL} 
     </a>
     ${returnButton(
@@ -84,7 +84,7 @@ const returnNetworkConnection = (issues) => {
       E.HISTORY_CUT_OFF+pClean,
       VALID_TIMEOUT("All Cut Off")
     )}
-    <div class="collapse" id="collapseTimeout">
+    <div class="collapse" id="${E.HISTORY_CUT_OFF+pClean}CollapseTimeout">
       <div class="card card-body">
       ${html} 
       </div>
