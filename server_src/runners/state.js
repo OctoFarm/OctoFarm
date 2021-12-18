@@ -62,7 +62,9 @@ function setupReconnectionTimeout(that) {
       farmPrinters[that.index].apiTimeout = false;
     }, 30000);
   } else {
-    logger.debug(farmPrinters[that.index].printerURL + ": Has attempted multiple reconnects!");
+    logger.debug(
+      farmPrinters[that.index].printerURL + ": Ignoring connection attempt, one planned..."
+    );
   }
 }
 
@@ -117,6 +119,7 @@ WebSocketClient.prototype.open = function (url, index) {
       }
     });
     this.instance.on("close", (e) => {
+      console.log("CASE", e);
       switch (e) {
         case 1000: // CLOSE_NORMAL
           logger.info(`WebSocket: closed: ${this.index}: ${this.url}`);
@@ -172,26 +175,26 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
             farmPrinters[this.index].webSocketDescription =
-              "Websocket Terminated by OctoFarm, Ping/Pong check fails";
+              "Websocket Terminated by OctoFarm... resetting up...";
             this.instance.removeAllListeners();
             if (typeof farmPrinters[this.index] !== "undefined") {
               PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.debug(
-              `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`,
+              `Websocket Terminated by OctoFarm, closing and attempted to reconnect: ${this.index}: ${this.url}`,
               e
             );
           }
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
-            "Ping/Pong failed to get a response, attempting to reconnect... in 30000ms",
+            "Websocket Terminated by OctoFarm, closing and attempted to reconnect in 30000ms",
             "Offline",
             farmPrinters[index]._id
           );
           logger.debug(
-            `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
+            `Websocket Terminated by OctoFarm, closing and attempted to reconnect: ${this.index}: ${this.url}`
           );
           setupReconnectionTimeout(this);
           break;
@@ -199,12 +202,12 @@ WebSocketClient.prototype.open = function (url, index) {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
-            "Unknown issue has occured! Will attempt a reconnect in 60000ms",
-            "Complete",
+            "Unknown issue has occured! Will attempt a reconnect in 30000ms",
+            "Disconnected ",
             farmPrinters[index]._id
           );
           logger.debug(
-            `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
+            `Unknown issue has occured! Will attempt a reconnect in 30000ms: ${this.index}: ${this.url}`
           );
           setupReconnectionTimeout(this);
       }
@@ -318,8 +321,7 @@ WebSocketClient.prototype.open = function (url, index) {
             );
           }
           logger.error(`WebSocket hard failure: ${this.index}: ${this.url}`);
-          // Auto connect here is causing double socket listeners when editing
-          //this.reconnect(e);
+          this.reconnect(e);
           break;
       }
     });
@@ -329,7 +331,7 @@ WebSocketClient.prototype.open = function (url, index) {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
-      "Client error, setting back up... in 10000ms",
+      "Client error, setting back up... in 30000ms",
       "Offline",
       farmPrinters[this.index]._id
     );
@@ -383,8 +385,8 @@ WebSocketClient.prototype.reconnect = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-  if (!that.timeout) {
-    that.timeout = setTimeout(async function () {
+  if (!that.webSocketReconnection) {
+    that.webSocketReconnection = setTimeout(async function () {
       farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
       farmPrinters[that.index].hostDescription = "Searching for Host";
       logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
@@ -392,8 +394,10 @@ WebSocketClient.prototype.reconnect = async function (e) {
         PrinterClean.generate(farmPrinters[that.index], systemSettings.filamentManager);
       }
       that.open(that.url, that.index);
-      that.timeout = false;
+      that.webSocketReconnection = false;
     }, this.autoReconnectInterval);
+  } else {
+    logger.debug("Websocket Reconnection attempt planned... ignoring");
   }
 
   return true;
@@ -2156,7 +2160,7 @@ class Runner {
         typeof farmPrinters[i].ws !== "undefined" &&
         typeof farmPrinters[i].ws.instance !== "undefined"
       ) {
-        await farmPrinters[i].ws.instance.terminate();
+        await farmPrinters[i].ws.instance.close();
       }
     }
     return "updated";
@@ -2427,19 +2431,6 @@ class Runner {
         return res.json();
       })
       .then(async (res) => {
-        // Update info to DB
-        if (res.current.state === "Offline") {
-          res.current.state = "Disconnected";
-          farmPrinters[index].stateDescription = "Your printer is disconnected";
-        } else if (res.current.state.includes("Error:")) {
-          farmPrinters[index].stateDescription = res.current.state;
-          res.current.state = "Error!";
-        } else if (res.current.state === "Closed") {
-          res.current.state = "Disconnected";
-          farmPrinters[index].stateDescription = "Your printer is disconnected";
-        } else {
-          farmPrinters[index].stateDescription = "Current Status from OctoPrint";
-        }
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
         farmPrinters[index].job = null;
