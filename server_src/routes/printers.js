@@ -319,7 +319,7 @@ router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
         farmPrinters[i].cameraURL,
         farmPrinters[i].otherSettings.webCamSettings
       ),
-      connectionIssues: checkConnectionsMatchRetrySettings()
+      connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
     };
     response.push(printerCheck);
   }

@@ -109,7 +109,11 @@ const profileChecks = (profile) => {
 const webcamChecks = (cameraURL, camSettings) => {
   const results = {
     camSetup: false,
-    historySetup: false
+    historySetup: {
+      ffmpegPath: false,
+      ffmpegVideoCodex: false,
+      timelapseEnabled: false
+    }
   };
 
   if (typeof cameraURL === "undefined" || !camSettings) return results;
@@ -120,22 +124,63 @@ const webcamChecks = (cameraURL, camSettings) => {
   }
 
   const { history } = SettingsClean.returnSystemSettings();
-  if (results.camSetup) {
+  if (!results.camSetup) {
     if (
       history.snapshot.onComplete ||
       history.snapshot.onFailure ||
       history.timelapse.onComplete ||
       history.timelapse.onFailure
     ) {
-      console.log(camSettings);
+      if (typeof camSettings.ffmpegPath === "string") {
+        results.historySetup.ffmpegPath = true;
+      }
+      if (camSettings.ffmpegVideoCodec === "libx264") {
+        results.historySetup.ffmpegVideoCodex = true;
+      }
+      if (camSettings.timelapseEnabled) {
+        results.historySetup.timelapseEnabled = true;
+      }
     }
   }
 
   return results;
 };
 
-const checkConnectionsMatchRetrySettings = () => {
+const checkConnectionsMatchRetrySettings = (printerURL) => {
   // check if current settings are causing high retry counts...
+  const connectionLogs = returnConnectionLogs(printerURL);
+
+  let logs = [];
+
+  const { timeout } = SettingsClean.returnSystemSettings();
+
+  if (connectionLogs?.connections) {
+    for (let i = 0; i < connectionLogs.connections.length; i++) {
+      const log = connectionLogs.connections[i];
+      if (!log.url.includes("/sockjs/websocket")) {
+        logs.push({
+          url: log.url,
+          responseTimes: log.log.lastResponseTimes
+        });
+      }
+    }
+  }
+
+  const responses = [];
+
+  for (let i = 0; i < logs.length; i++) {
+    const log = logs[i];
+    const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
+    if (responsesAverage) {
+      responses.push({
+        url: log.url,
+        initialTimeout: responsesAverage < timeout.apiTimeout,
+        cutOffTimeout: responsesAverage < timeout.apiRetryCutoff
+      });
+    }
+  }
+
+  return responses;
 };
 
 module.exports = {

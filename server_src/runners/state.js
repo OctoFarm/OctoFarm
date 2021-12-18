@@ -14,7 +14,6 @@ const softwareUpdateChecker = require("../services/octofarm-update.service");
 
 const { OctoprintApiClientService } = require("../services/octoprint/octoprint-api-client.service");
 const { HistoryCollection } = require("./history.runner.js");
-const { ServerSettings, filamentManager } = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");
@@ -26,6 +25,7 @@ const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../constants/connection-monitor.constants");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -53,12 +53,12 @@ function heartBeat(index) {
 
 function setupReconnectionTimeout(that) {
   if (!farmPrinters[that.index].apiTimeout) {
-    logger.error(
+    logger.debug(
       farmPrinters[that.index].printerURL + ": Could not reconnect, destroying and re-setting up"
     );
     farmPrinters[that.index].apiTimeout = setTimeout(async () => {
       await Runner.reScanOcto(farmPrinters[that.index]._id);
-      logger.error("Error with websockets... resetting up!");
+      logger.debug("Error with websockets... resetting up!");
       farmPrinters[that.index].apiTimeout = false;
     }, 30000);
   } else {
@@ -984,7 +984,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
     // Information cleaning of farmPrinters
     if (typeof farmPrinters[this.index] !== "undefined") {
-      PrinterClean.generate(farmPrinters[this.index], filamentManager);
+      PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
     }
   } catch (e) {
     logger.debug("Failed to parse event data", e);
@@ -1068,8 +1068,8 @@ class Runner {
       logger.debug("No printers information to remove");
     }
 
-    const server = await ServerSettings.check();
-    systemSettings = server[0];
+    systemSettings = SettingsClean.returnSystemSettings();
+
     timeout = systemSettings.timeout;
 
     this.octoPrintService = new OctoprintApiClientService(timeout);
