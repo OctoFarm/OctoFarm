@@ -49,7 +49,7 @@ In order to have OctoFarm running using a local installation of NodeJS and Mongo
 - [MongoDB](https://www.mongodb.com/) - v3.6+ (Latest test: V4.4)
 - [NodeJS](https://nodejs.org/) - v14.0.0 (Latest tested: v14.16.1)
 - [NPM](https://www.npmjs.com/) - v6.10.0+ (Latest tested: v7.17.0)
-- [OctoPrint](https://octoprint.org) - v1.4.2+
+- [OctoPrint](https://octoprint.org) - v1.4.2+ (Tested with: 1.4.2, 1.5.3, 1.6.1, 1.7.1)
 
 ### OS / Platform for OctoFarm
 Confirmed working on:
