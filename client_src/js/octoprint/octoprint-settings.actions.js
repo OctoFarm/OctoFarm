@@ -61,4 +61,31 @@ async function setupOctoPrintForFilamentManager(printers, settings) {
   };
 }
 
-export { setupOctoPrintForTimelapses, setupOctoPrintForFilamentManager };
+async function setupOctoPrintForVirtualPrinter(printers) {
+  let successfulPrinters = "";
+  let failedPrinters = "";
+
+  let virtualPrinterSettings = {
+    virtual_printer: {
+      enabled: true
+    }
+  };
+  for (let i = 0; i < printers.length; i++) {
+    if (printers[i].printerState.colour.category !== "Offline") {
+      await OctoPrintClient.post(printers[i], "settings", virtualPrinterSettings);
+      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
+    } else {
+      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printers[i].printerName}: Offline! <br>`;
+    }
+  }
+  return {
+    successfulPrinters,
+    failedPrinters
+  };
+}
+
+export {
+  setupOctoPrintForTimelapses,
+  setupOctoPrintForFilamentManager,
+  setupOctoPrintForVirtualPrinter
+};

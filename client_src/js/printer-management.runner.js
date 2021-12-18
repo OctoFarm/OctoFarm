@@ -3,7 +3,8 @@ import PrinterSelect from "./lib/modules/printerSelect";
 import {
   bulkOctoPrintClientUpdate,
   bulkOctoPrintPluginUpdate,
-  bulkOctoPrintPluginAction
+  bulkOctoPrintPluginAction,
+  bulkEnableVirtualPrinter
 } from "./printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
@@ -108,3 +109,11 @@ saveAllBtn.addEventListener("click", async (e) => {
 createClientSSEWorker(workerURL, workerEventFunction);
 
 setupSortablePrintersTable();
+
+//Development Actions
+const enableVirtualPrinter = document.getElementById("blkEnableVirtualPrinter");
+if (enableVirtualPrinter) {
+  enableVirtualPrinter.addEventListener("click", async () => {
+    await bulkEnableVirtualPrinter();
+  });
+}

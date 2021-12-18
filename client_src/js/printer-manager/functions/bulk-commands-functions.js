@@ -26,6 +26,10 @@ import {
   printerHomeAxis,
   printerSendGcode
 } from "../../octoprint/octoprint-printer-commands";
+import {
+  setupOctoPrintForFilamentManager,
+  setupOctoPrintForVirtualPrinter
+} from "../../octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
@@ -39,6 +43,7 @@ import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../lib/modules/clientQueue.js";
 import OctoPrintClient from "../../lib/octoprint";
+import { filamentManagerPluginActionElements } from "../../system/server.options";
 const fileUploads = new Queue();
 
 let selectedFolder = "";
@@ -1117,6 +1122,19 @@ export async function bulkOctoPrintPluginAction(action) {
       "clicked"
     );
   }
+}
+
+export async function bulkEnableVirtualPrinter() {
+  const printers = await OctoFarmClient.listPrinters();
+  const alert = UI.createAlert(
+    "warning",
+    `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
+  );
+
+  const { successfulPrinters, failedPrinters } = await setupOctoPrintForVirtualPrinter(printers);
+
+  alert.close();
+  bootbox.alert(successfulPrinters + failedPrinters);
 }
 
 setInterval(async () => {
