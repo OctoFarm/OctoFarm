@@ -17,6 +17,16 @@ const { PrinterClean } = printerClean;
 // Doesn't returns undefined, note to use is incorrect...
 // const { returnPrintersInformation } = require("../cache/printer.cache.js");
 
+const {
+  apiChecks,
+  websocketChecks,
+  printerConnectionCheck,
+  profileChecks,
+  webcamChecks,
+  printerChecks,
+  checkConnectionsMatchRetrySettings
+} = require("../services/printer-health-checks.service");
+
 const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
@@ -285,6 +295,36 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   const idList = JSON.parse(req.params.ids);
   let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
   res.json(uniqueFolderPaths);
+});
+
+router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
+  const farmPrinters = PrinterClean.listPrintersInformation();
+
+  const response = [];
+
+  for (let i = 0; i < farmPrinters.length; i++) {
+    const currentURL = new URL(farmPrinters[i].printerURL);
+
+    const printerCheck = {
+      printerName: farmPrinters[i].printerName,
+      printerChecks: printerChecks(farmPrinters[i]),
+      apiChecks: apiChecks(farmPrinters[i].systemChecks.scanning),
+      websocketChecks: websocketChecks(currentURL.host),
+      connectionChecks: printerConnectionCheck(
+        farmPrinters[i].currentConnection,
+        farmPrinters[i].connectionOptions
+      ),
+      profileChecks: profileChecks(farmPrinters[i].currentProfile),
+      webcamChecks: webcamChecks(
+        farmPrinters[i].cameraURL,
+        farmPrinters[i].otherSettings.webCamSettings
+      ),
+      connectionIssues: checkConnectionsMatchRetrySettings()
+    };
+    response.push(printerCheck);
+  }
+
+  res.send(response);
 });
 
 module.exports = router;

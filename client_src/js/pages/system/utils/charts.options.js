@@ -1,4 +1,4 @@
-import Calc from "../../lib/functions/calc";
+import Calc from "../../../lib/functions/calc";
 
 const title = {
   text: "",

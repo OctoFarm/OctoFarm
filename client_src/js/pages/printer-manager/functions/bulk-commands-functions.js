@@ -43,7 +43,7 @@ import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../../lib/modules/clientQueue.js";
 import OctoPrintClient from "../../../lib/octoprint";
-import { filamentManagerPluginActionElements } from "../../../system/server.options";
+import { filamentManagerPluginActionElements } from "../../system/server.options";
 const fileUploads = new Queue();
 
 let selectedFolder = "";

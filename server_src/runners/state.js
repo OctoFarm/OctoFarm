@@ -1608,6 +1608,18 @@ class Runner {
         system: {
           status: "danger",
           date: null
+        },
+        systemInfo: {
+          status: "danger",
+          date: null
+        },
+        plugins: {
+          status: "danger",
+          date: null
+        },
+        updates: {
+          status: "danger",
+          date: null
         }
       },
       cleaning: {
@@ -1920,8 +1932,12 @@ class Runner {
   static async trackCounters() {
     for (let p = 0; p < farmPrinters.length; p++) {
       if (typeof farmPrinters[p].stateColour !== "undefined") {
+        let update = {};
         if (farmPrinters[p].stateColour.category === "Active") {
           farmPrinters[p].currentActive = farmPrinters[p].currentActive + 30000;
+          update = {
+            currentActive: farmPrinters[p].currentActive
+          };
         }
         if (
           farmPrinters[p].stateColour.category === "Idle" ||
@@ -1929,13 +1945,25 @@ class Runner {
           farmPrinters[p].stateColour.category === "Complete"
         ) {
           farmPrinters[p].currentIdle = farmPrinters[p].currentIdle + 30000;
+          update = {
+            currentIdle: farmPrinters[p].currentIdle
+          };
         }
-        if (farmPrinters[p].stateColour.category === "Offline") {
+        if (
+          farmPrinters[p].stateColour.category === "Offline" ||
+          farmPrinters[p].stateColour.category === "Error!"
+        ) {
           farmPrinters[p].currentOffline = farmPrinters[p].currentOffline + 30000;
+          update = {
+            currentOffline: farmPrinters[p].currentOffline
+          };
         }
-        farmPrinters[p]
-          .save()
-          .catch((e) => logger.info("Error Saving Counters, Safe to ignore...", e));
+        const filter = { _id: farmPrinters[p]._id };
+        await Printers.findOneAndUpdate(filter, update, {
+          returnOriginal: false
+        }).catch((e) => {
+          logger.error("Issue with updating printer time trackers: ", e);
+        });
       }
     }
   }
@@ -2539,6 +2567,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
       PrinterTicker.addIssue(
         new Date(),
@@ -2549,7 +2578,7 @@ class Runner {
       );
       return false;
     }
-
+    farmPrinters[index].systemChecks.scanning.plugins.status = "warning";
     farmPrinters[index].pluginsList = [];
     PrinterTicker.addIssue(
       new Date(),
@@ -2566,6 +2595,8 @@ class Runner {
       })
       .then((res) => {
         farmPrinters[index].pluginsList = res.repository.plugins;
+        farmPrinters[index].systemChecks.scanning.plugins.status = "success";
+        farmPrinters[index].systemChecks.scanning.plugins.date = new Date();
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2595,6 +2626,7 @@ class Runner {
       return o._id == id;
     });
     farmPrinters[index].octoPrintSystemInfo = {};
+    farmPrinters[index].systemChecks.scanning.systemInfo.status = "warning";
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2619,8 +2651,12 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+        farmPrinters[index].systemChecks.scanning.systemInfo.status = "success";
+        farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
       })
       .catch((err) => {
+        farmPrinters[index].systemChecks.scanning.systemInfo.status = "danger";
+        farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2651,7 +2687,7 @@ class Runner {
     }
     farmPrinters[index].octoPrintUpdate = [];
     farmPrinters[index].octoPrintPluginUpdates = [];
-
+    farmPrinters[index].systemChecks.scanning.updates.status = "warning";
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2693,7 +2729,8 @@ class Runner {
         }
         farmPrinters[index].octoPrintUpdate = octoPrintUpdate;
         farmPrinters[index].octoPrintPluginUpdates = pluginUpdates;
-
+        farmPrinters[index].systemChecks.scanning.updates.status = "success";
+        farmPrinters[index].systemChecks.scanning.updates.date = new Date();
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2714,6 +2751,8 @@ class Runner {
           `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
           err
         );
+        farmPrinters[index].systemChecks.scanning.updates.status = "danger";
+        farmPrinters[index].systemChecks.scanning.updates.date = new Date();
         return false;
       });
   }

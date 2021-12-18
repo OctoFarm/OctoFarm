@@ -1,17 +1,17 @@
-import OctoFarmClient from "../services/octofarm-client.service";
-import UI from "../lib/functions/ui";
-import Calc from "../lib/functions/calc";
-import FileOperations from "../lib/functions/file";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import UI from "../../lib/functions/ui";
+import Calc from "../../lib/functions/calc";
+import FileOperations from "../../lib/functions/file";
 import {
   setupOctoPrintForTimelapses,
   setupOctoPrintForFilamentManager
-} from "../octoprint/octoprint-settings.actions";
+} from "../../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn
-} from "../services/filament-manager-plugin.service";
+} from "../../services/filament-manager-plugin.service";
 import {
   returnSaveBtn,
   settingsElements,

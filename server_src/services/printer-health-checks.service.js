@@ -1,5 +1,5 @@
 const { returnConnectionLogs } = require("./connection-monitor.service");
-
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 //TODO move to utils
 function isValidHttpUrl(string) {
   let url;
@@ -111,13 +111,24 @@ const webcamChecks = (cameraURL, camSettings) => {
     camSetup: false,
     historySetup: false
   };
-  console.log(cameraURL, camSettings);
-  if (!cameraURL || !camSettings) return results;
 
-  console.log(cameraURL);
-  if (cameraURL === "") {
+  if (typeof cameraURL === "undefined" || !camSettings) return results;
+
+  if (cameraURL === "" || cameraURL === null) {
     //Blank URL, make sure cam settings are off!
-    console.log(camSettings);
+    results.camSetup = !camSettings.webcamEnabled;
+  }
+
+  const { history } = SettingsClean.returnSystemSettings();
+  if (results.camSetup) {
+    if (
+      history.snapshot.onComplete ||
+      history.snapshot.onFailure ||
+      history.timelapse.onComplete ||
+      history.timelapse.onFailure
+    ) {
+      console.log(camSettings);
+    }
   }
 
   return results;
