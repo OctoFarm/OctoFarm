@@ -108,14 +108,15 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
-    const startUpTasks = [];
 
-    for (let i = 0; i < OctoFarmTasks.BOOT_TASKS.length; i++) {
-      const task = OctoFarmTasks.BOOT_TASKS[i];
-      startUpTasks.push(TaskManager.registerJobOrTask(task));
+    await Promise.all(OctoFarmTasks.REQUIRED_BOOT_TASKS);
+
+    for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
+      const task = OctoFarmTasks.RECURRING_BOOT_TASKS[i];
+      TaskManager.registerJobOrTask(task);
     }
     // TODO attempt to run in sequence
-    await Promise.all(startUpTasks);
+
 
     await optionalInfluxDatabaseSetup();
   }

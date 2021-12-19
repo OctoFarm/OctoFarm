@@ -185,18 +185,21 @@ function TaskStart(task, preset, milliseconds = 0) {
 }
 
 class OctoFarmTasks {
-  static BOOT_TASKS = [
-    TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
-    TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
+  static RECURRING_BOOT_TASKS = [
+    TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    TaskStart(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
+  ];
+  static REQUIRED_BOOT_TASKS = [
+    SYSTEM_INFO_CHECK_TASK(),
+    FARMPI_DETECTION_TASK(),
+    INITITIALISE_PRINTERS()
   ];
 }
 
