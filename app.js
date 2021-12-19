@@ -63,6 +63,10 @@ if (!!majorVersion && majorVersion < 14) {
 
       const applicationServer = app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
+        // PM2 to signify process is ready... should wait for database connection...
+        if (typeof process.send === "function") {
+          process.send("ready");
+        }
       });
 
       process.on("beforeExit", (code) => {
@@ -85,6 +89,14 @@ if (!!majorVersion && majorVersion < 14) {
         onShutdown(applicationServer);
       });
 
+      //PM2 Specific
+      process.on("message", function (msg) {
+        if (msg === "shutdown") {
+          logger.debug("SIGTERM: Requesting shutdown of Application");
+          onShutdown(applicationServer);
+        }
+      });
+
       logger.debug("Listeners for shutdown added!");
     })
     .catch(async (err) => {
@@ -92,11 +104,7 @@ if (!!majorVersion && majorVersion < 14) {
       logger.error(err.stack);
       if (
         err.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL) ||
-        err.includes(SERVER_ISSUES.DATABASE_CONN_FAIL)
-      ) {
-        const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
-        serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
-      } else if (
+        err.includes(SERVER_ISSUES.DATABASE_CONN_FAIL) ||
         err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_INIT) ||
         err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_UPDATE) ||
         err.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT) ||
@@ -104,6 +112,10 @@ if (!!majorVersion && majorVersion < 14) {
       ) {
         const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
         serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+        // PM2 to signify process is ready...
+        if (typeof process.send === "function") {
+          process.send("ready");
+        }
       } else {
         console.error("THIS IS MAJOR BROKEY");
       }

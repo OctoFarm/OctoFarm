@@ -19,11 +19,15 @@ function onShutdown(app) {
   shutdownServer(app)
     .then(() => {
       logger.debug("Clean shutdown successful!");
-      process.kill(process.pid);
+      setTimeout(function () {
+        process.exit(0);
+      }, 15000);
     })
     .catch((e) => {
       logger.error("Couldn't cleanly shutdown server!", e);
-      process.kill(process.pid);
+      setTimeout(function () {
+        process.exit(1);
+      }, 15000);
     });
 }
 
