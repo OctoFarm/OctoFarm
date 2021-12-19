@@ -15,12 +15,11 @@
 // <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
 
 const E = {
-    API_CHECK_STATE: "apiCheckState-",
+  API_CHECK_STATE: "apiCheckState-",
 
-
-    HISTORY_IN_TO: "historyInTo",
-    HISTORY_CUT_OFF: "historyCutOff"
-}
+  HISTORY_IN_TO: "historyInTo",
+  HISTORY_CUT_OFF: "historyCutOff"
+};
 
 const returnButton = (check, icon, id, message) => {
   const disabled = check ? "disabled" : "";
@@ -37,6 +36,13 @@ const returnButton = (check, icon, id, message) => {
 
 const returnNetworkConnection = (issues) => {
   let html = "";
+
+  if (issues.length < 1) {
+    return `
+        No connection has ever been established
+      `;
+  }
+
   const urlSplit = issues[0].url.split("/");
   const printerURL = urlSplit[0] + "//" + urlSplit[2];
   const pClean = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
@@ -56,35 +62,39 @@ const returnNetworkConnection = (issues) => {
     html += `
         <small>${endPoint}: ${returnButton(
       issue.initialTimeout,
-      '<i class="fas fa-history"></i>', 
-        E.HISTORY_IN_TO+endPoint+pClean,
+      '<i class="fas fa-history"></i>',
+      E.HISTORY_IN_TO + endPoint + pClean,
       VALID_TIMEOUT("Initial")
     )} | ${returnButton(
       issue.cutOffTimeout,
       '<i class="fas fa-stopwatch"></i>',
-        E.HISTORY_CUT_OFF+endPoint+pClean,
+      E.HISTORY_CUT_OFF + endPoint + pClean,
       VALID_TIMEOUT("Cut Off")
     )} </small><br>
         `;
   });
 
   const collapse = `
-    <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#${E.HISTORY_CUT_OFF+pClean}CollapseTimeout" role="button" aria-expanded="false" aria-controls="${E.HISTORY_CUT_OFF+pClean}CollapseTimeout">
+    <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#${
+      E.HISTORY_CUT_OFF + pClean
+    }CollapseTimeout" role="button" aria-expanded="false" aria-controls="${
+    E.HISTORY_CUT_OFF + pClean
+  }CollapseTimeout">
     ${printerURL} 
     </a>
     ${returnButton(
       totalInitial,
       '<i class="fas fa-history"></i>',
-      E.HISTORY_CUT_OFF+pClean,
+      E.HISTORY_CUT_OFF + pClean,
       VALID_TIMEOUT("All Initial")
     )}
     ${returnButton(
       totalCutOff,
       '<i class="fas fa-stopwatch"></i>',
-      E.HISTORY_CUT_OFF+pClean,
+      E.HISTORY_CUT_OFF + pClean,
       VALID_TIMEOUT("All Cut Off")
     )}
-    <div class="collapse" id="${E.HISTORY_CUT_OFF+pClean}CollapseTimeout">
+    <div class="collapse" id="${E.HISTORY_CUT_OFF + pClean}CollapseTimeout">
       <div class="card card-body">
       ${html} 
       </div>
