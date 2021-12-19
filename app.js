@@ -58,9 +58,34 @@ if (!!majorVersion && majorVersion < 14) {
       }
 
       const app = await serveOctoFarmNormally(octoFarmServer);
-      app.listen(port, "0.0.0.0", () => {
+
+      const { onShutdown } = require("./server_src/services/shutdown-service");
+
+      const applicationServer = app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
       });
+
+      process.on("beforeExit", (code) => {
+        logger.debug("beforeExit: Requesting shutdown of Application with code: ", code);
+        onShutdown(applicationServer);
+      });
+
+      process.on("exit", (code) => {
+        logger.debug("beforeExit: Requesting shutdown of Application with code: ", code);
+        onShutdown(applicationServer);
+      });
+
+      process.on("SIGINT", function () {
+        logger.debug("SIGINT: Requesting shutdown of Application");
+        onShutdown(applicationServer);
+      });
+
+      process.on("SIGTERM", function () {
+        logger.debug("SIGTERM: Requesting shutdown of Application");
+        onShutdown(applicationServer);
+      });
+
+      logger.debug("Listeners for shutdown added!");
     })
     .catch(async (err) => {
       const { SERVER_ISSUES } = require("server_src/constants/server-issues.constants");

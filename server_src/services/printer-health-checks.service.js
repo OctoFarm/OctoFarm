@@ -116,6 +116,10 @@ const webcamChecks = (cameraURL, camSettings) => {
     }
   };
 
+  if (!camSettings) {
+    return results;
+  }
+
   if (cameraURL === "" || cameraURL === null) {
     //Blank URL, make sure cam settings are off!
     results.camSetup = !camSettings.webcamEnabled;
@@ -166,6 +170,9 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
 
   for (let i = 0; i < logs.length; i++) {
     const log = logs[i];
+    if (log.responseTimes.length === 0) {
+      log.responseTimes = [0];
+    }
     const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
     if (responsesAverage) {
       responses.push({

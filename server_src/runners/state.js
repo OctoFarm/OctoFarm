@@ -1169,19 +1169,19 @@ class Runner {
     }
   }
 
-  static async setupWebSocket(id, skipAPICheck) {
+  static async setupWebSocket(id, force = false) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+
     try {
       if (i === -1) {
-        const error = {
+        throw {
           message: "Could not find printer...:",
           type: "system",
           errno: "DELETED",
           code: "DELETED"
         };
-        throw error;
       }
 
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
@@ -1293,28 +1293,22 @@ class Runner {
           farmPrinters[i].hostState = "Online";
           farmPrinters[i].hostStateColour = Runner.getColour("Online");
           farmPrinters[i].hostDescription = "Host is Online";
-          await Runner.getSystem(id);
-          await Runner.getProfile(id);
-          await Runner.getState(id);
-          await Runner.getSettings(id);
-          await Runner.getOctoPrintSystenInfo(id);
-          await Runner.getPluginList(id);
-          await Runner.getUpdates(id);
-          if (
-            typeof farmPrinters[i].fileList === "undefined" ||
-            typeof farmPrinters[i].storage === "undefined"
-          ) {
-            await Runner.getFiles(id, true);
-          } else {
-            const currentFilament = await Runner.compileSelectedFilament(
-              farmPrinters[i].selectedFilament,
-              i
-            );
-            FileClean.generate(farmPrinters[i], currentFilament);
-            farmPrinters[i].systemChecks.scanning.files.status = "success";
-            farmPrinters[i].systemChecks.scanning.files.date = new Date();
-            FileClean.statistics(farmPrinters);
-          }
+          await Runner.getSystem(id, force);
+          await Runner.getProfile(id, force);
+          await Runner.getState(id, force);
+          await Runner.getSettings(id, force);
+          await Runner.getOctoPrintSystenInfo(id, force);
+          await Runner.getPluginList(id, force);
+          await Runner.getUpdates(id, force);
+          await Runner.getFiles(id, true, force);
+          const currentFilament = await Runner.compileSelectedFilament(
+            farmPrinters[i].selectedFilament,
+            i
+          );
+          FileClean.generate(farmPrinters[i], currentFilament);
+          farmPrinters[i].systemChecks.scanning.files.status = "success";
+          farmPrinters[i].systemChecks.scanning.files.date = new Date();
+          FileClean.statistics(farmPrinters);
 
           // Connection to API successful, gather initial data and setup websocket.
           PrinterTicker.addIssue(
@@ -1326,38 +1320,34 @@ class Runner {
           );
           farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}/sockjs/websocket`, i);
         } else {
-          const error = {
+          throw {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
             type: "system",
             errno: "503",
             code: "503"
           };
-
-          throw error;
         }
       } else if (users.status === 503 || users.status === 404) {
-        const error = {
+        throw {
           message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "503",
           code: "503"
         };
-        throw error;
       } else if (users.status === 502) {
-        const error = {
+        throw {
           message: `Bad gateway! Gather OcotPrint is still booting: ${users.status}: ${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "ECONNREFUSED",
           code: "ECONNREFUSED"
         };
       } else {
-        const error = {
+        throw {
           message: `Could not Establish API Connection: ${users.status}${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "NO-API",
           code: "NO-API"
         };
-        throw error;
       }
     } catch (e) {
       switch (e.code) {
@@ -1647,29 +1637,6 @@ class Runner {
     if (typeof farmPrinters[i].alerts === "undefined") {
       farmPrinters[i].alerts = null;
     }
-    if (
-      typeof farmPrinters[i].powerSettings === "undefined" ||
-      farmPrinters[i].powerSettings === null
-    ) {
-      farmPrinters[i].powerSettings = {
-        powerOnCommand: "",
-        powerOnURL: "",
-        powerOffCommand: "",
-        powerOffURL: "",
-        powerToggleCommand: "",
-        powerToggleURL: "",
-        powerStatusCommand: "",
-        powerStatusURL: "",
-        wol: {
-          enabled: false,
-          ip: "255.255.255.0",
-          packets: "3",
-          port: "9",
-          interval: "100",
-          MAC: ""
-        }
-      };
-    }
 
     if (typeof farmPrinters[i].currentIdle === "undefined") {
       farmPrinters[i].currentIdle = 0;
@@ -1742,6 +1709,14 @@ class Runner {
     ) {
       farmPrinters[i].costSettings = null;
     }
+
+    if (
+      typeof farmPrinters[i].powerSettings === "undefined" ||
+      _.isEmpty(farmPrinters[i].powerSettings)
+    ) {
+      farmPrinters[i].powerSettings = null;
+    }
+
     printer.octoPrintSystemInfo = farmPrinters[i].octoPrintSystemInfo;
     printer.octoPrintVersion = farmPrinters[i].octoPrintVersion;
     printer.printerName = farmPrinters[i].printerName;
@@ -1757,9 +1732,9 @@ class Runner {
     printer.currentActive = farmPrinters[i].currentActive;
     printer.currentOffline = farmPrinters[i].currentOffline;
     printer.selectedFilament = farmPrinters[i].selectedFilament;
-    printer.powerSettings = farmPrinters[i].powerSettings;
     printer.alerts = farmPrinters[i].alerts;
     printer.costSettings = farmPrinters[i].costSettings;
+    printer.powerSettings = farmPrinters[i].powerSettings;
     await printer.save();
     await Runner.updateGroupList();
     return true;
@@ -1904,7 +1879,7 @@ class Runner {
         "Active",
         farmPrinters[changeIndex]._id
       );
-      await this.reScanOcto(changes[x], true);
+      await this.reScanOcto(changes[x]);
       if (changeIndex > -1) {
         const filter = { _id: farmPrinters[changeIndex]._id };
         const update = farmPrinters[changeIndex];
@@ -2072,7 +2047,7 @@ class Runner {
     return removed;
   }
 
-  static async reScanOcto(id, skipAPI) {
+  static async reScanOcto(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2093,6 +2068,9 @@ class Runner {
     farmPrinters[index].systemChecks.scanning.profile.status = "warning";
     farmPrinters[index].systemChecks.scanning.settings.status = "warning";
     farmPrinters[index].systemChecks.scanning.system.status = "warning";
+    farmPrinters[index].systemChecks.scanning.systemInfo.status = "warning";
+    farmPrinters[index].systemChecks.scanning.plugins.status = "warning";
+    farmPrinters[index].systemChecks.scanning.updates.status = "warning";
 
     farmPrinters[index].state = "Searching...";
     farmPrinters[index].stateColour = Runner.getColour("Searching...");
@@ -2125,7 +2103,7 @@ class Runner {
         await farmPrinters[index].ws.instance.close();
         logger.info(`Closed websocket connection for: ${farmPrinters[index].printerURL}`);
         const { _id } = farmPrinters[index];
-        await this.setupWebSocket(_id, skipAPI);
+        await this.setupWebSocket(_id, force);
       } else if (farmPrinters[index].ws.instance.readyState === 2) {
         PrinterTicker.addIssue(
           new Date(),
@@ -2152,7 +2130,7 @@ class Runner {
             "Active",
             farmPrinters[index]._id
           );
-          Runner.reScanOcto(_id, skipAPI);
+          Runner.reScanOcto(_id, force);
         }, 5000);
       } else {
         PrinterTicker.addIssue(
@@ -2164,7 +2142,7 @@ class Runner {
         );
         const { _id } = farmPrinters[index];
         await farmPrinters[index].ws.instance.close();
-        await this.setupWebSocket(_id, skipAPI);
+        await this.setupWebSocket(_id, force);
       }
     } else {
       PrinterTicker.addIssue(
@@ -2175,7 +2153,7 @@ class Runner {
         farmPrinters[index]._id
       );
       const { _id } = farmPrinters[index];
-      await this.setupWebSocket(_id, skipAPI);
+      await this.setupWebSocket(_id, force);
     }
     result.status = "success";
     result.msg = "Your client has been re-synced!";
@@ -2211,6 +2189,20 @@ class Runner {
     }
     return true;
   }
+  static async killAllConnections() {
+    logger.debug("Signal to kill all printer connections received...");
+    for (let i = 0; i < farmPrinters.length; i++) {
+      if (
+        typeof farmPrinters[i].ws !== "undefined" &&
+        typeof farmPrinters[i].ws.instance !== "undefined"
+      ) {
+        await farmPrinters[i].ws.instance.terminate();
+        logger.info(`Terminated websocket connection for: ${farmPrinters[i].printerURL}`);
+      }
+    }
+    logger.debug("Successfully killed all printer connections!");
+    return true;
+  }
 
   static async getFile(id, fullPath) {
     const index = _.findIndex(farmPrinters, function (o) {
@@ -2218,6 +2210,7 @@ class Runner {
     });
 
     const printer = farmPrinters[index];
+
     const getFileInformation = await this.octoPrintService.getFile(printer, fullPath);
     const getJson = await getFileInformation.json();
 
@@ -2277,291 +2270,380 @@ class Runner {
     };
   }
 
-  static async getFiles(id, recursive) {
+  static async getFiles(id, recursive, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
     farmPrinters[index].systemChecks.scanning.files.status = "warning";
     // Shim to fix undefined on upload files/folders
-    farmPrinters[index].fileList = {
-      files: [],
-      fileCount: 0,
-      folders: [],
-      folderCount: 0
-    };
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing file information...",
-      "Active",
-      farmPrinters[index]._id
-    );
-    const printer = farmPrinters[index];
 
-    return await this.octoPrintService
-      .getFiles(printer, recursive)
-      .then((res) => {
-        return res.json();
-      })
-      .then(async (res) => {
-        // Setup the files json storage object
-        farmPrinters[index].storage = {
-          free: res.free,
-          total: res.total
-        };
-        farmPrinters[index].markModified("storage");
-        // Setup the files location object to place files...
-        const printerFiles = [];
-        const printerLocations = [];
-        const recursivelyPrintNames = async function (entry, depth) {
-          // eslint-disable-next-line no-param-reassign
-          depth = depth || 0;
-          let timeStat = "";
-          let filament = [];
-          const isFolder = entry.type === "folder";
-          if (!isFolder) {
-            if (typeof entry.gcodeAnalysis !== "undefined") {
-              if (typeof entry.gcodeAnalysis.estimatedPrintTime !== "undefined") {
-                timeStat = entry.gcodeAnalysis.estimatedPrintTime;
-                // Start collecting multiple tool lengths and information from files....
-                Object.keys(entry.gcodeAnalysis.filament).forEach(function (item, i) {
-                  filament[i] = entry.gcodeAnalysis.filament[item].length;
-                });
+    if (!farmPrinters[index]?.fileList || !farmPrinters[index]?.storage || force) {
+      farmPrinters[index].fileList = {
+        files: [],
+        fileCount: 0,
+        folders: [],
+        folderCount: 0
+      };
+      farmPrinters[index].storage = {
+        free: 0,
+        total: 0
+      };
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing file information...",
+        "Active",
+        farmPrinters[index]._id
+      );
+      const printer = farmPrinters[index];
+
+      return await this.octoPrintService
+        .getFiles(printer, recursive)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          // Setup the files json storage object
+          farmPrinters[index].storage = {
+            free: res.free,
+            total: res.total
+          };
+          // Setup the files location object to place files...
+          const printerFiles = [];
+          const printerLocations = [];
+          const recursivelyPrintNames = async function (entry, depth) {
+            // eslint-disable-next-line no-param-reassign
+            depth = depth || 0;
+            let timeStat = "";
+            let filament = [];
+            const isFolder = entry.type === "folder";
+            if (!isFolder) {
+              if (typeof entry.gcodeAnalysis !== "undefined") {
+                if (typeof entry.gcodeAnalysis.estimatedPrintTime !== "undefined") {
+                  timeStat = entry.gcodeAnalysis.estimatedPrintTime;
+                  // Start collecting multiple tool lengths and information from files....
+                  Object.keys(entry.gcodeAnalysis.filament).forEach(function (item, i) {
+                    filament[i] = entry.gcodeAnalysis.filament[item].length;
+                  });
+                } else {
+                  timeStat = "No Time Estimate";
+                  filament = null;
+                }
               } else {
                 timeStat = "No Time Estimate";
                 filament = null;
               }
-            } else {
-              timeStat = "No Time Estimate";
-              filament = null;
+
+              let path = null;
+              if (entry.path.indexOf("/") > -1) {
+                path = entry.path.substr(0, entry.path.lastIndexOf("/"));
+              } else {
+                path = "local";
+              }
+              let thumbnail = null;
+
+              if (typeof entry.thumbnail !== "undefined") {
+                thumbnail = entry.thumbnail;
+              }
+
+              let success = 0;
+              let failed = 0;
+              let last = null;
+
+              if (typeof entry.prints !== "undefined") {
+                success = entry.prints.success;
+                failed = entry.prints.failure;
+                last = entry.prints.last.success;
+              }
+
+              const file = {
+                path,
+                fullPath: entry.path,
+                display: entry.display,
+                length: filament,
+                name: entry.name,
+                size: entry.size,
+                time: timeStat,
+                date: entry.date,
+                thumbnail,
+                success: success,
+                failed: failed,
+                last: last
+              };
+              printerFiles.push(file);
             }
 
-            let path = null;
-            if (entry.path.indexOf("/") > -1) {
-              path = entry.path.substr(0, entry.path.lastIndexOf("/"));
-            } else {
-              path = "local";
-            }
-            let thumbnail = null;
-
-            if (typeof entry.thumbnail !== "undefined") {
-              thumbnail = entry.thumbnail;
-            }
-
-            let success = 0;
-            let failed = 0;
-            let last = null;
-
-            if (typeof entry.prints !== "undefined") {
-              success = entry.prints.success;
-              failed = entry.prints.failure;
-              last = entry.prints.last.success;
-            }
-
-            const file = {
-              path,
-              fullPath: entry.path,
-              display: entry.display,
-              length: filament,
-              name: entry.name,
-              size: entry.size,
-              time: timeStat,
-              date: entry.date,
-              thumbnail,
-              success: success,
-              failed: failed,
-              last: last
+            const folderPaths = {
+              name: "",
+              path: ""
             };
-            printerFiles.push(file);
-          }
+            if (isFolder) {
+              if (entry.path.indexOf("/") > -1) {
+                folderPaths.path = entry.path.substr(0, entry.path.lastIndexOf("/"));
+              } else {
+                folderPaths.path = "local";
+              }
 
-          const folderPaths = {
-            name: "",
-            path: ""
+              if (entry.path.indexOf("/")) {
+                folderPaths.name = entry.path;
+              } else {
+                folderPaths.name = entry.path.substr(0, entry.path.lastIndexOf("/"));
+              }
+              folderPaths.display = folderPaths.name.replace("/_/g", " ");
+              printerLocations.push(folderPaths);
+            }
+
+            if (isFolder) {
+              _.each(entry.children, function (child) {
+                recursivelyPrintNames(child, depth + 1);
+              });
+            }
           };
-          if (isFolder) {
-            if (entry.path.indexOf("/") > -1) {
-              folderPaths.path = entry.path.substr(0, entry.path.lastIndexOf("/"));
-            } else {
-              folderPaths.path = "local";
+
+          _.each(res.files, function (entry) {
+            recursivelyPrintNames(entry);
+          });
+          farmPrinters[index].fileList = {
+            files: printerFiles,
+            fileCount: printerFiles.length,
+            folders: printerLocations,
+            folderCount: printerLocations.length
+          };
+
+          const filter = { _id: farmPrinters[index]._id };
+          await Printers.findOneAndUpdate(
+            filter,
+            { fileList: farmPrinters[index].fileList, storage: farmPrinters[index].storage },
+            {
+              returnOriginal: false
             }
+          );
 
-            if (entry.path.indexOf("/")) {
-              folderPaths.name = entry.path;
-            } else {
-              folderPaths.name = entry.path.substr(0, entry.path.lastIndexOf("/"));
-            }
-            folderPaths.display = folderPaths.name.replace("/_/g", " ");
-            printerLocations.push(folderPaths);
-          }
+          const currentFilament = await Runner.compileSelectedFilament(
+            farmPrinters[index].selectedFilament,
+            index
+          );
 
-          if (isFolder) {
-            _.each(entry.children, function (child) {
-              recursivelyPrintNames(child, depth + 1);
-            });
-          }
-        };
-
-        _.each(res.files, function (entry) {
-          recursivelyPrintNames(entry);
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed file information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+          farmPrinters[index].systemChecks.scanning.files.status = "success";
+          farmPrinters[index].systemChecks.scanning.files.date = new Date();
+          FileClean.statistics(farmPrinters);
+          return FileClean.generate(farmPrinters[index], currentFilament);
+        })
+        .catch((err) => {
+          farmPrinters[index].systemChecks.scanning.files.status = "danger";
+          farmPrinters[index].systemChecks.scanning.files.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing file information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          logger.error(
+            `Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
         });
-        farmPrinters[index].fileList = {
-          files: printerFiles,
-          fileCount: printerFiles.length,
-          folders: printerLocations,
-          folderCount: printerLocations.length
-        };
-        farmPrinters[index].markModified("fileList");
-        farmPrinters[index].save();
+    } else {
+      farmPrinters[index].fileList = {
+        files: [],
+        fileCount: 0,
+        folders: [],
+        folderCount: 0
+      };
+      farmPrinters[index].storage = {
+        free: 0,
+        total: 0
+      };
+      logger.debug("Skipping Files Grab... have data already - force is: " + force);
+      const filesIsArray = "";
+      const fileCountIsNumber = "";
+      const foldersIsArray = "";
+      const folderCountIsNumber = "";
+      const freeIsNumber = "";
+      const totalIsNumber = "";
 
-        const currentFilament = await Runner.compileSelectedFilament(
-          farmPrinters[index].selectedFilament,
-          index
-        );
+      const checks = [
+        filesIsArray,
+        fileCountIsNumber,
+        foldersIsArray,
+        folderCountIsNumber,
+        freeIsNumber,
+        totalIsNumber
+      ];
 
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed file information...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-        farmPrinters[index].systemChecks.scanning.files.status = "success";
-        farmPrinters[index].systemChecks.scanning.files.date = new Date();
-        FileClean.statistics(farmPrinters);
-        return FileClean.generate(farmPrinters[index], currentFilament);
-      })
-      .catch((err) => {
+      if (checks.includes(false)) {
         farmPrinters[index].systemChecks.scanning.files.status = "danger";
         farmPrinters[index].systemChecks.scanning.files.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing file information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        logger.error(`Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `, err);
-        return false;
-      });
+      } else {
+        farmPrinters[index].systemChecks.scanning.files.status = "success";
+        farmPrinters[index].systemChecks.scanning.files.date = new Date();
+      }
+    }
   }
 
-  static getState(id) {
+  static getState(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
     farmPrinters[index].systemChecks.scanning.state.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing state information...",
-      "Active",
-      farmPrinters[index]._id
-    );
-    return this.octoPrintService
-      .getConnection(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then(async (res) => {
-        farmPrinters[index].current = res.current;
-        farmPrinters[index].options = res.options;
-        farmPrinters[index].job = null;
-        farmPrinters[index].systemChecks.scanning.state.status = "success";
-        farmPrinters[index].systemChecks.scanning.state.date = new Date();
-        const currentFilament = JSON.parse(JSON.stringify(farmPrinters[index].selectedFilament));
-        for (let s = 0; s < farmPrinters[index].selectedFilament.length; s++) {
-          if (farmPrinters[index].selectedFilament[s] !== null) {
-            const profile = null;
-            // if (systemSettings.filamentManager) {
-            //   profile = await Profiles.findOne({
-            //     "profile.index":
-            //       farmPrinters[index].selectedFilament[s].spools.profile,
-            //   });
-            // } else {
-            //   profile = await Profiles.findById(
-            //     farmPrinters[index].selectedFilament[s].spools.profile
-            //   );
-            // }
-            // currentFilament[s].spools.profile = profile.profile;
+
+    if (!farmPrinters[index]?.current || !farmPrinters[index]?.options || force) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing state information...",
+        "Active",
+        farmPrinters[index]._id
+      );
+      return this.octoPrintService
+        .getConnection(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          farmPrinters[index].current = res.current;
+          farmPrinters[index].options = res.options;
+          farmPrinters[index].job = null;
+
+          farmPrinters[index].systemChecks.scanning.state.status = "success";
+          farmPrinters[index].systemChecks.scanning.state.date = new Date();
+
+          const filter = { _id: farmPrinters[index]._id };
+          await Printers.findOneAndUpdate(
+            filter,
+            { current: res.current, options: res.options },
+            {
+              returnOriginal: false
+            }
+          );
+
+          const currentFilament = JSON.parse(JSON.stringify(farmPrinters[index].selectedFilament));
+          for (let s = 0; s < farmPrinters[index].selectedFilament.length; s++) {
+            if (farmPrinters[index].selectedFilament[s] !== null) {
+              const profile = null;
+              // if (systemSettings.filamentManager) {
+              //   profile = await Profiles.findOne({
+              //     "profile.index":
+              //       farmPrinters[index].selectedFilament[s].spools.profile,
+              //   });
+              // } else {
+              //   profile = await Profiles.findById(
+              //     farmPrinters[index].selectedFilament[s].spools.profile
+              //   );
+              // }
+              // currentFilament[s].spools.profile = profile.profile;
+            }
           }
-        }
-        JobClean.generate(farmPrinters[index], currentFilament);
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed state information...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-      })
-      .catch((err) => {
-        farmPrinters[index].systemChecks.scanning.state.status = "danger";
-        farmPrinters[index].systemChecks.scanning.state.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing state information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        logger.error(`Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `, err);
-        return false;
-      });
+          JobClean.generate(farmPrinters[index], currentFilament);
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed state information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+        })
+        .catch((err) => {
+          farmPrinters[index].systemChecks.scanning.state.status = "danger";
+          farmPrinters[index].systemChecks.scanning.state.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing state information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          logger.error(`Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `, err);
+          return false;
+        });
+    } else {
+      logger.debug("Skipping State Grab... have data already - force is: " + force);
+
+      farmPrinters[index].job = null;
+
+      farmPrinters[index].systemChecks.scanning.state.status = "success";
+      farmPrinters[index].systemChecks.scanning.state.date = new Date();
+    }
   }
 
-  static getProfile(id) {
+  static getProfile(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
     farmPrinters[index].systemChecks.scanning.profile.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing profile information...",
-      "Active",
-      farmPrinters[index]._id
-    );
-    return this.octoPrintService
-      .getPrinterProfiles(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        // Update info to DB
-        farmPrinters[index].profiles = res.profiles;
-        farmPrinters[index].systemChecks.scanning.profile.status = "success";
-        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed profile information...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-        logger.info(
-          `Successfully grabbed profile information for...: ${farmPrinters[index].printerURL}`
-        );
-      })
-      .catch((err) => {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing profile information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
-        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
-        logger.error(
-          `Error grabbing profile for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
-        return false;
-      });
+
+    if (!farmPrinters[index]?.profiles || force) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing profile information...",
+        "Active",
+        farmPrinters[index]._id
+      );
+      return this.octoPrintService
+        .getPrinterProfiles(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          // Update info to DB
+          farmPrinters[index].profiles = res.profiles;
+          farmPrinters[index].systemChecks.scanning.profile.status = "success";
+          farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+
+          const filter = { _id: farmPrinters[index]._id };
+          await Printers.findOneAndUpdate(
+            filter,
+            { profiles: res.profiles },
+            {
+              returnOriginal: false
+            }
+          );
+
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed profile information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+          logger.info(
+            `Successfully grabbed profile information for...: ${farmPrinters[index].printerURL}`
+          );
+        })
+        .catch((err) => {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing profile information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+          farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+          logger.error(
+            `Error grabbing profile for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
+        });
+    } else {
+      logger.debug("Skipping Profiles Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.profile.status = "success";
+      farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+    }
   }
 
-  static getPluginList(id) {
+  static getPluginList(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2577,96 +2659,128 @@ class Runner {
       return false;
     }
     farmPrinters[index].systemChecks.scanning.plugins.status = "warning";
-    farmPrinters[index].pluginsList = [];
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing plugin list",
-      "Active",
-      farmPrinters[index]._id
-    );
+    if (
+      !farmPrinters[index]?.pluginsList ||
+      farmPrinters[index].pluginsList.length === 0 ||
+      force
+    ) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing plugin list",
+        "Active",
+        farmPrinters[index]._id
+      );
+      farmPrinters[index].pluginsList = [];
 
-    return this.octoPrintService
-      .getPluginManager(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        farmPrinters[index].pluginsList = res.repository.plugins;
-        farmPrinters[index].systemChecks.scanning.plugins.status = "success";
-        farmPrinters[index].systemChecks.scanning.plugins.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Grabbed plugin list (OctoPrint compatibility: ${farmPrinters[index].octoPrintVersion})`,
-          "Complete",
-          farmPrinters[index]._id
-        );
-      })
-      .catch((err) => {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing plugin list information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        logger.error(
-          `Error grabbing plugin list for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
-        return false;
-      });
+      return this.octoPrintService
+        .getPluginManager(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          farmPrinters[index].pluginsList = res.repository.plugins;
+
+          const filter = { _id: farmPrinters[index]._id };
+          await Printers.findOneAndUpdate(
+            filter,
+            { pluginsList: res.repository.plugins },
+            {
+              returnOriginal: false
+            }
+          );
+
+          farmPrinters[index].systemChecks.scanning.plugins.status = "success";
+          farmPrinters[index].systemChecks.scanning.plugins.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Grabbed plugin list (OctoPrint compatibility: ${farmPrinters[index].octoPrintVersion})`,
+            "Complete",
+            farmPrinters[index]._id
+          );
+        })
+        .catch((err) => {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing plugin list information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          logger.error(
+            `Error grabbing plugin list for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
+        });
+    } else {
+      logger.debug("Skipping PluginList Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.plugins.status = "success";
+      farmPrinters[index].systemChecks.scanning.plugins.date = new Date();
+    }
   }
 
-  static getOctoPrintSystenInfo(id) {
+  static getOctoPrintSystenInfo(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
-    farmPrinters[index].octoPrintSystemInfo = {};
+
     farmPrinters[index].systemChecks.scanning.systemInfo.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing OctoPrint's System Information",
-      "Active",
-      farmPrinters[index]._id
-    );
-    return this.octoPrintService
-      .getSystemInfo(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        farmPrinters[index].octoPrintSystemInfo = res.systeminfo;
-        Printers.findByIdAndUpdate(id, {
-          octoPrintSystemInfo: res.systemInfo
+
+    if (!farmPrinters[index]?.octoPrintSystemInfo || force) {
+      farmPrinters[index].octoPrintSystemInfo = {};
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing OctoPrint's System Information",
+        "Active",
+        farmPrinters[index]._id
+      );
+
+      return this.octoPrintService
+        .getSystemInfo(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          farmPrinters[index].octoPrintSystemInfo = res.systeminfo;
+          Printers.findByIdAndUpdate(id, {
+            octoPrintSystemInfo: res.systemInfo
+          });
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed OctoPrints System Info",
+            "Complete",
+            farmPrinters[index]._id
+          );
+          farmPrinters[index].systemChecks.scanning.systemInfo.status = "success";
+          farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
+        })
+        .catch((err) => {
+          farmPrinters[index].systemChecks.scanning.systemInfo.status = "danger";
+          farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing system information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          // farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+          // farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+          logger.error(
+            `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
         });
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed OctoPrints System Info",
-          "Complete",
-          farmPrinters[index]._id
-        );
-        farmPrinters[index].systemChecks.scanning.systemInfo.status = "success";
-        farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
-      })
-      .catch((err) => {
-        farmPrinters[index].systemChecks.scanning.systemInfo.status = "danger";
-        farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing system information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        // farmPrinters[index].systemChecks.scanning.profile.status = "danger";
-        // farmPrinters[index].systemChecks.scanning.profile.date = new Date();
-        logger.error(`Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `, err);
-        return false;
-      });
+    } else {
+      logger.debug("Skipping System Information Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.systemInfo.status = "success";
+      farmPrinters[index].systemChecks.scanning.systemInfo.date = new Date();
+    }
   }
 
   static getUpdates(id, force = false) {
@@ -2683,76 +2797,425 @@ class Runner {
       );
       return false;
     }
-    farmPrinters[index].octoPrintUpdate = [];
-    farmPrinters[index].octoPrintPluginUpdates = [];
-    farmPrinters[index].systemChecks.scanning.updates.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Checking OctoPrint for updates...",
-      "Active",
-      farmPrinters[index]._id
-    );
 
-    return this.octoPrintService
-      .getSoftwareUpdateCheck(farmPrinters[index], force, true)
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        let octoPrintUpdate = false;
-        let pluginUpdates = [];
-        for (var key in res.information) {
-          if (res.information.hasOwnProperty(key)) {
-            if (res.information[key].updateAvailable) {
-              if (key === "octoprint") {
-                octoPrintUpdate = {
-                  id: key,
-                  displayName: res.information[key].displayName,
-                  displayVersion: res.information[key].displayVersion,
-                  updateAvailable: res.information[key].updateAvailable,
-                  releaseNotesURL: res.information[key].releaseNotes
-                };
-              } else {
-                pluginUpdates.push({
-                  id: key,
-                  displayName: res.information[key].displayName,
-                  displayVersion: res.information[key].displayVersion,
-                  updateAvailable: res.information[key].updateAvailable,
-                  releaseNotesURL: res.information[key].releaseNotes
-                });
+    farmPrinters[index].systemChecks.scanning.updates.status = "warning";
+
+    if (
+      !farmPrinters[index]?.octoPrintUpdate ||
+      !farmPrinters[index]?.octoPrintPluginUpdates ||
+      force
+    ) {
+      farmPrinters[index].octoPrintUpdate = [];
+      farmPrinters[index].octoPrintPluginUpdates = [];
+
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Checking OctoPrint for updates...",
+        "Active",
+        farmPrinters[index]._id
+      );
+
+      return this.octoPrintService
+        .getSoftwareUpdateCheck(farmPrinters[index], force, true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          let octoPrintUpdate = false;
+          let pluginUpdates = [];
+          for (var key in res.information) {
+            if (res.information.hasOwnProperty(key)) {
+              if (res.information[key].updateAvailable) {
+                if (key === "octoprint") {
+                  octoPrintUpdate = {
+                    id: key,
+                    displayName: res.information[key].displayName,
+                    displayVersion: res.information[key].displayVersion,
+                    updateAvailable: res.information[key].updateAvailable,
+                    releaseNotesURL: res.information[key].releaseNotes
+                  };
+                } else {
+                  pluginUpdates.push({
+                    id: key,
+                    displayName: res.information[key].displayName,
+                    displayVersion: res.information[key].displayVersion,
+                    updateAvailable: res.information[key].updateAvailable,
+                    releaseNotesURL: res.information[key].releaseNotes
+                  });
+                }
               }
             }
           }
-        }
-        farmPrinters[index].octoPrintUpdate = octoPrintUpdate;
-        farmPrinters[index].octoPrintPluginUpdates = pluginUpdates;
-        farmPrinters[index].systemChecks.scanning.updates.status = "success";
-        farmPrinters[index].systemChecks.scanning.updates.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Octoprints checked for updates...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-      })
-      .catch((err) => {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing octoprint updates information: ${err}`,
-          "Disconnected",
-          farmPrinters[index]._id
-        );
-        logger.error(
-          `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
-        farmPrinters[index].systemChecks.scanning.updates.status = "danger";
-        farmPrinters[index].systemChecks.scanning.updates.date = new Date();
-        return false;
-      });
+          farmPrinters[index].octoPrintUpdate = octoPrintUpdate;
+          farmPrinters[index].octoPrintPluginUpdates = pluginUpdates;
+
+          const filter = { _id: farmPrinters[index]._id };
+          const update = {
+            octoPrintUpdate: octoPrintUpdate,
+            octoPrintPluginUpdates: pluginUpdates
+          };
+          await Printers.findOneAndUpdate(filter, update, {
+            returnOriginal: false
+          });
+
+          farmPrinters[index].systemChecks.scanning.updates.status = "success";
+          farmPrinters[index].systemChecks.scanning.updates.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Octoprints checked for updates...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+        })
+        .catch((err) => {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing octoprint updates information: ${err}`,
+            "Disconnected",
+            farmPrinters[index]._id
+          );
+          logger.error(
+            `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          farmPrinters[index].systemChecks.scanning.updates.status = "danger";
+          farmPrinters[index].systemChecks.scanning.updates.date = new Date();
+          return false;
+        });
+    } else {
+      logger.debug("Skipping OctoPrint Updates Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.updates.status = "success";
+      farmPrinters[index].systemChecks.scanning.updates.date = new Date();
+    }
+  }
+
+  static async getSettings(id, force = false) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    farmPrinters[index].systemChecks.scanning.settings.status = "warning";
+
+    if (
+      !farmPrinters[index]?.corsCheck ||
+      !farmPrinters[index]?.settingsApi ||
+      !farmPrinters[index]?.settingsFeature ||
+      !farmPrinters[index]?.settingsFolder ||
+      !farmPrinters[index]?.settingsPlugins ||
+      !farmPrinters[index]?.settingsScripts ||
+      !farmPrinters[index]?.settingsSerial ||
+      !farmPrinters[index]?.settingsServer ||
+      !farmPrinters[index]?.settingsSystem ||
+      !farmPrinters[index]?.settingsWebcam ||
+      force
+    ) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing settings information...",
+        "Active",
+        farmPrinters[index]._id
+      );
+      return this.octoPrintService
+        .getSettings(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          // Update info to DB
+          farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
+          farmPrinters[index].settingsApi = res.api;
+          farmPrinters[index].settingsFeature = res.feature;
+          farmPrinters[index].settingsFolder = res.folder;
+          farmPrinters[index].settingsPlugins = res.plugins;
+          farmPrinters[index].settingsScripts = res.scripts;
+          farmPrinters[index].settingsSerial = res.serial;
+          farmPrinters[index].settingsServer = res.server;
+          farmPrinters[index].settingsSystem = res.system;
+          farmPrinters[index].settingsWebcam = res.webcam;
+
+          const filter = { _id: farmPrinters[index]._id };
+          const update = {
+            corsCheck: res.api.allowCrossOrigin,
+            settingsApi: res.api,
+            settingsFeature: res.feature,
+            settingsFolder: res.folder,
+            settingsPlugins: res.plugins,
+            settingsScripts: res.scripts,
+            settingsSerial: res.serial,
+            settingsServer: res.server,
+            settingsSystem: res.system,
+            settingsWebcam: res.webcam
+          };
+          await Printers.findOneAndUpdate(filter, update, {
+            returnOriginal: false
+          });
+
+          if (farmPrinters[index].camURL === "") {
+            if (
+              typeof res.webcam !== "undefined" &&
+              typeof res.webcam.streamUrl !== "undefined" &&
+              res.webcam.streamUrl != null
+            ) {
+              if (res.webcam.streamUrl.includes("http")) {
+                farmPrinters[index].camURL = res.webcam.streamUrl;
+              } else {
+                farmPrinters[index].camURL = farmPrinters[index].printerURL + res.webcam.streamUrl;
+              }
+              const filter = { _id: farmPrinters[index]._id };
+              const update = {
+                camURL: farmPrinters[index].camURL
+              };
+              await Printers.findOneAndUpdate(filter, update, {
+                returnOriginal: false
+              });
+            }
+          }
+          if (!farmPrinters[index].settingsAppearance) {
+            farmPrinters[index].settingsAppearance = res.appearance;
+          } else if (farmPrinters[index].settingsAppearance.name === "") {
+            farmPrinters[index].settingsAppearance.name = res.appearance.name;
+          }
+          if (res.plugins["pi_support"]) {
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Pi Plugin detected... scanning for version information...",
+              "Active",
+              farmPrinters[index]._id
+            );
+
+            let piSupport = await this.octoPrintService.getPluginPiSupport(farmPrinters[index]);
+            piSupport = await piSupport.json();
+            const octoPi = {
+              model: piSupport.model,
+              version: piSupport.octopi_version
+            };
+            farmPrinters[index].octoPi = octoPi;
+            Printers.findByIdAndUpdate(id, {
+              octoPi: octoPi
+            });
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Sucessfully grabbed OctoPi information...",
+              "Complete",
+              farmPrinters[index]._id
+            );
+          }
+          if (farmPrinters[index].costSettings === null) {
+            if (res.plugins["costestimation"]) {
+              PrinterTicker.addIssue(
+                new Date(),
+                farmPrinters[index].printerURL,
+                "Cost Plugin detected... Updating OctoFarms Cost settings",
+                "Active",
+                farmPrinters[index]._id
+              );
+              farmPrinters[index].costSettings = {
+                powerConsumption: res.plugins["costestimation"].powerConsumption,
+                electricityCosts: res.plugins["costestimation"].costOfElectricity,
+                purchasePrice: res.plugins["costestimation"].priceOfPrinter,
+                estimateLifespan: res.plugins["costestimation"].lifespanOfPrinter,
+                maintenanceCosts: res.plugins["costestimation"].maintenanceCosts
+              };
+              PrinterTicker.addIssue(
+                new Date(),
+                farmPrinters[index].printerURL,
+                "Successfully saved Cost Estimation settings",
+                "Complete",
+                farmPrinters[index]._id
+              );
+            } else {
+              farmPrinters[index].costSettings = {
+                powerConsumption: 0.5,
+                electricityCosts: 0.15,
+                purchasePrice: 500,
+                estimateLifespan: 43800,
+                maintenanceCosts: 0.25
+              };
+            }
+            Printers.findByIdAndUpdate(id, {
+              costSettings: farmPrinters[index].costSettings
+            });
+          }
+          if (farmPrinters[index].powerSettings === null) {
+            if (res.plugins["psucontrol"]) {
+              PrinterTicker.addIssue(
+                new Date(),
+                farmPrinters[index].printerURL,
+                "PSU Control plugin detected... Updating OctoFarm power settings...",
+                "Active",
+                farmPrinters[index]._id
+              );
+              farmPrinters[index].powerSettings = {
+                powerOnCommand: '{"command":"turnPSUOn"}',
+                powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
+                powerOffCommand: '{"command":"turnPSUOff"}',
+                powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
+                powerToggleCommand: '{"command":"togglePSU"}',
+                powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
+                powerStatusCommand: '{"command":"getPSUState"}',
+                powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+                wol: {
+                  enabled: false,
+                  ip: "255.255.255.0",
+                  packets: "3",
+                  port: "9",
+                  interval: "100",
+                  MAC: ""
+                }
+              };
+
+              PrinterTicker.addIssue(
+                new Date(),
+                farmPrinters[index].printerURL,
+                "Successfully saved PSU control settings...",
+                "Complete",
+                farmPrinters[index]._id
+              );
+            } else {
+              farmPrinters[i].powerSettings = {
+                powerOnCommand: "",
+                powerOnURL: "",
+                powerOffCommand: "",
+                powerOffURL: "",
+                powerToggleCommand: "",
+                powerToggleURL: "",
+                powerStatusCommand: "",
+                powerStatusURL: "",
+                wol: {
+                  enabled: false,
+                  ip: "255.255.255.0",
+                  packets: "3",
+                  port: "9",
+                  interval: "100",
+                  MAC: ""
+                }
+              };
+            }
+            Printers.findByIdAndUpdate(id, {
+              powerSettings: farmPrinters[index].powerSettings
+            });
+          }
+
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed settings information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+
+          farmPrinters[index].systemChecks.scanning.settings.status = "success";
+          farmPrinters[index].systemChecks.scanning.settings.date = new Date();
+        })
+        .catch((err) => {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing settings information: ${err}`,
+            "Offline",
+            farmPrinters[index]._id
+          );
+          farmPrinters[index].systemChecks.scanning.settings.status = "danger";
+          farmPrinters[index].systemChecks.scanning.settings.date = new Date();
+          logger.error(
+            `Error grabbing settings for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
+        });
+    } else {
+      logger.debug("Skipping Settings Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.settings.status = "success";
+      farmPrinters[index].systemChecks.scanning.settings.date = new Date();
+    }
+  }
+
+  static getSystem(id, force = false) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    farmPrinters[index].systemChecks.scanning.system.status = "warning";
+
+    if (!farmPrinters[index]?.core || force) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        "Grabbing system information...",
+        "Active",
+        farmPrinters[index]._id
+      );
+      return this.octoPrintService
+        .getSystemCommands(farmPrinters[index], true)
+        .then((res) => {
+          return res.json();
+        })
+        .then(async (res) => {
+          // Update info to DB
+          farmPrinters[index].core = res.core;
+
+          const filter = { _id: farmPrinters[index]._id };
+          const update = {
+            core: res.core
+          };
+          await Printers.findOneAndUpdate(filter, update, {
+            returnOriginal: false
+          });
+
+          farmPrinters[index].systemChecks.scanning.system.status = "success";
+          farmPrinters[index].systemChecks.scanning.system.date = new Date();
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Grabbed system information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+        })
+        .catch((err) => {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            `Error grabbing system information: ${err}`,
+            "Offline",
+            farmPrinters[index]._id
+          );
+          farmPrinters[index].systemChecks.scanning.system.status = "danger";
+          farmPrinters[index].systemChecks.scanning.system.date = new Date();
+          logger.error(
+            `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
+            err
+          );
+          return false;
+        });
+    } else {
+      logger.debug("Skipping System Grab... have data already - force is: " + force);
+      farmPrinters[index].systemChecks.scanning.system.status = "success";
+      farmPrinters[index].systemChecks.scanning.system.date = new Date();
+    }
+  }
+
+  // Patch for updating OctoPrint's settings for now until re-work of printer cache with state.js.
+  static async getLatestOctoPrintSettingsValues(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    // This was causing slowdown of settings pages when loading, we should only be running this command when printer is considered online.
+    if (farmPrinters[index].state !== "Offline") {
+      // This is why the settings we're not updating! Forgot that connection options and preferences come in state, not settings/system.
+      await Runner.getState(id, true);
+      // Update the printers cached settings from OctoPrint
+      await Runner.getSettings(id, true);
+      // Update the printers cached system settings from OctoPrint
+      await Runner.getSystem(id, true);
+      // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
+    }
+
+    await PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
   }
 
   static async killPowerSettings(printerID) {
@@ -2785,272 +3248,6 @@ class Runner {
     } catch (e) {
       return false;
     }
-  }
-
-  static async getSettings(id) {
-    const index = _.findIndex(farmPrinters, function (o) {
-      return o._id == id;
-    });
-    farmPrinters[index].systemChecks.scanning.settings.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing settings information...",
-      "Active",
-      farmPrinters[index]._id
-    );
-    return this.octoPrintService
-      .getSettings(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then(async (res) => {
-        // Update info to DB
-        farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
-        farmPrinters[index].settingsApi = res.api;
-        if (!farmPrinters[index].settingsAppearance) {
-          farmPrinters[index].settingsAppearance = res.appearance;
-        } else if (farmPrinters[index].settingsAppearance.name === "") {
-          farmPrinters[index].settingsAppearance.name = res.appearance.name;
-        }
-        if (res.plugins["pi_support"]) {
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[index].printerURL,
-            "Pi Plugin detected... scanning for version information...",
-            "Active",
-            farmPrinters[index]._id
-          );
-
-          let piSupport = await this.octoPrintService.getPluginPiSupport(farmPrinters[index]);
-          piSupport = await piSupport.json();
-          const octoPi = {
-            model: piSupport.model,
-            version: piSupport.octopi_version
-          };
-          farmPrinters[index].octoPi = octoPi;
-          Printers.findByIdAndUpdate(id, {
-            octoPi: octoPi
-          });
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[index].printerURL,
-            "Sucessfully grabbed OctoPi information...",
-            "Complete",
-            farmPrinters[index]._id
-          );
-        }
-        if (farmPrinters[index].costSettings === null) {
-          if (res.plugins["costestimation"]) {
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[index].printerURL,
-              "Cost Plugin detected... Updating OctoFarms Cost settings",
-              "Active",
-              farmPrinters[index]._id
-            );
-            farmPrinters[index].costSettings = {
-              powerConsumption: res.plugins["costestimation"].powerConsumption,
-              electricityCosts: res.plugins["costestimation"].costOfElectricity,
-              purchasePrice: res.plugins["costestimation"].priceOfPrinter,
-              estimateLifespan: res.plugins["costestimation"].lifespanOfPrinter,
-              maintenanceCosts: res.plugins["costestimation"].maintenanceCosts
-            };
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[index].printerURL,
-              "Successfully saved Cost Estimation settings",
-              "Complete",
-              farmPrinters[index]._id
-            );
-          } else {
-            farmPrinters[index].costSettings = {
-              powerConsumption: 0.5,
-              electricityCosts: 0.15,
-              purchasePrice: 500,
-              estimateLifespan: 43800,
-              maintenanceCosts: 0.25
-            };
-          }
-          Printers.findByIdAndUpdate(id, {
-            costSettings: farmPrinters[index].costSettings
-          });
-        }
-        if (farmPrinters[index].powerSettings === null) {
-          if (res.plugins["psucontrol"]) {
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[index].printerURL,
-              "PSU Control plugin detected... Updating OctoFarm power settings...",
-              "Active",
-              farmPrinters[index]._id
-            );
-            farmPrinters[index].powerSettings = {
-              powerOnCommand: '{"command":"turnPSUOn"}',
-              powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerOffCommand: '{"command":"turnPSUOff"}',
-              powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerToggleCommand: '{"command":"togglePSU"}',
-              powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerStatusCommand: '{"command":"getPSUState"}',
-              powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
-              wol: {
-                enabled: false,
-                ip: "255.255.255.0",
-                packets: "3",
-                port: "9",
-                interval: "100",
-                MAC: ""
-              }
-            };
-
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[index].printerURL,
-              "Successfully saved PSU control settings...",
-              "Complete",
-              farmPrinters[index]._id
-            );
-          } else {
-            farmPrinters[i].powerSettings = {
-              powerOnCommand: "",
-              powerOnURL: "",
-              powerOffCommand: "",
-              powerOffURL: "",
-              powerToggleCommand: "",
-              powerToggleURL: "",
-              powerStatusCommand: "",
-              powerStatusURL: "",
-              wol: {
-                enabled: false,
-                ip: "255.255.255.0",
-                packets: "3",
-                port: "9",
-                interval: "100",
-                MAC: ""
-              }
-            };
-          }
-          Printers.findByIdAndUpdate(id, {
-            powerSettings: farmPrinters[index].powerSettings
-          });
-        }
-        farmPrinters[index].settingsFeature = res.feature;
-        farmPrinters[index].settingsFolder = res.folder;
-        farmPrinters[index].settingsPlugins = res.plugins;
-        farmPrinters[index].settingsScripts = res.scripts;
-        farmPrinters[index].settingsSerial = res.serial;
-        farmPrinters[index].settingsServer = res.server;
-        farmPrinters[index].settingsSystem = res.system;
-        farmPrinters[index].settingsWebcam = res.webcam;
-        if (farmPrinters[index].camURL === "") {
-          if (
-            typeof res.webcam !== "undefined" &&
-            typeof res.webcam.streamUrl !== "undefined" &&
-            res.webcam.streamUrl != null
-          ) {
-            if (res.webcam.streamUrl.includes("http")) {
-              farmPrinters[index].camURL = res.webcam.streamUrl;
-            } else {
-              farmPrinters[index].camURL = farmPrinters[index].printerURL + res.webcam.streamUrl;
-            }
-            const printer = await Printers.findById(id);
-            printer.camURL = farmPrinters[index].camURL;
-            await printer.save();
-          }
-        }
-
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed settings information...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-
-        farmPrinters[index].systemChecks.scanning.settings.status = "success";
-        farmPrinters[index].systemChecks.scanning.settings.date = new Date();
-      })
-      .catch((err) => {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing settings information: ${err}`,
-          "Offline",
-          farmPrinters[index]._id
-        );
-        farmPrinters[index].systemChecks.scanning.settings.status = "danger";
-        farmPrinters[index].systemChecks.scanning.settings.date = new Date();
-        logger.error(
-          `Error grabbing settings for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
-        return false;
-      });
-  }
-
-  static getSystem(id) {
-    const index = _.findIndex(farmPrinters, function (o) {
-      return o._id == id;
-    });
-    farmPrinters[index].systemChecks.scanning.system.status = "warning";
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[index].printerURL,
-      "Grabbing system information...",
-      "Active",
-      farmPrinters[index]._id
-    );
-    return this.octoPrintService
-      .getSystemCommands(farmPrinters[index], true)
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        // Update info to DB
-        farmPrinters[index].core = res.core;
-        farmPrinters[index].systemChecks.scanning.system.status = "success";
-        farmPrinters[index].systemChecks.scanning.system.date = new Date();
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          "Grabbed system information...",
-          "Complete",
-          farmPrinters[index]._id
-        );
-      })
-      .catch((err) => {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[index].printerURL,
-          `Error grabbing system information: ${err}`,
-          "Offline",
-          farmPrinters[index]._id
-        );
-        farmPrinters[index].systemChecks.scanning.system.status = "danger";
-        farmPrinters[index].systemChecks.scanning.system.date = new Date();
-        logger.error(`Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `, err);
-        return false;
-      });
-  }
-
-  // Patch for updating OctoPrint's settings for now until re-work of printer cache with state.js.
-  static async getLatestOctoPrintSettingsValues(id) {
-    const index = _.findIndex(farmPrinters, function (o) {
-      return o._id == id;
-    });
-    // This was causing slowdown of settings pages when loading, we should only be running this command when printer is considered online.
-    if (farmPrinters[index].state !== "Offline") {
-      // This is why the settings we're not updating! Forgot that connection options and preferences come in state, not settings/system.
-      await Runner.getState(id);
-      // Update the printers cached settings from OctoPrint
-      await Runner.getSettings(id);
-      // Update the printers cached system settings from OctoPrint
-      await Runner.getSystem(id);
-      // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
-    }
-
-    await PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
   }
 
   static getColour(state) {
@@ -3162,7 +3359,7 @@ class Runner {
       return o.fullPath == fullPath;
     });
     // Doesn't actually resync just the file... shhh
-    farmPrinters[i].fileList.files[fileID] = await Runner.getFile(id, fullPath);
+    farmPrinters[i].fileList.files[fileID] = await Runner.getFile(id, fullPath, true);
     farmPrinters[i].markModified("fileList");
     farmPrinters[i].save();
     const currentFilament = await Runner.compileSelectedFilament(

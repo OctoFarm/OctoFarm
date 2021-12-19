@@ -154,7 +154,10 @@ class TaskManager {
    * Stops the tasks which were registered
    */
   static stopSchedulerTasks() {
+    logger.debug("Signal to kill all scheduled tasks received!");
     this.jobScheduler.stop();
+    logger.debug("Successfully stopped all scheduled tasks!");
+    return true;
   }
 
   /**

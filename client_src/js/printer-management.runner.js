@@ -74,6 +74,30 @@ const searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener("click", async (e) => {
   await reSyncPrinters();
 });
+
+const forceSearchOffline = document.getElementById("forceSearchOffline");
+forceSearchOffline.addEventListener("click", (e) => {
+  bootbox.confirm({
+    message:
+      "Your about to do a full re-setup of your farm. This will call all your OctoPrint instances and refresh OctoFarms data that it holds... Are you sure?",
+    buttons: {
+      confirm: {
+        label: "Yes",
+        className: "btn-success"
+      },
+      cancel: {
+        label: "No",
+        className: "btn-danger"
+      }
+    },
+    callback: async function (result) {
+      if (result) {
+        await reSyncPrinters(true);
+      }
+    }
+  });
+});
+
 const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", async (event) => {
   await PrinterSelect.create(multiPrinterSelectModal, true, "Edit Printers", bulkEditPrinters);

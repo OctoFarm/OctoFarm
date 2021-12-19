@@ -104,8 +104,13 @@ export async function scanNetworkForDevices(e) {
   e.target.disabled = false;
 }
 
-export async function reSyncPrinters() {
-  const searchOffline = document.getElementById("searchOfflineBtn");
+export async function reSyncPrinters(force = false) {
+  let searchOffline = document.getElementById("searchOfflineBtn");
+
+  if (force) {
+    searchOffline = document.getElementById("forceSearchOffline");
+  }
+
   searchOffline.disabled = true;
   let alert = UI.createAlert(
     "info",
@@ -114,7 +119,8 @@ export async function reSyncPrinters() {
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
   try {
     const post = await OctoFarmClient.post("printers/reScanOcto", {
-      id: null
+      id: null,
+      force: force
     });
   } catch (e) {
     console.error(e);
@@ -122,7 +128,11 @@ export async function reSyncPrinters() {
   }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
-  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+  if (force) {
+    searchOffline.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Force Re-Setup';
+  } else {
+    searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Connect';
+  }
   searchOffline.disabled = false;
 }
 
