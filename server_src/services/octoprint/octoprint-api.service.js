@@ -102,13 +102,13 @@ class OctoprintApiService {
       const message = `Error connecting to OctoPrint API: ${item} | ${printerURL}`;
       logger.error(`${message} | timeout: ${this.timeout.apiTimeout}`, JSON.stringify(err.message));
       // If timeout exceeds max cut off then give up... Printer is considered offline.
+      console.log(this.timeout.apiTimeout);
       if (this.timeout.apiTimeout >= this.timeout.apiRetryCutoff) {
         logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
         throw err;
       }
       // Make sure to use the settings for api retry.
-      // TODO: Fix apiRetryCutoff + apiRetry as they are swapped.
-      this.timeout.apiTimeout = this.timeout.apiRetryCutoff;
+      this.timeout.apiTimeout = this.timeout.apiTimeout + 5000;
       return await this.getRetry(printerURL, apiKey, item);
     }
   }

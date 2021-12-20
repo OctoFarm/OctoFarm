@@ -97,5 +97,12 @@ bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
     bodyFile:'./PrinterManager/printerStatistics.modal.ejs'
 })
 %>
+<%- include(modal, {
+modal:{
+id:"healthChecks", title: "Printers Health Checks"
+},
+bodyFile:'./PrinterManager/healthChecks.modal.ejs'
+})
+%>
 
 <script src="/assets/dist/printer-management.runner.min.js" type="module"></script>

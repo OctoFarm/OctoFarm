@@ -17,6 +17,16 @@ const { PrinterClean } = printerClean;
 // Doesn't returns undefined, note to use is incorrect...
 // const { returnPrintersInformation } = require("../cache/printer.cache.js");
 
+const {
+  apiChecks,
+  websocketChecks,
+  printerConnectionCheck,
+  profileChecks,
+  webcamChecks,
+  printerChecks,
+  checkConnectionsMatchRetrySettings
+} = require("../services/printer-health-checks.service");
+
 const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
@@ -73,7 +83,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   if (typeof file.fullPath !== "undefined") {
     ret = await Runner.reSyncFile(file.i, file.fullPath);
   } else {
-    ret = await Runner.getFiles(file.i, true);
+    ret = await Runner.getFiles(file.i, true, true);
   }
   res.send(ret);
 });
@@ -142,6 +152,7 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
   }
   try {
     await Runner.getLatestOctoPrintSettingsValues(id);
+    logger.debug("Updating printer settings for: ", id);
     let printerInformation = PrinterClean.getPrintersInformationById(id);
     res.send(printerInformation);
   } catch (e) {
@@ -192,34 +203,34 @@ router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
       const batchOfTenPromises = [];
       if (i % 10 === 0) {
         if (farmPrinters[i]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i]._id, data.force));
         }
         if (farmPrinters[i + 1]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 1]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 1]._id, data.force));
         }
         if (farmPrinters[i + 2]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 2]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 2]._id, data.force));
         }
         if (farmPrinters[i + 3]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 3]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 3]._id, data.force));
         }
         if (farmPrinters[i + 4]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 4]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 4]._id, data.force));
         }
         if (farmPrinters[i + 5]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 5]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 5]._id, data.force));
         }
         if (farmPrinters[i + 6]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 6]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 6]._id, data.force));
         }
         if (farmPrinters[i + 7]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 7]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 7]._id, data.force));
         }
         if (farmPrinters[i + 8]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 8]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 8]._id, data.force));
         }
         if (farmPrinters[i + 9]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 9]._id));
+          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 9]._id, data.force));
         }
       }
       await Promise.allSettled(batchOfTenPromises);
@@ -228,7 +239,7 @@ router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
     res.send({ msg: "Started a full farm rescan." });
   } else {
     logger.info("Rescan OctoPrint Requests: ", data);
-    const reScan = await Runner.reScanOcto(data.id);
+    const reScan = await Runner.reScanOcto(data.id, data.force);
     logger.info("Rescan OctoPrint complete: ", reScan);
     res.send({ msg: reScan });
   }
@@ -285,6 +296,35 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   const idList = JSON.parse(req.params.ids);
   let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
   res.json(uniqueFolderPaths);
+});
+
+router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
+  const farmPrinters = PrinterClean.listPrintersInformation();
+
+  const response = [];
+
+  for (let i = 0; i < farmPrinters.length; i++) {
+    const currentURL = new URL(farmPrinters[i].printerURL);
+    const printerCheck = {
+      printerName: farmPrinters[i].printerName,
+      printerChecks: printerChecks(farmPrinters[i]),
+      apiChecks: apiChecks(farmPrinters[i].systemChecks.scanning),
+      websocketChecks: websocketChecks(currentURL.host),
+      connectionChecks: printerConnectionCheck(
+        farmPrinters[i].currentConnection,
+        farmPrinters[i].connectionOptions
+      ),
+      profileChecks: profileChecks(farmPrinters[i].currentProfile),
+      webcamChecks: webcamChecks(
+        farmPrinters[i].cameraURL,
+        farmPrinters[i].otherSettings.webCamSettings
+      ),
+      connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
+    };
+    response.push(printerCheck);
+  }
+
+  res.send(response);
 });
 
 module.exports = router;

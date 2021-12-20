@@ -29,7 +29,7 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     if (!ApplicationError.hasErrorNotificationBeenTriggered) {
       // Make sure online state is latest...
       printerOnline =
-        printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
+        printersInformation[currentPrinterIndex]?.printerState?.colour?.category !== "Offline";
       PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
     }
   } else {
@@ -38,7 +38,7 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
 
     //Convert online state to a boolean
-    printerOnline = currentPrinter.printerState.colour.category !== "Offline";
+    printerOnline = currentPrinter?.printerState?.colour?.category !== "Offline";
     PrinterSettings.updateStateElements(currentPrinter);
     // Clear the page of old values.
     UI.clearSelect("ps");
@@ -114,7 +114,7 @@ class PrinterSettings {
       userDropDown.value = currentPrinter.currentUser;
     } else {
       userDropDown.disabled = true;
-      userDropDown.insertAdjacentHTML("beforeend", "<option value=\"0\">No users available</option>");
+      userDropDown.insertAdjacentHTML("beforeend", '<option value="0">No users available</option>');
       userDropDown.value = 0;
     }
 
@@ -1098,6 +1098,9 @@ class PrinterSettings {
           profileCheck: document.getElementById("profileCheck"),
           settingsCheck: document.getElementById("settingsCheck"),
           systemCheck: document.getElementById("systemCheck"),
+          systemInfoCheck: document.getElementById("systemInfoCheck"),
+          pluginsCheck: document.getElementById("pluginsCheck"),
+          updatesCheck: document.getElementById("updatesCheck"),
           apiClean: document.getElementById("apiClean"),
           filesClean: document.getElementById("filesClean"),
           stateClean: document.getElementById("stateClean"),
@@ -1127,14 +1130,14 @@ class PrinterSettings {
       throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
-    pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;
-    pageElements.mainPage.status.className = `btn btn-${currentPrinter.printerState.colour.name} mb-1 btn-block`;
+    pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter?.printerState?.state}`;
+    pageElements.mainPage.status.className = `btn btn-${currentPrinter?.printerState?.colour?.name} mb-1 btn-block`;
     pageElements.mainPage.host.innerHTML = `<b>Host Status</b><br>${currentPrinter.hostState.state}`;
     pageElements.mainPage.host.className = `btn btn-${currentPrinter.hostState.colour.name} mb-1 btn-block`;
     pageElements.mainPage.socket.innerHTML = `<b>WebSocket Status</b><br>${currentPrinter.webSocketState.desc}`;
     pageElements.mainPage.socket.className = `btn btn-${currentPrinter.webSocketState.colour} mb-1 btn-block`;
 
-    pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-link"></i> <b>API Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+    pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-users"></i> <b>Users Check</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.scanning.api.date
     )}`;
     pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.api.status} mb-1 btn-block`;
@@ -1158,6 +1161,21 @@ class PrinterSettings {
       currentPrinter.systemChecks.scanning.system.date
     )}`;
     pageElements.connectPage.systemCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.system.status} mb-1 btn-block`;
+
+    pageElements.connectPage.systemInfoCheck.innerHTML = `<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.systemInfo.date
+    )}`;
+    pageElements.connectPage.systemInfoCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.systemInfo.status} mb-1 btn-block`;
+
+    pageElements.connectPage.pluginsCheck.innerHTML = `<i class="fas fa-plug"></i> <b>Plugins Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.plugins.date
+    )}`;
+    pageElements.connectPage.pluginsCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.plugins.status} mb-1 btn-block`;
+
+    pageElements.connectPage.updatesCheck.innerHTML = `<i class="fas fa-wrench"></i> <b>Updates Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.updates.date
+    )}`;
+    pageElements.connectPage.updatesCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.updates.status} mb-1 btn-block`;
 
     pageElements.connectPage.apiClean.innerHTML = `<i class="fas fa-server"></i> <b>Printer Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.cleaning.information.date
