@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
     - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
     - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
   - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it will automatically choose this user to use.
+  - Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections before killing itself.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2

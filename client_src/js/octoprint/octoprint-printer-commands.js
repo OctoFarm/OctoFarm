@@ -1,6 +1,6 @@
 import OctoPrintClient from "../lib/octoprint";
 import UI from "../lib/functions/ui";
-import bulkActionsStates from "../printer-manager/bulk-actions.constants";
+import bulkActionsStates from "../pages/printer-manager/bulk-actions.constants";
 
 export async function printerPreHeatChamber(printer, chamberTemp) {
   let chamberData = {

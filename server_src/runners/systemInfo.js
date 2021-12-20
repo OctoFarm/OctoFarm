@@ -4,6 +4,7 @@ const process = require("process");
 const Logger = require("../handlers/logger");
 const { bench } = require("../utils/benchmark.util");
 const logger = new Logger("OctoFarm-Server");
+const { farmPiStatus } = require("../services/farmpi-detection.service");
 
 const diskVeryFullWarning =
   "Warning your disk is getting full... Please clean up some space or move to a larger hard drive.";
@@ -44,7 +45,7 @@ class SystemRunner {
 
     systemInfo.currentProcess = currentProcess;
 
-    return this.returnInfo();
+    return SystemRunner.returnInfo();
   }
 
   static async queryStaticBench() {
@@ -106,12 +107,12 @@ class SystemRunner {
    */
   static async querySystemInfo() {
     try {
-      await this.queryWithFreshCurrentProcess();
-      const { benchResults, queryResults } = await this.queryStaticBench();
+      await SystemRunner.queryWithFreshCurrentProcess();
+      const { benchResults, queryResults } = await SystemRunner.queryStaticBench();
 
       //This maybe related to node 13.12.0 possibly. Issue #341.
       const systemDisk = queryResults.fileSize[0];
-      let warnings = this.getDiskWarnings(systemDisk);
+      let warnings = SystemRunner.getDiskWarnings(systemDisk);
 
       systemInfo = {
         cpuCurrentSpeed: queryResults.cpuCurrentSpeed,
@@ -128,8 +129,12 @@ class SystemRunner {
         systemDisk,
         currentProcess: systemInfo.currentProcess,
         benchmarkTimes: benchResults,
-        networkIpAddresses: this.getIpAddressList()
+        networkIpAddresses: SystemRunner.getIpAddressList()
       };
+
+      if (farmPiStatus()) {
+        systemInfo.osInfo.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
+      }
 
       return systemInfo;
     } catch (e) {

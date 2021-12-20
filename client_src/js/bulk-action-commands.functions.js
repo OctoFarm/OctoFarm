@@ -7,7 +7,7 @@ import {
   bulkDisconnectPrinters,
   bulkOctoPrintPreHeatCommand,
   bulkOctoPrintPowerCommand
-} from "./printer-manager/functions/bulk-commands-functions";
+} from "./pages/printer-manager/functions/bulk-commands-functions";
 const multiPrintersSection = document.getElementById("multiPrintersSection");
 
 const multiPrintCommandBtn = document.getElementById("multiPrintCommand");

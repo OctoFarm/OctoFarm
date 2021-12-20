@@ -104,7 +104,11 @@ class ConnectionMonitorService {
 
   static returnConnectionLogs(printerURL) {
     if (!printerURL) return printerConnectionLogs;
-    return printerConnectionLogs[printerURL];
+    return printerConnectionLogs[
+      findIndex(printerConnectionLogs, function (o) {
+        return o.printerURL === printerURL;
+      })
+    ];
   }
 }
 

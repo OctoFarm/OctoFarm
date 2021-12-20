@@ -10,7 +10,7 @@ const SpoolsDB = require("../models/Filament.js");
 const ProfilesDB = require("../models/Profiles.js");
 const RoomDataDB = require("../models/RoomData.js");
 const UserDB = require("../models/User.js");
-const PrinterDB = require("../models/Printer.js");
+const PrintersDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
 const Logger = require("../handlers/logger.js");
@@ -94,7 +94,7 @@ router.get(
       await ProfilesDB.deleteMany({});
       await RoomDataDB.deleteMany({});
       await UserDB.deleteMany({});
-      await PrinterDB.deleteMany({});
+      await PrintersDB.deleteMany({});
       await AlertsDB.deleteMany({});
       await GcodeDB.deleteMany({});
       res.send({

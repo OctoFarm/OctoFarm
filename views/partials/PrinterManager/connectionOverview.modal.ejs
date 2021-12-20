@@ -11,13 +11,13 @@
 <div class="col-lg-12">
     <div class="collapse" id="collapseExample">
         <div class="alert alert-secondary" role="alert">
-            <p> This is to get a understanding into how well your network / OctoFarm is performing at keeping the printers connected. The table below will list your printer totals (blue bar) and then below (grey and dark grey bars) a break down of each request url. There is the Average response time, success percentage and retry count tracked whilst OctoFarm is running.</p>
+            <p> This is an overview screen of the current connection responses OctoFarm gets from your OctoPrint instances</p>
             <hr>
-            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. If your seeing response times higher than 1000ms (blue is total and can be ignored) you will want to increase OctoFarms default connection timeout and see if that helps. If you have a wired connection then it's a good indication there's some network congestion somewhere / If wireless your results may vary. The slowest of OctoPrints api endpoints is "api/settings" and this is a good one to base your API Initial Timeout on, just make sure API Secondary Timeout is higher than that.
+            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. </p>
             <hr>
-            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests. This is a good indication that there are connection issues, especially with a high retry count. If your OctoPrint instances are usually offline and only turned on when printing it's probably safe to dis-regard this and Retry Counts as those both will increment as those connections are failing. </p>
+            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests.  </p>
             <hr>
-            <b>Retry Counts: </b> <p>This is how many times any request was retried. This is a good indication that OctoFarms default timeout settings are too fast for your network or you have issues with the OctoPrint host. </p>
+            <b>Retry Counts: </b> <p>This is how many times any request was retried. </p>
         </div>
     </div>
 </div>
