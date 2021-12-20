@@ -11,6 +11,8 @@ const ConnectionMonitorService = require("./services/connection-monitor.service"
 const { REQUEST_TYPE, REQUEST_KEYS } = require("./constants/connection-monitor.constants");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
 const { PrinterTicker } = require("./runners/printerTicker");
+const Logger = require("./handlers/logger.js");
+const logger = new Logger("OctoFarm-TaskManager");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -184,23 +186,30 @@ function TaskStart(task, preset, milliseconds = 0) {
   };
 }
 
+async function TimedBookTask(name, input){
+  const started = Date.now();
+  const task =  await input();
+  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms  ${task}`)
+  return true
+}
+
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
-    TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
   ];
-  static REQUIRED_BOOT_TASKS = [
-    SYSTEM_INFO_CHECK_TASK(),
-    FARMPI_DETECTION_TASK(),
-    INITITIALISE_PRINTERS()
-  ];
+  static TIMED_BOOT_TASTS = [
+    TimedBookTask("SYSTEM_INFO_CHECK_TASK", SystemRunner.querySystemInfo),
+    TimedBookTask("FARMPI_DETECTION_TASK", detectFarmPi),
+    // TimedBookTask("INITITIALISE_PRINTERS ", Runner.init)
+    ]
 }
 
 module.exports = {

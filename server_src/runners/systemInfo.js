@@ -45,7 +45,7 @@ class SystemRunner {
 
     systemInfo.currentProcess = currentProcess;
 
-    return this.returnInfo();
+    return SystemRunner.returnInfo();
   }
 
   static async queryStaticBench() {
@@ -107,12 +107,12 @@ class SystemRunner {
    */
   static async querySystemInfo() {
     try {
-      await this.queryWithFreshCurrentProcess();
-      const { benchResults, queryResults } = await this.queryStaticBench();
+      await SystemRunner.queryWithFreshCurrentProcess();
+      const { benchResults, queryResults } = await SystemRunner.queryStaticBench();
 
       //This maybe related to node 13.12.0 possibly. Issue #341.
       const systemDisk = queryResults.fileSize[0];
-      let warnings = this.getDiskWarnings(systemDisk);
+      let warnings = SystemRunner.getDiskWarnings(systemDisk);
 
       systemInfo = {
         cpuCurrentSpeed: queryResults.cpuCurrentSpeed,
@@ -129,7 +129,7 @@ class SystemRunner {
         systemDisk,
         currentProcess: systemInfo.currentProcess,
         benchmarkTimes: benchResults,
-        networkIpAddresses: this.getIpAddressList()
+        networkIpAddresses: SystemRunner.getIpAddressList()
       };
 
       if (farmPiStatus()) {

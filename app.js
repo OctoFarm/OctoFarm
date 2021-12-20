@@ -69,16 +69,6 @@ if (!!majorVersion && majorVersion < 14) {
         }
       });
 
-      process.on("beforeExit", (code) => {
-        logger.debug("beforeExit: Requesting shutdown of Application with code: ", code);
-        onShutdown(applicationServer);
-      });
-
-      process.on("exit", (code) => {
-        logger.debug("beforeExit: Requesting shutdown of Application with code: ", code);
-        onShutdown(applicationServer);
-      });
-
       process.on("SIGINT", function () {
         logger.debug("SIGINT: Requesting shutdown of Application");
         onShutdown(applicationServer);
@@ -100,7 +90,7 @@ if (!!majorVersion && majorVersion < 14) {
       logger.debug("Listeners for shutdown added!");
     })
     .catch(async (err) => {
-      const { SERVER_ISSUES } = require("server_src/constants/server-issues.constants");
+      const { SERVER_ISSUES } = require("./server_src/constants/server-issues.constants");
       logger.error(err.stack);
       if (
         err.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL) ||

@@ -1099,8 +1099,8 @@ class Runner {
 
     timeout = systemSettings.timeout;
 
-    this.octoPrintService = new OctoprintApiClientService(timeout);
-    await HistoryCollection.inject(this.octoPrintService);
+    Runner.octoPrintService = new OctoprintApiClientService(timeout);
+    await HistoryCollection.inject(Runner.octoPrintService);
 
     // Grab printers from database....
     try {
