@@ -1,8 +1,11 @@
 const Logger = require("../handlers/logger.js");
-const logger = new Logger("OctoFarm-PrinterManager");
+
 const PrinterService = require("./printer.service");
 const PrinterCache = require("../cache/printer.cache");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
+
+const logger = new Logger("OctoFarm-PrinterManager");
 
 class PrinterManagerService {
   printerList = [];
@@ -11,12 +14,12 @@ class PrinterManagerService {
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
-    console.log(pList);
-    console.log(SettingsClean.returnSystemSettings());
-    // Setup Defaults
-    // Save information in cache
+    const device = new OctoPrintPrinter(pList[0]);
+
+    // Save printer in cache...
+
+    return true;
   }
-  static async setupPrinterDefaults() {}
 }
 
 module.exports = {

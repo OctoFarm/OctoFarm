@@ -50,7 +50,7 @@ if (!!majorVersion && majorVersion < 14) {
     .then(async (mg) => {
       await runMigrations(mg.connection.db, mg.connection.getClient());
     })
-    .then(() => ensureSystemSettingsInitiated())
+    .then(async () => await ensureSystemSettingsInitiated())
     .then(async () => {
       const port = fetchOctoFarmPort();
       if (!port || Number.isNaN(parseInt(port))) {
@@ -93,12 +93,12 @@ if (!!majorVersion && majorVersion < 14) {
       const { SERVER_ISSUES } = require("./server_src/constants/server-issues.constants");
       logger.error(err.stack);
       if (
-        err.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL) ||
-        err.includes(SERVER_ISSUES.DATABASE_CONN_FAIL) ||
-        err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_INIT) ||
-        err.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_UPDATE) ||
-        err.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT) ||
-        err.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_UPDATE)
+        err.stack.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL) ||
+        err.stack.includes(SERVER_ISSUES.DATABASE_CONN_FAIL) ||
+        err.stack.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_INIT) ||
+        err.stack.includes(SERVER_ISSUES.SERVER_SETTINGS_FAIL_UPDATE) ||
+        err.stack.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT) ||
+        err.stack.includes(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_UPDATE)
       ) {
         const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
         serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());

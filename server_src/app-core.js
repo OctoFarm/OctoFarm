@@ -11,8 +11,9 @@ const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const { TaskManager, TimedBookTask } = require("./runners/task.manager");
+const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
+const { SERVER_ISSUES } = require("./constants/server-issues.constants");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -107,14 +108,22 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
 
-    const promises = await Promise.allSettled(OctoFarmTasks.TIMED_BOOT_TASTS);
-    console.log(promises)
+    const promises = await Promise.allSettled(
+      OctoFarmTasks.TIMED_BOOT_TASTS.map((f) => {
+        return f();
+      })
+    );
+    const success = promises.every((x) => x.value === true);
+
+    if (!success) {
+      logger.error(success);
+      throw new Error(SERVER_ISSUES.REQUIRED_BOOT_TASKS_FAILED);
+    }
+
     for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
       const task = OctoFarmTasks.RECURRING_BOOT_TASKS[i];
       TaskManager.registerJobOrTask(task);
     }
-    // TODO attempt to run in sequence
-
     await optionalInfluxDatabaseSetup();
   }
 

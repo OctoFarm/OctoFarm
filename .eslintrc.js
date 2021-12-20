@@ -3,12 +3,14 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true
+    node: true,
+    es2021: true
   },
+  parser: "@babel/eslint-parser",
   extends: ["plugin:prettier/recommended"],
   plugins: ["prettier"],
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 12,
     parser: "babel-eslint",
     sourceType: "module"
   },

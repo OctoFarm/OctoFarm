@@ -15,11 +15,11 @@ const Logger = require("./handlers/logger.js");
 const logger = new Logger("OctoFarm-TaskManager");
 const { PrinterManagerService } = require("./services/printer-manager.service");
 
-const PRINTER_CLEAN_TASK = async () => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const printersInformation = PrinterClean.listPrintersInformation();
-  await PrinterClean.sortCurrentOperations(printersInformation);
-  await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+const INITIALISE_PRINTERS = async () => {
+  // const serverSettings = SettingsClean.returnSystemSettings();
+  // const printersInformation = PrinterClean.listPrintersInformation();
+  // await PrinterClean.sortCurrentOperations(printersInformation);
+  // await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -187,11 +187,12 @@ function TaskStart(task, preset, milliseconds = 0) {
   };
 }
 
-async function TimedBookTask(name, input){
+async function TimedBookTask(name, input) {
   const started = Date.now();
-  const task =  await input();
-  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms  ${task}`)
-  return true
+  logger.info(`Boot Task '${name}' started.`);
+  const task = await input();
+  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms  ${task}`);
+  return true;
 }
 
 class OctoFarmTasks {
@@ -199,18 +200,27 @@ class OctoFarmTasks {
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
-    TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
+    // TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
+    // TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
   ];
   static TIMED_BOOT_TASTS = [
-    TimedBookTask("SYSTEM_INFO_CHECK_TASK", SystemRunner.querySystemInfo),
-    TimedBookTask("FARMPI_DETECTION_TASK", detectFarmPi),
-    // TimedBookTask("INITITIALISE_PRINTERS ", Runner.init)
-    ]
+    async function () {
+      return await TimedBookTask("SYSTEM_INFO_CHECK_TASK", SystemRunner.querySystemInfo);
+    },
+    async function () {
+      return await TimedBookTask("FARMPI_DETECTION_TASK", detectFarmPi);
+    },
+    async function () {
+      return await TimedBookTask(
+        "INITITIALISE_PRINTERS ",
+        PrinterManagerService.initialisePrinters
+      );
+    }
+  ];
 }
 
 module.exports = {
