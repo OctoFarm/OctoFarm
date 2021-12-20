@@ -113,10 +113,14 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
         return f();
       })
     );
-    const success = promises.every((x) => x.value === true);
+
+    const success = promises.every((x) => x.status === "fulfilled");
 
     if (!success) {
-      logger.error(success);
+      const errors = promises.filter((x) => x.status === "rejected");
+      errors.forEach(e => {
+        logger.error(e.reason)
+      })
       throw new Error(SERVER_ISSUES.REQUIRED_BOOT_TASKS_FAILED);
     }
 

@@ -106,8 +106,6 @@ if (!!majorVersion && majorVersion < 14) {
         if (typeof process.send === "function") {
           process.send("ready");
         }
-      } else {
-        console.error("THIS IS MAJOR BROKEY");
       }
     });
 

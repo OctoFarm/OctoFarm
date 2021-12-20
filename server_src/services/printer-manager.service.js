@@ -14,7 +14,10 @@ class PrinterManagerService {
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
-    const device = new OctoPrintPrinter(pList[0]);
+    for(let i = 0; i < pList.length; i++){
+      const device = new OctoPrintPrinter(pList[i]);
+    }
+
 
     // Save printer in cache...
 

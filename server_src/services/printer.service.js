@@ -1,54 +1,26 @@
 "use strict";
 
-const { OctoprintApiClientService } = require("../services/octoprint/octoprint-api-client.service");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
-const {
-  defaultPrinterState,
-  defaultApiChecksState
-} = require("../constants/printer-states.constants");
-const { PrinterTicker } = require("../runners/printerTicker");
-const { CATEGORY } = require("../constants/state.constants");
+const printerModel = require("../models/Printer");
 
-class Printer {
-  constructor(printer) {
-    const { printerURL, camURL, apikey, group, webSocketURL, _id } = printer;
-    this.disabled = false;
-    this.ready = false;
-    this._id = _id.toString();
-    this.printerURL = printerURL;
-    this.camURL = camURL;
-    this.apikey = apikey;
-    this.group = group;
-    this.webSockerURL = webSocketURL;
-    this.api = this.createApiService();
-    this.apiTimeoutTriggered = false;
-    this.apiChecks = defaultApiChecksState();
-    this.printerData = defaultPrinterState();
-    //this.websocket = new OctoPrintWebsocketService();
-  }
+/**
+ * Stores a new printer into the database.
+ * @param {Object} printer object to create.
+ * @throws {Error} If the printer is not correctly provided.
+ */
+const create = async (printer) => {
+  if (!printer) throw new Error("Missing printer");
 
-  createApiService() {
-    PrinterTicker.addIssue(
-      new Date(),
-      this.printerURL,
-      "Initiating Printer...",
-      CATEGORY.Active,
-      this._id
-    );
-    return new OctoprintApiClientService(SettingsClean.returnTimeoutSettings(), {
-      printerURL: this.printerURL,
-      apikey: this.apikey
-    });
-  }
+  return printerModel.create(printer);
+};
 
-  runApiChecks() {
-    // Update state to searching...
-    // Collate data from OctoPrint if required...
-  }
-
-  setupWebsocketService() {}
-}
+/**
+ * Lists the printers present in the database.
+ */
+const list = () => {
+  return printerModel.find({});
+};
 
 module.exports = {
-  Printer
+  create,
+  list
 };

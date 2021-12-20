@@ -1100,6 +1100,7 @@ class Runner {
     timeout = systemSettings.timeout;
 
     Runner.octoPrintService = new OctoprintApiClientService(timeout);
+    // Can't use this anymore, pass the service through absolute shite was of doing it.
     await HistoryCollection.inject(Runner.octoPrintService);
 
     // Grab printers from database....
@@ -1153,48 +1154,48 @@ class Runner {
       logger.error(err);
     }
   }
-
-  static async compareEnteredKeyToGlobalKey(printer) {
-    // Compare entered API key to settings API Key...
-    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer, true);
-    const errorCode = {
-      message: "Global API Key detected... unable to authenticate websocket connection",
-      type: "system",
-      errno: "999",
-      code: "999"
-    };
-
-    const globalStatusCode = globalAPIKeyCheck?.status
-      ? globalAPIKeyCheck?.status
-      : " Connection timeout reached...";
-
-    if (globalStatusCode === 200) {
-      //Safe to continue check
-      const settingsData = await globalAPIKeyCheck.json();
-      if (!settingsData) {
-        logger.error(`Settings json does not exist: ${printer.printerURL}`);
-        return errorCode;
-      }
-      if (!settingsData.api) {
-        logger.error(`API key does not exist: ${printer.printerURL}`);
-        return errorCode;
-      }
-      if (settingsData.api.key === printer.apikey) {
-        logger.error(`API Key matched global API key: ${printer.printerURL}`);
-        return errorCode;
-      }
-
-      return true;
-    } else {
-      // Hard failure as can't contact api
-      return {
-        message: "Could not Establish connection to OctoPrint returned status: " + globalStatusCode,
-        type: "system",
-        errno: "503",
-        code: "503"
-      };
-    }
-  }
+  //Done
+  // static async compareEnteredKeyToGlobalKey(printer) {
+  //   // Compare entered API key to settings API Key...
+  //   const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer, true);
+  //   const errorCode = {
+  //     message: "Global API Key detected... unable to authenticate websocket connection",
+  //     type: "system",
+  //     errno: "999",
+  //     code: "999"
+  //   };
+  //
+  //   const globalStatusCode = globalAPIKeyCheck?.status
+  //     ? globalAPIKeyCheck?.status
+  //     : " Connection timeout reached...";
+  //
+  //   if (globalStatusCode === 200) {
+  //     //Safe to continue check
+  //     const settingsData = await globalAPIKeyCheck.json();
+  //     if (!settingsData) {
+  //       logger.error(`Settings json does not exist: ${printer.printerURL}`);
+  //       return errorCode;
+  //     }
+  //     if (!settingsData.api) {
+  //       logger.error(`API key does not exist: ${printer.printerURL}`);
+  //       return errorCode;
+  //     }
+  //     if (settingsData.api.key === printer.apikey) {
+  //       logger.error(`API Key matched global API key: ${printer.printerURL}`);
+  //       return errorCode;
+  //     }
+  //
+  //     return true;
+  //   } else {
+  //     // Hard failure as can't contact api
+  //     return {
+  //       message: "Could not Establish connection to OctoPrint returned status: " + globalStatusCode,
+  //       type: "system",
+  //       errno: "503",
+  //       code: "503"
+  //     };
+  //   }
+  // }
 
   static async setupWebSocket(id, force = false) {
     const i = _.findIndex(farmPrinters, function (o) {
@@ -1239,11 +1240,8 @@ class Runner {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
 
-        users = await users.json();
-        if (!farmPrinters[i]?.userList) {
-          farmPrinters[i].userList = [];
-        }
-        farmPrinters[i].userList = [];
+
+
         if (!farmPrinters[i]?.currentUser) {
           //No user so make a grab at what's available
           if (_.isEmpty(users)) {

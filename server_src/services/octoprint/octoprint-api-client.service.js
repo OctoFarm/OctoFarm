@@ -41,11 +41,9 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getWithOptionalRetry(route, retry = false) {
     if (retry) {
-      return await this.getRetry(route);
-      // .then(r => r.json());
+      return await this.getRetry(route)
     } else {
-      return await this.get(route);
-      // .then(r => r.json());
+      return await this.get(route)
     }
   }
 

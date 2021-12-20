@@ -191,7 +191,7 @@ async function TimedBookTask(name, input) {
   const started = Date.now();
   logger.info(`Boot Task '${name}' started.`);
   const task = await input();
-  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms  ${task}`);
+  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms`);
   return true;
 }
 
