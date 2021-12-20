@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --wait-ready --listen-timeout 10000 --restart-delay=1000 --shutdown-with-message --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart OctoFarm",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
@@ -80,7 +80,10 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "eslint": "^7.12.1",
+    "@babel/core": "^7.16.5",
+    "@babel/eslint-parser": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",

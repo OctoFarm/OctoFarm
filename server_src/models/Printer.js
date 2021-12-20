@@ -46,7 +46,6 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     require: false
   },
-  // Non-essentials below
   powerSettings: {
     type: Object,
     required: false
@@ -109,6 +108,74 @@ const PrinterSchema = new mongoose.Schema({
   },
   storage: {
     type: Object,
+    required: false
+  },
+  current: {
+    type: Object,
+    required: false
+  },
+  options: {
+    type: Object,
+    required: false
+  },
+  profiles: {
+    type: Object,
+    required: false
+  },
+  pluginsList: {
+    type: Array,
+    required: false
+  },
+  octoPrintUpdate: {
+    type: Array,
+    required: false
+  },
+  octoPrintPluginUpdates: {
+    type: Array,
+    required: false
+  },
+  corsCheck: {
+    type: Boolean,
+    required: false
+  },
+  settingsApi: {
+    type: Object,
+    required: false
+  },
+  settingsFeature: {
+    type: Object,
+    required: false
+  },
+  settingsFolder: {
+    type: Object,
+    required: false
+  },
+  settingsPlugins: {
+    type: Object,
+    required: false
+  },
+  settingsScripts: {
+    type: Object,
+    required: false
+  },
+  settingsSerial: {
+    type: Object,
+    required: false
+  },
+  settingsServer: {
+    type: Object,
+    required: false
+  },
+  settingsSystem: {
+    type: Object,
+    required: false
+  },
+  settingsWebcam: {
+    type: Object,
+    required: false
+  },
+  core: {
+    type: Array,
     required: false
   }
 });

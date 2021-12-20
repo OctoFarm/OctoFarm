@@ -1,4 +1,4 @@
-import { sortAlphaNum } from "../../system/utils/array.utils";
+import { sortAlphaNum } from "../system/utils/array.utils";
 //TODO move this out to sevice
 function isRotated(otherSettings) {
   let flipH = "";

@@ -25,12 +25,8 @@ const apiPluginFilamentManagerSpecificSpool = apiBase + "/plugin/filamentmanager
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
 class OctoprintApiClientService extends OctoprintApiService {
-  constructor(timeoutSettings, printerSettings) {
-    super(timeoutSettings);
-    const { printerURL, apikey } = printerSettings;
-    OctoprintApiClientService.validatePrinter(printerSettings);
-    this.printerURL = printerURL;
-    this.apikey = apikey;
+  constructor(printerURL, apikey, timeoutSettings) {
+    super(printerURL, apikey, timeoutSettings);
   }
 
   static validatePrinter(printer) {
@@ -40,15 +36,15 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async postPrinter(route, data, timeout = false) {
-    return super.post(this.printerURL, this.apikey, route, data, timeout);
+    return super.post(route, data, timeout);
   }
 
   async getWithOptionalRetry(route, retry = false) {
     if (retry) {
-      return await this.getRetry(this.printerURL, this.apikey, route);
+      return await this.getRetry(route);
       // .then(r => r.json());
     } else {
-      return await this.get(this.printerURL, this.apikey, route);
+      return await this.get(route);
       // .then(r => r.json());
     }
   }

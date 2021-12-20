@@ -11,7 +11,7 @@ import {
   updateBulkActionsProgress,
   generateTableRows,
   updateTableRow
-} from "../../printer-manager/functions/bulk-actions-progress.functions";
+} from "../../pages/printer-manager/functions/bulk-actions-progress.functions";
 
 const fileUploads = new Queue();
 

@@ -3,8 +3,9 @@ import PrinterSelect from "./lib/modules/printerSelect";
 import {
   bulkOctoPrintClientUpdate,
   bulkOctoPrintPluginUpdate,
-  bulkOctoPrintPluginAction
-} from "./printer-manager/functions/bulk-commands-functions";
+  bulkOctoPrintPluginAction,
+  bulkEnableVirtualPrinter
+} from "./pages/printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
   bulkDeletePrinters,
@@ -15,10 +16,11 @@ import {
   reSyncPrinters,
   saveAllOnAddPrinterTable,
   scanNetworkForDevices,
-  workerEventFunction
-} from "./printer-manager/functions/printer-manager.functions";
+  workerEventFunction,
+  loadPrinterHealthChecks
+} from "./pages/printer-manager/functions/printer-manager.functions";
 
-import { setupSortablePrintersTable } from "./printer-manager/functions/sortable-table";
+import { setupSortablePrintersTable } from "./pages/printer-manager/functions/sortable-table";
 
 const workerURL = "/printersInfo/get/";
 
@@ -72,6 +74,30 @@ const searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener("click", async (e) => {
   await reSyncPrinters();
 });
+
+const forceSearchOffline = document.getElementById("forceSearchOffline");
+forceSearchOffline.addEventListener("click", (e) => {
+  bootbox.confirm({
+    message:
+      "Your about to do a full re-setup of your farm. This will call all your OctoPrint instances and refresh OctoFarms data that it holds... Are you sure?",
+    buttons: {
+      confirm: {
+        label: "Yes",
+        className: "btn-success"
+      },
+      cancel: {
+        label: "No",
+        className: "btn-danger"
+      }
+    },
+    callback: async function (result) {
+      if (result) {
+        await reSyncPrinters(true);
+      }
+    }
+  });
+});
+
 const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", async (event) => {
   await PrinterSelect.create(multiPrinterSelectModal, true, "Edit Printers", bulkEditPrinters);
@@ -105,6 +131,19 @@ saveAllBtn.addEventListener("click", async (e) => {
   await saveAllOnAddPrinterTable();
 });
 
+const printerHealthCheckBtn = document.getElementById("printerHealthCheckBtn");
+printerHealthCheckBtn.addEventListener("click", async (e) => {
+  await loadPrinterHealthChecks();
+});
+
 createClientSSEWorker(workerURL, workerEventFunction);
 
 setupSortablePrintersTable();
+
+//Development Actions
+const enableVirtualPrinter = document.getElementById("blkEnableVirtualPrinter");
+if (enableVirtualPrinter) {
+  enableVirtualPrinter.addEventListener("click", async () => {
+    await bulkEnableVirtualPrinter();
+  });
+}

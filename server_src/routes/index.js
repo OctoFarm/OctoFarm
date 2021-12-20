@@ -73,6 +73,8 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     });
   }
 
+  const development_mode = process.env.NODE_ENV === "development";
+
   res.render("printerManagement", {
     name: req.user.name,
     userGroup: req.user.group,
@@ -85,7 +87,8 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     serverSettings,
     clientSettings: req.user.clientSettings,
     printersList: returnArray,
-    printerConnectionStats: ConnectionMonitorService.returnConnectionLogs()
+    printerConnectionStats: ConnectionMonitorService.returnConnectionLogs(),
+    development_mode
   });
 });
 // File Manager Page

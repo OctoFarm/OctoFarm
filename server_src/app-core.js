@@ -13,6 +13,7 @@ const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
+const { SERVER_ISSUES } = require("./constants/server-issues.constants");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -71,9 +72,7 @@ async function ensureSystemSettingsInitiated() {
   });
 
   // Setup Settings as connection is established
-  const serverSettingsStatus = await SettingsClean.initialise();
-
-  return serverSettingsStatus;
+  return await SettingsClean.initialise();
 }
 
 function serveOctoFarmRoutes(app) {
@@ -108,14 +107,23 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
-    const startUpTasks = [];
 
-    for (let i = 0; i < OctoFarmTasks.BOOT_TASKS.length; i++) {
-      const task = OctoFarmTasks.BOOT_TASKS[i];
-      startUpTasks.push(TaskManager.registerJobOrTask(task));
+    const promises = await Promise.allSettled(
+      OctoFarmTasks.TIMED_BOOT_TASTS.map((f) => {
+        return f();
+      })
+    );
+    const success = promises.every((x) => x.value === true);
+
+    if (!success) {
+      logger.error(success);
+      throw new Error(SERVER_ISSUES.REQUIRED_BOOT_TASKS_FAILED);
     }
-    await Promise.all(startUpTasks);
 
+    for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
+      const task = OctoFarmTasks.RECURRING_BOOT_TASKS[i];
+      TaskManager.registerJobOrTask(task);
+    }
     await optionalInfluxDatabaseSetup();
   }
 

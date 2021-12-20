@@ -1,4 +1,4 @@
-import Calc from "../../lib/functions/calc";
+import Calc from "../../../lib/functions/calc";
 import bulkActionsStates from "../bulk-actions.constants";
 
 const EL = {
@@ -12,14 +12,14 @@ const EL = {
 };
 
 const INITIAL_MESSAGE =
-  "<i class=\"fas fa-info\"></i> Please wait whilst OctoFarm runs through your action!";
+  '<i class="fas fa-info"></i> Please wait whilst OctoFarm runs through your action!';
 const COMPLETE_MESSAGE =
-  "<i class=\"fas fa-info\"></i> Actions complete! You may check the results below.";
+  '<i class="fas fa-info"></i> Actions complete! You may check the results below.';
 
-const SKIPPED = "<i class=\"fas fa-forward text-warning\"></i>";
-const WARNING = "<i class=\"fas fa-exclamation-triangle text-warning\"></i>";
-const ERROR = "<i class=\"fas fa-times text-danger\"></i>";
-const SUCCESS = "<i class=\"fas fa-check text-success\"></i>";
+const SKIPPED = '<i class="fas fa-forward text-warning"></i>';
+const WARNING = '<i class="fas fa-exclamation-triangle text-warning"></i>';
+const ERROR = '<i class="fas fa-times text-danger"></i>';
+const SUCCESS = '<i class="fas fa-check text-success"></i>';
 
 function tableRowTemplate(info) {
   return `

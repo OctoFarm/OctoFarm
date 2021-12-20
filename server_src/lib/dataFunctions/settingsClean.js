@@ -44,6 +44,7 @@ class SettingsClean {
     await this.initialiseServerSettings();
     await this.initaliseClientSettings();
     await this.start();
+    console.log("INIT");
   }
 
   static async initialiseServerSettings() {

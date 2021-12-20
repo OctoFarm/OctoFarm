@@ -1,16 +1,17 @@
-import UI from "../../lib/functions/ui";
-import OctoFarmClient from "../../services/octofarm-client.service.js";
+import UI from "../../../lib/functions/ui";
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import { checkIfLoaderExistsAndRemove, updateConnectionLog } from "../connection-log";
 import { createOrUpdatePrinterTableRow } from "../printer-data";
-import PowerButton from "../../lib/modules/powerButton";
-import PrinterManager from "../../lib/modules/printerManager";
-import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
-import Validate from "../../lib/functions/validate";
+import PowerButton from "../../../lib/modules/powerButton";
+import PrinterManager from "../../../lib/modules/printerManager";
+import { updatePrinterSettingsModal } from "../../../lib/modules/printerSettings";
+import Validate from "../../../lib/functions/validate";
 import { PrintersManagement } from "../printer-constructor";
-import PrinterSelect from "../../lib/modules/printerSelect";
-import FileOperations from "../../lib/functions/file";
+import PrinterSelect from "../../../lib/modules/printerSelect";
+import FileOperations from "../../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
-import PrinterFileManager from "../../lib/modules/printerFileManager";
+import PrinterFileManager from "../../../lib/modules/printerFileManager";
+import { returnHealthCheckRow } from "../templates/health-checks-table-row.templates";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -103,8 +104,13 @@ export async function scanNetworkForDevices(e) {
   e.target.disabled = false;
 }
 
-export async function reSyncPrinters() {
-  const searchOffline = document.getElementById("searchOfflineBtn");
+export async function reSyncPrinters(force = false) {
+  let searchOffline = document.getElementById("searchOfflineBtn");
+
+  if (force) {
+    searchOffline = document.getElementById("forceSearchOffline");
+  }
+
   searchOffline.disabled = true;
   let alert = UI.createAlert(
     "info",
@@ -113,7 +119,8 @@ export async function reSyncPrinters() {
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
   try {
     const post = await OctoFarmClient.post("printers/reScanOcto", {
-      id: null
+      id: null,
+      force: force
     });
   } catch (e) {
     console.error(e);
@@ -121,7 +128,11 @@ export async function reSyncPrinters() {
   }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
-  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+  if (force) {
+    searchOffline.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Force Re-Setup';
+  } else {
+    searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Connect';
+  }
   searchOffline.disabled = false;
 }
 
@@ -283,4 +294,13 @@ export async function saveAllOnAddPrinterTable() {
   UI.createAlert("success", "Successfully saved all your instances", 4000);
   saveAllBtn.disabled = false;
   deleteAllBtn.disabled = true;
+}
+
+export async function loadPrinterHealthChecks() {
+  const healthChecks = await OctoFarmClient.getHealthChecks();
+  const table = document.getElementById("healthChecksTable");
+  table.innerHTML = "";
+  healthChecks.forEach((check) => {
+    table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+  });
 }

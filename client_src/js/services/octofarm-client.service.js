@@ -61,6 +61,7 @@ export default class OctoFarmClient {
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
   static userRoute = `/users/users`;
+  static healthCheckRoute = `${this.printerRoute}/healthChecks`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -168,6 +169,11 @@ export default class OctoFarmClient {
   static getCurrentOpState() {
     return this.get("client/currentOpSorting");
   }
+
+  static getHealthChecks() {
+    return this.get(this.healthCheckRoute);
+  }
+
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });
   }
