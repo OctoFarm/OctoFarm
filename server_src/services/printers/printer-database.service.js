@@ -1,17 +1,27 @@
 const printerModel = require("../../models/Printer");
+const Logger = require("../../handlers/logger");
 
-class PrinterDatabaseService{
-    #id
-    #options = {
-        returnOriginal: false
-    }
-    constructor(id){
-        this.#id = id;
-    }
+const logger = new Logger("OctoFarm-State");
 
-    update = (update) => {
-        return printerModel.findOneAndUpdate({_id: this.#id}, update, this.#options)
-    }
+class PrinterDatabaseService {
+  #id;
+  #options = {
+    returnOriginal: false
+  };
+  constructor(id) {
+    this.#id = id;
+  }
+
+  update = (update) => {
+    return printerModel
+      .findOneAndUpdate({ _id: this.#id }, update, this.#options)
+      .then(() => {
+        logger.debug("Successfully saved record! key list: " + Object.keys(update));
+      })
+      .catch((err) => {
+        logger.error(err);
+      });
+  };
 }
 
 module.exports = PrinterDatabaseService;

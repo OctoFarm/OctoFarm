@@ -1,4 +1,4 @@
-const { mapStateToCategory } = require("../utils/printer-helpers.utils");
+const { mapStateToCategory } = require("../utils/printer-state.utils");
 
 const COLOURS = {
   SUCCESS: "success",

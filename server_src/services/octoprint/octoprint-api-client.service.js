@@ -12,6 +12,7 @@ const apiPrinterProfiles = apiBase + "/printerprofiles";
 const apiSystem = apiBase + "/system";
 const apiSystemInfo = apiSystem + "/info";
 const apiSystemCommands = apiSystem + "/commands";
+const apiVersion = apiBase + "/version";
 const apiUsers = apiBase + "/users";
 const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=true" : "");
 
@@ -41,14 +42,18 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getWithOptionalRetry(route, retry = false) {
     if (retry) {
-      return await this.getRetry(route)
+      return await this.getRetry(route);
     } else {
-      return await this.get(route)
+      return await this.get(route);
     }
   }
 
   async getSettings(retry = false) {
     return this.getWithOptionalRetry(apiSettingsPart, retry);
+  }
+
+  async getVersion(retry = false) {
+    return this.getWithOptionalRetry(apiVersion, retry);
   }
 
   /**

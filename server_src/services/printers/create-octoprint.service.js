@@ -5,7 +5,8 @@ const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
 const { isEmpty } = require("lodash");
-
+const { checkApiStatusResponse } = require("../../utils/api.utils");
+const { acquireWebCamDataFromOP } = require("./utils/printer-data.utils");
 class OctoPrintPrinter {
   //OctoFarm state
   disabled = false;
@@ -25,6 +26,8 @@ class OctoPrintPrinter {
   _id = undefined;
   // Always default
   systemChecks = systemChecks;
+  // Always OP
+  sessionKey = undefined;
   //Overridden by database
   dateAdded = new Date().getTime();
   userList = [];
@@ -172,108 +175,299 @@ class OctoPrintPrinter {
 
     this.#db = new PrinterDatabaseService(this._id);
 
-    //Gather API data...
-    this.apiConnectionSequence().then(res => {
-      console.log(res)
-    }).catch(e => {
-      // Can't auth, printer considered offline!
-      console.error(e)
-    })
-    //Check we have correct API Key
-
-    //Connect Websocket and keep alive
+    //Gather API data...D
+    this.initialApiCheckSequence()
+      .then((res) => {
+        if (!res[0].value) {
+          throw new Error(this.printerURL + " Failed global API Key Check");
+        }
+        if (!res[1].value) {
+          throw new Error(this.printerURL + "Failed to acquire user list");
+        }
+        if (!res[2].value) {
+          throw new Error(this.printerURL + "Failed to acquire version data");
+        }
+      })
+      .then(async () => {
+        const session = await this.acquireOctoPrintSessionKey();
+        if (!session) {
+          throw new Error(this.printerURL + " We could not get a session key from OctoPrint!");
+        }
+        return session;
+      })
+      .then(async (res) => {
+        const fullApiCheck = await this.secondaryApiCheckSequence();
+        console.log(fullApiCheck);
+      })
+      .catch((e) => {
+        // Can't auth, printer considered offline!
+        console.error(e);
+      });
   }
 
-  createPrinterDatabaseRecord() {
-
+  async initialApiCheckSequence() {
+    return await Promise.allSettled([
+      this.globalAPIKeyCheck(),
+      this.acquireOctoPrintUsersList(),
+      this.acquireOctoPrintVersionData()
+    ]);
   }
 
-  async apiConnectionSequence(){
-    return await Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
-  }
-
-  async authenticateOctoPrintsWebsocket(){
-    return true
-  }
-
-  async acquireOctoPrintUsersList (force = false){
-    let usersCheck = await this.#api.getUsers(true);
-
-    const globalStatusCode = usersCheck?.status
-        ? usersCheck?.status
-        : " Connection timeout reached...";
-
-    if(globalStatusCode === 200){
-      const userJson = await usersCheck.json();
-      const userList = userJson.users;
-
-        // If we have no idea who the user is then
-        if(this.currentUser === null || force){
-          if (isEmpty(userList)) {
-            //If user list is empty then we can assume that an admin user is only one available.
-            //Only relevant for OctoPrint < 1.4.2.
-            this.currentUser = "admin";
-            this.userList.push(this.currentUser);
-            this.#db.update({currentUser: this.currentUser});
-          }else{
-            //If the userList isn't empty then we need to parse out the users and search for octofarm user.
-            for(let u = 0; u < userList.length; u++){
-              const currentUser = userList[u];
-              if(currentUser.admin) {
-                // Look for OctoFarm user and break, if not use the first admin we find
-                if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
-                  this.currentUser = currentUser.name;
-                  this.userList.push(currentUser.name);
-                  this.#db.update({currentUser: this.currentUser});
-                  //We only break out here because it's doubtful with a successful connection we need the other users.
-                  break;
-                }
-                // If no octofarm user then collect the rest for user choice in ui.
-                this.currentUser = currentUser.name;
-                this.#db.update({currentUser: this.currentUser});
-                this.userList.push(currentUser.name);
-              }
-            }
-          }
-      }else{
-        return true
-      }
-    }else{
-      return false;
-    }
+  // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
+  async secondaryApiCheckSequence() {
+    return await Promise.allSettled([
+      this.acquireOctoPrintSystemData(),
+      this.acquireOctoPrintProfileData(),
+      this.acquireOctoPrintStateData(),
+      this.acquireOctoPrintSettingsData(),
+      this.acquireOctoPrintSystemInfoData(),
+      this.acquireOctoPrintPluginsListData(),
+      this.acquireOctoPrintUpdatesData(),
+      this.acquireOctoPrintFilesData()
+    ]);
   }
 
   async globalAPIKeyCheck() {
     // Compare entered API key to settings API Key...
     const globalAPIKeyCheck = await this.#api.getSettings(true);
 
-    const globalStatusCode = globalAPIKeyCheck?.status
-        ? globalAPIKeyCheck?.status
-        : " Connection timeout reached...";
+    const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
 
     if (globalStatusCode === 200) {
       //Safe to continue check
-      const settingsData = await globalAPIKeyCheck.json();
+      const { api } = await globalAPIKeyCheck.json();
 
-      if (!settingsData) {
+      if (!api) {
         // logger.error(`Settings json does not exist: ${this.printerURL}`);
         return false;
       }
-      if (!settingsData.api) {
-        // logger.error(`API key does not exist: ${this.printerURL}`);
-        return false;
-      }
-      if (settingsData.api.key === this.apikey) {
-        // logger.error(`API Key matched global API key: ${this.printerURL}`);
-        return false;
-      }
-
-      return true;
+      return api.key !== this.apikey;
     } else {
       // Hard failure as can't contact api
       return false;
     }
   }
+
+  async acquireOctoPrintSessionKey() {
+    const passiveLogin = await this.#api.login(true);
+
+    const globalStatusCode = checkApiStatusResponse(passiveLogin);
+
+    if (globalStatusCode === 200) {
+      const sessionJson = await passiveLogin.json();
+
+      this.sessionKey = sessionJson.session;
+
+      return this.sessionKey;
+    }
+  }
+
+  async acquireOctoPrintUsersList(force = false) {
+    let usersCheck = await this.#api.getUsers(true);
+
+    const globalStatusCode = checkApiStatusResponse(usersCheck);
+
+    if (globalStatusCode === 200) {
+      const userJson = await usersCheck.json();
+
+      const userList = userJson.users;
+
+      // If we have no idea who the user is then
+      if (!this?.currentUser || force) {
+        if (isEmpty(userList)) {
+          //If user list is empty then we can assume that an admin user is only one available.
+          //Only relevant for OctoPrint < 1.4.2.
+          this.currentUser = "admin";
+          this.userList.push(this.currentUser);
+          this.#db.update({ currentUser: this.currentUser });
+          return true;
+        } else {
+          //If the userList isn't empty then we need to parse out the users and search for octofarm user.
+          for (let u = 0; u < userList.length; u++) {
+            const currentUser = userList[u];
+            if (currentUser.admin) {
+              // Look for OctoFarm user and break, if not use the first admin we find
+              if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
+                this.currentUser = currentUser.name;
+                this.userList.push(currentUser.name);
+                this.#db.update({ currentUser: this.currentUser });
+                //We only break out here because it's doubtful with a successful connection we need the other users.
+                break;
+              }
+              // If no octofarm user then collect the rest for user choice in ui.
+              this.currentUser = currentUser.name;
+              this.#db.update({ currentUser: this.currentUser });
+              this.userList.push(currentUser.name);
+            }
+          }
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  async acquireOctoPrintVersionData(force = false) {
+    if (!this?.octoPrintVersion || force) {
+      let versionCheck = await this.#api.getVersion(true);
+
+      const globalStatusCode = checkApiStatusResponse(versionCheck);
+      if (globalStatusCode === 200) {
+        const { server } = await versionCheck.json();
+        this.octoPrintVersion = server;
+        this.#db.update({
+          octoPrintVersion: server
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
+  async acquireOctoPrintSystemData(force = false) {
+    if ((!this?.core && this.core.length === 0) || force) {
+      let systemCheck = await this.#api.getSystemCommands(true);
+
+      const globalStatusCode = checkApiStatusResponse(systemCheck);
+
+      if (globalStatusCode === 200) {
+        const systemJson = await systemCheck.json();
+
+        this.core = systemJson.core;
+        this.#db.update({
+          core: systemJson.core
+        });
+
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
+  async acquireOctoPrintProfileData(force = false) {
+    if (!this?.profiles || force) {
+      let profileCheck = await this.#api.getPrinterProfiles(true);
+
+      const globalStatusCode = checkApiStatusResponse(profileCheck);
+
+      if (globalStatusCode === 200) {
+        const { profiles } = await profileCheck.json();
+        this.profiles = profiles;
+        this.#db.update({
+          profiles: profiles
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
+  async acquireOctoPrintStateData(force = false) {
+    if (!this?.current || !this?.options || force) {
+      let stateCheck = await this.#api.getConnection(true);
+
+      const globalStatusCode = checkApiStatusResponse(stateCheck);
+
+      if (globalStatusCode === 200) {
+        const { current, options } = await stateCheck.json();
+        this.current = current;
+        this.options = options;
+        this.#db.update({
+          current: current,
+          options: options
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
+  async acquireOctoPrintSettingsData(force = true) {
+    if (
+      !this?.corsCheck ||
+      !this?.settingsApi ||
+      !this?.settingsFeature ||
+      !this?.settingsFolder ||
+      !this?.settingsPlugins ||
+      !this?.settingsScripts ||
+      !this?.settingsSerial ||
+      !this?.settingsServer ||
+      !this?.settingsSystem ||
+      !this?.settingsWebcam ||
+      force
+    ) {
+      let settingsCheck = await this.#api.getSettings(true);
+
+      const globalStatusCode = checkApiStatusResponse(settingsCheck);
+
+      if (globalStatusCode === 200) {
+        const { api, feature, folder, plugins, scripts, serial, server, system, webcam } =
+          await settingsCheck.json();
+        this.corsCheck = api.allowCrossOrigin;
+        this.settingsApi = api;
+        this.settingsFeature = feature;
+        this.settingsFolder = folder;
+        this.settingsPlugins = plugins;
+        this.settingsScripts = scripts;
+        this.settingsSerial = serial;
+        this.settingsServer = server;
+        this.settingsSystem = system;
+        this.settingsWebcam = webcam;
+
+        this.camURL = acquireWebCamDataFromOP(this.camURL, this.printerURL, webcam.streamUrl);
+
+        this.#db.update({
+          camURL: this.camURL,
+          corsCheck: api.allowCrossOrigin,
+          settingsApi: api,
+          settingsFeature: feature,
+          settingsFolder: folder,
+          settingsPlugins: plugins,
+          settingsScripts: scripts,
+          settingsSerial: serial,
+          settingsServer: server,
+          settingsSystem: system,
+          settingsWebcam: webcam
+        });
+
+        //parse webcam check
+
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
+  async acquireOctoPrintSystemInfoData(force = false) {}
+
+  async acquireOctoPrintPluginsListData(force = false) {}
+
+  async acquireOctoPrintUpdatesData(force = false) {}
+
+  async acquireOctoPrintFilesData(force = false) {}
 }
 
 module.exports = {
