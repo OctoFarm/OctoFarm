@@ -7,7 +7,10 @@ const semver = require("semver");
 function checkPluginManagerAPIDeprecation(semverString) {
   return semver.satisfies(semver.coerce(semverString), ">=1.6.0");
 }
-
+/**
+ * System info didn't exist until after version 1.4.2
+ * @param semverString
+ */
 function checkSystemInfoAPIExistance(semverString) {
   return semver.satisfies(semver.coerce(semverString), ">1.4.2");
 }

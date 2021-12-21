@@ -6,7 +6,14 @@ const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
 const { isEmpty } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
-const { acquireWebCamDataFromOP } = require("./utils/printer-data.utils");
+const { acquireWebCamData, acquirePrinterNameData, acquirePrinterFilesAndFolderData } = require("../octoprint/utils/printer-data.utils");
+const { testAndCollectCostPlugin, testAndCollectPSUControlPlugin } = require("../octoprint/utils/octoprint-plugin.utils")
+const { checkSystemInfoAPIExistance} = require("../../utils/compatibility.utils");
+const softwareUpdateChecker = require("../../services/octofarm-update.service");
+
+
+const timerLabel = "PrinterAdd"
+
 class OctoPrintPrinter {
   //OctoFarm state
   disabled = false;
@@ -44,6 +51,7 @@ class OctoPrintPrinter {
   //Live printer state data
 
   //Updated by API / database
+  octoPi = undefined;
   costSettings = null;
   powerSettings = null;
   klipperFirmware = undefined;
@@ -85,6 +93,7 @@ class OctoPrintPrinter {
       currentUser,
       selectedFilament,
       octoPrintVersion,
+      octoPi,
       tempTriggers,
       feedRate,
       flowRate,
@@ -93,6 +102,7 @@ class OctoPrintPrinter {
       powerSettings,
       klipperFirmware,
       storage,
+      fileList,
       current,
       options,
       profiles,
@@ -113,6 +123,8 @@ class OctoPrintPrinter {
     } = printer;
     if (!_id || isNaN(sortIndex) || !apikey || !printerURL || !webSocketURL || !settingsAppearance)
       throw new Error("Missing params!");
+
+    const timerLabel = Date.now();
 
     // Shim because categories don't exist prior to V1.2
     if (!category) {
@@ -141,6 +153,7 @@ class OctoPrintPrinter {
     this.klipperFirmware = klipperFirmware;
     this.octoPrintVersion = octoPrintVersion;
     this.storage = storage;
+    this.fileList = fileList;
     this.current = current;
     this.options = options;
     this.profiles = profiles;
@@ -165,6 +178,7 @@ class OctoPrintPrinter {
     this.printerURL = printerURL;
     this.webSocketURL = webSocketURL;
     this.camURL = camURL;
+    this.octoPi = octoPi;
     const { timeout } = SettingsClean.returnSystemSettings();
 
     //Create OctoPrint Client
@@ -179,13 +193,13 @@ class OctoPrintPrinter {
     this.initialApiCheckSequence()
       .then((res) => {
         if (!res[0].value) {
-          throw new Error(this.printerURL + " Failed global API Key Check");
+          throw new Error(this.printerURL + " Failed to acquire version data");
         }
         if (!res[1].value) {
-          throw new Error(this.printerURL + "Failed to acquire user list");
+          throw new Error(this.printerURL + " Failed to acquire user list");
         }
         if (!res[2].value) {
-          throw new Error(this.printerURL + "Failed to acquire version data");
+          throw new Error(this.printerURL + " Failed global API Key Check");
         }
       })
       .then(async () => {
@@ -198,18 +212,21 @@ class OctoPrintPrinter {
       .then(async (res) => {
         const fullApiCheck = await this.secondaryApiCheckSequence();
         console.log(fullApiCheck);
+        console.log("API CHECK SPEED", Date.now() - timerLabel+"ms")
+
       })
       .catch((e) => {
         // Can't auth, printer considered offline!
         console.error(e);
       });
+
   }
 
   async initialApiCheckSequence() {
     return await Promise.allSettled([
       this.globalAPIKeyCheck(),
-      this.acquireOctoPrintUsersList(),
-      this.acquireOctoPrintVersionData()
+      this.acquireOctoPrintVersionData(),
+      this.acquireOctoPrintUsersList()
     ]);
   }
 
@@ -223,7 +240,8 @@ class OctoPrintPrinter {
       this.acquireOctoPrintSystemInfoData(),
       this.acquireOctoPrintPluginsListData(),
       this.acquireOctoPrintUpdatesData(),
-      this.acquireOctoPrintFilesData()
+      this.acquireOctoPrintFilesData(),
+      this.acquireOctoPrintPiPluginData()
     ]);
   }
 
@@ -331,6 +349,27 @@ class OctoPrintPrinter {
     }
   }
 
+  async acquireOctoPrintPiPluginData(force = false){
+    if (!this?.octoPi || force) {
+      let piPluginCheck = await this.#api.getPluginPiSupport(true);
+
+      const globalStatusCode = checkApiStatusResponse(piPluginCheck);
+      if (globalStatusCode === 200) {
+        const octoPi = await piPluginCheck.json();
+        this.octoPrintVersion = server;
+        this.#db.update({
+          octoPi: octoPi
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
+
   async acquireOctoPrintSystemData(force = false) {
     if ((!this?.core && this.core.length === 0) || force) {
       let systemCheck = await this.#api.getSystemCommands(true);
@@ -401,7 +440,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintSettingsData(force = true) {
+  async acquireOctoPrintSettingsData(force = false) {
     if (
       !this?.corsCheck ||
       !this?.settingsApi ||
@@ -420,7 +459,7 @@ class OctoPrintPrinter {
       const globalStatusCode = checkApiStatusResponse(settingsCheck);
 
       if (globalStatusCode === 200) {
-        const { api, feature, folder, plugins, scripts, serial, server, system, webcam } =
+        const { api, feature, folder, plugins, scripts, serial, server, system, webcam, appearance } =
           await settingsCheck.json();
         this.corsCheck = api.allowCrossOrigin;
         this.settingsApi = api;
@@ -433,10 +472,19 @@ class OctoPrintPrinter {
         this.settingsSystem = system;
         this.settingsWebcam = webcam;
 
-        this.camURL = acquireWebCamDataFromOP(this.camURL, this.printerURL, webcam.streamUrl);
+        //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
+        if(!force){
+          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
+          this.settingsAppearance = acquirePrinterNameData(this.settingsAppearance, appearance);
+          this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
+          this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+        }
 
         this.#db.update({
           camURL: this.camURL,
+          settingsAppearance: this.settingsAppearance,
+          costSettings: this.costSettings,
+          powerSettings: this.powerSettings,
           corsCheck: api.allowCrossOrigin,
           settingsApi: api,
           settingsFeature: feature,
@@ -449,8 +497,6 @@ class OctoPrintPrinter {
           settingsWebcam: webcam
         });
 
-        //parse webcam check
-
         return true;
       } else {
         return false;
@@ -461,13 +507,161 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintSystemInfoData(force = false) {}
+  async acquireOctoPrintSystemInfoData(force = false) {
+    if(checkSystemInfoAPIExistance(this.octoPrintVersion)) return false;
+    if (!this?.octoPrintSystemInfo || force) {
+      let systemInfoCheck = await this.#api.getSystemInfo(true);
 
-  async acquireOctoPrintPluginsListData(force = false) {}
+      const globalStatusCode = checkApiStatusResponse(systemInfoCheck);
 
-  async acquireOctoPrintUpdatesData(force = false) {}
+      if (globalStatusCode === 200) {
+        const { systemInfo} = await systemInfoCheck.json();
+        this.octoPrintSystemInfo = systemInfo;
+        this.#db.update({
+          octoPrintSystemInfo: systemInfo
+        });
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      // Call was skipped as we have data or not forced
+      return true;
+    }
+  }
 
-  async acquireOctoPrintFilesData(force = false) {}
+  async acquireOctoPrintPluginsListData(force = false) {
+    if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+
+    if(!this.pluginsList || this.pluginsList.length === 0 || force){
+      this.pluginsList = [];
+      const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion);
+      const globalStatusCode = checkApiStatusResponse(pluginList);
+
+      if (globalStatusCode === 200) {
+        const { repository } = await pluginList.json();
+        this.pluginsList = repository.plugins;
+        this.#db.update({
+          pluginsList: repository.plugins
+        });
+        return true;
+      } else {
+        return false;
+      }
+    }else{
+      return true;
+    }
+
+  }
+
+  async acquireOctoPrintUpdatesData(force = false) {
+    if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+
+    if (
+        !this?.octoPrintUpdate ||
+        !this?.octoPrintPluginUpdates ||
+        force
+    ) {
+      this.octoPrintUpdate = [];
+      this.octoPrintPluginUpdates = [];
+      const updateCheck = this.#api.getSoftwareUpdateCheck(force, true)
+
+      const globalStatusCode = checkApiStatusResponse(updateCheck);
+
+      if (globalStatusCode === 200) {
+        const { information } = await updateCheck.json();
+        let octoPrintUpdate = false;
+        const pluginUpdates = [];
+
+        for (const key in information) {
+          if (information.hasOwnProperty(key)) {
+            if (information[key].updateAvailable) {
+              if (key === "octoprint") {
+                octoPrintUpdate = {
+                  id: key,
+                  displayName: information[key].displayName,
+                  displayVersion: information[key].displayVersion,
+                  updateAvailable: information[key].updateAvailable,
+                  releaseNotesURL: information[key].releaseNotes
+                };
+              } else {
+                pluginUpdates.push({
+                  id: key,
+                  displayName: information[key].displayName,
+                  displayVersion: information[key].displayVersion,
+                  updateAvailable: information[key].updateAvailable,
+                  releaseNotesURL: information[key].releaseNotes
+                });
+              }
+            }
+          }
+        }
+
+        this.pluginsList = repository.plugins;
+        this.#db.update({
+          octoPrintUpdate: octoPrintUpdate,
+          octoPrintPluginUpdates: pluginUpdates
+        });
+        return true;
+      } else {
+        return false;
+      }
+
+    }else{
+      return true;
+    }
+  }
+
+  async acquireOctoPrintFilesData(force = false) {
+    if (!this?.fileList || !this?.storage || force) {
+      this.fileList = {
+        files: [],
+        fileCount: 0,
+        folders: [],
+        folderCount: 0
+      };
+      this.storage = {
+        free: 0,
+        total: 0
+      };
+
+      const filesCheck = await this.#api.getFiles(true, true);
+
+      const globalStatusCode = checkApiStatusResponse(filesCheck);
+
+      if (globalStatusCode === 200) {
+        const { free, total, files } = await filesCheck.json();
+
+        this.storage = {
+          free: free,
+          total: total
+        };
+
+        const {
+          printerFiles,
+          printerLocations
+        } = acquirePrinterFilesAndFolderData(files)
+
+        this.fileList = {
+          files: printerFiles,
+          fileCount: printerFiles.length,
+          folders: printerLocations,
+          folderCount: printerLocations.length
+        }
+
+        this.#db.update({
+          storage: this.storage,
+          fileList: this.fileList
+        })
+
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
 }
 
 module.exports = {
