@@ -192,6 +192,7 @@ class OctoPrintPrinter {
     //Gather API data...D
     this.initialApiCheckSequence()
       .then((res) => {
+        console.log(res)
         if (!res[0].value) {
           throw new Error(this.printerURL + " Failed to acquire version data");
         }
@@ -212,6 +213,9 @@ class OctoPrintPrinter {
       .then(async (res) => {
         const fullApiCheck = await this.secondaryApiCheckSequence();
         console.log(fullApiCheck);
+
+
+
         console.log("API CHECK SPEED", Date.now() - timerLabel+"ms")
 
       })
