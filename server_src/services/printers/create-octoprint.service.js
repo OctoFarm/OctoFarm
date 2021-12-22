@@ -19,16 +19,19 @@ const { checkSystemInfoAPIExistance } = require("../../utils/compatibility.utils
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
 const { convertHttpUrlToWebsocket } = require("../../utils/url.utils");
-
-const timerLabel = "PrinterAdd";
+const { handleMessage } = require("../octoprint/octoprint-websocket-message");
 
 class OctoPrintPrinter {
   //OctoFarm state
   disabled = false;
+  #retryNumber = 0;
   //Communications
   #api = undefined;
   #ws = undefined;
   #db = undefined;
+  #apiRetry = undefined;
+  timeout = undefined;
+  reconnectTimeout = undefined;
   //Required
   sortIndex = undefined;
   category = undefined;
@@ -132,8 +135,6 @@ class OctoPrintPrinter {
     if (!_id || isNaN(sortIndex) || !apikey || !printerURL || !webSocketURL || !settingsAppearance)
       throw new Error("Missing params!");
 
-    console.log(apikey);
-
     // this = { ...PRINTER_STATES.SETTING_UP }
     this.currentUser = currentUser;
     this.dateAdded = dateAdded;
@@ -181,18 +182,16 @@ class OctoPrintPrinter {
     this.camURL = camURL;
     this.octoPi = octoPi;
 
+    const { timeout } = SettingsClean.returnSystemSettings();
+    this.timeout = timeout;
+    this.#apiRetry = timeout.apiRetry;
+
     if (!disabled) {
       // Run connect sequence
       const timerLabel = Date.now();
-      this.setupClient()
-        .then((res) => {
-          console.log(res);
-          console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
-        })
-        .catch((e) => {
-          console.error(e);
-          console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
-        });
+      this.setupClient().then(() => {
+        console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
+      });
     } else {
       console.log("CLIENT IS DISABLED, AWAIT ENABLING BEFORE SETTING UP");
     }
@@ -208,17 +207,23 @@ class OctoPrintPrinter {
 
   async changeAPIKey() {}
 
-  async reConnectWebsocket() {}
+  async reConnectWebsocket() {
+    this.#ws.terminate();
+  }
 
-  async throttleWebSocket() {}
+  async throttleWebSocket(throttle) {}
 
-  async forceAPIScan() {}
+  async forceAPIScan() {
+    await this.secondaryApiCheckSequence(true);
+  }
+
+  async updatePrinterRecord(record) {
+    this.#db.update(record);
+  }
 
   async setupClient() {
-    const { timeout } = SettingsClean.returnSystemSettings();
-
     //Create OctoPrint Client
-    this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, timeout);
+    this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
 
     //Create Websocket Client
     if (!this.webSocketURL || !this.webSocketURL.includes("ws")) {
@@ -232,10 +237,8 @@ class OctoPrintPrinter {
     //Gather API data...D
     return this.initialApiCheckSequence()
       .then((res) => {
-        console.log(res);
         if (res.includes(false)) {
-          // Don't throw the error here, needs to be on call
-          throw new Error("FAILED: " + this.printerURL);
+          throw new Error("Printer failed initial API check sequence, marking as offline...");
         }
       })
       .then(async () => {
@@ -246,19 +249,44 @@ class OctoPrintPrinter {
         return session;
       })
       .then(async (session) => {
-        console.log("WEBSOCKET FOR ", this.printerURL);
         const fullApiCheck = await this.secondaryApiCheckSequence();
-        // console.log(session);
-        console.log(fullApiCheck);
-        this.#ws = new WebSocketClient(this.webSocketURL, this._id, this.currentUser, session);
+        this.#ws = new WebSocketClient(
+          this.webSocketURL,
+          this._id,
+          this.currentUser,
+          session,
+          handleMessage
+        );
 
         return true;
       })
       .catch((e) => {
-        // Can't auth, printer considered offline!
-        console.error(e);
-        return false;
+        console.log(e);
+        this.reconnectAPI();
       });
+  }
+
+  reconnectAPI() {
+    console.log(this.#apiRetry);
+    console.log(
+      this.printerURL + ": " + this.#apiRetry + "API: reconnecting..." + this.#retryNumber
+    );
+    this.reconnectTimeout = setTimeout(() => {
+      if (this.#retryNumber > 0) {
+        const modifier = this.timeout.apiRetry * 0.1;
+
+        console.log(modifier);
+        this.#apiRetry = this.#apiRetry + modifier;
+
+        console.log(this.#apiRetry);
+      }
+      const timerLabel = Date.now();
+      this.setupClient().then(() => {
+        console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
+      });
+      this.reconnectTimeout = false;
+      this.#retryNumber = this.#retryNumber + 1;
+    }, this.#apiRetry);
   }
 
   // Base minimum viable requirements for websocket connection
@@ -271,17 +299,17 @@ class OctoPrintPrinter {
   }
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
-  async secondaryApiCheckSequence() {
+  async secondaryApiCheckSequence(force = false) {
     return await Promise.allSettled([
-      this.acquireOctoPrintSystemData(),
-      this.acquireOctoPrintProfileData(),
-      this.acquireOctoPrintStateData(),
-      this.acquireOctoPrintSettingsData(),
-      this.acquireOctoPrintSystemInfoData(),
-      this.acquireOctoPrintPluginsListData(),
-      this.acquireOctoPrintUpdatesData(),
-      this.acquireOctoPrintFilesData(),
-      this.acquireOctoPrintPiPluginData()
+      this.acquireOctoPrintSystemData(force),
+      this.acquireOctoPrintProfileData(force),
+      this.acquireOctoPrintStateData(force),
+      this.acquireOctoPrintSettingsData(force),
+      this.acquireOctoPrintSystemInfoData(force),
+      this.acquireOctoPrintPluginsListData(force),
+      this.acquireOctoPrintUpdatesData(force),
+      this.acquireOctoPrintFilesData(force),
+      this.acquireOctoPrintPiPluginData(force)
     ]);
   }
 
@@ -703,6 +731,10 @@ class OctoPrintPrinter {
     } else {
       return true;
     }
+  }
+
+  killApiTimeout() {
+    clearTimeout(this.reconnectTimeout);
   }
 
   killWebsocketConnection() {

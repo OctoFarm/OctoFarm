@@ -57,6 +57,7 @@ class PrinterManagerService {
   killAllConnections() {
     logger.debug("Killing all printer connections...");
     this.#printers.forEach((printer) => {
+      printer.killApiTimeout();
       printer.killWebsocketConnection();
     });
   }

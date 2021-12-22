@@ -89,16 +89,16 @@ const OP_WS_MSG = {
   slicingProgress: "slicingProgress"
 };
 
-const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
-
-const WS_STATE = {
-  unopened: "unopened",
-  opening: "opening",
-  connected: "connected",
-  authed: "authed",
-  errored: "errored", // Not a disconnect error
-  closed: "closed" // Closing error received
-};
+// const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
+// not a clue what this actually relates too
+// const WS_STATE = {
+//   unopened: "unopened",
+//   opening: "opening",
+//   connected: "connected",
+//   authed: "authed",
+//   errored: "errored", // Not a disconnect error
+//   closed: "closed" // Closing error received
+// };
 
 module.exports = {
   getDefaultProgressState,
@@ -106,7 +106,5 @@ module.exports = {
   getDefaultPrinterState,
   getDefaultCurrentState,
   EVENT_TYPES,
-  WS_STATE,
-  OP_WS_MSG,
-  OP_WS_SKIP
+  OP_WS_MSG
 };
