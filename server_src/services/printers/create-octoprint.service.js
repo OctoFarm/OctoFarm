@@ -6,13 +6,21 @@ const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
 const { isEmpty } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
-const { acquireWebCamData, acquirePrinterNameData, acquirePrinterFilesAndFolderData } = require("../octoprint/utils/printer-data.utils");
-const { testAndCollectCostPlugin, testAndCollectPSUControlPlugin } = require("../octoprint/utils/octoprint-plugin.utils")
-const { checkSystemInfoAPIExistance} = require("../../utils/compatibility.utils");
+const {
+  acquireWebCamData,
+  acquirePrinterNameData,
+  acquirePrinterFilesAndFolderData
+} = require("../octoprint/utils/printer-data.utils");
+const {
+  testAndCollectCostPlugin,
+  testAndCollectPSUControlPlugin
+} = require("../octoprint/utils/octoprint-plugin.utils");
+const { checkSystemInfoAPIExistance } = require("../../utils/compatibility.utils");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
+const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
+const { convertHttpUrlToWebsocket } = require("../../utils/url.utils");
 
-
-const timerLabel = "PrinterAdd"
+const timerLabel = "PrinterAdd";
 
 class OctoPrintPrinter {
   //OctoFarm state
@@ -124,16 +132,7 @@ class OctoPrintPrinter {
     if (!_id || isNaN(sortIndex) || !apikey || !printerURL || !webSocketURL || !settingsAppearance)
       throw new Error("Missing params!");
 
-    const timerLabel = Date.now();
-
-    // Shim because categories don't exist prior to V1.2
-    if (!category) {
-      this.category = PRINTER_CATEGORIES.OCTOPRINT;
-    }
-    // Another shim for disabled prop, doesn't exist prior to V1.2
-    if (typeof disabled !== "boolean") {
-      this.disabled = false;
-    }
+    console.log(apikey);
 
     // this = { ...PRINTER_STATES.SETTING_UP }
     this.currentUser = currentUser;
@@ -175,32 +174,68 @@ class OctoPrintPrinter {
     this.settingsAppearance = settingsAppearance;
     this.sortIndex = sortIndex;
     this.category = category;
+    this.disabled = disabled;
+    this.apikey = apikey;
     this.printerURL = printerURL;
     this.webSocketURL = webSocketURL;
     this.camURL = camURL;
     this.octoPi = octoPi;
+
+    if (!disabled) {
+      // Run connect sequence
+      const timerLabel = Date.now();
+      this.setupClient()
+        .then((res) => {
+          console.log(res);
+          console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
+        })
+        .catch((e) => {
+          console.error(e);
+          console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
+        });
+    } else {
+      console.log("CLIENT IS DISABLED, AWAIT ENABLING BEFORE SETTING UP");
+    }
+  }
+
+  async enableClient() {}
+
+  async disableClient() {}
+
+  async changeURL() {}
+
+  async changeUser() {}
+
+  async changeAPIKey() {}
+
+  async reConnectWebsocket() {}
+
+  async throttleWebSocket() {}
+
+  async forceAPIScan() {}
+
+  async setupClient() {
     const { timeout } = SettingsClean.returnSystemSettings();
 
     //Create OctoPrint Client
-    this.#api = new OctoprintApiClientService(printerURL, apikey, timeout);
+    this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, timeout);
 
     //Create Websocket Client
-    this.#ws = "";
+    if (!this.webSocketURL || !this.webSocketURL.includes("ws")) {
+      this.webSocketURL = convertHttpUrlToWebsocket(this.printerURL);
+      this.#db.update({ webSocketURL: this.webSocketURL });
+    }
 
+    // Create database client
     this.#db = new PrinterDatabaseService(this._id);
 
     //Gather API data...D
-    this.initialApiCheckSequence()
+    return this.initialApiCheckSequence()
       .then((res) => {
-        console.log(res)
-        if (!res[0].value) {
-          throw new Error(this.printerURL + " Failed to acquire version data");
-        }
-        if (!res[1].value) {
-          throw new Error(this.printerURL + " Failed to acquire user list");
-        }
-        if (!res[2].value) {
-          throw new Error(this.printerURL + " Failed global API Key Check");
+        console.log(res);
+        if (res.includes(false)) {
+          // Don't throw the error here, needs to be on call
+          throw new Error("FAILED: " + this.printerURL);
         }
       })
       .then(async () => {
@@ -210,24 +245,25 @@ class OctoPrintPrinter {
         }
         return session;
       })
-      .then(async (res) => {
+      .then(async (session) => {
+        console.log("WEBSOCKET FOR ", this.printerURL);
         const fullApiCheck = await this.secondaryApiCheckSequence();
+        // console.log(session);
         console.log(fullApiCheck);
+        this.#ws = new WebSocketClient(this.webSocketURL, this._id, this.currentUser, session);
 
-
-
-        console.log("API CHECK SPEED", Date.now() - timerLabel+"ms")
-
+        return true;
       })
       .catch((e) => {
         // Can't auth, printer considered offline!
         console.error(e);
+        return false;
       });
-
   }
 
+  // Base minimum viable requirements for websocket connection
   async initialApiCheckSequence() {
-    return await Promise.allSettled([
+    return await Promise.all([
       this.globalAPIKeyCheck(),
       this.acquireOctoPrintVersionData(),
       this.acquireOctoPrintUsersList()
@@ -254,7 +290,7 @@ class OctoPrintPrinter {
     const globalAPIKeyCheck = await this.#api.getSettings(true);
 
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
-
+    console.log("APICHECK", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       //Safe to continue check
       const { api } = await globalAPIKeyCheck.json();
@@ -274,7 +310,7 @@ class OctoPrintPrinter {
     const passiveLogin = await this.#api.login(true);
 
     const globalStatusCode = checkApiStatusResponse(passiveLogin);
-
+    console.log("SESSION", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       const sessionJson = await passiveLogin.json();
 
@@ -288,7 +324,7 @@ class OctoPrintPrinter {
     let usersCheck = await this.#api.getUsers(true);
 
     const globalStatusCode = checkApiStatusResponse(usersCheck);
-
+    console.log("USER", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       const userJson = await usersCheck.json();
 
@@ -337,6 +373,7 @@ class OctoPrintPrinter {
       let versionCheck = await this.#api.getVersion(true);
 
       const globalStatusCode = checkApiStatusResponse(versionCheck);
+      console.log("VERSION", globalStatusCode + " " + this.printerURL);
       if (globalStatusCode === 200) {
         const { server } = await versionCheck.json();
         this.octoPrintVersion = server;
@@ -353,7 +390,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintPiPluginData(force = false){
+  async acquireOctoPrintPiPluginData(force = false) {
     if (!this?.octoPi || force) {
       let piPluginCheck = await this.#api.getPluginPiSupport(true);
 
@@ -463,8 +500,18 @@ class OctoPrintPrinter {
       const globalStatusCode = checkApiStatusResponse(settingsCheck);
 
       if (globalStatusCode === 200) {
-        const { api, feature, folder, plugins, scripts, serial, server, system, webcam, appearance } =
-          await settingsCheck.json();
+        const {
+          api,
+          feature,
+          folder,
+          plugins,
+          scripts,
+          serial,
+          server,
+          system,
+          webcam,
+          appearance
+        } = await settingsCheck.json();
         this.corsCheck = api.allowCrossOrigin;
         this.settingsApi = api;
         this.settingsFeature = feature;
@@ -477,7 +524,7 @@ class OctoPrintPrinter {
         this.settingsWebcam = webcam;
 
         //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
-        if(!force){
+        if (!force) {
           this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
           this.settingsAppearance = acquirePrinterNameData(this.settingsAppearance, appearance);
           this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
@@ -512,14 +559,14 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSystemInfoData(force = false) {
-    if(checkSystemInfoAPIExistance(this.octoPrintVersion)) return false;
+    if (checkSystemInfoAPIExistance(this.octoPrintVersion)) return false;
     if (!this?.octoPrintSystemInfo || force) {
       let systemInfoCheck = await this.#api.getSystemInfo(true);
 
       const globalStatusCode = checkApiStatusResponse(systemInfoCheck);
 
       if (globalStatusCode === 200) {
-        const { systemInfo} = await systemInfoCheck.json();
+        const { systemInfo } = await systemInfoCheck.json();
         this.octoPrintSystemInfo = systemInfo;
         this.#db.update({
           octoPrintSystemInfo: systemInfo
@@ -537,7 +584,7 @@ class OctoPrintPrinter {
   async acquireOctoPrintPluginsListData(force = false) {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
 
-    if(!this.pluginsList || this.pluginsList.length === 0 || force){
+    if (!this.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
       const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion);
       const globalStatusCode = checkApiStatusResponse(pluginList);
@@ -552,23 +599,18 @@ class OctoPrintPrinter {
       } else {
         return false;
       }
-    }else{
+    } else {
       return true;
     }
-
   }
 
   async acquireOctoPrintUpdatesData(force = false) {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
 
-    if (
-        !this?.octoPrintUpdate ||
-        !this?.octoPrintPluginUpdates ||
-        force
-    ) {
+    if (!this?.octoPrintUpdate || !this?.octoPrintPluginUpdates || force) {
       this.octoPrintUpdate = [];
       this.octoPrintPluginUpdates = [];
-      const updateCheck = this.#api.getSoftwareUpdateCheck(force, true)
+      const updateCheck = this.#api.getSoftwareUpdateCheck(force, true);
 
       const globalStatusCode = checkApiStatusResponse(updateCheck);
 
@@ -610,8 +652,7 @@ class OctoPrintPrinter {
       } else {
         return false;
       }
-
-    }else{
+    } else {
       return true;
     }
   }
@@ -641,22 +682,19 @@ class OctoPrintPrinter {
           total: total
         };
 
-        const {
-          printerFiles,
-          printerLocations
-        } = acquirePrinterFilesAndFolderData(files)
+        const { printerFiles, printerLocations } = acquirePrinterFilesAndFolderData(files);
 
         this.fileList = {
           files: printerFiles,
           fileCount: printerFiles.length,
           folders: printerLocations,
           folderCount: printerLocations.length
-        }
+        };
 
         this.#db.update({
           storage: this.storage,
           fileList: this.fileList
-        })
+        });
 
         return true;
       } else {

@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  disabled: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   apikey: {
     type: String,
     required: true // !

@@ -89,7 +89,7 @@ class OctoprintApiService {
   constructor(printerURL, apikey, timeoutSettings) {
     this.timeout = timeoutSettings;
     this.printerURL = printerURL;
-    this.apikey = apikey
+    this.apikey = apikey;
   }
 
   /**
@@ -129,7 +129,13 @@ class OctoprintApiService {
     }
     const url = new URL(route, this.printerURL).href;
 
-    return fetchApiTimeout(url, "POST", this.apikey, timeout ? this.timeout.apiTimeout : false, data);
+    return fetchApiTimeout(
+      url,
+      "POST",
+      this.apikey,
+      timeout ? this.timeout.apiTimeout : false,
+      data
+    );
     // const endTime = ConnectionMonitorService.stopTimer();
     //
     // ConnectionMonitorService.updateOrAddResponse(
@@ -212,7 +218,13 @@ class OctoprintApiService {
     }
     const url = new URL(route, this.printerURL).href;
     const startTime = ConnectionMonitorService.startTimer();
-    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.timeout.apiTimeout : false, data);
+    return fetchApiTimeout(
+      url,
+      "PATCH",
+      this.apikey,
+      timeout ? this.timeout.apiTimeout : false,
+      data
+    );
     // const endTime = ConnectionMonitorService.stopTimer();
     // ConnectionMonitorService.updateOrAddResponse(
     //   printerURL,

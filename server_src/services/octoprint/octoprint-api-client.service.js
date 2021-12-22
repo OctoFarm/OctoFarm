@@ -87,7 +87,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getPluginManager(retry = false, octoPrintVersion = undefined) {
-    if(!octoPrintVersion) throw new Error("Version not supplied...");
+    if (!octoPrintVersion) throw new Error("Version not supplied...");
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
 
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
