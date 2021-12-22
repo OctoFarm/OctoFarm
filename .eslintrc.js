@@ -6,12 +6,11 @@ module.exports = {
     node: true,
     es2021: true
   },
-  parser: "@babel/eslint-parser",
   extends: ["plugin:prettier/recommended"],
   plugins: ["prettier"],
+  parser: "@babel/eslint-parser",
   parserOptions: {
     ecmaVersion: 12,
-    parser: "babel-eslint",
     sourceType: "module"
   },
   rules: {
