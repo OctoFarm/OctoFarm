@@ -267,18 +267,10 @@ class OctoPrintPrinter {
   }
 
   reconnectAPI() {
-    console.log(this.#apiRetry);
-    console.log(
-      this.printerURL + ": " + this.#apiRetry + "API: reconnecting..." + this.#retryNumber
-    );
     this.reconnectTimeout = setTimeout(() => {
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
-
-        console.log(modifier);
         this.#apiRetry = this.#apiRetry + modifier;
-
-        console.log(this.#apiRetry);
       }
       const timerLabel = Date.now();
       this.setupClient().then(() => {
