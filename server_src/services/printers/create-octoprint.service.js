@@ -704,6 +704,10 @@ class OctoPrintPrinter {
       return true;
     }
   }
+
+  killWebsocketConnection() {
+    return this.#ws.killAllConnectionsAndListeners();
+  }
 }
 
 module.exports = {

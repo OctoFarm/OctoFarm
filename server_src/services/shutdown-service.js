@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Server");
-const { Runner } = require("../runners/state");
 const { TaskManager } = require("../runners/task.manager");
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 function shutdownServer(app) {
   logger.debug("Shutdown detected, started clean up!");
   return Promise.all([
     mongoose.disconnect(),
-    Runner.killAllConnections(),
+    getPrinterManagerCache().killAllConnections(),
     TaskManager.stopSchedulerTasks(),
     app.close()
   ]);

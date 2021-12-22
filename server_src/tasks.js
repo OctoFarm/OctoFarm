@@ -2,7 +2,6 @@ const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
@@ -13,13 +12,10 @@ const { detectFarmPi } = require("./services/farmpi-detection.service");
 const { PrinterTicker } = require("./runners/printerTicker");
 const Logger = require("./handlers/logger.js");
 const logger = new Logger("OctoFarm-TaskManager");
-const { PrinterManagerService } = require("./services/printer-manager.service");
+const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 
 const INITIALISE_PRINTERS = async () => {
-  // const serverSettings = SettingsClean.returnSystemSettings();
-  // const printersInformation = PrinterClean.listPrintersInformation();
-  // await PrinterClean.sortCurrentOperations(printersInformation);
-  // await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+  await getPrinterManagerCache().initialisePrinters();
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -53,44 +49,6 @@ const SYSTEM_INFO_CHECK_TASK = async () => {
 
 const GENERATE_MONTHLY_HISTORY_STATS = async () => {
   await getHistoryCache().generateMonthlyStats();
-};
-
-const WEBSOCKET_HEARTBEAT_TASK = () => {
-  const farmPrinters = Runner.returnFarmPrinters();
-  farmPrinters.forEach(function each(client) {
-    if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
-      if (
-        client.ws.instance.readyState !== 0 &&
-        client.ws.instance.readyState !== 2 &&
-        client.ws.instance.readyState !== 3
-      ) {
-        if (client.ws.isAlive === false) {
-          ConnectionMonitorService.updateOrAddResponse(
-            client.webSocketURL + "/sockjs/websocket",
-            REQUEST_TYPE.PING_PONG,
-            REQUEST_KEYS.TOTAL_PING_PONG
-          );
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[client.ws.index].printerURL,
-            "Ping/Pong check failed! Destroying printer and re-setting up!",
-            "Offline",
-            farmPrinters[client.ws.index]._id
-          );
-          return Runner.reScanOcto(farmPrinters[client.ws.index]._id);
-        }
-        const triggerStates = ["Offline", "Searching...", "Shutdown"];
-        if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
-          // Retry connecting if failed...
-          farmPrinters[client.ws.index].webSocket = "info";
-          farmPrinters[client.ws.index].webSocketDescription =
-            "Checking if Websocket is still alive";
-          client.ws.isAlive = false;
-          client.ws.instance.ping(function noop() {});
-        }
-      }
-    }
-  });
 };
 
 const SSE_TASK = () => {
@@ -154,9 +112,9 @@ const SSE_DASHBOARD = () => {
   // }
 };
 
-const STATE_TRACK_COUNTERS = async () => {
-  await Runner.trackCounters();
-};
+// const STATE_TRACK_COUNTERS = async () => {
+//   await Runner.trackCounters();
+// };
 
 const GRAB_LATEST_PATREON_DATA = async () => {
   await grabLatestPatreonData();
@@ -165,10 +123,6 @@ const GRAB_LATEST_PATREON_DATA = async () => {
 const DATABASE_MIGRATIONS_TASK = async () => {
   const migrations = require("./migrations");
   console.log(migrations);
-};
-
-const INITITIALISE_PRINTERS = async () => {
-  await Runner.init();
 };
 
 /**
@@ -198,11 +152,10 @@ async function TimedBookTask(name, input) {
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
+    TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    // TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
-    // TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
-    TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+    // TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
@@ -213,12 +166,6 @@ class OctoFarmTasks {
     },
     async function () {
       return await TimedBookTask("FARMPI_DETECTION_TASK", detectFarmPi);
-    },
-    async function () {
-      return await TimedBookTask(
-        "INITITIALISE_PRINTERS ",
-        PrinterManagerService.initialisePrinters
-      );
     }
   ];
 }

@@ -9,9 +9,9 @@ const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.
 const logger = new Logger("OctoFarm-PrinterManager");
 
 class PrinterManagerService {
-  printerList = [];
+  #printers = [];
 
-  static async initialisePrinters() {
+  async initialisePrinters() {
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
@@ -45,12 +45,20 @@ class PrinterManagerService {
           });
       }
       const device = new OctoPrintPrinter(pList[i]);
+      this.#printers.push(device);
       console.log("CREATED PRINTER" + i);
     }
 
     // Save printer in cache...
 
     return true;
+  }
+
+  killAllConnections() {
+    logger.debug("Killing all printer connections...");
+    this.#printers.forEach((printer) => {
+      printer.killWebsocketConnection();
+    });
   }
 
   // static async batchCreatePrinters(printerList){
@@ -76,6 +84,4 @@ class PrinterManagerService {
   // }
 }
 
-module.exports = {
-  PrinterManagerService
-};
+module.exports = PrinterManagerService;
