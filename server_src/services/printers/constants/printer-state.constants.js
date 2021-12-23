@@ -1,6 +1,6 @@
 const { mapStateToCategory } = require("../utils/printer-state.utils");
 
-const COLOURS = {
+const OF_COLOURS = {
   SUCCESS: "success",
   WARNING: "warning",
   INFO: "info",
@@ -8,43 +8,66 @@ const COLOURS = {
 };
 
 //Common States
-const C_STATE = {
+const OF_C_STATE = {
   SETTING_UP: "Setting Up",
   OFFLINE: "Offline"
 };
 
-//Websocket States
-const WS_STATE = {};
 //Printer States
-const S_STATE = {};
+const OF_S_STATE = {};
 //Host States
-const H_STATE = {};
+const OF_H_STATE = {
+  SHUTDOWN: "Shutdown"
+};
 
 //Common Descriptions
-const C_DESC = {
+const OF_C_DESC = {
   SETTING_UP: "Setting up your Printer"
 };
 
 //Websocket Descriptions
-const WS_DESC = {};
+const OF_WS_DESC = {
+  SETTING_UP: "Setting up the clients websocket connection: ",
+  TENTATIVE: "Websocket Connected but in Tentative state until receiving data",
+  CLOSED_BY_OF: "Websocket Closed by OctoFarm"
+};
 //Printer State Descriptions
-const S_DESC = {};
+const OF_S_DESC = {
+  OFFLINE: "OctoPrint is Offline"
+};
 //Host Descriptions
-const H_DESC = {};
+const OF_H_DESC = {
+  SHUTDOWN: "Host is Shutdown"
+};
 
 const PRINTER_STATES = {
   SETTING_UP: {
-    state: C_STATE.SETTING_UP,
-    stateColour: mapStateToCategory(C_STATE.OFFLINE),
-    hostState: C_STATE.SETTING_UP,
-    hostStateColour: mapStateToCategory(C_STATE.OFFLINE),
-    webSocket: COLOURS.DANGER,
-    stateDescription: C_DESC.SETTING_UP,
-    hostDescription: C_DESC.SETTING_UP,
-    webSocketDescription: C_DESC.SETTING_UP
+    state: OF_C_STATE.SETTING_UP,
+    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+    hostState: OF_C_STATE.SETTING_UP,
+    hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+    webSocket: OF_COLOURS.DANGER,
+    stateDescription: OF_C_DESC.SETTING_UP,
+    hostDescription: OF_C_DESC.SETTING_UP,
+    webSocketDescription: OF_C_DESC.SETTING_UP
+  },
+  SHUTDOWN: {
+    state: OF_C_STATE.OFFLINE,
+    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+    hostState: OF_H_STATE.SHUTDOWN,
+    hostStateColour: mapStateToCategory(OF_H_STATE.SHUTDOWN),
+    webSocket: OF_COLOURS.DANGER,
+    stateDescription: OF_S_DESC.OFFLINE,
+    hostDescription: OF_H_DESC.SHUTDOWN,
+    webSocketDescription: OF_WS_DESC.CLOSED_BY_OF
+  },
+  WS_TENTATIVE: {
+    webSocket: OF_COLOURS.WARNING,
+    webSocketDescription: OF_WS_DESC.TENTATIVE
   }
 };
 
 module.exports = {
-  PRINTER_STATES
+  PRINTER_STATES,
+  OF_WS_DESC
 };

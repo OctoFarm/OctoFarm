@@ -11,35 +11,35 @@ class OctoprintWebsocketMessage {
     const parsedData = OP_EM.parseData(data);
 
     if (parsedData[OP_WS_MSG.connected]) {
-      OP_EM.handleConnectedData(data);
+      OP_EM.handleConnectedData(parsedData[OP_WS_MSG.connected]);
     }
 
     if (parsedData[OP_WS_MSG.reauthRequired]) {
-      OP_EM.handleReAuthData(data);
+      OP_EM.handleReAuthData(parsedData[OP_WS_MSG.reauthRequired]);
     }
 
     if (parsedData[OP_WS_MSG.current]) {
-      OP_EM.handleCurrentData(data);
+      OP_EM.handleCurrentData(parsedData[OP_WS_MSG.current]);
     }
 
     if (parsedData[OP_WS_MSG.history]) {
-      OP_EM.handleHistoryData(data);
+      OP_EM.handleHistoryData(parsedData[OP_WS_MSG.history]);
     }
 
     if (parsedData[OP_WS_MSG.event]) {
-      OP_EM.handleEventData(data);
+      OP_EM.handleEventData(parsedData[OP_WS_MSG.event]);
     }
 
     if (parsedData[OP_WS_MSG.plugin]) {
-      OP_EM.handlePluginData(data);
+      OP_EM.handlePluginData(parsedData[OP_WS_MSG.plugin]);
     }
 
     if (parsedData[OP_WS_MSG.timelapse]) {
-      OP_EM.handleTimelapseData(data);
+      OP_EM.handleTimelapseData(parsedData[OP_WS_MSG.timelapse]);
     }
 
     if (parsedData[OP_WS_MSG.slicingProgress]) {
-      OP_EM.handleSlicingData(data);
+      OP_EM.handleSlicingData(parsedData[OP_WS_MSG.slicingProgress]);
     }
   }
 

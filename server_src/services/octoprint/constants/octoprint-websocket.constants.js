@@ -89,6 +89,10 @@ const OP_WS_MSG = {
   slicingProgress: "slicingProgress"
 };
 
+const OF_WS_MSG = {
+  SETTING_UP: "Setting up the clients websocket connection: "
+};
+
 // const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
 // not a clue what this actually relates too
 // const WS_STATE = {

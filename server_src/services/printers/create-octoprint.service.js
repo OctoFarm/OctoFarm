@@ -261,7 +261,7 @@ class OctoPrintPrinter {
         return true;
       })
       .catch((e) => {
-        console.log(e);
+        // console.log(e);
         this.reconnectAPI();
       });
   }

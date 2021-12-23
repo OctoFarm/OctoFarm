@@ -2,6 +2,14 @@ const WebSocket = require("ws");
 
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const { WS_STATE, WS_DESC, WS_ERRORS } = require("../printers/constants/websocket-constants");
+const { OF_WS_DESC } = require("../printers/constants/printer-state.constants");
+const { PrinterTicker } = require("../../runners/printerTicker");
+const Logger = require("../../handlers/logger");
+const ConnectionMonitorService = require("../../services/connection-monitor.service");
+const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
+
+const logger = new Logger("OctoFarm-State");
+
 const ENDPOINT = "/sockjs/websocket";
 
 const defaultWebsocketOptions = {
@@ -25,6 +33,12 @@ class WebSocketClient {
   pingPongTimer = 20000;
   systemSettings = SettingsClean.returnSystemSettings();
   url = undefined;
+  id = undefined;
+  polling = undefined;
+  currentUser = undefined;
+  sessionKey = undefined;
+  startTime = undefined;
+  endTime = undefined;
 
   constructor(
     webSocketURL = undefined,
@@ -45,11 +59,14 @@ class WebSocketClient {
 
     this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
     this.polling = this.systemSettings.onlinePolling.seconds;
-    this._id = id;
+    this.id = id;
     this.url = webSocketURL + ENDPOINT;
     this.currentUser = currentUser;
     this.sessionKey = sessionKey;
     this.#onMessage = onMessageFunction;
+
+    this.startTime = undefined;
+    this.endTime = undefined;
 
     this.open();
   }
@@ -66,7 +83,15 @@ class WebSocketClient {
   // }
 
   open() {
-    console.log("OPENING CONNECTION", this.url);
+    this.startTime = ConnectionMonitorService.startTimer();
+    logger.debug(OF_WS_DESC.SETTING_UP + this.url);
+    PrinterTicker.addIssue(
+      new Date(),
+      this.url,
+      OF_WS_DESC.SETTING_UP + this.url,
+      "Active",
+      this.id
+    );
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
       // console.log("PING RECEIVED");
@@ -96,6 +121,18 @@ class WebSocketClient {
     });
 
     this.#instance.on("open", () => {
+      this.endTime = ConnectionMonitorService.stopTimer();
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.LAST_RESPONSE,
+        ConnectionMonitorService.calculateTimer(this.startTime, this.endTime)
+      );
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.SUCCESS_RESPONSE
+      );
       // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
@@ -105,7 +142,7 @@ class WebSocketClient {
 
     // This needs overriding by message passed through
     this.#instance.on("message", (data) => {
-      console.debug(
+      logger.debug(
         `${this.url}: Message #${this.#messageNumber} received, ${
           Date.now() - this.#lastMessage
         }ms since last message`

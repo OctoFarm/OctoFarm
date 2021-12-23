@@ -94,38 +94,14 @@ function setupWebsocketConnection(index, force) {
 }
 
 WebSocketClient.prototype.open = function (url, index) {
-  const startTime = ConnectionMonitorService.startTimer();
   try {
-    this.url = url;
-    this.index = index;
-    PrinterTicker.addIssue(
-      new Date(),
-      farmPrinters[this.index].printerURL,
-      "Setting up the clients websocket connection: " + farmPrinters[this.index].webSocketURL,
-      "Active",
-      farmPrinters[this.index]._id
-    );
     farmPrinters[this.index].webSocket = "warning";
     farmPrinters[this.index].webSocketDescription =
       "Websocket Connected but in Tentative state until receiving data";
     this.instance = new WebSocket(this.url, { followRedirects: true });
     this.instance.on("open", () => {
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        this.url,
-        REQUEST_TYPE.WEBSOCKET,
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
       this.isAlive = true;
       try {
-        this.onopen(this.index).then(() => {
-          ConnectionMonitorService.updateOrAddResponse(
-            this.url,
-            REQUEST_TYPE.WEBSOCKET,
-            REQUEST_KEYS.SUCCESS_RESPONSE
-          );
-        });
       } catch (e) {
         logger.info(`Cannot re-open web socket... : ${this.index}: ${this.url}`);
         this.instance.emit("error", e);
@@ -1239,8 +1215,6 @@ class Runner {
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
-
-
 
         if (!farmPrinters[i]?.currentUser) {
           //No user so make a grab at what's available
@@ -2666,7 +2640,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[index].printerURL,
-        `Farm is air gapped, skipping OctoPrint plugin list request`,
+        "Farm is air gapped, skipping OctoPrint plugin list request",
         "Active",
         farmPrinters[index]._id
       );
@@ -2805,7 +2779,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[index].printerURL,
-        `Farm is air gapped, skipping OctoPrint updates request`,
+        "Farm is air gapped, skipping OctoPrint updates request",
         "Active",
         farmPrinters[index]._id
       );
@@ -3755,7 +3729,7 @@ class Runner {
         );
 
         // Update octoprint settings
-        const settingsApiRoute = `/api/settings`;
+        const settingsApiRoute = "/api/settings";
         sett = await this.octoPrintService.post(
           printerUrl,
           printerApiKey,
