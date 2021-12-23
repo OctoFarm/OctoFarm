@@ -152,8 +152,8 @@ async function TimedBookTask(name, input) {
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
-    TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     // TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),

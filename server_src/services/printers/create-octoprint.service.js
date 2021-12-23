@@ -308,9 +308,7 @@ class OctoPrintPrinter {
   async globalAPIKeyCheck() {
     // Compare entered API key to settings API Key...
     const globalAPIKeyCheck = await this.#api.getSettings(true);
-
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
-    console.log("APICHECK", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       //Safe to continue check
       const { api } = await globalAPIKeyCheck.json();
@@ -330,7 +328,6 @@ class OctoPrintPrinter {
     const passiveLogin = await this.#api.login(true);
 
     const globalStatusCode = checkApiStatusResponse(passiveLogin);
-    console.log("SESSION", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       const sessionJson = await passiveLogin.json();
 
@@ -344,7 +341,6 @@ class OctoPrintPrinter {
     let usersCheck = await this.#api.getUsers(true);
 
     const globalStatusCode = checkApiStatusResponse(usersCheck);
-    console.log("USER", globalStatusCode + " " + this.printerURL);
     if (globalStatusCode === 200) {
       const userJson = await usersCheck.json();
 
@@ -393,7 +389,6 @@ class OctoPrintPrinter {
       let versionCheck = await this.#api.getVersion(true);
 
       const globalStatusCode = checkApiStatusResponse(versionCheck);
-      console.log("VERSION", globalStatusCode + " " + this.printerURL);
       if (globalStatusCode === 200) {
         const { server } = await versionCheck.json();
         this.octoPrintVersion = server;

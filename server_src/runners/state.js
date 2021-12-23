@@ -99,26 +99,6 @@ WebSocketClient.prototype.open = function (url, index) {
     farmPrinters[this.index].webSocketDescription =
       "Websocket Connected but in Tentative state until receiving data";
     this.instance = new WebSocket(this.url, { followRedirects: true });
-    this.instance.on("open", () => {
-      this.isAlive = true;
-      try {
-      } catch (e) {
-        logger.info(`Cannot re-open web socket... : ${this.index}: ${this.url}`);
-        this.instance.emit("error", e);
-      }
-    });
-    this.instance.on("pong", () => {
-      heartBeat(this.index);
-    });
-    this.instance.on("message", (data, flags) => {
-      this.number++;
-      try {
-        this.onmessage(data, flags, this.number, this.index);
-      } catch (e) {
-        logger.info(e, "There was an issue opening the websocket... hard fail...");
-        this.instance.emit("error", e);
-      }
-    });
     this.instance.on("close", (e) => {
       console.log("CASE", e);
       switch (e) {

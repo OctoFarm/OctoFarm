@@ -20,65 +20,65 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
 }
 
 async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = undefined) {
-  const startTime = ConnectionMonitorService.startTimer();
   if (!fetchTimeout || method !== "GET") {
-    return await fetchApi(url, method, apikey, bodyData)
-      .then((res) => {
-        const endTime = ConnectionMonitorService.stopTimer();
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.LAST_RESPONSE,
-          ConnectionMonitorService.calculateTimer(startTime, endTime)
-        );
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.SUCCESS_RESPONSE
-        );
-        return res;
-      })
-      .catch((e) => {
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.FAILED_RESPONSE
-        );
-        return e;
-      });
+    return await fetchApi(url, method, apikey, bodyData);
+    // .then((res) => {
+    //   const endTime = ConnectionMonitorService.stopTimer();
+    //   ConnectionMonitorService.updateOrAddResponse(
+    //     url,
+    //     REQUEST_TYPE[method],
+    //     REQUEST_KEYS.LAST_RESPONSE,
+    //     ConnectionMonitorService.calculateTimer(startTime, endTime)
+    //   );
+    //   ConnectionMonitorService.updateOrAddResponse(
+    //     url,
+    //     REQUEST_TYPE[method],
+    //     REQUEST_KEYS.SUCCESS_RESPONSE
+    //   );
+    //   return res;
+    // })
+    // .catch((e) => {
+    //   ConnectionMonitorService.updateOrAddResponse(
+    //     url,
+    //     REQUEST_TYPE[method],
+    //     REQUEST_KEYS.FAILED_RESPONSE
+    //   );
+    //   return e;
+    // });
   }
   return Promise.race([
     fetchApi(url, method, apikey, bodyData),
     new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), fetchTimeout))
-  ])
-    .then((res) => {
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.SUCCESS_RESPONSE
-      );
-      return res;
-    })
-    .catch((e) => {
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.RETRY_REQUESTED
-      );
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.FAILED_RESPONSE
-      );
-      return e;
-    });
+  ]);
+  // TODO move somewhere else
+  // .then((res) => {
+  //   const endTime = ConnectionMonitorService.stopTimer();
+  //   ConnectionMonitorService.updateOrAddResponse(
+  //     url,
+  //     REQUEST_TYPE[method],
+  //     REQUEST_KEYS.LAST_RESPONSE,
+  //     ConnectionMonitorService.calculateTimer(startTime, endTime)
+  //   );
+  //   ConnectionMonitorService.updateOrAddResponse(
+  //     url,
+  //     REQUEST_TYPE[method],
+  //     REQUEST_KEYS.SUCCESS_RESPONSE
+  //   );
+  //   return res;
+  // })
+  // .catch((e) => {
+  //   ConnectionMonitorService.updateOrAddResponse(
+  //     url,
+  //     REQUEST_TYPE[method],
+  //     REQUEST_KEYS.RETRY_REQUESTED
+  //   );
+  //   ConnectionMonitorService.updateOrAddResponse(
+  //     url,
+  //     REQUEST_TYPE[method],
+  //     REQUEST_KEYS.FAILED_RESPONSE
+  //   );
+  //   return e;
+  // });
 }
 
 class OctoprintApiService {
@@ -100,13 +100,13 @@ class OctoprintApiService {
   async getRetry(item) {
     try {
       return await this.get(item);
-    } catch (err) {
-      const message = `Error connecting to OctoPrint API: ${item} | ${printerURL}`;
-      logger.error(`${message} | timeout: ${this.timeout.apiTimeout}`, JSON.stringify(err.message));
+    } catch (e) {
+      const message = `Error connecting to OctoPrint API: ${item} | ${this.printerURL}`;
+      logger.error(`${message} | timeout: ${this.timeout.apiTimeout}`, JSON.stringify(e.message));
       // If timeout exceeds max cut off then give up... Printer is considered offline.
       if (this.timeout.apiTimeout >= this.timeout.apiRetryCutoff) {
-        logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
-        throw err;
+        logger.debug(`Timeout Exceeded: ${item} | ${this.printerURL}`);
+        throw e;
       }
       // Make sure to use the settings for api retry.
       this.timeout.apiTimeout = this.timeout.apiTimeout + 5000;
@@ -170,13 +170,18 @@ class OctoprintApiService {
    * @param timeout optional race to timeout (default: true)
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
-  get(route, timeout = true) {
+  async get(route, timeout = true) {
     if (!this.printerURL.includes("http")) {
       this.printerURL = "http://" + this.printerURL;
     }
     //
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.timeout.apiTimeout : false);
+    return await fetchApiTimeout(
+      url,
+      "GET",
+      this.apikey,
+      timeout ? this.timeout.apiTimeout : false
+    );
 
     // const endTime = ConnectionMonitorService.stopTimer();
     // ConnectionMonitorService.updateOrAddResponse(
@@ -217,7 +222,6 @@ class OctoprintApiService {
       printerURL = "http://" + this.printerURL;
     }
     const url = new URL(route, this.printerURL).href;
-    const startTime = ConnectionMonitorService.startTimer();
     return fetchApiTimeout(
       url,
       "PATCH",

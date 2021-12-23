@@ -2,7 +2,7 @@ const WebSocket = require("ws");
 
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const { WS_STATE, WS_DESC, WS_ERRORS } = require("../printers/constants/websocket-constants");
-const { OF_WS_DESC } = require("../printers/constants/printer-state.constants");
+const { OF_WS_DESC, OF_C_DESC } = require("../printers/constants/printer-state.constants");
 const { PrinterTicker } = require("../../runners/printerTicker");
 const Logger = require("../../handlers/logger");
 const ConnectionMonitorService = require("../../services/connection-monitor.service");
@@ -65,9 +65,6 @@ class WebSocketClient {
     this.sessionKey = sessionKey;
     this.#onMessage = onMessageFunction;
 
-    this.startTime = undefined;
-    this.endTime = undefined;
-
     this.open();
   }
   // TODO maybe move to task manager again - required as OP doesn't seem to send ping/pong itself... Doesn't seem to be required anymore -_-
@@ -83,15 +80,7 @@ class WebSocketClient {
   // }
 
   open() {
-    this.startTime = ConnectionMonitorService.startTimer();
-    logger.debug(OF_WS_DESC.SETTING_UP + this.url);
-    PrinterTicker.addIssue(
-      new Date(),
-      this.url,
-      OF_WS_DESC.SETTING_UP + this.url,
-      "Active",
-      this.id
-    );
+    PrinterTicker.addIssue(new Date(), this.url, `${OF_WS_DESC.SETTING_UP}`, "Active", this.id);
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
       // console.log("PING RECEIVED");
@@ -121,18 +110,6 @@ class WebSocketClient {
     });
 
     this.#instance.on("open", () => {
-      this.endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        this.url,
-        REQUEST_TYPE.WEBSOCKET,
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(this.startTime, this.endTime)
-      );
-      ConnectionMonitorService.updateOrAddResponse(
-        this.url,
-        REQUEST_TYPE.WEBSOCKET,
-        REQUEST_KEYS.SUCCESS_RESPONSE
-      );
       // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
@@ -142,36 +119,55 @@ class WebSocketClient {
 
     // This needs overriding by message passed through
     this.#instance.on("message", (data) => {
+      const timeDifference = ConnectionMonitorService.stopTimer();
       logger.debug(
         `${this.url}: Message #${this.#messageNumber} received, ${
-          Date.now() - this.#lastMessage
+          timeDifference - this.#lastMessage
         }ms since last message`
+      );
+
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.LAST_RESPONSE,
+        ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
       );
 
       this.#onMessage(data);
 
       this.#messageNumber++;
-      this.#lastMessage = Date.now();
+      this.#lastMessage = ConnectionMonitorService.startTimer();
     });
 
     this.#instance.on("close", (code, reason) => {
-      console.log("Websocket closed. Code: " + code, reason.toString());
       switch (
         code // https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1
       ) {
         case 1000: //  1000 indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
-          console.log("WebSocket: closed");
+          PrinterTicker.addIssue(new Date(), this.url, `${OF_C_DESC.RE_SYNC}`, "Offline", this.id);
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the browser implementation.
-          console.log("WebSocket: closed abnormally");
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code}`,
+            "Offline",
+            this.id
+          );
           clearInterval(this.heartbeatInterval);
           this.reconnect(code);
           debugger;
           break;
         default:
           // Abnormal closure
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code}`,
+            "Offline",
+            this.id
+          );
           debugger;
-          console.log("WebSocket: closed unknown");
           clearInterval(this.heartbeatInterval);
           this.reconnect(code);
           break;
@@ -250,7 +246,6 @@ class WebSocketClient {
   }
 
   close() {
-    console.log("CLOSING WEBSOCKET");
     this.#instance.close();
   }
 

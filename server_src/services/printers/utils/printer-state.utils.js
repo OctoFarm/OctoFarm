@@ -23,6 +23,9 @@ const mapStateToCategory = (state) => {
   if (state === "Offline") {
     return { name: "danger", hex: "#2e0905", category: "Offline" };
   }
+  if (state === "Re-Sync") {
+    return { name: "danger", hex: "#2e0905", category: "Offline" };
+  }
   if (state === "Searching...") {
     return { name: "danger", hex: "#2e0905", category: "Offline" };
   }

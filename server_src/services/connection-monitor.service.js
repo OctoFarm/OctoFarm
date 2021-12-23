@@ -68,7 +68,8 @@ class ConnectionMonitorService {
       return o.url === url;
     });
     if (key === REQUEST_KEYS.LAST_RESPONSE) {
-      if (!value) throw new Error("No value supplied with " + REQUEST_KEYS.LAST_RESPONSE);
+      if (typeof value !== "number")
+        throw new Error("No value supplied with " + REQUEST_KEYS.LAST_RESPONSE);
       printerConnectionLogs[printerIndex].connections[connectionIndex].log[
         REQUEST_KEYS.LAST_RESPONSE
       ].push(value);
