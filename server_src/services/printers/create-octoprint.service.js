@@ -51,7 +51,7 @@ class OctoPrintPrinter {
   // Always database
   _id = undefined;
   // Always default
-  systemChecks = systemChecks;
+  systemChecks = Object.assign({}, systemChecks);
   // Always OP
   sessionKey = undefined;
   //Overridden by database
@@ -63,10 +63,12 @@ class OctoPrintPrinter {
   currentActive = 0;
   currentOffline = 0;
   selectedFilament = [];
-  tempTriggers = tempTriggers;
+  tempTriggers = Object.assign({}, tempTriggers);
   feedRate = 100;
   flowRate = 100;
+  stepRate = 10;
   group = "";
+  printerName = undefined;
   //Live printer state data
 
   //Updated by API / database
@@ -466,7 +468,7 @@ class OctoPrintPrinter {
         })
         .catch((e) => {
           logger.error(this.printerURL + ": Failed setup sequence, marking offline!", e);
-          this.setAllPrinterStates(PRINTER_STATES.DISABLED);
+          this.setAllPrinterStates(PRINTER_STATES.SHUTDOWN);
           if (this.#retryNumber < 1) {
             PrinterTicker.addIssue(
               new Date(),
@@ -500,7 +502,7 @@ class OctoPrintPrinter {
     );
 
     this.reconnectTimeout = setTimeout(() => {
-      this.setAllPrinterStates(PRINTER_STATES.SETTING_UP);
+      //this.setAllPrinterStates(PRINTER_STATES.SEARCHING);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
@@ -595,7 +597,7 @@ class OctoPrintPrinter {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
-      this.userList = userList;
+
       // If we have no idea who the user is then
       if (!this?.currentUser || force) {
         if (isEmpty(userList)) {

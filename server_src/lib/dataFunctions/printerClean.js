@@ -327,33 +327,34 @@ class PrinterClean {
       }
 
       const sortedPrinter = {
-        _id: farmPrinter._id,
-        sortIndex: farmPrinter.sortIndex,
-        hostState: {
-          state: farmPrinter.hostState,
-          colour: farmPrinter.hostStateColour,
-          desc: farmPrinter.hostDescription
-        },
-        userList: farmPrinter.userList,
-        printerState: {
-          state: farmPrinter.state,
-          colour: farmPrinter.stateColour,
-          desc: farmPrinter.stateDescription
-        },
-        webSocketState: {
-          colour: farmPrinter.webSocket,
-          desc: farmPrinter.webSocketDescription
-        },
-        group: farmPrinter.group,
-        printerURL: farmPrinter.printerURL,
-        webSocketURL: farmPrinter.webSocketURL,
-        cameraURL: farmPrinter.camURL,
-        apikey: farmPrinter.apikey,
-        octoPrintVersion: farmPrinter.octoPrintVersion,
-        flowRate: farmPrinter.flowRate,
-        feedRate: farmPrinter.feedRate,
-        stepRate: farmPrinter.stepRate,
-        systemChecks: farmPrinter.systemChecks,
+        // _id: farmPrinter._id,
+        // sortIndex: farmPrinter.sortIndex,
+        // hostState: {
+        //   state: farmPrinter.hostState,
+        //   colour: farmPrinter.hostStateColour,
+        //   desc: farmPrinter.hostDescription
+        // },
+        //
+        // printerState: {
+        //   state: farmPrinter.state,
+        //   colour: farmPrinter.stateColour,
+        //   desc: farmPrinter.stateDescription
+        // },
+        // webSocketState: {
+        //   colour: farmPrinter.webSocket,
+        //   desc: farmPrinter.webSocketDescription
+        // },
+        // userList: farmPrinter.userList,
+        // group: farmPrinter.group,
+        // printerURL: farmPrinter.printerURL,
+        // webSocketURL: farmPrinter.webSocketURL,
+        // cameraURL: farmPrinter.camURL,
+        // apikey: farmPrinter.apikey,
+        // octoPrintVersion: farmPrinter.octoPrintVersion,
+        // flowRate: farmPrinter.flowRate,
+        // feedRate: farmPrinter.feedRate,
+        // stepRate: farmPrinter.stepRate,
+        // systemChecks: farmPrinter.systemChecks,
         currentIdle: farmPrinter.currentIdle,
         currentActive: farmPrinter.currentActive,
         currentOffline: farmPrinter.currentOffline,

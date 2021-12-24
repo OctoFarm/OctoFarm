@@ -44,9 +44,10 @@ class LoggerService {
           COLOUR_MAP[info.level]
         }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route}: ${COLOURS.WHITE} \n ${
           COLOUR_MAP[info.level]
-        }MESSAGE: ${info.message} `;
+        }MESSAGE: ${COLOURS.WHITE}${info.message} `;
         message = info.meta
-          ? message + `\n ${COLOUR_MAP[info.level]}DATA: ${JSON.stringify(info.meta)}`
+          ? message +
+            `\n ${COLOUR_MAP[info.level]}DATA: ${COLOURS.WHITE}${JSON.stringify(info.meta)}`
           : message;
         return message;
       })

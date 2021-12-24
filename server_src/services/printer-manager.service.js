@@ -54,6 +54,25 @@ class PrinterManagerService {
 
     await createNewPrinterBatches(printerList);
   }
+
+  updateStateCounters() {
+    const printerList = getPrinterStoreCache().listPrinters();
+    for (let i = 0; i < printerList.length; i++) {
+      const printer = printerList[i];
+      if (!printer.disabled && !printer?.printerState?.colour?.category) {
+        switch (printer.printerState.colour.category) {
+          case "Active":
+            console.log("Active");
+            break;
+          case "Idle":
+          case "Disconnected":
+          case "Complete":
+            console.log("Idle");
+            break;
+        }
+      }
+    }
+  }
 }
 
 module.exports = PrinterManagerService;

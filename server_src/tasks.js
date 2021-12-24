@@ -117,9 +117,9 @@ const SSE_DASHBOARD = () => {
   // }
 };
 
-// const STATE_TRACK_COUNTERS = async () => {
-//   await Runner.trackCounters();
-// };
+const STATE_TRACK_COUNTERS = async () => {
+  await getPrinterManagerCache().updateStateCounters();
+};
 
 const GRAB_LATEST_PATREON_DATA = async () => {
   await grabLatestPatreonData();
@@ -161,7 +161,7 @@ class OctoFarmTasks {
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    // TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+    TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
