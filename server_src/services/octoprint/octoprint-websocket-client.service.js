@@ -30,7 +30,7 @@ class WebSocketClient {
   heartbeatTimeout = undefined;
   reconnectTimeout = undefined;
   number = 0; // Message number
-  pingPongTimer = 20000;
+  // pingPongTimer = 20000;
   systemSettings = SettingsClean.returnSystemSettings();
   url = undefined;
   id = undefined;
@@ -80,6 +80,7 @@ class WebSocketClient {
   // }
 
   open() {
+    logger.debug(`${this.url}: ${OF_WS_DESC.SETTING_UP}`);
     PrinterTicker.addIssue(new Date(), this.url, `${OF_WS_DESC.SETTING_UP}`, "Active", this.id);
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
@@ -102,14 +103,22 @@ class WebSocketClient {
     });
 
     this.#instance.on("unexpected-response", (err) => {
-      console.log("Unexpected Response");
+      logger.error(`${this.url}: Unexpected Response!`, err);
     });
 
-    this.#instance.on("isPaused", () => {
-      console.log("Paused websocket?");
-    });
+    // this.#instance.on("isPaused", () => {
+    //   console.log("Paused websocket?");
+    // });
 
     this.#instance.on("open", () => {
+      logger.debug(`${this.url}: Websocket has been opened!`);
+      PrinterTicker.addIssue(
+        new Date(),
+        this.url,
+        "Opened OctoPrint websocket for user:" + this.currentUser,
+        "Complete",
+        this.id
+      );
       // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
@@ -140,17 +149,29 @@ class WebSocketClient {
     });
 
     this.#instance.on("close", (code, reason) => {
+      logger.error(`${this.url}: Websocket Closed!`, { code, reason });
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.FAILED_RESPONSE
+      );
       switch (
         code // https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.1
       ) {
         case 1000: //  1000 indicates a normal closure, meaning that the purpose for which the connection was established has been fulfilled.
-          PrinterTicker.addIssue(new Date(), this.url, `${OF_C_DESC.RE_SYNC}`, "Offline", this.id);
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `${OF_C_DESC.RE_SYNC} Error: ${code} - ${reason}`,
+            "Offline",
+            this.id
+          );
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the browser implementation.
           PrinterTicker.addIssue(
             new Date(),
             this.url,
-            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code}`,
+            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code} - ${reason}`,
             "Offline",
             this.id
           );
@@ -163,7 +184,7 @@ class WebSocketClient {
           PrinterTicker.addIssue(
             new Date(),
             this.url,
-            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code}`,
+            `${OF_WS_DESC.SHUTDOWN_RECONNECT} Error: ${code} - ${reason}`,
             "Offline",
             this.id
           );
@@ -175,21 +196,57 @@ class WebSocketClient {
     });
 
     this.#instance.on("error", (e) => {
+      logger.error(`${this.url}: Websocket Error!`, e);
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.FAILED_RESPONSE
+      );
       switch (e.code) {
         case WS_ERRORS.ECONNREFUSED:
-          console.log(`Error ${WS_ERRORS.ECONNREFUSED}. Server is not accepting connections`);
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `Error ${WS_ERRORS.ECONNREFUSED}. Server is not accepting connections`,
+            "Offline",
+            this.id
+          );
           break;
         case WS_ERRORS.ECONNRESET:
-          console.log(`Error ${WS_ERRORS.ECONNRESET}. Server reset the connection!`);
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `Error ${WS_ERRORS.ECONNRESET}. Server reset the connection!`,
+            "Offline",
+            this.id
+          );
           break;
         case WS_ERRORS.EHOSTUNREACH:
-          console.log(`Error ${WS_ERRORS.EHOSTUNREACH}. Server is not reachable!`);
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `Error ${WS_ERRORS.EHOSTUNREACH}. Server is not reachable!`,
+            "Offline",
+            this.id
+          );
           break;
         case WS_ERRORS.ENOTFOUND:
-          console.log(`Error ${WS_ERRORS.ENOTFOUND}. Server cannot be found!`);
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `Error ${WS_ERRORS.ENOTFOUND}. Server cannot be found!`,
+            "Offline",
+            this.id
+          );
           break;
         default:
-          console.error("UNKNOWN ERROR");
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            `Error UNKNOWN. Server is not reachable! ${JSON.stringify(e)}`,
+            "Offline",
+            this.id
+          );
           break;
       }
       clearInterval(this.heartbeatInterval);
@@ -198,6 +255,14 @@ class WebSocketClient {
   }
 
   sendAuth() {
+    logger.debug("Authenticating the websocket for user:" + this.currentUser);
+    PrinterTicker.addIssue(
+      new Date(),
+      this.url,
+      "Authenticating the websocket for user:" + this.currentUser,
+      "Active",
+      this.id
+    );
     this.send(
       JSON.stringify({
         auth: `${this.currentUser}:${this.sessionKey}`
@@ -206,9 +271,18 @@ class WebSocketClient {
   }
 
   sendThrottle() {
+    const throttle = (this.polling * 1000) / 500;
+    logger.info("Throttling websocket connection to: " + throttle + " seconds");
+    PrinterTicker.addIssue(
+      new Date(),
+      this.url,
+      "Throttling websocket connection to: " + throttle + " seconds",
+      "Active",
+      this.id
+    );
     this.send(
       JSON.stringify({
-        throttle: (this.polling * 1000) / 500
+        throttle: throttle
       })
     );
   }
@@ -226,18 +300,41 @@ class WebSocketClient {
   }
 
   reconnect(e) {
-    console.log(
-      `${this.url} WebSocketClient: retry in ${this.autoReconnectInterval}ms retry #${
+    if (this.#retryNumber < 1) {
+      PrinterTicker.addIssue(
+        new Date(),
+        this.url,
+        `Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
+          this.#retryNumber
+        }. Subsequent logs will be silenced...`,
+        "Active",
+        this.id
+      );
+    }
+    logger.debug(
+      `${this.url} Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
         this.#retryNumber
-      }`,
-      e
+      }`
+    );
+    ConnectionMonitorService.updateOrAddResponse(
+      this.url,
+      REQUEST_TYPE.WEBSOCKET,
+      REQUEST_KEYS.RETRY_REQUESTED
     );
     this.#instance.removeAllListeners();
     this.reconnectTimeout = setTimeout(() => {
-      console.log("WebSocketClient: reconnecting...");
       if (this.#retryNumber > 0) {
         const modifier = this.systemSettings.timeout.webSocketRetry * 0.1;
         this.autoReconnectInterval = this.autoReconnectInterval + modifier;
+        logger.debug(`${this.url} retry modifier ${modifier}`);
+      } else if (this.#retryNumber === 0) {
+        PrinterTicker.addIssue(
+          new Date(),
+          this.url,
+          "Re-Opening websocket! Subsequent logs will be silenced.",
+          "Active",
+          this.id
+        );
       }
       this.open(this.url);
       this.reconnectTimeout = false;
@@ -246,10 +343,12 @@ class WebSocketClient {
   }
 
   close() {
+    logger.debug(`${this.url} requested to close the websocket...`);
     this.#instance.close();
   }
 
   terminate() {
+    logger.debug(`${this.url} requested to terminate the websocket...`);
     this.#instance.terminate();
   }
 
@@ -261,6 +360,7 @@ class WebSocketClient {
   }
 
   killAllConnectionsAndListeners() {
+    logger.debug(`${this.url} Killing all listeners`);
     clearTimeout(this.heartbeatTimeout);
     clearTimeout(this.reconnectTimeout);
     clearInterval(this.heartbeatInterval);

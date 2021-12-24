@@ -20,6 +20,10 @@ const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
 const { convertHttpUrlToWebsocket } = require("../../utils/url.utils");
 const { handleMessage } = require("../octoprint/octoprint-websocket-message");
+const { PrinterTicker } = require("../../runners/printerTicker");
+const Logger = require("../../handlers/logger");
+
+const logger = new Logger("OctoFarm-State");
 
 class OctoPrintPrinter {
   //OctoFarm state
@@ -186,15 +190,13 @@ class OctoPrintPrinter {
     this.timeout = timeout;
     this.#apiRetry = timeout.apiRetry;
 
-    if (!disabled) {
-      // Run connect sequence
-      const timerLabel = Date.now();
-      this.setupClient().then(() => {
-        console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
+    this.start()
+      .then((res) => {
+        logger.debug(this.printerURL + ": printer setup", res);
+      })
+      .catch((e) => {
+        logger.error(this.printerURL + ": printer setup", e);
       });
-    } else {
-      console.log("CLIENT IS DISABLED, AWAIT ENABLING BEFORE SETTING UP");
-    }
   }
 
   async enableClient() {}
@@ -214,27 +216,68 @@ class OctoPrintPrinter {
   async throttleWebSocket(throttle) {}
 
   async forceAPIScan() {
+    logger.info((this.printerURL = ": force API scan requested!"));
     await this.secondaryApiCheckSequence(true);
   }
 
   async updatePrinterRecord(record) {
+    logger.debug(this.printerURL + ": updating printer with new record: ", record);
     this.#db.update(record);
   }
 
+  async start() {
+    if (!this.disabled) {
+      // Run connect sequence
+      const timerLabel = Date.now();
+      return this.setupClient().then(() => {
+        PrinterTicker.addIssue(
+          new Date(),
+          this.printerURL,
+          "finished client setup in " + Date.now() - timerLabel + "ms",
+          "Complete",
+          this._id
+        );
+        logger.debug(
+          this.printerURL + ": finished client setup in " + Date.now() - timerLabel + "ms"
+        );
+      });
+    } else {
+      PrinterTicker.addIssue(
+        new Date(),
+        this.printerURL,
+        "Printer is marked as disabled. Ignoring until re-enabled...",
+        "Offline",
+        this._id
+      );
+      return false;
+    }
+  }
+
   async setupClient() {
+    logger.info(this.printerURL + ": Running setup sequence.");
+    PrinterTicker.addIssue(
+      new Date(),
+      this.printerURL,
+      "Running setup sequence.",
+      "Active",
+      this._id
+    );
     //Create OctoPrint Client
+    logger.debug(this.printerURL + ": Creating octoprint api client");
     this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
 
     //Create Websocket Client
     if (!this.webSocketURL || !this.webSocketURL.includes("ws")) {
+      logger.debug(this.printerURL + ": Websocket URL is missing, creating!");
       this.webSocketURL = convertHttpUrlToWebsocket(this.printerURL);
       this.#db.update({ webSocketURL: this.webSocketURL });
     }
 
     // Create database client
+    logger.debug(this.printerURL + ": Creating printer database link");
     this.#db = new PrinterDatabaseService(this._id);
 
-    //Gather API data...D
+    //Gather API data...
     return this.initialApiCheckSequence()
       .then((res) => {
         if (res.includes(false)) {
@@ -242,6 +285,18 @@ class OctoPrintPrinter {
         }
       })
       .then(async () => {
+        logger.debug(
+          this.printerURL + ": Grabbing session key for websocket auth with user: ",
+          this.currentUser
+        );
+        PrinterTicker.addIssue(
+          new Date(),
+          this.printerURL,
+          "Grabbing session key for websocket auth with user: ",
+          this.currentUser,
+          "Active",
+          this._id
+        );
         const session = await this.acquireOctoPrintSessionKey();
         if (!session) {
           throw new Error(this.printerURL + " We could not get a session key from OctoPrint!");
@@ -250,6 +305,9 @@ class OctoPrintPrinter {
       })
       .then(async (session) => {
         const fullApiCheck = await this.secondaryApiCheckSequence();
+        logger.debug(
+          this.printerURL + ": full api check complete... " + JSON.stringify(fullApiCheck)
+        );
         this.#ws = new WebSocketClient(
           this.webSocketURL,
           this._id,
@@ -257,25 +315,57 @@ class OctoPrintPrinter {
           session,
           handleMessage
         );
-
         return true;
       })
       .catch((e) => {
-        // console.log(e);
+        logger.error(
+          this.printerURL + ": Failed setup sequence, marking offline!" + JSON.stringify(e)
+        );
+        if (this.#retryNumber < 1) {
+          PrinterTicker.addIssue(
+            new Date(),
+            this.printerURL,
+            "Failed setup sequence, marking offline! Subsequent logs will be silenced.",
+            "Offline",
+            this._id
+          );
+        }
         this.reconnectAPI();
       });
   }
 
   reconnectAPI() {
+    logger.info(
+      this.printerURL +
+        `Setting up reconnect in ${this.#apiRetry}ms retry #${
+          this.#retryNumber
+        }. Subsequent logs will be silenced...`
+    );
+
+    PrinterTicker.addIssue(
+      new Date(),
+      this.printerURL,
+      `Setting up reconnect in ${this.#apiRetry}ms retry #${
+        this.#retryNumber
+      }. Subsequent logs will be silenced...`,
+      "Active",
+      this._id
+    );
+
     this.reconnectTimeout = setTimeout(() => {
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
+        logger.debug(this.printerURL + ": API modifier " + modifier);
+      } else if (this.#retryNumber === 0) {
       }
-      const timerLabel = Date.now();
-      this.setupClient().then(() => {
-        console.log("API CHECK SPEED", Date.now() - timerLabel + "ms");
-      });
+      this.start()
+        .then((res) => {
+          logger.debug(this.printerURL + ": printer setup" + JSON.stringify(res));
+        })
+        .catch((e) => {
+          logger.error(this.printerURL + ": printer setup" + JSON.stringify(e));
+        });
       this.reconnectTimeout = false;
       this.#retryNumber = this.#retryNumber + 1;
     }, this.#apiRetry);
@@ -283,6 +373,14 @@ class OctoPrintPrinter {
 
   // Base minimum viable requirements for websocket connection
   async initialApiCheckSequence() {
+    logger.debug(this.printerURL + ": Gathering Initial API Data");
+    PrinterTicker.addIssue(
+      new Date(),
+      this.printerURL,
+      "Gathering Initial API Data",
+      "Active",
+      this._id
+    );
     return await Promise.all([
       this.globalAPIKeyCheck(),
       this.acquireOctoPrintVersionData(),
@@ -292,6 +390,14 @@ class OctoPrintPrinter {
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
   async secondaryApiCheckSequence(force = false) {
+    logger.info(this.printerURL + ": Gathering Secondary API data. Forced Scan: " + force);
+    PrinterTicker.addIssue(
+      new Date(),
+      this.printerURL,
+      ": Gathering Secondary API data. Forced Scan: " + force,
+      "Active",
+      this._id
+    );
     return await Promise.allSettled([
       this.acquireOctoPrintSystemData(force),
       this.acquireOctoPrintProfileData(force),
@@ -319,7 +425,7 @@ class OctoPrintPrinter {
       }
       return api.key !== this.apikey;
     } else {
-      // Hard failure as can't contact api
+      // Hard failure as can't setup websocket
       return false;
     }
   }

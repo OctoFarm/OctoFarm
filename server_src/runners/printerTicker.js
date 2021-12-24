@@ -1,3 +1,6 @@
+const Logger = require("../handlers/logger");
+
+const logger = new Logger("OctoFarm-State");
 const currentIssues = [];
 const octoprintLogs = [];
 

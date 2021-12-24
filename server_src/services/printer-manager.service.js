@@ -48,6 +48,7 @@ class PrinterManagerService {
       // Shim for no websocketURL;
 
       const device = new OctoPrintPrinter(pList[i]);
+      // Add device to cache listing
       this.#printers.push(device);
       console.log("CREATED PRINTER" + i);
     }
@@ -56,6 +57,12 @@ class PrinterManagerService {
 
     return true;
   }
+
+  deletePrinter() {}
+
+  createPrinter() {}
+
+  editPrinter() {}
 
   killAllConnections() {
     logger.debug("Killing all printer connections...");

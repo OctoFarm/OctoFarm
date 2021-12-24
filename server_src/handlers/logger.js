@@ -10,9 +10,9 @@ const dtFormat = new Intl.DateTimeFormat("en-GB", {
 dateFormat = () => {
   return dtFormat.format(new Date());
 };
-
+//TODO Log level filter should be set by environment variable
 class LoggerService {
-  constructor(route, enableFileLogs = true, logFilterLevel) {
+  constructor(route, enableFileLogs = true, logFilterLevel = undefined) {
     const isProd = process.env.NODE_ENV === AppConstants.defaultProductionEnv;
     const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
     if (!logFilterLevel) {
@@ -21,6 +21,18 @@ class LoggerService {
 
     this.log_data = null;
     this.route = route;
+
+    let alignColorsAndTime = winston.format.combine(
+      winston.format.printf((info) => {
+        const level = info.level.toUpperCase();
+        const date = dateFormat();
+        let message = `${date} | ${level} | ${route} | ${info.message}`;
+        message = info.meta ? message + ` data: ${JSON.stringify(info.meta)}  | ` : message;
+        return message;
+      }),
+      winston.format.colorize({ all: true })
+    );
+
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
@@ -32,19 +44,12 @@ class LoggerService {
                 level: isTest ? "warn" : "info", // Irrespective of environment
                 filename: `./logs/${route}.log`,
                 maxsize: "5000000",
-                maxFiles: 1,
-                tailable: true
+                maxFiles: 1
               })
             ]
           : [])
       ],
-      format: winston.format.printf((info) => {
-        const level = info.level.toUpperCase();
-        const date = dateFormat();
-        let message = `${date} | ${level} | ${route} | ${info.message}`;
-        message = info.meta ? message + ` data: ${info.meta} | ` : message;
-        return message;
-      })
+      format: alignColorsAndTime
     });
   }
 
