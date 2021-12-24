@@ -9,6 +9,7 @@ const OF_COLOURS = {
 
 //Common States
 const OF_C_STATE = {
+  DISABLED: "Disabled",
   SETTING_UP: "Setting Up",
   OFFLINE: "Offline",
   RE_SYNC: "Please Re-Sync"
@@ -18,11 +19,13 @@ const OF_C_STATE = {
 const OF_S_STATE = {};
 //Host States
 const OF_H_STATE = {
+  ONLINE: "Online",
   SHUTDOWN: "Shutdown"
 };
 
 //Common Descriptions
 const OF_C_DESC = {
+  DISABLED: "Your printer is disabled...",
   SETTING_UP: "Setting up your Printer",
   RE_SYNC: "Websocket Closed by OctoFarm! Please re-connect your printers websocket..."
 };
@@ -44,6 +47,16 @@ const OF_H_DESC = {
 };
 
 const PRINTER_STATES = {
+  DISABLED: {
+    state: OF_C_STATE.DISABLED,
+    stateColour: mapStateToCategory(OF_C_STATE.DISABLED),
+    hostState: OF_C_STATE.DISABLED,
+    hostStateColour: mapStateToCategory(OF_C_STATE.DISABLED),
+    webSocket: OF_COLOURS.DANGER,
+    stateDescription: OF_C_DESC.DISABLED,
+    hostDescription: OF_C_DESC.DISABLED,
+    webSocketDescription: OF_C_DESC.DISABLED
+  },
   SETTING_UP: {
     state: OF_C_STATE.SETTING_UP,
     stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
@@ -77,6 +90,11 @@ const PRINTER_STATES = {
   WS_TENTATIVE: {
     webSocket: OF_COLOURS.WARNING,
     webSocketDescription: OF_WS_DESC.TENTATIVE
+  },
+  HOST_ONLINE: {
+    hostState: OF_H_STATE.ONLINE,
+    hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
+    hostDescription: OF_H_DESC.ONLINE
   }
 };
 

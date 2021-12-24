@@ -13,9 +13,14 @@ const { PrinterTicker } = require("./runners/printerTicker");
 const Logger = require("./handlers/logger.js");
 const logger = new Logger("OctoFarm-TaskManager");
 const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
+const { getPrinterStoreCache } = require("./cache/printer-store.cache");
 
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
+};
+
+const INITIALIST_PRINTERS_STORE = async () => {
+  await getPrinterStoreCache();
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -144,7 +149,7 @@ function TaskStart(task, preset, milliseconds = 0) {
 async function TimedBookTask(name, input) {
   const started = Date.now();
   logger.info(`Boot Task '${name}' started.`);
-  const task = await input();
+  await input();
   logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms`);
   return true;
 }
@@ -153,6 +158,7 @@ class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     // TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),

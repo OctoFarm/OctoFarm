@@ -1,5 +1,4 @@
 const winston = require("winston");
-const { AppConstants } = require("../app.constants");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -7,16 +6,31 @@ const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC"
 });
 
+const COLOURS = {
+  RED: "\033[0;31m",
+  YELLOW: "\033[1;33m",
+  ORANGE: "\033[0;33m",
+  BLUE: "\033[0;34m",
+  PURPLE: "\033[0;35m",
+  WHITE: "\033[1;37m",
+  CYAN: "\033[0;36m"
+};
+
+const COLOUR_MAP = {
+  info: COLOURS.BLUE,
+  warn: COLOURS.ORANGE,
+  debug: COLOURS.ORANGE,
+  error: COLOURS.RED
+};
+
 dateFormat = () => {
   return dtFormat.format(new Date());
 };
 //TODO Log level filter should be set by environment variable
 class LoggerService {
   constructor(route, enableFileLogs = true, logFilterLevel = undefined) {
-    const isProd = process.env.NODE_ENV === AppConstants.defaultProductionEnv;
-    const isTest = process.env.NODE_ENV === AppConstants.defaultTestEnv;
     if (!logFilterLevel) {
-      logFilterLevel = isProd || isTest ? "warn" : "debug";
+      logFilterLevel = process.env.LOG_LEVEL;
     }
 
     this.log_data = null;
@@ -26,11 +40,16 @@ class LoggerService {
       winston.format.printf((info) => {
         const level = info.level.toUpperCase();
         const date = dateFormat();
-        let message = `${date} | ${level} | ${route} | ${info.message}`;
-        message = info.meta ? message + ` data: ${JSON.stringify(info.meta)}  | ` : message;
+        let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
+          COLOUR_MAP[info.level]
+        }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route}: ${COLOURS.WHITE} \n ${
+          COLOUR_MAP[info.level]
+        }MESSAGE: ${info.message} `;
+        message = info.meta
+          ? message + `\n ${COLOUR_MAP[info.level]}DATA: ${JSON.stringify(info.meta)}`
+          : message;
         return message;
-      }),
-      winston.format.colorize({ all: true })
+      })
     );
 
     this.logger = winston.createLogger({
@@ -41,7 +60,7 @@ class LoggerService {
         ...(enableFileLogs
           ? [
               new winston.transports.File({
-                level: isTest ? "warn" : "info", // Irrespective of environment
+                level: logFilterLevel,
                 filename: `./logs/${route}.log`,
                 maxsize: "5000000",
                 maxFiles: 1

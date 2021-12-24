@@ -47,6 +47,9 @@ const mapStateToCategory = (state) => {
   if (state === "Offline after error") {
     return { name: "danger", hex: "#2e0905", category: "Error!" };
   }
+  if (state === "Disabled") {
+    return { name: "danger", hex: "#2e0905", category: "Disabled" };
+  }
   return { name: "warning", hex: "#583c0e", category: "Idle" };
 };
 

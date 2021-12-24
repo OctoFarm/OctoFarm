@@ -13,6 +13,8 @@ const { ensureCurrentUserAndGroup } = require("../config/users.js");
 
 const { PrinterTicker } = printerTicker;
 
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
 let interval = false;
@@ -42,7 +44,7 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, function (re
 
 if (interval === false) {
   interval = setInterval(async function () {
-    const printersInformation = PrinterClean.listPrintersInformation();
+    const printersInformation = getPrinterStoreCache().listPrinters();
     const printerControlList = PrinterClean.returnPrinterControlList();
     const currentTickerList = PrinterTicker.returnIssue();
 

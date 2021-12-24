@@ -2,6 +2,7 @@ const MONGO_KEY = "MONGO";
 const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
 const NON_NPM_MODE_KEY = "NON_NPM_MODE";
 const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
+const LOG_LEVEL = "LOG_LEVEL";
 const NODE_ENV_KEY = "NODE_ENV";
 
 const VERSION_KEY = "npm_package_version";
@@ -12,6 +13,8 @@ const defaultOctoFarmPageTitle = "OctoFarm";
 const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
+const knownLogLevels = ["info", "debug", "verbose"];
+const defaultLogLevel = "info";
 
 // Make sure the client is up to date with this
 const jsonStringify = false;
@@ -43,12 +46,20 @@ class AppConstants {
     return knownEnvNames;
   }
 
+  static get knownLogLevels() {
+    return knownLogLevels;
+  }
+
   static get defaultProductionEnv() {
     return defaultProductionEnv;
   }
 
   static get defaultTestEnv() {
     return defaultTestEnv;
+  }
+
+  static get defaultLogLevel() {
+    return defaultLogLevel;
   }
 
   static get VERSION_KEY() {
@@ -73,6 +84,10 @@ class AppConstants {
 
   static get OCTOFARM_SITE_TITLE_KEY() {
     return OCTOFARM_SITE_TITLE_KEY;
+  }
+
+  static get LOG_LEVEL() {
+    return LOG_LEVEL;
   }
 }
 

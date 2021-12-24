@@ -89,7 +89,8 @@ const PrinterSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: false
+    required: false,
+    default: "OctoPrint"
   },
   ip: {
     type: String,

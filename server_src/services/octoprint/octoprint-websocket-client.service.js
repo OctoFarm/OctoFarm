@@ -29,7 +29,6 @@ class WebSocketClient {
   heartbeatInterval = undefined;
   heartbeatTimeout = undefined;
   reconnectTimeout = undefined;
-  number = 0; // Message number
   // pingPongTimer = 20000;
   systemSettings = SettingsClean.returnSystemSettings();
   url = undefined;

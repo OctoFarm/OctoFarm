@@ -1,9 +1,14 @@
 const PrinterManagerService = require("../services/printer-manager.service");
 
-let printerManagerState = new PrinterManagerService();
+let printerManagerState = undefined;
 
 function getPrinterManagerCache() {
-  return printerManagerState;
+  if (!!printerManagerState) {
+    return printerManagerState;
+  } else {
+    printerManagerState = new PrinterManagerService();
+    return printerManagerState;
+  }
 }
 
 module.exports = { getPrinterManagerCache };

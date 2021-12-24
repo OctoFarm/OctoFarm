@@ -219,6 +219,17 @@ function ensurePortSet() {
   }
 }
 
+function ensureLogLevelSet() {
+  const logLevel = process.env[AppConstants.LOG_LEVEL];
+
+  if (!logLevel || !AppConstants.knownLogLevels.includes(logLevel)) {
+    logger.info(
+      `~ ${AppConstants.LOG_LEVEL} environment variable is not set. Assuming default: ${AppConstants.LOG_LEVEL}=${AppConstants.defaultLogLevel}.`
+    );
+    process.env[AppConstants.LOG_LEVEL] = AppConstants.defaultLogLevel.toString();
+  }
+}
+
 /**
  * Parse and consume the .env file. Validate everything before starting OctoFarm.
  * Later this will switch to parsing a `config.yaml` file.
@@ -237,6 +248,7 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePortSet();
   envUtils.ensureBackgroundImageExists(__dirname);
   ensurePageTitle();
+  ensureLogLevelSet();
 }
 
 function getViewsPath() {

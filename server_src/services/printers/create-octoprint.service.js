@@ -21,6 +21,7 @@ const WebSocketClient = require("../octoprint/octoprint-websocket-client.service
 const { convertHttpUrlToWebsocket } = require("../../utils/url.utils");
 const { handleMessage } = require("../octoprint/octoprint-websocket-message");
 const { PrinterTicker } = require("../../runners/printerTicker");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const Logger = require("../../handlers/logger");
 
 const logger = new Logger("OctoFarm-State");
@@ -28,7 +29,10 @@ const logger = new Logger("OctoFarm-State");
 class OctoPrintPrinter {
   //OctoFarm state
   disabled = false;
+  display = true;
   #retryNumber = 0;
+  multiUserIssue = false;
+  restartRequired = false;
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -66,6 +70,8 @@ class OctoPrintPrinter {
   //Live printer state data
 
   //Updated by API / database
+  layerData = undefined;
+  resends = undefined;
   octoPi = undefined;
   costSettings = null;
   powerSettings = null;
@@ -89,7 +95,36 @@ class OctoPrintPrinter {
   settingsSystem = undefined;
   settingsWebcam = undefined;
   core = undefined;
+
+  //Processed Information from cleaners
+  hostState = undefined;
+  printerState = undefined;
+  webSocketState = undefined;
+
   constructor(printer) {
+    if (
+      !printer?._id ||
+      isNaN(printer?.sortIndex) ||
+      !printer?.apikey ||
+      !printer?.printerURL ||
+      !printer?.webSocketURL ||
+      !printer?.settingsAppearance
+    )
+      throw new Error("Missing params!");
+
+    this.#updatePrinterRecordsFromDatabase(printer);
+    this.#updatePrinterSettingsFromDatabase();
+
+    this.start()
+      .then((res) => {
+        logger.debug(this.printerURL + ": printer setup", res);
+      })
+      .catch((e) => {
+        logger.error(this.printerURL + ": printer setup", e);
+      });
+  }
+
+  #updatePrinterRecordsFromDatabase(printer) {
     const {
       disabled,
       _id,
@@ -136,69 +171,172 @@ class OctoPrintPrinter {
       settingsWebcam,
       core
     } = printer;
-    if (!_id || isNaN(sortIndex) || !apikey || !printerURL || !webSocketURL || !settingsAppearance)
-      throw new Error("Missing params!");
-
-    // this = { ...PRINTER_STATES.SETTING_UP }
-    this.currentUser = currentUser;
-    this.dateAdded = dateAdded;
-    this.alerts = alerts;
-    this.currentIdle = currentIdle;
-    this.currentActive = currentActive;
-    this.currentOffline = currentOffline;
-    this.selectedFilament = selectedFilament;
-    this.octoPrintVersion = octoPrintVersion;
-    this.tempTriggers = tempTriggers;
-    this.feedRate = feedRate;
-    this.flowRate = flowRate;
-    this.group = group;
-    this.costSettings = costSettings;
-    this.powerSettings = powerSettings;
-    this.klipperFirmware = klipperFirmware;
-    this.octoPrintVersion = octoPrintVersion;
-    this.storage = storage;
-    this.fileList = fileList;
-    this.current = current;
-    this.options = options;
-    this.profiles = profiles;
-    this.pluginsList = pluginsList;
-    this.octoPrintUpdate = octoPrintUpdate;
-    this.octoPrintPluginUpdates = octoPrintPluginUpdates;
-    this.corsCheck = corsCheck;
-    this.settingsApi = settingsApi;
-    this.settingsFeature = settingsFeature;
-    this.settingsFolder = settingsFolder;
-    this.settingsPlugins = settingsPlugins;
-    this.settingsScripts = settingsScripts;
-    this.settingsSerial = settingsSerial;
-    this.settingsServer = settingsServer;
-    this.settingsSystem = settingsSystem;
-    this.settingsWebcam = settingsWebcam;
-    this.core = core;
     this._id = _id.toString();
-    this.settingsAppearance = settingsAppearance;
     this.sortIndex = sortIndex;
-    this.category = category;
-    this.disabled = disabled;
     this.apikey = apikey;
     this.printerURL = printerURL;
     this.webSocketURL = webSocketURL;
     this.camURL = camURL;
-    this.octoPi = octoPi;
+    this.category = category;
+    //Only update the below if received from database, otherwise is required from scans.
+    if (!!currentUser) {
+      this.currentUser = currentUser;
+    }
+    if (!!dateAdded) {
+      this.dateAdded = dateAdded;
+    }
+    if (!!alerts) {
+      this.alerts = alerts;
+    }
+    if (!!currentIdle) {
+      this.currentIdle = currentIdle;
+    }
+    if (!!currentActive) {
+      this.currentActive = currentActive;
+    }
+    if (!!currentOffline) {
+      this.currentOffline = currentOffline;
+    }
+    if (!!selectedFilament) {
+      this.selectedFilament = selectedFilament;
+    }
+    if (!!octoPrintVersion) {
+      this.octoPrintVersion = octoPrintVersion;
+    }
+    if (!!tempTriggers) {
+      this.tempTriggers = tempTriggers;
+    }
+    if (!!feedRate) {
+      this.feedRate = feedRate;
+    }
+    if (!!flowRate) {
+      this.flowRate = flowRate;
+    }
+    if (!!group) {
+      this.group = group;
+    }
+    if (!!costSettings) {
+      this.costSettings = costSettings;
+    }
+    if (!!powerSettings) {
+      this.powerSettings = powerSettings;
+    }
+    if (!!klipperFirmware) {
+      this.klipperFirmware = klipperFirmware;
+    }
+    if (!!storage) {
+      this.storage = storage;
+    }
+    if (!!fileList) {
+      this.fileList = fileList;
+    }
+    if (!!current) {
+      this.current = current;
+    }
+    if (!!options) {
+      this.options = options;
+    }
+    if (!!profiles) {
+      this.profiles = profiles;
+    }
+    if (!!pluginsList) {
+      this.pluginsList = pluginsList;
+    }
+    if (!!octoPrintUpdate) {
+      this.octoPrintUpdate = octoPrintUpdate;
+    }
+    if (!!octoPrintPluginUpdates) {
+      this.octoPrintPluginUpdates = octoPrintPluginUpdates;
+    }
+    if (!!corsCheck) {
+      this.corsCheck = corsCheck;
+    }
+    if (!!settingsApi) {
+      this.settingsApi = settingsApi;
+    }
+    if (!!settingsFeature) {
+      this.settingsFeature = settingsFeature;
+    }
+    if (!!settingsFolder) {
+      this.settingsFolder = settingsFolder;
+    }
+    if (!!settingsPlugins) {
+      this.settingsPlugins = settingsPlugins;
+    }
+    if (!!settingsScripts) {
+      this.settingsScripts = settingsScripts;
+    }
+    if (!!settingsSerial) {
+      this.settingsSerial = settingsSerial;
+    }
+    if (!!settingsServer) {
+      this.settingsServer = settingsServer;
+    }
+    if (!!settingsSystem) {
+      this.settingsSystem = settingsSystem;
+    }
+    if (!!settingsWebcam) {
+      this.settingsWebcam = settingsWebcam;
+    }
+    if (!!settingsSerial) {
+      this.settingsSerial = settingsSerial;
+    }
+    if (!!core) {
+      this.core = core;
+    }
+    if (!!settingsAppearance) {
+      this.settingsAppearance = settingsAppearance;
+    }
+    if (!!disabled) {
+      this.disabled = disabled;
+    }
+    if (!!octoPi) {
+      this.octoPi = octoPi;
+    }
 
+    this.setAllPrinterStates(PRINTER_STATES.SETTING_UP);
+  }
+
+  #updatePrinterSettingsFromDatabase() {
     const { timeout } = SettingsClean.returnSystemSettings();
     this.timeout = timeout;
     this.#apiRetry = timeout.apiRetry;
-
-    this.start()
-      .then((res) => {
-        logger.debug(this.printerURL + ": printer setup", res);
-      })
-      .catch((e) => {
-        logger.error(this.printerURL + ": printer setup", e);
-      });
   }
 
+  setAllPrinterStates(state) {
+    this.setPrinterState(state);
+    this.setHostState(state);
+    this.setWebsocketState(state);
+  }
+
+  setPrinterState(state) {
+    if (!state?.hostState || !state?.hostStateColour || !state?.hostDescription)
+      throw new Error("Missing keys required!");
+    this.hostState = {
+      state: state.hostState,
+      colour: state.hostStateColour,
+      desc: state.hostDescription
+    };
+  }
+
+  setHostState(state) {
+    if (!state?.state || !state?.stateColour || !state?.stateDescription)
+      throw new Error("Missing keys required!");
+    this.printerState = {
+      state: state.state,
+      colour: state.stateColour,
+      desc: state.stateDescription
+    };
+  }
+
+  setWebsocketState(state) {
+    if (!state?.webSocket || !state?.webSocketDescription)
+      throw new Error("Missing keys required!");
+    this.webSocketState = {
+      colour: state.webSocket,
+      desc: state.webSocketDescription
+    };
+  }
   async enableClient() {}
 
   async disableClient() {}
@@ -226,7 +364,7 @@ class OctoPrintPrinter {
   }
 
   async start() {
-    if (!this.disabled) {
+    if (!this?.disabled) {
       // Run connect sequence
       const timerLabel = Date.now();
       return this.setupClient().then(() => {
@@ -242,6 +380,7 @@ class OctoPrintPrinter {
         );
       });
     } else {
+      this.setAllPrinterStates(PRINTER_STATES.DISABLED);
       PrinterTicker.addIssue(
         new Date(),
         this.printerURL,
@@ -251,6 +390,14 @@ class OctoPrintPrinter {
       );
       return false;
     }
+  }
+
+  getMessageNumber() {
+    return this.#ws.getMessageNumber();
+  }
+
+  async testTheApiWaters() {
+    return this.acquireOctoPrintVersionData();
   }
 
   async setupClient() {
@@ -266,7 +413,7 @@ class OctoPrintPrinter {
     logger.debug(this.printerURL + ": Creating octoprint api client");
     this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
 
-    //Create Websocket Client
+    //TODO BRING INTO PATCHES
     if (!this.webSocketURL || !this.webSocketURL.includes("ws")) {
       logger.debug(this.printerURL + ": Websocket URL is missing, creating!");
       this.webSocketURL = convertHttpUrlToWebsocket(this.printerURL);
@@ -278,60 +425,60 @@ class OctoPrintPrinter {
     this.#db = new PrinterDatabaseService(this._id);
 
     //Gather API data...
-    return this.initialApiCheckSequence()
-      .then((res) => {
-        if (res.includes(false)) {
-          throw new Error("Printer failed initial API check sequence, marking as offline...");
-        }
-      })
-      .then(async () => {
-        logger.debug(
-          this.printerURL + ": Grabbing session key for websocket auth with user: ",
-          this.currentUser
-        );
-        PrinterTicker.addIssue(
-          new Date(),
-          this.printerURL,
-          "Grabbing session key for websocket auth with user: ",
-          this.currentUser,
-          "Active",
-          this._id
-        );
-        const session = await this.acquireOctoPrintSessionKey();
-        if (!session) {
-          throw new Error(this.printerURL + " We could not get a session key from OctoPrint!");
-        }
-        return session;
-      })
-      .then(async (session) => {
-        const fullApiCheck = await this.secondaryApiCheckSequence();
-        logger.debug(
-          this.printerURL + ": full api check complete... " + JSON.stringify(fullApiCheck)
-        );
-        this.#ws = new WebSocketClient(
-          this.webSocketURL,
-          this._id,
-          this.currentUser,
-          session,
-          handleMessage
-        );
-        return true;
-      })
-      .catch((e) => {
-        logger.error(
-          this.printerURL + ": Failed setup sequence, marking offline!" + JSON.stringify(e)
-        );
-        if (this.#retryNumber < 1) {
+    return this.testTheApiWaters().then((res) => {
+      // Host is online here...
+      this.initialApiCheckSequence()
+        .then((res) => {
+          if (res.includes(false)) {
+            throw new Error("Printer failed initial API check sequence, marking as offline...");
+          }
+        })
+        .then(async () => {
+          logger.debug(
+            this.printerURL + ": Grabbing session key for websocket auth with user: ",
+            this.currentUser
+          );
           PrinterTicker.addIssue(
             new Date(),
             this.printerURL,
-            "Failed setup sequence, marking offline! Subsequent logs will be silenced.",
-            "Offline",
+            "Grabbing session key for websocket auth with user: ",
+            this.currentUser,
+            "Active",
             this._id
           );
-        }
-        this.reconnectAPI();
-      });
+          const session = await this.acquireOctoPrintSessionKey();
+          if (!session) {
+            throw new Error(this.printerURL + " We could not get a session key from OctoPrint!");
+          }
+          return session;
+        })
+        .then(async (session) => {
+          const fullApiCheck = await this.secondaryApiCheckSequence();
+          logger.debug(this.printerURL + ": full api check complete... ", fullApiCheck);
+          this.#ws = new WebSocketClient(
+            this.webSocketURL,
+            this._id,
+            this.currentUser,
+            session,
+            handleMessage
+          );
+          return true;
+        })
+        .catch((e) => {
+          logger.error(this.printerURL + ": Failed setup sequence, marking offline!", e);
+          this.setAllPrinterStates(PRINTER_STATES.DISABLED);
+          if (this.#retryNumber < 1) {
+            PrinterTicker.addIssue(
+              new Date(),
+              this.printerURL,
+              "Failed setup sequence, marking offline! Subsequent logs will be silenced.",
+              "Offline",
+              this._id
+            );
+          }
+          this.reconnectAPI();
+        });
+    });
   }
 
   reconnectAPI() {
@@ -353,6 +500,7 @@ class OctoPrintPrinter {
     );
 
     this.reconnectTimeout = setTimeout(() => {
+      this.setAllPrinterStates(PRINTER_STATES.SETTING_UP);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
@@ -361,10 +509,10 @@ class OctoPrintPrinter {
       }
       this.start()
         .then((res) => {
-          logger.debug(this.printerURL + ": printer setup" + JSON.stringify(res));
+          logger.debug(this.printerURL + ": printer setup", res);
         })
         .catch((e) => {
-          logger.error(this.printerURL + ": printer setup" + JSON.stringify(e));
+          logger.error(this.printerURL + ": printer setup", e);
         });
       this.reconnectTimeout = false;
       this.#retryNumber = this.#retryNumber + 1;
@@ -381,11 +529,7 @@ class OctoPrintPrinter {
       "Active",
       this._id
     );
-    return await Promise.all([
-      this.globalAPIKeyCheck(),
-      this.acquireOctoPrintVersionData(),
-      this.acquireOctoPrintUsersList()
-    ]);
+    return await Promise.all([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
   }
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
@@ -451,7 +595,7 @@ class OctoPrintPrinter {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
-
+      this.userList = userList;
       // If we have no idea who the user is then
       if (!this?.currentUser || force) {
         if (isEmpty(userList)) {
@@ -503,7 +647,7 @@ class OctoPrintPrinter {
         });
         return true;
       } else {
-        return false;
+        throw new Error("Could not contact API, is the host online?");
       }
     } else {
       // Call was skipped as we have data or not forced

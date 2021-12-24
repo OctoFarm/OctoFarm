@@ -22,6 +22,7 @@ const ignoredHostStatesForAPIErrors = [
 ];
 
 function updatePrinterInfoAndState(printer) {
+  console.log(printer);
   const printName = document.getElementById(`printerName-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
   const hostBadge = document.getElementById(`hostBadge-${printer._id}`);

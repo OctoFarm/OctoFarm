@@ -1,4 +1,5 @@
 const { OP_WS_MSG } = require("../octoprint/constants/octoprint-websocket.constants");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 class OctoprintWebsocketMessage {
   static parseData(data) {
@@ -9,6 +10,8 @@ class OctoprintWebsocketMessage {
     const OP_EM = OctoprintWebsocketMessage;
 
     const parsedData = OP_EM.parseData(data);
+
+    getPrinterStoreCache().updatePrinter("TEST", "DATA");
 
     if (parsedData[OP_WS_MSG.connected]) {
       OP_EM.handleConnectedData(parsedData[OP_WS_MSG.connected]);
