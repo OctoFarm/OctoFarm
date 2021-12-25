@@ -13,7 +13,7 @@ const defaultOctoFarmPageTitle = "OctoFarm";
 const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
-const knownLogLevels = ["info", "debug", "verbose"];
+const knownLogLevels = ["info", "debug", "silly"];
 const defaultLogLevel = "info";
 
 // Make sure the client is up to date with this

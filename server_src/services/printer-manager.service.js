@@ -3,6 +3,7 @@ const Logger = require("../handlers/logger.js");
 const PrinterService = require("./printer.service");
 const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
 const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
+const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-PrinterManager");
@@ -27,8 +28,7 @@ class PrinterManagerService {
     getPrinterStoreCache()
       .listPrinters()
       .forEach((printer) => {
-        printer.killApiTimeout();
-        printer.killWebsocketConnection();
+        printer.killAllConnections();
       });
   }
 
@@ -57,21 +57,46 @@ class PrinterManagerService {
 
   updateStateCounters() {
     const printerList = getPrinterStoreCache().listPrinters();
+    logger.debug(printerList.length + " printers updating state counters...");
     for (let i = 0; i < printerList.length; i++) {
       const printer = printerList[i];
-      if (!printer.disabled && !printer?.printerState?.colour?.category) {
+      if (!printer.disabled && !!printer?.printerState?.colour?.category) {
         switch (printer.printerState.colour.category) {
-          case "Active":
-            console.log("Active");
+          case CATEGORIES.ACTIVE:
+            this.updateStateCounterCategory(CATEGORIES.ACTIVE, printer);
             break;
-          case "Idle":
-          case "Disconnected":
-          case "Complete":
-            console.log("Idle");
+          case CATEGORIES.IDLE:
+            this.updateStateCounterCategory(CATEGORIES.IDLE, printer);
             break;
+          case CATEGORIES.DISCONNECTED:
+            this.updateStateCounterCategory(CATEGORIES.IDLE, printer);
+            break;
+          case CATEGORIES.COMPLETE:
+            this.updateStateCounterCategory(CATEGORIES.IDLE, printer);
+            break;
+          case CATEGORIES.DISABLED:
+            this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
+            break;
+          case CATEGORIES.OFFLINE:
+            this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
+            break;
+          case CATEGORIES.ERROR:
+            this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
+            break;
+          default:
+            logger.debug("Don't know category", printer.printerState.colour.category);
         }
       }
     }
+  }
+
+  updateStateCounterCategory(category, printer) {
+    logger.debug("Updating " + category + " counter", {
+      before: printer["current" + category],
+      after: printer["current" + category] + 30000
+    });
+    printer["current" + category] = printer["current" + category] + 30000;
+    printer.updateStateTrackingCounters(category, printer["current" + category]);
   }
 }
 

@@ -53,7 +53,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getVersion(retry = false) {
-    return this.getWithOptionalRetry(apiVersion, retry);
+    return await this.getWithOptionalRetry(apiVersion, retry);
   }
 
   /**
@@ -64,7 +64,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFiles(recursive = false, retry = false) {
-    return this.getWithOptionalRetry(apiFiles(recursive), retry);
+    return await this.getWithOptionalRetry(apiFiles(recursive), retry);
   }
 
   /**
@@ -75,44 +75,43 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFile(path, retry = false) {
-    return this.getWithOptionalRetry(apiFile(path), retry);
+    return await this.getWithOptionalRetry(apiFile(path), retry);
   }
 
   async getConnection(retry = false) {
-    return this.getWithOptionalRetry(apiConnection, retry);
+    return await this.getWithOptionalRetry(apiConnection, retry);
   }
 
   async getPrinterProfiles(retry = false) {
-    return this.getWithOptionalRetry(apiPrinterProfiles, retry);
+    return await this.getWithOptionalRetry(apiPrinterProfiles, retry);
   }
 
   async getPluginManager(retry = false, octoPrintVersion = undefined) {
     if (!octoPrintVersion) throw new Error("Version not supplied...");
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
-
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
-    return this.getWithOptionalRetry(route, retry);
+    return await this.getWithOptionalRetry(route, retry);
   }
 
   async getSystemInfo(retry = false) {
-    return this.getWithOptionalRetry(apiSystemInfo, retry);
+    return await this.getWithOptionalRetry(apiSystemInfo, retry);
   }
 
   async getSystemCommands(retry = false) {
-    return this.getWithOptionalRetry(apiSystemCommands, retry);
+    return await this.getWithOptionalRetry(apiSystemCommands, retry);
   }
 
   async getSoftwareUpdateCheck(force, retry = false) {
-    return this.getWithOptionalRetry(apiSoftwareUpdateCheck(force), retry);
+    return await this.getWithOptionalRetry(apiSoftwareUpdateCheck(force), retry);
   }
 
   async getUsers(retry = false) {
-    return this.getWithOptionalRetry(apiUsers, retry);
+    return await this.getWithOptionalRetry(apiUsers, retry);
   }
 
   async getPluginPiSupport(retry = false) {
-    return this.getWithOptionalRetry(apiPluginPiSupport, retry);
+    return await this.getWithOptionalRetry(apiPluginPiSupport, retry);
   }
 
   async getPluginFilamentManagerFilament(filamentID) {
@@ -123,11 +122,11 @@ class OctoprintApiClientService extends OctoprintApiService {
       throw OPClientErrors.filamentIDNotANumber;
     }
     const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
-    return this.getWithOptionalRetry(getURL, false);
+    return await this.getWithOptionalRetry(getURL, false);
   }
 
   async login(passive = true) {
-    return this.postPrinter(apiLogin(passive), {}, false);
+    return await this.postPrinter(apiLogin(passive), {}, false);
   }
 }
 

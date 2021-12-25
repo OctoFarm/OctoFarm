@@ -13,14 +13,15 @@ const COLOURS = {
   BLUE: "\033[0;34m",
   PURPLE: "\033[0;35m",
   WHITE: "\033[1;37m",
-  CYAN: "\033[0;36m"
+  CYAN: "\033[0;32m"
 };
 
 const COLOUR_MAP = {
   info: COLOURS.BLUE,
   warn: COLOURS.ORANGE,
   debug: COLOURS.ORANGE,
-  error: COLOURS.RED
+  error: COLOURS.RED,
+  silly: COLOURS.CYAN
 };
 
 dateFormat = () => {
@@ -93,6 +94,10 @@ class LoggerService {
 
   error(message, meta) {
     this.logger.log("error", message, { meta });
+  }
+
+  silly(message, meta) {
+    this.logger.log("silly", message, { meta });
   }
 }
 

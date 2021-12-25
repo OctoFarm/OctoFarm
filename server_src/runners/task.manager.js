@@ -39,7 +39,7 @@ class TaskManager {
       !schedulerOptions?.runDelayed
     ) {
       throw new JobValidationException(
-        `Provide 'periodic' or 'runOnce' or 'runDelayed' option'`,
+        "Provide 'periodic' or 'runOnce' or 'runDelayed' option'",
         taskId
       );
     }
@@ -50,7 +50,7 @@ class TaskManager {
     ) {
       // Require milliseconds, minutes, hours or days
       throw new JobValidationException(
-        `Provide a delayed timing parameter (milliseconds|seconds)'`,
+        "Provide a delayed timing parameter (milliseconds|seconds)'",
         taskId
       );
     }
@@ -64,7 +64,7 @@ class TaskManager {
     ) {
       // Require milliseconds, minutes, hours or days
       throw new JobValidationException(
-        `Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`,
+        "Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'",
         taskId
       );
     }
@@ -154,9 +154,8 @@ class TaskManager {
    * Stops the tasks which were registered
    */
   static stopSchedulerTasks() {
-    logger.debug("Signal to kill all scheduled tasks received!");
     this.jobScheduler.stop();
-    logger.debug("Successfully stopped all scheduled tasks!");
+    logger.warning("Successfully stopped all scheduled tasks!");
     return true;
   }
 

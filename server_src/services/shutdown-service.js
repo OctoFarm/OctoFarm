@@ -5,10 +5,19 @@ const logger = new Logger("OctoFarm-Server");
 const { TaskManager } = require("../runners/task.manager");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
+function killMongoDBConnection() {
+  if (mongoose.connection.readyState === 1) {
+    logger.warning("Killing mongoose connection.");
+    return mongoose.disconnect();
+  } else {
+    return true;
+  }
+}
+
 function shutdownServer(app) {
-  logger.debug("Shutdown detected, started clean up!");
-  return Promise.all([
-    mongoose.disconnect(),
+  logger.warning("Shutdown detected, started clean up!");
+  return Promise.allSettled([
+    killMongoDBConnection(),
     getPrinterManagerCache().killAllConnections(),
     TaskManager.stopSchedulerTasks(),
     app.close()
@@ -18,16 +27,13 @@ function shutdownServer(app) {
 function onShutdown(app) {
   shutdownServer(app)
     .then(() => {
-      logger.debug("Clean shutdown successful!");
-      setTimeout(function () {
-        process.exit(0);
-      }, 15000);
+      logger.warning("Clean shutdown successful!");
+      process.exit(0);
+      setTimeout(function () {}, 5000);
     })
     .catch((e) => {
       logger.error("Couldn't cleanly shutdown server!", e);
-      setTimeout(function () {
-        process.exit(1);
-      }, 15000);
+      process.exit(1);
     });
 }
 

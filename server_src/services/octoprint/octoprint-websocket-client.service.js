@@ -128,7 +128,7 @@ class WebSocketClient {
     // This needs overriding by message passed through
     this.#instance.on("message", (data) => {
       const timeDifference = ConnectionMonitorService.stopTimer();
-      logger.debug(
+      logger.silly(
         `${this.url}: Message #${this.#messageNumber} received, ${
           timeDifference - this.#lastMessage
         }ms since last message`
@@ -359,11 +359,18 @@ class WebSocketClient {
   }
 
   killAllConnectionsAndListeners() {
-    logger.debug(`${this.url} Killing all listeners`);
-    clearTimeout(this.heartbeatTimeout);
-    clearTimeout(this.reconnectTimeout);
-    clearInterval(this.heartbeatInterval);
+    logger.info(`${this.url} Killing all listeners`);
+    logger.debug("Force terminating websocket connection");
     this.terminate();
+    logger.debug("Clearning heartbeat timeout", this.heartbeatTimeout);
+    clearTimeout(this.heartbeatTimeout);
+    logger.debug("Clearning reconnect timeout", this.reconnectTimeout);
+    clearTimeout(this.reconnectTimeout);
+    logger.debug("Clearning heartbeat interval", this.heartbeatInterval);
+    clearInterval(this.heartbeatInterval);
+    logger.debug("Removing all listeners", this.reconnectTimeout);
+    this.#instance.removeAllListeners();
+    return true;
   }
 }
 
