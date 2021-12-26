@@ -271,7 +271,7 @@ class WebSocketClient {
 
   sendThrottle() {
     const throttle = (this.polling * 1000) / 500;
-    logger.info("Throttling websocket connection to: " + throttle + " seconds");
+    logger.info("Throttling websocket connection to: " + this.polling + " seconds");
     PrinterTicker.addIssue(
       new Date(),
       this.url,

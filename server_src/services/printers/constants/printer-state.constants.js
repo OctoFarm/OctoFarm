@@ -89,7 +89,7 @@ const PRINTER_STATES = {
   SEARCHING: {
     state: OF_C_STATE.SEARCHING,
     stateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
-    hostState: OF_C_STATE.ONLINE,
+    hostState: OF_H_STATE.ONLINE,
     hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
     webSocket: OF_COLOURS.INFO,
     stateDescription: OF_C_DESC.SEARCHING,

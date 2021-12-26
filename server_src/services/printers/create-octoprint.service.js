@@ -307,9 +307,9 @@ class OctoPrintPrinter {
     this.setWebsocketState(state);
   }
 
-  setPrinterState(state) {
+  setHostState(state) {
     if (!state?.hostState || !state?.hostStateColour || !state?.hostDescription)
-      throw new Error("Missing keys required!");
+      throw new Error("Missing keys required! " + JSON.stringify(state));
     this.hostState = {
       state: state.hostState,
       colour: state.hostStateColour,
@@ -317,9 +317,9 @@ class OctoPrintPrinter {
     };
   }
 
-  setHostState(state) {
+  setPrinterState(state) {
     if (!state?.state || !state?.stateColour || !state?.stateDescription)
-      throw new Error("Missing keys required!");
+      throw new Error("Missing keys required!" + JSON.stringify(state));
     this.printerState = {
       state: state.state,
       colour: state.stateColour,
@@ -329,7 +329,7 @@ class OctoPrintPrinter {
 
   setWebsocketState(state) {
     if (!state?.webSocket || !state?.webSocketDescription)
-      throw new Error("Missing keys required!");
+      throw new Error("Missing keys required!" + JSON.stringify(state));
     this.webSocketState = {
       colour: state.webSocket,
       desc: state.webSocketDescription
@@ -380,9 +380,12 @@ class OctoPrintPrinter {
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
-      //this.reconnectAPI();
+      this.reconnectAPI();
       return;
     }
+
+    this.setHostState(PRINTER_STATES.HOST_ONLINE);
+
     // Grab user list, current user and passively login to the client, Fail to Shutdown
     const initialApiCheck = await this.initialApiCheckSequence();
 
@@ -390,7 +393,7 @@ class OctoPrintPrinter {
       return typeof check.value === "number";
     });
     if (initialApiCheckValues.includes(true)) {
-      //this.reconnectAPI();
+      this.reconnectAPI();
       return;
     }
 
@@ -472,14 +475,19 @@ class OctoPrintPrinter {
   }
 
   async setupClient() {
-    logger.info(this.printerURL + ": Running setup sequence.");
-    PrinterTicker.addIssue(
-      new Date(),
-      this.printerURL,
-      "Running setup sequence.",
-      "Active",
-      this._id
-    );
+    if (this.#retryNumber === 0) {
+      logger.info(this.printerURL + ": Running setup sequence.");
+      PrinterTicker.addIssue(
+        new Date(),
+        this.printerURL,
+        "Running setup sequence. Subsequent logs will be silence...",
+        "Active",
+        this._id
+      );
+    } else {
+      logger.info(this.printerURL + ": Re-running setup sequence");
+    }
+
     //Create OctoPrint Client
     logger.debug(this.printerURL + ": Creating octoprint api client");
     this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
