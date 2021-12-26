@@ -451,8 +451,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       // PrinterTicker.addIssue(
       //   new Date(),
       //   farmPrinters[this.index].printerURL,
-      //   "Successfully opened websocket connection...",
-      //   "Complete",
+      //   "Successfully opened websocket connection...",.temps
       //   farmPrinters[this.index]._id
       // );
     }
@@ -460,25 +459,25 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     farmPrinters[this.index].silenceOfflineLog = false;
     // Listen for printer status
     if (typeof data.current !== "undefined") {
-      farmPrinters[this.index].webSocket = "success";
-      farmPrinters[this.index].webSocketDescription = "Websocket Alive and Receiving Data";
-      if (data.current.state.text === "Offline") {
-        data.current.state.text = "Disconnected";
-        farmPrinters[this.index].stateDescription = "Your printer is disconnected";
-      } else if (
-        data.current.state.text.includes("Error:") ||
-        data.current.state.text.includes("error")
-      ) {
-        farmPrinters[this.index].stateDescription = data.current.state.text;
-        data.current.state.text = "Error!";
-      } else if (data.current.state.text === "Closed") {
-        res.current.state.text = "Disconnected";
-        farmPrinters[this.index].stateDescription = "Your printer is disconnected";
-      } else {
-        farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
-      }
-      farmPrinters[this.index].state = data.current.state.text;
-      farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
+      // farmPrinters[this.index].webSocket = "success";
+      // farmPrinters[this.index].webSocketDescription = "Websocket Alive and Receiving Data";
+      // if (data.current.state.text === "Offline") {
+      //   data.current.state.text = "Disconnected";
+      //   farmPrinters[this.index].stateDescription = "Your printer is disconnected";
+      // } else if (
+      //   data.current.state.text.includes("Error:") ||
+      //   data.current.state.text.includes("error")
+      // ) {
+      //   farmPrinters[this.index].stateDescription = data.current.state.text;
+      //   data.current.state.text = "Error!";
+      // } else if (data.current.state.text === "Closed") {
+      //   res.current.state.text = "Disconnected";
+      //   farmPrinters[this.index].stateDescription = "Your printer is disconnected";
+      // } else {
+      //   farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
+      // }
+      // farmPrinters[this.index].state = data.current.state.text;
+      // farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
       if (typeof data.current.resends !== "undefined") {
         farmPrinters[this.index].resends = data.current.resends;
       }

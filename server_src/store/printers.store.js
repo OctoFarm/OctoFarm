@@ -6,6 +6,14 @@ class PrinterStore {
     this.#printersList = [];
   }
 
+  #findMePrinter = (id) => {
+    return this.#printersList[
+      findIndex(this.#printersList, function (o) {
+        return o._id === id;
+      })
+    ];
+  };
+
   listPrinters() {
     return this.#printersList;
   }
@@ -18,7 +26,45 @@ class PrinterStore {
     console.log(id);
   }
 
-  updatePrinter(id, data) {}
+  updatePrinterState(id, data) {
+    const printer = this.#findMePrinter(id);
+    printer.setPrinterState(data);
+  }
+
+  updatePrinterLiveValue(id, data) {
+    const printer = this.#findMePrinter(id);
+    printer.updatePrinterLiveValue(data);
+  }
+
+  updatePrinterDatabase(id, data) {
+    const printer = this.#findMePrinter(id);
+    printer.updatePrinterData(data);
+  }
+
+  getSelectedFilament(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.selectedFilament;
+  }
+
+  getFileList(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.fileList;
+  }
+
+  getCurrentZ(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.currentZ;
+  }
+
+  getCostSettings(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.costSettings;
+  }
+
+  getTerminalData(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.terminal;
+  }
 }
 
 module.exports = PrinterStore;

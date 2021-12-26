@@ -37,7 +37,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async postPrinter(route, data, timeout = false) {
-    return super.post(route, data, timeout);
+    return await super.post(route, data, timeout);
   }
 
   async getWithOptionalRetry(route, retry = false) {
@@ -49,7 +49,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getSettings(retry = false) {
-    return this.getWithOptionalRetry(apiSettingsPart, retry);
+    return await this.getWithOptionalRetry(apiSettingsPart, retry);
   }
 
   async getVersion(retry = false) {

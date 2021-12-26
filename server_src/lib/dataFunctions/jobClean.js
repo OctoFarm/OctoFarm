@@ -1,6 +1,6 @@
 "use strict";
 
-const _ = require("lodash");
+const { findIndex } = require("lodash");
 const { DateTime } = require("luxon");
 const { getPrintCostNumeric } = require("../../utils/print-cost.util");
 const { HistoryClean } = require("./historyClean.js");
@@ -24,17 +24,14 @@ class JobClean {
 
   /**
    * Generate current job report
-   * @param farmPrinter
+   * @param printerJob
    * @param selectedFilament
-   * @returns {Promise<void>}
+   * @param fileList
+   * @param currentZ
+   * @param costSettings
+   * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: null, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
    */
-  static generate(farmPrinter, selectedFilament) {
-    const printer = farmPrinter;
-
-    if (!!farmPrinter.systemChecks) {
-      farmPrinter.systemChecks.cleaning.job.status = "warning";
-    }
-
+  static generate(printerJob, selectedFilament, fileList, currentZ, costSettings) {
     const currentJob = {
       progress: 0,
       fileName: "No File Selected",
@@ -53,27 +50,26 @@ class JobClean {
       thumbnail: null
     };
 
-    const printerJob = printer.job;
     if (!!printerJob) {
       currentJob.fileName = printerJob.file.name;
-      const foundFile = _.find(printer.fileList.files, (o) => {
-        return o.name == printerJob.file.name;
+      const { files } = fileList;
+      const foundFile = findIndex(files, (o) => {
+        return o.name === printerJob.file.name;
       });
       if (!!foundFile) {
-        currentJob.thumbnail = foundFile.thumbnail;
+        currentJob.thumbnail = foundFile?.thumbnail;
       }
       currentJob.fileDisplay = printerJob.file.display;
       currentJob.filePath = printerJob.file.path;
       currentJob.averagePrintTime = printerJob.averagePrintTime;
       currentJob.lastPrintTime = printerJob.lastPrintTime;
-      if (!!printer.currentZ) {
-        currentJob.currentZ = printer.currentZ;
+      if (!!currentZ) {
+        currentJob.currentZ = currentZ;
       }
       currentJob.expectedPrinterCosts = getPrintCostNumeric(
         printerJob.estimatedPrintTime,
-        printer.costSettings
+        costSettings
       )?.toFixed(2);
-      // TODO selectedFilament should not be passed, instead the result of getSpool should be passed to this function as argument
       currentJob.expectedFilamentCosts = HistoryClean.getSpool(
         selectedFilament,
         printerJob,
@@ -108,25 +104,20 @@ class JobClean {
       };
     }
 
-    const printerProgress = printer.progress;
-    if (!!printerProgress) {
-      currentJob.progress = Math.floor(printerProgress.completion);
-      currentJob.printTimeRemaining = printerProgress.printTimeLeft;
-      currentJob.printTimeElapsed = printerProgress.printTime;
-      currentJob.expectedPrintTime =
-        Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
-      currentJob.expectedCompletionDate = JobClean.getCompletionDate(
-        printerProgress.printTimeLeft,
-        printerProgress.completion
-      );
-    }
+    // const printerProgress = printer.progress;
+    // if (!!printerProgress) {
+    //   currentJob.progress = Math.floor(printerProgress.completion);
+    //   currentJob.printTimeRemaining = printerProgress.printTimeLeft;
+    //   currentJob.printTimeElapsed = printerProgress.printTime;
+    //   currentJob.expectedPrintTime =
+    //     Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
+    //   currentJob.expectedCompletionDate = JobClean.getCompletionDate(
+    //     printerProgress.printTimeLeft,
+    //     printerProgress.completion
+    //   );
+    // }
 
-    if (!!farmPrinter.systemChecks) {
-      const systemCleaningJob = farmPrinter.systemChecks.cleaning.job;
-      systemCleaningJob.status = "success";
-      systemCleaningJob.date = new Date();
-    }
-    cleanJobs[printer.sortIndex] = currentJob;
+    return currentJob;
   }
 }
 

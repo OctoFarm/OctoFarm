@@ -157,27 +157,30 @@ class HistoryClean {
         ? filamentSelection[keyIndex]
         : filamentSelection;
       const metric = filament[key];
-      let completionRatio = success ? 1.0 : printPercentage / 100;
 
-      const spoolWeight = HistoryClean.calcSpoolWeightAsString(
-        metric.length / 1000,
-        filamentEntry,
-        completionRatio
-      );
-      const spoolName = HistoryClean.getSpoolLabel(filamentEntry);
-      spools.push({
-        [key]: {
-          toolName: "Tool " + key.substring(4, 5),
-          spoolName,
-          spoolId: filamentEntry?._id || null, // TODO discuss fallback null or undefined
-          volume: (completionRatio * metric.volume).toFixed(2),
-          length: ((completionRatio * metric.length) / 1000).toFixed(2),
-          weight: spoolWeight,
-          cost: HistoryClean.getCostAsString(spoolWeight, filamentEntry, completionRatio),
-          type: filamentEntry?.spools?.profile?.material || "",
-          manufacturer: filamentEntry?.spools?.profile?.manufacturer || ""
-        }
-      });
+      if (metric !== null) {
+        let completionRatio = success ? 1.0 : printPercentage / 100;
+
+        const spoolWeight = HistoryClean.calcSpoolWeightAsString(
+          metric.length / 1000,
+          filamentEntry,
+          completionRatio
+        );
+        const spoolName = HistoryClean.getSpoolLabel(filamentEntry);
+        spools.push({
+          [key]: {
+            toolName: "Tool " + key.substring(4, 5),
+            spoolName,
+            spoolId: filamentEntry?._id || null, // TODO discuss fallback null or undefined
+            volume: (completionRatio * metric.volume).toFixed(2),
+            length: ((completionRatio * metric.length) / 1000).toFixed(2),
+            weight: spoolWeight,
+            cost: HistoryClean.getCostAsString(spoolWeight, filamentEntry, completionRatio),
+            type: filamentEntry?.spools?.profile?.material || "",
+            manufacturer: filamentEntry?.spools?.profile?.manufacturer || ""
+          }
+        });
+      }
     }
     return spools;
   }

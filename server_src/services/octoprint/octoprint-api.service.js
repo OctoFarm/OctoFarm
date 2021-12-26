@@ -125,13 +125,10 @@ class OctoprintApiService {
    * @param timeout optional race to timeout (default: true)
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
-  post(route, data, timeout = true) {
-    if (!this.printerURL.includes("http")) {
-      this.printerURL = "http://" + this.printerURL;
-    }
+  async post(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
 
-    return fetchApiTimeout(
+    return await fetchApiTimeout(
       url,
       "POST",
       this.apikey,
@@ -173,10 +170,6 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
   async get(route, timeout = true) {
-    if (!this.printerURL.includes("http")) {
-      this.printerURL = "http://" + this.printerURL;
-    }
-    //
     const url = new URL(route, this.printerURL).href;
     return await fetchApiTimeout(
       url,
@@ -220,9 +213,6 @@ class OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)>}
    */
   patch(route, data, timeout = true) {
-    if (!this.printerURL.includes("http")) {
-      printerURL = "http://" + this.printerURL;
-    }
     const url = new URL(route, this.printerURL).href;
     return fetchApiTimeout(
       url,

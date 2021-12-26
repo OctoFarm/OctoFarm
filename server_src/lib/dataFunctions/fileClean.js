@@ -85,35 +85,13 @@ class FileClean {
     }
   }
 
-  static generate(farmPrinter, selectedFilament) {
-    const { fileList, sortIndex } = farmPrinter;
-
+  static generate(fileList, selectedFilament, costSettings) {
     if (!fileList) {
       logger.error("Printer File Cleaner failed: farmPrinter:fileList not defined.");
       return;
     }
 
-    // NaN, object, undefined here
-    if (Number.isNaN(sortIndex) || isNaN(sortIndex)) {
-      logger.error(`Printer File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`);
-      return;
-    }
-
-    // null, string caught here
-    if (!sortIndex && !Number.isInteger(sortIndex)) {
-      logger.error(`Printer File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`);
-      return;
-    }
-
-    if (sortIndex < 0) {
-      logger.error(`File Cleaner failed: farmPrinter:sortIndex cannot be negative (${sortIndex})`);
-      return;
-    }
-
-    if (!!farmPrinter.systemChecks) {
-      farmPrinter.systemChecks.cleaning.file.status = "warning";
-    }
-    const printCost = farmPrinter.costSettings;
+    const printCost = costSettings;
     const sortedFileList = [];
     if (!!fileList?.files) {
       for (let file of fileList.files) {
@@ -138,19 +116,12 @@ class FileClean {
         sortedFileList.push(sortedFile);
       }
     }
-
-    cleanFileList[sortIndex] = {
+    return {
       fileList: sortedFileList,
       filecount: fileList.fileCount || 0,
       folderList: fileList.folders || [],
       folderCount: fileList.folderCount || 0
     };
-
-    if (!!farmPrinter.systemChecks) {
-      farmPrinter.systemChecks.cleaning.file.status = "success";
-      farmPrinter.systemChecks.cleaning.file.date = new Date();
-    }
-    return cleanFileList[sortIndex];
   }
 
   /**

@@ -89,8 +89,16 @@ const OP_WS_MSG = {
   slicingProgress: "slicingProgress"
 };
 
-const OF_WS_MSG = {
-  SETTING_UP: "Setting up the clients websocket connection: "
+const OP_WS_MSG_KEYS = {
+  temps: "temps",
+  job: "job",
+  logs: "logs",
+  current: "current"
+};
+
+const OP_WS_PLUGIN_KEYS = {
+  pluginmanager: "pluginmanager",
+  klipper: "klipper"
 };
 
 // const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
@@ -110,5 +118,7 @@ module.exports = {
   getDefaultPrinterState,
   getDefaultCurrentState,
   EVENT_TYPES,
-  OP_WS_MSG
+  OP_WS_MSG,
+  OP_WS_MSG_KEYS,
+  OP_WS_PLUGIN_KEYS
 };

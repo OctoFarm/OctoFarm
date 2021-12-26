@@ -133,7 +133,7 @@ class WebSocketClient {
           timeDifference - this.#lastMessage
         }ms since last message`
       );
-
+      logger.debug(`${timeDifference - this.#lastMessage}ms since last message`);
       ConnectionMonitorService.updateOrAddResponse(
         this.url,
         REQUEST_TYPE.WEBSOCKET,
@@ -141,7 +141,7 @@ class WebSocketClient {
         ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
       );
 
-      this.#onMessage(data);
+      this.#onMessage(this.id, data);
 
       this.#messageNumber++;
       this.#lastMessage = ConnectionMonitorService.startTimer();
@@ -275,7 +275,7 @@ class WebSocketClient {
     PrinterTicker.addIssue(
       new Date(),
       this.url,
-      "Throttling websocket connection to: " + throttle + " seconds",
+      "Throttling websocket connection to: " + this.polling + " seconds",
       "Active",
       this.id
     );

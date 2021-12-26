@@ -355,68 +355,45 @@ class PrinterClean {
         // feedRate: farmPrinter.feedRate,
         // stepRate: farmPrinter.stepRate,
         // systemChecks: farmPrinter.systemChecks,
-        currentIdle: farmPrinter.currentIdle,
-        currentActive: farmPrinter.currentActive,
-        currentOffline: farmPrinter.currentOffline,
-        dateAdded: farmPrinter.dateAdded,
-        corsCheck: farmPrinter.corsCheck,
-        currentUser: farmPrinter.currentUser,
-        octoPrintUpdate: farmPrinter.octoPrintUpdate,
-        octoPrintPluginUpdates: farmPrinter.octoPrintPluginUpdates,
-        display: true,
-        order: farmPrinter.sortIndex,
-        octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
+        // currentIdle: farmPrinter.currentIdle,
+        // currentActive: farmPrinter.currentActive,
+        // currentOffline: farmPrinter.currentOffline,
+        // dateAdded: farmPrinter.dateAdded,
+        // corsCheck: farmPrinter.corsCheck,
+        // currentUser: farmPrinter.currentUser,
+        // octoPrintUpdate: farmPrinter.octoPrintUpdate,
+        // octoPrintPluginUpdates: farmPrinter.octoPrintPluginUpdates,
+        // display: true,
+        // order: farmPrinter.sortIndex,
+        // octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
-      if (farmPrinter?.multiUserIssue) {
-        sortedPrinter.multiUserIssue = farmPrinter.multiUserIssue;
-      }
+      // sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
+      // sortedPrinter.currentJob = JobClean.getCleanJobAtIndex(farmPrinter.sortIndex);
+      // sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
+      //
+      // sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);
+      // sortedPrinter.currentProfile = PrinterClean.sortProfile(
+      //   farmPrinter.profiles,
+      //   farmPrinter.current
+      // );
+      // sortedPrinter.currentConnection = PrinterClean.sortConnection(farmPrinter.current);
+      // sortedPrinter.connectionOptions = farmPrinter.options;
+      // if (
+      //   !!sortedPrinter?.connectionOptions?.ports &&
+      //   !sortedPrinter.connectionOptions.ports.includes("AUTO")
+      // ) {
+      //   sortedPrinter.connectionOptions.baudrates.unshift(0);
+      //   sortedPrinter.connectionOptions.ports.unshift("AUTO");
 
-      if (farmPrinter?.restartRequired) {
-        sortedPrinter.restartRequired = farmPrinter.restartRequired;
-      }
+      // sortedPrinter.gcodeScripts = PrinterClean.sortGCODE(farmPrinter.settingsScripts);
+      // sortedPrinter.otherSettings = PrinterClean.sortOtherSettings(
+      //   farmPrinter.tempTriggers,
+      //   farmPrinter.settingsWebcam,
+      //   farmPrinter.settingsServer
+      // );
+      // sortedPrinter.printerName = PrinterClean.grabPrinterName(farmPrinter);
 
-      if (farmPrinter?.layerData) {
-        sortedPrinter.layerData = farmPrinter.layerData;
-      }
-
-      if (farmPrinter?.resends) {
-        sortedPrinter.resends = farmPrinter.resends;
-      }
-      sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
-      sortedPrinter.currentJob = JobClean.getCleanJobAtIndex(farmPrinter.sortIndex);
-      sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
-
-      sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);
-      sortedPrinter.currentProfile = PrinterClean.sortProfile(
-        farmPrinter.profiles,
-        farmPrinter.current
-      );
-      sortedPrinter.currentConnection = PrinterClean.sortConnection(farmPrinter.current);
-      sortedPrinter.connectionOptions = farmPrinter.options;
-      if (
-        !!sortedPrinter?.connectionOptions?.ports &&
-        !sortedPrinter.connectionOptions.ports.includes("AUTO")
-      ) {
-        sortedPrinter.connectionOptions.baudrates.unshift(0);
-        sortedPrinter.connectionOptions.ports.unshift("AUTO");
-      }
-      sortedPrinter.terminal = PrinterClean.sortTerminal(farmPrinter.sortIndex, farmPrinter.logs);
-      sortedPrinter.costSettings = farmPrinter.costSettings;
-      sortedPrinter.powerSettings = farmPrinter.powerSettings;
-      sortedPrinter.gcodeScripts = PrinterClean.sortGCODE(farmPrinter.settingsScripts);
-      sortedPrinter.otherSettings = PrinterClean.sortOtherSettings(
-        farmPrinter.tempTriggers,
-        farmPrinter.settingsWebcam,
-        farmPrinter.settingsServer
-      );
-      sortedPrinter.printerName = PrinterClean.grabPrinterName(farmPrinter);
-      sortedPrinter.storage = farmPrinter.storage;
-      sortedPrinter.tempHistory = farmPrinter.tempHistory;
-
-      if (typeof farmPrinter.octoPi !== "undefined") {
-        sortedPrinter.octoPi = farmPrinter.octoPi;
-      }
       sortedPrinter.connectionLog = printerConnectionLogs[farmPrinter.sortIndex];
       if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
         sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(0, 6);
@@ -599,34 +576,17 @@ class PrinterClean {
     return otherSettings;
   }
 
-  static sortTerminal(i, logs) {
-    if (typeof logs !== "undefined") {
-      if (typeof currentLogs[i] === "undefined") {
-        currentLogs[i] = [];
-      } else {
-        if (logs.length === 1) {
-          if (currentLogs[i][currentLogs[i].length - 1] !== logs[0]) {
-            currentLogs[i].push(logs[0]);
-          }
-          if (currentLogs[i].length >= 100) {
-            currentLogs[i].shift();
-          }
-        } else {
-          for (let l = 0; l < logs.length; l++) {
-            if (currentLogs[i][currentLogs[i].length - 1] !== logs[l]) {
-              currentLogs[i].push(logs[l]);
-            }
-            if (currentLogs[i].length >= 100) {
-              currentLogs[i].shift();
-            }
-          }
-          previousLogs[i] = currentLogs[i];
-        }
+  static sortTerminal(logs, currentLogs) {
+    if (!!logs) {
+      logs.forEach((log) => {
+        currentLogs.push(log);
+      });
+
+      if (currentLogs.length >= 100) {
+        currentLogs.shift();
       }
-    } else {
-      currentLogs[i] = [];
     }
-    return currentLogs[i];
+    return currentLogs;
   }
 
   static sortGCODE(settings) {
@@ -643,6 +603,20 @@ class PrinterClean {
         port: current.port,
         printerProfile: current.printerProfile
       };
+    }
+    return null;
+  }
+
+  static sortOptions(options) {
+    if (typeof options !== "undefined") {
+      const connectionOptions = options;
+      if (!!connectionOptions?.ports && !connectionOptions.ports.includes("AUTO")) {
+        connectionOptions.ports.unshift("AUTO");
+      }
+      if (!!connectionOptions?.baudrates && !connectionOptions.baudrates.includes(0)) {
+        connectionOptions.baudrates.unshift(0);
+      }
+      return connectionOptions;
     }
     return null;
   }
@@ -664,18 +638,16 @@ class PrinterClean {
     return null;
   }
 
-  static grabPrinterName(printer) {
-    let name = null;
-    if (typeof printer.settingsAppearance !== "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-        name = printer.printerURL;
+  static grabPrinterName(settingsAppearance, printerURL) {
+    if (!!settingsAppearance) {
+      if (settingsAppearance.name === "" || settingsAppearance.name === null) {
+        return printerURL;
       } else {
-        name = printer.settingsAppearance.name;
+        return settingsAppearance.name;
       }
     } else {
-      name = printer.printerURL;
+      return printerURL;
     }
-    return name;
   }
 
   static async sortCurrentOperations(farmPrinters) {

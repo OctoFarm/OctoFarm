@@ -5,6 +5,7 @@ const { OctoPrintPrinter } = require("../services/printers/create-octoprint.serv
 const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
 const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { patchPrinterValues } = require("../services/version-patches.service");
 
 const logger = new Logger("OctoFarm-PrinterManager");
 
@@ -13,6 +14,9 @@ class PrinterManagerService {
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
+    for (let p = 0; p < pList.length; p++) {
+      patchPrinterValues(pList[p]);
+    }
     await this.batchCreatePrinters(pList);
     return true;
   }
@@ -45,7 +49,7 @@ class PrinterManagerService {
 
         // requests will have 100 or less pending promises.
         // Promise.all will wait till all the promises got resolves and then take the next 100.
-        logger.debug("Creating printers batch", requests.length);
+        logger.debug(`Running printer batch ${i + 1}`);
         await Promise.all(requests).catch((e) =>
           console.log(`Error in sending email for the batch ${i} - ${e}`)
         ); // Catch the error.
@@ -82,6 +86,7 @@ class PrinterManagerService {
             break;
           case CATEGORIES.ERROR:
             this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
+            //this.updateStateCounterCategory(CATEGORIES.ERROR, printer);
             break;
           default:
             logger.debug("Don't know category", printer.printerState.colour.category);

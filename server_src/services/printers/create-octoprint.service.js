@@ -1,6 +1,5 @@
 const { systemChecks, tempTriggers } = require("./constants/printer-defaults.constants");
 const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.constants");
-const { PRINTER_CATEGORIES } = require("./constants/printer-categories.constants");
 const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client.service");
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
@@ -18,10 +17,11 @@ const {
 const { checkSystemInfoAPIExistance } = require("../../utils/compatibility.utils");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
-const { convertHttpUrlToWebsocket } = require("../../utils/url.utils");
-const { handleMessage } = require("../octoprint/octoprint-websocket-message");
+const { handleMessage } = require("../octoprint/octoprint-websocket-message.service");
 const { PrinterTicker } = require("../../runners/printerTicker");
+const { FileClean } = require("../../lib/dataFunctions/fileClean");
 const Logger = require("../../handlers/logger");
+const { PrinterClean } = require("../../lib/dataFunctions/printerClean");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -70,14 +70,22 @@ class OctoPrintPrinter {
   group = "";
   printerName = undefined;
   //Live printer state data
-
-  //Updated by API / database
   layerData = undefined;
   resends = undefined;
+  tools = undefined;
+  currentJob = undefined;
+  currentZ = undefined;
+  currentProfile = undefined;
+  currentConnection = undefined;
+  connectionOptions = undefined;
+  terminal = [];
+  otherSettings = undefined;
+
+  //Updated by API / database
   octoPi = undefined;
   costSettings = null;
   powerSettings = null;
-  klipperFirmware = undefined;
+  klipperFirmwareVersion = undefined;
   octoPrintVersion = undefined;
   storage = undefined;
   current = undefined;
@@ -97,11 +105,13 @@ class OctoPrintPrinter {
   settingsSystem = undefined;
   settingsWebcam = undefined;
   core = undefined;
+  octoPrintSystemInfo = undefined;
 
   //Processed Information from cleaners
   hostState = undefined;
   printerState = undefined;
   webSocketState = undefined;
+  order = undefined;
 
   constructor(printer) {
     if (
@@ -112,7 +122,7 @@ class OctoPrintPrinter {
       !printer?.webSocketURL ||
       !printer?.settingsAppearance
     )
-      throw new Error("Missing params!");
+      throw new Error("Missing params! params:" + JSON.stringify(printer));
 
     this.#updatePrinterRecordsFromDatabase(printer);
     this.#updatePrinterSettingsFromDatabase();
@@ -146,7 +156,7 @@ class OctoPrintPrinter {
       group,
       costSettings,
       powerSettings,
-      klipperFirmware,
+      klipperFirmwareVersion,
       storage,
       fileList,
       current,
@@ -165,10 +175,13 @@ class OctoPrintPrinter {
       settingsServer,
       settingsSystem,
       settingsWebcam,
-      core
+      core,
+      octoPrintSystemInfo
     } = printer;
     this._id = _id.toString();
     this.sortIndex = sortIndex;
+    // Old cleaner patching
+    this.order = sortIndex;
     this.apikey = apikey;
     this.printerURL = printerURL;
     this.webSocketURL = webSocketURL;
@@ -217,14 +230,11 @@ class OctoPrintPrinter {
     if (!!powerSettings) {
       this.powerSettings = powerSettings;
     }
-    if (!!klipperFirmware) {
-      this.klipperFirmware = klipperFirmware;
+    if (!!klipperFirmwareVersion) {
+      this.klipperFirmwareVersion = klipperFirmwareVersion;
     }
     if (!!storage) {
       this.storage = storage;
-    }
-    if (!!fileList) {
-      this.fileList = fileList;
     }
     if (!!current) {
       this.current = current;
@@ -288,6 +298,51 @@ class OctoPrintPrinter {
     }
     if (!!octoPi) {
       this.octoPi = octoPi;
+    }
+
+    if (!!octoPrintSystemInfo) {
+      this.octoPrintSystemInfo = octoPrintSystemInfo;
+    }
+
+    if (!!fileList) {
+      this.fileList = FileClean.generate(
+        {
+          files: fileList.files,
+          fileCount: fileList.files.length,
+          folders: fileList.folders,
+          folderCount: fileList.folders.length
+        },
+        this.selectedFilament,
+        this.costSettings
+      );
+    }
+
+    if (!!profiles && !!current) {
+      this.currentProfile = PrinterClean.sortProfile(profiles, current);
+    }
+
+    if (!!current) {
+      this.currentConnection = PrinterClean.sortConnection(current);
+    }
+
+    if (!!options) {
+      this.connectionOptions = PrinterClean.sortOptions(options);
+    }
+
+    if (!!settingsScripts) {
+      this.settingsScripts = PrinterClean.sortGCODE(settingsScripts);
+    }
+
+    if (!!tempTriggers && !!settingsWebcam && !!settingsServer) {
+      this.otherSettings = PrinterClean.sortOtherSettings(
+        tempTriggers,
+        settingsWebcam,
+        settingsServer
+      );
+    }
+
+    if (!!settingsAppearance) {
+      this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
     }
 
     this.setAllPrinterStates(PRINTER_STATES.SETTING_UP);
@@ -489,19 +544,17 @@ class OctoPrintPrinter {
     }
 
     //Create OctoPrint Client
-    logger.debug(this.printerURL + ": Creating octoprint api client");
-    this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
-
-    //TODO BRING INTO PATCHES IN PRINTER MANAGER
-    if (!this.webSocketURL || !this.webSocketURL.includes("ws")) {
-      logger.debug(this.printerURL + ": Websocket URL is missing, creating!");
-      this.webSocketURL = convertHttpUrlToWebsocket(this.printerURL);
-      await this.#db.update({ webSocketURL: this.webSocketURL });
+    if (!this?.#api) {
+      logger.debug(this.printerURL + ": Creating octoprint api client");
+      this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
     }
 
     // Create database client
-    logger.debug(this.printerURL + ": Creating printer database link");
-    this.#db = new PrinterDatabaseService(this._id);
+    if (!this?.#db) {
+      logger.debug(this.printerURL + ": Creating printer database link");
+      this.#db = new PrinterDatabaseService(this._id);
+    }
+
     return true;
   }
 
@@ -564,7 +617,7 @@ class OctoPrintPrinter {
     PrinterTicker.addIssue(
       new Date(),
       this.printerURL,
-      ": Gathering required API data. Forced Scan: " + force,
+      "Gathering required API data. Forced Scan: " + force,
       "Active",
       this._id
     );
@@ -768,6 +821,9 @@ class OctoPrintPrinter {
         this.#db.update({
           profiles: profiles
         });
+        if (!!this?.profiles && !!this?.current) {
+          this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+        }
         return true;
       } else {
         return globalStatusCode;
@@ -794,6 +850,19 @@ class OctoPrintPrinter {
           current: current,
           options: options
         });
+
+        if (!!this?.profiles && !!this?.current) {
+          this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+        }
+
+        if (!!this?.current) {
+          this.currentConnection = PrinterClean.sortConnection(this.current);
+        }
+
+        if (!!this?.options) {
+          this.connectionOptions = PrinterClean.sortOptions(this.options);
+        }
+
         return true;
       } else {
         return globalStatusCode;
@@ -873,6 +942,11 @@ class OctoPrintPrinter {
           settingsWebcam: webcam
         });
 
+        this.settingsScripts = PrinterClean.sortGCODE(scripts);
+        this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
+
+        this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
+
         return true;
       } else {
         return globalStatusCode;
@@ -912,7 +986,6 @@ class OctoPrintPrinter {
     if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
     if (!this.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
-      logger.info("GETT PLUG");
       const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
         return false;
       });
@@ -1017,17 +1090,26 @@ class OctoPrintPrinter {
 
         const { printerFiles, printerLocations } = acquirePrinterFilesAndFolderData(files);
 
-        this.fileList = {
-          files: printerFiles,
-          fileCount: printerFiles.length,
-          folders: printerLocations,
-          folderCount: printerLocations.length
-        };
-
         this.#db.update({
           storage: this.storage,
-          fileList: this.fileList
+          fileList: {
+            files: printerFiles,
+            fileCount: printerFiles.length,
+            folders: printerLocations,
+            folderCount: printerLocations.length
+          }
         });
+
+        this.fileList = FileClean.generate(
+          {
+            files: printerFiles,
+            fileCount: printerFiles.length,
+            folders: printerLocations,
+            folderCount: printerLocations.length
+          },
+          this.selectedFilament,
+          this.costSettings
+        );
 
         return true;
       } else {
@@ -1053,6 +1135,17 @@ class OctoPrintPrinter {
     logger.debug(this.printerURL + " Updating printer counters", data);
 
     return this.#db.update(data);
+  }
+
+  updatePrinterLiveValue(object) {
+    const { key, data } = object;
+    logger.silly("Updating live printer key: " + key, data);
+    this[key] = data;
+  }
+
+  updatePrinterData(data) {
+    logger.debug("Updating printer database: ", data);
+    this.#db.update(data);
   }
 
   killApiTimeout() {
