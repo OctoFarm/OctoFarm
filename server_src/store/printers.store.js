@@ -31,6 +31,11 @@ class PrinterStore {
     printer.setPrinterState(data);
   }
 
+  updateWebsocketState(id, data) {
+    const printer = this.#findMePrinter(id);
+    printer.setWebsocketState(data);
+  }
+
   updatePrinterLiveValue(id, data) {
     const printer = this.#findMePrinter(id);
     printer.updatePrinterLiveValue(data);
@@ -38,6 +43,7 @@ class PrinterStore {
 
   updatePrinterDatabase(id, data) {
     const printer = this.#findMePrinter(id);
+    printer.updatePrinterLiveValue(data);
     printer.updatePrinterData(data);
   }
 
@@ -64,6 +70,11 @@ class PrinterStore {
   getTerminalData(id) {
     const printer = this.#findMePrinter(id);
     return printer.terminal;
+  }
+
+  getOctoPrintVersion(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.octoPrintVersion;
   }
 }
 

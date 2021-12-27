@@ -104,9 +104,22 @@ const capturePrinterState = (id, data) => {
   }
 };
 
+const captureConnectedData = (id, data) => {
+  if (!!data[OP_WS_MSG_KEYS.connected]) {
+    const { version } = data[OP_WS_MSG_KEYS.connected];
+    const currentVersion = getPrinterStoreCache().getOctoPrintVersion(id);
+    if (version !== currentVersion) {
+      console.log("VERSION", version);
+      console.log("CURRENT", currentVersion);
+      getPrinterStoreCache().updatePrinterDatabase(id, { octoPrintVersion: version });
+    }
+  }
+};
+
 module.exports = {
   captureTemperatureData,
   captureJobData,
   captureLogData,
-  capturePrinterState
+  capturePrinterState,
+  captureConnectedData
 };

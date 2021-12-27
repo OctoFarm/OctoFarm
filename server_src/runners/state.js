@@ -420,11 +420,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
       farmPrinters[this.index].config_hash = data.connected.config_hash;
 
-      if (data.connected.version.includes("1.4.2") || data.connected.version.includes("1.4.1")) {
-        farmPrinters[this.index].webSocket = "danger";
-        farmPrinters[this.index].webSocketDescription =
-          "OctoPrint Version 1.4.1+ requires the use of an Application/User API key to connect, please update your instance with that";
-      }
       if (farmPrinters[this.index].userList.length > 1) {
         farmPrinters[this.index].webSocket = "danger";
         farmPrinters[this.index].webSocketDescription =

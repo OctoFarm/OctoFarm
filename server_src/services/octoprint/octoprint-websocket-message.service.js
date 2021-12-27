@@ -7,10 +7,14 @@ const {
   captureTemperatureData,
   captureJobData,
   captureLogData,
-  capturePrinterState
+  capturePrinterState,
+  captureConnectedData
 } = require("./utils/octoprint-websocket-helpers.utils");
 const { captureKlipperPluginData } = require("./utils/octoprint-plugin.utils");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
+
 const Logger = require("../../handlers/logger");
+
 const logger = new Logger("OctoFarm-State");
 
 class OctoprintWebsocketMessageService {
@@ -49,7 +53,7 @@ class OctoprintWebsocketMessageService {
     const OP_EM = OctoprintWebsocketMessageService;
 
     const { header, data } = OP_EM.parseOctoPrintWebsocketMessage(message);
-    //TODO convert to switch
+
     switch (header) {
       case OP_WS_MSG.connected:
         OP_EM.handleConnectedData(printerID, data);
@@ -78,16 +82,26 @@ class OctoprintWebsocketMessageService {
     }
   }
 
-  static handleConnectedData(printerID, data) {}
-  static handleReAuthData(printerID, data) {}
+  static handleConnectedData(printerID, data) {
+    //updateVersionData
+    //I WISH OP DIDN'T SEND THIS UNLESS AUTHED!
+    captureConnectedData(printerID, data);
+  }
+  static handleReAuthData(printerID, data) {
+    // logger.error(printerID + "RE_AUTH DATA RECEIVED", data);
+  }
   static handleCurrentData(printerID, data) {
     capturePrinterState(printerID, data);
     captureTemperatureData(printerID, data);
     captureJobData(printerID, data);
     captureLogData(printerID, data);
   }
-  static handleHistoryData(printerID, data) {}
-  static handleEventData(printerID, data) {}
+  static handleHistoryData(printerID, data) {
+    // logger.error(printerID + "HISTORY DATA RECEIVED", data);
+  }
+  static handleEventData(printerID, data) {
+    // logger.error(printerID + "EVENT DATA RECEIVED", data);
+  }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
     const { header, data } = OP_EM.parseOctoPrintPluginMessage(message);

@@ -93,7 +93,8 @@ const OP_WS_MSG_KEYS = {
   temps: "temps",
   job: "job",
   logs: "logs",
-  current: "current"
+  current: "current",
+  connected: "connected"
 };
 
 const OP_WS_PLUGIN_KEYS = {

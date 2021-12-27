@@ -21,12 +21,6 @@ class PrinterManagerService {
     return true;
   }
 
-  deletePrinter() {}
-
-  createPrinter() {}
-
-  editPrinter() {}
-
   killAllConnections() {
     logger.debug("Killing all printer connections...");
     getPrinterStoreCache()

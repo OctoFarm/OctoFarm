@@ -2,11 +2,16 @@ const WebSocket = require("ws");
 
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const { WS_STATE, WS_DESC, WS_ERRORS } = require("../printers/constants/websocket-constants");
-const { OF_WS_DESC, OF_C_DESC } = require("../printers/constants/printer-state.constants");
+const {
+  OF_WS_DESC,
+  OF_C_DESC,
+  PRINTER_STATES
+} = require("../printers/constants/printer-state.constants");
 const { PrinterTicker } = require("../../runners/printerTicker");
 const Logger = require("../../handlers/logger");
 const ConnectionMonitorService = require("../../services/connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -118,6 +123,9 @@ class WebSocketClient {
         "Complete",
         this.id
       );
+      // These will get overridden.
+      getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES.WS_TENTATIVE);
+      getPrinterStoreCache().updatePrinterState(this.id, PRINTER_STATES.PRINTER_TENTATIVE);
       // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
