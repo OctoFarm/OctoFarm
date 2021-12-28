@@ -12,18 +12,17 @@ const logger = new Logger("OctoFarm-State");
 const tempTimers = {};
 
 const captureLogData = (id, data) => {
-  if (!!data[OP_WS_MSG_KEYS.logs]) {
-    const logs = data[OP_WS_MSG_KEYS.logs];
+  if (!!data) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       key: "terminal",
-      data: PrinterClean.sortTerminal(logs, getPrinterStoreCache().getTerminalData(id))
+      data: PrinterClean.sortTerminal(data, getPrinterStoreCache().getTerminalData(id))
     });
   }
 };
 
 const captureTemperatureData = (id, data) => {
-  if (!!data[OP_WS_MSG_KEYS.temps] && data[OP_WS_MSG_KEYS.temps].length !== 0) {
-    const temps = data[OP_WS_MSG_KEYS.temps];
+  if (!!data && data.length !== 0) {
+    const temps = data;
     //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       key: "tools",
@@ -56,27 +55,25 @@ const captureTemperatureData = (id, data) => {
 };
 
 const captureJobData = (id, data) => {
-  if (!!data[OP_WS_MSG_KEYS.job]) {
-    const job = data[OP_WS_MSG_KEYS.job];
+  if (!!data) {
     //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       key: "job",
       data: JobClean.generate(
-        job,
+        data,
         getPrinterStoreCache().getSelectedFilament(id),
         getPrinterStoreCache().getFileList(id),
         getPrinterStoreCache().getCurrentZ(id),
-        getPrinterStoreCache().getCostSettings(id)
+        getPrinterStoreCache().getCostSettings(id),
+        getPrinterStoreCache().getPrinterProgress(id)
       )
     });
   }
 };
 
 const capturePrinterState = (id, data) => {
-  if (!!data[OP_WS_MSG_KEYS.current]) {
-    const { state } = data[OP_WS_MSG_KEYS.current];
-    const { text } = state;
-
+  if (!!data) {
+    const { text } = data;
     let returnState = "";
     let returnStateDescription = "";
 
@@ -110,6 +107,30 @@ const captureConnectedData = (id, data) => {
     parseAndUpdateVersionData(id, version);
     //Overridden straight away
     checkForMultipleUsers(id);
+  }
+};
+
+const captureResendsData = (id, data) => {
+  if (!!data) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      resends: data
+    });
+  }
+};
+
+const capturePrinterProgress = (id, data) => {
+  if (!!data) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      progress: data
+    });
+  }
+};
+
+const captureCurrentZ = (id, data) => {
+  if (!!data) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      currentZ: data
+    });
   }
 };
 
@@ -166,5 +187,8 @@ module.exports = {
   capturePrinterState,
   captureConnectedData,
   removeMultiUserFlag,
-  setWebsocketAlive
+  setWebsocketAlive,
+  captureResendsData,
+  capturePrinterProgress,
+  captureCurrentZ
 };

@@ -11,7 +11,10 @@ const {
   capturePrinterState,
   captureConnectedData,
   removeMultiUserFlag,
-  setWebsocketAlive
+  setWebsocketAlive,
+  captureResendsData,
+  capturePrinterProgress,
+  captureCurrentZ
 } = require("./utils/octoprint-websocket-helpers.utils");
 const { captureKlipperPluginData } = require("./utils/octoprint-plugin.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
@@ -47,13 +50,6 @@ class OctoprintWebsocketMessageService {
   static parseOctoPrintPluginType = (message) => {
     const type = Object.values(message)[0];
 
-    logger.silly(`DEBUG WS ['${type}', ${byteCount(message)} bytes]`);
-
-    return type;
-  };
-
-  static parseOctoPrintCurrentData = (message) => {
-    const type = Object.keys(message)[0];
     logger.silly(`DEBUG WS ['${type}', ${byteCount(message)} bytes]`);
 
     return type;
@@ -102,24 +98,21 @@ class OctoprintWebsocketMessageService {
   }
   static handleCurrentData(printerID, data) {
     setWebsocketAlive(printerID);
-    const OP_EM = OctoprintWebsocketMessageService;
-    const type = OP_EM.parseOctoPrintCurrentData(data);
-    switch (type) {
-      case OP_WS_MSG_KEYS.current:
-        capturePrinterState(printerID, data);
-        break;
-      case OP_WS_MSG_KEYS.temps:
-        captureTemperatureData(printerID, data);
-        break;
-      case OP_WS_MSG_KEYS.job:
-        captureJobData(printerID, data);
-        break;
-      case OP_WS_MSG_KEYS.logs:
-        captureLogData(printerID, data);
-        break;
-      default:
-        logger.info("Unknown key from current...");
-    }
+    const { current } = data;
+
+    capturePrinterState(printerID, current[OP_WS_MSG_KEYS.state]);
+
+    captureTemperatureData(printerID, current[OP_WS_MSG_KEYS.temps]);
+
+    captureJobData(printerID, current[OP_WS_MSG_KEYS.job]);
+
+    captureLogData(printerID, current[OP_WS_MSG_KEYS.logs]);
+
+    captureResendsData(printerID, current[OP_WS_MSG_KEYS.resends]);
+
+    capturePrinterProgress(printerID, current[OP_WS_MSG_KEYS.progress]);
+
+    captureCurrentZ(printerID, current[OP_WS_MSG_KEYS.currentZ]);
   }
   static handleHistoryData(printerID, data) {
     removeMultiUserFlag(printerID);

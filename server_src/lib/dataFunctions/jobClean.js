@@ -31,7 +31,7 @@ class JobClean {
    * @param costSettings
    * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: null, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
    */
-  static generate(printerJob, selectedFilament, fileList, currentZ, costSettings) {
+  static generate(printerJob, selectedFilament, fileList, currentZ, costSettings, printerProgress) {
     const currentJob = {
       progress: 0,
       fileName: "No File Selected",
@@ -104,18 +104,17 @@ class JobClean {
       };
     }
 
-    // const printerProgress = printer.progress;
-    // if (!!printerProgress) {
-    //   currentJob.progress = Math.floor(printerProgress.completion);
-    //   currentJob.printTimeRemaining = printerProgress.printTimeLeft;
-    //   currentJob.printTimeElapsed = printerProgress.printTime;
-    //   currentJob.expectedPrintTime =
-    //     Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
-    //   currentJob.expectedCompletionDate = JobClean.getCompletionDate(
-    //     printerProgress.printTimeLeft,
-    //     printerProgress.completion
-    //   );
-    // }
+    if (!!printerProgress) {
+      currentJob.progress = Math.floor(printerProgress.completion);
+      currentJob.printTimeRemaining = printerProgress.printTimeLeft;
+      currentJob.printTimeElapsed = printerProgress.printTime;
+      currentJob.expectedPrintTime =
+        Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
+      currentJob.expectedCompletionDate = JobClean.getCompletionDate(
+        printerProgress.printTimeLeft,
+        printerProgress.completion
+      );
+    }
 
     return currentJob;
   }

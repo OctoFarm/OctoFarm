@@ -90,28 +90,21 @@ const OP_WS_MSG = {
 };
 
 const OP_WS_MSG_KEYS = {
+  state: "state",
   temps: "temps",
   job: "job",
   logs: "logs",
   current: "current",
-  connected: "connected"
+  connected: "connected",
+  resends: "resends",
+  progress: "progress",
+  currentZ: "currentZ"
 };
 
 const OP_WS_PLUGIN_KEYS = {
   pluginmanager: "pluginmanager",
   klipper: "klipper"
 };
-
-// const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
-// not a clue what this actually relates too
-// const WS_STATE = {
-//   unopened: "unopened",
-//   opening: "opening",
-//   connected: "connected",
-//   authed: "authed",
-//   errored: "errored", // Not a disconnect error
-//   closed: "closed" // Closing error received
-// };
 
 module.exports = {
   getDefaultProgressState,

@@ -91,6 +91,11 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return printer.multiUserIssue;
   }
+
+  getPrinterProgress(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.progress;
+  }
 }
 
 module.exports = PrinterStore;
