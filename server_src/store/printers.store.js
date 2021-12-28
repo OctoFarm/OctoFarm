@@ -2,6 +2,7 @@ const { findIndex } = require("lodash");
 
 class PrinterStore {
   #printersList = undefined;
+
   constructor() {
     this.#printersList = [];
   }
@@ -13,6 +14,10 @@ class PrinterStore {
       })
     ];
   };
+
+  getPrinterCount() {
+    return this.#printersList.length;
+  }
 
   listPrinters() {
     return this.#printersList;
@@ -75,6 +80,16 @@ class PrinterStore {
   getOctoPrintVersion(id) {
     const printer = this.#findMePrinter(id);
     return printer.octoPrintVersion;
+  }
+
+  getOctoPrintUserList(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.userList;
+  }
+
+  getMultiUserIssueState(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.multiUserIssue;
   }
 }
 

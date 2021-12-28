@@ -87,7 +87,7 @@ class OctoprintApiService {
   apikey = undefined;
 
   constructor(printerURL, apikey, timeoutSettings) {
-    this.timeout = timeoutSettings;
+    this.timeout = Object.assign({}, timeoutSettings);
     this.printerURL = printerURL;
     this.apikey = apikey;
   }

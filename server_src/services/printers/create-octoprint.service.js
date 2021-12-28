@@ -3,7 +3,7 @@ const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.consta
 const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client.service");
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
-const { isEmpty } = require("lodash");
+const { isEmpty, assign } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
 const {
   acquireWebCamData,
@@ -22,6 +22,7 @@ const { PrinterTicker } = require("../../runners/printerTicker");
 const { FileClean } = require("../../lib/dataFunctions/fileClean");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../../lib/dataFunctions/printerClean");
+const printerModel = require("../../models/Printer");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -30,7 +31,7 @@ class OctoPrintPrinter {
   disabled = false;
   display = true;
   #retryNumber = 0;
-  multiUserIssue = false;
+  multiUserIssue = undefined;
   restartRequired = false;
   //Communications
   #api = undefined;
@@ -115,16 +116,36 @@ class OctoPrintPrinter {
 
   constructor(printer) {
     if (
-      !printer?._id ||
       Number.isNaN(printer?.sortIndex) ||
       !printer?.apikey ||
       !printer?.printerURL ||
       !printer?.webSocketURL ||
       !printer?.settingsAppearance
     )
-      throw new Error("Missing params! params:" + JSON.stringify(printer));
+      throw new Error(
+        "Missing params! params:" +
+          JSON.stringify({
+            sortIndex: printer?.sortIndex,
+            apikey: printer?.apikey,
+            printerURL: printer?.printerURL,
+            webSocketURL: printer?.webSocketURL,
+            settingsAppearance: printer?.settingsAppearance
+          })
+      );
 
-    this.#updatePrinterRecordsFromDatabase(printer);
+    this.sortIndex = printer.sortIndex;
+    // Old cleaner patching
+    this.order = printer.sortIndex;
+    this.apikey = printer.apikey;
+    this.printerURL = printer.printerURL;
+    this.webSocketURL = printer.webSocketURL;
+    this.camURL = printer.camURL;
+    this.category = printer.category;
+
+    if (!!printer?._id) {
+      this.#updatePrinterRecordsFromDatabase(printer);
+    }
+
     this.#updatePrinterSettingsFromDatabase();
 
     this.startOctoPrintService();
@@ -134,13 +155,7 @@ class OctoPrintPrinter {
     const {
       disabled,
       _id,
-      sortIndex,
       settingsAppearance,
-      category,
-      apikey,
-      printerURL,
-      webSocketURL,
-      camURL,
       dateAdded,
       alerts,
       currentIdle,
@@ -179,14 +194,6 @@ class OctoPrintPrinter {
       octoPrintSystemInfo
     } = printer;
     this._id = _id.toString();
-    this.sortIndex = sortIndex;
-    // Old cleaner patching
-    this.order = sortIndex;
-    this.apikey = apikey;
-    this.printerURL = printerURL;
-    this.webSocketURL = webSocketURL;
-    this.camURL = camURL;
-    this.category = category;
     //Only update the below if received from database, otherwise is required from scans.
     if (!!currentUser) {
       this.currentUser = currentUser;
@@ -560,6 +567,22 @@ class OctoPrintPrinter {
       logger.info(this.printerURL + ": Re-running setup sequence");
     }
 
+    // If printer ID doesn't exist, we need to create the database record
+    if (!this?._id) {
+      const newPrinter = new printerModel(this);
+      this._id = newPrinter._id.toString();
+      await newPrinter
+        .save()
+        .then((res) => {
+          logger.info("Successfully saved your new printer to database", res);
+          return res;
+        })
+        .catch((e) => {
+          logger.info("Failed to save your new printer to database", e);
+          return e;
+        });
+    }
+
     //Create OctoPrint Client
     if (!this?.#api) {
       logger.debug(this.printerURL + ": Creating octoprint api client");
@@ -713,7 +736,7 @@ class OctoPrintPrinter {
       const userList = userJson.users;
 
       // If we have no idea who the user is then
-      if (!this?.currentUser || force) {
+      if (!this?.currentUser || this.userList.length === 0 || force) {
         if (isEmpty(userList)) {
           //If user list is empty then we can assume that an admin user is only one available.
           //Only relevant for OctoPrint < 1.4.2.
@@ -734,14 +757,18 @@ class OctoPrintPrinter {
               // Look for OctoFarm user and break, if not use the first admin we find
               if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
                 this.currentUser = currentUser.name;
-                this.userList.push(currentUser.name);
                 this.#db.update({ currentUser: this.currentUser });
+
+                this.userList.push(currentUser.name);
                 //We only break out here because it's doubtful with a successful connection we need the other users.
                 break;
               }
               // If no octofarm user then collect the rest for user choice in ui.
-              this.currentUser = currentUser.name;
-              this.#db.update({ currentUser: this.currentUser });
+              if (!this?.currentUser) {
+                // We should not override the database value to allow users to update it.
+                this.currentUser = currentUser.name;
+                this.#db.update({ currentUser: this.currentUser });
+              }
               this.userList.push(currentUser.name);
             }
           }
@@ -953,6 +980,7 @@ class OctoPrintPrinter {
       !this?.settingsServer ||
       !this?.settingsSystem ||
       !this?.settingsWebcam ||
+      !this?.settingsAppearance ||
       force
     ) {
       let settingsCheck = await this.#api.getSettings(true).catch(() => {
@@ -1012,7 +1040,6 @@ class OctoPrintPrinter {
 
         this.settingsScripts = PrinterClean.sortGCODE(scripts);
         this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
-
         this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
         this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
         return true;
@@ -1248,14 +1275,12 @@ class OctoPrintPrinter {
   }
 
   updatePrinterLiveValue(object) {
-    const { key, data } = object;
-    logger.silly("Updating live printer key: " + key, data);
-    this[key] = data;
+    assign(this, object);
+    logger.silly("Updating live printer data", object);
   }
 
   updatePrinterData(data) {
     logger.debug("Updating printer database: ", data);
-    console.log(data);
     this.#db.update(data);
   }
 

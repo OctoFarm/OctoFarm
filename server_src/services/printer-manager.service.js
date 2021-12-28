@@ -2,7 +2,6 @@ const Logger = require("../handlers/logger.js");
 
 const PrinterService = require("./printer.service");
 const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
-const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
 const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
@@ -28,6 +27,11 @@ class PrinterManagerService {
       .forEach((printer) => {
         printer.killAllConnections();
       });
+  }
+
+  async addPrinter(printer) {
+    patchPrinterValues(printer);
+    return await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
   }
 
   async batchCreatePrinters(printerList) {

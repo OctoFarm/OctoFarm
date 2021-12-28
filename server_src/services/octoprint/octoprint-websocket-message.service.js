@@ -1,6 +1,7 @@
 const {
   OP_WS_MSG,
-  OP_WS_PLUGIN_KEYS
+  OP_WS_PLUGIN_KEYS,
+  OP_WS_MSG_KEYS
 } = require("../octoprint/constants/octoprint-websocket.constants");
 const { byteCount } = require("../../utils/benchmark.util");
 const {
@@ -8,7 +9,9 @@ const {
   captureJobData,
   captureLogData,
   capturePrinterState,
-  captureConnectedData
+  captureConnectedData,
+  removeMultiUserFlag,
+  setWebsocketAlive
 } = require("./utils/octoprint-websocket-helpers.utils");
 const { captureKlipperPluginData } = require("./utils/octoprint-plugin.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
@@ -44,6 +47,13 @@ class OctoprintWebsocketMessageService {
   static parseOctoPrintPluginType = (message) => {
     const type = Object.values(message)[0];
 
+    logger.silly(`DEBUG WS ['${type}', ${byteCount(message)} bytes]`);
+
+    return type;
+  };
+
+  static parseOctoPrintCurrentData = (message) => {
+    const type = Object.keys(message)[0];
     logger.silly(`DEBUG WS ['${type}', ${byteCount(message)} bytes]`);
 
     return type;
@@ -88,15 +98,31 @@ class OctoprintWebsocketMessageService {
     captureConnectedData(printerID, data);
   }
   static handleReAuthData(printerID, data) {
-    // logger.error(printerID + "RE_AUTH DATA RECEIVED", data);
+    logger.error(printerID + "RE_AUTH DATA RECEIVED", data);
   }
   static handleCurrentData(printerID, data) {
-    capturePrinterState(printerID, data);
-    captureTemperatureData(printerID, data);
-    captureJobData(printerID, data);
-    captureLogData(printerID, data);
+    setWebsocketAlive(printerID);
+    const OP_EM = OctoprintWebsocketMessageService;
+    const type = OP_EM.parseOctoPrintCurrentData(data);
+    switch (type) {
+      case OP_WS_MSG_KEYS.current:
+        capturePrinterState(printerID, data);
+        break;
+      case OP_WS_MSG_KEYS.temps:
+        captureTemperatureData(printerID, data);
+        break;
+      case OP_WS_MSG_KEYS.job:
+        captureJobData(printerID, data);
+        break;
+      case OP_WS_MSG_KEYS.logs:
+        captureLogData(printerID, data);
+        break;
+      default:
+        logger.info("Unknown key from current...");
+    }
   }
   static handleHistoryData(printerID, data) {
+    removeMultiUserFlag(printerID);
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static handleEventData(printerID, data) {

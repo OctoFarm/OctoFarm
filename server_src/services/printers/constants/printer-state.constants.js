@@ -156,7 +156,7 @@ const PRINTER_STATES = {
   },
   PRINTER_TENTATIVE: {
     state: OF_S_STATE.DISCONNECTED,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+    stateColour: mapStateToCategory(OF_S_STATE.DISCONNECTED),
     stateDescription: "Current status from OctoPrint"
   },
   HOST_ONLINE: {

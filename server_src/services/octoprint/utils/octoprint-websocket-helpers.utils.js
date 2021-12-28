@@ -107,13 +107,56 @@ const capturePrinterState = (id, data) => {
 const captureConnectedData = (id, data) => {
   if (!!data[OP_WS_MSG_KEYS.connected]) {
     const { version } = data[OP_WS_MSG_KEYS.connected];
-    const currentVersion = getPrinterStoreCache().getOctoPrintVersion(id);
-    if (version !== currentVersion) {
-      console.log("VERSION", version);
-      console.log("CURRENT", currentVersion);
-      getPrinterStoreCache().updatePrinterDatabase(id, { octoPrintVersion: version });
+    parseAndUpdateVersionData(id, version);
+    //Overridden straight away
+    checkForMultipleUsers(id);
+  }
+};
+
+const checkForMultipleUsers = (id) => {
+  const userList = getPrinterStoreCache().getOctoPrintUserList(id);
+  if (userList.length > 1) {
+    const multiUserIssue = getPrinterStoreCache().getMultiUserIssueState(id);
+    if (!multiUserIssue) {
+      getPrinterStoreCache().updatePrinterLiveValue(id, {
+        multiUserIssue: true
+      });
+      const currentState = {
+        state: "Offline",
+        stateColour: mapStateToCategory("Offline"),
+        stateDescription: "Multiple users detected... couldn't authenticate the websocket!"
+      };
+
+      getPrinterStoreCache().updatePrinterState(id, currentState);
+
+      const currentWebsocketState = {
+        webSocket: "danger",
+        webSocketDescription: "Websocket is Offline!"
+      };
+      getPrinterStoreCache().updateWebsocketState(id, currentWebsocketState);
     }
   }
+};
+
+const parseAndUpdateVersionData = (id, version) => {
+  const currentVersion = getPrinterStoreCache().getOctoPrintVersion(id);
+  if (version !== currentVersion) {
+    getPrinterStoreCache().updatePrinterDatabase(id, { octoPrintVersion: version });
+  }
+};
+
+const removeMultiUserFlag = (id) => {
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    multiUserIssue: false
+  });
+};
+
+const setWebsocketAlive = (id) => {
+  const currentWebsocketState = {
+    webSocket: "success",
+    webSocketDescription: "Online and receiving data!"
+  };
+  getPrinterStoreCache().updateWebsocketState(id, currentWebsocketState);
 };
 
 module.exports = {
@@ -121,5 +164,7 @@ module.exports = {
   captureJobData,
   captureLogData,
   capturePrinterState,
-  captureConnectedData
+  captureConnectedData,
+  removeMultiUserFlag,
+  setWebsocketAlive
 };

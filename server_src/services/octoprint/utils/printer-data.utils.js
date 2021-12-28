@@ -39,13 +39,12 @@ const acquirePrinterNameData = (oldAppearance, newAppearance) => {
   // Check if user left blank, grab from OctoPrint... dis-regard if not blank
   if (oldAppearance?.name === "" || oldAppearance?.name === " ") {
     oldAppearance.name = newAppearance.name;
+    oldAppearance.color = newAppearance.color;
+    oldAppearance.colorIcon = newAppearance.colorIcon;
+  } else {
+    oldAppearance = newAppearance;
   }
-
-  //Grab the rest of the used data
-  oldAppearance.color = newAppearance.color;
-  oldAppearance.colorIcon = newAppearance.colorIcon;
-
-  return oldAppearance
+  return oldAppearance;
 };
 
 const acquirePrinterFilesAndFolderData = function (fileList) {
@@ -147,8 +146,7 @@ const acquirePrinterFilesAndFolderData = function (fileList) {
   return {
     printerFiles,
     printerLocations
-  }
-
+  };
 };
 
 module.exports = {

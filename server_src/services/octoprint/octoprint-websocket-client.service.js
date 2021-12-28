@@ -29,20 +29,18 @@ class WebSocketClient {
   #retryNumber = 0;
   #lastMessage = Date.now();
   #instance = undefined;
+  #pingPongTimer = 20000;
+  #heartbeatTerminate = undefined;
+  #heartbeatPing = undefined;
   #onMessage = undefined;
   autoReconnectInterval = undefined; // ms
-  heartbeatInterval = undefined;
-  heartbeatTimeout = undefined;
   reconnectTimeout = undefined;
-  // pingPongTimer = 20000;
   systemSettings = SettingsClean.returnSystemSettings();
   url = undefined;
   id = undefined;
   polling = undefined;
   currentUser = undefined;
   sessionKey = undefined;
-  startTime = undefined;
-  endTime = undefined;
 
   constructor(
     webSocketURL = undefined,
@@ -71,39 +69,37 @@ class WebSocketClient {
 
     this.open();
   }
-  // TODO maybe move to task manager again - required as OP doesn't seem to send ping/pong itself... Doesn't seem to be required anymore -_-
-  // heartBeat() {
-  //   if (!this.heartbeatInterval) {
-  //     this.heartbeatInterval = setInterval(() => {
-  //       console.log("heartbeat running");
-  //       if (this.#instance.readyState === 1) {
-  //         this.ping();
-  //       }
-  //     }, this.pingPongTimer);
-  //   }
-  // }
 
   open() {
     logger.debug(`${this.url}: ${OF_WS_DESC.SETTING_UP}`);
     PrinterTicker.addIssue(new Date(), this.url, `${OF_WS_DESC.SETTING_UP}`, "Active", this.id);
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
-      // console.log("PING RECEIVED");
+      logger.error("PING RECEIVED");
     });
 
     this.#instance.on("pong", () => {
-      // // this is issued if server sends ping
-      // console.log(this.url + " Event pong");
-      // clearTimeout(this.heartbeatTimeout);-
-      //
-      // // Use `WebSocket#terminate()`, which immediately destroys the connection,
-      // // instead of `WebSocket#close()`, which waits for the close timer.
-      // // Delay should be equal to the interval at which your server
-      // // sends out pings plus a conservative assumption of the latency.
-      // this.heartbeatTimeout = setTimeout(() => {
-      //   console.log("Disconected from server");
-      //   this.terminate();
-      // }, this.pingPongTimer + 1000);
+      logger.debug(this.url + " received pong message from server");
+      clearTimeout(this.#heartbeatTerminate);
+      clearTimeout(this.#heartbeatPing);
+
+      this.#heartbeatTerminate = setTimeout(() => {
+        logger.info(this.url + ": Didn't receive a pong from client, reconnecting!");
+        PrinterTicker.addIssue(
+          new Date(),
+          this.url,
+          "Didn't receive a pong from client, reconnecting!",
+          "Offline",
+          this.id
+        );
+        this.terminate();
+      }, this.#pingPongTimer + 1000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
+      this.#heartbeatPing = setTimeout(() => {
+        logger.debug(this.url + ": Pinging client");
+        this.#instance.ping();
+      }, this.#pingPongTimer - 1000);
+      logger.debug(this.url + " ping timout set", this.#pingPongTimer - 1000);
     });
 
     this.#instance.on("unexpected-response", (err) => {
@@ -131,6 +127,7 @@ class WebSocketClient {
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
       this.sendAuth();
       this.sendThrottle();
+      this.#instance.ping();
     });
 
     // This needs overriding by message passed through
@@ -182,7 +179,6 @@ class WebSocketClient {
             "Offline",
             this.id
           );
-          clearInterval(this.heartbeatInterval);
           this.reconnect(code);
           debugger;
           break;
@@ -196,7 +192,6 @@ class WebSocketClient {
             this.id
           );
           debugger;
-          clearInterval(this.heartbeatInterval);
           this.reconnect(code);
           break;
       }
@@ -256,7 +251,6 @@ class WebSocketClient {
           );
           break;
       }
-      clearInterval(this.heartbeatInterval);
       this.reconnect(e);
     });
   }
@@ -279,7 +273,7 @@ class WebSocketClient {
 
   sendThrottle() {
     const throttle = (this.polling * 1000) / 500;
-    logger.info("Throttling websocket connection to: " + this.polling + " seconds");
+    logger.debug("Throttling websocket connection to: " + this.polling + " seconds");
     PrinterTicker.addIssue(
       new Date(),
       this.url,
@@ -292,10 +286,6 @@ class WebSocketClient {
         throttle: throttle
       })
     );
-  }
-
-  ping() {
-    this.#instance.ping();
   }
 
   send(data, option) {
@@ -318,7 +308,7 @@ class WebSocketClient {
         this.id
       );
     }
-    logger.debug(
+    logger.info(
       `${this.url} Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
         this.#retryNumber
       }`
@@ -328,6 +318,8 @@ class WebSocketClient {
       REQUEST_TYPE.WEBSOCKET,
       REQUEST_KEYS.RETRY_REQUESTED
     );
+    clearTimeout(this.#heartbeatTerminate);
+    clearTimeout(this.#heartbeatPing);
     this.#instance.removeAllListeners();
     this.reconnectTimeout = setTimeout(() => {
       if (this.#retryNumber > 0) {
@@ -343,6 +335,7 @@ class WebSocketClient {
           this.id
         );
       }
+      logger.info(`${this.url} Opening websocket URL!`);
       this.open(this.url);
       this.reconnectTimeout = false;
       this.#retryNumber = this.#retryNumber + 1;
@@ -370,13 +363,13 @@ class WebSocketClient {
     logger.info(`${this.url} Killing all listeners`);
     logger.debug("Force terminating websocket connection");
     this.terminate();
-    logger.debug("Clearning heartbeat timeout", this.heartbeatTimeout);
-    clearTimeout(this.heartbeatTimeout);
-    logger.debug("Clearning reconnect timeout", this.reconnectTimeout);
+    clearTimeout(this.#heartbeatPing);
+    logger.debug(this.url + " Cleared heartbeat ping timeout", this.#heartbeatPing);
+    clearTimeout(this.#heartbeatTerminate);
+    logger.debug(this.url + " Cleared heartbeat terminate timeout", this.#heartbeatTerminate);
     clearTimeout(this.reconnectTimeout);
-    logger.debug("Clearning heartbeat interval", this.heartbeatInterval);
-    clearInterval(this.heartbeatInterval);
-    logger.debug("Removing all listeners", this.reconnectTimeout);
+    logger.debug(this.url + " Cleared reconnect timeout", this.reconnectTimeout);
+    logger.debug(this.url + " Removing all listeners");
     this.#instance.removeAllListeners();
     return true;
   }

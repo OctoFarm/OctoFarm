@@ -253,7 +253,6 @@ export class PrintersManagement {
           UI.createAlert(error.type, error.msg, 3000, "clicked");
         });
       } else {
-        const printers = [];
         const saveButton = document.getElementById(`saveButton-${newId}`);
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         saveButton.disabled = true;
@@ -265,8 +264,7 @@ export class PrintersManagement {
           printerGroup.value,
           printerName.value
         ).build();
-        printers.push(printer);
-        const printersToAdd = await OctoFarmClient.post("printers/add", printers);
+        const printersToAdd = await OctoFarmClient.post("printers/add", printer);
         const printersAdded = printersToAdd.printersAdded;
         printersAdded.forEach((printer) => {
           UI.createAlert(

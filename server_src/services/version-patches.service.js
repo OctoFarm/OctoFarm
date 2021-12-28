@@ -1,15 +1,34 @@
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const Logger = require("../handlers/logger");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
 
 const logger = new Logger("OctoFarm-State");
 
 const patchPrinterValues = (printer) => {
+  patchSortIndex(printer);
   printerURLPatch(printer);
   printerHTTPPatch(printer);
   printerURLTrailingSlashPatch(printer);
   webSocketURLPatch(printer);
   selectedFilamentNotArrayPatch(printer);
+  categoryPatch(printer);
   return printer;
+};
+
+const categoryPatch = (printer) => {
+  if (!printer?.category) {
+    printer.category = PRINTER_CATEGORIES.OCTOPRINT;
+  }
+};
+
+const patchSortIndex = (printer) => {
+  const currentPrinterCount = getPrinterStoreCache().getPrinterCount();
+  if (currentPrinterCount === 0) {
+    printer.sortIndex = 0;
+  } else if (currentPrinterCount > 0) {
+    printer.sortIndex = currentPrinterCount - 1;
+  }
 };
 
 const selectedFilamentNotArrayPatch = (printer) => {

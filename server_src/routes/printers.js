@@ -14,8 +14,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
 
-// Doesn't returns undefined, note to use is incorrect...
-// const { returnPrintersInformation } = require("../cache/printer.cache.js");
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 const {
   apiChecks,
@@ -36,7 +35,9 @@ router.post("/add", ensureAuthenticated, async (req, res) => {
   const printers = req.body;
   // Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
-  const p = await Runner.addPrinters(printers);
+  const p = await getPrinterManagerCache().addPrinter(printers);
+  console.log(p);
+
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });

@@ -419,17 +419,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       farmPrinters[this.index].octoPrintVersion = data.connected.version;
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
       farmPrinters[this.index].config_hash = data.connected.config_hash;
-
-      if (farmPrinters[this.index].userList.length > 1) {
-        farmPrinters[this.index].webSocket = "danger";
-        farmPrinters[this.index].webSocketDescription =
-          "Websocket Connected but in Tentative state until receiving data";
-        farmPrinters[this.index].state = "Offline";
-        farmPrinters[this.index].stateColour = Runner.getColour("Offline");
-        if (!farmPrinters[this.index]?.multiUserIssue) {
-          farmPrinters[this.index].multiUserIssue = true;
-        }
-      }
     }
     if (data.history) {
       if (farmPrinters[this.index]?.multiUserIssue) {
