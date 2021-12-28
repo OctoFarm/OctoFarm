@@ -462,110 +462,110 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       // }
       // farmPrinters[this.index].state = data.current.state.text;
       // farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
-      if (typeof data.current.resends !== "undefined") {
-        farmPrinters[this.index].resends = data.current.resends;
-      }
-
-      if (typeof data.current.progress !== "undefined") {
-        farmPrinters[this.index].progress = data.current.progress;
-      } else {
-        farmPrinters[this.index].progress = 0;
-      }
-      if (typeof data.current.currentZ !== "undefined" && data.currentZ !== null) {
-        farmPrinters[this.index].currentZ = data.current.currentZ;
-      }
-      if (typeof data.current.job !== "undefined" && data.current.job.user !== null) {
-        farmPrinters[this.index].job = data.current.job;
-        const currentFileIndex = _.findIndex(farmPrinters[this.index].fileList.files, function (o) {
-          return o.name === data.current.job.file.name;
-        });
-        if (currentFileIndex > -1) {
-          if (
-            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined" &&
-            farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail != null
-          ) {
-            farmPrinters[this.index].job.file.thumbnail =
-              farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
-          }
-          if (typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined") {
-            farmPrinters[this.index].job.file.length =
-              farmPrinters[this.index].fileList.files[currentFileIndex].length;
-          }
-        }
-        const currentFilament = JSON.parse(
-          JSON.stringify(farmPrinters[this.index].selectedFilament)
-        );
-        for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
-          if (farmPrinters[this.index].selectedFilament[s] !== null) {
-            let profile = null;
-            if (systemSettings.filamentManager) {
-              profile = await Profiles.findOne({
-                "profile.index": parseInt(
-                  farmPrinters[this.index].selectedFilament[s].spools.profile
-                )
-              });
-            } else {
-              profile = await Profiles.findById(
-                farmPrinters[this.index].selectedFilament[s].spools.profile
-              );
-            }
-            currentFilament[s].spools.profile = profile.profile;
-          }
-        }
-        await JobClean.generate(farmPrinters[this.index], currentFilament);
-      } else {
-        const currentFilament = JSON.parse(
-          JSON.stringify(farmPrinters[this.index].selectedFilament)
-        );
-        for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
-          if (farmPrinters[this.index].selectedFilament[s] !== null) {
-            let profile = null;
-            if (systemSettings.filamentManager) {
-              profile = await Profiles.findOne({
-                "profile.index": parseInt(
-                  farmPrinters[this.index].selectedFilament[s].spools.profile
-                )
-              });
-            } else {
-              profile = await Profiles.findById(
-                farmPrinters[this.index].selectedFilament[s].spools.profile
-              );
-            }
-            currentFilament[s].spools.profile = profile.profile;
-          }
-        }
-        await JobClean.generate(farmPrinters[this.index], currentFilament);
-      }
-
-      if (typeof data.current.logs !== undefined) {
-        farmPrinters[this.index].logs = data.current.logs;
-      }
-      if (typeof data.current.temps !== "undefined" && data.current.temps.length !== 0) {
-        if (typeof data.current.temps[0].tool0 !== "undefined") {
-          farmPrinters[this.index].temps = data.current.temps;
-          let timeStamp = new Date();
-          timeStamp = timeStamp.getTime();
-          if (typeof farmPrinters[this.index].tempTimer === "undefined") {
-            farmPrinters[this.index].tempTimer = 1500;
-            data.current.temps[0].time = timeStamp;
-          } else {
-            if (farmPrinters[this.index].tempTimer >= 2500) {
-              data.current.temps[0].time = timeStamp;
-              let temps = {
-                currentTemp: data.current.temps[0],
-                printer_id: farmPrinters[this.index]._id
-              };
-              if (farmPrinters[this.index].stateColour.category !== "Offline") {
-                const newTemp = await new TempHistory(temps);
-                await newTemp.save();
-              }
-              farmPrinters[this.index].tempTimer = 0;
-            } else {
-              farmPrinters[this.index].tempTimer = farmPrinters[this.index].tempTimer + 1000;
-            }
-          }
-        }
-      }
+      // if (typeof data.current.resends !== "undefined") {
+      //   farmPrinters[this.index].resends = data.current.resends;
+      // }
+      //
+      // if (typeof data.current.progress !== "undefined") {
+      //   farmPrinters[this.index].progress = data.current.progress;
+      // } else {
+      //   farmPrinters[this.index].progress = 0;
+      // }
+      // if (typeof data.current.currentZ !== "undefined" && data.currentZ !== null) {
+      //   farmPrinters[this.index].currentZ = data.current.currentZ;
+      // }
+      // if (typeof data.current.job !== "undefined" && data.current.job.user !== null) {
+      //   farmPrinters[this.index].job = data.current.job;
+      //   const currentFileIndex = _.findIndex(farmPrinters[this.index].fileList.files, function (o) {
+      //     return o.name === data.current.job.file.name;
+      //   });
+      //   if (currentFileIndex > -1) {
+      //     if (
+      //       typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined" &&
+      //       farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail != null
+      //     ) {
+      //       farmPrinters[this.index].job.file.thumbnail =
+      //         farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
+      //     }
+      //     if (typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined") {
+      //       farmPrinters[this.index].job.file.length =
+      //         farmPrinters[this.index].fileList.files[currentFileIndex].length;
+      //     }
+      //   }
+      //   const currentFilament = JSON.parse(
+      //     JSON.stringify(farmPrinters[this.index].selectedFilament)
+      //   );
+      //   for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
+      //     if (farmPrinters[this.index].selectedFilament[s] !== null) {
+      //       let profile = null;
+      //       if (systemSettings.filamentManager) {
+      //         profile = await Profiles.findOne({
+      //           "profile.index": parseInt(
+      //             farmPrinters[this.index].selectedFilament[s].spools.profile
+      //           )
+      //         });
+      //       } else {
+      //         profile = await Profiles.findById(
+      //           farmPrinters[this.index].selectedFilament[s].spools.profile
+      //         );
+      //       }
+      //       currentFilament[s].spools.profile = profile.profile;
+      //     }
+      //   }
+      //   await JobClean.generate(farmPrinters[this.index], currentFilament);
+      // } else {
+      //   const currentFilament = JSON.parse(
+      //     JSON.stringify(farmPrinters[this.index].selectedFilament)
+      //   );
+      //   for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
+      //     if (farmPrinters[this.index].selectedFilament[s] !== null) {
+      //       let profile = null;
+      //       if (systemSettings.filamentManager) {
+      //         profile = await Profiles.findOne({
+      //           "profile.index": parseInt(
+      //             farmPrinters[this.index].selectedFilament[s].spools.profile
+      //           )
+      //         });
+      //       } else {
+      //         profile = await Profiles.findById(
+      //           farmPrinters[this.index].selectedFilament[s].spools.profile
+      //         );
+      //       }
+      //       currentFilament[s].spools.profile = profile.profile;
+      //     }
+      //   }
+      //   await JobClean.generate(farmPrinters[this.index], currentFilament);
+      // }
+      //
+      // if (typeof data.current.logs !== undefined) {
+      //   farmPrinters[this.index].logs = data.current.logs;
+      // }
+      // if (typeof data.current.temps !== "undefined" && data.current.temps.length !== 0) {
+      //   if (typeof data.current.temps[0].tool0 !== "undefined") {
+      //     farmPrinters[this.index].temps = data.current.temps;
+      //     let timeStamp = new Date();
+      //     timeStamp = timeStamp.getTime();
+      //     if (typeof farmPrinters[this.index].tempTimer === "undefined") {
+      //       farmPrinters[this.index].tempTimer = 1500;
+      //       data.current.temps[0].time = timeStamp;
+      //     } else {
+      //       if (farmPrinters[this.index].tempTimer >= 2500) {
+      //         data.current.temps[0].time = timeStamp;
+      //         let temps = {
+      //           currentTemp: data.current.temps[0],
+      //           printer_id: farmPrinters[this.index]._id
+      //         };
+      //         if (farmPrinters[this.index].stateColour.category !== "Offline") {
+      //           const newTemp = await new TempHistory(temps);
+      //           await newTemp.save();
+      //         }
+      //         farmPrinters[this.index].tempTimer = 0;
+      //       } else {
+      //         farmPrinters[this.index].tempTimer = farmPrinters[this.index].tempTimer + 1000;
+      //       }
+      //     }
+      //   }
+      // }
       if (data.current.progress.completion != null && data.current.progress.completion === 100) {
         farmPrinters[this.index].stateColour = Runner.getColour("Complete");
         farmPrinters[this.index].stateDescription = "Your current print is Completed!";

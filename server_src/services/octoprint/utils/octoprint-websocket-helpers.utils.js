@@ -6,6 +6,7 @@ const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
 
 const Logger = require("../../../handlers/logger");
+const { PRINTER_STATES } = require("../../printers/constants/printer-state.constants");
 const logger = new Logger("OctoFarm-State");
 
 //TODO, could potentially build up if not careful.
@@ -89,6 +90,12 @@ const capturePrinterState = (id, data) => {
     } else {
       returnState = text;
       returnStateDescription = "Current status from OctoPrint";
+
+      const progress = getPrinterStoreCache().getPrinterProgress(id);
+      if (progress?.completion === 100) {
+        returnState = "Complete";
+        returnStateDescription = "Your current print is Completed!";
+      }
     }
 
     const currentState = {
