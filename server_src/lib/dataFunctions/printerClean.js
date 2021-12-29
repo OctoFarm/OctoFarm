@@ -164,7 +164,8 @@ class PrinterClean {
       printerResendRatioWeekly: [],
       historyByDay: [],
       historyByDayIncremental: [],
-      octoPrintSystemInfo: printer.octoPrintSystemInfo
+      octoPrintSystemInfo: printer.octoPrintSystemInfo,
+      printerFirmware: printer.printerFirmware
     };
     //Generate utilisation chart
     const totalTime = printer.currentActive + printer.currentIdle + printer.currentOffline;
@@ -968,7 +969,7 @@ class PrinterClean {
               totalToolTarget,
               totalToolActual,
               printer.otherSettings.temperatureTriggers.heatingVariation,
-              printer.otherSettings.temperatureTriggers.coolDownf
+              printer.otherSettings.temperatureTriggers.coolDown
             )} heatMapLeft"></div>`;
             actualString += '<div title="';
             for (let r = 0; r < rightString.length; r++) {

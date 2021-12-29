@@ -287,9 +287,9 @@ export default class PrinterLogs {
     let hardwareCores = "Unknown";
     let hardwareRam = "Unknown";
 
-    if (stats.octoPrintSystemInfo) {
-      octoPrintVersion = stats.octoPrintSystemInfo["octoprint.version"];
+    printerFirmware = !!stats.printerFirmware;
 
+    if (stats.octoPrintSystemInfo) {
       pythonVersion = stats.octoPrintSystemInfo["env.python.version"];
 
       pythonPip = stats.octoPrintSystemInfo["env.python.pip"];

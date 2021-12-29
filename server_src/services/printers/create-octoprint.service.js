@@ -88,6 +88,7 @@ class OctoPrintPrinter {
   costSettings = null;
   powerSettings = null;
   klipperFirmwareVersion = undefined;
+  printerFirmware = undefined;
   octoPrintVersion = undefined;
   storage = undefined;
   current = undefined;
@@ -192,7 +193,8 @@ class OctoPrintPrinter {
       settingsSystem,
       settingsWebcam,
       core,
-      octoPrintSystemInfo
+      octoPrintSystemInfo,
+      printerFirmware
     } = printer;
     this._id = _id.toString();
     //Only update the below if received from database, otherwise is required from scans.
@@ -310,6 +312,10 @@ class OctoPrintPrinter {
 
     if (!!octoPrintSystemInfo) {
       this.octoPrintSystemInfo = octoPrintSystemInfo;
+    }
+
+    if (!!printerFirmware) {
+      this.printerFirmware = printerFirmware;
     }
 
     if (!!fileList) {
@@ -799,7 +805,10 @@ class OctoPrintPrinter {
       alreadyAvailable: this?.octoPrintVersion,
       currentVersion: this.octoPrintVersion
     });
-    this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
+    if (this.#retryNumber === 0) {
+      this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
+    }
+
     let versionCheck = await this.#api.getVersion(true).catch(() => {
       return false;
     });
@@ -816,11 +825,14 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Successfully found printer on the high sea!", "Complete");
       return true;
     } else {
-      this.#apiPrinterTickerWrap(
-        "Failed to find printer on the high sea! marking offline...",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      if (this.#retryNumber === 0) {
+        this.#apiPrinterTickerWrap(
+          "Failed to find printer on the high sea! marking offline...",
+          "Offline",
+          "Error Code: " + globalStatusCode
+        );
+      }
+
       return globalStatusCode;
     }
   }

@@ -105,7 +105,10 @@ const OP_WS_MSG_KEYS = {
 
 const OP_WS_PLUGIN_KEYS = {
   pluginmanager: "pluginmanager",
-  klipper: "klipper"
+  klipper: "klipper",
+  displayLayerProgress: "DisplayLayerProgress",
+  softwareupdate: "softwareupdate",
+  psucontrol: "psucontrol" //Not used
 };
 
 module.exports = {

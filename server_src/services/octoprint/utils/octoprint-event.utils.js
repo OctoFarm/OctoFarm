@@ -16,17 +16,16 @@ const tickerWrapper = (id, state, message) => {
 const captureClientAuthed = (id, data) => {
   let { networkIpAddresses } = SystemRunner.returnInfo();
   if (!networkIpAddresses) networkIpAddresses = [];
-
   const { remoteAddress, username } = data;
 
-  let detectedAddress = "";
+  let detectedAddress = "Socked Authed for: ";
 
   if (networkIpAddresses.includes(remoteAddress)) {
-    detectedAddress = process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
+    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress = remoteAddress;
+    detectedAddress += remoteAddress;
   } else {
-    detectedAddress = "Unknown IP";
+    detectedAddress += "Unknown IP";
   }
 
   const currentUser = getPrinterStoreCache().getCurrentUser(id);
@@ -34,35 +33,34 @@ const captureClientAuthed = (id, data) => {
 
   switch (currentUser) {
     case username:
-      detectedUser = username;
+      detectedUser += username;
       break;
     case null:
-      detectedUser = "A pesky ghost";
+      detectedUser += "A pesky ghost (Don't know who)";
       break;
     default:
-      detectedUser = currentUser;
+      detectedUser += currentUser;
   }
-  const message = `${detectedAddress} has authenticated on the socket with user: ${detectedUser}`;
+  const message = `${detectedAddress} with user: ${detectedUser}`;
   logger.warning(message);
   tickerWrapper(id, "Complete", message);
 };
 const captureClientClosed = (id, data) => {
   let { networkIpAddresses } = SystemRunner.returnInfo();
-  if (!networkIpAddresses) networkIpAddresses = [];
 
+  if (!networkIpAddresses) networkIpAddresses = [];
   const { remoteAddress } = data;
 
-  let detectedAddress = "";
-  const hasDiscconected = " has disconnected from the socket.";
+  let detectedAddress = "Socket was closed for: ";
   if (networkIpAddresses.includes(remoteAddress)) {
-    detectedAddress = process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
+    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress = remoteAddress;
+    detectedAddress += remoteAddress;
   } else {
-    detectedAddress = "Unknown IP";
+    detectedAddress += "Unknown IP";
   }
-  logger.warning(detectedAddress + hasDiscconected);
-  tickerWrapper(id, "Info", detectedAddress + hasDiscconected);
+  logger.warning(detectedAddress);
+  tickerWrapper(id, "Info", detectedAddress);
 };
 const captureClientOpened = (id, data) => {
   let { networkIpAddresses } = SystemRunner.returnInfo();
@@ -70,17 +68,16 @@ const captureClientOpened = (id, data) => {
 
   const { remoteAddress } = data;
 
-  let detectedAddress = "";
-  const hasOpened = " has opened the socket.";
+  let detectedAddress = "Socket Opened for: ";
   if (networkIpAddresses.includes(remoteAddress)) {
-    detectedAddress = process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
+    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress = remoteAddress;
+    detectedAddress += remoteAddress;
   } else {
-    detectedAddress = "Unknown IP";
+    detectedAddress += "Unknown IP";
   }
-  logger.warning(detectedAddress + hasOpened);
-  tickerWrapper(id, "Info", detectedAddress + hasOpened);
+  logger.warning(detectedAddress);
+  tickerWrapper(id, "Info", detectedAddress);
 };
 const captureConnected = (id, data) => {};
 const captureDisconnecting = (id, data) => {};
@@ -118,7 +115,13 @@ const captureError = (id, data) => {
 const captureFileAdded = (id, data) => {};
 const captureFileDeselected = (id, data) => {};
 const captureFileRemoved = (id, data) => {};
-const captureFirmwareData = (id, data) => {};
+const captureFirmwareData = (id, data) => {
+  const { name } = data;
+  logger.warning("Updating printer firmware version", name);
+  getPrinterStoreCache().updatePrinterDatabase(id, {
+    printerFirmware: name
+  });
+};
 const captureFolderAdded = (id, data) => {};
 const captureFolderRemoved = (id, data) => {};
 const captureHome = (id, data) => {};
@@ -174,36 +177,36 @@ const captureUpdatedFiles = (id, data) => {};
 const captureUpload = (id, data) => {};
 const captureUserLoggedOut = (id, data) => {
   const currentUser = getPrinterStoreCache().getCurrentUser(id);
-  let detectedUser = "";
+  let detectedUser = "User: ";
   const hasLoggedOut = " has logged out of OctoPrint.";
 
   switch (currentUser) {
     case data.username:
-      detectedUser = data.username;
+      detectedUser += data.username;
       break;
     case null:
-      detectedUser = "A pesky ghost";
+      detectedUser += "A pesky ghost (Don't know who)";
       break;
     default:
-      detectedUser = currentUser;
+      detectedUser += currentUser;
   }
   logger.warning(detectedUser + hasLoggedOut);
   tickerWrapper(id, "Info", detectedUser + hasLoggedOut);
 };
 const captureUserLoggedIn = (id, data) => {
   const currentUser = getPrinterStoreCache().getCurrentUser(id);
-  let detectedUser = "";
+  let detectedUser = "User: ";
   const hasLoggedIn = " has logged in to OctoPrint.";
 
   switch (currentUser) {
     case data.username:
-      detectedUser = data.username;
+      detectedUser += data.username;
       break;
     case null:
-      detectedUser = "A pesky ghost";
+      detectedUser += "A pesky ghost (Don't know who)";
       break;
     default:
-      detectedUser = currentUser;
+      detectedUser += currentUser;
   }
   logger.warning(detectedUser + hasLoggedIn);
   tickerWrapper(id, "Info", detectedUser + hasLoggedIn);

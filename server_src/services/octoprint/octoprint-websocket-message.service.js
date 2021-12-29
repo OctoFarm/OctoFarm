@@ -52,7 +52,10 @@ const {
   captureUserLoggedOut,
   captureZChange
 } = require("./utils/octoprint-event.utils");
-const { captureKlipperPluginData } = require("./utils/octoprint-plugin.utils");
+const {
+  captureKlipperPluginData,
+  capturePluginManagerData
+} = require("./utils/octoprint-plugin.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const Logger = require("../../handlers/logger");
@@ -189,7 +192,7 @@ class OctoprintWebsocketMessageService {
         break;
       case EVENT_TYPES.FirmwareData:
         // Update firmware data rather than resyncing
-        console.log("firmwareData", payload);
+        captureFirmwareData(printerID, payload);
         break;
       case EVENT_TYPES.FolderAdded:
         // Trigger resyncs
@@ -269,7 +272,7 @@ class OctoprintWebsocketMessageService {
 
     switch (header) {
       case OP_WS_PLUGIN_KEYS.pluginmanager:
-        console.log(type);
+        capturePluginManagerData(printerID, type, data);
         break;
       case OP_WS_PLUGIN_KEYS.klipper:
         console.log(type);

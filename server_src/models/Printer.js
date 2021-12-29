@@ -31,6 +31,10 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  printerFirmware: {
+    type: String,
+    required: false
+  },
   currentUser: {
     type: String,
     required: false

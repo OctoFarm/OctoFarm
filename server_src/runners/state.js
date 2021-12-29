@@ -739,74 +739,108 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       // }
     }
     if (data.plugin) {
-      if (data.plugin.data.type === "loglines") {
-        if (
-          typeof data.plugin.data !== "undefined" &&
-          typeof data.plugin.data.loglines !== "undefined"
-        ) {
-          data.plugin.data.loglines.forEach((logLine) => {
-            if (logLine.stream === "call" || logLine.stream === "message") {
-              PrinterTicker.addOctoPrintLog(
-                farmPrinters[this.index],
-                logLine.line,
-                "Active",
-                data.plugin.plugin
-              );
-            } else if (logLine.stream === "stdout") {
-              PrinterTicker.addOctoPrintLog(
-                farmPrinters[this.index],
-                logLine.line,
-                "Complete",
-                data.plugin.plugin
-              );
-              if (
-                logLine.line.includes("Successfully installed") ||
-                logLine.line.includes("Successfully built")
-              ) {
-                PrinterTicker.addIssue(
-                  new Date(),
-                  farmPrinters[this.index].printerURL,
-                  logLine.line,
-                  "Complete",
-                  data.plugin.plugin
-                );
-              }
-              if (logLine.line.includes("Uninstalling")) {
-                PrinterTicker.addIssue(
-                  new Date(),
-                  farmPrinters[this.index].printerURL,
-                  logLine.line,
-                  "Offline",
-                  data.plugin.plugin
-                );
-              }
-              if (logLine.line.includes("Processing")) {
-                PrinterTicker.addIssue(
-                  new Date(),
-                  farmPrinters[this.index].printerURL,
-                  logLine.line,
-                  "Active",
-                  data.plugin.plugin
-                );
-              }
-            } else {
-              PrinterTicker.addOctoPrintLog(
-                farmPrinters[this.index],
-                logLine.line,
-                "Offline",
-                data.plugin.plugin
-              );
-              PrinterTicker.addIssue(
-                new Date(),
-                farmPrinters[this.index].printerURL,
-                logLine.line,
-                "Offline",
-                data.plugin.plugin
-              );
-            }
-          });
-        }
-      }
+      // if (data.plugin.plugin === "pluginmanager") {
+      //   if (
+      //     typeof data.plugin.data !== "undefined" &&
+      //     typeof data.plugin.data.loglines !== "undefined"
+      //   ) {
+      //     data.plugin.data.loglines.forEach((logLine) => {
+      //       if (logLine.stream === "call" || logLine.stream === "message") {
+      //         PrinterTicker.addOctoPrintLog(
+      //           farmPrinters[this.index],
+      //           logLine.line,
+      //           "Active",
+      //           data.plugin.plugin
+      //         );
+      //       } else if (logLine.stream === "stdout") {
+      //         PrinterTicker.addOctoPrintLog(
+      //           farmPrinters[this.index],
+      //           logLine.line,
+      //           "Complete",
+      //           data.plugin.plugin
+      //         );
+      //         if (
+      //           logLine.line.includes("Successfully installed") ||
+      //           logLine.line.includes("Successfully built")
+      //         ) {
+      //           PrinterTicker.addIssue(
+      //             new Date(),
+      //             farmPrinters[this.index].printerURL,
+      //             logLine.line,
+      //             "Complete",
+      //             data.plugin.plugin
+      //           );
+      //         }
+      //         if (logLine.line.includes("Uninstalling")) {
+      //           PrinterTicker.addIssue(
+      //             new Date(),
+      //             farmPrinters[this.index].printerURL,
+      //             logLine.line,
+      //             "Offline",
+      //             data.plugin.plugin
+      //           );
+      //         }
+      //         if (logLine.line.includes("Processing")) {
+      //           PrinterTicker.addIssue(
+      //             new Date(),
+      //             farmPrinters[this.index].printerURL,
+      //             logLine.line,
+      //             "Active",
+      //             data.plugin.plugin
+      //           );
+      //         }
+      //       } else {
+      //         PrinterTicker.addOctoPrintLog(
+      //           farmPrinters[this.index],
+      //           logLine.line,
+      //           "Offline",
+      //           data.plugin.plugin
+      //         );
+      //         PrinterTicker.addIssue(
+      //           new Date(),
+      //           farmPrinters[this.index].printerURL,
+      //           logLine.line,
+      //           "Offline",
+      //           data.plugin.plugin
+      //         );
+      //       }
+      //     });
+      //   }
+      //   if (data.plugin.data.needs_restart) {
+      //     PrinterTicker.addOctoPrintLog(
+      //       farmPrinters[this.index],
+      //       "Restart required detected!",
+      //       "Active",
+      //       data.plugin.plugin
+      //     );
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "Restart required detected!",
+      //       "Active",
+      //       farmPrinters[this.index]._id
+      //     );
+      //     farmPrinters[this.index].restartRequired = true;
+      //   }
+      //   if (
+      //     data.plugin.data.type === "loglines" &&
+      //     data.plugin.data?.data?.loglines[0]?.line.includes("Processing")
+      //   ) {
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       data.plugin.data.data.loglines[0].line,
+      //       "Active",
+      //       farmPrinters[this.index]._id
+      //     );
+      //     PrinterTicker.addOctoPrintLog(
+      //       farmPrinters[this.index],
+      //       data.plugin.data.data.loglines[0].line,
+      //       "Active",
+      //       data.plugin.plugin
+      //     );
+      //   }
+      // }
       if (data.plugin.plugin === "klipper") {
         // console.log(data.plugin.data.payload);
         if (data.plugin.data.payload.includes("Firmware version:")) {
@@ -839,42 +873,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           }
         }
       }
-      if (data.plugin.plugin === "pluginmanager") {
-        if (data.plugin.data.needs_restart) {
-          PrinterTicker.addOctoPrintLog(
-            farmPrinters[this.index],
-            "Restart required detected!",
-            "Active",
-            data.plugin.plugin
-          );
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Restart required detected!",
-            "Active",
-            farmPrinters[this.index]._id
-          );
-          farmPrinters[this.index].restartRequired = true;
-        }
-        if (
-          data.plugin.data.type === "loglines" &&
-          data.plugin.data?.data?.loglines[0]?.line.includes("Processing")
-        ) {
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            data.plugin.data.data.loglines[0].line,
-            "Active",
-            farmPrinters[this.index]._id
-          );
-          PrinterTicker.addOctoPrintLog(
-            farmPrinters[this.index],
-            data.plugin.data.data.loglines[0].line,
-            "Active",
-            data.plugin.plugin
-          );
-        }
-      }
+
       if (data.plugin.plugin === "softwareupdate") {
         if (data.plugin.data.type === "updating") {
           PrinterTicker.addIssue(

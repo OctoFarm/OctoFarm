@@ -67,20 +67,12 @@ function updatePrinterColumn(printer) {
   const printerPrinterInformation = document.getElementById(
     `printerPrinterInformation-${printer._id}`
   );
-  if (!!printer.octoPrintSystemInfo) {
-    if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
-      UI.doesElementNeedUpdating(
-        '<small title="Please connect and resync to display printer firmware">Unknown</small>',
-        printerPrinterInformation,
-        "innerHTML"
-      );
-    } else {
-      UI.doesElementNeedUpdating(
-        `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
-        printerPrinterInformation,
-        "innerHTML"
-      );
-    }
+  if (!!printer.printerFirmware) {
+    UI.doesElementNeedUpdating(
+      `<small>${printer.printerFirmware}</small>`,
+      printerPrinterInformation,
+      "innerHTML"
+    );
   }
 }
 
@@ -88,7 +80,7 @@ function updateOctoPiColumn(printer) {
   const printerOctoPrintInformation = document.getElementById(
     `printerOctoPrintInformation-${printer._id}`
   );
-  if (!!printer.octoPi) {
+  if (!!printer?.octoPi?.version) {
     UI.doesElementNeedUpdating(
       `<small>${printer.octoPrintVersion}</small><br>` +
         (printer.octoPi?.version ? `<small>${printer.octoPi.version}</small><br>` : "") +
