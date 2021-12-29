@@ -52,6 +52,7 @@ const EVENT_TYPES = {
   Disconnecting: "Disconnecting",
   Disconnected: "Disconnected",
   Dwelling: "Dwelling",
+  Error: "Error",
   FileAdded: "FileAdded",
   FileDeselected: "FileDeselected",
   FileRemoved: "FileRemoved",
@@ -75,6 +76,7 @@ const EVENT_TYPES = {
   UpdatedFiles: "UpdatedFiles",
   Upload: "Upload",
   UserLoggedIn: "UserLoggedIn",
+  UserLoggedOut: "UserLoggedOut",
   ZChange: "ZChange"
 };
 

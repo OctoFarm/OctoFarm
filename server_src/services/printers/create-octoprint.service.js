@@ -33,6 +33,7 @@ class OctoPrintPrinter {
   #retryNumber = 0;
   multiUserIssue = undefined;
   restartRequired = false;
+  coolDownEvent = undefined;
   //Communications
   #api = undefined;
   #ws = undefined;

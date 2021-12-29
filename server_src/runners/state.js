@@ -566,180 +566,177 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       //     }
       //   }
       // }
-      if (data.current.progress.completion != null && data.current.progress.completion === 100) {
-        farmPrinters[this.index].stateColour = Runner.getColour("Complete");
-        farmPrinters[this.index].stateDescription = "Your current print is Completed!";
-      } else {
-        farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
-      }
+      // if (data.current.progress.completion != null && data.current.progress.completion === 100) {
+      //   farmPrinters[this.index].stateColour = Runner.getColour("Complete");
+      //   farmPrinters[this.index].stateDescription = "Your current print is Completed!";
+      // } else {
+      //   farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
+      // }
     }
     if (typeof data.event !== "undefined") {
-      if (data.event.type === "UserLoggedIn") {
-        if (farmPrinters[this.index].currentUser === data.event.payload.username) {
-          //Authed from OctoFarm host...
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "OctoFarm has logged in to OctoPrint",
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        } else if (data.event.payload.username === null) {
-          //Authed from OctoFarm host...
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Someone has opened OctoPrints login page...",
-            "Active",
-            farmPrinters[this.index]._id
-          );
-        } else {
-          //Not authed from OctoFarm host
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            `${data.event.payload.username} has Logged in to OctoPrint!`,
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        }
-      }
-      if (data.event.type === "UserLoggedOut") {
-        if (farmPrinters[this.index].currentUser === data.event.payload.username) {
-          //Authed from OctoFarm host...
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "OctoFarm has logged out of OctoPrint...",
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        } else {
-          //Not authed from OctoFarm host
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            `${data.event.payload.username} has Logged out to OctoPrint!`,
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        }
-      }
-
-      if (data.event.type === "ClientClosed") {
-        let { networkIpAddresses } = SystemRunner.returnInfo();
-        if (!networkIpAddresses) networkIpAddresses = [];
-        if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
-          //Authed from OctoFarm host...
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "OctoFarm has logged out from OctoPrint...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-        } else {
-          //Not authed from OctoFarm host
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            `${data.event.payload.remoteAddress} device has disconnected from OctoPrints websocket!`,
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-        }
-      }
-
-      if (data.event.type === "ClientAuthed") {
-        let { networkIpAddresses } = SystemRunner.returnInfo();
-        if (!networkIpAddresses) networkIpAddresses = [];
-        farmPrinters[this.index].restartRequired = false;
-        if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
-          //Authed from OctoFarm host...
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "OctoFarm is authenticated on OctoPrints websocket!",
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        } else {
-          //Not authed from OctoFarm host
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            `${data.event.payload.remoteAddress} device has connected to OctoPrints websocket!`,
-            "Complete",
-            farmPrinters[this.index]._id
-          );
-        }
-      }
-
-      if (data.event.type === "PrintPaused") {
-        const that = this;
-        await ScriptRunner.check(farmPrinters[that.index], "paused");
-      }
-      if (data.event.type === "PrintFailed") {
-        // Make a capture of the current required printer data..
-        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
-          data.event.payload,
-          farmPrinters[this.index]
-        );
-        const that = this;
-        setTimeout(async function () {
-          // Register cancelled print...
-          await HistoryCollection.capturePrint(
-            payloadData,
-            printer,
-            job,
-            files,
-            resendStats,
-            false
-          );
-          await Runner.updateFilament();
-          setTimeout(async function () {
-            await Runner.reSyncFile(
-              farmPrinters[that.index]._id,
-              farmPrinters[that.index].job.file.path
-            );
-          }, 5000);
-        }, 10000);
-      }
-      if (data.event.type === "PrintDone") {
-        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
-          data.event.payload,
-          farmPrinters[this.index]
-        );
-        const that = this;
-        setTimeout(async function () {
-          // Register cancelled print...
-          await HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, true);
-          await Runner.updateFilament();
-          setTimeout(async function () {
-            await Runner.reSyncFile(
-              farmPrinters[that.index]._id,
-              farmPrinters[that.index].job.file.path
-            );
-          }, 500);
-        }, 10000);
-      }
-      if (data.event.type === "Error") {
-        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
-          data.event.payload,
-          farmPrinters[this.index]
-        );
-        const that = this;
-        setTimeout(async function () {
-          // Register cancelled print...
-          await HistoryCollection.errorLog(payloadData, printer, job, files, resendStats);
-          await Runner.updateFilament();
-          setTimeout(async function () {
-            if (!_.isEmpty(job)) {
-              await Runner.reSyncFile(farmPrinters[that.index]._id, job.file.path);
-            }
-          }, 500);
-        }, 10000);
-      }
+      // if (data.event.type === "UserLoggedIn") {
+      //   if (farmPrinters[this.index].currentUser === data.event.payload.username) {
+      //     //Authed from OctoFarm host...
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "OctoFarm has logged in to OctoPrint",
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   } else if (data.event.payload.username === null) {
+      //     //Authed from OctoFarm host...
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "Someone has opened OctoPrints login page...",
+      //       "Active",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   } else {
+      //     //Not authed from OctoFarm host
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       `${data.event.payload.username} has Logged in to OctoPrint!`,
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   }
+      // }
+      // if (data.event.type === "UserLoggedOut") {
+      //   if (farmPrinters[this.index].currentUser === data.event.payload.username) {
+      //     //Authed from OctoFarm host...
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "OctoFarm has logged out of OctoPrint...",
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   } else {
+      //     //Not authed from OctoFarm host
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       `${data.event.payload.username} has Logged out to OctoPrint!`,
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   }
+      // }
+      // if (data.event.type === "ClientClosed") {
+      //   let { networkIpAddresses } = SystemRunner.returnInfo();
+      //   if (!networkIpAddresses) networkIpAddresses = [];
+      //   if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
+      //     //Authed from OctoFarm host...
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "OctoFarm has logged out from OctoPrint...",
+      //       "Offline",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   } else {
+      //     //Not authed from OctoFarm host
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       `${data.event.payload.remoteAddress} device has disconnected from OctoPrints websocket!`,
+      //       "Offline",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   }
+      // }
+      // if (data.event.type === "ClientAuthed") {
+      //   let { networkIpAddresses } = SystemRunner.returnInfo();
+      //   if (!networkIpAddresses) networkIpAddresses = [];
+      //   farmPrinters[this.index].restartRequired = false;
+      //   if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
+      //     //Authed from OctoFarm host...
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       "OctoFarm is authenticated on OctoPrints websocket!",
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   } else {
+      //     //Not authed from OctoFarm host
+      //     PrinterTicker.addIssue(
+      //       new Date(),
+      //       farmPrinters[this.index].printerURL,
+      //       `${data.event.payload.remoteAddress} device has connected to OctoPrints websocket!`,
+      //       "Complete",
+      //       farmPrinters[this.index]._id
+      //     );
+      //   }
+      // }
+      // if (data.event.type === "PrintPaused") {
+      //   const that = this;
+      //   await ScriptRunner.check(farmPrinters[that.index], "paused");
+      // }
+      // if (data.event.type === "PrintFailed") {
+      //   // Make a capture of the current required printer data..
+      //   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+      //     data.event.payload,
+      //     farmPrinters[this.index]
+      //   );
+      //   const that = this;
+      //   setTimeout(async function () {
+      //     // Register cancelled print...
+      //     await HistoryCollection.capturePrint(
+      //       payloadData,
+      //       printer,
+      //       job,
+      //       files,
+      //       resendStats,
+      //       false
+      //     );
+      //     await Runner.updateFilament();
+      //     setTimeout(async function () {
+      //       await Runner.reSyncFile(
+      //         farmPrinters[that.index]._id,
+      //         farmPrinters[that.index].job.file.path
+      //       );
+      //     }, 5000);
+      //   }, 10000);
+      // }
+      // if (data.event.type === "PrintDone") {
+      //   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+      //     data.event.payload,
+      //     farmPrinters[this.index]
+      //   );
+      //   const that = this;
+      //   setTimeout(async function () {
+      //     // Register cancelled print...
+      //     await HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, true);
+      //     await Runner.updateFilament();
+      //     setTimeout(async function () {
+      //       await Runner.reSyncFile(
+      //         farmPrinters[that.index]._id,
+      //         farmPrinters[that.index].job.file.path
+      //       );
+      //     }, 500);
+      //   }, 10000);
+      // }
+      // if (data.event.type === "Error") {
+      //   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+      //     data.event.payload,
+      //     farmPrinters[this.index]
+      //   );
+      //   const that = this;
+      //   setTimeout(async function () {
+      //     // Register cancelled print...
+      //     await HistoryCollection.errorLog(payloadData, printer, job, files, resendStats);
+      //     await Runner.updateFilament();
+      //     setTimeout(async function () {
+      //       if (!_.isEmpty(job)) {
+      //         await Runner.reSyncFile(farmPrinters[that.index]._id, job.file.path);
+      //       }
+      //     }, 500);
+      //   }, 10000);
+      // }
     }
     if (data.plugin) {
       if (data.plugin.data.type === "loglines") {

@@ -1,7 +1,8 @@
 const {
   OP_WS_MSG,
   OP_WS_PLUGIN_KEYS,
-  OP_WS_MSG_KEYS
+  OP_WS_MSG_KEYS,
+  EVENT_TYPES
 } = require("../octoprint/constants/octoprint-websocket.constants");
 const { byteCount } = require("../../utils/benchmark.util");
 const {
@@ -16,6 +17,41 @@ const {
   capturePrinterProgress,
   captureCurrentZ
 } = require("./utils/octoprint-websocket-helpers.utils");
+const {
+  captureClientAuthed,
+  captureClientClosed,
+  captureClientOpened,
+  captureConnected,
+  captureDisconnecting,
+  captureDisconnected,
+  captureDwelling,
+  captureError,
+  captureFileAdded,
+  captureFileDeselected,
+  captureFileRemoved,
+  captureFirmwareData,
+  captureFolderAdded,
+  captureFolderRemoved,
+  captureHome,
+  captureMetadataAnalysisFinished,
+  captureMetadataAnalysisStarted,
+  captureMetadataStatisticsUpdated,
+  capturePositionUpdate,
+  capturePrintCancelled,
+  capturePrintCancelling,
+  capturePrintDone,
+  captureFinishedPrint,
+  capturePrintPaused,
+  capturePrintStarted,
+  capturePrinterStateChanged,
+  captureTransferDone,
+  captureTransferStarted,
+  captureUpdatedFiles,
+  captureUpload,
+  captureUserLoggedIn,
+  captureUserLoggedOut,
+  captureZChange
+} = require("./utils/octoprint-event.utils");
 const { captureKlipperPluginData } = require("./utils/octoprint-plugin.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
@@ -119,6 +155,110 @@ class OctoprintWebsocketMessageService {
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static handleEventData(printerID, data) {
+    const { type, payload } = data.event;
+    const debugMessage = `Detected ${type} event`;
+    logger.debug(debugMessage, payload);
+    switch (type) {
+      case EVENT_TYPES.ClientAuthed:
+        captureClientAuthed(printerID, payload);
+        break;
+      case EVENT_TYPES.ClientClosed:
+        captureClientClosed(printerID, payload);
+        break;
+      case EVENT_TYPES.ClientOpened:
+        captureClientOpened(printerID, payload);
+        break;
+      case EVENT_TYPES.Connected:
+        break;
+      case EVENT_TYPES.Disconnecting:
+        break;
+      case EVENT_TYPES.Disconnected:
+        break;
+      case EVENT_TYPES.Dwelling:
+        break;
+      case EVENT_TYPES.Error:
+        captureError(printerID, payload);
+        break;
+      case EVENT_TYPES.FileAdded:
+        // Trigger resyncs
+        break;
+      case EVENT_TYPES.FileDeselected:
+        break;
+      case EVENT_TYPES.FileRemoved:
+        // Trigger resyncs
+        break;
+      case EVENT_TYPES.FirmwareData:
+        // Update firmware data rather than resyncing
+        console.log("firmwareData", payload);
+        break;
+      case EVENT_TYPES.FolderAdded:
+        // Trigger resyncs
+        break;
+      case EVENT_TYPES.FolderRemoved:
+        // Trigger resyncs
+        break;
+      case EVENT_TYPES.Home:
+        break;
+      case EVENT_TYPES.MetadataAnalysisFinished:
+        // Trigger resyncs
+        break;
+      case EVENT_TYPES.MetadataAnalysisStarted:
+        break;
+      case EVENT_TYPES.MetadataStatisticsUpdated:
+        break;
+
+      case EVENT_TYPES.PositionUpdate:
+        break;
+
+      case EVENT_TYPES.PrintCancelled:
+        break;
+
+      case EVENT_TYPES.PrintCancelling:
+        break;
+
+      case EVENT_TYPES.PrintDone:
+        captureFinishedPrint(printerID, payload, true);
+        break;
+
+      case EVENT_TYPES.PrintFailed:
+        captureFinishedPrint(printerID, payload, false);
+        break;
+
+      case EVENT_TYPES.PrintPaused:
+        capturePrintPaused(printerID, payload);
+        break;
+
+      case EVENT_TYPES.PrintStarted:
+        break;
+
+      case EVENT_TYPES.PrinterStateChanged:
+        break;
+
+      case EVENT_TYPES.TransferDone:
+        break;
+
+      case EVENT_TYPES.TransferStarted:
+        break;
+
+      case EVENT_TYPES.UpdatedFiles:
+        // Trigger resyncs
+        break;
+
+      case EVENT_TYPES.Upload:
+        break;
+
+      case EVENT_TYPES.UserLoggedIn:
+        captureUserLoggedIn(printerID, payload);
+        break;
+
+      case EVENT_TYPES.UserLoggedOut:
+        captureUserLoggedOut(printerID, payload);
+        break;
+
+      case EVENT_TYPES.ZChange:
+        break;
+    }
+
     // logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {

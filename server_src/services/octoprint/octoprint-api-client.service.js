@@ -22,7 +22,8 @@ const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "?force=true" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
 const apiPluginFilamentManagerSpecificSpool = apiBase + "/plugin/filamentmanager/spools";
-
+const apiTimelapse = (unrendered = true) =>
+  apiBase + "/timelapse" + (unrendered ? "?unrendered=true" : "");
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
 class OctoprintApiClientService extends OctoprintApiService {
@@ -127,6 +128,10 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async login(passive = true) {
     return await this.postPrinter(apiLogin(passive), {}, false);
+  }
+
+  async getTimelapses(unrendered = true) {
+    return await this.getWithOptionalRetry(apiTimelapse(unrendered), true);
   }
 }
 

@@ -43,11 +43,11 @@ function checkTempRange(state, target, actual, heatingVariation, coolDown) {
 }
 
 const clonePayloadDataForHistory = function (payload, farmPrinter) {
-  const payloadData = _.cloneDeep(payload);
-  const printer = _.cloneDeep(farmPrinter);
-  const job = _.cloneDeep(farmPrinter.job);
-  const files = _.cloneDeep(farmPrinter.fileList.files);
-  const resendStats = _.cloneDeep(farmPrinter.resends);
+  const payloadData = Object.assign({}, payload);
+  const printer = Object.assign({}, farmPrinter);
+  const job = Object.assign({}, farmPrinter.job);
+  const files = Object.assign({}, farmPrinter.fileList.files);
+  const resendStats = Object.assign({}, farmPrinter.resends);
 
   return { payloadData, printer, job, files, resendStats };
 };

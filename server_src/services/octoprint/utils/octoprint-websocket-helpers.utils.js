@@ -6,7 +6,6 @@ const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
 
 const Logger = require("../../../handlers/logger");
-const { PRINTER_STATES } = require("../../printers/constants/printer-state.constants");
 const logger = new Logger("OctoFarm-State");
 
 //TODO, could potentially build up if not careful.
@@ -15,8 +14,7 @@ const tempTimers = {};
 const captureLogData = (id, data) => {
   if (!!data) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
-      key: "terminal",
-      data: PrinterClean.sortTerminal(data, getPrinterStoreCache().getTerminalData(id))
+      terminal: PrinterClean.sortTerminal(data, getPrinterStoreCache().getTerminalData(id))
     });
   }
 };
@@ -26,8 +24,7 @@ const captureTemperatureData = (id, data) => {
     const temps = data;
     //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
-      key: "tools",
-      data: PrinterClean.sortTemps(temps[0])
+      tools: PrinterClean.sortTemps(temps[0])
     });
 
     if (!tempTimers[id]) {
@@ -52,6 +49,27 @@ const captureTemperatureData = (id, data) => {
     } else {
       tempTimers[id] = tempTimers[id] + 2000;
     }
+
+    coolDownEvent(id, temps);
+  }
+};
+
+const coolDownEvent = (id, temps) => {
+  const currentEvent = getPrinterStoreCache().getPrinterEvent(id, "coolDown");
+  const { printerState } = getPrinterStoreCache().getPrinterState(id);
+
+  if (printerState.colour.category === "Active") {
+    if (!currentEvent) {
+      getPrinterStoreCache().addPrinterEvent(id, "coolDown");
+    }
+  } else if (printerState.colour.category === "Complete") {
+    const { coolDown } = getPrinterStoreCache().getTempTriggers(id);
+    if (
+      parseFloat(temps[0].tool0.actual) < parseFloat(coolDown) &&
+      parseFloat(temps[0].bed.actual) < parseFloat(coolDown)
+    ) {
+      getPrinterStoreCache().firePrinterEvent(id, "coolDown");
+    }
   }
 };
 
@@ -59,8 +77,10 @@ const captureJobData = (id, data) => {
   if (!!data) {
     //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
-      key: "job",
-      data: JobClean.generate(
+      job: data
+    });
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      currentJob: JobClean.generate(
         data,
         getPrinterStoreCache().getSelectedFilament(id),
         getPrinterStoreCache().getFileList(id),

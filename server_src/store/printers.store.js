@@ -1,4 +1,10 @@
 const { findIndex } = require("lodash");
+const { EventEmitter } = require("events");
+const { ScriptRunner } = require("../runners/scriptCheck");
+
+const Logger = require("../handlers/logger");
+
+const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
   #printersList = undefined;
@@ -67,6 +73,11 @@ class PrinterStore {
     return printer.currentZ;
   }
 
+  getCurrentUser(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.currentUser;
+  }
+
   getCostSettings(id) {
     const printer = this.#findMePrinter(id);
     return printer.costSettings;
@@ -95,6 +106,56 @@ class PrinterStore {
   getPrinterProgress(id) {
     const printer = this.#findMePrinter(id);
     return printer.progress;
+  }
+
+  getPrinterURL(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.printerURL;
+  }
+
+  getPrinter(id) {
+    const printer = this.#findMePrinter(id);
+    return Object.assign({}, printer);
+  }
+
+  getPrinterEvent(id, event) {
+    const printer = this.#findMePrinter(id);
+    return printer[event + "Event"];
+  }
+
+  firePrinterEvent(id, event) {
+    const printer = this.#findMePrinter(id);
+    if (!!printer[event + "Event"]) {
+      logger.info("Fired printer event", event);
+      printer[event + "Event"].emit(event.toLowerCase());
+    }
+  }
+
+  getPrinterState(id) {
+    const printer = this.#findMePrinter(id);
+    return {
+      printerState: printer.printerState,
+      hostState: printer.hostState,
+      webSocketState: printer.webSocketState
+    };
+  }
+
+  getTempTriggers(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.tempTriggers;
+  }
+
+  addPrinterEvent(id, event) {
+    const printer = this.#findMePrinter(id);
+    if (!printer[event + "Event"]) {
+      printer[event + "Event"] = new EventEmitter();
+      if (!printer[event + "Event"]._events[event.toLowerCase()]) {
+        logger.info("Added new event to printer: ", event);
+        printer[event + "Event"].once(event.toLowerCase(), (stream) => {
+          ScriptRunner.check(printer, event.toLowerCase(), undefined);
+        });
+      }
+    }
   }
 }
 
