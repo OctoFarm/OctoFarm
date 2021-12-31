@@ -41,14 +41,18 @@ class LoggerService {
       winston.format.printf((info) => {
         const level = info.level.toUpperCase();
         const date = dateFormat();
+        let metaData = undefined;
+        if (!!info?.meta) {
+          metaData = Object.assign({}, info.meta);
+          metaData = JSON.stringify(metaData);
+        }
         let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
           COLOUR_MAP[info.level]
-        }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route}: ${COLOURS.WHITE} \n ${
+        }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route} ${COLOURS.WHITE} \n ${
           COLOUR_MAP[info.level]
         }MESSAGE: ${COLOURS.WHITE}${info.message} `;
-        message = info.meta
-          ? message +
-            `\n ${COLOUR_MAP[info.level]}DATA: ${COLOURS.WHITE}${JSON.stringify(info.meta)}`
+        message = metaData
+          ? message + `\n ${COLOUR_MAP[info.level]}DATA: ${COLOURS.WHITE}${metaData}`
           : message;
         return message;
       })

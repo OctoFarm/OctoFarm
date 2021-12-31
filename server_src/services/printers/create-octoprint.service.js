@@ -50,7 +50,7 @@ class OctoPrintPrinter {
   #db = undefined;
   #apiRetry = undefined;
   timeout = undefined;
-  reconnectTimeout = undefined;
+  #reconnectTimeout = undefined;
   #reconnectingIn = 0;
   //Required
   sortIndex = undefined;
@@ -63,7 +63,7 @@ class OctoPrintPrinter {
   // Always database
   _id = undefined;
   // Always default
-  systemChecks = Object.assign({}, systemChecks);
+  systemChecks = systemChecks();
   // Always OP
   sessionKey = undefined;
   //Overridden by database
@@ -75,7 +75,7 @@ class OctoPrintPrinter {
   currentActive = 0;
   currentOffline = 0;
   selectedFilament = [];
-  tempTriggers = Object.assign({}, tempTriggers);
+  tempTriggers = tempTriggers();
   feedRate = 100;
   flowRate = 100;
   stepRate = 10;
@@ -387,7 +387,6 @@ class OctoPrintPrinter {
   }
 
   #apiChecksUpdateWrap(apiCall, status, dateUpdate = false) {
-    if (!ALLOWED_SYSTEM_CHECKS[apiCall.toUpperCase()]) throw new Error("Unknown API Call");
     this.systemChecks.scanning[apiCall].status = status;
     // Only update dates on calls made, unless date is currently null...
     if (dateUpdate || this.systemChecks.scanning[apiCall].date === null) {
@@ -478,10 +477,11 @@ class OctoPrintPrinter {
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
+      console.log(this.printerURL, "HIGH SEA FAIL");
       this.reconnectAPI();
       return;
     }
-
+    console.log(this.printerURL, "HIGH SEA");
     this.setHostState(PRINTER_STATES.HOST_ONLINE);
 
     // Grab user list, current user and passively login to the client, Fail to Shutdown
@@ -629,6 +629,7 @@ class OctoPrintPrinter {
   }
 
   reconnectAPI() {
+    this.#retryNumber = this.#retryNumber + 1;
     this.setAllPrinterStates(PRINTER_STATES.SHUTDOWN);
     logger.info(
       this.printerURL + `Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
@@ -645,7 +646,7 @@ class OctoPrintPrinter {
       );
     }
 
-    this.reconnectTimeout = setTimeout(() => {
+    this.#reconnectTimeout = setTimeout(() => {
       this.setAllPrinterStates(PRINTER_STATES.SEARCHING);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
@@ -663,8 +664,7 @@ class OctoPrintPrinter {
         );
       }
       this.enablePrinter().then();
-      this.reconnectTimeout = false;
-      this.#retryNumber = this.#retryNumber + 1;
+      this.#reconnectTimeout = false;
     }, this.#apiRetry);
   }
 
@@ -754,7 +754,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintUsersList(force = false) {
     this.#apiPrinterTickerWrap("Acquiring User List", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.API, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
     let usersCheck = await this.#api.getUsers(true).catch(() => {
       return false;
     });
@@ -779,7 +779,7 @@ class OctoPrintPrinter {
             "Complete",
             "Current User: " + this.currentUser
           );
-          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.API, "success", true);
+          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
           return true;
         } else {
           //If the userList isn't empty then we need to parse out the users and search for octofarm user.
@@ -809,7 +809,7 @@ class OctoPrintPrinter {
             "Complete",
             "Current User: " + this.currentUser
           );
-          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.API, "success", true);
+          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
           return true;
         }
       } else {
@@ -818,12 +818,12 @@ class OctoPrintPrinter {
           "Complete",
           "Current User: " + this.currentUser
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.API, "success");
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success");
         return true;
       }
     } else {
       this.#apiPrinterTickerWrap("Failed to acquire user list...", "Offline");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.API, "danger", true);
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "danger", true);
       return globalStatusCode;
     }
   }
@@ -903,7 +903,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintSystemData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring system data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
     if ((!this?.core && this.core.length === 0) || force) {
       let systemCheck = await this.#api.getSystemCommands(true).catch(() => {
         return false;
@@ -918,7 +918,7 @@ class OctoPrintPrinter {
           core: systemJson.core
         });
         this.#apiPrinterTickerWrap("Acquired system data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -926,12 +926,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("System data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success");
       // Call was skipped as we have data or not forced
       return true;
     }
@@ -939,7 +939,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintProfileData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring profile data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PROFILE, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "warning");
     if (!this?.profiles || force) {
       let profileCheck = await this.#api.getPrinterProfiles(true).catch(() => {
         return false;
@@ -955,7 +955,7 @@ class OctoPrintPrinter {
           this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
         }
         this.#apiPrinterTickerWrap("Acquired profile data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PROFILE, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -963,12 +963,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PROFILE, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("Profile data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PROFILE, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success");
       // Call was skipped as we have data or not forced
       return true;
     }
@@ -976,7 +976,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintStateData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.STATE, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
     if (!this?.current || !this?.options || force) {
       let stateCheck = await this.#api.getConnection(true).catch(() => {
         return false;
@@ -1005,7 +1005,7 @@ class OctoPrintPrinter {
           this.connectionOptions = PrinterClean.sortOptions(this.options);
         }
         this.#apiPrinterTickerWrap("Acquired state data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.STATE, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1013,12 +1013,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.STATE, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("State data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.STATE, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success");
       // Call was skipped as we have data or not forced
       return true;
     }
@@ -1026,7 +1026,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintSettingsData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SETTINGS, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
     if (
       !this?.corsCheck ||
       !this?.settingsApi ||
@@ -1100,7 +1100,7 @@ class OctoPrintPrinter {
         this.gcodeScripts = PrinterClean.sortGCODE(scripts);
         this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
         this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SETTINGS, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1108,12 +1108,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SETTINGS, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("State data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SETTINGS, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success");
       // Call was skipped as we have data or not forced
       return true;
     }
@@ -1122,7 +1122,7 @@ class OctoPrintPrinter {
   async acquireOctoPrintSystemInfoData(force = false) {
     if (!checkSystemInfoAPIExistance(this.octoPrintVersion)) return false;
     this.#apiPrinterTickerWrap("Acquiring system information plugin data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM_INFO, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "warning");
     if (!this?.octoPrintSystemInfo || force) {
       let systemInfoCheck = await this.#api.getSystemInfo(true).catch(() => {
         return false;
@@ -1137,7 +1137,7 @@ class OctoPrintPrinter {
           octoPrintSystemInfo: systemInfo
         });
         this.#apiPrinterTickerWrap("Acquired system information plugin data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM_INFO, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1145,7 +1145,7 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM_INFO, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "danger", true);
         return globalStatusCode;
       }
     } else {
@@ -1153,7 +1153,7 @@ class OctoPrintPrinter {
         "System information plugin data acquired previously... skipped!",
         "Complete"
       );
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.SYSTEM_INFO, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success");
       // Call was skipped as we have data or not forced
       return true;
     }
@@ -1162,7 +1162,7 @@ class OctoPrintPrinter {
   async acquireOctoPrintPluginsListData(force = true) {
     if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
     this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PLUGINS, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
     if (!this.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
       const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
@@ -1177,7 +1177,7 @@ class OctoPrintPrinter {
           pluginsList: repository.plugins
         });
         this.#apiPrinterTickerWrap("Acquired plugin lists data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PLUGINS, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1185,12 +1185,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PLUGINS, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("Plugin lists data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.PLUGINS, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success");
       return true;
     }
   }
@@ -1198,7 +1198,7 @@ class OctoPrintPrinter {
   async acquireOctoPrintUpdatesData(force = false) {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
     this.#apiPrinterTickerWrap("Acquiring OctoPrint updates data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.UPDATES, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "warning");
     if (!this?.octoPrintUpdate || !this?.octoPrintPluginUpdates || force) {
       this.octoPrintUpdate = [];
       this.octoPrintPluginUpdates = [];
@@ -1243,7 +1243,7 @@ class OctoPrintPrinter {
           octoPrintPluginUpdates: pluginUpdates
         });
         this.#apiPrinterTickerWrap("Acquired OctoPrint updates data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.UPDATES, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1251,7 +1251,7 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.UPDATES, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "danger", true);
         return globalStatusCode;
       }
     } else {
@@ -1259,14 +1259,14 @@ class OctoPrintPrinter {
         "OctoPrint updates data acquired previously... skipped!",
         "Complete"
       );
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.UPDATES, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "success");
       return true;
     }
   }
 
   async acquireOctoPrintFilesData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.FILES, "warning");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
     if (!this?.fileList || !this?.storage || force) {
       this.fileList = {
         files: [],
@@ -1314,7 +1314,7 @@ class OctoPrintPrinter {
           this.costSettings
         );
         this.#apiPrinterTickerWrap("Acquired file list data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.FILES, "success", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "success", true);
         return true;
       } else {
         this.#apiPrinterTickerWrap(
@@ -1322,12 +1322,12 @@ class OctoPrintPrinter {
           "Offline",
           "Error Code: " + globalStatusCode
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.FILES, "danger", true);
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "danger", true);
         return globalStatusCode;
       }
     } else {
       this.#apiPrinterTickerWrap("File list data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS.FILES, "success");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "success");
       return true;
     }
   }
@@ -1399,8 +1399,8 @@ class OctoPrintPrinter {
   }
 
   killApiTimeout() {
-    logger.debug("Clearning API Timeout", this.reconnectTimeout);
-    clearTimeout(this.reconnectTimeout);
+    logger.debug("Clearning API Timeout", this.#reconnectTimeout);
+    clearTimeout(this.#reconnectTimeout);
   }
 
   killAllConnections() {

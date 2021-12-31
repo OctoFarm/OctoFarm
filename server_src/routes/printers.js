@@ -137,7 +137,7 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   if (!id) {
     returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
   } else {
-    returnedPrinterInformation = getPrinterStoreCache().getPrinter(id);
+    returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
   }
   res.send(returnedPrinterInformation);
 });
@@ -153,7 +153,7 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
   try {
     await getPrinterStoreCache().updateLatestOctoPrintSettings(id, true);
     logger.debug("Updating printer settings for: ", id);
-    res.send(getPrinterStoreCache().getPrinter(id));
+    res.send(getPrinterStoreCache().getPrinterInformation(id));
   } catch (e) {
     logger.error(`The server couldn't update your printer settings! ${e}`);
     res.statusMessage = `The server couldn't update your printer settings! ${e}`;

@@ -3,9 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
-const { Runner } = require("../runners/state.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
@@ -17,6 +15,7 @@ const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -147,7 +146,7 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
   const currentFilter = getFilter();
   const serverSettings = SettingsClean.returnSystemSettings();
 
-  let printGroups = Runner.returnGroupList();
+  let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -176,7 +175,7 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = Runner.returnGroupList();
+  let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -204,7 +203,7 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = Runner.returnGroupList();
+  let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -233,7 +232,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = Runner.returnGroupList();
+  let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }
@@ -262,7 +261,7 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
-  let printGroups = Runner.returnGroupList();
+  let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
   }

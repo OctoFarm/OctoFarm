@@ -1,4 +1,4 @@
-const { findIndex } = require("lodash");
+const { findIndex, cloneDeep } = require("lodash");
 const { EventEmitter } = require("events");
 const { ScriptRunner } = require("../runners/scriptCheck");
 const { PrinterTicker } = require("../runners/printerTicker");
@@ -155,9 +155,9 @@ class PrinterStore {
     return printer.printerURL;
   }
 
-  getPrinter(id) {
+  getPrinterInformation(id) {
     const printer = this.#findMePrinter(id);
-    return Object.assign({}, printer);
+    return JSON.parse(JSON.stringify(printer));
   }
 
   getPrinterEvent(id, event) {
@@ -221,11 +221,6 @@ class PrinterStore {
 
       //Check for a printer name change...
       if (oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name) {
-        this.updatePrinterDatabase(newPrinterInfo._id, {
-          settingsAppearance: {
-            name: newPrinterInfo.settingsAppearance.name
-          }
-        });
         const loggerMessage = `Changed printer name from ${oldPrinter.settingsAppearance.name} to ${newPrinterInfo.settingsAppearance.name}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
@@ -235,9 +230,15 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
+        this.updatePrinterDatabase(newPrinterInfo._id, {
+          settingsAppearance: {
+            name: newPrinterInfo.settingsAppearance.name
+          }
+        });
+
         if (
           findIndex(this.#printersList, function (o) {
-            return o._id === id;
+            return o._id === newPrinterInfo._id;
           }) !== -1
         ) {
           changesList.push({
@@ -249,6 +250,15 @@ class PrinterStore {
 
       //Check for a printer url change...
       if (oldPrinter.printerURL !== newPrinterInfo.printerURL) {
+        const loggerMessage = `Changed printer url from ${oldPrinter.printerURL} to ${newPrinterInfo.printerURL}`;
+        logger.warning(loggerMessage);
+        PrinterTicker.addIssue(
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
+        );
         if (newPrinterInfo.printerURL[newPrinterInfo.printerURL.length - 1] === "/") {
           newPrinterInfo.printerURL = newPrinterInfo.printerURL.replace(/\/?$/, "");
         }
@@ -262,18 +272,10 @@ class PrinterStore {
           printerURL: newPrinterInfo.printerURL,
           webSocketURL: convertHttpUrlToWebsocket(newPrinterInfo.printerURL)
         });
-        const loggerMessage = `Changed printer url from ${oldPrinter.printerURL} to ${newPrinterInfo.printerURL}`;
-        logger.warning(loggerMessage);
-        PrinterTicker.addIssue(
-          new Date(),
-          oldPrinter.printerURL,
-          loggerMessage,
-          "Active",
-          oldPrinter._id
-        );
+
         if (
           findIndex(this.#printersList, function (o) {
-            return o._id === id;
+            return o._id === newPrinterInfo._id;
           }) !== -1
         ) {
           changesList.push({
@@ -289,9 +291,6 @@ class PrinterStore {
 
       // Check for apikey change...
       if (oldPrinter.apikey !== newPrinterInfo.apikey) {
-        this.updatePrinterDatabase(newPrinterInfo._id, {
-          apikey: newPrintersInformation.apikey
-        });
         const loggerMessage = `Changed apiKey from ${oldPrinter.apikey} to ${newPrinterInfo.apikey}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -301,9 +300,13 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
+        this.updatePrinterDatabase(newPrinterInfo._id, {
+          apikey: newPrinterInfo.apikey
+        });
+
         if (
           findIndex(this.#printersList, function (o) {
-            return o._id === id;
+            return o._id === newPrinterInfo._id;
           }) !== -1
         ) {
           changesList.push({
@@ -318,9 +321,6 @@ class PrinterStore {
 
       // Check for group change...
       if (oldPrinter.group !== newPrinterInfo.group) {
-        this.updatePrinterDatabase(newPrinterInfo._id, {
-          group: newPrintersInformation.group
-        });
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -330,9 +330,12 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
+        this.updatePrinterDatabase(newPrinterInfo._id, {
+          group: newPrinterInfo.group
+        });
         if (
           findIndex(this.#printersList, function (o) {
-            return o._id === id;
+            return o._id === newPrinterInfo._id;
           }) !== -1
         ) {
           changesList.push({
@@ -342,24 +345,24 @@ class PrinterStore {
         }
         updateGroupListing = true;
       }
-
       // Check for camURL change...
+      const loggerMessage = `Changed camera url from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
+      logger.info(loggerMessage);
+      PrinterTicker.addIssue(
+        new Date(),
+        oldPrinter.printerURL,
+        loggerMessage,
+        "Active",
+        oldPrinter._id
+      );
       if (oldPrinter.camURL !== newPrinterInfo.camURL) {
         this.updatePrinterDatabase(newPrinterInfo._id, {
           camURL: newPrinterInfo.camURL
         });
-        const loggerMessage = `Changed camURL from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
-        logger.info(loggerMessage);
-        PrinterTicker.addIssue(
-          new Date(),
-          oldPrinter.printerURL,
-          loggerMessage,
-          "Active",
-          oldPrinter._id
-        );
+
         if (
           findIndex(this.#printersList, function (o) {
-            return o._id === id;
+            return o._id === newPrinterInfo._id;
           }) !== -1
         ) {
           changesList.push({

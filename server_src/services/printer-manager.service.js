@@ -129,7 +129,7 @@ class PrinterManagerService {
 
     for (let d = 0; d < deleteList.length; d++) {
       const id = deleteList[d];
-      const printer = getPrinterStoreCache().getPrinter(id);
+      const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
       removedPrinterList.push({
         printerURL: printer.printerURL,

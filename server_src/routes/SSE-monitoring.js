@@ -19,10 +19,9 @@ const SettingsClean = settingsClean.SettingsClean;
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const { writePoints } = require("../lib/influxExport.js");
 // User Modal
-const runner = require("../runners/state.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const Runner = runner.Runner;
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 let influxCounter = 2000;
 
@@ -40,7 +39,7 @@ const sortMe = function (printers) {
 };
 const filterMe = function (printers) {
   let filterBy = getFilter();
-  let currentGroups = Runner.returnGroupList();
+  let currentGroups = getPrinterManagerCache().returnGroupList();
   if (filterBy === "All Printers") {
     return printers;
   } else if (filterBy === "State: Active") {

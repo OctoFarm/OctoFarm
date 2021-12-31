@@ -142,7 +142,7 @@ const PRINTER_STATES = {
     state: OF_S_STATE.WEBSOCKET_FAIL,
     stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
     hostState: OF_H_STATE.ONLINE,
-    hostStateColour: mapStateToCategory(OF_C_STATE.RE_SYNC),
+    hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
     stateDescription: OF_C_DESC.RE_CONNECT_WEBSOCKET,
     hostDescription: OF_H_DESC.ONLINE
   },
@@ -154,6 +154,11 @@ const PRINTER_STATES = {
     webSocket: OF_COLOURS.WARNING,
     webSocketDescription: OF_WS_DESC.TENTATIVE
   },
+  WS_ONLINE: {
+    webSocket: OF_COLOURS.WARNING,
+    webSocketDescription: OF_WS_DESC.TENTATIVE
+  },
+  PRINTER_OFFLINE: {},
   PRINTER_TENTATIVE: {
     state: OF_S_STATE.DISCONNECTED,
     stateColour: mapStateToCategory(OF_S_STATE.DISCONNECTED),
@@ -163,7 +168,9 @@ const PRINTER_STATES = {
     hostState: OF_H_STATE.ONLINE,
     hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
     hostDescription: OF_H_DESC.ONLINE
-  }
+  },
+  HOST_OFFLINE: {},
+  HOST_SHUTDOWN: {}
 };
 
 module.exports = {

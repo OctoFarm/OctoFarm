@@ -4,7 +4,6 @@ const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
-const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const ConnectionMonitorService = require("./services/connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("./constants/connection-monitor.constants");
