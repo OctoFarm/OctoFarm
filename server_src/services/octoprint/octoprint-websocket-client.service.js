@@ -171,7 +171,7 @@ class WebSocketClient {
             this.id
           );
           break;
-        case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the browser implementation.
+        case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the server implementation.
           PrinterTicker.addIssue(
             new Date(),
             this.url,
@@ -271,8 +271,11 @@ class WebSocketClient {
     );
   }
 
-  sendThrottle() {
-    const throttle = (this.polling * 1000) / 500;
+  sendThrottle(seconds = undefined) {
+    let throttle = (this.polling * 1000) / 500;
+    if (!!seconds) {
+      throttle = (seconds * 1000) / 500;
+    }
     logger.debug("Throttling websocket connection to: " + this.polling + " seconds");
     PrinterTicker.addIssue(
       new Date(),
@@ -335,10 +338,9 @@ class WebSocketClient {
           this.id
         );
       }
-      logger.info(`${this.url} Opening websocket URL!`);
-      this.open(this.url);
-      this.reconnectTimeout = false;
+      this.open();
       this.#retryNumber = this.#retryNumber + 1;
+      clearTimeout(this.reconnectTimeout);
     }, this.autoReconnectInterval);
   }
 
@@ -372,6 +374,12 @@ class WebSocketClient {
     logger.debug(this.url + " Removing all listeners");
     this.#instance.removeAllListeners();
     return true;
+  }
+
+  resetSocketConnection(newURL, newSession) {
+    this.url = newURL;
+    this.sessionKey = newSession;
+    this.terminate();
   }
 }
 

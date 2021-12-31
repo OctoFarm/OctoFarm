@@ -22,6 +22,10 @@ class PrinterDatabaseService {
         logger.error(err);
       });
   };
+
+  delete = () => {
+    return printerModel.findOneAndDelete({ _id: this.#id });
+  };
 }
 
 module.exports = PrinterDatabaseService;

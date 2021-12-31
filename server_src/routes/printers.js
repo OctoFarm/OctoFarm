@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 
@@ -30,7 +30,7 @@ const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
 
-router.post("/add", ensureAuthenticated, async (req, res) => {
+router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
   const printers = req.body;
   // Send Dashboard to Runner..
@@ -42,21 +42,21 @@ router.post("/add", ensureAuthenticated, async (req, res) => {
   res.send({ printersAdded: p, status: 200 });
 });
 
-router.post("/update", ensureAuthenticated, async (req, res) => {
+router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   // Grab the API body
   const printers = req.body;
   // Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
-  const p = await Runner.updatePrinters(printers);
+  const p = getPrinterManagerCache().bulkUpdateBasicPrinterInformation(printers);
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });
-router.post("/remove", ensureAuthenticated, async (req, res) => {
+router.post("/remove", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
   const printers = req.body;
   // Send Dashboard to Runner..
   logger.info("Delete printers request: ", printers);
-  const p = await Runner.removePrinter(printers);
+  const p = getPrinterManagerCache().bulkDeletePrinters(printers);
   // Return printers added...
   res.send({ printersRemoved: p, status: 200 });
 });
@@ -106,7 +106,7 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   Runner.feedRate(step.printer, step.newSteps);
   res.send("success");
 });
-router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
+router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Check required fields
   const settings = req.body;
   logger.info("Update printers request: ", settings);
@@ -250,7 +250,7 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   logger.info("Action wake host: ", data);
   Script.wol(data);
 });
-router.post("/updateSortIndex", ensureAuthenticated, async (req, res) => {
+router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const data = req.body;
   logger.info("Update filament sorting request: ", data);
   Runner.updateSortIndex(data);
@@ -275,7 +275,7 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
     res.send(pluginList);
   }
 });
-router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
+router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const { searchForDevicesOnNetwork } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();

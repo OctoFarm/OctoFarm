@@ -5,10 +5,16 @@ const { OctoPrintPrinter } = require("../services/printers/create-octoprint.serv
 const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
+const { isEmpty } = require("lodash");
+const _ = require("lodash");
+const { PrinterClean } = require("../lib/dataFunctions/printerClean");
+const Printers = require("../models/Printer");
 
 const logger = new Logger("OctoFarm-PrinterManager");
 
 class PrinterManagerService {
+  #printerGroupList = [];
+
   async initialisePrinters() {
     // Grab printers from database
     const pList = await PrinterService.list();
@@ -100,6 +106,71 @@ class PrinterManagerService {
     });
     printer["current" + category] = printer["current" + category] + 30000;
     printer.updateStateTrackingCounters(category, printer["current" + category]);
+  }
+
+  bulkUpdateBasicPrinterInformation(newPrintersInformation) {
+    const { updateGroupListing, changesList, socketsNeedTerminating } =
+      getPrinterStoreCache().updatePrintersBasicInformation(newPrintersInformation);
+
+    if (updateGroupListing) this.updateGroupList();
+
+    if (socketsNeedTerminating.length > 0) {
+      getPrinterStoreCache().resetPrintersSocketConnections(socketsNeedTerminating);
+    }
+
+    return changesList;
+  }
+
+  bulkDeletePrinters(deleteList) {
+    const removedPrinterList = [];
+
+    for (let d = 0; d < deleteList.length; d++) {
+      const id = deleteList[d];
+      getPrinterStoreCache().deletePrinter(id);
+      removedPrinterList.push(id);
+    }
+    // Regenerate groups list
+    this.updateGroupList();
+
+    // Regenerate sort indexs
+    this.updatePrinterSortIndexes();
+    return removedPrinterList;
+  }
+
+  returnGroupList() {
+    return this.#printerGroupList;
+  }
+
+  updatePrinterSortIndexes() {
+    const printerList = getPrinterStoreCache().listPrinters();
+    for (let i = 0; i < printerList.length; i++) {
+      const printer = printerList[i];
+      printer.updatePrinterDatabase(printer._id, {
+        sortIndex: i
+      });
+    }
+  }
+
+  updateGroupList() {
+    const defaultGroupList = [
+      "All Printers",
+      "State: Idle",
+      "State: Active",
+      "State: Complete",
+      "State: Disconnected"
+    ];
+
+    defaultGroupList.forEach((group) => {
+      this.#printerGroupList.push(group);
+    });
+    const printerList = getPrinterStoreCache().listPrinters();
+    printerList.forEach((printer) => {
+      if (!this.#printerGroupList.includes(`Group: ${printer.group}`)) {
+        if (!isEmpty(printer.group)) {
+          this.#printerGroupList.push(`Group: ${printer.group}`);
+        }
+      }
+    });
   }
 }
 

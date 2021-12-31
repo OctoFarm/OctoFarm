@@ -1,11 +1,10 @@
 const fetch = require("node-fetch");
 const { findIndex } = require("lodash");
-const runner = require("../runners/state.js");
-const { Runner } = runner;
 const Spool = require("../models/Filament.js");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const getOnlinePrinterList = async function () {
-  const printerList = Runner.returnFarmPrinters();
+  const printerList = getPrinterStoreCache().listPrinters();
   const onlinePrintersList = [];
   for (let i = 0; i < printerList.length; i++) {
     if (
@@ -65,7 +64,7 @@ const checkFilamentManagerPluginSettings = async function (printers) {
 };
 
 const checkIfSpoolAttachedToPrinter = function (spoolId) {
-  const printerList = Runner.returnFarmPrinters();
+  const printerList = getPrinterStoreCache().listPrinters();
   const filteredList = printerList.filter((printer) => printer.selectedFilament.length > 0);
   let isSpoolAttached = false;
   for (let i = 0; i < filteredList.length; i++) {
