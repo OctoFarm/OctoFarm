@@ -5,7 +5,6 @@ const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
-const _ = require("lodash");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -36,12 +35,23 @@ class PrinterStore {
       return o._id === id;
     });
     if (index > -1) {
+      logger.warning("Found printer index, deleting from database...", index);
       this.#printersList.splice(index, 1);
     }
   };
 
   getPrinterCount() {
     return this.#printersList.length;
+  }
+
+  listPrintersInformation() {
+    const returnList = [];
+
+    this.#printersList.forEach((printer) => {
+      returnList.push(Object.assign({}, printer));
+    });
+
+    return returnList;
   }
 
   listPrinters() {
@@ -52,12 +62,19 @@ class PrinterStore {
     return this.#printersList.push(printer);
   }
 
-  deletePrinter(id) {
+  async updateLatestOctoPrintSettings(id, force = false) {
+    const printer = this.#findMePrinter(id);
+    if (printer.printerState.state !== "Offline") {
+      await printer.acquireOctoPrintLatestSettings(force);
+    }
+  }
+
+  async deletePrinter(id) {
     const printer = this.#findMePrinter(id);
     //Kill all printer connections
-    printer.killAllConnections();
+    await printer.killAllConnections();
     //Remove from database
-    printer.deleteFromDataBase();
+    await printer.deleteFromDataBase();
     //Remove from printer store
     this.#removeFromStore(id);
   }
@@ -198,14 +215,13 @@ class PrinterStore {
     const socketsNeedTerminating = [];
 
     // Cycle through the printers and update their state...
-
     for (let i = 0; i < newPrintersInformation.length; i++) {
-      const oldPrinter = this.#findMePrinter(newPrintersInformation._id);
+      const oldPrinter = this.#findMePrinter(newPrintersInformation[i]._id);
       const newPrinterInfo = newPrintersInformation[i];
 
       //Check for a printer name change...
       if (oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name) {
-        this.updatePrinterDatabase(newPrintersInformation._id, {
+        this.updatePrinterDatabase(newPrinterInfo._id, {
           settingsAppearance: {
             name: newPrinterInfo.settingsAppearance.name
           }
@@ -219,8 +235,15 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
-        if (!changesList.includes(oldPrinter._id)) {
-          changesList.push(oldPrinter._id);
+        if (
+          findIndex(this.#printersList, function (o) {
+            return o._id === id;
+          }) !== -1
+        ) {
+          changesList.push({
+            _id: newPrinterInfo._id,
+            printerURL: newPrinterInfo.printerURL
+          });
         }
       }
 
@@ -235,7 +258,7 @@ class PrinterStore {
         ) {
           newPrinterInfo.printerURL = `http://${newPrinterInfo.printerURL}`;
         }
-        this.updatePrinterDatabase(newPrintersInformation._id, {
+        this.updatePrinterDatabase(newPrinterInfo._id, {
           printerURL: newPrinterInfo.printerURL,
           webSocketURL: convertHttpUrlToWebsocket(newPrinterInfo.printerURL)
         });
@@ -248,8 +271,15 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
-        if (!changesList.includes(oldPrinter._id)) {
-          changesList.push(oldPrinter._id);
+        if (
+          findIndex(this.#printersList, function (o) {
+            return o._id === id;
+          }) !== -1
+        ) {
+          changesList.push({
+            _id: newPrinterInfo._id,
+            printerURL: newPrinterInfo.printerURL
+          });
         }
 
         if (!socketsNeedTerminating.includes(oldPrinter._id)) {
@@ -259,8 +289,7 @@ class PrinterStore {
 
       // Check for apikey change...
       if (oldPrinter.apikey !== newPrinterInfo.apikey) {
-        oldPrinter.apikey = newPrinterInfo.apikey;
-        this.updatePrinterDatabase(newPrintersInformation._id, {
+        this.updatePrinterDatabase(newPrinterInfo._id, {
           apikey: newPrintersInformation.apikey
         });
         const loggerMessage = `Changed apiKey from ${oldPrinter.apikey} to ${newPrinterInfo.apikey}`;
@@ -272,8 +301,15 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
-        if (!changesList.includes(newPrinterInfo._id)) {
-          changesList.push(newPrinterInfo._id);
+        if (
+          findIndex(this.#printersList, function (o) {
+            return o._id === id;
+          }) !== -1
+        ) {
+          changesList.push({
+            _id: newPrinterInfo._id,
+            printerURL: newPrinterInfo.printerURL
+          });
         }
         if (!socketsNeedTerminating.includes(oldPrinter._id)) {
           socketsNeedTerminating.push(oldPrinter._id);
@@ -282,8 +318,7 @@ class PrinterStore {
 
       // Check for group change...
       if (oldPrinter.group !== newPrinterInfo.group) {
-        oldPrinter.group = newPrinterInfo.group;
-        this.updatePrinterDatabase(newPrintersInformation._id, {
+        this.updatePrinterDatabase(newPrinterInfo._id, {
           group: newPrintersInformation.group
         });
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
@@ -295,17 +330,23 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
-        if (!changesList.includes(newPrinterInfo._id)) {
-          changesList.push(newPrinterInfo._id);
+        if (
+          findIndex(this.#printersList, function (o) {
+            return o._id === id;
+          }) !== -1
+        ) {
+          changesList.push({
+            _id: newPrinterInfo._id,
+            printerURL: newPrinterInfo.printerURL
+          });
         }
         updateGroupListing = true;
       }
 
       // Check for camURL change...
       if (oldPrinter.camURL !== newPrinterInfo.camURL) {
-        oldPrinter.camURL = newPrinterInfo.camURL;
-        this.updatePrinterDatabase(newPrintersInformation._id, {
-          camURL: newPrintersInformation.camURL
+        this.updatePrinterDatabase(newPrinterInfo._id, {
+          camURL: newPrinterInfo.camURL
         });
         const loggerMessage = `Changed camURL from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
         logger.info(loggerMessage);
@@ -316,8 +357,15 @@ class PrinterStore {
           "Active",
           oldPrinter._id
         );
-        if (!changesList.includes(newPrinterInfo._id)) {
-          changesList.push(newPrinterInfo._id);
+        if (
+          findIndex(this.#printersList, function (o) {
+            return o._id === id;
+          }) !== -1
+        ) {
+          changesList.push({
+            _id: newPrinterInfo._id,
+            printerURL: newPrinterInfo.printerURL
+          });
         }
       }
     }

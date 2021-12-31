@@ -36,7 +36,6 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
     // Resync Printer Settings to latest values and continue to setup page.
     currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
-
     //Convert online state to a boolean
     printerOnline = currentPrinter?.printerState?.colour?.category !== "Offline";
     PrinterSettings.updateStateElements(currentPrinter);
@@ -124,7 +123,7 @@ class PrinterSettings {
     const webSocketURL = new URL(currentPrinter.webSocketURL);
     // Grab out the protocol and select it on the select box.
     document.getElementById("psWebSocketProtocol").value = webSocketURL.protocol + "//";
-    document.getElementById("psCamURL").placeholder = currentPrinter.cameraURL;
+    document.getElementById("psCamURL").placeholder = currentPrinter.camURL;
     document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
 
     const baudrateDropdown = document.getElementById("psDefaultBaudrate");
@@ -1101,9 +1100,6 @@ class PrinterSettings {
           systemInfoCheck: document.getElementById("systemInfoCheck"),
           pluginsCheck: document.getElementById("pluginsCheck"),
           updatesCheck: document.getElementById("updatesCheck"),
-          apiClean: document.getElementById("apiClean"),
-          filesClean: document.getElementById("filesClean"),
-          stateClean: document.getElementById("stateClean"),
           portNotAvailableMessage: document.getElementById("portNotAvailableMessage")
         },
         menu: {
@@ -1129,6 +1125,7 @@ class PrinterSettings {
       });
       throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
+
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter?.printerState?.state}`;
     pageElements.mainPage.status.className = `btn btn-${currentPrinter?.printerState?.colour?.name} mb-1 btn-block`;
@@ -1166,6 +1163,10 @@ class PrinterSettings {
       currentPrinter.systemChecks.scanning.systemInfo.date
     )}`;
     pageElements.connectPage.systemInfoCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.systemInfo.status} mb-1 btn-block`;
+    if (currentPrinter.octoPrintVersion.includes("1.4")) {
+      pageElements.connectPage.systemInfoCheck.disabled = true;
+      pageElements.connectPage.systemInfoCheck.innerHTML = `<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Never Checked: </b>  - version not supported!`;
+    }
 
     pageElements.connectPage.pluginsCheck.innerHTML = `<i class="fas fa-plug"></i> <b>Plugins Check</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.scanning.plugins.date
@@ -1176,19 +1177,6 @@ class PrinterSettings {
       currentPrinter.systemChecks.scanning.updates.date
     )}`;
     pageElements.connectPage.updatesCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.updates.status} mb-1 btn-block`;
-
-    pageElements.connectPage.apiClean.innerHTML = `<i class="fas fa-server"></i> <b>Printer Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.cleaning.information.date
-    )}`;
-    pageElements.connectPage.apiClean.className = `btn btn-${currentPrinter.systemChecks.cleaning.information.status} mb-1 btn-block`;
-    pageElements.connectPage.filesClean.innerHTML = `<i class="fas fa-server"></i> <b>File Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.cleaning.file.date
-    )}`;
-    pageElements.connectPage.filesClean.className = `btn btn-${currentPrinter.systemChecks.cleaning.file.status} mb-1 btn-block`;
-    pageElements.connectPage.stateClean.innerHTML = `<i class="fas fa-server"></i> <b>Job Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.cleaning.job.date
-    )}`;
-    pageElements.connectPage.stateClean.className = `btn btn-${currentPrinter.systemChecks.cleaning.job.status} mb-1 btn-block`;
 
     if (!printerOnline) {
       pageElements.menu.printerProfileBtn.disabled = true;

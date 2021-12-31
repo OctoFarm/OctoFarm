@@ -29,6 +29,7 @@ const {
 const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -36,8 +37,6 @@ router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) =
   // Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
   const p = await getPrinterManagerCache().addPrinter(printers);
-  console.log(p);
-
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });
@@ -56,7 +55,7 @@ router.post("/remove", ensureAuthenticated, ensureAdministrator, async (req, res
   const printers = req.body;
   // Send Dashboard to Runner..
   logger.info("Delete printers request: ", printers);
-  const p = getPrinterManagerCache().bulkDeletePrinters(printers);
+  const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
   // Return printers added...
   res.send({ printersRemoved: p, status: 200 });
 });
@@ -120,7 +119,7 @@ router.post("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
   res.send({ updateSettings });
 });
 router.get("/groups", ensureAuthenticated, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
   for (let i = 0; i < printers.length; i++) {
     await groups.push({
@@ -136,9 +135,9 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
   let returnedPrinterInformation;
   if (!id) {
-    returnedPrinterInformation = PrinterClean.listPrintersInformation();
+    returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
   } else {
-    returnedPrinterInformation = PrinterClean.getPrintersInformationById(id);
+    returnedPrinterInformation = getPrinterStoreCache().getPrinter(id);
   }
   res.send(returnedPrinterInformation);
 });
@@ -152,10 +151,9 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
     return;
   }
   try {
-    await Runner.getLatestOctoPrintSettingsValues(id);
+    await getPrinterStoreCache().updateLatestOctoPrintSettings(id, true);
     logger.debug("Updating printer settings for: ", id);
-    let printerInformation = PrinterClean.getPrintersInformationById(id);
-    res.send(printerInformation);
+    res.send(getPrinterStoreCache().getPrinter(id));
   } catch (e) {
     logger.error(`The server couldn't update your printer settings! ${e}`);
     res.statusMessage = `The server couldn't update your printer settings! ${e}`;

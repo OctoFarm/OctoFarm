@@ -65,9 +65,9 @@ function imageOrCamera(printer) {
     printer.otherSettings.webCamSettings.webcamEnabled
   ) {
     //Check if URL actually exists...
-    if (printer.cameraURL !== "") {
+    if (printer.camURL !== "") {
       return drawCamera({
-        url: printer.cameraURL,
+        url: printer.camURL,
         flipV,
         flipH,
         rotate90
@@ -115,7 +115,7 @@ function checkCameraState(printer) {
     printer.otherSettings.webCamSettings.webcamEnabled
   ) {
     //Check if URL actually exists...
-    if (printer.cameraURL !== "") {
+    if (printer.camURL !== "") {
       return true;
     } else {
       return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
@@ -505,7 +505,7 @@ export function drawPanelView(printer, clientSettings) {
 
 export function drawCameraView(printer, clientSettings) {
   let hidden = isHidden(printer, clientSettings);
-  if (printer.cameraURL === "") {
+  if (printer.camURL === "") {
     hidden = "hidden";
   }
   const name = printer.printerName;

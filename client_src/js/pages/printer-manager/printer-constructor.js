@@ -48,7 +48,7 @@ export class PrintersManagement {
           <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.printerURL}">
         </div></td>
         <td><div class="mb-0">
-          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.cameraURL}">
+          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.camURL}">
         </div></td>
         <td><div class="mb-0">
           <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.apikey}">
@@ -139,8 +139,8 @@ export class PrintersManagement {
           if (typeof importPrinters[index].printerURL !== "undefined") {
             printer.printerURL = importPrinters[index].printerURL;
           }
-          if (typeof importPrinters[index].cameraURL !== "undefined") {
-            printer.cameraURL = importPrinters[index].cameraURL;
+          if (typeof importPrinters[index].camURL !== "undefined") {
+            printer.camURL = importPrinters[index].camURL;
           }
           if (typeof importPrinters[index].group !== "undefined") {
             printer.group = importPrinters[index].group;
@@ -167,12 +167,15 @@ export class PrintersManagement {
 
   static async deletePrinter(deletedPrinters) {
     if (deletedPrinters.length > 0) {
+      const deletingAlert = UI.createAlert(
+        "warning",
+        `Deleting ${[...deletedPrinters]} from the farm...`,
+        0
+      );
       try {
         const printersToRemove = await OctoFarmClient.post("printers/remove", deletedPrinters);
-        // Should help with SSE event re-building the deleted printer causing a refresh to be needed to actually clear from UI
-        await UI.delay(5000);
-        const printersRemoved = printersToRemove.printersRemoved;
-        printersRemoved.forEach((printer) => {
+        deletingAlert.close();
+        printersToRemove.forEach((printer) => {
           UI.createAlert(
             "success",
             `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
@@ -183,6 +186,7 @@ export class PrintersManagement {
         });
       } catch (e) {
         console.error(e);
+        deletingAlert.close();
         UI.createAlert(
           "error",
           "Something went wrong updating the server, please check your logs",
@@ -191,6 +195,7 @@ export class PrintersManagement {
         );
       }
     } else {
+      deletingAlert.close();
       UI.createAlert(
         "error",
         "To delete a printer... one must first select a printer.",
@@ -265,8 +270,7 @@ export class PrintersManagement {
           printerName.value
         ).build();
         const printersToAdd = await OctoFarmClient.post("printers/add", printer);
-        const printersAdded = printersToAdd.printersAdded;
-        printersAdded.forEach((printer) => {
+        printersToAdd.forEach((printer) => {
           UI.createAlert(
             "success",
             `Printer: ${printer.printerURL} has successfully been added to the farm...`,

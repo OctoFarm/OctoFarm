@@ -708,10 +708,10 @@ export async function bulkOctoPrintControlCommand() {
   const printersToControl = await getCurrentlySelectedPrinterList();
   let cameraBlock = "";
   printersToControl.forEach((printer) => {
-    if (printer.cameraURL && printer.cameraURL.length !== 0) {
+    if (printer.camURL && printer.camURL.length !== 0) {
       cameraBlock += `
         <div class="col-lg-3">
-            <img width="100%" src="${printer.cameraURL}">
+            <img width="100%" src="${printer.camURL}">
         </div>
         `;
     }

@@ -44,7 +44,7 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, function (re
 
 if (interval === false) {
   interval = setInterval(async function () {
-    const printersInformation = getPrinterStoreCache().listPrinters();
+    const printersInformation = getPrinterStoreCache().listPrintersInformation();
     const printerControlList = PrinterClean.returnPrinterControlList();
     const currentTickerList = PrinterTicker.returnIssue();
 

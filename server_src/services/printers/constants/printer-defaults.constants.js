@@ -1,3 +1,14 @@
+const ALLOWED_SYSTEM_CHECKS = {
+  API: "api",
+  FILES: "files",
+  STATE: "state",
+  PROFILE: "profile",
+  SETTINGS: "settings",
+  SYSTEM: "system",
+  SYSTEM_INFO: "systemInfo",
+  PLUGINS: "plugins",
+  UPDATES: "updates"
+};
 const systemChecks = {
   scanning: {
     api: {
@@ -36,20 +47,6 @@ const systemChecks = {
       status: "danger",
       date: null
     }
-  },
-  cleaning: {
-    information: {
-      status: "danger",
-      date: null
-    },
-    file: {
-      status: "danger",
-      date: null
-    },
-    job: {
-      status: "danger",
-      date: null
-    }
   }
 };
 const tempTriggers = {
@@ -59,5 +56,6 @@ const tempTriggers = {
 
 module.exports = {
   systemChecks,
-  tempTriggers
+  tempTriggers,
+  ALLOWED_SYSTEM_CHECKS
 };

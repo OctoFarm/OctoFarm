@@ -225,7 +225,7 @@ export async function exportPrintersToJson() {
         name: printers[r].printerName,
         group: printers[r].group,
         printerURL: printers[r].printerURL,
-        cameraURL: printers[r].cameraURL,
+        cameraURL: printers[r].camURL,
         apikey: printers[r].apikey
       };
       printersExport.push(printer);

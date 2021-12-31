@@ -16,6 +16,7 @@ const { getDefaultDashboardSettings } = require("../lib/providers/settings.const
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -43,7 +44,7 @@ router.get("/", async (req, res) => {
 
 // Dashboard Page
 router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
   let dashboardSettings = req.user.clientSettings?.dashboard || getDefaultDashboardSettings();
@@ -63,7 +64,7 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
   });
 });
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
 
   const returnArray = [];
@@ -93,7 +94,7 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 });
 // File Manager Page
 router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = PrinterClean.listPrintersInformation();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const currentOperations = PrinterClean.returnCurrentOperations();
   const fileStatistics = FileClean.returnStatistics();
@@ -114,7 +115,7 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
 });
 // History Page
 router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = Runner.returnFarmPrinters();
+  const printers = getPrinterStoreCache().listPrintersInformation();
 
   const serverSettings = SettingsClean.returnSystemSettings();
 
@@ -140,8 +141,7 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
 
 // Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
@@ -158,7 +158,6 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "Panel View",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -171,8 +170,7 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 });
 // Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = await Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
   const currentSort = getSorting();
@@ -189,7 +187,6 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "Camera View",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -201,8 +198,7 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
   });
 });
 router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
 
   const currentSort = getSorting();
@@ -219,7 +215,6 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "Group",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -231,8 +226,7 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 });
 // List view  Page
 router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const clientSettings = SettingsClean.returnClientSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
@@ -250,7 +244,6 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "List View",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -263,8 +256,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 });
 
 router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = PrinterClean.returnDashboardStatistics();
   const currentSort = getSorting();
@@ -281,7 +273,6 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "Combined View",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -294,8 +285,7 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
 });
 
 router.get("/mon/currentOp", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  const sortedIndex = Runner.sortedIndex();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
 
   res.render("currentOperationsView", {
@@ -304,7 +294,6 @@ router.get("/mon/currentOp", ensureAuthenticated, ensureCurrentUserAndGroup, asy
     version,
     printers,
     printerCount: printers.length,
-    sortedIndex,
     page: "Current Operations",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
@@ -316,7 +305,7 @@ router.get("/filament", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   const historyCache = getHistoryCache();
   const historyStats = historyCache.generateStatistics();
 
-  const printers = Runner.returnFarmPrinters();
+  const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const statistics = FilamentClean.getStatistics();
   const spools = FilamentClean.getSpools();

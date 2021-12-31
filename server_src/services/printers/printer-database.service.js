@@ -16,7 +16,7 @@ class PrinterDatabaseService {
     return printerModel
       .findOneAndUpdate({ _id: this.#id }, update, this.#options)
       .then(() => {
-        logger.debug("Successfully saved record! key list: " + Object.keys(update));
+        logger.debug("Successfully saved record! key list", Object.keys(update));
       })
       .catch((err) => {
         logger.error(err);
@@ -24,7 +24,14 @@ class PrinterDatabaseService {
   };
 
   delete = () => {
-    return printerModel.findOneAndDelete({ _id: this.#id });
+    return printerModel
+      .findOneAndDelete({ _id: this.#id })
+      .then((res) => {
+        logger.warning("Successfully deleted printer from database", this.#id);
+      })
+      .catch((err) => {
+        logger.error(err);
+      });
   };
 }
 

@@ -208,7 +208,7 @@ export default class PrinterSelect {
                             .toLowerCase()}"><input id="editInputCamera-${
       printer.id
     }" type="text" class="form-control Idle" placeholder="${
-      printer.cameraURL
+      printer.camURL
     }" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td><input id="editInputApikey-${
                             printer.id
@@ -295,7 +295,7 @@ export default class PrinterSelect {
           state: printer.printerState.colour.category,
           group: printer.group,
           spool: spoolName,
-          cameraURL: printer.cameraURL,
+          cameraURL: printer.camURL,
           apikey: printer.apikey
         };
         printerList.push(forList);

@@ -372,8 +372,8 @@ export default class PrinterManager {
             `;
 
       let camURL = "";
-      if (typeof printer.cameraURL !== "undefined" && printer.cameraURL.includes("http")) {
-        camURL = printer.cameraURL;
+      if (typeof printer.camURL !== "undefined" && printer.camURL.includes("http")) {
+        camURL = printer.camURL;
       } else {
         camURL = "../../../images/noCamera.jpg";
       }

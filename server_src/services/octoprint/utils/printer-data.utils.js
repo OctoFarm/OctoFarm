@@ -50,6 +50,7 @@ const acquirePrinterNameData = (oldAppearance, newAppearance) => {
 const acquirePrinterFilesAndFolderData = function (fileList) {
   const printerFiles = [];
   const printerLocations = [];
+
   const recursivelyPrintNames = function (entry, depth) {
     // eslint-disable-next-line no-param-reassign
     depth = depth || 0;
@@ -133,7 +134,7 @@ const acquirePrinterFilesAndFolderData = function (fileList) {
     }
 
     if (isFolder) {
-      _.each(entry.children, function (child) {
+      each(entry.children, function (child) {
         recursivelyPrintNames(child, depth + 1);
       });
     }

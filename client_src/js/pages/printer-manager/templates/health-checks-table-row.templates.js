@@ -172,7 +172,7 @@ export function returnHealthCheckRow(check) {
           VALID("Your http/https websocket connection")
         )}
         ${returnButton(
-          check.printerChecks.cameraURL,
+          check.printerChecks.camURL,
           '<i class="fas fa-camera"></i>',
           pClean,
           VALID("Camera URL")

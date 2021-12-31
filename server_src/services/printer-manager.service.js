@@ -37,7 +37,10 @@ class PrinterManagerService {
 
   async addPrinter(printer) {
     patchPrinterValues(printer);
-    return await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
+    const returnPrinter = await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
+    return {
+      printerURL: returnPrinter.printerURL
+    };
   }
 
   async batchCreatePrinters(printerList) {
@@ -121,13 +124,17 @@ class PrinterManagerService {
     return changesList;
   }
 
-  bulkDeletePrinters(deleteList) {
+  async bulkDeletePrinters(deleteList) {
     const removedPrinterList = [];
 
     for (let d = 0; d < deleteList.length; d++) {
       const id = deleteList[d];
-      getPrinterStoreCache().deletePrinter(id);
-      removedPrinterList.push(id);
+      const printer = getPrinterStoreCache().getPrinter(id);
+      await getPrinterStoreCache().deletePrinter(printer._id);
+      removedPrinterList.push({
+        printerURL: printer.printerURL,
+        printerId: printer._id
+      });
     }
     // Regenerate groups list
     this.updateGroupList();
@@ -145,7 +152,7 @@ class PrinterManagerService {
     const printerList = getPrinterStoreCache().listPrinters();
     for (let i = 0; i < printerList.length; i++) {
       const printer = printerList[i];
-      printer.updatePrinterDatabase(printer._id, {
+      getPrinterStoreCache().updatePrinterDatabase(printer._id, {
         sortIndex: i
       });
     }

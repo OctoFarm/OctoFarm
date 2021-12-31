@@ -21,6 +21,7 @@ const { writePoints } = require("../lib/influxExport.js");
 // User Modal
 const runner = require("../runners/state.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Runner = runner.Runner;
 
 let influxCounter = 2000;
@@ -99,7 +100,7 @@ const filterMe = function (printers) {
 async function sendData() {
   const currentOperations = PrinterClean.returnCurrentOperations();
 
-  let printersInformation = PrinterClean.listPrintersInformation();
+  let printersInformation = getPrinterStoreCache().listPrintersInformation();
 
   printersInformation = await filterMe(printersInformation);
   printersInformation = sortMe(printersInformation);
