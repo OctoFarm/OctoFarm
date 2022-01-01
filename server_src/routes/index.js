@@ -16,6 +16,7 @@ const softwareUpdateChecker = require("../services/octofarm-update.service");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
+const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -65,11 +66,12 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
-
   const returnArray = [];
   for (let i = 0; i < printers.length; i++) {
     returnArray.push({
-      statistics: await PrinterClean.generatePrinterStatistics(printers[i]._id)
+      octoPrintVersion: printers[i]?.octoPrintVersion,
+      printerFirmware: printers[i]?.printerFirmware,
+      statistics: await generatePrinterStatistics(printers[i]._id)
     });
   }
 

@@ -298,12 +298,13 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
-  const farmPrinters = PrinterClean.listPrintersInformation();
+  const farmPrinters = getPrinterStoreCache().listPrintersInformation();
 
   const response = [];
 
   for (let i = 0; i < farmPrinters.length; i++) {
     const currentURL = new URL(farmPrinters[i].printerURL);
+
     const printerCheck = {
       printerName: farmPrinters[i].printerName,
       printerChecks: printerChecks(farmPrinters[i]),
@@ -316,7 +317,7 @@ router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
       profileChecks: profileChecks(farmPrinters[i].currentProfile),
       webcamChecks: webcamChecks(
         farmPrinters[i].cameraURL,
-        farmPrinters[i].otherSettings.webCamSettings
+        farmPrinters[i]?.otherSettings?.webCamSettings
       ),
       connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
     };
