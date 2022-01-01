@@ -367,7 +367,6 @@ class OctoPrintPrinter {
     }
 
     if (!!settingsAppearance) {
-      console.log("FROM DB", settingsAppearance);
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
     }
   }
@@ -496,9 +495,17 @@ class OctoPrintPrinter {
         return;
       } else if (testingTheWaters === 404) {
         const unavailable = {
-          hostState: "Unavailable!",
+          hostState: "Not Found!",
           hostDescription:
             "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        return;
+      } else if (testingTheWaters === 403) {
+        const unavailable = {
+          hostState: "Forbidden!",
+          hostDescription:
+            "Could not establish authentication... please check your API key and try again!"
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
         return;
@@ -680,7 +687,7 @@ class OctoPrintPrinter {
   reconnectAPI() {
     this.#retryNumber = this.#retryNumber + 1;
     logger.info(
-      this.printerURL + `Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
+      this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
     );
     if (this.#retryNumber < 1) {
       PrinterTicker.addIssue(
@@ -885,18 +892,27 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
     }
 
-    let versionCheck = await this.#api.getVersion(true).catch(() => {
-      return false;
+    let versionCheck = await this.#api.getVersion(true).catch((e) => {
+      return {
+        status: e
+      };
     });
+
     const globalStatusCode = checkApiStatusResponse(versionCheck);
     if (globalStatusCode === 200) {
-      const { server } = await versionCheck.json();
-      this.octoPrintVersion = server;
+      let server = undefined;
+      try {
+        server = await versionCheck.json();
+      } catch (e) {
+        return 999;
+      }
+
+      this.octoPrintVersion = server.server;
       this.#db.update({
-        octoPrintVersion: server
+        octoPrintVersion: server.server
       });
       logger.info(this.printerURL + ": Acquired OctoPrint Version.", {
-        octoPrintVersion: server
+        octoPrintVersion: server.server
       });
 
       this.versionNotChecked = checkHighestSupportedOctoPrint(this.octoPrintVersion);
