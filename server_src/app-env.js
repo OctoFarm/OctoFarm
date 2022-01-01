@@ -69,7 +69,7 @@ function ensureEnvNpmVersionSet() {
 }
 
 function removePm2Service(reason) {
-  logger.error(`Removing PM2 service as OctoFarm failed to start: ${reason}`);
+  logger.error("Removing PM2 service as OctoFarm failed to start", reason);
   execSync("pm2 delete OctoFarm");
 }
 
@@ -252,7 +252,7 @@ function setupEnvConfig(skipDotEnv = false) {
 }
 
 function getViewsPath() {
-  logger.debug("Running in directory:", __dirname);
+  logger.debug("Running in directory:", { dirname: __dirname });
   const viewsPath = path.join(__dirname, "../views");
   if (!fs.existsSync(viewsPath)) {
     if (isDocker()) {
@@ -273,7 +273,7 @@ function getViewsPath() {
       );
     }
   } else {
-    logger.debug("✓ Views folder found:", viewsPath);
+    logger.debug("✓ Views folder found:", { path: viewsPath });
   }
   return viewsPath;
 }

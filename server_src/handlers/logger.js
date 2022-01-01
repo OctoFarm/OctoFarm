@@ -43,8 +43,12 @@ class LoggerService {
         const date = dateFormat();
         let metaData = undefined;
         if (!!info?.meta) {
-          metaData = Object.assign({}, info.meta);
-          metaData = JSON.stringify(metaData);
+          if (typeof info.meta === "string") {
+            metaData = info.meta;
+          } else {
+            metaData = Object.assign({}, info.meta);
+            metaData = JSON.stringify(metaData);
+          }
         }
         let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
           COLOUR_MAP[info.level]
