@@ -93,6 +93,11 @@ class WebSocketClient {
           "Offline",
           this.id
         );
+        ConnectionMonitorService.updateOrAddResponse(
+          this.url + ENDPOINT,
+          REQUEST_TYPE.WEBSOCKET,
+          REQUEST_KEYS.TOTAL_PING_PONG
+        );
         this.terminate();
       }, this.#pingPongTimer + 1000);
       logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
@@ -113,6 +118,11 @@ class WebSocketClient {
     // });
 
     this.#instance.on("open", () => {
+      ConnectionMonitorService.updateOrAddResponse(
+        this.url + ENDPOINT,
+        REQUEST_TYPE.WEBSOCKET,
+        REQUEST_KEYS.SUCCESS_RESPONSE
+      );
       logger.debug(`${this.url}: Websocket has been opened!`);
       PrinterTicker.addIssue(
         new Date(),
@@ -141,7 +151,7 @@ class WebSocketClient {
       );
       logger.debug(`${timeDifference - this.#lastMessage}ms since last message`);
       ConnectionMonitorService.updateOrAddResponse(
-        this.url,
+        this.url + ENDPOINT,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.LAST_RESPONSE,
         ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
@@ -156,7 +166,7 @@ class WebSocketClient {
     this.#instance.on("close", (code, reason) => {
       logger.error(`${this.url}: Websocket Closed!`, { code, reason });
       ConnectionMonitorService.updateOrAddResponse(
-        this.url,
+        this.url + ENDPOINT,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.FAILED_RESPONSE
       );
@@ -201,7 +211,7 @@ class WebSocketClient {
     this.#instance.on("error", (e) => {
       logger.error(`${this.url}: Websocket Error!`, e);
       ConnectionMonitorService.updateOrAddResponse(
-        this.url,
+        this.url + ENDPOINT,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.FAILED_RESPONSE
       );

@@ -17,7 +17,9 @@
             <hr>
             <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests.  </p>
             <hr>
-            <b>Retry Counts: </b> <p>This is how many times any request was retried. </p>
+            <b>API Timeout Retries: </b> <p>How many times your timeout settings has stalled a connection Attempt.</p>
+            <hr>
+            <b>API Connection Errors: </b> <p>How many times the connection resulted in a total error. Usually from the OctoPrint host / incorrect printer settings.</p>
         </div>
     </div>
 </div>
@@ -32,9 +34,10 @@
         <% const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
         <% const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections %>
         <% const failedPercent = (log.totalRequestsFailed * 100) / totalConnections %>
+        <% const apiFailures = log.connectionFailures %>
         <% const retryCount = log.totalRetries %>
 
-        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount }%>
+        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures }%>
 
         <% toCalc.push(toPush) %>
     <% })%>
@@ -48,7 +51,8 @@
             <th scope="col" class="sticky-table table-dark" style="">URL</th>
             <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
             <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
-            <th scope="col" class="sticky-table table-dark" style="">Retry Count</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Timeout Retry</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Connection Errors</th>
             <th scope="col" class="sticky-table table-dark" style="">WebSocket Ping/Pong Failure Count</th>
         </tr>
         </thead>
@@ -59,9 +63,16 @@
             <% const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0) %>
             <% const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length %>
             <% const actualFailedPercent = totalFailedPercent / totalsArray[index].length %>
+            <% let averageTotalCountLength = 0; %>
+            <% const averageTotalCount = totalsArray[index].reduce( function(a, b){
+                averageTotalCountLength = averageTotalCountLength + 1;
+                return a + b["totalResponse"]
+            }, 0) %>
+            <% const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0) %>
+            <% const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0; %>
                 <tr class="bg-primary">
                     <th scope="row"><%= currentPrinter.printerURL  %></th>
-                    <th> <%= helpers.generateMilisecondsTime(totalsArray[index].reduce( function(a, b){ return a + b["totalResponse"] }, 0)) %> </th>
+                    <th> <%= helpers.generateMilisecondsTime(averageTotalCalc) %> </th>
                     <th>
                         <div class="progress">
                             <div class="progress-bar bg-success" role="progressbar" style="width: <%=actualSuccessPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
@@ -69,6 +80,9 @@
                         </div>
                     </th>
                     <th> <%= totalsArray[index].reduce( function(a, b){ return a + b["retryCount"] }, 0) %> </th>
+                    <th>
+                        <%= totalAPIFailed %>
+                    </th>
                     <th>  </th>
                 </tr>
                 <% currentPrinter.connections.forEach(con => { %>
@@ -89,13 +103,14 @@
                         <%} %>
 
                     <% const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+                    <% const averageCalculation = (averageCount / log.lastResponseTimes.length) || 0; %>
                     <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
                     <% const successPercent = (log.totalRequestsSuccess * 100) / totalConnections %>
                     <% const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections %>
                     <tr>
                         <th class="p-1"><%= url %></th>
 
-                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCount) %></th>
+                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCalculation) %></th>
                         <th class="p-1">
                             <div class="progress">
                                 <div class="progress-bar bg-success" role="progressbar" style="width: <%=successPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=successPercent.toFixed(0) %>%</div>
@@ -103,7 +118,8 @@
                             </div>
                         </th>
                         <th class="p-1"><%= log.totalRetries %></th>
-                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "" %></th>
+                        <th class="p-1"><%= log.connectionFailures %></th>
+                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "-" %></th>
                     </tr>
                 <% })%>
 

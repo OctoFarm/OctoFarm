@@ -5,6 +5,7 @@ const defaultConnectionMonitorLog = {
   lastResponseTimes: [],
   totalRequestsFailed: 0,
   totalRequestsSuccess: 0,
+  connectionFailures: 0,
   totalRetries: 0,
   totalPingPong: 0
 };
@@ -17,6 +18,7 @@ class ConnectionMonitorService {
     REQUEST_KEYS.SUCCESS_RESPONSE,
     REQUEST_KEYS.RETRY_REQUESTED,
     REQUEST_KEYS.LAST_RESPONSE,
+    REQUEST_KEYS.CONNECTION_FAILURES,
     REQUEST_KEYS.TOTAL_PING_PONG
   ];
   static acceptedTypes = [
