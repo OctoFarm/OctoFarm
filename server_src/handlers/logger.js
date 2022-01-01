@@ -43,7 +43,7 @@ class LoggerService {
         const date = dateFormat();
         let metaData = undefined;
         if (!!info?.meta) {
-          if (typeof info.meta === "string") {
+          if (typeof info.meta === "string" || typeof info.meta === "number") {
             metaData = info.meta;
           } else {
             metaData = Object.assign({}, info.meta);

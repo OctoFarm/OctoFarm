@@ -88,7 +88,7 @@ class OctoprintApiService {
   #currentTimeout = 0;
 
   constructor(printerURL, apikey, timeoutSettings) {
-    this.timeout = Object.assign({}, timeoutSettings);
+    this.timeout = timeoutSettings;
     this.printerURL = printerURL;
     this.apikey = apikey;
   }
@@ -102,20 +102,28 @@ class OctoprintApiService {
     try {
       return await this.get(item);
     } catch (e) {
-      const message = `Error connecting to OctoPrint API: ${item} | ${this.printerURL} `;
-      logger.error(`${message} | timeout: ${this.timeout.apiTimeout}`, e.message);
+      // const message = `Error connecting to OctoPrint API: ${item} | ${this.printerURL} `;
+      // logger.error(`${message} | timeout: ${this.timeout.apiTimeout}`, e.message);
       // If timeout exceeds max cut off then give up... Printer is considered offline.
+      const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
+      if (cutOffIn === 0) {
+        logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
+      } else {
+        logger.debug(
+          `${this.printerURL} | Current Timeout: ${this.#currentTimeout} | Cut off in ${cutOffIn}`
+        );
+      }
       if (this.#currentTimeout >= this.timeout.apiRetryCutoff) {
         logger.error(
           `Timeout Exceeded: ${item} | ${this.printerURL} | Timeout: ${this.#currentTimeout}`
         );
         // Reset the timeout after failed...
-        this.#currentTimeout = this.timeout.apiTimeout;
+        this.#currentTimeout = JSON.parse(JSON.stringify(this.timeout.apiTimeout));
         throw e;
       }
       // Make sure to use the settings for api retry.
       this.#currentTimeout = this.#currentTimeout + 5000;
-      logger.error("Intitial timeout failed increasing...", this.#currentTimeout);
+      logger.error("Intitial timeout failed increasing...", { timeout: this.#currentTimeout });
       return await this.getRetry(item);
     }
   }

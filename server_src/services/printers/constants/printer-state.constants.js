@@ -54,10 +54,10 @@ const OF_C_DESC = {
 
 //Websocket Descriptions
 const OF_WS_DESC = {
-  SETTING_UP: "Setting up the clients websocket connection: ",
+  ONLINE: "Online and receiving data!",
   TENTATIVE: "Websocket Connected but in Tentative state until receiving data",
   CLOSED_BY_OF: "Websocket Closed by OctoFarm",
-  SHUTDOWN_RECONNECT: "Websocket Terminated by OctoFarm... reconnection planned",
+  SHUTDOWN_RECONNECT: "Websocket Terminated by OctoFarm...",
   OFFLINE: "Websocket is Offline"
 };
 //Printer State Descriptions
@@ -70,107 +70,79 @@ const OF_H_DESC = {
   ONLINE: "Host is Online"
 };
 
-const PRINTER_STATES = {
-  DISABLED: {
-    state: OF_C_STATE.DISABLED,
-    stateColour: mapStateToCategory(OF_C_STATE.DISABLED),
-    hostState: OF_C_STATE.DISABLED,
-    hostStateColour: mapStateToCategory(OF_C_STATE.DISABLED),
-    webSocket: OF_COLOURS.DANGER,
-    stateDescription: OF_C_DESC.DISABLED,
-    hostDescription: OF_C_DESC.DISABLED,
-    webSocketDescription: OF_C_DESC.DISABLED
-  },
-  SETTING_UP: {
-    state: OF_C_STATE.SETTING_UP,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    hostState: OF_C_STATE.SETTING_UP,
-    hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    webSocket: OF_COLOURS.DANGER,
-    stateDescription: OF_C_DESC.SETTING_UP,
-    hostDescription: OF_C_DESC.SETTING_UP,
-    webSocketDescription: OF_C_DESC.SETTING_UP
-  },
-  SEARCHING: {
-    state: OF_C_STATE.SEARCHING,
-    stateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
-    hostState: OF_H_STATE.ONLINE,
-    hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
-    webSocket: OF_COLOURS.INFO,
-    stateDescription: OF_C_DESC.SEARCHING,
-    hostDescription: OF_C_DESC.SEARCHING,
-    webSocketDescription: OF_C_DESC.SEARCHING
-  },
-  SHUTDOWN: {
-    state: OF_C_STATE.OFFLINE,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    hostState: OF_H_STATE.SHUTDOWN,
-    hostStateColour: mapStateToCategory(OF_H_STATE.SHUTDOWN),
-    webSocket: OF_COLOURS.DANGER,
-    stateDescription: OF_S_DESC.OFFLINE,
-    hostDescription: OF_H_DESC.SHUTDOWN,
-    webSocketDescription: OF_WS_DESC.SHUTDOWN_RECONNECT
-  },
-  SHUTDOWN_RE_SYNC: {
-    state: OF_C_STATE.RE_SYNC,
-    stateColour: mapStateToCategory(OF_C_STATE.RE_SYNC),
-    hostState: OF_H_STATE.SHUTDOWN,
-    hostStateColour: mapStateToCategory(OF_C_STATE.RE_SYNC),
-    webSocket: OF_COLOURS.DANGER,
-    stateDescription: OF_C_DESC.RE_SYNC,
-    hostDescription: OF_C_DESC.RE_SYNC,
-    webSocketDescription: OF_WS_DESC.CLOSED_BY_OF
-  },
-  SHUTDOWN_API_FAIL: {
-    state: OF_S_STATE.API_FAIL,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    hostState: OF_H_STATE.ONLINE,
-    webSocket: OF_COLOURS.DANGER,
-    hostStateColour: mapStateToCategory(OF_C_STATE.RE_SYNC),
-    stateDescription: OF_C_DESC.RE_SYNC_API,
-    hostDescription: OF_H_DESC.ONLINE
-  },
-  SHUTDOWN_API_GLOBAL_FAIL: {
-    state: OF_S_STATE.GLOBAL_API_FAIL,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    hostState: OF_H_STATE.ONLINE,
-    hostStateColour: mapStateToCategory(OF_C_STATE.RE_SYNC),
-    stateDescription: OF_C_DESC.RE_SYNC_API_GLOBAL,
-    hostDescription: OF_WS_DESC.OFFLINE
-  },
-  SHUTDOWN_WEBSOCKET_FAIL: {
-    state: OF_S_STATE.WEBSOCKET_FAIL,
-    stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    hostState: OF_H_STATE.ONLINE,
-    hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
-    stateDescription: OF_C_DESC.RE_CONNECT_WEBSOCKET,
-    hostDescription: OF_H_DESC.ONLINE
-  },
-  WS_OFFLINE: {
-    webSocket: OF_COLOURS.DANGER,
-    webSocketDescription: OF_WS_DESC.OFFLINE
-  },
-  WS_TENTATIVE: {
-    webSocket: OF_COLOURS.WARNING,
-    webSocketDescription: OF_WS_DESC.TENTATIVE
-  },
-  WS_ONLINE: {
-    webSocket: OF_COLOURS.WARNING,
-    webSocketDescription: OF_WS_DESC.TENTATIVE
-  },
-  PRINTER_OFFLINE: {},
-  PRINTER_TENTATIVE: {
-    state: OF_S_STATE.DISCONNECTED,
-    stateColour: mapStateToCategory(OF_S_STATE.DISCONNECTED),
-    stateDescription: "Current status from OctoPrint"
-  },
-  HOST_ONLINE: {
-    hostState: OF_H_STATE.ONLINE,
-    hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
-    hostDescription: OF_H_DESC.ONLINE
-  },
-  HOST_OFFLINE: {},
-  HOST_SHUTDOWN: {}
+const PRINTER_STATES = (customStates = {}) => {
+  const { state, hostState, stateDescription, hostDescription, webSocketDescription } =
+    customStates;
+
+  return {
+    DISABLED: {
+      state: OF_C_STATE.DISABLED,
+      stateColour: mapStateToCategory(OF_C_STATE.DISABLED),
+      hostState: OF_C_STATE.DISABLED,
+      hostStateColour: mapStateToCategory(OF_C_STATE.DISABLED),
+      webSocket: OF_COLOURS.DANGER,
+      stateDescription: OF_C_DESC.DISABLED,
+      hostDescription: OF_C_DESC.DISABLED,
+      webSocketDescription: OF_C_DESC.DISABLED
+    },
+    SETTING_UP: {
+      state: OF_C_STATE.SETTING_UP,
+      stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+      hostState: OF_C_STATE.SETTING_UP,
+      hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+      webSocket: OF_COLOURS.DANGER,
+      stateDescription: OF_C_DESC.SETTING_UP,
+      hostDescription: OF_C_DESC.SETTING_UP,
+      webSocketDescription: OF_C_DESC.SETTING_UP
+    },
+    SEARCHING: {
+      state: OF_C_STATE.SEARCHING,
+      stateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
+      hostState: OF_C_STATE.SEARCHING,
+      hostStateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
+      webSocket: OF_COLOURS.WARNING,
+      stateDescription: OF_C_DESC.SEARCHING,
+      hostDescription: OF_C_DESC.SEARCHING,
+      webSocketDescription: OF_C_DESC.SEARCHING
+    },
+    SHUTDOWN: {
+      state: state ? state : OF_C_STATE.OFFLINE,
+      stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+      hostState: hostState ? hostState : OF_H_STATE.SHUTDOWN,
+      hostStateColour: mapStateToCategory(OF_H_STATE.SHUTDOWN),
+      webSocket: OF_COLOURS.DANGER,
+      stateDescription: stateDescription ? stateDescription : OF_S_DESC.OFFLINE,
+      hostDescription: hostDescription ? hostDescription : OF_H_DESC.SHUTDOWN,
+      webSocketDescription: OF_WS_DESC.OFFLINE
+    },
+    WS_OFFLINE: {
+      webSocket: OF_COLOURS.DANGER,
+      webSocketDescription: OF_WS_DESC.OFFLINE
+    },
+    WS_TENTATIVE: {
+      webSocket: OF_COLOURS.WARNING,
+      webSocketDescription: OF_WS_DESC.TENTATIVE
+    },
+    WS_ONLINE: {
+      webSocket: OF_COLOURS.SUCCESS,
+      webSocketDescription: OF_WS_DESC.ONLINE
+    },
+    WS_PONGING: {
+      webSocket: OF_COLOURS.INFO,
+      webSocketDescription: "Checking if websocket is still alive!"
+    },
+    PRINTER_TENTATIVE: {
+      state: OF_S_STATE.DISCONNECTED,
+      stateColour: mapStateToCategory(OF_S_STATE.DISCONNECTED),
+      stateDescription: "Current status from OctoPrint"
+    },
+    HOST_ONLINE: {
+      hostState: OF_H_STATE.ONLINE,
+      hostStateColour: mapStateToCategory(OF_H_STATE.ONLINE),
+      hostDescription: OF_H_DESC.ONLINE
+    },
+    HOST_SHUTDOWN: {}
+  };
 };
 
 module.exports = {

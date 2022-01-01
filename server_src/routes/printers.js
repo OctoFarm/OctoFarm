@@ -256,7 +256,7 @@ router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async 
 router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
   let id = req.params.id;
   logger.info("Grabbing connection logs for: ", id);
-  let connectionLogs = await Runner.returnPrinterLogs(id);
+  let connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
 
   res.send(connectionLogs);
 });

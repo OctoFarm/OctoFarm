@@ -5,20 +5,17 @@ const {
   getDefaultDashboardStatisticsObject,
   getEmptyHeatmap,
   getEmptyToolTemperatureArray,
-  getEmptyOperationsObject,
-  ALL_MONTHS
+  getEmptyOperationsObject
 } = require("../providers/cleaner.constants");
 const { returnCurrentOrdering } = require("../../services/current-operations-order.service");
 const { getHistoryCache } = require("../../cache/history.cache");
 const _ = require("lodash");
-const { JobClean } = require("./jobClean.js");
-const fileClean = require("./fileClean.js");
-const { FileClean } = fileClean;
 const FarmStatisticsService = require("../../services/farm-statistics.service");
 const RoomData = require("../../models/RoomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
 const TempHistory = require("../../models/TempHistory.js");
 const { PrinterTicker } = require("../../runners/printerTicker.js");
+const { generateRandomName } = require("../../services/printer-name-generator.service");
 
 const Logger = require("../../handlers/logger.js");
 const { getDayName } = require("../../utils/time.util");
@@ -426,7 +423,7 @@ class PrinterClean {
   }
 
   static async generateConnectionLogs(farmPrinter) {
-    let printerErrorLogs = await ErrorLogs.find({});
+    let printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id });
 
     let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
@@ -446,7 +443,7 @@ class PrinterClean {
         currentErrorLogs.push(errorFormat);
       }
     }
-    let currentIssues = await PrinterTicker.returnIssue();
+    let currentIssues = PrinterTicker.returnIssue();
     for (let i = 0; i < currentIssues.length; i++) {
       if (JSON.stringify(currentIssues[i].printerID) === JSON.stringify(farmPrinter._id)) {
         let errorFormat = {
@@ -459,7 +456,7 @@ class PrinterClean {
       }
     }
 
-    let octoprintLogs = await PrinterTicker.returnOctoPrintLogs();
+    let octoprintLogs = PrinterTicker.returnOctoPrintLogs();
     for (let i = 0; i < octoprintLogs.length; i++) {
       if (JSON.stringify(octoprintLogs[i].printerID) === JSON.stringify(farmPrinter._id)) {
         let octoFormat = {
@@ -640,14 +637,15 @@ class PrinterClean {
   }
 
   static grabPrinterName(settingsAppearance, printerURL) {
+    const randomisedName = generateRandomName();
     if (!!settingsAppearance) {
       if (settingsAppearance.name === "" || settingsAppearance.name === null) {
-        return printerURL;
+        return randomisedName ? randomisedName : printerURL;
       } else {
         return settingsAppearance.name;
       }
     } else {
-      return printerURL;
+      return randomisedName ? randomisedName : printerURL;
     }
   }
 

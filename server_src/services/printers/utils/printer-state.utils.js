@@ -3,19 +3,19 @@ const mapStateToCategory = (state) => {
     return { name: "secondary", category: "Idle" };
   }
   if (state === "Paused") {
-    return { name: "warning", category: "Idle" };
+    return { name: "warning text-dark", category: "Idle" };
   }
   if (state === "Printing") {
-    return { name: "warning", category: "Active" };
+    return { name: "warning text-dark", category: "Active" };
   }
   if (state === "Pausing") {
-    return { name: "warning", category: "Active" };
+    return { name: "warning text-dark", category: "Active" };
   }
   if (state === "Cancelling") {
-    return { name: "warning", hex: "#583c0e", category: "Active" };
+    return { name: "warning text-dark", hex: "#583c0e", category: "Active" };
   }
   if (state === "Starting") {
-    return { name: "warning", hex: "#583c0e", category: "Active" };
+    return { name: "warning text-dark", hex: "#583c0e", category: "Active" };
   }
   if (state === "Error!") {
     return { name: "danger", hex: "#2e0905", category: "Error!" };
@@ -27,7 +27,7 @@ const mapStateToCategory = (state) => {
     return { name: "danger", hex: "#2e0905", category: "Offline" };
   }
   if (state === "Searching...") {
-    return { name: "danger", hex: "#2e0905", category: "Offline" };
+    return { name: "warning text-dark", hex: "#2e0905", category: "Offline" };
   }
   if (state === "Disconnected") {
     return { name: "danger", hex: "#2e0905", category: "Disconnected" };
@@ -50,7 +50,7 @@ const mapStateToCategory = (state) => {
   if (state === "Disabled") {
     return { name: "danger", hex: "#2e0905", category: "Disabled" };
   }
-  return { name: "warning", hex: "#583c0e", category: "Idle" };
+  return { name: "warning text-dark", hex: "#583c0e", category: "Idle" };
 };
 
 module.exports = {

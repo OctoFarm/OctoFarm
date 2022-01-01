@@ -79,6 +79,7 @@ class WebSocketClient {
     });
 
     this.#instance.on("pong", () => {
+      getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
@@ -96,6 +97,7 @@ class WebSocketClient {
       }, this.#pingPongTimer + 1000);
       logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
       this.#heartbeatPing = setTimeout(() => {
+        getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
         logger.debug(this.url + ": Pinging client");
         this.#instance.ping();
       }, this.#pingPongTimer - 1000);
@@ -120,8 +122,7 @@ class WebSocketClient {
         this.id
       );
       // These will get overridden.
-      getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES.WS_TENTATIVE);
-      getPrinterStoreCache().updatePrinterState(this.id, PRINTER_STATES.PRINTER_TENTATIVE);
+      getPrinterStoreCache().updatePrinterState(this.id, PRINTER_STATES().PRINTER_TENTATIVE);
       // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
@@ -366,11 +367,11 @@ class WebSocketClient {
     logger.debug("Force terminating websocket connection");
     this.terminate();
     clearTimeout(this.#heartbeatPing);
-    logger.debug(this.url + " Cleared heartbeat ping timeout", this.#heartbeatPing);
+    logger.debug(this.url + " Cleared heartbeat ping timeout");
     clearTimeout(this.#heartbeatTerminate);
-    logger.debug(this.url + " Cleared heartbeat terminate timeout", this.#heartbeatTerminate);
+    logger.debug(this.url + " Cleared heartbeat terminate timeout");
     clearTimeout(this.reconnectTimeout);
-    logger.debug(this.url + " Cleared reconnect timeout", this.reconnectTimeout);
+    logger.debug(this.url + " Cleared reconnect timeout");
     logger.debug(this.url + " Removing all listeners");
     this.#instance.removeAllListeners();
     return true;

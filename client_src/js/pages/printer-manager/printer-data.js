@@ -98,10 +98,15 @@ function updateOctoPiColumn(printer) {
 }
 
 function corsWarningCheck(printer) {
-  const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.printerState.state)) {
-    UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
-  }
+  // const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
+  // if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.printerState.state)) {
+  //   UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
+  // }
+}
+
+function reconnectingIn(printer) {
+  const { reconnectingIn } = printer;
+  // console.log(reconnectingIn);
 }
 
 function checkForOctoPrintUpdate(printer) {
@@ -197,6 +202,8 @@ function updatePrinterRow(printer) {
     updateOctoPiColumn(printer);
 
     corsWarningCheck(printer);
+
+    reconnectingIn(printer);
 
     checkForOctoPrintUpdate(printer);
 

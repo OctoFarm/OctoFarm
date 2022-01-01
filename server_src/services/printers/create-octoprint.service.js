@@ -51,7 +51,7 @@ class OctoPrintPrinter {
   #apiRetry = undefined;
   timeout = undefined;
   #reconnectTimeout = undefined;
-  #reconnectingIn = 0;
+  reconnectingIn = 0;
   //Required
   sortIndex = undefined;
   category = undefined;
@@ -154,7 +154,7 @@ class OctoPrintPrinter {
     this.webSocketURL = printer.webSocketURL;
     this.camURL = printer.camURL;
     this.category = printer.category;
-
+    this.settingsAppearance = printer.settingsAppearance;
     if (!!printer?._id) {
       this.#updatePrinterRecordsFromDatabase(printer);
     }
@@ -367,10 +367,9 @@ class OctoPrintPrinter {
     }
 
     if (!!settingsAppearance) {
+      console.log("FROM DB", settingsAppearance);
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
     }
-
-    this.setAllPrinterStates(PRINTER_STATES.SETTING_UP);
   }
 
   /*
@@ -399,7 +398,7 @@ class OctoPrintPrinter {
     this.timeout = timeout;
     this.#apiRetry = timeout.apiRetry;
     this.#retryNumber = 0;
-    this.#reconnectingIn = 0;
+    this.reconnectingIn = 0;
   }
 
   setAllPrinterStates(state) {
@@ -462,6 +461,7 @@ class OctoPrintPrinter {
 
   startOctoPrintService() {
     if (!this?.disabled) {
+      this.setAllPrinterStates(PRINTER_STATES().SETTING_UP);
       this.enablePrinter().then();
     } else {
       this.disablePrinter();
@@ -477,12 +477,42 @@ class OctoPrintPrinter {
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
-      console.log(this.printerURL, "HIGH SEA FAIL");
-      this.reconnectAPI();
-      return;
+      if (testingTheWaters === 408) {
+        // Failed to find the printer on the high seas, fail and don't reconnect user iteraction required...
+        const timeout = {
+          hostState: "Timeout!",
+          hostDescription: "Printer timed out, will attempt reconnection..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
+        this.reconnectAPI();
+        return;
+      } else if (testingTheWaters === 503 || testingTheWaters === 502) {
+        const unavailable = {
+          hostState: "Unavailable!",
+          hostDescription: "Printer is unavailable, will attempt reconnection..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        this.reconnectAPI();
+        return;
+      } else if (testingTheWaters === 404) {
+        const unavailable = {
+          hostState: "Unavailable!",
+          hostDescription:
+            "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        return;
+      } else {
+        const unavailable = {
+          hostState: "Hard Fail!",
+          hostDescription:
+            "Something is seriously wrong... please check all settings! will not attempt reconnect..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        return;
+      }
     }
-    console.log(this.printerURL, "HIGH SEA");
-    this.setHostState(PRINTER_STATES.HOST_ONLINE);
+    this.setHostState(PRINTER_STATES().HOST_ONLINE);
 
     // Grab user list, current user and passively login to the client, Fail to Shutdown
     const initialApiCheck = await this.initialApiCheckSequence();
@@ -492,8 +522,11 @@ class OctoPrintPrinter {
     });
     // Global api heck triggered, fail with no reconnect
     if (apiCheckFail.includes(true)) {
-      this.setPrinterState(PRINTER_STATES.SHUTDOWN_API_GLOBAL_FAIL);
-      this.setWebsocketState(PRINTER_STATES.WS_OFFLINE);
+      const globalAPICheck = {
+        state: "Global API Fail!",
+        stateDescription: "Global api key detected... please use application / user generated key!"
+      };
+      this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
       return;
     }
 
@@ -502,6 +535,7 @@ class OctoPrintPrinter {
     });
     // User list fail... reconnect same as others, probably network at this stage.
     if (initialApiCheckValues.includes(true)) {
+      this.setPrinterState(PRINTER_STATES().SHUTDOWN);
       this.reconnectAPI();
       return;
     }
@@ -512,8 +546,12 @@ class OctoPrintPrinter {
       return typeof check.value === "number";
     });
     if (requiredApiCheckValues.includes(true)) {
-      this.setHostState(PRINTER_STATES.SHUTDOWN_API_FAIL);
-      this.setPrinterState(PRINTER_STATES.SHUTDOWN_API_FAIL);
+      const requiredAPIFail = {
+        state: "API Fail!",
+        stateDescription: "Required API Checks have failed... attempting reconnect..."
+      };
+      this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
+      this.reconnectAPI();
       return;
     }
 
@@ -546,8 +584,12 @@ class OctoPrintPrinter {
 
       if (typeof session !== "string") {
         // Couldn't setup websocket
-        this.setHostState(PRINTER_STATES.SHUTDOWN_WEBSOCKET_FAIL);
-        this.setPrinterState(PRINTER_STATES.SHUTDOWN_WEBSOCKET_FAIL);
+        const sessionKeyFail = {
+          state: "Session Fail!",
+          stateDescription:
+            "Failed to acquire session key, please check your API key and try again..."
+        };
+        this.setPrinterState(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
         return;
       }
 
@@ -563,7 +605,8 @@ class OctoPrintPrinter {
 
   disablePrinter() {
     this.disabled = true;
-    this.setAllPrinterStates(PRINTER_STATES.DISABLED);
+    this.setAllPrinterStates(PRINTER_STATES().DISABLED);
+    this.killAllConnections();
     logger.debug(this.printerURL + ": client set as disabled...");
     PrinterTicker.addIssue(
       new Date(),
@@ -592,12 +635,17 @@ class OctoPrintPrinter {
 
     // If printer ID doesn't exist, we need to create the database record
     if (!this?._id) {
+      this.settingsAppearance.name = PrinterClean.grabPrinterName(
+        this.settingsAppearance,
+        this.printerURL
+      );
+      this.printerName = this.settingsAppearance.name;
       const newPrinter = new printerModel(this);
       this._id = newPrinter._id.toString();
       await newPrinter
         .save()
         .then((res) => {
-          logger.info("Successfully saved your new printer to database", res);
+          logger.info("Successfully saved your new printer to database", this._id);
           return res;
         })
         .catch((e) => {
@@ -609,7 +657,8 @@ class OctoPrintPrinter {
     //Create OctoPrint Client
     if (!this?.#api) {
       logger.debug(this.printerURL + ": Creating octoprint api client");
-      this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, this.timeout);
+      const timeoutSettings = Object.assign({}, this.timeout);
+      this.#api = new OctoprintApiClientService(this.printerURL, this.apikey, timeoutSettings);
     }
 
     // Create database client
@@ -630,7 +679,6 @@ class OctoPrintPrinter {
 
   reconnectAPI() {
     this.#retryNumber = this.#retryNumber + 1;
-    this.setAllPrinterStates(PRINTER_STATES.SHUTDOWN);
     logger.info(
       this.printerURL + `Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
     );
@@ -647,12 +695,11 @@ class OctoPrintPrinter {
     }
 
     this.#reconnectTimeout = setTimeout(() => {
-      this.setAllPrinterStates(PRINTER_STATES.SEARCHING);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
         logger.debug(this.printerURL + ": API modifier " + modifier);
-        this.#reconnectingIn = this.#apiRetry;
+        this.reconnectingIn = this.#apiRetry;
       } else if (this.#retryNumber === 0) {
         logger.info(this.printerURL + ": Attempting to reconnect to printer!");
         PrinterTicker.addIssue(
@@ -663,6 +710,7 @@ class OctoPrintPrinter {
           this._id
         );
       }
+      this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
       this.enablePrinter().then();
       this.#reconnectTimeout = false;
     }, this.#apiRetry);
@@ -1372,8 +1420,8 @@ class OctoPrintPrinter {
 
     if (typeof session !== "string") {
       // Couldn't setup websocket
-      this.setHostState(PRINTER_STATES.SHUTDOWN_WEBSOCKET_FAIL);
-      this.setPrinterState(PRINTER_STATES.SHUTDOWN_WEBSOCKET_FAIL);
+      this.setHostState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
+      this.setPrinterState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
       return;
     }
 
@@ -1399,7 +1447,7 @@ class OctoPrintPrinter {
   }
 
   killApiTimeout() {
-    logger.debug("Clearning API Timeout", this.#reconnectTimeout);
+    logger.debug("Clearning API Timeout");
     clearTimeout(this.#reconnectTimeout);
   }
 

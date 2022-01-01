@@ -5,6 +5,8 @@ const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
+const _ = require("lodash");
+const { PrinterClean } = require("../lib/dataFunctions/printerClean");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -385,6 +387,11 @@ class PrinterStore {
       const printer = this.#findMePrinter(id);
       printer.resetSocketConnection();
     });
+  }
+
+  async generatePrinterConnectionLogs(id) {
+    const printer = this.#findMePrinter(id);
+    return await PrinterClean.generateConnectionLogs(printer);
   }
 }
 
