@@ -35,22 +35,35 @@ const returnButton = (check, icon, id, message) => {
 };
 
 const returnNetworkConnection = (issues) => {
+  const { apiResponses, webSocketResponses } = issues;
+
   let html = "";
 
-  if (issues.length < 1) {
+  if (apiResponses.length < 1) {
+    return `
+        No connection has ever been established
+      `;
+  }
+  if (webSocketResponses.length < 1) {
     return `
         No connection has ever been established
       `;
   }
 
-  const urlSplit = issues[0].url.split("/");
+  const urlSplit = apiResponses[0].url.split("/");
   const printerURL = urlSplit[0] + "//" + urlSplit[2];
   const pClean = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
+
+  const urlSplit_W = webSocketResponses[0].url.split("/");
+  const printerURL_W = urlSplit_W[0] + "//" + urlSplit_W[2];
+  const pClean_W = printerURL_W.replace(/[^\w\-]+/g, "-").toLowerCase();
 
   let totalInitial = 0;
   let totalCutOff = 0;
 
-  issues.forEach((issue) => {
+  let throttle = 0;
+
+  apiResponses.forEach((issue) => {
     const endPoint = issue.url.includes("api")
       ? issue.url.replace(printerURL + "/" + urlSplit[3], "")
       : issue.url.replace(printerURL + "/plugin", "");
@@ -73,6 +86,20 @@ const returnNetworkConnection = (issues) => {
     )} </small><br>
         `;
   });
+  webSocketResponses.forEach((issue) => {
+    const endPoint = issue.url.replace(printerURL_W + "/sockjs/websocket", "");
+
+    throttle += issue.throttle ? 1 : 0;
+
+    html += `
+        <small>${endPoint}: ${returnButton(
+      issue.initialTimeout,
+      '<i class="fas fa-history"></i>',
+      E.HISTORY_IN_TO + endPoint + pClean,
+      VALID_TIMEOUT("Initial")
+    )}
+        `;
+  });
 
   const collapse = `
     <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#${
@@ -93,6 +120,12 @@ const returnNetworkConnection = (issues) => {
       '<i class="fas fa-stopwatch"></i>',
       E.HISTORY_CUT_OFF + pClean,
       VALID_TIMEOUT("All Cut Off")
+    )}
+    ${returnButton(
+      throttle,
+      '<i class="fas fa-stopwatch"></i>',
+      E.HISTORY_CUT_OFF + pClean_W,
+      VALID_TIMEOUT("Websocket Throttle")
     )}
     <div class="collapse" id="${E.HISTORY_CUT_OFF + pClean}CollapseTimeout">
       <div class="card card-body">

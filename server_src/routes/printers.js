@@ -30,6 +30,10 @@ const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const {
+  updatePrinterHealthChecks,
+  returnPrinterHealthChecks
+} = require("../store/printer-health-checks.store");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -296,35 +300,9 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
   res.json(uniqueFolderPaths);
 });
-
+//TODO move to task call
 router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
-  const farmPrinters = getPrinterStoreCache().listPrintersInformation();
-
-  const response = [];
-
-  for (let i = 0; i < farmPrinters.length; i++) {
-    const currentURL = new URL(farmPrinters[i].printerURL);
-
-    const printerCheck = {
-      printerName: farmPrinters[i].printerName,
-      printerChecks: printerChecks(farmPrinters[i]),
-      apiChecks: apiChecks(farmPrinters[i].systemChecks.scanning),
-      websocketChecks: websocketChecks(currentURL.host),
-      connectionChecks: printerConnectionCheck(
-        farmPrinters[i].currentConnection,
-        farmPrinters[i].connectionOptions
-      ),
-      profileChecks: profileChecks(farmPrinters[i].currentProfile),
-      webcamChecks: webcamChecks(
-        farmPrinters[i].cameraURL,
-        farmPrinters[i]?.otherSettings?.webCamSettings
-      ),
-      connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
-    };
-    response.push(printerCheck);
-  }
-
-  res.send(response);
+  res.send(returnPrinterHealthChecks(true));
 });
 
 module.exports = router;

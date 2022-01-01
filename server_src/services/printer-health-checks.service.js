@@ -150,15 +150,21 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
   // check if current settings are causing high retry counts...
   const connectionLogs = returnConnectionLogs(printerURL);
 
-  let logs = [];
+  const logs = [];
+  const WS_logs = [];
 
-  const { timeout } = SettingsClean.returnSystemSettings();
+  const { timeout, onlinePolling } = SettingsClean.returnSystemSettings();
 
   if (connectionLogs?.connections) {
     for (let i = 0; i < connectionLogs.connections.length; i++) {
       const log = connectionLogs.connections[i];
       if (!log.url.includes("/sockjs/websocket")) {
         logs.push({
+          url: log.url,
+          responseTimes: log.log.lastResponseTimes
+        });
+      } else {
+        WS_logs.push({
           url: log.url,
           responseTimes: log.log.lastResponseTimes
         });
@@ -183,7 +189,30 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
     }
   }
 
-  return responses;
+  const WS_responses = [];
+
+  const THROTTLE_MS = parseFloat(onlinePolling.seconds) * 1000;
+
+  for (let i = 0; i < WS_logs.length; i++) {
+    const log = WS_logs[i];
+    if (log.responseTimes.length === 0) {
+      log.responseTimes = [0];
+    }
+    const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
+
+    if (responsesAverage) {
+      WS_responses.push({
+        url: log.url,
+        throttle: responsesAverage < THROTTLE_MS - 150 || responsesAverage > THROTTLE_MS + 500,
+        over: responsesAverage > THROTTLE_MS + 500
+      });
+    }
+  }
+
+  return {
+    webSocketResponses: WS_responses,
+    apiResponses: responses
+  };
 };
 
 module.exports = {
