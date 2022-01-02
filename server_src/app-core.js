@@ -105,7 +105,7 @@ function serveOctoFarmRoutes(app) {
 
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
-    logger.info("Initialising FarmInformation...");
+    logger.info("Starting OctoFarm server tasks...");
 
     for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
       TaskManager.registerJobOrTask(OctoFarmTasks.RECURRING_BOOT_TASKS[i]);
