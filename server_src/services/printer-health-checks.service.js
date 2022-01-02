@@ -1,5 +1,7 @@
 const { returnConnectionLogs } = require("./connection-monitor.service");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
 //TODO move to utils
 function isValidHttpUrl(string) {
   let url;
@@ -201,10 +203,17 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
     const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
 
     if (responsesAverage) {
+      logger.debug("Throttle Generation", {
+        url: log.url,
+        throttle: responsesAverage < THROTTLE_MS - 150 || responsesAverage > THROTTLE_MS + 500,
+        over: responsesAverage > THROTTLE_MS + 500,
+        under: responsesAverage < THROTTLE_MS - 150
+      });
       WS_responses.push({
         url: log.url,
         throttle: responsesAverage < THROTTLE_MS - 150 || responsesAverage > THROTTLE_MS + 500,
-        over: responsesAverage > THROTTLE_MS + 500
+        over: responsesAverage > THROTTLE_MS + 500,
+        under: responsesAverage < THROTTLE_MS - 150
       });
     }
   }

@@ -23,6 +23,7 @@ const {
   checkConnectionsMatchRetrySettings
 } = require("./services/printer-health-checks.service");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
+const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
@@ -143,6 +144,10 @@ const DATABASE_MIGRATIONS_TASK = async () => {
   console.log(migrations);
 };
 
+const INIT_FARM_INFORMATION = async () => {
+  await PrinterClean.initFarmInformation();
+};
+
 /**
  * @param task
  * @param preset
@@ -163,6 +168,7 @@ class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
+    TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),

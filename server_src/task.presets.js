@@ -48,6 +48,7 @@ class TASK_PRESETS {
   static PERIODIC_120000MS = {
     ...this.PERIODIC,
     logFirstCompletion: true,
+    runImmediately: true,
     milliseconds: 120000
   };
 

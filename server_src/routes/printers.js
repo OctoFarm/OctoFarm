@@ -10,30 +10,13 @@ const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
 
-const printerClean = require("../lib/dataFunctions/printerClean.js");
-
-const { PrinterClean } = printerClean;
-
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
-
-const {
-  apiChecks,
-  websocketChecks,
-  printerConnectionCheck,
-  profileChecks,
-  webcamChecks,
-  printerChecks,
-  checkConnectionsMatchRetrySettings
-} = require("../services/printer-health-checks.service");
 
 const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const {
-  updatePrinterHealthChecks,
-  returnPrinterHealthChecks
-} = require("../store/printer-health-checks.store");
+const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -286,18 +269,18 @@ router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req,
 });
 
 router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = PrinterClean.returnUniqueListOfOctoPrintPaths();
+  let uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
   res.json(uniqueFolderPaths);
 });
 
 router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = PrinterClean.returnUniqueListOfOctoPrintFiles();
+  let uniqueFolderPaths = getPrinterStoreCache().listUniqueFiles();
   res.json(uniqueFolderPaths);
 });
 
 router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   const idList = JSON.parse(req.params.ids);
-  let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
+  let uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
   res.json(uniqueFolderPaths);
 });
 

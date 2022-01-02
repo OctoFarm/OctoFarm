@@ -20,6 +20,7 @@ const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js")
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
 const { TaskManager } = require("../runners/task.manager");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const systemInformationFileName = "system_information.txt";
 
@@ -138,7 +139,7 @@ function generateSystemInformationContents() {
     }
   }
 
-  const printerVersions = PrinterClean.returnAllOctoPrintVersions();
+  const printerVersions = getPrinterStoreCache().listAllOctoPrintVersions();
 
   if (printerVersions) {
     systemInformationContents += "\n --- OctoPrint Information ---\n\n";

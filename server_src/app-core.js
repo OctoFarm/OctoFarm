@@ -106,23 +106,6 @@ function serveOctoFarmRoutes(app) {
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
-    await PrinterClean.initFarmInformation();
-
-    // const promises = await Promise.allSettled(
-    //   OctoFarmTasks.TIMED_BOOT_TASTS.map((f) => {
-    //     return f();
-    //   })
-    // );
-    //
-    // const success = promises.every((x) => x.status === "fulfilled");
-    //
-    // if (!success) {
-    //   const errors = promises.filter((x) => x.status === "rejected");
-    //   errors.forEach(e => {
-    //     logger.error(e.reason)
-    //   })
-    //   throw new Error(SERVER_ISSUES.REQUIRED_BOOT_TASKS_FAILED);
-    // }
 
     for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
       TaskManager.registerJobOrTask(OctoFarmTasks.RECURRING_BOOT_TASKS[i]);

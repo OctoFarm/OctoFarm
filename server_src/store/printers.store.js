@@ -393,6 +393,98 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return await PrinterClean.generateConnectionLogs(printer);
   }
+
+  listAllOctoPrintVersions() {
+    const printers = this.listPrintersInformation();
+
+    const versionArray = [];
+
+    printers.forEach((printer) => {
+      if (!versionArray.includes(printer.octoPrintVersion))
+        versionArray.push(printer.octoPrintVersion);
+    });
+    return versionArray;
+  }
+
+  listUniqueFiles() {
+    const printers = this.listPrintersInformation();
+
+    const filePathsArray = [];
+
+    for (let f = 0; f < printers.length; f++) {
+      const fileList = printers[f]?.fileList?.fileList;
+      if (fileList) {
+        for (let p = 0; p < fileList.length; p++) {
+          const index = _.findIndex(filePathsArray, function (o) {
+            return o.display == fileList[p].display;
+          });
+          if (index === -1) {
+            filePathsArray.push({
+              name: fileList[p].name,
+              display: fileList[p].display
+            });
+          }
+        }
+      }
+    }
+    return filePathsArray;
+  }
+
+  listUniqueFolderPaths() {
+    const printers = this.listPrintersInformation();
+
+    const filePathsArray = [""];
+
+    for (let f = 0; f < printers.length; f++) {
+      const folderList = printers[f]?.fileList?.folderList;
+      if (folderList) {
+        for (let p = 0; p < folderList.length; p++) {
+          if (!filePathsArray.includes(folderList[p].name)) {
+            filePathsArray.push(folderList[p].name);
+          }
+        }
+      }
+    }
+    return filePathsArray;
+  }
+
+  listCommonFilesOnAllPrinters(ids) {
+    const uniqueFilesListFromAllPrinters = [];
+    // Create unique list of files
+    ids.forEach((id) => {
+      const currentPrinter = this.#findMePrinter(id);
+      const fileList = currentPrinter?.fileList?.fileList;
+      if (fileList) {
+        for (let p = 0; p < fileList.length; p++) {
+          const index = _.findIndex(uniqueFilesListFromAllPrinters, function (o) {
+            return o.name == fileList[p].name;
+          });
+          if (index === -1) {
+            uniqueFilesListFromAllPrinters.push(fileList[p]);
+          }
+        }
+      }
+    });
+    const filesThatExistOnAllPrinters = [];
+    // Check if that file exists on all of the printers...
+    for (let f = 0; f < uniqueFilesListFromAllPrinters.length; f++) {
+      const fileToCheck = uniqueFilesListFromAllPrinters[f];
+      const fileChecks = [];
+      for (let p = 0; p < ids.length; p++) {
+        const currentPrinter = this.#findMePrinter(ids[p]);
+        const fileList = currentPrinter?.fileList?.fileList;
+        fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
+      }
+      if (
+        fileChecks.every(function (e) {
+          return e === true;
+        })
+      ) {
+        filesThatExistOnAllPrinters.push(fileToCheck);
+      }
+    }
+    return filesThatExistOnAllPrinters;
+  }
 }
 
 module.exports = PrinterStore;

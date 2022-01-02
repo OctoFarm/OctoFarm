@@ -83,13 +83,13 @@ const returnNetworkConnection = (issues) => {
       '<i class="fas fa-stopwatch"></i>',
       E.HISTORY_CUT_OFF + endPoint + pClean,
       VALID_TIMEOUT("Cut Off")
-    )} </small><br>
+    )} </small>
         `;
   });
   webSocketResponses.forEach((issue) => {
     const endPoint = issue.url.replace(printerURL_W + "/sockjs/websocket", "");
-
-    throttle += issue.throttle ? 1 : 0;
+    console.log(issue.throttle);
+    throttle += issue.throttle ? 0 : 1;
 
     html += `
         <small>${endPoint}: ${returnButton(
@@ -102,13 +102,13 @@ const returnNetworkConnection = (issues) => {
   });
 
   const collapse = `
-    <a class="btn btn-sm btn-outline-info"  data-toggle="collapse" href="#${
+    <a class="btn btn-sm btn-outline-info mb-1"  data-toggle="collapse" href="#${
       E.HISTORY_CUT_OFF + pClean
     }CollapseTimeout" role="button" aria-expanded="false" aria-controls="${
     E.HISTORY_CUT_OFF + pClean
   }CollapseTimeout">
     ${printerURL} 
-    </a>
+    </a><br>
     ${returnButton(
       totalInitial,
       '<i class="fas fa-history"></i>',

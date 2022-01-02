@@ -4,8 +4,8 @@ const _ = require("lodash");
 const Logger = require("../../handlers/logger.js");
 const Spools = require("../../models/Filament.js");
 const Profiles = require("../../models/Profiles.js");
-const { PrinterClean } = require("./printerClean.js");
 const { SettingsClean } = require("../dataFunctions/settingsClean");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 
@@ -21,7 +21,7 @@ let dropDownList = {
 let printerFilamentList = [];
 
 class FilamentClean {
-  static noSpoolOptions = `<option value="0">No Spool Selected</option>`;
+  static noSpoolOptions = '<option value="0">No Spool Selected</option>';
 
   static returnFilamentList() {
     return printerFilamentList;
@@ -50,7 +50,7 @@ class FilamentClean {
   static async start(filamentManager) {
     const profiles = await Profiles.find({});
     const spools = await Spools.find({});
-    const farmPrinters = PrinterClean.listPrintersInformation();
+    const farmPrinters = getPrinterStoreCache().listPrintersInformation();
     const spoolsArray = [];
     const profilesArray = [];
 
