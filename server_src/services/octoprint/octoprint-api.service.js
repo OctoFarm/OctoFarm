@@ -165,7 +165,7 @@ class OctoprintApiService {
             throw 408;
           }
           // Make sure to use the settings for api retry.
-          this.#currentTimeout = this.#currentTimeout + 5000;
+          this.#currentTimeout = this.#currentTimeout + 2500;
           logger.error(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });
