@@ -27,28 +27,13 @@ const dashboardStatistics = getDefaultDashboardStatisticsObject();
 let heatMap = getEmptyHeatmap();
 const currentHistoryTemp = getEmptyToolTemperatureArray();
 let printersInformation = [];
-const currentLogs = [];
-const previousLogs = [];
 let farmStats = null;
 let heatMapCounter = 17280;
 const arrayTotal = [];
 const printerControlList = [];
 
 let printerConnectionLogs = [];
-
-let fmToggle = false;
-
 class PrinterClean {
-  static removePrintersInformation(index) {
-    if (typeof index !== "undefined") {
-      printersInformation = printersInformation.filter((el) => {
-        return el.sortIndex === index;
-      });
-    } else {
-      printersInformation = [];
-    }
-  }
-
   static returnPrinterLogs(sortIndex) {
     if (typeof sortIndex !== "undefined") {
       return printerConnectionLogs[sortIndex];
@@ -57,30 +42,8 @@ class PrinterClean {
     }
   }
 
-  /**
-   * @deprecated Use cache/printer.cache.js instead
-   * @returns {[]}
-   */
-  static listPrintersInformation() {
-    return printersInformation;
-  }
-
-  /**
-   * @deprecated Use cache/printer.cache.js instead
-   * @returns {{}|undefined}
-   */
-  static getPrintersInformationById(id) {
-    return _.find(printersInformation, function (o) {
-      return o._id == id;
-    });
-  }
-
   static returnPrinterControlList() {
     return printerControlList;
-  }
-
-  static returnFilamentList() {
-    return printerFilamentList;
   }
 
   /**
@@ -97,113 +60,6 @@ class PrinterClean {
    */
   static returnDashboardStatistics() {
     return dashboardStatistics;
-  }
-
-  // TODO remove or util
-
-  static generate(farmPrinter, filamentManager) {
-    fmToggle = filamentManager;
-    try {
-      if (typeof farmPrinter.systemChecks !== "undefined") {
-        farmPrinter.systemChecks.cleaning.information.status = "warning";
-      }
-
-      const sortedPrinter = {
-        // _id: farmPrinter._id,
-        // sortIndex: farmPrinter.sortIndex,
-        // hostState: {
-        //   state: farmPrinter.hostState,
-        //   colour: farmPrinter.hostStateColour,
-        //   desc: farmPrinter.hostDescription
-        // },
-        //
-        // printerState: {
-        //   state: farmPrinter.state,
-        //   colour: farmPrinter.stateColour,
-        //   desc: farmPrinter.stateDescription
-        // },
-        // webSocketState: {
-        //   colour: farmPrinter.webSocket,
-        //   desc: farmPrinter.webSocketDescription
-        // },
-        // userList: farmPrinter.userList,
-        // group: farmPrinter.group,
-        // printerURL: farmPrinter.printerURL,
-        // webSocketURL: farmPrinter.webSocketURL,
-        // cameraURL: farmPrinter.camURL,
-        // apikey: farmPrinter.apikey,
-        // octoPrintVersion: farmPrinter.octoPrintVersion,
-        // flowRate: farmPrinter.flowRate,
-        // feedRate: farmPrinter.feedRate,
-        // stepRate: farmPrinter.stepRate,
-        // systemChecks: farmPrinter.systemChecks,
-        // currentIdle: farmPrinter.currentIdle,
-        // currentActive: farmPrinter.currentActive,
-        // currentOffline: farmPrinter.currentOffline,
-        // dateAdded: farmPrinter.dateAdded,
-        // corsCheck: farmPrinter.corsCheck,
-        // currentUser: farmPrinter.currentUser,
-        // octoPrintUpdate: farmPrinter.octoPrintUpdate,
-        // octoPrintPluginUpdates: farmPrinter.octoPrintPluginUpdates,
-        // display: true,
-        // order: farmPrinter.sortIndex,
-        // octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
-      };
-
-      // sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
-      // sortedPrinter.currentJob = JobClean.getCleanJobAtIndex(farmPrinter.sortIndex);
-      // sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
-      //
-      // sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);
-      // sortedPrinter.currentProfile = PrinterClean.sortProfile(
-      //   farmPrinter.profiles,
-      //   farmPrinter.current
-      // );
-      // sortedPrinter.currentConnection = PrinterClean.sortConnection(farmPrinter.current);
-      // sortedPrinter.connectionOptions = farmPrinter.options;
-      // if (
-      //   !!sortedPrinter?.connectionOptions?.ports &&
-      //   !sortedPrinter.connectionOptions.ports.includes("AUTO")
-      // ) {
-      //   sortedPrinter.connectionOptions.baudrates.unshift(0);
-      //   sortedPrinter.connectionOptions.ports.unshift("AUTO");
-
-      // sortedPrinter.gcodeScripts = PrinterClean.sortGCODE(farmPrinter.settingsScripts);
-      // sortedPrinter.otherSettings = PrinterClean.sortOtherSettings(
-      //   farmPrinter.tempTriggers,
-      //   farmPrinter.settingsWebcam,
-      //   farmPrinter.settingsServer
-      // );
-      // sortedPrinter.printerName = PrinterClean.grabPrinterName(farmPrinter);
-
-      sortedPrinter.connectionLog = printerConnectionLogs[farmPrinter.sortIndex];
-      if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
-        sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(0, 6);
-      }
-      const printerIndex = _.findIndex(printerControlList, function (o) {
-        return o.printerName === sortedPrinter.printerName;
-      });
-      if (printerIndex !== -1) {
-        printerControlList[printerIndex] = {
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        };
-      } else {
-        printerControlList.push({
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        });
-      }
-      if (typeof farmPrinter.systemChecks !== "undefined") {
-        farmPrinter.systemChecks.cleaning.information.status = "success";
-        farmPrinter.systemChecks.cleaning.information.date = new Date();
-      }
-      printersInformation[farmPrinter.sortIndex] = sortedPrinter;
-    } catch (e) {
-      logger.error(e);
-    }
   }
 
   static async generateConnectionLogs(farmPrinter) {
