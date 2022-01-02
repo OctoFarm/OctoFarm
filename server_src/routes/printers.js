@@ -300,7 +300,7 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   let uniqueFolderPaths = PrinterClean.returnUnifiedListOfOctoPrintFiles(idList);
   res.json(uniqueFolderPaths);
 });
-//TODO move to task call
+
 router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
   res.send(returnPrinterHealthChecks(true));
 });
