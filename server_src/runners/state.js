@@ -1022,73 +1022,73 @@ class Runner {
     PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
   }
 
-  static async init() {
-    farmPrinters = [];
-    try {
-      await PrinterClean.removePrintersInformation();
-    } catch (e) {
-      logger.debug("No printers information to remove");
-    }
-
-    systemSettings = SettingsClean.returnSystemSettings();
-
-    timeout = systemSettings.timeout;
-
-    Runner.octoPrintService = new OctoprintApiClientService(timeout);
-    // Can't use this anymore, pass the service through absolute shite was of doing it.
-    await HistoryCollection.inject(Runner.octoPrintService);
-
-    // Grab printers from database....
-    try {
-      farmPrinters = await Printers.find({}, null, {
-        sort: { sortIndex: 1 }
-      });
-      for (let i = 0; i < farmPrinters.length; i++) {
-        const batchOfTenPromises = [];
-        if (i % 10 === 0) {
-          if (farmPrinters[i]) {
-            batchOfTenPromises.push(Runner.setup(i));
-          }
-          if (farmPrinters[i + 1]) {
-            batchOfTenPromises.push(Runner.setup(i + 1));
-          }
-          if (farmPrinters[i + 2]) {
-            batchOfTenPromises.push(Runner.setup(i + 2));
-          }
-          if (farmPrinters[i + 3]) {
-            batchOfTenPromises.push(Runner.setup(i + 3));
-          }
-          if (farmPrinters[i + 4]) {
-            batchOfTenPromises.push(Runner.setup(i + 4));
-          }
-          if (farmPrinters[i + 5]) {
-            batchOfTenPromises.push(Runner.setup(i + 5));
-          }
-          if (farmPrinters[i + 6]) {
-            batchOfTenPromises.push(Runner.setup(i + 6));
-          }
-          if (farmPrinters[i + 7]) {
-            batchOfTenPromises.push(Runner.setup(i + 7));
-          }
-          if (farmPrinters[i + 8]) {
-            batchOfTenPromises.push(Runner.setup(i + 8));
-          }
-          if (farmPrinters[i + 9]) {
-            batchOfTenPromises.push(Runner.setup(i + 9));
-          }
-        }
-        await Promise.allSettled(batchOfTenPromises);
-      }
-    } catch (err) {
-      const error = {
-        err: err.message,
-        action: "Database connection failed... No action taken",
-        userAction:
-          "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
-      };
-      logger.error(err);
-    }
-  }
+  // static async init() {
+  //   farmPrinters = [];
+  //   try {
+  //     await PrinterClean.removePrintersInformation();
+  //   } catch (e) {
+  //     logger.debug("No printers information to remove");
+  //   }
+  //
+  //   systemSettings = SettingsClean.returnSystemSettings();
+  //
+  //   timeout = systemSettings.timeout;
+  //
+  //   Runner.octoPrintService = new OctoprintApiClientService(timeout);
+  //   // Can't use this anymore, pass the service through absolute shite was of doing it.
+  //   await HistoryCollection.inject(Runner.octoPrintService);
+  //
+  //   // Grab printers from database....
+  //   try {
+  //     farmPrinters = await Printers.find({}, null, {
+  //       sort: { sortIndex: 1 }
+  //     });
+  //     for (let i = 0; i < farmPrinters.length; i++) {
+  //       const batchOfTenPromises = [];
+  //       if (i % 10 === 0) {
+  //         if (farmPrinters[i]) {
+  //           batchOfTenPromises.push(Runner.setup(i));
+  //         }
+  //         if (farmPrinters[i + 1]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 1));
+  //         }
+  //         if (farmPrinters[i + 2]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 2));
+  //         }
+  //         if (farmPrinters[i + 3]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 3));
+  //         }
+  //         if (farmPrinters[i + 4]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 4));
+  //         }
+  //         if (farmPrinters[i + 5]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 5));
+  //         }
+  //         if (farmPrinters[i + 6]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 6));
+  //         }
+  //         if (farmPrinters[i + 7]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 7));
+  //         }
+  //         if (farmPrinters[i + 8]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 8));
+  //         }
+  //         if (farmPrinters[i + 9]) {
+  //           batchOfTenPromises.push(Runner.setup(i + 9));
+  //         }
+  //       }
+  //       await Promise.allSettled(batchOfTenPromises);
+  //     }
+  //   } catch (err) {
+  //     const error = {
+  //       err: err.message,
+  //       action: "Database connection failed... No action taken",
+  //       userAction:
+  //         "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
+  //     };
+  //     logger.error(err);
+  //   }
+  // }
   //Done
   // static async compareEnteredKeyToGlobalKey(printer) {
   //   // Compare entered API key to settings API Key...

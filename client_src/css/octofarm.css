@@ -297,6 +297,11 @@ a.notyet {
   background-color: transparent;
   opacity: 0.5;
 }
+.printerEnabled {
+  border-left: green 4px solid;
+  background-color: transparent;
+  opacity: 1.0;
+}
 .fileFooter {
   padding: 5px;
 }

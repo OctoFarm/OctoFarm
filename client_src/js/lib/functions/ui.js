@@ -292,7 +292,7 @@ export default class UI {
     } else if (e.target.innerHTML.includes("wheelchair")) {
       e.target.classList = "btn btn-outline-success btn-sm";
       e.target.innerHTML = '<i class="fas fa-running"></i>';
-      printerCard.classList = "";
+      printerCard.classList = "printerEnabled";
       apiReScan.disabled = true;
     }
   }
