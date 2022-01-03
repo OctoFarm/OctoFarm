@@ -1,4 +1,8 @@
 import Noty from "noty";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import { updatePrinterSettingsModal } from "../modules/printerSettings";
+import PrinterLogs from "../modules/printerLogs";
+import { reSyncAPI } from "../../pages/printer-manager/functions/printer-manager.functions";
 
 const printerSettingsModal = document.getElementById("printerSettingsModal");
 const printerManagerModal = document.getElementById("printerManagerModal");
@@ -265,6 +269,31 @@ export default class UI {
         string = "No Interval";
       }
       return string;
+    }
+  }
+
+  static isPrinterDisabled(e) {
+    if (e.target.innerHTML.includes("running")) {
+      return false;
+    } else if (e.target.innerHTML.includes("wheelchair")) {
+      return true;
+    }
+  }
+
+  static togglePrinterDisableState(e, id) {
+    const printerCard = document.getElementById(`printerCard-${id}`);
+    const apiReScan = document.getElementById(`printerAPIReScan-${id}`);
+
+    if (e.target.innerHTML.includes("running")) {
+      e.target.classList = "btn btn-outline-light btn-sm";
+      e.target.innerHTML = '<i class="fas fa-wheelchair"></i>';
+      printerCard.classList = "printerDisabled";
+      apiReScan.disabled = true;
+    } else if (e.target.innerHTML.includes("wheelchair")) {
+      e.target.classList = "btn btn-outline-success btn-sm";
+      e.target.innerHTML = '<i class="fas fa-running"></i>';
+      printerCard.classList = "";
+      apiReScan.disabled = true;
     }
   }
 }

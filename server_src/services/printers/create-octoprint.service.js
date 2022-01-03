@@ -466,7 +466,6 @@ class OctoPrintPrinter {
 
   startOctoPrintService() {
     if (!this?.disabled) {
-      this.setAllPrinterStates(PRINTER_STATES().SETTING_UP);
       this.enablePrinter().then();
     } else {
       this.disablePrinter();
@@ -474,6 +473,7 @@ class OctoPrintPrinter {
   }
 
   async enablePrinter() {
+    this.setAllPrinterStates(PRINTER_STATES().SETTING_UP);
     // Setup initial client stuff, database, api
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
@@ -490,7 +490,7 @@ class OctoPrintPrinter {
         };
         this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
         this.reconnectAPI();
-        return;
+        return "Successfully enabled printer...";
       } else if (testingTheWaters === 503 || testingTheWaters === 502) {
         const unavailable = {
           hostState: "Unavailable!",
@@ -498,7 +498,7 @@ class OctoPrintPrinter {
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
         this.reconnectAPI();
-        return;
+        return "Successfully enabled printer...";
       } else if (testingTheWaters === 404) {
         const unavailable = {
           hostState: "Not Found!",
@@ -506,7 +506,7 @@ class OctoPrintPrinter {
             "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return;
+        return "Successfully enabled printer...";
       } else if (testingTheWaters === 403) {
         const unavailable = {
           hostState: "Forbidden!",
@@ -514,7 +514,7 @@ class OctoPrintPrinter {
             "Could not establish authentication... please check your API key and try again!"
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return;
+        return "Successfully enabled printer...";
       } else {
         const unavailable = {
           hostState: "Hard Fail!",
@@ -522,7 +522,7 @@ class OctoPrintPrinter {
             "Something is seriously wrong... please check all settings! will not attempt reconnect..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return;
+        return "Successfully enabled printer...";
       }
     }
     this.setHostState(PRINTER_STATES().HOST_ONLINE);
@@ -540,7 +540,7 @@ class OctoPrintPrinter {
         stateDescription: "Global api key detected... please use application / user generated key!"
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
-      return;
+      return "Successfully enabled printer...";
     }
 
     const initialApiCheckValues = initialApiCheck.map((check) => {
@@ -550,7 +550,7 @@ class OctoPrintPrinter {
     if (initialApiCheckValues.includes(true)) {
       this.setPrinterState(PRINTER_STATES().SHUTDOWN);
       this.reconnectAPI();
-      return;
+      return "Successfully enabled printer...";
     }
 
     // Grab required api data, fail to shutdown... should not continue without this data...
@@ -565,7 +565,7 @@ class OctoPrintPrinter {
       };
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
       this.reconnectAPI();
-      return;
+      return "Successfully enabled printer...";
     }
 
     // Get a session key
@@ -573,6 +573,8 @@ class OctoPrintPrinter {
 
     // Grab optional api data
     await this.#optionalApiSequence();
+
+    return "Successfully enabled printer...";
   }
 
   async #setupWebsocket(force = false) {
@@ -617,7 +619,16 @@ class OctoPrintPrinter {
   }
 
   disablePrinter() {
-    this.disabled = true;
+    if (this.disabled === false) {
+      this.disabled = true;
+      printerModel
+        .findOneAndUpdate({ _id: this._id }, { disabled: true })
+        .then(() => logger.warning("Successfully saved enable state for printer"), {
+          disabled: true
+        })
+        .catch((e) => logger.warning("Successfully saved enable state for printer", e));
+    }
+    this.reconnectingIn = 0;
     this.setAllPrinterStates(PRINTER_STATES().DISABLED);
     this.killAllConnections();
     logger.debug(this.printerURL + ": client set as disabled...");
@@ -628,6 +639,7 @@ class OctoPrintPrinter {
       "Offline",
       this._id
     );
+    return "Printer successfully disabled...";
   }
 
   getMessageNumber() {
@@ -639,6 +651,7 @@ class OctoPrintPrinter {
   }
 
   async setupClient() {
+    this.disabled = false;
     if (this.#retryNumber === 0) {
       logger.info(this.printerURL + ": Running setup sequence.");
       this.#apiPrinterTickerWrap("Starting printer setup sequence", "Info");
@@ -679,6 +692,7 @@ class OctoPrintPrinter {
       logger.debug(this.printerURL + ": Creating printer database link");
       this.#db = new PrinterDatabaseService(this._id);
       this.#db.update({
+        disabled: this.disabled,
         sortIndex: this.sortIndex,
         apikey: this.apikey,
         printerURL: this.printerURL,
@@ -1430,37 +1444,7 @@ class OctoPrintPrinter {
   }
 
   async resetSocketConnection() {
-    // TODO -
-    // - Check printer state...
-    // - Missing #api, #db, #ws then we're at differing states of setup.
-    // PrinterTicker.addIssue(
-    //   new Date(),
-    //   this.printerURL,
-    //   "Grabbing session key for websocket auth with user: " + this.currentUser,
-    //   "Active",
-    //   this._id
-    // );
-    //
-    // const session = await this.acquireOctoPrintSessionKey();
-    //
-    // if (typeof session !== "string") {
-    //   // Couldn't setup websocket
-    //   this.setHostState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
-    //   this.setPrinterState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
-    //   return;
-    // }
-    //
-    // if (!!this.#ws) {
-    //   this.#ws.resetSocketConnection(this.webSocketURL, session);
-    // } else {
-    //   this.#ws = new WebSocketClient(
-    //     this.webSocketURL,
-    //     this._id,
-    //     this.currentUser,
-    //     session,
-    //     handleMessage
-    //   );
-    // }
+    await this.enablePrinter();
   }
 
   async acquireOctoPrintLatestSettings(force = false) {

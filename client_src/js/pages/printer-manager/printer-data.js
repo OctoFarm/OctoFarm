@@ -178,12 +178,11 @@ function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
     updatePrinterInfo(printer);
+    reconnectingIn(printer);
     if (!printer.disabled) {
       checkQuickConnectState(printer);
 
       updatePrinterState(printer);
-
-      reconnectingIn(printer);
 
       checkForOctoPrintUpdate(printer);
 
@@ -228,12 +227,12 @@ export function createOrUpdatePrinterTableRow(printers) {
           const printersInfo = await OctoFarmClient.listPrinters();
           await updatePrinterSettingsModal(printersInfo, printer._id);
         });
-      document
-        .getElementById(`scanningIssues-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          const printersInfo = await OctoFarmClient.listPrinters();
-          await updatePrinterSettingsModal(printersInfo, printer._id);
-        });
+      // document
+      //   .getElementById(`scanningIssues-${printer._id}`)
+      //   .addEventListener("click", async (e) => {
+      //     const printersInfo = await OctoFarmClient.listPrinters();
+      //     await updatePrinterSettingsModal(printersInfo, printer._id);
+      //   });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
         let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
@@ -276,6 +275,34 @@ export function createOrUpdatePrinterTableRow(printers) {
               }
             }
           });
+        });
+
+      document
+        .getElementById(`printerDisable-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          e.target.disabled = true;
+          const isDisabled = UI.isPrinterDisabled(e);
+          const alert = UI.createAlert(
+            "warning",
+            `${isDisabled ? "Enabling" : "Disabling"} your printer... please wait!`
+          );
+          let patch = null;
+          if (isDisabled) {
+            patch = await OctoFarmClient.enablePrinter(printer._id);
+          } else {
+            patch = await OctoFarmClient.disablePrinter(printer._id);
+          }
+          alert.close();
+          UI.createAlert(
+            "success",
+            `Successfully ${isDisabled ? "Enabled" : "Disabled"} your printer!`,
+            "Clicked",
+            3000
+          );
+          UI.togglePrinterDisableState(e, printer._id);
+          setTimeout(() => {
+            e.target.disabled = false;
+          }, 5000);
         });
     }
   });

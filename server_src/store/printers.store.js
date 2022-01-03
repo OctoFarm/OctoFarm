@@ -489,6 +489,15 @@ class PrinterStore {
     }
     return filesThatExistOnAllPrinters;
   }
+
+  disablePrinter(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.disablePrinter();
+  }
+  async enablePrinter(id) {
+    const printer = this.#findMePrinter(id);
+    return await printer.enablePrinter();
+  }
 }
 
 module.exports = PrinterStore;

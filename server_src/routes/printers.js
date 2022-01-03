@@ -99,13 +99,18 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
   const updateSettings = await Runner.updateSettings(settings);
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
-router.post("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
-  // Check required fields
-  const printerID = req.params.id;
-  const updateSettings = await Runner.killPowerSettings(printerID);
-  res.send({ updateSettings });
-});
-router.get("/groups", ensureAuthenticated, async (req, res) => {
+router.post(
+  "/killPowerSettings/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  async (req, res) => {
+    // Check required fields
+    const printerID = req.params.id;
+    const updateSettings = await Runner.killPowerSettings(printerID);
+    res.send({ updateSettings });
+  }
+);
+router.get("/groups", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
   for (let i = 0; i < printers.length; i++) {
@@ -129,24 +134,29 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   res.send(returnedPrinterInformation);
 });
 
-router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
-  const id = req.body.i;
-  if (!id) {
-    logger.error("Printer Settings: No ID key was provided");
-    res.statusMessage = "No ID key was provided";
-    res.sendStatus(400);
-    return;
+router.post(
+  "/updatePrinterSettings",
+  ensureAuthenticated,
+  ensureAdministrator,
+  async (req, res) => {
+    const id = req.body.i;
+    if (!id) {
+      logger.error("Printer Settings: No ID key was provided");
+      res.statusMessage = "No ID key was provided";
+      res.sendStatus(400);
+      return;
+    }
+    try {
+      await getPrinterStoreCache().updateLatestOctoPrintSettings(id, true);
+      logger.debug("Updating printer settings for: ", id);
+      res.send(getPrinterStoreCache().getPrinterInformation(id));
+    } catch (e) {
+      logger.error(`The server couldn't update your printer settings! ${e}`);
+      res.statusMessage = `The server couldn't update your printer settings! ${e}`;
+      res.sendStatus(500);
+    }
   }
-  try {
-    await getPrinterStoreCache().updateLatestOctoPrintSettings(id, true);
-    logger.debug("Updating printer settings for: ", id);
-    res.send(getPrinterStoreCache().getPrinterInformation(id));
-  } catch (e) {
-    logger.error(`The server couldn't update your printer settings! ${e}`);
-    res.statusMessage = `The server couldn't update your printer settings! ${e}`;
-    res.sendStatus(500);
-  }
-});
+);
 
 router.post("/moveFile", ensureAuthenticated, async (req, res) => {
   const data = req.body;
@@ -180,7 +190,7 @@ router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const roll = await Runner.selectedFilament(data);
   res.send({ msg: roll });
 });
-router.post("/reSyncAPI", ensureAuthenticated, async (req, res) => {
+router.post("/reSyncAPI", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const id = req.body.id;
   const force = req.body.force;
   logger.info(`Rescan ${id ? id : "All"} OctoPrint Requested. Forced: `, { force: force });
@@ -212,7 +222,7 @@ router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async 
   logger.info("Update filament sorting request: ", data);
   Runner.updateSortIndex(data);
 });
-router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
+router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let id = req.params.id;
   logger.info("Grabbing connection logs for: ", id);
   let connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
@@ -256,8 +266,18 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
   res.json(uniqueFolderPaths);
 });
 
-router.get("/healthChecks", ensureAuthenticated, async (req, res) => {
+router.get("/healthChecks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   res.send(returnPrinterHealthChecks(true));
+});
+
+router.patch("/disable/:id", ensureAuthenticated, ensureAdministrator, (req, res) => {
+  const id = req.params.id;
+  res.send(getPrinterStoreCache().disablePrinter(id));
+});
+
+router.patch("/enable/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const id = req.params.id;
+  res.send(await getPrinterStoreCache().enablePrinter(id));
 });
 
 module.exports = router;

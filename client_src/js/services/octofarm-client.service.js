@@ -55,6 +55,8 @@ axios.interceptors.response.use(
 export default class OctoFarmClient {
   static base = "/api";
   static printerRoute = "/printers";
+  static disablePrinterRoute = this.printerRoute + "/disable/";
+  static enablePrinterRoute = this.printerRoute + "/enable/";
   static serverSettingsRoute = "/settings/server";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
@@ -96,6 +98,14 @@ export default class OctoFarmClient {
 
   static async listPrinters() {
     return this.post(`${this.printerRoute}/printerInfo/`);
+  }
+
+  static async disablePrinter(id) {
+    return this.patch(`${this.disablePrinterRoute}${id}`);
+  }
+
+  static async enablePrinter(id) {
+    return this.patch(`${this.enablePrinterRoute}${id}`);
   }
 
   static async refreshPrinterSettings(id) {
