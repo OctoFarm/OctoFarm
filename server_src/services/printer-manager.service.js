@@ -184,7 +184,7 @@ class PrinterManagerService {
       const printerList = getPrinterStoreCache().listPrinters();
       return await this.batchReSyncWebsockets(printerList, 50);
     } else {
-      const printer = getPrinterStoreCache().getPrinterInformation(id);
+      const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reConnectWebsocket();
     }
   }
@@ -195,7 +195,7 @@ class PrinterManagerService {
       const printerList = getPrinterStoreCache().listPrinters();
       return await this.batchReScanAPI(printerList, 10, force);
     } else {
-      const printer = getPrinterStoreCache().getPrinterInformation(id);
+      const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reScanAPI(force);
     }
   }

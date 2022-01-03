@@ -181,7 +181,6 @@ router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   res.send({ msg: roll });
 });
 router.post("/reSyncAPI", ensureAuthenticated, async (req, res) => {
-  console.log(req.body);
   const id = req.body.id;
   const force = req.body.force;
   logger.info("Rescan All OctoPrint Requested. Forced: ", { force: force });
@@ -192,14 +191,21 @@ router.post("/reSyncAPI", ensureAuthenticated, async (req, res) => {
 router.post("/reSyncSockets", ensureAuthenticated, async (req, res) => {
   const id = req.body.id;
   logger.info("Rescan All OctoPrint Requests: ");
-  await getPrinterManagerCache().reSyncWebsockets(id);
-  logger.info("Full re-scan of OctoFarm completed");
-  res.send({ msg: "Finished Socket Reconnect..." });
+  try {
+    await getPrinterManagerCache().reSyncWebsockets(id);
+    logger.info("Full re-scan of OctoFarm completed");
+    res.send({
+      status: "success",
+      msg: "Successfully Reconnected Socket! Please await reconnect."
+    });
+  } catch (e) {
+    res.send({ status: "error", msg: `Couldn't Reconnect Socket! : ${e.message}` });
+  }
 });
 router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Action wake host: ", data);
-  Script.wol(data);
+  await Script.wol(data);
 });
 router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const data = req.body;

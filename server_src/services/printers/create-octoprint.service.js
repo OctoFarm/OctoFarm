@@ -440,7 +440,11 @@ class OctoPrintPrinter {
   async disableClient() {}
 
   reConnectWebsocket() {
-    if (!!this?.#ws) this.#ws.terminate();
+    if (!!this?.#ws) {
+      this.#ws.terminate();
+      return "Successfully terminated websocket! Please wait for reconnect.";
+    }
+    throw new Error("No websocket to reconnect!");
   }
 
   async throttleWebSocket(seconds) {
@@ -687,6 +691,7 @@ class OctoPrintPrinter {
   }
 
   reconnectAPI() {
+    this.reconnectingIn = Date.now() + this.#apiRetry;
     this.#retryNumber = this.#retryNumber + 1;
     logger.info(
       this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
@@ -702,13 +707,12 @@ class OctoPrintPrinter {
         this._id
       );
     }
-
     this.#reconnectTimeout = setTimeout(() => {
+      this.reconnectingIn = 0;
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
         logger.debug(this.printerURL + ": API modifier " + modifier);
-        this.reconnectingIn = this.#apiRetry;
       } else if (this.#retryNumber === 0) {
         logger.info(this.printerURL + ": Attempting to reconnect to printer!");
         PrinterTicker.addIssue(

@@ -166,6 +166,10 @@ class WebSocketClient {
 
     this.#instance.on("close", (code, reason) => {
       logger.error(`${this.url}: Websocket Closed!`, { code, reason });
+      getPrinterStoreCache().updateWebsocketState(this.id, {
+        webSocket: "danger",
+        webSocketDescription: "Socket connection error! Reconnecting...."
+      });
       ConnectionMonitorService.updateOrAddResponse(
         this.url + ENDPOINT,
         REQUEST_TYPE.WEBSOCKET,
@@ -230,6 +234,10 @@ class WebSocketClient {
         state: "Connection Error!",
         stateColour: mapStateToCategory("Offline"),
         stateDescription: "Printer connection detected an Error, reconnecting shortly!"
+      });
+      getPrinterStoreCache().updateWebsocketState(this.id, {
+        webSocket: "danger",
+        webSocketDescription: "Socket connection error! Reconnecting...."
       });
       ConnectionMonitorService.updateOrAddResponse(
         this.url + ENDPOINT,
@@ -355,12 +363,17 @@ class WebSocketClient {
     );
     clearTimeout(this.#heartbeatTerminate);
     clearTimeout(this.#heartbeatPing);
+    clearTimeout(this.reconnectTimeout);
     this.#instance.removeAllListeners();
     this.reconnectTimeout = setTimeout(() => {
       getPrinterStoreCache().updatePrinterState(this.id, {
         state: "Searching...",
         stateColour: mapStateToCategory("Searching..."),
         stateDescription: "Searching for websocket connection!"
+      });
+      getPrinterStoreCache().updateWebsocketState(this.id, {
+        webSocket: "info",
+        webSocketDescription: "Searching for a printer connection!"
       });
       if (this.#retryNumber > 0) {
         const modifier = this.systemSettings.timeout.webSocketRetry * 0.1;

@@ -162,6 +162,10 @@ class PrinterStore {
     return JSON.parse(JSON.stringify(printer));
   }
 
+  getPrinter(id) {
+    return this.#findMePrinter(id);
+  }
+
   getPrinterEvent(id, event) {
     const printer = this.#findMePrinter(id);
     return printer[event + "Event"];

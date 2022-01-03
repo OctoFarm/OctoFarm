@@ -105,64 +105,77 @@ function corsWarningCheck(printer) {
 }
 
 function reconnectingIn(printer) {
-  const { reconnectingIn } = printer;
-  // console.log(reconnectingIn);
+  const { reconnectingIn, _id } = printer;
+  const printerReScanIcon = document.getElementById("apiReScanIcon-" + _id);
+  const printerReScanText = document.getElementById("apiReScanText-" + _id);
+  const reconnectingInCalculation = reconnectingIn - Date.now();
+  if (reconnectingInCalculation > 1000) {
+    if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
+      printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
+      printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
+    } else {
+      printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
+    }
+  } else {
+    printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
+    printerReScanText.innerHTML = "";
+  }
 }
 
 function checkForOctoPrintUpdate(printer) {
-  let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
-  if (printer?.octoPrintUpdate?.updateAvailable) {
-    if (updateButton.disabled) {
-      UI.doesElementNeedUpdating(false, updateButton, "disabled");
-      updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
-    }
-  } else {
-    if (!updateButton.disabled) {
-      UI.doesElementNeedUpdating(true, updateButton, "disabled");
-      updateButton.setAttribute("title", "No OctoPrint updates available!");
-    }
-  }
+  // let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
+  // if (printer?.octoPrintUpdate?.updateAvailable) {
+  //   if (updateButton.disabled) {
+  //     UI.doesElementNeedUpdating(false, updateButton, "disabled");
+  //     updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
+  //   }
+  // } else {
+  //   if (!updateButton.disabled) {
+  //     UI.doesElementNeedUpdating(true, updateButton, "disabled");
+  //     updateButton.setAttribute("title", "No OctoPrint updates available!");
+  //   }
+  // }
 }
 
 function checkForOctoPrintPluginUpdates(printer) {
-  let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
-  if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
-    if (updatePluginButton.disabled) {
-      updatePluginButton.disabled = false;
-      updatePluginButton.title = "You have OctoPrint plugin updates to install!";
-    }
-  } else {
-    if (!updatePluginButton.disabled) {
-      updatePluginButton.disabled = true;
-      updatePluginButton.title = "No OctoPrint plugin updates available!";
-    }
-  }
+  // let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
+  // if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
+  //   if (updatePluginButton.disabled) {
+  //     updatePluginButton.disabled = false;
+  //     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
+  //   }
+  // } else {
+  //   if (!updatePluginButton.disabled) {
+  //     updatePluginButton.disabled = true;
+  //     updatePluginButton.title = "No OctoPrint plugin updates available!";
+  //   }
+  // }
 }
 
 function checkIfRestartRequired(printer) {
-  const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
-  if (restartRequiredTag && printer?.restartRequired) {
-    if (restartRequiredTag.classList.contains("d-none")) {
-      restartRequiredTag.classList.remove("d-none");
-    }
-  } else {
-    if (!restartRequiredTag.classList.contains("d-none")) {
-      restartRequiredTag.classList.add("d-none");
-    }
-  }
+  // const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
+  // if (restartRequiredTag && printer?.restartRequired) {
+  //   if (restartRequiredTag.classList.contains("d-none")) {
+  //     restartRequiredTag.classList.remove("d-none");
+  //   }
+  // } else {
+  //   if (!restartRequiredTag.classList.contains("d-none")) {
+  //     restartRequiredTag.classList.add("d-none");
+  //   }
+  // }
 }
 
 function checkIfMultiUserIssueFlagged(printer) {
-  const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
-  if (printer?.multiUserIssue) {
-    if (multiUserIssueAlert.classList.contains("d-none")) {
-      multiUserIssueAlert.classList.remove("d-none");
-    }
-  } else {
-    if (!multiUserIssueAlert.classList.contains("d-none")) {
-      multiUserIssueAlert.classList.add("d-none");
-    }
-  }
+  // const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
+  // if (printer?.multiUserIssue) {
+  //   if (multiUserIssueAlert.classList.contains("d-none")) {
+  //     multiUserIssueAlert.classList.remove("d-none");
+  //   }
+  // } else {
+  //   if (!multiUserIssueAlert.classList.contains("d-none")) {
+  //     multiUserIssueAlert.classList.add("d-none");
+  //   }
+  // }
 }
 
 function checkForApiErrors(printer) {
@@ -201,8 +214,6 @@ function updatePrinterRow(printer) {
 
     updateOctoPiColumn(printer);
 
-    corsWarningCheck(printer);
-
     reconnectingIn(printer);
 
     checkForOctoPrintUpdate(printer);
@@ -214,6 +225,8 @@ function updatePrinterRow(printer) {
     checkIfRestartRequired(printer);
 
     checkIfMultiUserIssueFlagged(printer);
+
+    corsWarningCheck(printer);
   }
 }
 
@@ -257,6 +270,8 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         .addEventListener("click", async (e) => {
           await PrinterLogs.loadStatistics(printer._id);
         });
+
+      document.getElementById("printerAPIReScan").addEventListener("click", async (e) => {});
     }
   });
 }
