@@ -83,15 +83,15 @@ class PrinterManagerService {
           case CATEGORIES.COMPLETE:
             this.updateStateCounterCategory(CATEGORIES.IDLE, printer);
             break;
-          case CATEGORIES.DISABLED:
-            this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
-            break;
           case CATEGORIES.OFFLINE:
             this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
             break;
           case CATEGORIES.ERROR:
             this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
             //this.updateStateCounterCategory(CATEGORIES.ERROR, printer);
+            break;
+          case CATEGORIES.DISABLED:
+            //this.updateStateCounterCategory(CATEGORIES.DISABLED, printer);
             break;
           default:
             logger.debug("Don't know category", printer.printerState.colour.category);

@@ -1430,34 +1430,37 @@ class OctoPrintPrinter {
   }
 
   async resetSocketConnection() {
-    PrinterTicker.addIssue(
-      new Date(),
-      this.printerURL,
-      "Grabbing session key for websocket auth with user: " + this.currentUser,
-      "Active",
-      this._id
-    );
-
-    const session = await this.acquireOctoPrintSessionKey();
-
-    if (typeof session !== "string") {
-      // Couldn't setup websocket
-      this.setHostState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
-      this.setPrinterState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
-      return;
-    }
-
-    if (!!this.#ws) {
-      this.#ws.resetSocketConnection(this.webSocketURL, session);
-    } else {
-      this.#ws = new WebSocketClient(
-        this.webSocketURL,
-        this._id,
-        this.currentUser,
-        session,
-        handleMessage
-      );
-    }
+    // TODO -
+    // - Check printer state...
+    // - Missing #api, #db, #ws then we're at differing states of setup.
+    // PrinterTicker.addIssue(
+    //   new Date(),
+    //   this.printerURL,
+    //   "Grabbing session key for websocket auth with user: " + this.currentUser,
+    //   "Active",
+    //   this._id
+    // );
+    //
+    // const session = await this.acquireOctoPrintSessionKey();
+    //
+    // if (typeof session !== "string") {
+    //   // Couldn't setup websocket
+    //   this.setHostState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
+    //   this.setPrinterState(PRINTER_STATES().SHUTDOWN_WEBSOCKET_FAIL);
+    //   return;
+    // }
+    //
+    // if (!!this.#ws) {
+    //   this.#ws.resetSocketConnection(this.webSocketURL, session);
+    // } else {
+    //   this.#ws = new WebSocketClient(
+    //     this.webSocketURL,
+    //     this._id,
+    //     this.currentUser,
+    //     session,
+    //     handleMessage
+    //   );
+    // }
   }
 
   async acquireOctoPrintLatestSettings(force = false) {

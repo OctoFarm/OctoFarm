@@ -5,23 +5,9 @@ const { TaskPresets } = require("./task.presets");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const ConnectionMonitorService = require("./services/connection-monitor.service");
-const { REQUEST_TYPE, REQUEST_KEYS } = require("./constants/connection-monitor.constants");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
-const { PrinterTicker } = require("./runners/printerTicker");
-const Logger = require("./handlers/logger.js");
-const logger = new Logger("OctoFarm-TaskManager");
 const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("./cache/printer-store.cache");
-const {
-  printerChecks,
-  apiChecks,
-  websocketChecks,
-  printerConnectionCheck,
-  profileChecks,
-  webcamChecks,
-  checkConnectionsMatchRetrySettings
-} = require("./services/printer-health-checks.service");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 
@@ -31,6 +17,11 @@ const INITIALISE_PRINTERS = async () => {
 
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
+};
+
+const SORT_CURRENT_OPERATIONS = async () => {
+  const printerList = getPrinterStoreCache().listPrintersInformation();
+  await PrinterClean.sortCurrentOperations(printerList);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -173,6 +164,7 @@ class OctoFarmTasks {
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
+    TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),

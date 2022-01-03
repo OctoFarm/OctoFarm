@@ -104,7 +104,7 @@ export async function scanNetworkForDevices(e) {
   e.target.disabled = false;
 }
 
-export async function reSyncAPI(force = false) {
+export async function reSyncAPI(force = false, id = null) {
   let reSyncAPIBtn = document.getElementById("reSyncAPI");
 
   reSyncAPIBtn.disabled = true;
@@ -115,7 +115,7 @@ export async function reSyncAPI(force = false) {
   reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
   try {
     const post = await OctoFarmClient.post("printers/reSyncAPI", {
-      id: null,
+      id: id,
       force: force
     });
   } catch (e) {

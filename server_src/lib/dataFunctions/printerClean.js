@@ -47,7 +47,6 @@ class PrinterClean {
   }
 
   /**
-   * @deprecated Use cache/printer.cache.js instead
    * @returns {{operations: [], count: {offline: number, disconnected: number, farmProgressColour: string, printerCount: number, idle: number, farmProgress: number, active: number, complete: number}}|{operations: [], count: {offline: number, disconnected: number, farmProgressColour: string, printerCount: number, idle: number, farmProgress: number, active: number, complete: number}}}
    */
   static returnCurrentOperations() {
@@ -55,7 +54,6 @@ class PrinterClean {
   }
 
   /**
-   * @deprecated Use cache/printer.cache.js instead
    * @returns {{printerHeatMaps: {}, currentPressure: null, timeEstimates: {}, farmUtilisation: {}, currentTemperature: null, currentUtilisation: {}, utilisationGraph: {}, currentStatus: {}, currentIAQ: null, currentHumidity: null, temperatureGraph: {}}}
    */
   static returnDashboardStatistics() {

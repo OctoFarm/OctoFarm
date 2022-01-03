@@ -1,4 +1,7 @@
-import { returnPrinterTableRow } from "./templates/printer-table-row.templates.js";
+import {
+  returnDisabledPrinterTableRow,
+  returnPrinterTableRow
+} from "./templates/printer-table-row.templates.js";
 import {
   checkQuickConnectState,
   init as actionButtonInit
@@ -9,6 +12,7 @@ import UI from "../../lib/functions/ui.js";
 import PrinterLogs from "../../lib/modules/printerLogs.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
+import { reSyncAPI } from "./functions/printer-manager.functions";
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
@@ -20,23 +24,10 @@ const ignoredHostStatesForAPIErrors = [
   "Error!",
   "Operational"
 ];
-
-function updatePrinterInfoAndState(printer) {
-  const printName = document.getElementById(`printerName-${printer._id}`);
-  const webButton = document.getElementById(`printerWeb-${printer._id}`);
+function updatePrinterState(printer) {
   const hostBadge = document.getElementById(`hostBadge-${printer._id}`);
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
   const socketBadge = document.getElementById(`webSocketIcon-${printer._id}`);
-
-  const printerSortIndex = document.getElementById(`printerSortIndex-${printer._id}`);
-  const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
-
-  UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
-  UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
-
-  printerGroup.innerHTML = printer.group;
 
   UI.doesElementNeedUpdating(
     `tag badge badge-${printer.printerState.colour.name} badge-pill`,
@@ -62,39 +53,19 @@ function updatePrinterInfoAndState(printer) {
     "className"
   );
 }
+function updatePrinterInfo(printer) {
+  const printName = document.getElementById(`printerName-${printer._id}`);
+  const webButton = document.getElementById(`printerWeb-${printer._id}`);
 
-function updatePrinterColumn(printer) {
-  const printerPrinterInformation = document.getElementById(
-    `printerPrinterInformation-${printer._id}`
-  );
-  if (!!printer.printerFirmware) {
-    UI.doesElementNeedUpdating(
-      `<small>${printer.printerFirmware}</small>`,
-      printerPrinterInformation,
-      "innerHTML"
-    );
-  }
-}
+  const printerSortIndex = document.getElementById(`printerSortIndex-${printer._id}`);
+  const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
-function updateOctoPiColumn(printer) {
-  const printerOctoPrintInformation = document.getElementById(
-    `printerOctoPrintInformation-${printer._id}`
-  );
-  if (!!printer?.octoPi?.version) {
-    UI.doesElementNeedUpdating(
-      `<small>${printer.octoPrintVersion}</small><br>` +
-        (printer.octoPi?.version ? `<small>${printer.octoPi.version}</small><br>` : "") +
-        `<small>${printer.octoPi.model}</small>`,
-      printerOctoPrintInformation,
-      "innerHTML"
-    );
-  } else {
-    UI.doesElementNeedUpdating(
-      `<small>${printer.octoPrintVersion}</small>`,
-      printerOctoPrintInformation,
-      "innerHTML"
-    );
-  }
+  UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
+  UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
+  UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
+  UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
+
+  printerGroup.innerHTML = printer.group;
 }
 
 function corsWarningCheck(printer) {
@@ -123,18 +94,18 @@ function reconnectingIn(printer) {
 }
 
 function checkForOctoPrintUpdate(printer) {
-  // let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
-  // if (printer?.octoPrintUpdate?.updateAvailable) {
-  //   if (updateButton.disabled) {
-  //     UI.doesElementNeedUpdating(false, updateButton, "disabled");
-  //     updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
-  //   }
-  // } else {
-  //   if (!updateButton.disabled) {
-  //     UI.doesElementNeedUpdating(true, updateButton, "disabled");
-  //     updateButton.setAttribute("title", "No OctoPrint updates available!");
-  //   }
-  // }
+  let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
+  if (printer?.octoPrintUpdate?.updateAvailable) {
+    if (updateButton.disabled) {
+      UI.doesElementNeedUpdating(false, updateButton, "disabled");
+      updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
+    }
+  } else {
+    if (!updateButton.disabled) {
+      UI.doesElementNeedUpdating(true, updateButton, "disabled");
+      updateButton.setAttribute("title", "No OctoPrint updates available!");
+    }
+  }
 }
 
 function checkForOctoPrintPluginUpdates(printer) {
@@ -206,37 +177,41 @@ function checkForApiErrors(printer) {
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
-    checkQuickConnectState(printer);
+    updatePrinterInfo(printer);
+    if (!printer.disabled) {
+      checkQuickConnectState(printer);
 
-    updatePrinterInfoAndState(printer);
+      updatePrinterState(printer);
 
-    updatePrinterColumn(printer);
+      reconnectingIn(printer);
 
-    updateOctoPiColumn(printer);
+      checkForOctoPrintUpdate(printer);
 
-    reconnectingIn(printer);
+      checkForOctoPrintPluginUpdates(printer);
 
-    checkForOctoPrintUpdate(printer);
+      checkForApiErrors(printer);
 
-    checkForOctoPrintPluginUpdates(printer);
+      checkIfRestartRequired(printer);
 
-    checkForApiErrors(printer);
+      checkIfMultiUserIssueFlagged(printer);
 
-    checkIfRestartRequired(printer);
-
-    checkIfMultiUserIssueFlagged(printer);
-
-    corsWarningCheck(printer);
+      corsWarningCheck(printer);
+    }
   }
 }
 
-export function createOrUpdatePrinterTableRow(printers, printerControlList) {
+export function createOrUpdatePrinterTableRow(printers) {
   printers.forEach((printer) => {
     const printerCard = document.getElementById(`printerCard-${printer._id}`);
     if (printerCard) {
       updatePrinterRow(printer);
     } else {
-      printerList.insertAdjacentHTML("beforeend", returnPrinterTableRow(printer));
+      if (printer.disabled) {
+        printerList.insertAdjacentHTML("beforeend", returnDisabledPrinterTableRow(printer));
+      } else {
+        printerList.insertAdjacentHTML("beforeend", returnPrinterTableRow(printer));
+      }
+
       // Insert actions buttons
       actionButtonInit(printer, `printerActionBtns-${printer._id}`);
       // Check quick connect state and apply
@@ -271,7 +246,37 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
           await PrinterLogs.loadStatistics(printer._id);
         });
 
-      document.getElementById("printerAPIReScan").addEventListener("click", async (e) => {});
+      document
+        .getElementById(`printerAPIReScan-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          bootbox.dialog({
+            title: "Rescan All API endpoints",
+            message:
+              '<p class="alert alert-warning text-dark" role="alert">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>' +
+              '<p class="alert alert-danger text-dark" role="alert">Force ReScan: Will rescan all endpoints regardless of existing data.</p>',
+            size: "large",
+            buttons: {
+              normal: {
+                label: "ReScan",
+                className: "btn-warning text-dark",
+                callback: async function () {
+                  await reSyncAPI(false, printer._id);
+                }
+              },
+              force: {
+                label: "Force ReScan",
+                className: "btn-danger text-dark",
+                callback: async function () {
+                  await reSyncAPI(true, printer._id);
+                }
+              },
+              cancel: {
+                label: "Cancel",
+                className: "btn-secondary"
+              }
+            }
+          });
+        });
     }
   });
 }

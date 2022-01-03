@@ -96,6 +96,7 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 // File Manager Page
 router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
+
   const serverSettings = SettingsClean.returnSystemSettings();
   const currentOperations = PrinterClean.returnCurrentOperations();
   const fileStatistics = FileClean.returnStatistics();

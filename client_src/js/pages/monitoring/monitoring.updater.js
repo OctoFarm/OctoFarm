@@ -977,7 +977,7 @@ async function updateState(printer, clientSettings, view, index) {
 async function updateGroupState(printers, clientSettings, view) {
   checkGroupQuickConnectState(printers);
   printers.forEach((printer, index) => {
-    if (printer.group !== "") {
+    if (printer.group !== "" || !printer.disabled) {
       const elements = grabElements(printer);
       if (typeof elements.row === "undefined") return;
       elements.row.style.order = index;
@@ -1294,70 +1294,72 @@ export async function initMonitoring(printers, clientSettings, view) {
     case true:
       // Run printer manager updater
       if (currentOpenModal.innerHTML.includes("Files")) {
-        PrinterFileManager.init("", printers, getControlList());
+        await PrinterFileManager.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Control")) {
-        PrinterManager.init("", printers, getControlList());
+        await PrinterManager.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
-        PrinterTerminalManager.init("", printers, getControlList());
+        await PrinterTerminalManager.init("", printers, getControlList());
       }
       break;
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
-        let printerPanel = document.getElementById("panel-" + printers[p]._id);
-        if (!printerPanel) {
-          if (view === "panel") {
-            let printerHTML = drawPanelView(printers[p], clientSettings);
-            printerArea.insertAdjacentHTML("beforeend", printerHTML);
-          } else if (view === "list") {
-            let printerHTML = drawListView(printers[p], clientSettings);
-            printerArea.insertAdjacentHTML("beforeend", printerHTML);
-          } else if (view === "camera") {
-            let printerHTML = drawCameraView(printers[p], clientSettings);
-            printerArea.insertAdjacentHTML("beforeend", printerHTML);
-          } else if (view === "group") {
-            drawGroupViewContainers(printers, printerArea, clientSettings);
-            drawGroupViewPrinters(printers, clientSettings);
-          } else if (view === "combined") {
-            let printerHTML = drawCombinedView(printers[p], clientSettings);
-            printerArea.insertAdjacentHTML("beforeend", printerHTML);
-          } else {
-            console.error("printerPanel could not determine view type to update", view);
-          }
-
-          if (view !== "group") {
-            //Update the printer panel to the actual one
-            printerPanel = document.getElementById("panel-" + printers[p]._id);
-            //Setup Action Buttons
-            await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
-            //Add page listeners
-            addListeners(printers[p]);
-            //Grab elements
-            await grabElements(printers[p]);
-            //Initialise Drag and Drop
-            await dragAndDropEnable(printerPanel, printers[p]);
-          } else {
-            if (!actionButtonsInitialised) {
-              //Setup Action Buttons
-              await actionButtonGroupInit(printers);
-
-              addGroupListeners(printers);
-              await dragAndDropGroupEnable(printers);
-              actionButtonsInitialised = true;
+        if (!printers[p].disabled) {
+          let printerPanel = document.getElementById("panel-" + printers[p]._id);
+          if (!printerPanel) {
+            if (view === "panel") {
+              let printerHTML = drawPanelView(printers[p], clientSettings);
+              printerArea.insertAdjacentHTML("beforeend", printerHTML);
+            } else if (view === "list") {
+              let printerHTML = drawListView(printers[p], clientSettings);
+              printerArea.insertAdjacentHTML("beforeend", printerHTML);
+            } else if (view === "camera") {
+              let printerHTML = drawCameraView(printers[p], clientSettings);
+              printerArea.insertAdjacentHTML("beforeend", printerHTML);
+            } else if (view === "group") {
+              drawGroupViewContainers(printers, printerArea, clientSettings);
+              drawGroupViewPrinters(printers, clientSettings);
+            } else if (view === "combined") {
+              let printerHTML = drawCombinedView(printers[p], clientSettings);
+              printerArea.insertAdjacentHTML("beforeend", printerHTML);
+            } else {
+              console.error("printerPanel could not determine view type to update", view);
             }
-          }
-        } else {
-          if (!printerManagerModal.classList.contains("show")) {
-            if (!dragCheck()) {
-              if (view !== "group") {
-                await updateState(printers[p], clientSettings, view, p);
+
+            if (view !== "group") {
+              //Update the printer panel to the actual one
+              printerPanel = document.getElementById("panel-" + printers[p]._id);
+              //Setup Action Buttons
+              await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+              //Add page listeners
+              addListeners(printers[p]);
+              //Grab elements
+              await grabElements(printers[p]);
+              //Initialise Drag and Drop
+              await dragAndDropEnable(printerPanel, printers[p]);
+            } else {
+              if (!actionButtonsInitialised) {
+                //Setup Action Buttons
+                await actionButtonGroupInit(printers);
+
+                addGroupListeners(printers);
+                await dragAndDropGroupEnable(printers);
+                actionButtonsInitialised = true;
               }
             }
-            if (powerTimer >= 20000) {
-              //await PowerButton.applyBtn(printers[p]);
-              powerTimer = 0;
-            } else {
-              powerTimer += 500;
+          } else {
+            if (!printerManagerModal.classList.contains("show")) {
+              if (!dragCheck()) {
+                if (view !== "group") {
+                  await updateState(printers[p], clientSettings, view, p);
+                }
+              }
+              if (powerTimer >= 20000) {
+                //await PowerButton.applyBtn(printers[p]);
+                powerTimer = 0;
+              } else {
+                powerTimer += 500;
+              }
             }
           }
         }

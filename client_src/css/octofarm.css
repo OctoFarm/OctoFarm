@@ -292,6 +292,11 @@ a.notyet {
 .printerSelected {
   border-left: #f39c12 4px solid;
 }
+.printerDisabled {
+  border-left: #e74c3c 4px solid;
+  background-color: transparent;
+  opacity: 0.5;
+}
 .fileFooter {
   padding: 5px;
 }
