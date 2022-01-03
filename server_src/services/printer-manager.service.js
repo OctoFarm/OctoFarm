@@ -7,8 +7,6 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
 const { isEmpty } = require("lodash");
 const _ = require("lodash");
-const { PrinterClean } = require("../lib/dataFunctions/printerClean");
-const Printers = require("../models/Printer");
 
 const logger = new Logger("OctoFarm-PrinterManager");
 
@@ -58,7 +56,7 @@ class PrinterManagerService {
         // Promise.all will wait till all the promises got resolves and then take the next 100.
         logger.debug(`Running printer batch ${i + 1}`);
         await Promise.all(requests).catch((e) =>
-          console.log(`Error in sending email for the batch ${i} - ${e}`)
+          logger.error(`Error in creating new printer batch: ${i} - ${e}`)
         ); // Catch the error.
       }
     };
@@ -178,6 +176,70 @@ class PrinterManagerService {
         }
       }
     });
+  }
+
+  async reSyncWebsockets(id) {
+    if (id === null) {
+      //No id, full scan requested..
+      const printerList = getPrinterStoreCache().listPrinters();
+      return await this.batchReSyncWebsockets(printerList, 50);
+    } else {
+      const printer = getPrinterStoreCache().getPrinterInformation(id);
+      return printer.reConnectWebsocket();
+    }
+  }
+
+  async reScanAPI(id, force) {
+    if (id === null) {
+      //No id, full scan requested..
+      const printerList = getPrinterStoreCache().listPrinters();
+      return await this.batchReScanAPI(printerList, 10, force);
+    } else {
+      const printer = getPrinterStoreCache().getPrinterInformation(id);
+      return printer.reScanAPI(force);
+    }
+  }
+  async batchReScanAPI(printerList = [], batchSize = 10, force) {
+    const createNewPrinterBatches = async (printer, force) => {
+      const printerLength = printer.length;
+
+      for (let i = 0; i < printerLength; i += batchSize) {
+        const requests = printer.slice(i, i + batchSize).map((printer) => {
+          // The batch size is 100. We are processing in a set of 100 users.
+          return printer.reScanAPI(force);
+        });
+
+        // requests will have 100 or less pending promises.
+        // Promise.all will wait till all the promises got resolves and then take the next 100.
+        logger.debug(`Running printer batch ${i + 1}`);
+        await Promise.all(requests).catch((e) =>
+          logger.error(`Error in batch printers! ${i} - ${e}`)
+        ); // Catch the error.
+      }
+    };
+
+    await createNewPrinterBatches(printerList, force);
+  }
+  async batchReSyncWebsockets(printerList = [], batchSize = 10) {
+    const createNewPrinterBatches = async (printer) => {
+      const printerLength = printer.length;
+
+      for (let i = 0; i < printerLength; i += batchSize) {
+        const requests = printer.slice(i, i + batchSize).map((printer) => {
+          // The batch size is 100. We are processing in a set of 100 users.
+          return printer.reConnectWebsocket();
+        });
+
+        // requests will have 100 or less pending promises.
+        // Promise.all will wait till all the promises got resolves and then take the next 100.
+        logger.debug(`Running printer batch ${i + 1}`);
+        await Promise.all(requests).catch((e) =>
+          logger.error(`Error in batch printers! ${i} - ${e}`)
+        ); // Catch the error.
+      }
+    };
+
+    await createNewPrinterBatches(printerList);
   }
 }
 

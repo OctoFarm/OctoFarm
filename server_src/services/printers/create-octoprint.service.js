@@ -439,18 +439,20 @@ class OctoPrintPrinter {
 
   async disableClient() {}
 
-  async reConnectWebsocket() {
-    this.#ws.terminate();
+  reConnectWebsocket() {
+    if (!!this?.#ws) this.#ws.terminate();
   }
 
   async throttleWebSocket(seconds) {
     this.#ws.throttle(seconds);
   }
 
-  async forceAPIScan() {
-    logger.info((this.printerURL = ": force API scan requested!"));
-    await this.#requiredApiSequence(true);
-    await this.#optionalApiSequence(true);
+  async reScanAPI(force) {
+    logger.info(this.printerURL + ": API scan requested! Forced:", { force });
+    if (this.printerState.state !== "Offline") {
+      await this.#requiredApiSequence(force);
+      await this.#optionalApiSequence(force);
+    }
   }
 
   async updatePrinterRecord(record) {

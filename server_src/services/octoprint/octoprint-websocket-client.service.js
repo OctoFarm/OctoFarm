@@ -12,6 +12,7 @@ const Logger = require("../../handlers/logger");
 const ConnectionMonitorService = require("../../services/connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
+const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -181,6 +182,11 @@ class WebSocketClient {
             "Offline",
             this.id
           );
+          getPrinterStoreCache().updatePrinterState(this.id, {
+            state: "Socket Closed!",
+            stateColour: mapStateToCategory("Offline"),
+            stateDescription: "Printer connection was closed. Will not reconnect automatically!"
+          });
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the server implementation.
           PrinterTicker.addIssue(
@@ -190,6 +196,11 @@ class WebSocketClient {
             "Offline",
             this.id
           );
+          getPrinterStoreCache().updatePrinterState(this.id, {
+            state: "Socket Closed!",
+            stateColour: mapStateToCategory("Offline"),
+            stateDescription: "Printer connection was closed. Will reconnect shortly!"
+          });
           this.reconnect(code);
           debugger;
           break;
@@ -202,6 +213,11 @@ class WebSocketClient {
             "Offline",
             this.id
           );
+          getPrinterStoreCache().updatePrinterState(this.id, {
+            state: "Socket Closed!",
+            stateColour: mapStateToCategory("Offline"),
+            stateDescription: "Printer connection was closed. Will reconnect shortly!"
+          });
           debugger;
           this.reconnect(code);
           break;
@@ -210,6 +226,11 @@ class WebSocketClient {
 
     this.#instance.on("error", (e) => {
       logger.error(`${this.url}: Websocket Error!`, e);
+      getPrinterStoreCache().updatePrinterState(this.id, {
+        state: "Connection Error!",
+        stateColour: mapStateToCategory("Offline"),
+        stateDescription: "Printer connection detected an Error, reconnecting shortly!"
+      });
       ConnectionMonitorService.updateOrAddResponse(
         this.url + ENDPOINT,
         REQUEST_TYPE.WEBSOCKET,
@@ -336,6 +357,11 @@ class WebSocketClient {
     clearTimeout(this.#heartbeatPing);
     this.#instance.removeAllListeners();
     this.reconnectTimeout = setTimeout(() => {
+      getPrinterStoreCache().updatePrinterState(this.id, {
+        state: "Searching...",
+        stateColour: mapStateToCategory("Searching..."),
+        stateDescription: "Searching for websocket connection!"
+      });
       if (this.#retryNumber > 0) {
         const modifier = this.systemSettings.timeout.webSocketRetry * 0.1;
         this.autoReconnectInterval = this.autoReconnectInterval + modifier;

@@ -180,55 +180,21 @@ router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const roll = await Runner.selectedFilament(data);
   res.send({ msg: roll });
 });
-router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
-  const data = req.body;
-  if (data.id === null) {
-    logger.info("Rescan All OctoPrint Requests: ", data);
-    const farmPrinters = await Runner.returnFarmPrinters();
-    for (let i = 0; i < farmPrinters.length; i++) {
-      const batchOfTenPromises = [];
-      if (i % 10 === 0) {
-        if (farmPrinters[i]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i]._id, data.force));
-        }
-        if (farmPrinters[i + 1]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 1]._id, data.force));
-        }
-        if (farmPrinters[i + 2]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 2]._id, data.force));
-        }
-        if (farmPrinters[i + 3]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 3]._id, data.force));
-        }
-        if (farmPrinters[i + 4]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 4]._id, data.force));
-        }
-        if (farmPrinters[i + 5]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 5]._id, data.force));
-        }
-        if (farmPrinters[i + 6]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 6]._id, data.force));
-        }
-        if (farmPrinters[i + 7]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 7]._id, data.force));
-        }
-        if (farmPrinters[i + 8]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 8]._id, data.force));
-        }
-        if (farmPrinters[i + 9]) {
-          batchOfTenPromises.push(Runner.reScanOcto(farmPrinters[i + 9]._id, data.force));
-        }
-      }
-      await Promise.allSettled(batchOfTenPromises);
-    }
-    logger.info("Full re-scan of OctoFarm completed");
-    res.send({ msg: "Started a full farm rescan." });
-  } else {
-    logger.info("Rescan OctoPrint Requests: ", data);
-    const reScan = await Runner.reScanOcto(data.id, data.force);
-    logger.info("Rescan OctoPrint complete: ", reScan);
-    res.send({ msg: reScan });
-  }
+router.post("/reSyncAPI", ensureAuthenticated, async (req, res) => {
+  console.log(req.body);
+  const id = req.body.id;
+  const force = req.body.force;
+  logger.info("Rescan All OctoPrint Requested. Forced: ", { force: force });
+  await getPrinterManagerCache().reScanAPI(id, force);
+  logger.info("Full re-scan of OctoFarm completed");
+  res.send({ msg: "Finished API Rescan..." });
+});
+router.post("/reSyncSockets", ensureAuthenticated, async (req, res) => {
+  const id = req.body.id;
+  logger.info("Rescan All OctoPrint Requests: ");
+  await getPrinterManagerCache().reSyncWebsockets(id);
+  logger.info("Full re-scan of OctoFarm completed");
+  res.send({ msg: "Finished Socket Reconnect..." });
 });
 router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   const data = req.body;

@@ -38,21 +38,21 @@
                 <%- include('./octoPrintActionBtns.ejs') %>
                 <button
                         title="Scan all of your OctoPrint instances API endpoints"
-                        id="searchOfflineBtn"
+                        id="reSyncAPI"
                         type="button"
-                        class="btn btn-outline-info"
+                        class="btn btn-outline-info ml-1"
                         href="#"
                 >
-                    <i class="fas fa-redo fa-sm"></i> ReScan All API's
+                    <i class="fas fa-redo fa-sm"></i> ReScan APIs
                 </button>
                 <button
                         title="Reconnect all of your OctoPrint websocket connections."
-                        id="forceSearchOffline"
+                        id="reSyncSockets"
                         type="button"
                         class="btn btn-outline-danger"
                         href="#"
                 >
-                    <i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets
+                    <i class="fas fa-sync-alt fa-sm"></i> Reconnect Sockets
                 </button>
                 <%- include('./devOctoPrintActionBtns.ejs') %>
                 <button type="button" class="btn btn-outline-info float-right mr-1" data-toggle="modal" data-target="#connectionsOverviewModal">

@@ -13,11 +13,12 @@ import {
   deleteAllOnAddPrinterTable,
   exportPrintersToJson,
   importPrintersFromJsonFile,
-  reSyncPrinters,
   saveAllOnAddPrinterTable,
   scanNetworkForDevices,
   workerEventFunction,
-  loadPrinterHealthChecks
+  loadPrinterHealthChecks,
+  reSyncAPI,
+  reSyncWebsockets
 } from "./pages/printer-manager/functions/printer-manager.functions";
 
 import { setupSortablePrintersTable } from "./pages/printer-manager/functions/sortable-table";
@@ -70,29 +71,55 @@ blkPluginsDisableBtn.addEventListener("click", async (e) => {
   });
 });
 
-const searchOffline = document.getElementById("searchOfflineBtn");
-searchOffline.addEventListener("click", async (e) => {
-  await reSyncPrinters();
-});
-
-const forceSearchOffline = document.getElementById("forceSearchOffline");
-forceSearchOffline.addEventListener("click", (e) => {
-  bootbox.confirm({
+const reSyncAPIBtn = document.getElementById("reSyncAPI");
+reSyncAPIBtn.addEventListener("click", async (e) => {
+  bootbox.dialog({
+    title: "Rescan All API endpoints",
     message:
-      "Your about to do a full re-setup of your farm. This will call all your OctoPrint instances and refresh OctoFarms data that it holds... Are you sure?",
+      '<p class="alert alert-warning text-dark" role="alert">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>' +
+      '<p class="alert alert-danger text-dark" role="alert">Force ReScan: Will rescan all endpoints regardless of existing data.</p>',
+    size: "large",
     buttons: {
-      confirm: {
-        label: "Yes",
-        className: "btn-success"
+      normal: {
+        label: "ReScan",
+        className: "btn-warning text-dark",
+        callback: async function () {
+          await reSyncAPI();
+        }
+      },
+      force: {
+        label: "Force ReScan",
+        className: "btn-danger text-dark",
+        callback: async function () {
+          await reSyncAPI(true);
+        }
       },
       cancel: {
-        label: "No",
-        className: "btn-danger"
+        label: "Cancel",
+        className: "btn-secondary"
       }
-    },
-    callback: async function (result) {
-      if (result) {
-        await reSyncPrinters(true);
+    }
+  });
+});
+
+const reSyncSockets = document.getElementById("reSyncSockets");
+reSyncSockets.addEventListener("click", async (e) => {
+  bootbox.dialog({
+    title: "Reconnect all sockets",
+    message:
+      '<p class="alert alert-warning text-dark" role="alert">Will terminate and re-open all currently established connections</p>',
+    size: "large",
+    buttons: {
+      normal: {
+        label: "Reconnect",
+        className: "btn-warning text-dark",
+        callback: function () {
+          reSyncWebsockets();
+        }
+      },
+      cancel: {
+        label: "Cancel",
+        className: "btn-secondary"
       }
     }
   });

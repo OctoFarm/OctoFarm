@@ -104,21 +104,17 @@ export async function scanNetworkForDevices(e) {
   e.target.disabled = false;
 }
 
-export async function reSyncPrinters(force = false) {
-  let searchOffline = document.getElementById("searchOfflineBtn");
+export async function reSyncAPI(force = false) {
+  let reSyncAPIBtn = document.getElementById("reSyncAPI");
 
-  if (force) {
-    searchOffline = document.getElementById("forceSearchOffline");
-  }
-
-  searchOffline.disabled = true;
+  reSyncAPIBtn.disabled = true;
   let alert = UI.createAlert(
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
   try {
-    const post = await OctoFarmClient.post("printers/reScanOcto", {
+    const post = await OctoFarmClient.post("printers/reSyncAPI", {
       id: null,
       force: force
     });
@@ -128,12 +124,30 @@ export async function reSyncPrinters(force = false) {
   }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
-  if (force) {
-    searchOffline.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Force Re-Setup';
-  } else {
-    searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Connect';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm"></i> ReScan All API\'s';
+  reSyncAPIBtn.disabled = false;
+}
+export async function reSyncWebsockets() {
+  let reSyncSocketsBtn = document.getElementById("reSyncSockets");
+
+  reSyncSocketsBtn.disabled = true;
+  let alert = UI.createAlert(
+    "info",
+    "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
+  );
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing Sockets...';
+  try {
+    const post = await OctoFarmClient.post("printers/reSyncSockets", {
+      id: null
+    });
+  } catch (e) {
+    console.error(e);
+    UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
   }
-  searchOffline.disabled = false;
+  alert.close();
+  UI.createAlert("success", "Background sync started successfully!", 3000, "clicked");
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets';
+  reSyncSocketsBtn.disabled = false;
 }
 
 export async function bulkEditPrinters() {
