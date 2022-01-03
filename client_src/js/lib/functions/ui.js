@@ -1,8 +1,4 @@
 import Noty from "noty";
-import OctoFarmClient from "../../services/octofarm-client.service";
-import { updatePrinterSettingsModal } from "../modules/printerSettings";
-import PrinterLogs from "../modules/printerLogs";
-import { reSyncAPI } from "../../pages/printer-manager/functions/printer-manager.functions";
 
 const printerSettingsModal = document.getElementById("printerSettingsModal");
 const printerManagerModal = document.getElementById("printerManagerModal");
@@ -277,6 +273,22 @@ export default class UI {
       return false;
     } else if (e.target.innerHTML.includes("wheelchair")) {
       return true;
+    }
+  }
+
+  static doesElementIncludeDisplayNone(element) {
+    return !element.classList.includes("d-none");
+  }
+
+  static addDisplayNoneToElement(element) {
+    if (element.classList.contains("d-none")) {
+      element.classList.remove("d-none");
+    }
+  }
+
+  static removeDisplayNoneFromElement(element) {
+    if (!element.classList.contains("d-none")) {
+      element.classList.add("d-none");
     }
   }
 

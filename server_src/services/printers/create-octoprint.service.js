@@ -107,7 +107,7 @@ class OctoPrintPrinter {
   pluginsList = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
-  corsCheck = undefined;
+  corsCheck = true;
   settingsApi = undefined;
   settingsFeature = undefined;
   settingsFolder = undefined;
@@ -567,10 +567,10 @@ class OctoPrintPrinter {
       this.reconnectAPI();
       return "Successfully enabled printer...";
     }
-    console.log("SETTING UP SOCKET");
+
     // Get a session key
     await this.#setupWebsocket();
-    console.log("RUNNING OPTIONAL");
+
     // Grab optional api data
     await this.#optionalApiSequence();
 
@@ -578,7 +578,6 @@ class OctoPrintPrinter {
   }
 
   async #setupWebsocket(force = false) {
-    console.log("SETUP WEBSOCKET", force);
     if (!this?.#ws || force) {
       if (force) {
         // If forced we allow the resetup of websocket connection

@@ -69,10 +69,12 @@ function updatePrinterInfo(printer) {
 }
 
 function corsWarningCheck(printer) {
-  // const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  // if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.printerState.state)) {
-  //   UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
-  // }
+  const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
+  if (!printer.corsCheck) {
+    UI.addDisplayNoneToElement(corsAlert);
+  } else {
+    UI.removeDisplayNoneFromElement(corsAlert);
+  }
 }
 
 function reconnectingIn(printer) {
@@ -96,80 +98,63 @@ function reconnectingIn(printer) {
 function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
   if (printer?.octoPrintUpdate?.updateAvailable) {
-    if (updateButton.disabled) {
-      UI.doesElementNeedUpdating(false, updateButton, "disabled");
-      updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
-    }
+    UI.addDisplayNoneToElement(updateButton);
+    updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
   } else {
-    if (!updateButton.disabled) {
-      UI.doesElementNeedUpdating(true, updateButton, "disabled");
-      updateButton.setAttribute("title", "No OctoPrint updates available!");
-    }
+    UI.removeDisplayNoneFromElement(updateButton);
+    updateButton.setAttribute("title", "No OctoPrint updates available!");
   }
 }
 
 function checkForOctoPrintPluginUpdates(printer) {
-  // let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
-  // if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
-  //   if (updatePluginButton.disabled) {
-  //     updatePluginButton.disabled = false;
-  //     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
-  //   }
-  // } else {
-  //   if (!updatePluginButton.disabled) {
-  //     updatePluginButton.disabled = true;
-  //     updatePluginButton.title = "No OctoPrint plugin updates available!";
-  //   }
-  // }
+  let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
+  if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
+    UI.addDisplayNoneToElement(updatePluginButton);
+    updatePluginButton.title = "You have OctoPrint plugin updates to install!";
+  } else {
+    UI.removeDisplayNoneFromElement(updatePluginButton);
+    updatePluginButton.title = "No OctoPrint plugin updates available!";
+  }
 }
 
 function checkIfRestartRequired(printer) {
-  // const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
-  // if (restartRequiredTag && printer?.restartRequired) {
-  //   if (restartRequiredTag.classList.contains("d-none")) {
-  //     restartRequiredTag.classList.remove("d-none");
-  //   }
-  // } else {
-  //   if (!restartRequiredTag.classList.contains("d-none")) {
-  //     restartRequiredTag.classList.add("d-none");
-  //   }
-  // }
+  const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
+  if (restartRequiredTag && printer?.restartRequired) {
+    UI.addDisplayNoneToElement(restartRequiredTag);
+  } else {
+    UI.removeDisplayNoneFromElement(restartRequiredTag);
+  }
 }
 
 function checkIfMultiUserIssueFlagged(printer) {
-  // const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
-  // if (printer?.multiUserIssue) {
-  //   if (multiUserIssueAlert.classList.contains("d-none")) {
-  //     multiUserIssueAlert.classList.remove("d-none");
-  //   }
-  // } else {
-  //   if (!multiUserIssueAlert.classList.contains("d-none")) {
-  //     multiUserIssueAlert.classList.add("d-none");
-  //   }
-  // }
+  const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
+  if (printer?.multiUserIssue) {
+    UI.addDisplayNoneToElement(multiUserIssueAlert);
+  } else {
+    UI.removeDisplayNoneFromElement(multiUserIssueAlert);
+  }
 }
 
 function checkForApiErrors(printer) {
-  const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
+  if (!printer.printerState.colour.category === "Offline") {
+    const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
-  if (apiErrorTag && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
-    let apiErrors = 0;
-    for (const key in printer.systemChecks) {
-      if (printer.systemChecks.scanning.hasOwnProperty(key)) {
-        if (printer.systemChecks.scanning[key].status !== "success") {
-          apiErrors = apiErrors + 1;
+    if (apiErrorTag && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
+      let apiErrors = 0;
+      for (const key in printer.systemChecks) {
+        if (printer.systemChecks.scanning.hasOwnProperty(key)) {
+          console.log(key);
+          if (printer.systemChecks.scanning[key].status !== "success") {
+            apiErrors = apiErrors + 1;
+          }
         }
       }
-    }
 
-    if (apiErrors > 0) {
-      if (apiErrorTag.classList.contains("d-none")) {
-        apiErrorTag.classList.remove("d-none");
+      if (apiErrors > 0) {
+        UI.removeDisplayNoneFromElement(apiErrorTag);
       }
-    }
-  } else {
-    if (apiErrorTag.classList.contains("d-none")) {
-      apiErrorTag.classList.add("d-none");
+    } else {
+      UI.addDisplayNoneToElement(apiErrorTag);
     }
   }
 }
@@ -180,14 +165,16 @@ function updatePrinterRow(printer) {
     updatePrinterInfo(printer);
     reconnectingIn(printer);
     updatePrinterState(printer);
+    checkQuickConnectState(printer);
     if (!printer.disabled) {
-      checkQuickConnectState(printer);
-
       checkForOctoPrintUpdate(printer);
 
       checkForOctoPrintPluginUpdates(printer);
 
       checkForApiErrors(printer);
+
+      //Health Checks
+      //checkIfPrinterHealthOK(printer);
 
       checkIfRestartRequired(printer);
 
@@ -226,12 +213,6 @@ export function createOrUpdatePrinterTableRow(printers) {
           const printersInfo = await OctoFarmClient.listPrinters();
           await updatePrinterSettingsModal(printersInfo, printer._id);
         });
-      // document
-      //   .getElementById(`scanningIssues-${printer._id}`)
-      //   .addEventListener("click", async (e) => {
-      //     const printersInfo = await OctoFarmClient.listPrinters();
-      //     await updatePrinterSettingsModal(printersInfo, printer._id);
-      //   });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
         let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
