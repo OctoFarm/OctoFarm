@@ -179,10 +179,9 @@ function updatePrinterRow(printer) {
   if (printerCard) {
     updatePrinterInfo(printer);
     reconnectingIn(printer);
+    updatePrinterState(printer);
     if (!printer.disabled) {
       checkQuickConnectState(printer);
-
-      updatePrinterState(printer);
 
       checkForOctoPrintUpdate(printer);
 

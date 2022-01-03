@@ -283,17 +283,26 @@ export default class UI {
   static togglePrinterDisableState(e, id) {
     const printerCard = document.getElementById(`printerCard-${id}`);
     const apiReScan = document.getElementById(`printerAPIReScan-${id}`);
+    const printerSettings = document.getElementById(`printerSettings-${id}`);
+    const printerLog = document.getElementById(`printerLog-${id}`);
+    const printerStatistics = document.getElementById(`printerStatistics-${id}`);
 
     if (e.target.innerHTML.includes("running")) {
       e.target.classList = "btn btn-outline-light btn-sm";
       e.target.innerHTML = '<i class="fas fa-wheelchair"></i>';
       printerCard.classList = "printerDisabled";
       apiReScan.disabled = true;
+      printerSettings.disabled = true;
+      printerLog.disabled = true;
+      printerStatistics.disabled = true;
     } else if (e.target.innerHTML.includes("wheelchair")) {
       e.target.classList = "btn btn-outline-success btn-sm";
       e.target.innerHTML = '<i class="fas fa-running"></i>';
       printerCard.classList = "printerEnabled";
-      apiReScan.disabled = true;
+      apiReScan.disabled = false;
+      printerSettings.disabled = false;
+      printerLog.disabled = false;
+      printerStatistics.disabled = false;
     }
   }
 }

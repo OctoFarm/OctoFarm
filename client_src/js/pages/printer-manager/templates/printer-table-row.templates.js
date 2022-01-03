@@ -41,7 +41,7 @@ export function returnPrinterTableRow(printer) {
             <button  title="Change your Printer Settings"
                  id="printerSettings-${printer._id}"
                  type="button"
-                 class="tag btn btn-secondary btn-sm bg-colour-1"
+                 class="tag btn btn-outline-info btn-sm"
                  data-toggle="modal"
                  data-target="#printerSettingsModal"
                 >
@@ -185,9 +185,10 @@ export function returnDisabledPrinterTableRow(printer) {
             <button  title="Change your Printer Settings"
                  id="printerSettings-${printer._id}"
                  type="button"
-                 class="tag btn btn-secondary btn-sm bg-colour-1"
+                 class="tag btn btn-outline-info btn-sm"
                  data-toggle="modal"
                  data-target="#printerSettingsModal"
+                 disabled
                 >
                 <i class="fas fa-cog"></i>
             </button>
@@ -216,6 +217,7 @@ export function returnDisabledPrinterTableRow(printer) {
                  class="tag btn btn-info btn-sm"
                  data-toggle="modal"
                  data-target="#printerLogsModal"
+                 disabled
             >
                 <i class="fas fa-file-alt"></i>
             </button>
@@ -225,6 +227,7 @@ export function returnDisabledPrinterTableRow(printer) {
                      class="tag btn btn-secondary btn-sm bg-colour-3"
                      data-toggle="modal"
                      data-target="#printerStatisticsModal"
+                     disabled
                 >
                 <i class="fas fa-chart-pie text-dark"></i>
               </button>

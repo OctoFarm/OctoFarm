@@ -567,10 +567,10 @@ class OctoPrintPrinter {
       this.reconnectAPI();
       return "Successfully enabled printer...";
     }
-
+    console.log("SETTING UP SOCKET");
     // Get a session key
     await this.#setupWebsocket();
-
+    console.log("RUNNING OPTIONAL");
     // Grab optional api data
     await this.#optionalApiSequence();
 
@@ -578,6 +578,7 @@ class OctoPrintPrinter {
   }
 
   async #setupWebsocket(force = false) {
+    console.log("SETUP WEBSOCKET", force);
     if (!this?.#ws || force) {
       if (force) {
         // If forced we allow the resetup of websocket connection
@@ -615,6 +616,20 @@ class OctoPrintPrinter {
         session,
         handleMessage
       );
+    } else {
+      const session = await this.acquireOctoPrintSessionKey();
+
+      if (typeof session !== "string") {
+        // Couldn't setup websocket
+        const sessionKeyFail = {
+          state: "Session Fail!",
+          stateDescription:
+            "Failed to acquire session key, please check your API key and try again..."
+        };
+        this.setPrinterState(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
+        return;
+      }
+      this.#ws.resetSocketConnection(this.webSocketURL, session);
     }
   }
 

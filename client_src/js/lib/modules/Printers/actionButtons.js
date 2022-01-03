@@ -396,8 +396,12 @@ function addEventListeners(printer) {
 }
 
 function checkQuickConnectState(printer) {
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
-    printer.printerState.colour.category === "Offline";
+  const isDisabledOrOffline =
+    printer.printerState.colour.category === "Offline" ||
+    printer.printerState.colour.category === "Disabled";
+  document.getElementById("printerQuickConnect-" + printer._id).disabled = isDisabledOrOffline;
+
+  document.getElementById("printerSyncButton-" + printer._id).disabled = isDisabledOrOffline;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||
