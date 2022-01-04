@@ -617,7 +617,7 @@ export function addHealthCheckListeners(check) {
       returnBootBox(
         "Your webcam settings from OctoPrint do not match your values in OctoFarm.",
         "If you have no camera url inputted into OctoFarm then please turn off the 'Enable Webcam' setting in OctoFarms printer settings modal.",
-        "Nothing bad will happen, you will just see the awful little 'image failed to load icon' in the relevant views."
+        "Nothing bad will happen, you will just see the awful little <img src='http://nono.com/no.jpg'> icon in the relevant views."
       );
     });
   }

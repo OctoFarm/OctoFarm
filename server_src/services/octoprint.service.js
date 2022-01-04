@@ -18,7 +18,7 @@ const getOnlinePrinterList = async function () {
   }
   return onlinePrintersList;
 };
-
+// TODO needs to not check for offline printers
 const checkIfFilamentManagerPluginExists = async function (printers) {
   const missingPlugin = [];
 
