@@ -45,11 +45,11 @@ class TASK_PRESETS {
     logFirstCompletion: true,
     milliseconds: 10000
   };
-  static PERIODIC_120000MS = {
+  static PERIODIC_600000MS = {
     ...this.PERIODIC,
     logFirstCompletion: true,
     runImmediately: true,
-    milliseconds: 120000
+    milliseconds: 600000
   };
 
   static PERIODIC_1000MS = {

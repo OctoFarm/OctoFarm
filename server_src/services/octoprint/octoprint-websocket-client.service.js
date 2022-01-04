@@ -42,6 +42,7 @@ class WebSocketClient {
   polling = undefined;
   currentUser = undefined;
   sessionKey = undefined;
+  reconnectingIn = 0;
 
   constructor(
     webSocketURL = undefined,
@@ -72,8 +73,14 @@ class WebSocketClient {
   }
 
   open() {
-    logger.debug(`${this.url}: ${OF_WS_DESC.SETTING_UP}`);
-    PrinterTicker.addIssue(new Date(), this.url, `${OF_WS_DESC.SETTING_UP}`, "Active", this.id);
+    logger.debug(`${this.url}: Opening websocket connection...`);
+    PrinterTicker.addIssue(
+      new Date(),
+      this.url,
+      "Opening websocket connection...",
+      "Active",
+      this.id
+    );
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
       logger.error("PING RECEIVED");
@@ -111,7 +118,7 @@ class WebSocketClient {
     });
 
     this.#instance.on("unexpected-response", (err) => {
-      logger.error(`${this.url}: Unexpected Response!`, err);
+      logger.error(`${this.url}: Unexpected Response!`, JSON.stringify(err));
     });
 
     // this.#instance.on("isPaused", () => {
@@ -120,7 +127,7 @@ class WebSocketClient {
 
     this.#instance.on("open", () => {
       ConnectionMonitorService.updateOrAddResponse(
-        this.url + ENDPOINT,
+        this.url,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.SUCCESS_RESPONSE
       );
@@ -152,7 +159,7 @@ class WebSocketClient {
       );
       logger.debug(`${timeDifference - this.#lastMessage}ms since last message`);
       ConnectionMonitorService.updateOrAddResponse(
-        this.url + ENDPOINT,
+        this.url,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.LAST_RESPONSE,
         ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
@@ -171,7 +178,7 @@ class WebSocketClient {
         webSocketDescription: "Socket connection error! Reconnecting...."
       });
       ConnectionMonitorService.updateOrAddResponse(
-        this.url + ENDPOINT,
+        this.url,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.FAILED_RESPONSE
       );
@@ -240,7 +247,7 @@ class WebSocketClient {
         webSocketDescription: "Socket connection error! Reconnecting...."
       });
       ConnectionMonitorService.updateOrAddResponse(
-        this.url + ENDPOINT,
+        this.url,
         REQUEST_TYPE.WEBSOCKET,
         REQUEST_KEYS.FAILED_RESPONSE
       );
@@ -296,11 +303,11 @@ class WebSocketClient {
   }
 
   sendAuth() {
-    logger.debug("Authenticating the websocket for user:" + this.currentUser);
+    logger.debug("Authenticating the websocket for user: " + this.currentUser);
     PrinterTicker.addIssue(
       new Date(),
       this.url,
-      "Authenticating the websocket for user:" + this.currentUser,
+      "Authenticating the websocket for user: " + this.currentUser,
       "Active",
       this.id
     );
@@ -340,6 +347,10 @@ class WebSocketClient {
   }
 
   reconnect(e) {
+    this.reconnectingIn = Date.now() + this.autoReconnectInterval;
+    getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+      websocketReconnectingIn: this.reconnectingIn
+    });
     if (this.#retryNumber < 1) {
       PrinterTicker.addIssue(
         new Date(),
@@ -365,7 +376,11 @@ class WebSocketClient {
     clearTimeout(this.#heartbeatPing);
     clearTimeout(this.reconnectTimeout);
     this.#instance.removeAllListeners();
-    this.reconnectTimeout = setTimeout(() => {
+    this.reconnectTimeout = setTimeout(async () => {
+      this.reconnectingIn = 0;
+      getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+        websocketReconnectingIn: this.reconnectingIn
+      });
       getPrinterStoreCache().updatePrinterState(this.id, {
         state: "Searching...",
         stateColour: mapStateToCategory("Searching..."),
@@ -387,6 +402,11 @@ class WebSocketClient {
           "Active",
           this.id
         );
+      }
+      this.sessionKey = await getPrinterStoreCache().getNewSessionKey(this.id);
+      if (!this.sessionKey) {
+        this.reconnect("No session key!");
+        return;
       }
       this.open();
       this.#retryNumber = this.#retryNumber + 1;
@@ -412,6 +432,10 @@ class WebSocketClient {
   }
 
   killAllConnectionsAndListeners() {
+    this.reconnectingIn = 0;
+    getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+      websocketReconnectingIn: this.reconnectingIn
+    });
     logger.info(`${this.url} Killing all listeners`);
     logger.debug("Force terminating websocket connection");
     this.terminate();

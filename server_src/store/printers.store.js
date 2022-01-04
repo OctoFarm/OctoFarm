@@ -46,11 +46,17 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
-  listPrintersInformation() {
+  listPrintersInformation(disabled = false) {
     const returnList = [];
 
     this.#printersList.forEach((printer) => {
-      returnList.push(Object.assign({}, printer));
+      if (disabled) {
+        returnList.push(Object.assign({}, printer));
+      } else {
+        if (!printer.disabled) {
+          returnList.push(Object.assign({}, printer));
+        }
+      }
     });
 
     return returnList;
@@ -494,9 +500,15 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return printer.disablePrinter();
   }
+
   async enablePrinter(id) {
     const printer = this.#findMePrinter(id);
     return await printer.enablePrinter();
+  }
+
+  async getNewSessionKey(id) {
+    const printer = this.#findMePrinter(id);
+    return await printer.getSessionkey();
   }
 }
 

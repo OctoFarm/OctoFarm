@@ -40,12 +40,26 @@ const returnAlerts = (id) => {
     >
         <i class="fas fa-crosshairs"></i>
     </button>
+    <button  title="Offline Rescan planned"
+                 id="printerAPIScanning-${id}"
+                 type="button"
+                 class="tag btn btn-outline-danger btn-sm d-none"
+                >
+               <span id="apiReScanIcon-${id}"><i class="fas fa-redo fa-sm"></i></span><span id="apiReScanText-${id}"></span> 
+    </button>
+        <button  title="Offline Rescan planned"
+                 id="printerWebsocketScanning-${id}"
+                 type="button"
+                 class="tag btn btn-outline-warning btn-sm d-none"
+                >
+               <span id="webosocketScanIcon-${id}"><i class="fas fa-sync-alt fa-sm"></i></span><span id="websocketScanText-${id}"></span> 
+    </button>
    `;
 };
 
 export function returnPrinterTableRow(printer) {
   return `
-        <tr class="printerEnabled" id="printerCard-${printer._id}">
+        <tr class="" id="printerCard-${printer._id}">
         <td class="align-middle">
             <span title="Drag and Change your Printers sorting"  id="printerSortIndex-${
               printer._id
@@ -88,28 +102,25 @@ export function returnPrinterTableRow(printer) {
                  type="button"
                  class="tag btn btn-outline-danger btn-sm"
                 >
-                <span id="apiReScanIcon-${
-                  printer._id
-                }"><i class="fas fa-redo fa-sm"></i></span><span id="apiReScanText-${
-    printer._id
-  }"></span>
+                <i class="fab fa-searchengin"></i> Scan API
                 
-            </button>
-            <button  title="Change your Printer Settings"
-                 id="printerSettings-${printer._id}"
-                 type="button"
-                 class="tag btn btn-outline-info btn-sm"
-                 data-toggle="modal"
-                 data-target="#printerSettingsModal"
-                >
-                <i class="fas fa-cog"></i>
             </button>
             <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${printer._id}"
                  type="button"
                  class="tag btn btn-outline-success btn-sm"
                 >
-                <i class="fas fa-running"></i>
+                <i class="fas fa-running"></i> Enabled
+            </button>
+            
+            <button  title="Change your Printer Settings"
+                 id="printerSettings-${printer._id}"
+                 type="button"
+                 class="tag btn btn-primary btn-sm"
+                 data-toggle="modal"
+                 data-target="#printerSettingsModal"
+                >
+                <i class="fas fa-cog"></i> Settings
             </button>
             <button  title="Setup and track Maintenance Issues with Printers"
                      id="printerMaintenance-${printer._id}"
@@ -119,7 +130,7 @@ export function returnPrinterTableRow(printer) {
                      data-target="#printerMaintenanceModal"
                      disabled
                 >
-                    <i class="fas fa-wrench"></i>
+                    <i class="fas fa-wrench"></i> Maintainance
             </button>
         </td>
         <td class="align-middle" id="printerInformationBtns-${printer._id}">
@@ -130,16 +141,16 @@ export function returnPrinterTableRow(printer) {
                  data-toggle="modal"
                  data-target="#printerLogsModal"
             >
-                <i class="fas fa-file-alt"></i>
+                <i class="fas fa-file-alt"></i> Logs
             </button>
             <button title="View individual Printer Statistics"
                      id="printerStatistics-${printer._id}"
                      type="button"
-                     class="tag btn btn-secondary btn-sm bg-colour-3"
+                     class="tag btn btn-warning btn-sm text-dark"
                      data-toggle="modal"
                      data-target="#printerStatisticsModal"
                 >
-                <i class="fas fa-chart-pie text-dark"></i>
+                <i class="fas fa-chart-pie text-dark"></i> Statistics
               </button>
         </td>
         <td class="align-middle" id="printerActionBtns-${printer._id}">
@@ -200,28 +211,24 @@ export function returnDisabledPrinterTableRow(printer) {
                  class="tag btn btn-outline-danger btn-sm"
                  disabled
                 >
-                <span id="apiReScanIcon-${
-                  printer._id
-                }"><i class="fas fa-redo fa-sm"></i></span><span id="apiReScanText-${
-    printer._id
-  }"></span>
+                 <i class="fab fa-searchengin"></i> Scan API
             </button>
-            <button  title="Change your Printer Settings"
-                 id="printerSettings-${printer._id}"
-                 type="button"
-                 class="tag btn btn-outline-info btn-sm"
-                 data-toggle="modal"
-                 data-target="#printerSettingsModal"
-                 disabled
-                >
-                <i class="fas fa-cog"></i>
-            </button>
-            <button  title="Printer is current disabled, click to re-enable"
+            <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${printer._id}"
                  type="button"
                  class="tag btn btn-outline-light btn-sm"
                 >
-                <i class="fas fa-wheelchair"></i>
+                <i class="fas fa-wheelchair"></i> Disabled
+            </button>
+            
+            <button  title="Change your Printer Settings"
+                 id="printerSettings-${printer._id}"
+                 type="button"
+                 class="tag btn btn-primary btn-sm"
+                 data-toggle="modal"
+                 data-target="#printerSettingsModal"
+                >
+                <i class="fas fa-cog"></i> Settings
             </button>
             <button  title="Setup and track Maintenance Issues with Printers"
                      id="printerMaintenance-${printer._id}"
@@ -231,7 +238,7 @@ export function returnDisabledPrinterTableRow(printer) {
                      data-target="#printerMaintenanceModal"
                      disabled
                 >
-                    <i class="fas fa-wrench"></i>
+                    <i class="fas fa-wrench"></i> Maintainence
             </button>
         </td>
         <td class="align-middle" id="printerInformationBtns-${printer._id}">
@@ -243,17 +250,17 @@ export function returnDisabledPrinterTableRow(printer) {
                  data-target="#printerLogsModal"
                  disabled
             >
-                <i class="fas fa-file-alt"></i>
+                <i class="fas fa-file-alt"></i> Logs
             </button>
             <button title="View individual Printer Statistics"
                      id="printerStatistics-${printer._id}"
                      type="button"
-                     class="tag btn btn-secondary btn-sm bg-colour-3"
+                     class="tag btn btn-warning btn-sm text-dark"
                      data-toggle="modal"
                      data-target="#printerStatisticsModal"
                      disabled
                 >
-                <i class="fas fa-chart-pie text-dark"></i>
+                <i class="fas fa-chart-pie text-dark"></i> Statistics
               </button>
         </td>
         <td class="align-middle" id="printerActionBtns-${printer._id}">

@@ -150,23 +150,33 @@ li {
   color: #262626;
 }
 .textActive {
-  color: #63450f;
+  color: #6b5103;
 }
+
 .textOffline {
-  color: #630c05;
+  color: #721c24;
 }
+
 .textClosed {
-  color: #630a05;
+  color: #721c24;
 }
+
 .textComplete {
-  color: #006311;
+  color: #155724;
 }
+
+.textInfo {
+  color: #004085;
+}
+
 .text-offline {
   color: #401418;
 }
+
 .Info {
   background-color: #25386e;
 }
+
 .Idle {
   background-color: #262626;
 }

@@ -6,30 +6,34 @@
         <div class="row px-1" id="actionsBarBody">
             <div class="col-12">
                 <div class="dropdown">
-                    <button class="btn btn-outline-success dropdown-toggle float-left mr-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-success dropdown-toggle float-left mr-1" type="button"
+                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-print"></i> Printer Manager
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a  class="dropdown-item" title="Add Printer to your Farm"
+                        <a class="dropdown-item" title="Add Printer to your Farm"
                            id="addPrinterBtn"
                            href="#"
                            aria-expanded="false"><i class="fas fa-plus fa-sm"></i> Add</a>
-                        <a  class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark" data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit"></i> Edit</a>
-                        <a  class="dropdown-item" title="Delete Printers from your farm"
-                          id="deletePrintersBtn"
-                          data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash"></i> Delete</a>
+                        <a class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark"
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit"></i> Edit</a>
+                        <a class="dropdown-item" title="Delete Printers from your farm"
+                           id="deletePrintersBtn"
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash"></i> Delete</a>
                         <label>
-                            <input  class="fileElem"
-                                    type="file"
-                                    id="importPrinterBtn"
-                                    accept=".json" style="display: none;">
-                            <a title="Import printers from a json file" class="dropdown-item"><i class="fas fa-file-import"></i> Import</a>
+                            <input class="fileElem"
+                                   type="file"
+                                   id="importPrinterBtn"
+                                   accept=".json" style="display: none;">
+                            <a title="Import printers from a json file" class="dropdown-item"><i
+                                        class="fas fa-file-import"></i> Import</a>
                         </label>
-                        <a  class="dropdown-item" title="Export printers from OctoFarm"
+                        <a class="dropdown-item" title="Export printers from OctoFarm"
                            id="exportPrinterBtn">
                             <i class="fas fa-file-export"></i> Export
                         </a>
-                        <a  class="dropdown-item" title="Add printers by scanning your network for online OctoPrint instances."
+                        <a class="dropdown-item"
+                           title="Add printers by scanning your network for online OctoPrint instances."
                            id="scanNetworkBtn">
                             <i class="fas fa-wifi"></i> Scan
                         </a>
@@ -55,17 +59,19 @@
                     <i class="fas fa-sync-alt fa-sm"></i> Reconnect Sockets
                 </button>
                 <%- include('./devOctoPrintActionBtns.ejs') %>
-                <button type="button" class="btn btn-outline-info float-right mr-1" data-toggle="modal" data-target="#connectionsOverviewModal">
+                <button type="button" class="btn btn-info float-right mr-1" data-toggle="modal"
+                        data-target="#connectionsOverviewModal">
                     <i class="fas fa-plug"></i> Connections Overview
                 </button>
-                <button type="button" class="btn btn-outline-success float-right mr-1" data-toggle="modal" data-target="#farmOverviewModal">
+                <button type="button" class="btn btn-success float-right mr-1" data-toggle="modal"
+                        data-target="#farmOverviewModal">
                     <i class="fas fa-infinity"></i> Printer Overview
                 </button>
                 <button
                         title="Check over your OctoPrint setup for OctoFarm usage"
                         id="printerHealthCheckBtn"
                         type="button"
-                        class="btn btn-outline-warning float-right mr-1"
+                        class="btn btn-warning text-dark float-right mr-1"
                         href="#"
                         data-toggle="modal" data-target="#healthChecksModal"
                 >

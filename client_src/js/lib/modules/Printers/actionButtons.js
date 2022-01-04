@@ -18,7 +18,7 @@ function returnActionBtnTemplate(id) {
          title="Terminate and reconnect OctoPrints Socket connection."
          id="printerSyncButton-${id}"
          type="button"
-         class="tag btn btn-outline-warning btn-sm"
+         class="tag btn btn-success btn-sm"
       >
           <i class="fas fa-sync"></i>
       </button> 

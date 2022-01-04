@@ -4,14 +4,14 @@ const Spool = require("../models/Filament.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const getOnlinePrinterList = async function () {
-  const printerList = getPrinterStoreCache().listPrinters();
+  const printerList = getPrinterStoreCache().listPrintersInformation();
   const onlinePrintersList = [];
   for (let i = 0; i < printerList.length; i++) {
     if (
-      printerList[i].stateColour.category === "Disconnected" ||
-      printerList[i].stateColour.category === "Idle" ||
-      printerList[i].stateColour.category === "Active" ||
-      printerList[i].stateColour.category === "Complete"
+      printerList[i].printerState.colour.category === "Disconnected" ||
+      printerList[i].printerState.colour.category === "Idle" ||
+      printerList[i].printerState.colour.category === "Active" ||
+      printerList[i].printerState.colour.category === "Complete"
     ) {
       onlinePrintersList.push(printerList[i]);
     }

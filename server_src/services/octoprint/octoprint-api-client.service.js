@@ -18,8 +18,9 @@ const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=t
 
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
 const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository";
+// TODO check if force scan actually needed at all ?force=true
 const apiSoftwareUpdateCheck = (force) =>
-  octoPrintBase + "plugin/softwareupdate/check" + (force ? "?force=true" : "");
+  octoPrintBase + "plugin/softwareupdate/check" + (force ? "" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
 const apiPluginFilamentManagerSpecificSpool = apiBase + "/plugin/filamentmanager/spools";
 const apiTimelapse = (unrendered = true) =>

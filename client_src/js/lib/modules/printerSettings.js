@@ -1163,7 +1163,7 @@ class PrinterSettings {
       currentPrinter.systemChecks.scanning.systemInfo.date
     )}`;
     pageElements.connectPage.systemInfoCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.systemInfo.status} mb-1 btn-block`;
-    if (currentPrinter.octoPrintVersion.includes("1.4")) {
+    if (currentPrinter?.octoPrintVersion?.includes("1.4")) {
       pageElements.connectPage.systemInfoCheck.disabled = true;
       pageElements.connectPage.systemInfoCheck.innerHTML = `<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Never Checked: </b>  - version not supported!`;
     }

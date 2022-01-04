@@ -11,7 +11,10 @@ import PrinterSelect from "../../../lib/modules/printerSelect";
 import FileOperations from "../../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
 import PrinterFileManager from "../../../lib/modules/printerFileManager";
-import { returnHealthCheckRow } from "../templates/health-checks-table-row.templates";
+import {
+  addHealthCheckListeners,
+  returnHealthCheckRow
+} from "../templates/health-checks-table-row.templates";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -316,5 +319,6 @@ export async function loadPrinterHealthChecks() {
   table.innerHTML = "";
   healthChecks.forEach((check) => {
     table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+    addHealthCheckListeners(check);
   });
 }

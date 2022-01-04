@@ -58,7 +58,7 @@ const GENERATE_MONTHLY_HISTORY_STATS = async () => {
 };
 
 const RUN_PRINTER_HEALTH_CHECKS = async () => {
-  await updatePrinterHealthChecks();
+  await updatePrinterHealthChecks(true);
 };
 
 const SSE_TASK = () => {
@@ -169,7 +169,7 @@ class OctoFarmTasks {
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_120000MS)
+    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS)
   ];
 }
 

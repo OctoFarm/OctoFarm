@@ -68,6 +68,15 @@ function updatePrinterInfo(printer) {
   printerGroup.innerHTML = printer.group;
 }
 
+function checkIfPrinterHealthOK(printer) {
+  const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
+  if (!printer.healthChecksPass) {
+    UI.addDisplayNoneToElement(healthAlert);
+  } else {
+    UI.removeDisplayNoneFromElement(healthAlert);
+  }
+}
+
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
@@ -79,10 +88,12 @@ function corsWarningCheck(printer) {
 
 function reconnectingIn(printer) {
   const { reconnectingIn, _id } = printer;
+  const printerReScanButton = document.getElementById("printerAPIScanning-" + _id);
   const printerReScanIcon = document.getElementById("apiReScanIcon-" + _id);
   const printerReScanText = document.getElementById("apiReScanText-" + _id);
   const reconnectingInCalculation = reconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
+    UI.addDisplayNoneToElement(printerReScanButton);
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
@@ -90,7 +101,29 @@ function reconnectingIn(printer) {
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     }
   } else {
+    UI.removeDisplayNoneFromElement(printerReScanButton);
     printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
+    printerReScanText.innerHTML = "";
+  }
+}
+
+function reconnectingWebsocketIn(printer) {
+  const { websocketReconnectingIn, _id } = printer;
+  const printerReScanButton = document.getElementById("printerWebsocketScanning-" + _id);
+  const printerReScanIcon = document.getElementById("webosocketScanIcon-" + _id);
+  const printerReScanText = document.getElementById("websocketScanText-" + _id);
+  const reconnectingInCalculation = websocketReconnectingIn - Date.now();
+  if (reconnectingInCalculation > 1000) {
+    UI.addDisplayNoneToElement(printerReScanButton);
+    if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
+      printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm fa-spin"></i>';
+      printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
+    } else {
+      printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
+    }
+  } else {
+    UI.removeDisplayNoneFromElement(printerReScanButton);
+    printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i>';
     printerReScanText.innerHTML = "";
   }
 }
@@ -143,7 +176,6 @@ function checkForApiErrors(printer) {
       let apiErrors = 0;
       for (const key in printer.systemChecks) {
         if (printer.systemChecks.scanning.hasOwnProperty(key)) {
-          console.log(key);
           if (printer.systemChecks.scanning[key].status !== "success") {
             apiErrors = apiErrors + 1;
           }
@@ -159,13 +191,26 @@ function checkForApiErrors(printer) {
   }
 }
 
+function updateButtonState(printer) {
+  const apiReScan = document.getElementById(`printerAPIReScan-${printer._id}`);
+  const printerSettings = document.getElementById(`printerSettings-${printer._id}`);
+  const printerLog = document.getElementById(`printerLog-${printer._id}`);
+  const printerStatistics = document.getElementById(`printerStatistics-${printer._id}`);
+  UI.doesElementNeedUpdating(printer.disabled, apiReScan, "disabled");
+  UI.doesElementNeedUpdating(printer.disabled, printerSettings, "disabled");
+  UI.doesElementNeedUpdating(printer.disabled, printerLog, "disabled");
+  UI.doesElementNeedUpdating(printer.disabled, printerStatistics, "disabled");
+}
+
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
     updatePrinterInfo(printer);
     reconnectingIn(printer);
+    reconnectingWebsocketIn(printer);
     updatePrinterState(printer);
     checkQuickConnectState(printer);
+    updateButtonState(printer);
     if (!printer.disabled) {
       checkForOctoPrintUpdate(printer);
 
@@ -173,8 +218,7 @@ function updatePrinterRow(printer) {
 
       checkForApiErrors(printer);
 
-      //Health Checks
-      //checkIfPrinterHealthOK(printer);
+      checkIfPrinterHealthOK(printer);
 
       checkIfRestartRequired(printer);
 
@@ -257,33 +301,54 @@ export function createOrUpdatePrinterTableRow(printers) {
           });
         });
 
-      document
-        .getElementById(`printerDisable-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          e.target.disabled = true;
-          const isDisabled = UI.isPrinterDisabled(e);
-          const alert = UI.createAlert(
-            "warning",
-            `${isDisabled ? "Enabling" : "Disabling"} your printer... please wait!`
-          );
-          let patch = null;
-          if (isDisabled) {
-            patch = await OctoFarmClient.enablePrinter(printer._id);
-          } else {
-            patch = await OctoFarmClient.disablePrinter(printer._id);
+      document.getElementById(`printerDisable-${printer._id}`).addEventListener("click", (e) => {
+        const isDisabled = UI.isPrinterDisabled(e);
+        const messageDisabled =
+          "A disabled printer will not make any connection attempts until re-enabled. You will not see it in the UI and it will not effect any stats like Offline printer count.";
+        const messageEnabled = "Enabling a printer will restore it to it's previous functionality.";
+        bootbox.confirm({
+          title: `This will ${
+            isDisabled ? "<b>ENABLE</b>" : "<b>DISABLE</b>"
+          } your printer. Are you sure?`,
+          message: `${isDisabled ? messageEnabled : messageDisabled}`,
+
+          buttons: {
+            cancel: {
+              label: '<i class="fa fa-times"></i> Cancel'
+            },
+            confirm: {
+              label: '<i class="fa fa-check"></i> Confirm'
+            }
+          },
+          callback: async function (result) {
+            if (result) {
+              e.target.disabled = true;
+              const alert = UI.createAlert(
+                "warning",
+                `${isDisabled ? "Enabling" : "Disabling"} your printer... please wait!`
+              );
+              let patch = null;
+              if (isDisabled) {
+                patch = await OctoFarmClient.enablePrinter(printer._id);
+              } else {
+                patch = await OctoFarmClient.disablePrinter(printer._id);
+              }
+
+              alert.close();
+              UI.createAlert(
+                "success",
+                `Successfully ${isDisabled ? "Enabled" : "Disabled"} your printer!`,
+                "Clicked",
+                3000
+              );
+              UI.togglePrinterDisableState(e, printer._id);
+              setTimeout(() => {
+                e.target.disabled = false;
+              }, 5000);
+            }
           }
-          alert.close();
-          UI.createAlert(
-            "success",
-            `Successfully ${isDisabled ? "Enabled" : "Disabled"} your printer!`,
-            "Clicked",
-            3000
-          );
-          UI.togglePrinterDisableState(e, printer._id);
-          setTimeout(() => {
-            e.target.disabled = false;
-          }, 5000);
         });
+      });
     }
   });
 }
