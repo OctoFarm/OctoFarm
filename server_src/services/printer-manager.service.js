@@ -72,7 +72,7 @@ class PrinterManagerService {
     logger.debug(printerList.length + " printers updating state counters...");
     for (let i = 0; i < printerList.length; i++) {
       const printer = printerList[i];
-      if (!printer.disabled && !!printer?.printerState?.colour?.category) {
+      if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
         switch (printer.printerState.colour.category) {
           case CATEGORIES.ACTIVE:
             this.updateStateCounterCategory(CATEGORIES.ACTIVE, printer);
