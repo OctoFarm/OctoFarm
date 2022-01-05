@@ -21,7 +21,7 @@ class PrinterManagerService {
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
     for (let p = 0; p < pList.length; p++) {
-      patchPrinterValues(pList[p]);
+      await patchPrinterValues(pList[p]);
     }
     await this.batchCreatePrinters(pList);
     return true;
@@ -37,7 +37,7 @@ class PrinterManagerService {
   }
 
   async addPrinter(printer) {
-    patchPrinterValues(printer);
+    await patchPrinterValues(printer);
     const returnPrinter = await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
     return {
       printerURL: returnPrinter.printerURL
@@ -157,13 +157,7 @@ class PrinterManagerService {
         sortIndex: i
       });
       // We have to bypass the database object here and go straight to the printer service.
-      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i })
-        .then((res) => {
-          logger.debug("Successfully updated printer sort index!");
-        })
-        .catch((e) => {
-          logger.error("Failed to update printer sort index!");
-        });
+      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i }).then();
     }
     return "Regenerated sortIndex for all printers...";
   }

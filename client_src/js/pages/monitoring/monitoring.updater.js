@@ -753,7 +753,7 @@ async function updateState(printer, clientSettings, view, index) {
       const tool = document.getElementById(`${printer._id}-spool-${i}`);
       if (printer.selectedFilament[i] !== null) {
         if (tool) {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
+          tool.innerHTML = `${printer.selectedFilament[i]?.spools?.profile?.material}`;
         }
       } else {
         if (tool) {

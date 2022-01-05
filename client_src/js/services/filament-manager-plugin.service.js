@@ -141,15 +141,33 @@ export async function returnDropDown(history) {
   }
 }
 
-export async function selectFilament(printerId, spoolId, tool) {
+export async function selectFilament(printers, spoolId) {
   const data = {
-    tool,
-    printerId,
+    printers,
     spoolId
   };
   try {
-    await OctoFarmClient.post("filament/select", data);
+    await OctoFarmClient.post("filament/assign", data);
   } catch (e) {
     UI.createAlert("error", "Issue changing your spool, please check the logs...");
   }
+}
+
+export async function createFilamentSelector(element, printer, toolIndex) {
+  element.innerHTML = "";
+  const filamentDropDown = await returnDropDown();
+  filamentDropDown.forEach((filament) => {
+    element.insertAdjacentHTML("beforeend", filament);
+  });
+  if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
+    if (
+      typeof printer.selectedFilament[i] !== "undefined" &&
+      printer.selectedFilament[i] !== null
+    ) {
+      element.value = printer.selectedFilament[i]._id;
+    }
+  }
+  element.addEventListener("change", (event) => {
+    selectFilament([{ printer: printer._id, tool: toolIndex }], event.target.value);
+  });
 }

@@ -24,7 +24,7 @@ const captureTemperatureData = (id, data) => {
     const temps = data;
     //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
-      tools: PrinterClean.sortTemps(temps[0])
+      tools: PrinterClean.sortTemps(temps)
     });
 
     if (!tempTimers[id]) {
@@ -59,6 +59,7 @@ const coolDownEvent = (id, temps) => {
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {
+    W;
     if (!currentEvent) {
       getPrinterStoreCache().addPrinterEvent(id, "coolDown");
     }
@@ -76,9 +77,6 @@ const coolDownEvent = (id, temps) => {
 const captureJobData = (id, data) => {
   if (!!data) {
     //Make sure we have at least a tool!
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      job: data
-    });
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       currentJob: JobClean.generate(
         data,

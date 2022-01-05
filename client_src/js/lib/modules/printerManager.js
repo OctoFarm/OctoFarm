@@ -2,7 +2,7 @@ import OctoPrintClient from "../octoprint";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import { returnDropDown, selectFilament } from "../../services/filament-manager-plugin.service";
+import { createFilamentSelector } from "../../services/filament-manager-plugin.service";
 import CustomGenerator from "./customScripts.js";
 import { setupClientSwitchDropDown } from "../../services/client-modal.service";
 
@@ -40,13 +40,12 @@ export default class PrinterManager {
 
       setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
 
-      const filamentDropDown = await returnDropDown();
-      await PrinterManager.loadPrinter(currentPrinter, printerControlList, filamentDropDown);
+      await PrinterManager.loadPrinter(currentPrinter, printerControlList);
       const elements = PrinterManager.grabPage();
       elements.printerControls["step" + currentPrinter.stepRate].className = "btn btn-dark active";
       PrinterManager.applyState(currentPrinter, elements);
       PrinterManager.applyTemps(currentPrinter, elements);
-      PrinterManager.applyListeners(elements, printers, filamentDropDown);
+      PrinterManager.applyListeners(elements, printers);
     } else {
       const id = _.findIndex(printers, function (o) {
         return o._id == currentIndex;
@@ -59,7 +58,7 @@ export default class PrinterManager {
     }
   }
 
-  static async loadPrinter(printer, printerControlList, filamentDropDown) {
+  static async loadPrinter(printer, printerControlList) {
     //Load Connection Panel
 
     try {
@@ -418,24 +417,7 @@ export default class PrinterManager {
                                 `
               );
               const pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
-              pmFilamentDrop.innerHTML = "";
-              filamentDropDown.forEach((filament) => {
-                pmFilamentDrop.insertAdjacentHTML("beforeend", filament);
-              });
-              if (
-                Array.isArray(printer.selectedFilament) &&
-                printer.selectedFilament.length !== 0
-              ) {
-                if (
-                  typeof printer.selectedFilament[i] !== "undefined" &&
-                  printer.selectedFilament[i] !== null
-                ) {
-                  pmFilamentDrop.value = printer.selectedFilament[i]._id;
-                }
-              }
-              pmFilamentDrop.addEventListener("change", (event) => {
-                selectFilament(printer._id, event.target.value, `${i}`);
-              });
+              await createFilamentSelector(pmFilamentDrop, printer, i);
             }
           } else if (keys[t].includes("heatedBed")) {
             if (printer.currentProfile[keys[t]]) {
@@ -502,7 +484,7 @@ export default class PrinterManager {
     }
   }
 
-  static applyListeners(elements, printers, filamentDropDown) {
+  static applyListeners(elements, printers) {
     const rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach((slider) => {
       slider.addEventListener("input", (e) => {

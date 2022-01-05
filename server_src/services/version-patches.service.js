@@ -2,16 +2,18 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const Logger = require("../handlers/logger");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
+const { attachProfileToSpool } = require("../utils/spool.utils");
 
 const logger = new Logger("OctoFarm-State");
 
-const patchPrinterValues = (printer) => {
+const patchPrinterValues = async (printer) => {
   patchSortIndex(printer);
   printerURLPatch(printer);
   printerHTTPPatch(printer);
   printerURLTrailingSlashPatch(printer);
   webSocketURLPatch(printer);
   selectedFilamentNotArrayPatch(printer);
+  await collateSelectedFilament(printer);
   categoryPatch(printer);
   return printer;
 };
@@ -35,6 +37,19 @@ const patchSortIndex = (printer) => {
 const selectedFilamentNotArrayPatch = (printer) => {
   if (!printer?.selectedFilament || !Array.isArray(printer.selectedFilament)) {
     printer.selectedFilament = [];
+  }
+};
+
+const collateSelectedFilament = async (selectedFilament) => {
+  if (Array.isArray(selectedFilament)) {
+    for (let i = 0; i < selectedFilament.length; i++) {
+      const spool = selectedFilament[i];
+      if (typeof spool.profile === "string") {
+        this.selectedFilament[i] = await attachProfileToSpool(spool);
+      } else {
+        this.selectedFilament[i] = selectedFilament[i];
+      }
+    }
   }
 };
 

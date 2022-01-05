@@ -31,6 +31,7 @@ const { FileClean } = require("../../lib/dataFunctions/fileClean");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../../lib/dataFunctions/printerClean");
 const printerModel = require("../../models/Printer");
+const { attachProfileToSpool } = require("../../utils/spool.utils");
 
 const logger = new Logger("OctoFarm-State");
 

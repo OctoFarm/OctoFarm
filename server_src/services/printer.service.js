@@ -1,6 +1,8 @@
 "use strict";
 
 const printerModel = require("../models/Printer");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
 
 /**
  * Stores a new printer into the database.
@@ -20,7 +22,19 @@ const list = () => {
   return printerModel.find({});
 };
 
+const findOneAndUpdate = (id, obj) => {
+  return printerModel
+    .findOneAndUpdate({ _id: id }, obj, { new: true })
+    .then((res) => {
+      logger.debug("Successfully updated printer database!", obj);
+    })
+    .catch((e) => {
+      logger.error("Failed to update printer database!", obj);
+    });
+};
+
 module.exports = {
   create,
-  list
+  list,
+  findOneAndUpdate
 };

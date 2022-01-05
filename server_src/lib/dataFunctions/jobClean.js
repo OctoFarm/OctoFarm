@@ -29,6 +29,7 @@ class JobClean {
    * @param fileList
    * @param currentZ
    * @param costSettings
+   * @param printerProgress
    * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: null, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
    */
   static generate(printerJob, selectedFilament, fileList, currentZ, costSettings, printerProgress) {
@@ -50,26 +51,34 @@ class JobClean {
       thumbnail: null
     };
 
+    // console.log(selectedFilament);
+
     if (!!printerJob) {
-      currentJob.fileName = printerJob.file.name;
-      const { files } = fileList;
-      const foundFile = findIndex(files, (o) => {
-        return o.name === printerJob.file.name;
-      });
-      if (!!foundFile) {
-        currentJob.thumbnail = foundFile?.thumbnail;
+      if (!!printerJob?.file?.name) {
+        currentJob.fileName = printerJob.file.name;
+        const { files } = fileList;
+        const foundFile = findIndex(files, (o) => {
+          return o.name === printerJob.file.name;
+        });
+        if (!!foundFile) {
+          currentJob.thumbnail = foundFile?.thumbnail;
+        }
       }
-      currentJob.fileDisplay = printerJob.file.display;
-      currentJob.filePath = printerJob.file.path;
-      currentJob.averagePrintTime = printerJob.averagePrintTime;
-      currentJob.lastPrintTime = printerJob.lastPrintTime;
+      if (!!printerJob?.file?.display) currentJob.fileDisplay = printerJob.file.display;
+
+      if (!!printerJob?.file?.path) currentJob.filePath = printerJob.file.path;
+      if (!!printerJob?.averagePrintTime) currentJob.averagePrintTime = printerJob.averagePrintTime;
+      if (!!printerJob?.lastPrintTime) currentJob.lastPrintTime = printerJob.lastPrintTime;
+
       if (!!currentZ) {
         currentJob.currentZ = currentZ;
       }
+
       currentJob.expectedPrinterCosts = getPrintCostNumeric(
         printerJob.estimatedPrintTime,
         costSettings
       )?.toFixed(2);
+
       currentJob.expectedFilamentCosts = HistoryClean.getSpool(
         selectedFilament,
         printerJob,

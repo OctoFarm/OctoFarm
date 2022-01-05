@@ -8,7 +8,10 @@ const { moveFolderOnPrinter } = require("../services/octoprint/octoprint-file-ma
 const Logger = require("../handlers/logger");
 const _ = require("lodash");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean");
-
+const Filament = require("../models/Filament");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const PrinterService = require("../services/printer.service");
+const { attachProfileToSpool } = require("../utils/spool.utils");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -60,7 +63,7 @@ class PrinterStore {
       }
     });
 
-    return returnList;
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }
 
   listPrinters() {
@@ -530,6 +533,56 @@ class PrinterStore {
   deleteFolder() {}
 
   moveFolder() {}
+
+  async assignSpoolToPrinters(printerIDs, spoolID) {
+    const farmPrinters = this.listPrintersInformation(true);
+    const spool = await Filament.findById(spoolID);
+
+    if (SettingsClean.returnFilamentManagerSettings()) {
+      this.deattachSpoolFromAllPrinters(spoolID);
+    }
+
+    // Asign new printer id's;
+    for (let i = 0; i < printerIDs.length; i++) {
+      const id = printerIDs[i];
+      const split = id.printer.split("-");
+      const printerID = split[0];
+      const tool = id.tool;
+      const printerIndex = findIndex(farmPrinters, function (o) {
+        return o._id === printerID;
+      });
+
+      const updatedSpool = await attachProfileToSpool(spool);
+
+      farmPrinters[printerIndex].selectedFilament[tool] = updatedSpool;
+
+      PrinterService.findOneAndUpdate(printerID, {
+        selectedFilament: farmPrinters[printerIndex].selectedFilament
+      }).then();
+    }
+
+    return "Attached all spools";
+  }
+
+  deattachSpoolFromAllPrinters(filamentID) {
+    const farmPrinters = this.listPrintersInformation(true);
+    // Unassign existing printers
+    const farmPrintersAssigned = farmPrinters.filter(
+      (printer) =>
+        findIndex(printer.selectedFilament, function (o) {
+          if (!!o) {
+            return o._id === filamentID;
+          }
+        }) > -1
+    );
+
+    farmPrintersAssigned.forEach((printer) => {
+      printer.selectedFilament[tool] = null;
+      PrinterService.findOneAndUpdate(printerID, {
+        selectedFilament: printer.selectedFilament
+      }).then();
+    });
+  }
 }
 
 module.exports = PrinterStore;
