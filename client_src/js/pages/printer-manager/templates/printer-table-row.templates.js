@@ -67,7 +67,12 @@ export function returnPrinterTableRow(printer) {
                    class="btn btn-light btn-sm sortableList" style="vertical-align: middle"><i class="fas fa-spinner fa-spin"></i>
             </span>
         </td>
-        <td class="align-middle" id="printerName-${printer._id}"></td>
+        <td class="align-middle">
+            <span><i class="fas fa-print" style="color:${
+              printer.settingsAppearance.color
+            };"></i></span>
+            <span id="printerName-${printer._id}"></span>
+        </td>
                 <td class="align-middle">
             <small>
                 <span data-title="${printer.hostState.desc}" id="hostBadge-${
@@ -174,7 +179,12 @@ export function returnDisabledPrinterTableRow(printer) {
                    class="btn btn-light btn-sm sortableList" style="vertical-align: middle"><i class="fas fa-spinner fa-spin"></i>
             </span>
         </td>
-        <td class="align-middle" id="printerName-${printer._id}"></td>
+        <td class="align-middle" >
+                 <span><i class="fas fa-print" style="color:${
+                   printer.settingsAppearance.color
+                 };"></i></span>
+            <span id="printerName-${printer._id}"></span>
+            </td>
                 <td class="align-middle">
             <small>
                 <span data-title="${printer.hostState.desc}" id="hostBadge-${

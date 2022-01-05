@@ -37,12 +37,17 @@ const acquireWebCamData = (currentURL, printerURL, streamURL) => {
  */
 const acquirePrinterNameData = (oldAppearance, newAppearance) => {
   // Check if user left blank, grab from OctoPrint... dis-regard if not blank
+  console.log(oldAppearance.name);
   if (oldAppearance?.name === "" || oldAppearance?.name === " ") {
     oldAppearance.name = newAppearance.name;
     oldAppearance.color = newAppearance.color;
     oldAppearance.colorIcon = newAppearance.colorIcon;
   } else {
-    oldAppearance = newAppearance;
+    if (newAppearance.name !== "" || newAppearance.name !== " ") {
+      oldAppearance.name = newAppearance.name;
+    } else {
+      oldAppearance = newAppearance;
+    }
   }
   return oldAppearance;
 };
