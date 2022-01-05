@@ -568,7 +568,6 @@ class OctoPrintPrinter {
 
     // Grab required api data, fail to shutdown... should not continue without this data...
     const requiredApiCheck = await this.#requiredApiSequence();
-    console.log(requiredApiCheck);
     const requiredApiCheckValues = requiredApiCheck.map((check) => {
       return typeof check.value === "number";
     });
@@ -1178,13 +1177,18 @@ class OctoPrintPrinter {
 
         //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
         if (!force) {
-          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
           this.settingsAppearance = acquirePrinterNameData(this.settingsAppearance, appearance);
+          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
           this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
           this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-          this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
         }
-
+        this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+        if (this.printerName !== this.settingsAppearance.name) {
+          this.settingsAppearance.name = this.printerName;
+        }
+        if (this.settingsAppearance.color !== appearance.color) {
+          this.settingsAppearance.color = appearance.color;
+        }
         this.#db.update({
           camURL: this.camURL,
           settingsAppearance: this.settingsAppearance,
