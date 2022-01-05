@@ -1,33 +1,30 @@
 import {
   dragAndDropEnable,
-  dragCheck,
   dragAndDropGroupEnable,
-  dragAndDropEnableMultiplePrinters
+  dragCheck
 } from "../../lib/functions/dragAndDrop.js";
 import PrinterManager from "../../lib/modules/printerManager.js";
 import PrinterFileManager from "../../lib/modules/printerFileManager.js";
-import PowerButton from "../../lib/modules/powerButton.js";
 import UI from "../../lib/functions/ui.js";
 import Calc from "../../lib/functions/calc.js";
 import {
+  checkGroupQuickConnectState,
   checkQuickConnectState,
-  init as actionButtonInit,
   groupInit as actionButtonGroupInit,
-  checkGroupQuickConnectState
+  init as actionButtonInit
 } from "../../lib/modules/Printers/actionButtons.js";
 import OctoPrintClient from "../../lib/octoprint.js";
 import { checkTemps } from "../../lib/modules/temperatureCheck.js";
-import { checkFilamentManager } from "../../services/filament-manager-plugin.service";
 import doubleClickFullScreen from "../../lib/functions/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 import {
   drawCameraView,
-  drawPanelView,
-  drawListView,
   drawCombinedView,
   drawGroupViewContainers,
-  drawGroupViewPrinters
+  drawGroupViewPrinters,
+  drawListView,
+  drawPanelView
 } from "./monitoring.templates";
 import PrinterTerminalManager from "../../lib/modules/printerTerminalManager";
 import { groupBy, mapValues } from "lodash";
@@ -702,12 +699,11 @@ async function updateState(printer, clientSettings, view, index) {
     elements.currentFile.innerHTML = '<i class="fas fa-file-code"></i> ' + "No File Selected";
   }
 
-  if (printer?.layerData) {
+  if (!!printer?.layerData) {
     const formatLayerData = `<i class="fas fa-layer-group"></i> ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
     UI.doesElementNeedUpdating(formatLayerData, elements.layerData, "innerHTML");
   }
-
-  if (printer.tools !== null) {
+  if (!!printer.tools) {
     const toolKeys = Object.keys(printer.tools[0]);
     for (let t = 0; t < toolKeys.length; t++) {
       if (toolKeys[t].includes("tool")) {
@@ -856,7 +852,7 @@ async function updateState(printer, clientSettings, view, index) {
     if (elements.row.classList.contains(hideOffline)) {
       elements.row.classList.remove(hideOffline);
     }
-    if (printer.currentJob !== null && printer.currentJob.fileName !== "No File Selected") {
+    if (!!printer.currentJob && printer.currentJob.fileName !== "No File Selected") {
       if (elements.start) {
         elements.start.disabled = false;
       }
@@ -979,7 +975,7 @@ async function updateGroupState(printers, clientSettings, view) {
   printers.forEach((printer, index) => {
     if (printer.group !== "" || !printer.disabled) {
       const elements = grabElements(printer);
-      if (typeof elements.row === "undefined") return;
+      if (!elements?.row) return;
       elements.row.style.order = index;
       if (printer.display) {
         if (elements.row.style.display === "none") {

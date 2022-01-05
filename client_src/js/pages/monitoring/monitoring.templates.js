@@ -1,11 +1,28 @@
 import { sortAlphaNum } from "../system/utils/array.utils";
+
 //TODO move this out to sevice
+
+function getNameColour(colour) {
+  let colourStyle = `background-color: ${colour} !important;`;
+  let buttonStyle = "btn-outline-dark";
+  if (colour === "default") {
+    colourStyle = "";
+    buttonStyle = "btn-secondary";
+  } else if (colour === "black") {
+    buttonStyle = "btn-outline-light";
+  }
+  return {
+    colourStyle,
+    buttonStyle
+  };
+}
+
 function isRotated(otherSettings) {
   let flipH = "";
   let flipV = "";
   let rotate90 = "";
 
-  if (otherSettings.webCamSettings !== null) {
+  if (!!otherSettings) {
     if (otherSettings.webCamSettings.flipH) {
       flipH = "rotateY(180deg)";
     }
@@ -59,11 +76,7 @@ function imageOrCamera(printer) {
   const { flipH, flipV, rotate90 } = flip;
 
   //Is octoprints camera settings enabled?
-  if (
-    printer.otherSettings !== null &&
-    printer.otherSettings.webCamSettings !== null &&
-    printer.otherSettings.webCamSettings.webcamEnabled
-  ) {
+  if (!!printer.otherSettings) {
     //Check if URL actually exists...
     if (printer.camURL !== "") {
       return drawCamera({
@@ -109,11 +122,7 @@ function checkCameraState(printer) {
   const { flipH, flipV, rotate90 } = flip;
 
   //Is octoprints camera settings enabled?
-  if (
-    printer.otherSettings !== null &&
-    printer.otherSettings.webCamSettings !== null &&
-    printer.otherSettings.webCamSettings.webcamEnabled
-  ) {
+  if (!!printer.otherSettings) {
     //Check if URL actually exists...
     if (printer.camURL !== "") {
       return true;
@@ -130,8 +139,7 @@ export function drawListView(printer, clientSettings) {
   const name = printer.printerName;
   let toolList = "";
   let environment = "";
-
-  if (printer.currentProfile !== null) {
+  if (!!printer?.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
@@ -165,12 +173,23 @@ export function drawListView(printer, clientSettings) {
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
+  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
   return `
         <tr
           class="p-0 ${stateCategory} ${hidden}"
           id="panel-${printer._id}">
-          <td id="name-${printer._id}" class="py-auto">
-            ${name}
+          <td class="text-center">
+             <button
+                id="name-${printer._id}"
+                type="button"
+                class="btn ${buttonStyle} mb-0 btn-sm btn-block text-truncate"
+                role="button"
+                style="${colourStyle}"
+               
+                disabled
+              >
+                ${name}
+              </button>
           </td>
           <td id="state-${printer._id}" class="py-auto">
            ${printer.printerState.state}
@@ -302,7 +321,7 @@ export function drawPanelView(printer, clientSettings) {
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
-  if (printer.currentProfile !== null) {
+  if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
@@ -322,19 +341,24 @@ export function drawPanelView(printer, clientSettings) {
           </small>`;
     }
   }
+  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
 
   return `
         <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
           <div class="row">
-            <div class="col-6 text-truncate">
+            <div class="col-6">
               <button
                 id="name-${printer._id}"
                 type="button"
-                class="btn btn-secondary mb-0 btn-sm float-left w-75"
-                role="button"
+                class="btn ${buttonStyle} mb-0 btn-sm btn-block 
                 
+                
+                text-truncate"
+                role="button"
+                style="${colourStyle}"
+               
                 disabled
               >
                 ${name}
@@ -516,7 +540,7 @@ export function drawCameraView(printer, clientSettings) {
 
   let toolList = "";
   let environment = "";
-  if (printer.currentProfile !== null) {
+  if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
     }
@@ -533,6 +557,7 @@ export function drawCameraView(printer, clientSettings) {
  `;
     }
   }
+  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
 
   return `
   <div
@@ -544,18 +569,27 @@ export function drawCameraView(printer, clientSettings) {
           class="card-header dashHeader p-0"
           id="camHeader-${printer._id}"
         >
-            <button
+        <div class="row">
+            <div class="col-lg-6">
+                     <button
               id="name-${printer._id}"
               type="button"
-              class="btn btn-secondary float-left p-0 pl-2 pt-1"
+              class="btn ${buttonStyle} btn-block p-0 pl-2 pt-1"
               data-toggle="modal"
               data-target="#printerManagerModal"
+              style="${colourStyle}"
               disabled
             >
                 ${name}
             </button>
-          <small id="printerActionBtns-${printer._id}" class="float-right">
+            </div>
+              <div class="col-lg-6">
+                 <small id="printerActionBtns-${printer._id}" class="float-right">
           </small>
+            </div>
+        </div>
+   
+     
         </div>
         <div
           class="card-body cameraContain text-truncate noBlue"
@@ -714,7 +748,7 @@ export function drawCombinedView(printer, clientSettings) {
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
-  if (printer.currentProfile !== null) {
+  if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
@@ -745,7 +779,7 @@ export function drawCombinedView(printer, clientSettings) {
     columns.cameraColumn = "d-none";
     columns.mainColumn = "col-12";
   }
-
+  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
   return `
      <div class="card ${hidden} mb-3" id="panel-${printer._id}">
         <div class="d-none index">${printer.sortIndex}</div>
@@ -766,8 +800,9 @@ export function drawCombinedView(printer, clientSettings) {
                           <button
                             id="name-${printer._id}"
                             type="button"
-                            class="btn btn-block btn-secondary btn-sm text-left"
+                            class="btn btn-block ${buttonStyle} btn-sm text-left"
                             role="button"
+                            style="${colourStyle}"
                             disabled
                           >
                             ${name}
@@ -1064,6 +1099,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
 export function drawGroupViewPrinters(printer, clientSettings) {
   printer.forEach((printer) => {
     if (printer.group !== "") {
+      const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
       const cleanGroup = encodeURIComponent(printer.group);
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
       const skipElement = document.getElementById(`panel-${printer._id}`);
@@ -1098,7 +1134,7 @@ export function drawGroupViewPrinters(printer, clientSettings) {
         <div class="col-sm-12 col-md-6 col-lg-${panelColumns}">
           <div id="panel-${printer._id}" class="card text-white bg-dark">
             <div class="card-header dashHeader text-truncate">
-                <span id="name-${printer._id}" class="badge badge-secondary float-left ml-1 py-1">${printer.printerName}</span><br>
+                <button id="name-${printer._id}" class="btn btn-block btn-sm text-truncate ${buttonStyle}" style="${colourStyle}" disabled>${printer.printerName}</button>
                 <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                     <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
                 </div>
