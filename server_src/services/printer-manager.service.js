@@ -157,7 +157,13 @@ class PrinterManagerService {
         sortIndex: i
       });
       // We have to bypass the database object here and go straight to the printer service.
-      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i });
+      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i })
+        .then((res) => {
+          logger.debug("Successfully updated printer sort index!");
+        })
+        .catch((e) => {
+          logger.error("Failed to update printer sort index!");
+        });
     }
     return "Regenerated sortIndex for all printers...";
   }
