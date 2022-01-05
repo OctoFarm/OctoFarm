@@ -17,6 +17,10 @@ class SettingsClean {
     return systemClean.timeout;
   }
 
+  static returnFilamentManagerSettings() {
+    return systemClean.filamentManager;
+  }
+
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {
