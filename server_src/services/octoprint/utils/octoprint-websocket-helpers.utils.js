@@ -59,7 +59,6 @@ const coolDownEvent = (id, temps) => {
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {
-    W;
     if (!currentEvent) {
       getPrinterStoreCache().addPrinterEvent(id, "coolDown");
     }

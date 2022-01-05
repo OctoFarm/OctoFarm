@@ -160,11 +160,10 @@ export async function createFilamentSelector(element, printer, toolIndex) {
     element.insertAdjacentHTML("beforeend", filament);
   });
   if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
-    if (
-      typeof printer.selectedFilament[i] !== "undefined" &&
-      printer.selectedFilament[i] !== null
-    ) {
-      element.value = printer.selectedFilament[i]._id;
+    for (let i = 0; i < printer.selectedFilament.length; i++) {
+      if (!!printer.selectedFilament[i]) {
+        element.value = printer.selectedFilament[i]._id;
+      }
     }
   }
   element.addEventListener("change", (event) => {

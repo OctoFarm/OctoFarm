@@ -23,6 +23,7 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 export default class PrinterManager {
   static async init(index, printers, printerControlList) {
     //clear camera
+    console.log(index);
     if (index !== "") {
       if (document.getElementById("printerControlCamera")) {
         document.getElementById("printerControlCamera").src = "";
@@ -39,7 +40,6 @@ export default class PrinterManager {
       };
 
       setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
-
       await PrinterManager.loadPrinter(currentPrinter, printerControlList);
       const elements = PrinterManager.grabPage();
       elements.printerControls["step" + currentPrinter.stepRate].className = "btn btn-dark active";
@@ -391,6 +391,7 @@ export default class PrinterManager {
       const printerToolTemps = document.getElementById("pmToolTemps");
       document.getElementById("pmOtherTemps").innerHTML = "";
       printerToolTemps.innerHTML = "";
+
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         const keys = Object.keys(printer.currentProfile);
         for (let t = 0; t < keys.length; t++) {
@@ -469,7 +470,7 @@ export default class PrinterManager {
         }
       }
 
-      CustomGenerator.generateButtons(printer);
+      await CustomGenerator.generateButtons(printer);
 
       return true;
     } catch (e) {
@@ -568,6 +569,7 @@ export default class PrinterManager {
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step01.className = "btn btn-light";
     });
+
     if (currentPrinter.currentProfile !== null) {
       const keys = Object.keys(currentPrinter.currentProfile);
       for (let t = 0; t < keys.length; t++) {

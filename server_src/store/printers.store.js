@@ -536,7 +536,6 @@ class PrinterStore {
 
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
-    const spool = await Filament.findById(spoolID);
 
     if (SettingsClean.returnFilamentManagerSettings()) {
       this.deattachSpoolFromAllPrinters(spoolID);
@@ -545,17 +544,18 @@ class PrinterStore {
     // Asign new printer id's;
     for (let i = 0; i < printerIDs.length; i++) {
       const id = printerIDs[i];
+      const tool = id.tool;
       const split = id.printer.split("-");
       const printerID = split[0];
-      const tool = id.tool;
       const printerIndex = findIndex(farmPrinters, function (o) {
         return o._id === printerID;
       });
-
-      const updatedSpool = await attachProfileToSpool(spool);
-
-      farmPrinters[printerIndex].selectedFilament[tool] = updatedSpool;
-
+      if (spoolID !== "0") {
+        const spool = await Filament.findById(spoolID);
+        farmPrinters[printerIndex].selectedFilament[tool] = await attachProfileToSpool(spool);
+      } else {
+        farmPrinters[printerIndex].selectedFilament[tool] = null;
+      }
       PrinterService.findOneAndUpdate(printerID, {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
       }).then();
@@ -577,8 +577,10 @@ class PrinterStore {
     );
 
     farmPrintersAssigned.forEach((printer) => {
-      printer.selectedFilament[tool] = null;
-      PrinterService.findOneAndUpdate(printerID, {
+      printer.selectedFilament.forEach((spool) => {
+        spool = null;
+      });
+      PrinterService.findOneAndUpdate(printer._id, {
         selectedFilament: printer.selectedFilament
       }).then();
     });
