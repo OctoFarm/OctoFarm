@@ -3,6 +3,7 @@ const { EventEmitter } = require("events");
 const { ScriptRunner } = require("../runners/scriptCheck");
 const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
+const { moveFolderOnPrinter } = require("../services/octoprint/octoprint-file-manager.service");
 
 const Logger = require("../handlers/logger");
 const _ = require("lodash");
@@ -510,6 +511,25 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return await printer.getSessionkey();
   }
+
+  newFolder() {}
+
+  editFolder() {}
+
+  deleteFolder() {}
+
+  moveFolder(id, oldFolder, newFullPath, folderName) {
+    const printer = this.#findMePrinter(id);
+    return moveFolderOnPrinter(printer, oldFolder, newFullPath, folderName);
+  }
+
+  newFile() {}
+
+  editFile() {}
+
+  deleteFolder() {}
+
+  moveFolder() {}
 }
 
 module.exports = PrinterStore;

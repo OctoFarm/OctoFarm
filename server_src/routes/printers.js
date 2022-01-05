@@ -217,10 +217,10 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   logger.info("Action wake host: ", data);
   await Script.wol(data);
 });
-router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const data = req.body;
-  logger.info("Update filament sorting request: ", data);
-  Runner.updateSortIndex(data);
+  logger.info("Update printer sort indexes: ", data);
+  res.send(getPrinterManagerCache().updatePrinterSortIndexes(data));
 });
 router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let id = req.params.id;

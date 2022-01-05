@@ -7,6 +7,9 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
 const { isEmpty } = require("lodash");
 const _ = require("lodash");
+const Filament = require("../models/Filament");
+const Printers = require("../models/Printer");
+const { FileClean } = require("../lib/dataFunctions/fileClean");
 
 const logger = new Logger("OctoFarm-PrinterManager");
 
@@ -146,14 +149,17 @@ class PrinterManagerService {
     return this.#printerGroupList;
   }
 
-  updatePrinterSortIndexes() {
-    const printerList = getPrinterStoreCache().listPrinters();
-    for (let i = 0; i < printerList.length; i++) {
-      const printer = printerList[i];
-      getPrinterStoreCache().updatePrinterDatabase(printer._id, {
+  updatePrinterSortIndexes(idList) {
+    for (let i = 0; i < idList.length; i++) {
+      const orderedID = idList[i];
+      logger.debug("Updating printers sort index", i);
+      getPrinterStoreCache().updatePrinterLiveValue(orderedID, {
         sortIndex: i
       });
+      // We have to bypass the database object here and go straight to the printer service.
+      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i });
     }
+    return "Regenerated sortIndex for all printers...";
   }
 
   updateGroupList() {
@@ -240,6 +246,37 @@ class PrinterManagerService {
     };
 
     await createNewPrinterBatches(printerList);
+  }
+
+  async updatePrinterFilamentSelections() {
+    const pList = getPrinterStoreCache().listPrintersInformation();
+    for (let i = 0; i < pList.length; i++) {
+      const printer = pList[i];
+      if (Array.isArray(printer.selectedFilament)) {
+        for (let f = 0; f < printer.selectedFilament.length; f++) {
+          if (printer.selectedFilament[f] !== null) {
+            const newInfo = await Filament.findById(printer.selectedFilament[f]._id);
+            printer.selectedFilament[f] = newInfo;
+            const currentFilament = await Runner.compileSelectedFilament(
+              farmPrinters[i].selectedFilament,
+              i
+            );
+            FileClean.generate(farmPrinters[i], currentFilament);
+          }
+        }
+      } else if (farmPrinters[i].selectedFilament != null) {
+        const newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id);
+        const printer = await Printers.findById(farmPrinters[i]._id);
+        farmPrinters[i].selectedFilament = newInfo;
+        printer.selectedFilament = newInfo;
+        printer.save();
+        const currentFilament = await Runner.compileSelectedFilament(
+          farmPrinters[i].selectedFilament,
+          i
+        );
+        FileClean.generate(farmPrinters[i], currentFilament);
+      }
+    }
   }
 }
 
