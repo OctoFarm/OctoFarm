@@ -598,7 +598,10 @@ async function saveSpool(e) {
     document.getElementById(`edit-${id}`).classList.remove("d-none");
   }
 
-  selectFilament(getSelectValues(document.getElementById(`spoolsPrinterAssignment-${id}`)), id);
+  await selectFilament(
+    getSelectValues(document.getElementById(`spoolsPrinterAssignment-${id}`)),
+    id
+  );
   jplist.refresh();
 }
 
@@ -746,18 +749,16 @@ async function selectFilament(spools, id) {
   for (let i = 0; i < spools.length; i++) {
     const meta = spools[i].split("-");
     const printerId = meta[0];
-    printerIds.push(printerId);
-  }
-
-  for (let i = 0; i < spools.length; i++) {
-    const meta = spools[i].split("-");
-    const tool = meta[1];
-    await OctoFarmClient.post("/filament/assign", {
-      printerIds: printerIds,
-      spoolId: id,
-      tool: tool
+    printerIds.push({
+      printer: printerId,
+      tool: meta[1]
     });
   }
+
+  await OctoFarmClient.post("/filament/assign", {
+    printers: printerIds,
+    spoolId: id
+  });
 
   await reRenderPageInformation();
   await updatePrinterDrops();
@@ -909,4 +910,9 @@ element.addEventListener(
   false
 );
 init();
+// $("select option").on("dblclick", function (e) {
+//   this.selected = !this.selected;
+//   e.preventDefault();
+// });
+
 // load();

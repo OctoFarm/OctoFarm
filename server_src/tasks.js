@@ -39,8 +39,7 @@ const HISTORY_CACHE_TASK = async () => {
 };
 
 const FILAMENT_CLEAN_TASK = async () => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  await FilamentClean.start(serverSettings.filamentManager);
+  await FilamentClean.start();
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {

@@ -47,7 +47,8 @@ class FilamentClean {
     return dropDownList;
   }
 
-  static async start(filamentManager) {
+  static async start() {
+    const filamentManager = SettingsClean.returnFilamentManagerSettings();
     const profiles = await Profiles.find({});
     const spools = await Spools.find({});
     const farmPrinters = getPrinterStoreCache().listPrintersInformation();
@@ -95,6 +96,7 @@ class FilamentClean {
       profilesArray,
       selectedFilamentList
     );
+    await FilamentClean.createPrinterList(farmPrinters, filamentManager);
     await FilamentClean.dropDownList(spools, profiles, filamentManager, selectedFilamentList);
     logger.info("Filament information cleaned and ready for consumption...");
   }

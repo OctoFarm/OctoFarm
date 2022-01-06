@@ -36,6 +36,7 @@ const {
   checkIfProfileAttachedToSpool
 } = require("../services/octoprint.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { TaskManager } = require("../runners/task.manager");
 
 router.get("/get/printerList", ensureAuthenticated, (req, res) => {
   const printerList = FilamentClean.returnFilamentList();
@@ -51,12 +52,12 @@ router.get("/get/statistics", ensureAuthenticated, async (req, res) => {
     profiles
   });
 });
-router.get("/get/profile", ensureAuthenticated, async (req, res) => {
-  const profiles = await FilamentClean.getProfiles();
+router.get("/get/profile", ensureAuthenticated, (req, res) => {
+  const profiles = FilamentClean.getProfiles();
   res.send({ profiles });
 });
-router.get("/get/filament", ensureAuthenticated, async (req, res) => {
-  const spools = await FilamentClean.getSpools();
+router.get("/get/filament", ensureAuthenticated, (req, res) => {
+  const spools = FilamentClean.getSpools();
   res.send({ Spool: spools });
 });
 router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
@@ -92,7 +93,7 @@ router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
 //     req.body.spoolId,
 //     req.body.tool
 //   );
-//   FilamentClean.start(filamentManager);
+//   TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
 //   res.send({ status: 200 });
 // });
 router.post("/assign", ensureAuthenticated, async (req, res) => {
@@ -121,7 +122,7 @@ router.post("/assign", ensureAuthenticated, async (req, res) => {
   //   });
   // }
   await getPrinterStoreCache().assignSpoolToPrinters(req.body.printers, req.body.spoolId);
-  // FilamentClean.start(filamentManager);
+  TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   res.send({ status: 200 });
 });
 
@@ -198,7 +199,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     newFilament.save().then(async (e) => {
       logger.info("New Spool saved successfully: ", newFilament);
       await FilamentManagerPlugin.filamentManagerReSync();
-      await FilamentClean.start(filamentManager);
+      await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
       res.send({ res: "success", spools: newFilament, filamentManager });
     });
   }
@@ -244,7 +245,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
     logger.info("Successfully deleted: ", searchId);
     rel.status = 200;
     Spool.find({}).then((spools) => {
-      FilamentClean.start(filamentManager);
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
       res.send({ spool: spools });
     });
   } else {
@@ -252,7 +253,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
     logger.info("Successfully deleted: ", searchId);
     rel.status = 200;
     Spool.find({}).then((spools) => {
-      FilamentClean.start(filamentManager);
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
       res.send({ spool: spools });
     });
   }
@@ -342,7 +343,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
   await Runner.updateFilament();
   Spool.find({}).then((spools) => {
     logger.info("New spool details saved: ", req.body.spool);
-    FilamentClean.start(filamentManager);
+    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     Runner.updateFilament();
     res.send({ spools });
   });
@@ -409,7 +410,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       .save()
       .then(async (e) => {
         logger.info("New profile saved to database, running filament cleaner", e);
-        FilamentClean.start(filamentManager);
+        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
         res.send({ res: error, dataProfile, filamentManager });
       })
       .catch((e) => logger.error(e));
@@ -480,7 +481,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   }
   await profile.save();
   logger.info("Profile saved successfully");
-  FilamentClean.start(filamentManager);
+  TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   Profiles.find({}).then((profiles) => {
     Runner.updateFilament();
     res.send({ profiles });
@@ -525,7 +526,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     logger.info("Deleting from database: ", searchId);
     const rel = await Profiles.deleteOne({ _id: profiles[findID]._id }).exec();
     logger.info("Profile deleted successfully");
-    await FilamentClean.start(filamentManager);
+    await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     rel.status = 200;
     res.send({ profiles });
   } else {
@@ -533,7 +534,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     const rel = await Profiles.deleteOne({ _id: searchId }).exec();
     rel.status = 200;
     logger.info("Profile deleted successfully");
-    await FilamentClean.start(filamentManager);
+    await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     Profiles.find({}).then((profiles) => {
       res.send({ profiles });
     });
@@ -557,7 +558,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   const errors = [];
   const warnings = [];
 
-  const printerList = Runner.returnFarmPrinters();
+  const printerList = getPrinterStoreCache().listPrintersInformation();
   const onlinePrinterList = await getOnlinePrinterList();
 
   if (onlinePrinterList.length !== printerList.length) {

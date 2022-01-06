@@ -268,10 +268,11 @@ class PrinterClean {
   }
 
   static sortTemps(temps) {
-    if (typeof temps !== "undefined") {
-      return temps;
-    }
-    return null;
+    if (!temps) return null;
+    if (temps.length === 0) return null;
+    if (!temps[0]?.tool0) return null;
+
+    return temps;
   }
 
   static grabPrinterName(settingsAppearance, printerURL) {

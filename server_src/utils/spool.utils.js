@@ -298,7 +298,6 @@ function getCost(filamentSelection, units) {
 
 const attachProfileToSpool = async (spool) => {
   let profile = null;
-
   if (SettingsClean.returnFilamentManagerSettings()) {
     profile = await Profiles.findOne({
       "profile.index": spool.spools.profile

@@ -23,7 +23,6 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 export default class PrinterManager {
   static async init(index, printers, printerControlList) {
     //clear camera
-    console.log(index);
     if (index !== "") {
       if (document.getElementById("printerControlCamera")) {
         document.getElementById("printerControlCamera").src = "";

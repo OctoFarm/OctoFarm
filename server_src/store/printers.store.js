@@ -12,6 +12,7 @@ const Filament = require("../models/Filament");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
+const { TaskManager } = require("../runners/task.manager");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -560,7 +561,7 @@ class PrinterStore {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
       }).then();
     }
-
+    TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
     return "Attached all spools";
   }
 
