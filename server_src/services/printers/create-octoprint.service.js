@@ -7,7 +7,7 @@ const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.consta
 const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client.service");
 const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 const PrinterDatabaseService = require("./printer-database.service");
-const { isEmpty, assign } = require("lodash");
+const { isEmpty, assign, findIndex } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
 const {
   acquireWebCamData,
@@ -31,7 +31,8 @@ const { FileClean } = require("../../lib/dataFunctions/fileClean");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../../lib/dataFunctions/printerClean");
 const printerModel = require("../../models/Printer");
-const { attachProfileToSpool } = require("../../utils/spool.utils");
+const _ = require("lodash");
+const PrinterService = require("../printer.service");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -54,6 +55,7 @@ class OctoPrintPrinter {
   timeout = undefined;
   #reconnectTimeout = undefined;
   reconnectingIn = 0;
+  #fileInformationTimeout = {};
   websocketReconnectingIn = 0;
   //Required
   sortIndex = undefined;
@@ -1377,7 +1379,75 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintFilesData(force = false) {
+  async acquireOctoPrintFileData(fullPath) {
+    const filesCheck = await this.#api.getFile(fullPath, true).catch(() => {
+      return false;
+    });
+
+    const globalStatusCode = checkApiStatusResponse(filesCheck);
+
+    if (globalStatusCode === 200) {
+      const fileEntry = await filesCheck.json();
+
+      let timeStat = null;
+      let filament = [];
+      if (typeof fileEntry.gcodeAnalysis !== "undefined") {
+        if (typeof fileEntry.gcodeAnalysis.estimatedPrintTime !== "undefined") {
+          timeStat = fileEntry.gcodeAnalysis.estimatedPrintTime;
+          // Start collecting multiple tool lengths and information from files....
+          Object.keys(fileEntry.gcodeAnalysis.filament).forEach(function (item, i) {
+            filament[i] = fileEntry.gcodeAnalysis.filament[item].length;
+          });
+        } else {
+          timeStat = "No Time Estimate";
+          filament = null;
+        }
+      } else {
+        timeStat = "No Time Estimate";
+        filament = null;
+      }
+      let path = null;
+      if (fileEntry.path.indexOf("/") > -1) {
+        path = fileEntry.path.substr(0, fileEntry.path.lastIndexOf("/"));
+      } else {
+        path = "local";
+      }
+      let thumbnail = null;
+
+      if (typeof fileEntry.thumbnail !== "undefined") {
+        thumbnail = fileEntry.thumbnail;
+      }
+
+      let success = 0;
+      let failed = 0;
+      let last = null;
+
+      if (typeof fileEntry.prints !== "undefined") {
+        success = fileEntry.prints.success;
+        failed = fileEntry.prints.failure;
+        last = fileEntry.prints.last.success;
+      }
+
+      return {
+        path,
+        fullPath: fileEntry.path,
+        display: fileEntry.display,
+        length: filament,
+        name: fileEntry.name,
+        size: fileEntry.size,
+        time: timeStat,
+        date: fileEntry.date,
+        thumbnail,
+        success: success,
+        failed: failed,
+        last: last
+      };
+    } else {
+      return false;
+    }
+  }
+
+  async acquireOctoPrintFilesData(force = false, returnObject = false) {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
     if (!this?.fileList || !this?.storage || force) {
@@ -1406,6 +1476,7 @@ class OctoPrintPrinter {
           total: total
         };
         const { printerFiles, printerLocations } = acquirePrinterFilesAndFolderData(files);
+
         this.#db.update({
           storage: this.storage,
           fileList: {
@@ -1428,7 +1499,20 @@ class OctoPrintPrinter {
         );
         this.#apiPrinterTickerWrap("Acquired file list data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "success", true);
-        return true;
+        if (!returnObject) {
+          return true;
+        } else {
+          return FileClean.generate(
+            {
+              files: printerFiles,
+              filecount: printerFiles.length,
+              folders: printerLocations,
+              folderCount: printerLocations.length
+            },
+            this.selectedFilament,
+            this.costSettings
+          );
+        }
       } else {
         this.#apiPrinterTickerWrap(
           "Failed to acquire file list data",
@@ -1497,6 +1581,80 @@ class OctoPrintPrinter {
 
   deleteFromDataBase() {
     return this.#db.delete();
+  }
+
+  async fileInformationScanAndCheck(file) {
+    const cleanFileName = file.display.replace(".gcode", "");
+    if (this.#fileInformationTimeout[cleanFileName].timer > 15000) {
+      logger.debug("Deleting timeout", cleanFileName);
+      clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
+      delete this.#fileInformationTimeout[cleanFileName];
+      logger.debug("Deleted timeout", cleanFileName);
+    } else {
+      // Try to update file information...
+      const fileInformation = await this.acquireOctoPrintFileData(file.fullPath);
+
+      if (!!fileInformation) {
+        // We have fileInformation returned, check for some update meta data
+        if (fileInformation?.time === null || fileInformation?.time === "No Time Estimate") {
+          // File information is not generated, plz try again!
+          this.#fileInformationTimeout[cleanFileName].timer =
+            this.#fileInformationTimeout[cleanFileName].timer + 5000;
+          logger.info(
+            "Triggering octoprint file scan",
+            this.#fileInformationTimeout[cleanFileName].timer
+          );
+          clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
+          this.#fileInformationTimeout[cleanFileName].timeout = false;
+          this.triggerFileInformationScan(file);
+        } else {
+          // File information is grabbed, sort and update the file information
+          const fileIndex = findIndex(this.fileList.fileList, function (o) {
+            return o.display === fileInformation.display;
+          });
+
+          this.fileList.fileList[fileIndex] = FileClean.generateSingle(
+            fileInformation,
+            this.selectedFilament,
+            this.costSettings
+          );
+
+          logger.debug("Deleting timeout", cleanFileName);
+          clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
+          delete this.#fileInformationTimeout[cleanFileName];
+          logger.debug("Deleted timeout", cleanFileName);
+        }
+      } else {
+        // Call failed, clear and delete the timeout...
+        logger.debug("Call failed due to network issue, deleting timeout...", cleanFileName);
+        clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
+        delete this.#fileInformationTimeout[cleanFileName];
+        logger.debug("Deleted timeout", cleanFileName);
+      }
+    }
+  }
+
+  triggerFileInformationScan(file) {
+    const cleanFileName = file.display.replace(".gcode", "");
+    // No timer exists, create one. If exists, update existing.
+    if (!this?.#fileInformationTimeout[cleanFileName]) {
+      logger.info("Triggering initial scan", cleanFileName);
+      this.#fileInformationTimeout[cleanFileName] = {
+        timer: 0,
+        timeout: setTimeout(async () => {
+          await this.fileInformationScanAndCheck(file);
+        }, 5000)
+      };
+    } else {
+      logger.info("Timeout or file information not met, trigging another scan...", cleanFileName);
+      if (this.#fileInformationTimeout[cleanFileName].timeout === false) {
+        this.#fileInformationTimeout[cleanFileName].timeout = setTimeout(async () => {
+          await this.fileInformationScanAndCheck(file);
+        }, 5000);
+      } else {
+        return "Scan already planned, ignoring extra scan";
+      }
+    }
   }
 }
 

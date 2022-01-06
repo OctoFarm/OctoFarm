@@ -33,8 +33,13 @@ const findOneAndUpdate = (id, obj) => {
     });
 };
 
+const findOneAndPush = (id, pushKey, obj) => {
+  return printerModel.findOneAndUpdate({ _id: id }, { $push: { [pushKey]: obj } }, { new: true });
+};
+
 module.exports = {
   create,
   list,
-  findOneAndUpdate
+  findOneAndUpdate,
+  findOneAndPush
 };

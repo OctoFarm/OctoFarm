@@ -10,10 +10,15 @@ const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("./cache/printer-store.cache");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
+const { getFileUploadQueueCache } = require("./cache/file-upload-queue.cache");
 
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
 };
+
+// const INIT_FILE_UPLOAD_QUEUE = async () => {
+//   getFileUploadQueueCache().actionQueueState();
+// };
 
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
@@ -169,6 +174,7 @@ class OctoFarmTasks {
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS)
+    // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
 

@@ -70,7 +70,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   if (typeof file.fullPath !== "undefined") {
     ret = await Runner.reSyncFile(file.i, file.fullPath);
   } else {
-    ret = await Runner.getFiles(file.i, true, true);
+    ret = await getPrinterStoreCache().resyncFilesList(file.i);
   }
   res.send(ret);
 });
@@ -182,7 +182,7 @@ router.post("/newFolder", ensureAuthenticated, async (req, res) => {
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Adding a new file to server: ", data);
-  res.send({ msg: "success", files: await Runner.newFile(data) });
+  res.send({ msg: "success", files: getPrinterStoreCache().addNewFile(data) });
 });
 router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const data = req.body;

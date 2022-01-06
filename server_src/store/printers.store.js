@@ -13,6 +13,7 @@ const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../runners/task.manager");
+const { FileClean } = require("../lib/dataFunctions/fileClean");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -516,6 +517,11 @@ class PrinterStore {
     return await printer.getSessionkey();
   }
 
+  async resyncFilesList(id) {
+    const printer = this.#findMePrinter(id);
+    return await printer.acquireOctoPrintFilesData(true, true);
+  }
+
   newFolder() {}
 
   editFolder() {}
@@ -527,13 +533,61 @@ class PrinterStore {
     return moveFolderOnPrinter(printer, oldFolder, newFullPath, folderName);
   }
 
-  newFile() {}
+  addNewFile(file) {
+    const { index, files } = file;
+    const printer = this.#findMePrinter(index);
+
+    const date = new Date();
+
+    const { name, path } = files.local;
+
+    let filePath = "";
+    if (path.indexOf("/") > -1) {
+      filePath = path.substr(0, path.lastIndexOf("/"));
+    } else {
+      filePath = "local";
+    }
+    const fileDisplay = name.replace(/_/g, " ");
+    const data = {
+      path: filePath,
+      fullPath: path,
+      display: fileDisplay,
+      length: null,
+      name: name,
+      size: null,
+      time: null,
+      date: date.getTime() / 1000,
+      thumbnail: null,
+      success: 0,
+      failed: 0,
+      last: null
+    };
+    PrinterService.findOneAndPush(index, "fileList.files", data);
+    printer.fileList.fileList.push(
+      FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
+    );
+    // TODO move statistics to run after generate
+    // Trigger file update check service
+    this.triggerOctoPrintFileScan(index, data)
+      .then((res) => {
+        logger.info("File information scan finished", res);
+      })
+      .catch((e) => {
+        logger.error("File information scan errored", e);
+      });
+    return FileClean.generate(printer, printer.selectedFilament);
+  }
+
+  async triggerOctoPrintFileScan(id, file) {
+    const printer = this.#findMePrinter(id);
+    return await printer.triggerFileInformationScan(file);
+  }
 
   editFile() {}
 
   deleteFile() {}
 
-  deleteFolder() {}
+  deleteFile() {}
 
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);

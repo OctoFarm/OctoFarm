@@ -124,6 +124,36 @@ class FileClean {
     };
   }
 
+  static generateSingle(file, selectedFilament, costSettings) {
+    if (!file) {
+      logger.error("Printer File Cleaner failed: farmPrinter:fileList not defined.");
+      return;
+    }
+
+    const printCost = costSettings;
+
+    const sortedFile = {
+      path: file.path,
+      fullPath: file.fullPath,
+      display: file.display,
+      name: file.name,
+      uploadDate: file.date,
+      fileSize: file.size,
+      thumbnail: file.thumbnail,
+      toolUnits: "",
+      toolCosts: "",
+      success: file.success,
+      failed: file.failed,
+      last: file.last,
+      expectedPrintTime: file.time,
+      printCost: getPrintCostNumeric(file.time, printCost)
+    };
+    sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
+    sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
+
+    return sortedFile;
+  }
+
   /**
    * TODO get units of what? Be explicit. Your in a file called FILECLEAN... maybe just maybe the cost of the file!? follow your own god damn rules
    * @param filamentSelection

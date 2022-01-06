@@ -35,8 +35,13 @@ setInterval(async () => {
       FileManager.updateFileList(current.index);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
-      if (fileCounts && fileCounts.innerHTML == 1) {
-        fileCounts.innerHTML = ` ${0}`;
+      console.log(fileCounts.innerHTML);
+      if (fileCounts && fileCounts.innerHTML === "1") {
+        fileCounts.innerHTML = "0";
+      }
+      const uploadsRemaining = document.getElementById("uploadsRemaining");
+      if (uploadsRemaining && uploadsRemaining.innerHTML === "1") {
+        uploadsRemaining.innerHTML = "0";
       }
     }
   }
@@ -46,6 +51,10 @@ setInterval(async () => {
       return n + (up.index == uploads.index);
     }, 0);
     const fileCounts = document.getElementById(`fileCounts-${uploads.index}`);
+    const uploadsRemaining = document.getElementById("uploadsRemaining");
+    if (uploadsRemaining) {
+      uploadsRemaining.innerHTML = `${currentCount}`;
+    }
     if (fileCounts) {
       fileCounts.innerHTML = ` ${currentCount}`;
     }
@@ -259,7 +268,7 @@ export default class FileManager {
     const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id
     });
-
+    console.log(how);
     const flashReturn = function () {
       e.target.classList = "btn btn-success mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";

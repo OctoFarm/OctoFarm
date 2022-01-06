@@ -17,9 +17,16 @@ if (multiUploadBtn) {
 
 class Manager {
   static async init() {
+    // Draw printer list from server
+
+    // Select first printer from printer list
+
+    // Grab file list for that specific printer
+
+    // Render that file list
+
     // Draw printers
     let printers = await OctoFarmClient.listPrinters();
-    console.log(printers);
     // Draw first printer list...
     const filamentDropDown = await returnDropDown();
     const printerList = document.getElementById("printerList");
