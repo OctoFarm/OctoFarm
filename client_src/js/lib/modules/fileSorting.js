@@ -97,7 +97,7 @@ export default class FileSorting {
         sortHeader.innerHTML = '<i class="fas fa-sort-alpha-down"></i> File Name';
         this.saveSort("file", false);
       }
-      FileManager.drawFiles(printer, recursive);
+      FileManager.drawFiles(printer, true);
     }
   }
 

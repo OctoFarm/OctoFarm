@@ -177,7 +177,7 @@ router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("New folder request: ", data);
-  res.send({ msg: "success", files: await Runner.newFolder(data) });
+  res.send({ msg: "success", files: getPrinterStoreCache().addNewFolder(data) });
 });
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;

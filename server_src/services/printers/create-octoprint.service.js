@@ -1626,7 +1626,7 @@ class OctoPrintPrinter {
         }
       } else {
         // Call failed, clear and delete the timeout...
-        logger.debug("Call failed due to network issue, deleting timeout...", cleanFileName);
+        logger.warning("Call failed due to network issue, deleting timeout...", cleanFileName);
         clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
         delete this.#fileInformationTimeout[cleanFileName];
         logger.debug("Deleted timeout", cleanFileName);
@@ -1638,7 +1638,7 @@ class OctoPrintPrinter {
     const cleanFileName = file.display.replace(".gcode", "");
     // No timer exists, create one. If exists, update existing.
     if (!this?.#fileInformationTimeout[cleanFileName]) {
-      logger.info("Triggering initial scan", cleanFileName);
+      logger.warning("Triggering initial scan", cleanFileName);
       this.#fileInformationTimeout[cleanFileName] = {
         timer: 0,
         timeout: setTimeout(async () => {
@@ -1646,7 +1646,10 @@ class OctoPrintPrinter {
         }, 5000)
       };
     } else {
-      logger.info("Timeout or file information not met, trigging another scan...", cleanFileName);
+      logger.warning(
+        "Timeout or file information not met, trigging another scan...",
+        cleanFileName
+      );
       if (this.#fileInformationTimeout[cleanFileName].timeout === false) {
         this.#fileInformationTimeout[cleanFileName].timeout = setTimeout(async () => {
           await this.fileInformationScanAndCheck(file);

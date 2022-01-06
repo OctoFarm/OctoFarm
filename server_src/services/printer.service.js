@@ -34,7 +34,14 @@ const findOneAndUpdate = (id, obj) => {
 };
 
 const findOneAndPush = (id, pushKey, obj) => {
-  return printerModel.findOneAndUpdate({ _id: id }, { $push: { [pushKey]: obj } }, { new: true });
+  return printerModel
+    .findOneAndUpdate({ _id: id }, { $push: { [pushKey]: obj } }, { new: true })
+    .then((res) => {
+      logger.debug("Successfully updated printer database! Key Push: " + pushKey, obj);
+    })
+    .catch((e) => {
+      logger.error("Failed to update printer database!! Key Push: " + pushKey, obj);
+    });
 };
 
 module.exports = {

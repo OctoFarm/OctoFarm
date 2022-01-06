@@ -64,8 +64,8 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-12">
-                                        <small>Printer: </small><br>
-                                        <small>File: </small><br>
+                                        <small>Printer: <span id="uploadsPrinterName"></span></small><br>
+                                        <small>File: <span id="uploadsFileName"></span></small><br>
                                     </div>
 
                                 </div>
@@ -128,16 +128,6 @@
                                 <i class="fas fa-print"></i> Printers
                             </button>
                         </h5>
-                        <button
-                                type="button"
-                                class="btn btn-secondary float-right d-block"
-                                href="#"
-                                aria-expanded="false"
-                                disabled
-                        >
-                            <i id="fileUploadCountSpinner" class="fas fa-spinner"></i></span> <span
-                                    id="fileUploadCount"> File Queue: 0</span>
-                        </button>
                     </div>
                     <div class="card-body fileBody">
                         <div id="printerList" class="list-group">

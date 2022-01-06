@@ -522,17 +522,6 @@ class PrinterStore {
     return await printer.acquireOctoPrintFilesData(true, true);
   }
 
-  newFolder() {}
-
-  editFolder() {}
-
-  deleteFolder() {}
-
-  moveFolder(id, oldFolder, newFullPath, folderName) {
-    const printer = this.#findMePrinter(id);
-    return moveFolderOnPrinter(printer, oldFolder, newFullPath, folderName);
-  }
-
   addNewFile(file) {
     const { index, files } = file;
     const printer = this.#findMePrinter(index);
@@ -542,11 +531,13 @@ class PrinterStore {
     const { name, path } = files.local;
 
     let filePath = "";
+    console.log(path);
     if (path.indexOf("/") > -1) {
       filePath = path.substr(0, path.lastIndexOf("/"));
     } else {
       filePath = "local";
     }
+    console.log(filePath);
     const fileDisplay = name.replace(/_/g, " ");
     const data = {
       path: filePath,
@@ -568,26 +559,49 @@ class PrinterStore {
     );
     // TODO move statistics to run after generate
     // Trigger file update check service
-    this.triggerOctoPrintFileScan(index, data)
-      .then((res) => {
-        logger.info("File information scan finished", res);
-      })
-      .catch((e) => {
-        logger.error("File information scan errored", e);
-      });
-    return FileClean.generate(printer, printer.selectedFilament);
+    this.triggerOctoPrintFileScan(index, data);
+
+    return printer;
   }
 
-  async triggerOctoPrintFileScan(id, file) {
+  addNewFolder(folder) {
+    const { i, foldername } = folder;
+    const printer = this.#findMePrinter(i);
+
+    let path = "local";
+    let name = foldername;
+    if (folder.path !== "") {
+      path = folder.path;
+      name = `${path}/${name}`;
+    }
+    const display = JSON.parse(JSON.stringify(name));
+    name = name.replace(/ /g, "_");
+    const newFolder = {
+      name,
+      path,
+      display
+    };
+    printer.fileList.folderList.push(newFolder);
+    PrinterService.findOneAndPush(i, "fileList.folders", newFolder);
+
+    return printer;
+  }
+
+  deleteFolder() {}
+
+  moveFolder(id, oldFolder, newFullPath, folderName) {
     const printer = this.#findMePrinter(id);
-    return await printer.triggerFileInformationScan(file);
+    return moveFolderOnPrinter(printer, oldFolder, newFullPath, folderName);
   }
 
-  editFile() {}
+  triggerOctoPrintFileScan(id, file) {
+    const printer = this.#findMePrinter(id);
+    return printer.triggerFileInformationScan(file);
+  }
 
   deleteFile() {}
 
-  deleteFile() {}
+  deleteFolder() {}
 
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
@@ -615,7 +629,7 @@ class PrinterStore {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
       }).then();
     }
-    TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
+    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
   }
 
