@@ -7,9 +7,9 @@ import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import {
+  generateTableRows,
   showBulkActionsModal,
   updateBulkActionsProgress,
-  generateTableRows,
   updateTableRow
 } from "../../pages/printer-manager/functions/bulk-actions-progress.functions";
 
@@ -441,7 +441,7 @@ export default class FileManager {
         const file = printer.fileList.fileList[i];
         let currentFolder = document.getElementById("currentFolder")?.innerHTML;
         if (!currentFolder) {
-          // Null-ref is tolerable
+          // Null-ref is tolerable - then why check?
           continue;
         }
         if (currentFolder.includes("local/")) {
@@ -498,24 +498,19 @@ export default class FileManager {
       const fileElem = document.getElementById(`fileList-${printer._id}`);
       if (fileElem) {
         const { fileList } = printer;
-        if (printer.systemChecks.cleaning.file.status === "danger") {
-          fileElem.innerHTML = `
-            <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>Your files are either still scanning or have failed to scan...</h5></div>
-      `;
-        } else {
-          fileElem.innerHTML = "";
-          let currentFolder = document.getElementById("currentFolder").innerHTML;
-          if (currentFolder.includes("local/")) {
-            currentFolder = currentFolder.replace("local/", "");
-          }
+        fileElem.innerHTML = "";
+        let currentFolder = document.getElementById("currentFolder").innerHTML;
+        if (currentFolder.includes("local/")) {
+          currentFolder = currentFolder.replace("local/", "");
+        }
 
-          // Draw sub - folders present in current folder
-          if (fileList.folderList.length > 0) {
-            fileList.folderList.forEach((folder) => {
-              if (folder.path == currentFolder) {
-                fileElem.insertAdjacentHTML(
-                  "beforeend",
-                  `<a
+        // Draw sub - folders present in current folder
+        if (fileList.folderList.length > 0) {
+          fileList.folderList.forEach((folder) => {
+            if (folder.path == currentFolder) {
+              fileElem.insertAdjacentHTML(
+                "beforeend",
+                `<a
               id="file-${folder.name}"
               href="#"
               class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
@@ -543,13 +538,13 @@ export default class FileManager {
                       aria-label="Basic example"
                     >
                       <button id="${printer._id}*folderActionMove*${
-                    folder.name
-                  }" type="button" class="btn btn-warning">
+                  folder.name
+                }" type="button" class="btn btn-warning">
                         <i class="fas fa-people-carry"></i> Move
                       </button>
                       <button id="${printer._id}*folderActionDelete*${
-                    folder.name
-                  }" type="button" class="btn btn-danger">
+                  folder.name
+                }" type="button" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i> Delete
                       </button>
                     </div>
@@ -558,10 +553,9 @@ export default class FileManager {
               </div>
             </a>
             `
-                );
-              }
-            });
-          }
+              );
+            }
+          });
 
           // Filter out files out of current folder scope
           const currentFileList = fileList.fileList.filter(

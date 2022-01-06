@@ -531,9 +531,9 @@ class PrinterStore {
 
   editFile() {}
 
-  deleteFolder() {}
+  deleteFile() {}
 
-  moveFolder() {}
+  deleteFolder() {}
 
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);

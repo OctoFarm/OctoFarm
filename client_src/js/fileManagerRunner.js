@@ -4,7 +4,6 @@ import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
 import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
-import gcodeScript from "./services/gcode-scripts.service";
 
 let lastId = null;
 
@@ -20,7 +19,7 @@ class Manager {
   static async init() {
     // Draw printers
     let printers = await OctoFarmClient.listPrinters();
-
+    console.log(printers);
     // Draw first printer list...
     const filamentDropDown = await returnDropDown();
     const printerList = document.getElementById("printerList");

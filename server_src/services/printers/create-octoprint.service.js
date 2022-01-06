@@ -335,10 +335,10 @@ class OctoPrintPrinter {
     if (!!fileList) {
       this.fileList = FileClean.generate(
         {
-          files: fileList.fileList,
-          filecount: fileList.filecount.length,
-          folders: fileList.folderList,
-          folderCount: fileList.folderCount.length
+          files: fileList.files,
+          filecount: fileList.files.length,
+          folders: fileList.folders,
+          folderCount: fileList.folders.length
         },
         this.selectedFilament,
         this.costSettings
