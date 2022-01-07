@@ -1198,17 +1198,15 @@ export class FileActions {
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
     const btnName = null;
-    refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
+    refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing...';
     const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id,
       fullPath
     });
     if (how) {
-      if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-        await FileSorting.loadSort(printer._id);
-      }
+      await FileSorting.loadSort(printer._id);
     }
-    refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh';
+    refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Re-Sync';
     const flashReturn = function () {
       refreshBtn.classList = "btn btn-dark";
     };

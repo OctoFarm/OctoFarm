@@ -1379,7 +1379,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintFileData(fullPath) {
+  async acquireOctoPrintFileData(fullPath, generate = false) {
     const filesCheck = await this.#api.getFile(fullPath, true).catch(() => {
       return false;
     });
@@ -1427,21 +1427,47 @@ class OctoPrintPrinter {
         failed = fileEntry.prints.failure;
         last = fileEntry.prints.last.success;
       }
+      if (generate) {
+        const fileInformation = {
+          path,
+          fullPath: fileEntry.path,
+          display: fileEntry.display,
+          length: filament,
+          name: fileEntry.name,
+          size: fileEntry.size,
+          time: timeStat,
+          date: fileEntry.date,
+          thumbnail,
+          success: success,
+          failed: failed,
+          last: last
+        };
+        const fileIndex = findIndex(this.fileList.fileList, function (o) {
+          return o.display === fileInformation.display;
+        });
 
-      return {
-        path,
-        fullPath: fileEntry.path,
-        display: fileEntry.display,
-        length: filament,
-        name: fileEntry.name,
-        size: fileEntry.size,
-        time: timeStat,
-        date: fileEntry.date,
-        thumbnail,
-        success: success,
-        failed: failed,
-        last: last
-      };
+        this.fileList.fileList[fileIndex] = FileClean.generateSingle(
+          fileInformation,
+          this.selectedFilament,
+          this.costSettings
+        );
+        return this.fileList.fileList[fileIndex];
+      } else {
+        return {
+          path,
+          fullPath: fileEntry.path,
+          display: fileEntry.display,
+          length: filament,
+          name: fileEntry.name,
+          size: fileEntry.size,
+          time: timeStat,
+          date: fileEntry.date,
+          thumbnail,
+          success: success,
+          failed: failed,
+          last: last
+        };
+      }
     } else {
       return false;
     }

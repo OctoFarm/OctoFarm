@@ -12,6 +12,7 @@ const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../runners/task.manager");
 const { FileClean } = require("../lib/dataFunctions/fileClean");
+const { generate } = require("rxjs");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -518,6 +519,11 @@ class PrinterStore {
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
     return await printer.acquireOctoPrintFilesData(true, true);
+  }
+
+  async resyncFile(id, fullPath) {
+    const printer = this.#findMePrinter(id);
+    return await printer.acquireOctoPrintFileData(fullPath, true);
   }
 
   triggerOctoPrintFileScan(id, file) {

@@ -69,7 +69,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   logger.info("File Re-sync request for: ", file);
   let ret = null;
   if (typeof file.fullPath !== "undefined") {
-    ret = await Runner.reSyncFile(file.i, file.fullPath);
+    ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
   } else {
     ret = await getPrinterStoreCache().resyncFilesList(file.i);
   }
