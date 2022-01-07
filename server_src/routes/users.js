@@ -4,10 +4,11 @@ const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ClientSettings = require("../models/ClientSettings.js");
 const { AppConstants } = require("../app.constants");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const ServerSettingsDB = require("../models/ServerSettings.js");
 
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 const {
   fetchUsers,
@@ -139,6 +140,7 @@ router.post("/register", async (req, res) => {
           }
           const userSettings = new ClientSettings();
           await userSettings.save();
+          await SettingsClean.start();
           const newUser = new User({
             name,
             username,
@@ -155,13 +157,17 @@ router.post("/register", async (req, res) => {
               // Save new User
               newUser
                 .save()
-                .then((user) => {
+                .then(async () => {
+                  const currentSettings = ServerSettingsDB.find({});
+                  currentSettings[0].server.registration = false;
+                  currentSettings[0].markModified("server.registration");
+                  currentSettings[0].save();
+                  await SettingsClean.start();
                   req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
                 .catch((err) => console.log(err))
                 .finally(async () => {
-                  await SettingsClean.start();
                   await fetchUsers(true);
                 });
             })

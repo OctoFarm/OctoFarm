@@ -109,14 +109,17 @@ All notable changes to this project will be documented in this file.
   - Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once. 
   - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your remaining filament.
   - Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup correctly. It will fail to enable if that is so.
-  - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if required. Existing setups unaffected. 
-  - Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows. 
-  - Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the first spool to apply an offset.
-  - Filament Manager can no longer delete spools if attached to printer.
-  - Filament Manager can no longer delete profiles if attached to spool.
-  - Filament Manager totals are now displayed in KG.
-  - Re-enabled the filament manager spool assignment:
-    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or normal left click to select a single.
+- Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if
+  required. Existing setups unaffected.
+- Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows.
+- Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the
+  first spool to apply an offset.
+- Filament Manager can no longer delete spools if attached to printer.
+- Filament Manager can no longer delete profiles if attached to spool.
+- Filament Manager totals are now displayed in KG.
+- Re-enabled the filament manager spool assignment:
+    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or
+      normal left click to select a single.
     - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the
       plugins requirements.
 - Printers with selected spools are now disabled from selection without filament manager plugin.
@@ -141,6 +144,7 @@ All notable changes to this project will be documented in this file.
     - Creates Websocket Client.
     - Attempts to grab optional information from endpoints.
 - Initial scan times changed, all data is now stored in database and will only update on a forced re-scan.
+- Due to the inclusion of User CRUD manager registration is now disabled after creation of first admin user.
 
 ### Removed
 
