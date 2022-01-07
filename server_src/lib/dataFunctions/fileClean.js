@@ -27,9 +27,9 @@ class FileClean {
     const fileLengths = [];
     const fileCount = [];
     const folderCount = [];
-
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
-    farmPrinters.forEach((printer, index) => {
+    for (let p = 0; p < farmPrinters.length; p++) {
+      const printer = farmPrinters[p];
       if (!!printer.storage) {
         const device = {
           ip: printer.printerURL,
@@ -39,21 +39,23 @@ class FileClean {
         devices.push(device);
       }
       if (!!printer.fileList) {
-        printer.fileList.files?.forEach((file) => {
-          if (!isNaN(file.size)) {
-            fileSizes.push(file.size);
+        for (let i = 0; i < printer.fileList.fileList.length; i++) {
+          const file = printer.fileList.fileList[i];
+
+          if (!isNaN(file.fileSize)) {
+            fileSizes.push(file.fileSize);
           }
-          if (!isNaN(file.length)) {
-            fileLengths.push(file.length / 1000);
+          if (!isNaN(file.filamentLength)) {
+            fileLengths.push(file.filamentLength / 1000);
           }
 
           fileCount.push(file);
-        });
-        printer.fileList.folders?.forEach((file) => {
-          folderCount.push(file);
-        });
+        }
+        for (let i = 0; i < printer.fileList.folderList.length; i++) {
+          folderCount.push(printer.fileList.folderList[i]);
+        }
       }
-    });
+    }
 
     const uniqueDevices = _.uniqBy(devices, "printerURL");
     uniqueDevices.forEach((device) => {
@@ -83,6 +85,7 @@ class FileClean {
       fileStatistics.smallestLength = Math.min(...fileLengths);
       fileStatistics.averageLength = fileLengths.reduce((a, b) => a + b, 0) / fileCount.length;
     }
+    return fileStatistics;
   }
 
   static generate(fileList, selectedFilament, costSettings) {
@@ -109,6 +112,7 @@ class FileClean {
           failed: file.failed,
           last: file.last,
           expectedPrintTime: file.time,
+          filamentLength: file.length,
           printCost: getPrintCostNumeric(file.time, printCost)
         };
         sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
@@ -144,6 +148,7 @@ class FileClean {
       failed: file.failed,
       last: file.last,
       expectedPrintTime: file.time,
+      filamentLength: file.length,
       printCost: getPrintCostNumeric(file.time, costSettings)
     };
     sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);

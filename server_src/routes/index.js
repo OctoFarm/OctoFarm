@@ -17,6 +17,7 @@ const ConnectionMonitorService = require("../services/connection-monitor.service
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
+const { TaskManager } = require("../runners/task.manager");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -96,7 +97,7 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 // File Manager Page
 router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-
+  await TaskManager.forceRunTask("GENERATE_FILE_STATISTICS");
   const serverSettings = SettingsClean.returnSystemSettings();
   const currentOperations = PrinterClean.returnCurrentOperations();
   const fileStatistics = FileClean.returnStatistics();

@@ -223,7 +223,6 @@ export default class OctoPrintClient {
         }
       }
     } else {
-      // TODO improve handling
       if (notify) {
         UI.createAlert("error", `${printer.printerName}: ${action} failed`, 3000, "clicked");
       }

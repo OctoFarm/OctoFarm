@@ -1,3 +1,4 @@
+const THIRTY_SECONDS = 30 * 1000;
 const HOUR_MS = 3600 * 1000;
 const DAY_MS = 24 * HOUR_MS;
 const WEEK_MS = 7 * DAY_MS;
@@ -56,6 +57,13 @@ class TASK_PRESETS {
     ...this.PERIODIC,
     logFirstCompletion: true,
     milliseconds: 1000
+  };
+
+  static PERIODIC_IMMEDIATE_30_SECONDS = {
+    ...this.PERIODIC,
+    runImmediately: true,
+    logFirstCompletion: true,
+    milliseconds: THIRTY_SECONDS
   };
 
   static PERIODIC_IMMEDIATE_DAY = {

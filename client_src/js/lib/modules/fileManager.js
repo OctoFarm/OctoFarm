@@ -1179,8 +1179,8 @@ export class FileActions {
     }
   }
 
-  static selectFile(printer, filePath) {
-    OctoPrintClient.file(printer, filePath, "load");
+  static async selectFile(printer, filePath) {
+    await OctoPrintClient.file(printer, filePath, "load", true);
   }
 
   static async updateFile(printer, btn, fullPath) {

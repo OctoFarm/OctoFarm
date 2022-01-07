@@ -38,16 +38,31 @@ All notable changes to this project will be documented in this file.
     - There is a special cut down file list you can bring up that collates all available files on each printer in the group. You may start prints from here. Note: There is no folders and the list may get large. The file name becomes the path to halp see which file is which. Search isn't available yet. 
   - Added a quick setup button for Filament Manager Plugin in System. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
-  - System manager can now view the running OctoFarm tasks.
-  - History now has server side pagination, should reduce resources some and make the history page load snappier. 
-  - Any history data requests are now filtered starting from the first day of the last month. You should see at least 1 months worth of data( when available ) as well as any from the current month.
-  - Filament Manager has some new settings in System -> Server -> Filament Manager:
-    - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
-    - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
-    - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
-  - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it will automatically choose this user to use.
-  - Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections before killing itself.
-  - Added the ability to set the logging level by environment variables. Example: LOG_LEVEL=info. Accepted values=info,debug,verbose 
+- System manager can now view the running OctoFarm tasks.
+- History now has server side pagination, should reduce resources some and make the history page load snappier.
+- Any history data requests are now filtered starting from the first day of the last month. You should see at least 1
+  months worth of data( when available ) as well as any from the current month.
+- Filament Manager has some new settings in System -> Server -> Filament Manager:
+    - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main
+      printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
+    - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to
+      the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
+    - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using
+      OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament
+      manager Plugin).
+- New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it
+  will automatically choose this user to use.
+- Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections
+  before killing itself.
+- Added the ability to set the logging level by environment variables. Example: LOG_LEVEL=info. Accepted
+  values=info,debug,verbose
+- New alerts section on printer manager, moved all the OP updates, and printer issues to here with their own dedicated
+  icon and action button.
+- New button to do a Re-Scan and Forced Re-Scan of OctoPrint's API. This is to update information from OctoPrint ->
+  OctoFarm. Does nothing to your websocket connection.
+- New button to do a websocket reconnect if one is available. It will close the socket and re-open to refresh.
+- New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
+  purposefully closed.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -101,25 +116,39 @@ All notable changes to this project will be documented in this file.
   - Filament Manager can no longer delete profiles if attached to spool.
   - Filament Manager totals are now displayed in KG.
   - Re-enabled the filament manager spool assignment:
-    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or normal left click to select a single. 
-    - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the plugins requirements. 
-  - Printers with selected spools are now disabled from selection without filament manager plugin.
-  - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
-  - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost. All other info is inspectable in the "view" button.
-  - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics Modal, Pagination, Sorting, Range and Filters.
-  - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action. 
-  - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value from OctoPrint which is often wildly inaccurate.
-  - Completely reworked the history UI. 
-  - Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API. 
-  - OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the printer has been scanned online once!
-  - If OctoFarm detects OctoPrint a multiple user setup then it will warn you rather than just producing a stale connection with no indication to what's happening. 
+    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or normal left click to select a single.
+    - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the
+      plugins requirements.
+- Printers with selected spools are now disabled from selection without filament manager plugin.
+- System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
+- Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost.
+  All other info is inspectable in the "view" button.
+- Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics
+  Modal, Pagination, Sorting, Range and Filters.
+- Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action.
+- Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value
+  from OctoPrint which is often wildly inaccurate.
+- Completely reworked the history UI.
+- Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API.
+- OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the
+  printer has been scanned online once!
+- If OctoFarm detects OctoPrint a multiple user setup then it will warn you rather than just producing a stale
+  connection with no indication to what's happening.
+- Decoupled the API and Websocket calls. Printers will now connect in the following manor following fail hard and fast.
+    - Attempt to grab the octoprint version
+    - Attempt to grab both Settings and Users endpoints for initial multi-user setup and global api key checks
+    - Attempts to grab all required information from OctoPrint.
+    - Creates Websocket Client.
+    - Attempts to grab optional information from endpoints.
+- Initial scan times changed, all data is now stored in database and will only update on a forced re-scan.
 
 ### Removed
 
-  - Gulp packages and gulp as bundler
-  - Some bulk actions notification alert
-  - Ping/Pong message on connection log, redundant and ends up flooding the log.
-  - Removed Offline count from Current Operations. Feel it's pointless please open an issue if it's required back.
+- Gulp packages and gulp as bundler
+- Some bulk actions notification alert
+- Ping/Pong message on connection log, redundant and ends up flooding the log.
+- Removed Offline count from Current Operations. Feel it's pointless please open an issue if it's required back.
+- state.js - WOOP HAPPY DAYS! Ripped out and gone for good!
 
 ### Fixed
 
@@ -169,22 +198,29 @@ All notable changes to this project will be documented in this file.
   - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
   - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
   - Fixed changelog been considered a block via parsers.
-  - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
-  - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot if required. 
+  - Fixed the buggy behaviour of the printer swap drop down in Printer Control.
+  - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot
+    if required.
   - Fixed history chart colours for Failed and Cancelled been mixed up.
   - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
   - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
   - Fixed history trying to capture timelapse, thumbnails and influxdb without been enabled...
   - Fixed history not registering spools when cancelled in some situations.
-  - Latest file re-syncs we're not saved to database.
-  - Put an SSE event source re-connect using debounce function. If connections lost, every browser should attempt to reconnect now. Chrome didn't sometimes.
+  - Fixed Latest file re-syncs we're not saved to database.
+  - Fixed Put an SSE event source re-connect using debounce function. If connections lost, every browser should attempt
+    to reconnect now. Chrome didn't sometimes.
   - Fixed an issue where SSE would lose the connection url if server connection lost.
+  - Fixed File manager been an outright bag of crap. Files now load correctly after commands, instantly too.
+  - Fixed Improved the OctoPrint file update grab so it doesn't end up making multiple calls.
+  - Fixed Fix an issue with folders not relecting their state correctly after command in file manager.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.
   - Protected all user CRUD endpoints by ensuring user is Administrator.
   - Protected all Alerts CRUD endpoints by ensuring user is Administrator.
-  - Protected Filament Manager Plugin Enable and Filament Manager Full Resync endpoints by ensuring user is Administrator.
+  - Protected Filament Manager Plugin Enable and Filament Manager Full Resync endpoints by ensuring user is
+    Administrator.
+  - Protected all administrator only actions as additional protection.
   
 ## [v1.1.13-hotfix]
 

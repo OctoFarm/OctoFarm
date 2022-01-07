@@ -4,14 +4,14 @@ const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
-const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
 const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("./cache/printer-store.cache");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
-const { getFileUploadQueueCache } = require("./cache/file-upload-queue.cache");
-
+const { FileClean } = require("./lib/dataFunctions/fileClean");
+const Logger = require("./handlers/logger");
+const logger = new Logger("OctoFarm-TaskManager");
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
 };
@@ -126,6 +126,12 @@ const SSE_DASHBOARD = () => {
   // }
 };
 
+const GENERATE_FILE_STATISTICS = async () => {
+  const pList = getPrinterStoreCache().listPrintersInformation();
+  const stats = FileClean.statistics(pList);
+  logger.debug("File Statistics Run", stats);
+};
+
 const STATE_TRACK_COUNTERS = async () => {
   await getPrinterManagerCache().updateStateCounters();
 };
@@ -173,7 +179,8 @@ class OctoFarmTasks {
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS)
+    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
+    TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
