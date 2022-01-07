@@ -190,6 +190,7 @@ export default class OctoPrintClient {
   static async file(printer, fullPath, action, notify = true) {
     const url = "files/local/" + fullPath;
     let post = null;
+
     if (action === "load") {
       const opt = {
         command: "select",
@@ -199,7 +200,6 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
-      return post.status;
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -212,7 +212,9 @@ export default class OctoPrintClient {
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
     }
-    if (post?.status === 204) {
+    console.log(post?.status);
+    console.log(notify);
+    if (post?.status === 204 || post?.status === 200) {
       if (action === "delete") {
         if (notify) {
           UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");

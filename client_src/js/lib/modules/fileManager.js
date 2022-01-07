@@ -1171,11 +1171,23 @@ export class FileActions {
     const opts = {
       command: "start"
     };
-    let loadFile = await OctoPrintClient.file(printer, filePath, "load");
-    if (loadFile) {
-      OctoPrintClient.jobAction(printer, opts);
+    await OctoPrintClient.file(printer, filePath, "load", false);
+    const ret = await OctoPrintClient.jobAction(printer, opts);
+    if (ret?.status === 200 || ret?.status === 201) {
+      UI.createAlert(
+        "success",
+        `${printer.printerName}: Successfully started printing ${filePath}`
+      );
+    } else if (ret?.status === 409) {
+      UI.createAlert(
+        "warning",
+        `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`
+      );
     } else {
-      UI.createAlert("error", "Could not start file", 3000, "clicked");
+      UI.createAlert(
+        "danger",
+        `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`
+      );
     }
   }
 
