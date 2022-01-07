@@ -308,6 +308,7 @@ export default class FileManager {
   static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
     if (typeof target !== "undefined" && target.type === "button") {
+      await FileSorting.loadSort(printer._id);
       return;
     }
     if (typeof folder !== "undefined") {
@@ -315,18 +316,17 @@ export default class FileManager {
 
       document.getElementById("currentFolder").innerHTML = `local/${folder}`;
       fileBackButtonElement.disabled = false;
-      await FileSorting.loadSort(printer._id);
     } else {
       const currentFolder = document.getElementById("currentFolder").innerHTML;
       if (currentFolder !== "local") {
         const previousFolder = currentFolder.substring(0, currentFolder.lastIndexOf("/"));
         document.getElementById("currentFolder").innerHTML = previousFolder;
         fileBackButtonElement.disabled = previousFolder === "local";
-        await FileSorting.loadSort(printer._id);
       } else {
         fileBackButtonElement.disabled = true;
       }
     }
+    await FileSorting.loadSort(printer._id);
   }
 
   // static async drawFile(file) {
@@ -1265,10 +1265,8 @@ export class FileActions {
               newFullPath: json.path
             };
             UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
-            if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-              await FileSorting.loadSort(printer._id);
-            }
-
+            await OctoFarmClient.post("printers/moveFile", opts);
+            await FileSorting.loadSort(printer._id);
             setTimeout(function () {
               UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
             }, 3000);
@@ -1338,7 +1336,7 @@ export class FileActions {
       inputOptions.push(option);
     });
     bootbox.prompt({
-      title: "Where would you like to move the file?",
+      title: "Where would you like to move the folder?",
       inputType: "select",
       inputOptions,
       async callback(result) {
@@ -1372,10 +1370,8 @@ export class FileActions {
               folderName: json.path
             };
             UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFolder", opts);
-            if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-              await FileSorting.loadSort(printer._id);
-            }
+            await OctoFarmClient.post("printers/moveFolder", opts);
+            await FileSorting.loadSort(printer._id);
             UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
           }
         }

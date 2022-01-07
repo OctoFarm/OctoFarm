@@ -148,7 +148,6 @@ class FileClean {
     };
     sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
     sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
-    console.log(sortedFile);
     return sortedFile;
   }
 

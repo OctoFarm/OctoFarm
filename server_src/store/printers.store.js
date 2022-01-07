@@ -3,7 +3,6 @@ const { EventEmitter } = require("events");
 const { ScriptRunner } = require("../runners/scriptCheck");
 const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
-const { moveFolderOnPrinter } = require("../services/octoprint/octoprint-file-manager.service");
 
 const Logger = require("../handlers/logger");
 const _ = require("lodash");
@@ -522,6 +521,11 @@ class PrinterStore {
     return await printer.acquireOctoPrintFilesData(true, true);
   }
 
+  triggerOctoPrintFileScan(id, file) {
+    const printer = this.#findMePrinter(id);
+    return printer.triggerFileInformationScan(file);
+  }
+
   addNewFile(file) {
     const { index, files } = file;
     const printer = this.#findMePrinter(index);
@@ -591,12 +595,33 @@ class PrinterStore {
 
   moveFolder(id, oldFolder, newFullPath, folderName) {
     const printer = this.#findMePrinter(id);
-    return moveFolderOnPrinter(printer, oldFolder, newFullPath, folderName);
+    const folderIndex = findIndex(printer.fileList.folderList, function (o) {
+      return o.name === oldFolder;
+    });
+    printer.fileList.fileList.forEach((file, index) => {
+      if (file.path === oldFolder) {
+        const fileName = printer.fileList.fileList[index].fullPath.substring(
+          printer.fileList.fileList[index].fullPath.lastIndexOf("/") + 1
+        );
+        printer.fileList.fileList[index].fullPath = `${folderName}/${fileName}`;
+        printer.fileList.fileList[index].path = folderName;
+      }
+    });
+    printer.fileList.folderList[folderIndex].name = folderName;
+    printer.fileList.folderList[folderIndex].path = newFullPath;
+
+    return printer;
   }
 
-  triggerOctoPrintFileScan(id, file) {
+  moveFile(id, newPath, fullPath, filename) {
     const printer = this.#findMePrinter(id);
-    return printer.triggerFileInformationScan(file);
+    const file = _.findIndex(printer.fileList.fileList, function (o) {
+      return o.name === filename;
+    });
+    // farmPrinters[i].fileList.files[file].path = newPath;
+    printer.fileList.fileList[file].path = newPath;
+    printer.fileList.fileList[file].fullPath = fullPath;
+    return printer;
   }
 
   deleteFile() {}
