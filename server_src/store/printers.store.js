@@ -5,7 +5,6 @@ const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
-const _ = require("lodash");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean");
 const Filament = require("../models/Filament");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
@@ -430,7 +429,7 @@ class PrinterStore {
       const fileList = printers[f]?.fileList?.fileList;
       if (fileList) {
         for (let p = 0; p < fileList.length; p++) {
-          const index = _.findIndex(filePathsArray, function (o) {
+          const index = findIndex(filePathsArray, function (o) {
             return o.display == fileList[p].display;
           });
           if (index === -1) {
@@ -471,7 +470,7 @@ class PrinterStore {
       const fileList = currentPrinter?.fileList?.fileList;
       if (fileList) {
         for (let p = 0; p < fileList.length; p++) {
-          const index = _.findIndex(uniqueFilesListFromAllPrinters, function (o) {
+          const index = findIndex(uniqueFilesListFromAllPrinters, function (o) {
             return o.name == fileList[p].name;
           });
           if (index === -1) {
@@ -591,8 +590,6 @@ class PrinterStore {
     return printer;
   }
 
-  deleteFolder() {}
-
   moveFolder(id, oldFolder, newFullPath, folderName) {
     const printer = this.#findMePrinter(id);
     const folderIndex = findIndex(printer.fileList.folderList, function (o) {
@@ -615,7 +612,7 @@ class PrinterStore {
 
   moveFile(id, newPath, fullPath, filename) {
     const printer = this.#findMePrinter(id);
-    const file = _.findIndex(printer.fileList.fileList, function (o) {
+    const file = findIndex(printer.fileList.fileList, function (o) {
       return o.name === filename;
     });
     // farmPrinters[i].fileList.files[file].path = newPath;
@@ -624,9 +621,33 @@ class PrinterStore {
     return printer;
   }
 
-  deleteFile() {}
+  deleteFile(id, fullPath) {
+    const printer = this.#findMePrinter(id);
+    const index = findIndex(printer.fileList.fileList, function (o) {
+      return o.fullPath === fullPath;
+    });
+    printer.fileList.fileList.splice(index, 1);
+    return printer;
+  }
 
-  deleteFolder() {}
+  deleteFolder(id, fullPath) {
+    const printer = this.#findMePrinter(id);
+    printer.fileList.fileList.forEach((file, index) => {
+      if (file.path === fullPath) {
+        printer.fileList.fileList.splice(index, 1);
+      }
+    });
+    printer.fileList.folderList.forEach((folder, index) => {
+      if (folder.path === fullPath) {
+        printer.fileList.folderList.splice(index, 1);
+      }
+    });
+    const folder = findIndex(printer.fileList.folderList, function (o) {
+      return o.name === fullPath;
+    });
+    printer.fileList.folderList.splice(folder, 1);
+    return printer;
+  }
 
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);

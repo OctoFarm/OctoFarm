@@ -52,14 +52,15 @@ router.post("/removefile", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const file = req.body;
   logger.info("File deletion request: ", file.i);
-  await Runner.removeFile(file.i, file.fullPath);
+  console.log(file);
+  getPrinterStoreCache().deleteFile(file.i, file.fullPath);
   res.send("success");
 });
 router.post("/removefolder", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const folder = req.body;
   logger.info("Folder deletion request: ", folder.fullPath);
-  await Runner.deleteFolder(folder.index, folder.fullPath);
+  getPrinterStoreCache().deleteFolder(folder.index, folder.fullPath);
   res.send(true);
 });
 router.post("/resyncFile", ensureAuthenticated, async (req, res) => {

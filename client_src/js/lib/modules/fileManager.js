@@ -1092,14 +1092,8 @@ export class FileActions {
             foldername: result,
             path: currentFolder
           };
-          const update = await OctoFarmClient.post("printers/newFolder", opts);
-          if (
-            document
-              .getElementById("currentPrinter")
-              .innerHTML.replace('<i class="fas fa-print"></i> ', "") === printer.printerName
-          ) {
-            await FileSorting.loadSort(printer._id);
-          }
+          await OctoFarmClient.post("printers/newFolder", opts);
+          await FileSorting.loadSort(printer._id);
           UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
         } else {
           UI.createAlert("error", "Sorry your folder couldn't be saved...", 3000, "clicked");
@@ -1131,10 +1125,8 @@ export class FileActions {
           foldername: folderSplit[f],
           path: octofarmPath
         };
-        const update = await OctoFarmClient.post("printers/newFolder", opts);
-        if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-          await FileSorting.loadSort(post.files);
-        }
+        await OctoFarmClient.post("printers/newFolder", opts);
+        await FileSorting.loadSort(post.files);
         return {
           status: "success",
           message: "Successfully created your missing folder!"
@@ -1290,6 +1282,11 @@ export class FileActions {
       async callback(result) {
         if (result) {
           await OctoPrintClient.file(printer, fullPath, "delete");
+          const opt = {
+            i: printer._id,
+            fullPath
+          };
+          await OctoFarmClient.post("printers/removefile", opt);
           document.getElementById(`file-${fullPath}`).remove();
         }
       }
@@ -1313,8 +1310,8 @@ export class FileActions {
           fullPath
         };
         if (result) {
-          const post = await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
-          const del = await OctoFarmClient.post("printers/removefolder", opts);
+          await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
+          await OctoFarmClient.post("printers/removefolder", opts);
           document.getElementById(`file-${fullPath}`).remove();
         }
       }

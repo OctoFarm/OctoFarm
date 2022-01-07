@@ -214,15 +214,9 @@ export default class OctoPrintClient {
     }
     if (post?.status === 204) {
       if (action === "delete") {
-        const opt = {
-          i: printer,
-          fullPath
-        };
-        const fileDel = await OctoFarmClient.post("printers/removefile", opt);
         if (notify) {
           UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");
         }
-        return fileDel;
       } else {
         if (notify) {
           UI.createAlert("success", `${printer.printerName}: ${action} actioned`, 3000, "clicked");
