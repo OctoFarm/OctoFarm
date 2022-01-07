@@ -3,8 +3,8 @@ import UI from "../../lib/functions/ui";
 import Calc from "../../lib/functions/calc";
 import FileOperations from "../../lib/functions/file";
 import {
-  setupOctoPrintForTimelapses,
-  setupOctoPrintForFilamentManager
+  setupOctoPrintForFilamentManager,
+  setupOctoPrintForTimelapses
 } from "../../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
@@ -13,15 +13,12 @@ import {
   setupFilamentManagerSyncBtn
 } from "../../services/filament-manager-plugin.service";
 import {
+  filamentManagerPluginActionElements,
   returnSaveBtn,
   settingsElements,
-  userActionElements,
-  filamentManagerPluginActionElements
+  userActionElements
 } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
-import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
-
-import ApexCharts from "apexcharts";
 
 let systemChartCPU;
 let systemChartMemory;
@@ -356,75 +353,31 @@ async function grabOctoFarmLogList() {
   });
 }
 
-function renderSystemCharts() {
-  systemChartCPU = new ApexCharts(document.querySelector("#systemChartCPU"), cpuChartOptions);
-  systemChartCPU.render();
-  systemChartMemory = new ApexCharts(
-    document.querySelector("#systemChartMemory"),
-    memoryChartOptions
-  );
-  systemChartMemory.render();
+function renderSystemCharts() {}
+
+async function updateLiveSystemInformation() {
+  const systemInformation = await OctoFarmClient.get("system/info");
+  console.log(systemInformation);
+  const sysUptimeElem = document.getElementById("systemUptime");
+  const procUptimeElem = document.getElementById("processUpdate");
+
+  if (systemInformation?.uptime && !!procUptimeElem) {
+    procUptimeElem.innerHTML = Calc.generateTime(systemInformation.uptime);
+  }
+
+  if (systemInformation?.osUptime && !!sysUptimeElem) {
+    sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
+  }
+
+  const historicCPUUsageGraph = document.getElementById("currentCPUUsage");
+  const historicMemoryUsageGraph = document.getElementById("currentMemoryUsage");
 }
 
-function startUpdateInfoRunner() {
-  setInterval(async function updateStatus() {
-    const systemInformation = await OctoFarmClient.get("system/info");
-
-    const sysUptimeElem = document.getElementById("systemUptime");
-    const procUptimeElem = document.getElementById("processUpdate");
-
-    if (systemInformation.sysUptime?.uptime && !!sysUptimeElem) {
-      sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.sysUptime.uptime);
-    }
-
-    if (systemInformation.processUptime && !!sysUptimeElem) {
-      procUptimeElem.innerHTML = Calc.generateTime(systemInformation.processUptime);
-    }
-
-    const currentProc = systemInformation?.currentProcess;
-    const cpuLoad = systemInformation?.cpuLoad;
-
-    const currentCPULoad = document.getElementById("currentCPUUsage");
-    const currentMemoryLoad = document.getElementById("currentMemoryUsage");
-
-    if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
-      const systemLoad = cpuLoad.currentLoadSystem;
-      const userLoad = cpuLoad.currentLoadUser;
-      const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
-      currentCPULoad.innerHTML = octoLoad.toFixed(10) + "%";
-      const remain = systemLoad + octoLoad + userLoad;
-
-      // labels: ['System', 'OctoFarm', 'User', 'Free'],
-      systemChartCPU.updateSeries([systemLoad, octoLoad, userLoad, 100 - remain]);
-    }
-
-    const memoryInfo = systemInformation?.memoryInfo;
-
-    if (!!memoryInfo) {
-      const systemUsedRAM = memoryInfo.used;
-      const freeRAM = memoryInfo.free;
-
-      if (!!(currentProc?.memRss || currentProc?.mem)) {
-        let octoFarmRAM = currentProc?.memRss * 1000;
-        if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
-          octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
-        }
-        if (Number.isNaN(octoFarmRAM)) {
-          // labels: ['System', 'OctoFarm', 'Free'],
-          systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
-        } else {
-          currentMemoryLoad.innerHTML =
-            ((100 * currentProc?.mem) / memoryInfo.total).toFixed(10) + "%";
-          systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
-        }
-      } else {
-        systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
-      }
-    } else {
-      systemChartMemory.updateSeries([0, 0, 0]);
-    }
-  }, 15000);
+async function startUpdateInfoRunner() {
+  await updateLiveSystemInformation();
+  setInterval(await updateLiveSystemInformation, 5000);
 }
+
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
     const taskManagerState = await OctoFarmClient.get("system/tasks");

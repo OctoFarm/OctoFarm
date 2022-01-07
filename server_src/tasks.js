@@ -54,7 +54,15 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
 };
 
 const SYSTEM_INFO_CHECK_TASK = async () => {
-  await SystemRunner.querySystemInfo();
+  await SystemRunner.initialiseSystemInformation();
+};
+
+const CPU_PROFILING_TASK = async () => {
+  await SystemRunner.profileCPUUsagePercent();
+};
+
+const MEMORY_PROFILING_TASK = async () => {
+  await SystemRunner.profileMemoryUsagePercent();
 };
 
 const GENERATE_MONTHLY_HISTORY_STATS = async () => {
@@ -168,13 +176,15 @@ function TaskStart(task, preset, milliseconds = 0) {
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_5000MS),
+    TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
     TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
-    TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
+    TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),

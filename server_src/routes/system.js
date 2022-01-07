@@ -74,8 +74,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
  */
 router.get("/info", ensureAuthenticated, (req, res) => {
   TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
-  const systemInformation = SystemRunner.returnInfo();
-
+  const systemInformation = SystemRunner.returnInfo(true);
   res.send(systemInformation);
 });
 

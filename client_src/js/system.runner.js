@@ -3,30 +3,29 @@ import Script from "./services/octofarm-scripts.service";
 import ClientSettings from "./pages/system/client-settings";
 import {
   localStorageKeys,
+  returnSaveBtn,
   serverActionsElements,
   serverDatabaseKeys,
-  userActionElements,
-  returnSaveBtn
+  userActionElements
 } from "./pages/system/server.options";
 import {
-  generateLogDumpFile,
-  exportDatabases,
-  nukeDatabases,
-  restartOctoFarmServer,
   checkFilamentManagerPluginState,
-  updateServerSettings,
-  updateOctoFarmCommand,
   checkForOctoFarmUpdates,
-  grabOctoFarmLogList,
-  startUpdateTasksRunner,
-  startUpdateInfoRunner,
-  renderSystemCharts,
   createNewUser,
-  editUser,
   deleteUser,
-  resetUserPassword,
+  editUser,
+  exportDatabases,
   fillInEditInformation,
-  setupOPFilamentManagerPluginSettings
+  generateLogDumpFile,
+  grabOctoFarmLogList,
+  nukeDatabases,
+  resetUserPassword,
+  restartOctoFarmServer,
+  setupOPFilamentManagerPluginSettings,
+  startUpdateInfoRunner,
+  startUpdateTasksRunner,
+  updateOctoFarmCommand,
+  updateServerSettings
 } from "./pages/system/server.actions";
 import { serverBootBoxOptions } from "./pages/system/utils/bootbox.options";
 import { removeLocalStorage } from "./services/local-storage.service";
@@ -69,10 +68,9 @@ if (serverActionsElements.LOG_DUMP_GENERATE) {
   Script.get().then();
 }
 
-renderSystemCharts();
 startUpdateTasksRunner();
-startUpdateInfoRunner();
-ClientSettings.init();
+startUpdateInfoRunner().then();
+ClientSettings.init().then();
 
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
   serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
