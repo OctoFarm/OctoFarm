@@ -5,7 +5,7 @@ import {
   defaultLoadingText,
   defaultTheme
 } from "./chart.options";
-import Calc from "../../lib/functions/calc";
+import Calc from "../../../lib/functions/calc";
 
 export const toFixedTempCelciusFormatter = (value) => {
   return `${value}°C`;

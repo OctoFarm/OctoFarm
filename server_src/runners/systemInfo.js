@@ -2,7 +2,6 @@ const { time, fsSize } = require("systeminformation");
 const os = require("os");
 const process = require("process");
 const Logger = require("../handlers/logger");
-const { bench } = require("../utils/benchmark.util");
 const logger = new Logger("OctoFarm-Server");
 const { farmPiStatus } = require("../services/farmpi-detection.service");
 const { getCPULoadAVG } = require("../services/cpu-profiling.service");
@@ -49,7 +48,7 @@ class SystemRunner {
     }
   }
 
-  static async profileMemoryUsagePercent() {
+  static profileMemoryUsagePercent() {
     const used = process.memoryUsage();
     const total = used.heapUsed + used.external;
     const totalUsed = Math.round((total / 1024 / 1024) * 100) / 100;

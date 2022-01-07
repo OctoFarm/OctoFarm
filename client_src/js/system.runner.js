@@ -19,6 +19,7 @@ import {
   generateLogDumpFile,
   grabOctoFarmLogList,
   nukeDatabases,
+  renderSystemCharts,
   resetUserPassword,
   restartOctoFarmServer,
   setupOPFilamentManagerPluginSettings,
@@ -68,6 +69,7 @@ if (serverActionsElements.LOG_DUMP_GENERATE) {
   Script.get().then();
 }
 
+renderSystemCharts().then();
 startUpdateTasksRunner();
 startUpdateInfoRunner().then();
 ClientSettings.init().then();

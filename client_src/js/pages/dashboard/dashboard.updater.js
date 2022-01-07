@@ -1,4 +1,4 @@
-import Calc from "../lib/functions/calc";
+import Calc from "../../lib/functions/calc";
 import { ChartsManager } from "./charts.manager";
 import { humidityLabel, iaqLabel, pressureLabel, temperatureLabel } from "./utils/chart.utils";
 

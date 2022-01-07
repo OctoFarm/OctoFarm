@@ -61,8 +61,8 @@ const CPU_PROFILING_TASK = async () => {
   await SystemRunner.profileCPUUsagePercent();
 };
 
-const MEMORY_PROFILING_TASK = async () => {
-  await SystemRunner.profileMemoryUsagePercent();
+const MEMORY_PROFILING_TASK = () => {
+  SystemRunner.profileMemoryUsagePercent();
 };
 
 const GENERATE_MONTHLY_HISTORY_STATS = async () => {

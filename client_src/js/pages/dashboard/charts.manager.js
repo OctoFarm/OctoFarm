@@ -1,5 +1,6 @@
 import ApexCharts from "apexcharts";
 import { dashboardOptions } from "./dashboard.options";
+
 const chartIds = {
   hourlyTotalTemperatureChart: "#hourlyTotalTemperatureChart",
   weeklyUtilisationPerDayHeatMap: "#weeklyUtilisationPerDayHeatMap",

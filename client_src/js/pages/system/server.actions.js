@@ -19,9 +19,60 @@ import {
   userActionElements
 } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
+import ApexCharts from "apexcharts";
 
-let systemChartCPU;
-let systemChartMemory;
+let historicUsageGraph;
+
+const options = {
+  series: [],
+  chart: {
+    id: "realtime",
+    height: 300,
+    type: "line",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    },
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "No Data to Display"
+  },
+  stroke: {
+    curve: "smooth"
+  },
+  title: {
+    text: "CPU and Memory Usage (%)",
+    align: "left"
+  },
+  markers: {
+    size: 0
+  },
+  xaxis: {
+    type: "datetime"
+  },
+  yaxis: {
+    max: 100
+  },
+  legend: {
+    show: false
+  }
+};
 
 async function setupOPTimelapseSettings() {
   const printers = await OctoFarmClient.listPrinters();
@@ -353,11 +404,13 @@ async function grabOctoFarmLogList() {
   });
 }
 
-function renderSystemCharts() {}
+async function renderSystemCharts() {
+  historicUsageGraph = new ApexCharts(document.querySelector("#historicUsageGraph"), options);
+  await historicUsageGraph.render();
+}
 
 async function updateLiveSystemInformation() {
   const systemInformation = await OctoFarmClient.get("system/info");
-  console.log(systemInformation);
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
@@ -369,8 +422,17 @@ async function updateLiveSystemInformation() {
     sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
   }
 
-  const historicCPUUsageGraph = document.getElementById("currentCPUUsage");
-  const historicMemoryUsageGraph = document.getElementById("currentMemoryUsage");
+  const dataSeriesForCharts = [
+    {
+      name: "Desktops",
+      data: systemInformation.memoryLoadHistory
+    },
+    {
+      name: "LAPTOPS",
+      data: systemInformation.cpuLoadHistory
+    }
+  ];
+  await historicUsageGraph.updateSeries(dataSeriesForCharts);
 }
 
 async function startUpdateInfoRunner() {
