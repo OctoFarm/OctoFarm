@@ -130,8 +130,6 @@ class FileClean {
       return;
     }
 
-    const printCost = costSettings;
-
     const sortedFile = {
       path: file.path,
       fullPath: file.fullPath,
@@ -146,11 +144,11 @@ class FileClean {
       failed: file.failed,
       last: file.last,
       expectedPrintTime: file.time,
-      printCost: getPrintCostNumeric(file.time, printCost)
+      printCost: getPrintCostNumeric(file.time, costSettings)
     };
     sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
     sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
-
+    console.log(sortedFile);
     return sortedFile;
   }
 

@@ -31,14 +31,9 @@ setInterval(async () => {
       file = JSON.parse(file);
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
-      const post = await OctoFarmClient.post("printers/newFiles", file);
-      if (post) {
-        if (document.getElementById("currentPrinter").innerHTML === post.files.printerName) {
-          FileSorting.loadSort(post.files);
-        }
-      }
-
       fileUploads.remove();
+      await OctoFarmClient.post("printers/newFiles", file);
+      await FileSorting.loadSort(current.index);
       const uploadsRemaining = document.getElementById("uploadsRemaining");
       if (uploadsRemaining) {
         uploadsRemaining.innerHTML = `${fileUploads.size()}`;
@@ -103,7 +98,7 @@ export default class FileManager {
     const uploadsSpinnerIcon = document.getElementById("uploadsSpinnerIcon");
     const uploadsRemaining = document.getElementById("uploadsRemaining");
     if (uploadsRemaining) {
-      uploadsRemaining.innerHTML = fileUploads.size();
+      uploadsRemaining.innerHTML = `${uploadSize}`;
     }
 
     if (uploadsSpinnerIcon) {
@@ -233,7 +228,6 @@ export default class FileManager {
           uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner'></i>";
         } else {
           fileUploads.remove();
-
           resolve(xhr.response);
           UI.createAlert(
             "error",
@@ -266,25 +260,25 @@ export default class FileManager {
     });
   }
 
-  static actionBtnGate(printer, btn) {
+  static async actionBtnGate(printer, btn) {
     const data = btn.split("*");
     const action = data[1];
     const filePath = data[2];
     if (action === "fileActionStart") {
-      FileActions.startPrint(printer, filePath);
+      await FileActions.startPrint(printer, filePath);
     } else if (action === "fileActionSelect") {
-      FileActions.selectFile(printer, filePath);
+      await FileActions.selectFile(printer, filePath);
     } else if (action === "fileActionUpdate") {
-      FileActions.updateFile(printer, btn, filePath);
+      await FileActions.updateFile(printer, btn, filePath);
     } else if (action === "fileActionMove") {
-      FileActions.moveFile(printer, filePath);
+      await FileActions.moveFile(printer, filePath);
     } else if (action === "fileActionDownload") {
     } else if (action === "fileActionDelete") {
-      FileActions.deleteFile(printer, filePath);
+      await FileActions.deleteFile(printer, filePath);
     } else if (action === "folderActionMove") {
-      FileActions.moveFolder(printer, filePath);
+      await FileActions.moveFolder(printer, filePath);
     } else if (action === "folderActionDelete") {
-      FileActions.deleteFolder(printer, filePath);
+      await FileActions.deleteFolder(printer, filePath);
     }
   }
 
@@ -308,12 +302,11 @@ export default class FileManager {
     }
 
     printer.fileList = how;
-    FileSorting.loadSort(printer);
+    await FileSorting.loadSort(printer._id);
   }
 
   static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
-
     if (typeof target !== "undefined" && target.type === "button") {
       return;
     }
@@ -322,14 +315,14 @@ export default class FileManager {
 
       document.getElementById("currentFolder").innerHTML = `local/${folder}`;
       fileBackButtonElement.disabled = false;
-      await FileSorting.loadSort(printer);
+      await FileSorting.loadSort(printer._id);
     } else {
       const currentFolder = document.getElementById("currentFolder").innerHTML;
       if (currentFolder !== "local") {
         const previousFolder = currentFolder.substring(0, currentFolder.lastIndexOf("/"));
         document.getElementById("currentFolder").innerHTML = previousFolder;
         fileBackButtonElement.disabled = previousFolder === "local";
-        await FileSorting.loadSort(printer);
+        await FileSorting.loadSort(printer._id);
       } else {
         fileBackButtonElement.disabled = true;
       }
@@ -759,12 +752,12 @@ export default class FileManager {
     }
   }
 
-  static search(id) {
-    FileActions.search(id);
+  static async search(id) {
+    await FileActions.search(id);
   }
 
-  static createFolder(printer) {
-    FileActions.createFolder(printer);
+  static async createFolder(printer) {
+    await FileActions.createFolder(printer);
   }
 
   static updateListeners(printer) {
@@ -773,22 +766,24 @@ export default class FileManager {
     const folders = document.querySelectorAll(".folderAction");
     folders.forEach((folder) => {
       folder.addEventListener("click", async (e) => {
-        // Remove from UI
-        await FileManager.openFolder(folder.id, e.target, printer);
+        const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
+        await FileManager.openFolder(folder.id, e.target, updatedPrinter);
       });
     });
     const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
     fileActionBtns.forEach((btn) => {
       // Gate Keeper listener for file action buttons
       btn.addEventListener("click", async (e) => {
-        await FileManager.actionBtnGate(printer, btn.id);
+        const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
+        await FileManager.actionBtnGate(updatedPrinter, btn.id);
       });
     });
     const folderActionBtns = document.querySelectorAll("[id*='*folderAction']");
     folderActionBtns.forEach((btn) => {
       // Gate Keeper listener for file action buttons
       btn.addEventListener("click", async (e) => {
-        await FileManager.actionBtnGate(printer, btn.id);
+        const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
+        await FileManager.actionBtnGate(updatedPrinter, btn.id);
       });
     });
   }
@@ -1054,11 +1049,11 @@ export class FileActions {
     if (input === "") {
       // No search term so reset view
       document.getElementById("currentFolder").value = "local/";
-      FileSorting.loadSort(printer);
+      await FileSorting.loadSort(printer._id);
       //FileManager.drawFiles(printer, "Recursive");
     } else {
       document.getElementById("currentFolder").value = "local/";
-      FileSorting.loadSort(printer, "recursive");
+      await FileSorting.loadSort(printer._id, "recursive");
       //FileManager.drawFiles(printer, "Recursive");
     }
     if (fileList) {
@@ -1098,14 +1093,12 @@ export class FileActions {
             path: currentFolder
           };
           const update = await OctoFarmClient.post("printers/newFolder", opts);
-          if (update) {
-            if (
-              document
-                .getElementById("currentPrinter")
-                .innerHTML.replace('<i class="fas fa-print"></i> ', "") === printer.printerName
-            ) {
-              FileSorting.loadSort(update.files);
-            }
+          if (
+            document
+              .getElementById("currentPrinter")
+              .innerHTML.replace('<i class="fas fa-print"></i> ', "") === printer.printerName
+          ) {
+            await FileSorting.loadSort(printer._id);
           }
           UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
         } else {
@@ -1139,10 +1132,8 @@ export class FileActions {
           path: octofarmPath
         };
         const update = await OctoFarmClient.post("printers/newFolder", opts);
-        if (update) {
-          if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-            FileSorting.loadSort(post.files);
-          }
+        if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
+          await FileSorting.loadSort(post.files);
         }
         return {
           status: "success",
@@ -1210,7 +1201,7 @@ export class FileActions {
     });
     if (how) {
       if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-        FileSorting.loadSort(how);
+        await FileSorting.loadSort(printer._id);
       }
     }
     refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh';
@@ -1274,12 +1265,10 @@ export class FileActions {
               newFullPath: json.path
             };
             UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFile", opts);
-            if (updateFarm) {
-              if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-                FileSorting.loadSort(updateFarm.files);
-              }
+            if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
+              await FileSorting.loadSort(printer._id);
             }
+
             setTimeout(function () {
               UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
             }, 3000);
@@ -1384,10 +1373,8 @@ export class FileActions {
             };
             UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
             const updateFarm = await OctoFarmClient.post("printers/moveFolder", opts);
-            if (updateFarm) {
-              if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
-                FileSorting.loadSort(updateFarm.files);
-              }
+            if (document.getElementById("currentPrinter").innerHTML === printer.printerName) {
+              await FileSorting.loadSort(printer._id);
             }
             UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
           }

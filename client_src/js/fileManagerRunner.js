@@ -126,7 +126,6 @@ class Manager {
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
         firstElement.innerHTML = `<i class="fas fa-print"></i> ${printer.printerName}`;
-        FileSorting.loadSort(printer);
         Manager.updatePrinterList(printer._id);
       }
     });
@@ -203,7 +202,7 @@ class Manager {
 
     let printer = await OctoFarmClient.getPrinter(id);
 
-    FileSorting.loadSort(printer);
+    await FileSorting.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
       '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
     const fileButtons = {
@@ -238,17 +237,17 @@ class Manager {
     fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
       FileManager.search(printer._id);
     });
-    fileButtons.fileManager.uploadPrintFile.addEventListener("change", function () {
-      FileManager.handleFiles(this.files, printer, "print");
+    fileButtons.fileManager.uploadPrintFile.addEventListener("change", async function () {
+      await FileManager.handleFiles(this.files, printer, "print");
     });
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
-    fileButtons.fileManager.back.addEventListener("click", (e) => {
-      FileManager.openFolder(undefined, undefined, printer);
+    fileButtons.fileManager.back.addEventListener("click", async (e) => {
+      await FileManager.openFolder(undefined, undefined, printer);
     });
-    fileButtons.fileManager.syncFiles.addEventListener("click", (e) => {
-      FileManager.reSyncFiles(e, printer);
+    fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
+      await FileManager.reSyncFiles(e, printer);
     });
   }
 }

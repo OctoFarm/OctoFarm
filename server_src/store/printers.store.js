@@ -531,13 +531,13 @@ class PrinterStore {
     const { name, path } = files.local;
 
     let filePath = "";
-    console.log(path);
+
     if (path.indexOf("/") > -1) {
       filePath = path.substr(0, path.lastIndexOf("/"));
     } else {
       filePath = "local";
     }
-    console.log(filePath);
+
     const fileDisplay = name.replace(/_/g, " ");
     const data = {
       path: filePath,
