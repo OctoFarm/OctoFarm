@@ -51,7 +51,7 @@ const options = {
     mode: "dark"
   },
   noData: {
-    text: "No Data to Display"
+    text: "Loading Data..."
   },
   stroke: {
     curve: "smooth"
@@ -70,7 +70,50 @@ const options = {
     max: 100
   },
   legend: {
-    show: false
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: "bottom",
+    horizontalAlign: "center",
+    floating: false,
+    fontSize: "14px",
+    fontFamily: "Helvetica, Arial",
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    customLegendItems: [],
+    offsetX: 0,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false
+    },
+    markers: {
+      width: 12,
+      height: 12,
+      strokeWidth: 0,
+      strokeColor: "#fff",
+      fillColors: undefined,
+      radius: 12,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0
+    },
+    itemMargin: {
+      horizontal: 5,
+      vertical: 0
+    },
+    onItemClick: {
+      toggleDataSeries: true
+    },
+    onItemHover: {
+      highlightDataSeries: true
+    }
   }
 };
 
@@ -421,18 +464,26 @@ async function updateLiveSystemInformation() {
   if (systemInformation?.osUptime && !!sysUptimeElem) {
     sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
   }
-
-  const dataSeriesForCharts = [
-    {
-      name: "Desktops",
-      data: systemInformation.memoryLoadHistory
-    },
-    {
-      name: "LAPTOPS",
-      data: systemInformation.cpuLoadHistory
-    }
-  ];
-  await historicUsageGraph.updateSeries(dataSeriesForCharts);
+  if (systemInformation.memoryLoadHistory.length > 5) {
+    const dataSeriesForCharts = [
+      {
+        name: "Memory",
+        data: systemInformation.memoryLoadHistory
+      },
+      {
+        name: "CPU",
+        data: systemInformation.cpuLoadHistory
+      }
+    ];
+    await historicUsageGraph.updateSeries(dataSeriesForCharts);
+  } else {
+    const options = {
+      noData: {
+        text: "No data to display yet!"
+      }
+    };
+    await historicUsageGraph.updateOptions(options);
+  }
 }
 
 async function startUpdateInfoRunner() {
