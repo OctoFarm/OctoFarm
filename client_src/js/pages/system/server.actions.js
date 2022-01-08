@@ -22,6 +22,8 @@ import { serverBootBoxOptions } from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";
 
 let historicUsageGraph;
+let cpuUsageDonut;
+let memoryUsageDonut;
 
 const options = {
   series: [],
@@ -57,7 +59,7 @@ const options = {
     curve: "smooth"
   },
   title: {
-    text: "CPU and Memory Usage (%)",
+    text: "CPU and Memory Usage History",
     align: "left"
   },
   markers: {
@@ -115,6 +117,50 @@ const options = {
       highlightDataSeries: true
     }
   }
+};
+const cpuOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    }
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "Loading Data..."
+  },
+  series: [],
+  labels: ["CPU Usage"]
+};
+const memoryOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    }
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "Loading Data..."
+  },
+  series: [],
+  labels: ["Memory Usage"]
 };
 
 async function setupOPTimelapseSettings() {
@@ -450,9 +496,18 @@ async function grabOctoFarmLogList() {
 async function renderSystemCharts() {
   historicUsageGraph = new ApexCharts(document.querySelector("#historicUsageGraph"), options);
   await historicUsageGraph.render();
+  cpuUsageDonut = new ApexCharts(document.querySelector("#cpuUsageDonut"), cpuOptions);
+  await cpuUsageDonut.render();
+  memoryUsageDonut = new ApexCharts(document.querySelector("#memoryUsageDonut"), memoryOptions);
+  await memoryUsageDonut.render();
 }
 
 async function updateLiveSystemInformation() {
+  const options = {
+    noData: {
+      text: "No data to display yet!"
+    }
+  };
   const systemInformation = await OctoFarmClient.get("system/info");
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
@@ -464,6 +519,23 @@ async function updateLiveSystemInformation() {
   if (systemInformation?.osUptime && !!sysUptimeElem) {
     sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
   }
+
+  if (systemInformation.memoryLoadHistory.length > 0) {
+    await memoryUsageDonut.updateSeries([
+      systemInformation.memoryLoadHistory[systemInformation.memoryLoadHistory.length - 1].y
+    ]);
+  } else {
+    await historicUsageGraph.updateOptions(options);
+  }
+
+  if (systemInformation.cpuLoadHistory) {
+    await cpuUsageDonut.updateSeries([
+      systemInformation.cpuLoadHistory[systemInformation.cpuLoadHistory.length - 1].y
+    ]);
+  } else {
+    await historicUsageGraph.updateOptions(options);
+  }
+
   if (systemInformation.memoryLoadHistory.length > 5) {
     const dataSeriesForCharts = [
       {
@@ -477,11 +549,6 @@ async function updateLiveSystemInformation() {
     ];
     await historicUsageGraph.updateSeries(dataSeriesForCharts);
   } else {
-    const options = {
-      noData: {
-        text: "No data to display yet!"
-      }
-    };
     await historicUsageGraph.updateOptions(options);
   }
 }

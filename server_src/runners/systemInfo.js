@@ -52,6 +52,7 @@ class SystemRunner {
     const used = process.memoryUsage();
     const total = used.heapUsed + used.external;
     const totalUsed = Math.round((total / 1024 / 1024) * 100) / 100;
+
     if (systemInfo.totalMemory !== 0) {
       const totalSystemMemoryInMB = Math.round((systemInfo.totalMemory / 1024 / 1024) * 100) / 100;
       const memoryPercent = Math.round((100 * totalUsed) / totalSystemMemoryInMB) / 100;

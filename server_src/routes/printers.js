@@ -79,18 +79,21 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
+  // getPrinterStoreCache().updateStepRate()
   Runner.stepRate(step.printer, step.newSteps);
   res.send("success");
 });
 router.post("/flowChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
+  //getPrinterStoreCache().updateFlowRate()
   Runner.flowRate(step.printer, step.newSteps);
   res.send("success");
 });
 router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
+  //getPrinterStoreCache().updateFeedRate()
   Runner.feedRate(step.printer, step.newSteps);
   res.send("success");
 });
@@ -98,20 +101,11 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
   // Check required fields
   const settings = req.body;
   logger.info("Update printers request: ", settings);
+  // //getPrinterStoreCache().updatePrinterSettings()
   const updateSettings = await Runner.updateSettings(settings);
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
-router.post(
-  "/killPowerSettings/:id",
-  ensureAuthenticated,
-  ensureAdministrator,
-  async (req, res) => {
-    // Check required fields
-    const printerID = req.params.id;
-    const updateSettings = await Runner.killPowerSettings(printerID);
-    res.send({ updateSettings });
-  }
-);
+
 router.get("/groups", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
@@ -185,12 +179,6 @@ router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Adding a new file to server: ", data);
   res.send({ msg: "success", files: getPrinterStoreCache().addNewFile(data) });
-});
-router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
-  const data = req.body;
-  logger.info("Change filament request: ", data);
-  const roll = await Runner.selectedFilament(data);
-  res.send({ msg: roll });
 });
 router.post("/reSyncAPI", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const id = req.body.id;
