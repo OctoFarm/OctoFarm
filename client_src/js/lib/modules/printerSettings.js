@@ -71,6 +71,8 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     // Setup Save Settings button
     await PrinterSettings.setupSaveButton(currentPrinter);
 
+    UI.addSelectListeners("ps");
+
     // Remove any loadng elements left over
     Object.values(pageElements.menu).map((e) => {
       UI.removeLoaderFromElementInnerHTML(e);
@@ -566,7 +568,7 @@ class PrinterSettings {
          <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
         <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
         <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
-        <button id="resetPowerFields" title="The dev coded himself into a corner here... Use this button to reset the below commands to blank." type="button" class="btn btn-danger mb-2">Reset Fields</button>
+        
         <h6>Power On</h6>
          <div class="form-row">
             <div class="col-4">
@@ -657,10 +659,6 @@ class PrinterSettings {
       document.getElementById("psPowerStateURL").placeholder =
         currentPrinter.powerSettings.powerStatusURL;
     }
-    document.getElementById("resetPowerFields").addEventListener("click", async () => {
-      await OctoFarmClient.post("printers/killPowerSettings/" + currentPrinter?._id);
-      UI.createAlert("success", "Successfully cleared Power Settings", 3000, "clicked");
-    });
   }
 
   static async setupAlertsTab(currentPrinter) {
@@ -925,55 +923,68 @@ class PrinterSettings {
 
   static getPageValues(currentPrinter) {
     let newPrinterSettingsValues = {
-      state: currentPrinter.printerState.colour.category,
       printer: {
-        printerName: document.getElementById("psPrinterName").value,
-        printerURL: document.getElementById("psPrinterURL").value,
-        webSocketProtocol: document.getElementById("psWebSocketProtocol").value,
+        printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
+        printerURL: UI.getValueOrPlaceHolder(document.getElementById("psPrinterURL")),
+        webSocketProtocol: UI.getValueOrPlaceHolder(document.getElementById("psWebSocketProtocol")),
         index: currentPrinter._id,
-        cameraURL: document.getElementById("psCamURL").value,
-        apikey: document.getElementById("psAPIKEY").value,
-        currentUser: document.getElementById("psOctoPrintUser").value
+        cameraURL: UI.getValueOrPlaceHolder(document.getElementById("psCamURL")),
+        apikey: UI.getValueOrPlaceHolder(document.getElementById("psAPIKEY")),
+        currentUser: UI.getValueOrPlaceHolder(document.getElementById("psOctoPrintUser"))
       },
       connection: {
-        preferredPort: document.getElementById("psDefaultSerialPort").value,
-        preferredBaud: document.getElementById("psDefaultBaudrate").value,
-        preferredProfile: document.getElementById("psDefaultProfile").value
+        preferredPort: UI.getValueOrPlaceHolder(document.getElementById("psDefaultSerialPort")),
+        preferredBaud: UI.getValueOrPlaceHolder(document.getElementById("psDefaultBaudrate")),
+        preferredProfile: UI.getValueOrPlaceHolder(document.getElementById("psDefaultProfile"))
       },
       systemCommands: {
-        serverRestart: document.getElementById("psServerRestart").value,
-        systemRestart: document.getElementById("psSystemRestart").value,
-        systemShutdown: document.getElementById("psSystemShutdown").value
+        serverRestart: UI.getValueOrPlaceHolder(document.getElementById("psServerRestart")),
+        systemRestart: UI.getValueOrPlaceHolder(document.getElementById("psSystemRestart")),
+        systemShutdown: UI.getValueOrPlaceHolder(document.getElementById("psSystemShutdown"))
       },
       powerCommands: {
-        powerOnCommand: document.getElementById("psPowerOnCommand").value,
-        powerOnURL: document.getElementById("psPowerOnURL").value,
-        powerOffCommand: document.getElementById("psPowerOffCommand").value,
-        powerOffURL: document.getElementById("psPowerOffURL").value,
-        powerToggleCommand: document.getElementById("psPowerToggleCommand").value,
-        powerToggleURL: document.getElementById("psPowerToggleURL").value,
-        powerStatusCommand: document.getElementById("psPowerStateCommand").value,
-        powerStatusURL: document.getElementById("psPowerStateURL").value,
+        powerOnCommand: UI.getValueOrPlaceHolder(document.getElementById("psPowerOnCommand")),
+        powerOnURL: UI.getValueOrPlaceHolder(document.getElementById("psPowerOnURL")),
+        powerOffCommand: UI.getValueOrPlaceHolder(document.getElementById("psPowerOffCommand")),
+        powerOffURL: UI.getValueOrPlaceHolder(document.getElementById("psPowerOffURL")),
+        powerToggleCommand: UI.getValueOrPlaceHolder(
+          document.getElementById("psPowerToggleCommand")
+        ),
+        powerToggleURL: UI.getValueOrPlaceHolder(document.getElementById("psPowerToggleURL")),
+        powerStatusCommand: UI.getValueOrPlaceHolder(
+          document.getElementById("psPowerStateCommand")
+        ),
+        powerStatusURL: UI.getValueOrPlaceHolder(document.getElementById("psPowerStateURL")),
         wol: {
           enabled: document.getElementById("psWolEnable").checked,
-          ip: document.getElementById("psWolIP").value,
-          port: document.getElementById("psWolPort").value,
-          interval: document.getElementById("psWolInterval").value,
-          packets: document.getElementById("psWolCount").value,
-          MAC: document.getElementById("psWolMAC").value
+          ip: UI.getValueOrPlaceHolder(document.getElementById("psWolIP")),
+          port: UI.getValueOrPlaceHolder(document.getElementById("psWolPort")),
+          interval: UI.getValueOrPlaceHolder(document.getElementById("psWolInterval")),
+          packets: UI.getValueOrPlaceHolder(document.getElementById("psWolCount")),
+          MAC: UI.getValueOrPlaceHolder(document.getElementById("psWolMAC"))
         }
       },
       costSettings: {
-        powerConsumption: parseFloat(document.getElementById("psPowerConsumption").value),
-        electricityCosts: parseFloat(document.getElementById("psElectricityCosts").value),
-        purchasePrice: parseFloat(document.getElementById("psPurchasePrice").value),
-        estimateLifespan: parseFloat(document.getElementById("psEstimatedLifespan").value),
-        maintenanceCosts: parseFloat(document.getElementById("psMaintenanceCosts").value)
+        powerConsumption: parseFloat(
+          UI.getValueOrPlaceHolder(document.getElementById("psPowerConsumption"))
+        ),
+        electricityCosts: parseFloat(
+          UI.getValueOrPlaceHolder(document.getElementById("psElectricityCosts"))
+        ),
+        purchasePrice: parseFloat(
+          UI.getValueOrPlaceHolder(document.getElementById("psPurchasePrice"))
+        ),
+        estimateLifespan: parseFloat(
+          UI.getValueOrPlaceHolder(document.getElementById("psEstimatedLifespan"))
+        ),
+        maintenanceCosts: parseFloat(
+          UI.getValueOrPlaceHolder(document.getElementById("psMaintenanceCosts"))
+        )
       }
     };
     if (printerOnline) {
-      let printerName = document.getElementById("psProfileName").value;
-      let printerModel = document.getElementById("psPrinterModel").value;
+      let printerName = UI.getValueOrPlaceHolder(document.getElementById("psProfileName"));
+      let printerModel = UI.getValueOrPlaceHolder(document.getElementById("psPrinterModel"));
       if (printerName === "") {
         printerName = null;
       }
@@ -983,51 +994,69 @@ class PrinterSettings {
       newPrinterSettingsValues.profileID = currentPrinter.currentProfile.id;
       newPrinterSettingsValues.profile = {
         name: printerName,
-        color: "default",
         model: printerModel,
         volume: {
-          formFactor: document.getElementById("extruderFormFactor").value,
-          width: parseInt(document.getElementById("psVolumeWidth").value),
-          depth: parseInt(document.getElementById("psVolumeDepth").value),
-          height: parseInt(document.getElementById("psVolumeHeight").value)
+          formFactor: UI.getValueOrPlaceHolder(document.getElementById("extruderFormFactor")),
+          width: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psVolumeWidth"))),
+          depth: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psVolumeDepth"))),
+          height: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psVolumeHeight")))
         },
         heatedBed: document.getElementById("psHeatedBed").checked,
         heatedChamber: document.getElementById("psHeatedChamber").checked,
         axes: {
           x: {
-            speed: parseInt(document.getElementById("psPrinterXAxis").value),
+            speed: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psPrinterXAxis"))),
             inverted: document.getElementById("psXInverted").checked
           },
           y: {
-            speed: parseInt(document.getElementById("psPrinterYAxis").value),
+            speed: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psPrinterYAxis"))),
             inverted: document.getElementById("psYInverted").checked
           },
           z: {
-            speed: parseInt(document.getElementById("psPrinterZAxis").value),
+            speed: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psPrinterZAxis"))),
             inverted: document.getElementById("psZInverted").checked
           },
           e: {
-            speed: parseInt(document.getElementById("psPrinterEAxis").value),
+            speed: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psPrinterEAxis"))),
             inverted: document.getElementById("psEInverted").checked
           }
         },
         extruder: {
-          count: parseInt(document.getElementById("psExtruderCount").value),
-          nozzleDiameter: parseFloat(document.getElementById("psNozzleDiameter").value),
+          count: parseInt(UI.getValueOrPlaceHolder(document.getElementById("psExtruderCount"))),
+          nozzleDiameter: parseFloat(
+            UI.getValueOrPlaceHolder(document.getElementById("psNozzleDiameter"))
+          ),
           sharedNozzle: document.getElementById("psSharedNozzle").checked
         }
       };
       newPrinterSettingsValues.gcode = {
-        afterPrintCancelled: document.getElementById("psSettingsAfterPrinterCancelled").value,
-        afterPrintDone: document.getElementById("psSettingsAfterPrinterDone").value,
-        afterPrintPaused: document.getElementById("psSettingsAfterPrinterPaused").value,
-        afterPrinterConnected: document.getElementById("psSettingsAfterPrinterConnected").value,
-        afterToolChange: document.getElementById("psSettingsAfterToolChange").value,
-        beforePrintResumed: document.getElementById("psSettingsBeforePrinterResumed").value,
-        beforePrintStarted: document.getElementById("psSettingsBeforePrinterStarted").value,
-        beforePrinterDisconnected: document.getElementById("psSettingsBeforePrinterDisconnected")
-          .value,
-        beforeToolChange: document.getElementById("psSettingsBeforeToolChange").value
+        afterPrintCancelled: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsAfterPrinterCancelled")
+        ),
+        afterPrintDone: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsAfterPrinterDone")
+        ),
+        afterPrintPaused: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsAfterPrinterPaused")
+        ),
+        afterPrinterConnected: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsAfterPrinterConnected")
+        ),
+        afterToolChange: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsAfterToolChange")
+        ),
+        beforePrintResumed: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsBeforePrinterResumed")
+        ),
+        beforePrintStarted: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsBeforePrinterStarted")
+        ),
+        beforePrinterDisconnected: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsBeforePrinterDisconnected")
+        ),
+        beforeToolChange: UI.getValueOrPlaceHolder(
+          document.getElementById("psSettingsBeforeToolChange")
+        )
       };
       newPrinterSettingsValues.other = {
         enableCamera: document.getElementById("camEnabled").checked,
@@ -1035,8 +1064,8 @@ class PrinterSettings {
         flipHCamera: document.getElementById("camFlipH").checked,
         flipVCamera: document.getElementById("camFlipV").checked,
         enableTimeLapse: document.getElementById("camTimelapse").checked,
-        heatingVariation: document.getElementById("psHeatingVariation").value,
-        coolDown: document.getElementById("psCoolDown").value
+        heatingVariation: UI.getValueOrPlaceHolder(document.getElementById("psHeatingVariation")),
+        coolDown: UI.getValueOrPlaceHolder(document.getElementById("psCoolDown"))
       };
     }
     return newPrinterSettingsValues;

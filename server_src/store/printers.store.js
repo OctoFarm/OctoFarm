@@ -422,6 +422,10 @@ class PrinterStore {
     };
   }
 
+  async updatePrinterSettings(settings) {
+    console.log(settings);
+  }
+
   resetPrintersSocketConnections(idList) {
     idList.forEach((id) => {
       const printer = this.#findMePrinter(id);
@@ -730,6 +734,19 @@ class PrinterStore {
         selectedFilament: printer.selectedFilament
       }).then();
     });
+  }
+
+  updateStepRate(id, stepRate) {
+    const printer = this.#findMePrinter(id);
+    printer.stepRate = stepRate;
+  }
+
+  updateFeedRate(id, feedRate) {
+    this.updatePrinterDatabase(id, { feedRate: feedRate });
+  }
+
+  updateFlowRate(id, flowRate) {
+    this.updatePrinterDatabase(id, { flowRate: flowRate });
   }
 }
 

@@ -79,38 +79,34 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
-  // getPrinterStoreCache().updateStepRate()
-  Runner.stepRate(step.printer, step.newSteps);
+  getPrinterStoreCache().updateStepRate(step.printer, step.newSteps);
   res.send("success");
 });
 router.post("/flowChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
-  //getPrinterStoreCache().updateFlowRate()
-  Runner.flowRate(step.printer, step.newSteps);
+  getPrinterStoreCache().updateFlowRate(step.printer, step.newSteps);
   res.send("success");
 });
 router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
-  //getPrinterStoreCache().updateFeedRate()
-  Runner.feedRate(step.printer, step.newSteps);
+  getPrinterStoreCache().updateFeedRate(step.printer, step.newSteps);
   res.send("success");
 });
 router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Check required fields
   const settings = req.body;
   logger.info("Update printers request: ", settings);
-  // //getPrinterStoreCache().updatePrinterSettings()
-  const updateSettings = await Runner.updateSettings(settings);
-  res.send({ status: updateSettings.status, printer: updateSettings.printer });
+  const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
+  res.send({});
 });
 
-router.get("/groups", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+router.get("/groups", ensureAuthenticated, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
   for (let i = 0; i < printers.length; i++) {
-    await groups.push({
+    groups.push({
       _id: printers[i]._id,
       group: printers[i].group
     });

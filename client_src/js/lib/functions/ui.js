@@ -94,16 +94,18 @@ export default class UI {
   static addSelectListeners(elementValue) {
     let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
     inputBoxes.forEach((input) => {
-      input.addEventListener("focus", (e) => {
-        if (input.value !== input.placeholder) {
-          input.value = input.placeholder;
-        }
-      });
-      input.addEventListener("focusout", (e) => {
-        if (input.value !== input.placeholder) {
-          input.placeholder = input.value;
-        }
-      });
+      if (input.localName === "input") {
+        input.addEventListener("focus", (e) => {
+          if (input.value !== input.placeholder) {
+            input.value = input.placeholder;
+          }
+        });
+        input.addEventListener("focusout", (e) => {
+          if (input.value !== input.placeholder) {
+            input.placeholder = input.value;
+          }
+        });
+      }
     });
   }
   //TODO: Move to a templates folder
@@ -301,6 +303,18 @@ export default class UI {
       e.target.innerHTML = '<i class="fas fa-running"></i> Enabled';
       e.target.title = "Printer is Enabled, click to disable";
       printerCard.classList = "";
+    }
+  }
+
+  static getValueOrPlaceHolder(element) {
+    if (element) {
+      if (element.value === "") {
+        return undefined;
+      } else {
+        return element.value;
+      }
+    } else {
+      return undefined;
     }
   }
 }
