@@ -11,6 +11,7 @@
                         <i class="fas fa-print"></i> Printer Manager
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Manage</h6>
                         <a class="dropdown-item" title="Add Printer to your Farm"
                            id="addPrinterBtn"
                            href="#"
@@ -20,6 +21,7 @@
                         <a class="dropdown-item" title="Delete Printers from your farm"
                            id="deletePrintersBtn"
                            data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash"></i> Delete</a>
+                        <h6 class="dropdown-header">Actions</h6>
                         <label>
                             <input class="fileElem"
                                    type="file"
@@ -36,6 +38,28 @@
                            title="Add printers by scanning your network for online OctoPrint instances."
                            id="scanNetworkBtn">
                             <i class="fas fa-wifi"></i> Scan
+                        </a>
+                        <h6 class="dropdown-header">Printer Commands</h6>
+                        <a class="dropdown-item"
+                           title="Add printers by scanning your network for online OctoPrint instances."
+                           id="bulkConnectBtn"
+                           aria-expanded="false"
+                           data-toggle="modal" data-target="#printerSelectModal">
+                            <i class="fas fa-link"></i> Connect
+                        </a>
+                        <a class="dropdown-item"
+                           title="Add printers by scanning your network for online OctoPrint instances."
+                           id="bulkDisconnectBtn"
+                           aria-expanded="false"
+                           data-toggle="modal" data-target="#printerSelectModal">
+                            <i class="fas fa-unlink"></i> Disconnect
+                        </a>
+                        <a class="dropdown-item"
+                           title="Add printers by scanning your network for online OctoPrint instances."
+                           id="bulkPowerBtn">
+                            <i class="fas fa-power-off"
+                               aria-expanded="false"
+                               data-toggle="modal" data-target="#printerSelectModal"></i> Power
                         </a>
                     </div>
                 </div>

@@ -1,10 +1,13 @@
 import { createClientSSEWorker } from "./services/client-worker.service";
 import PrinterSelect from "./lib/modules/printerSelect";
 import {
+  bulkConnectPrinters,
+  bulkDisconnectPrinters,
+  bulkEnableVirtualPrinter,
   bulkOctoPrintClientUpdate,
-  bulkOctoPrintPluginUpdate,
   bulkOctoPrintPluginAction,
-  bulkEnableVirtualPrinter
+  bulkOctoPrintPluginUpdate,
+  bulkOctoPrintPowerCommand
 } from "./pages/printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
@@ -13,12 +16,12 @@ import {
   deleteAllOnAddPrinterTable,
   exportPrintersToJson,
   importPrintersFromJsonFile,
-  saveAllOnAddPrinterTable,
-  scanNetworkForDevices,
-  workerEventFunction,
   loadPrinterHealthChecks,
   reSyncAPI,
-  reSyncWebsockets
+  reSyncWebsockets,
+  saveAllOnAddPrinterTable,
+  scanNetworkForDevices,
+  workerEventFunction
 } from "./pages/printer-manager/functions/printer-manager.functions";
 
 import { setupSortablePrintersTable } from "./pages/printer-manager/functions/sortable-table";
@@ -161,6 +164,34 @@ saveAllBtn.addEventListener("click", async (e) => {
 const printerHealthCheckBtn = document.getElementById("printerHealthCheckBtn");
 printerHealthCheckBtn.addEventListener("click", async (e) => {
   await loadPrinterHealthChecks();
+});
+
+const bulkConnectBtn = document.getElementById("bulkConnectBtn");
+bulkConnectBtn.addEventListener("click", async (e) => {
+  await PrinterSelect.create(
+    multiPrintersSection,
+    false,
+    "Connect Printers",
+    await bulkConnectPrinters
+  );
+});
+const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
+bulkDisconnectBtn.addEventListener("click", async (e) => {
+  await PrinterSelect.create(
+    multiPrintersSection,
+    false,
+    "Disconnect Printers",
+    await bulkDisconnectPrinters
+  );
+});
+const bulkPowerBtn = document.getElementById("bulkPowerBtn");
+bulkPowerBtn.addEventListener("click", async (e) => {
+  await PrinterSelect.create(
+    multiPrintersSection,
+    false,
+    "Power On/Off Printers",
+    await bulkOctoPrintPowerCommand
+  );
 });
 
 createClientSSEWorker(workerURL, workerEventFunction);

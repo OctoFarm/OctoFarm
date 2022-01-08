@@ -575,14 +575,15 @@ export function addHealthCheckListeners(check) {
     "This will not affect the normal operation of OctoFarm but you won't be able to use the quick connect functionality. ";
   const profileFix =
     "Either save the values in OctoPrint and do a forced Re-Scan of your API, or use OctoFarm printer settings modal to update both.";
-  if (!check.connectionChecks.baud || true) {
+
+  if (!check.connectionChecks.baud) {
     document.getElementById(E.BAUD + pClean).addEventListener("click", () => {
       returnBootBox("OctoFarm has no saved baud rate it's aware of.", profileFix, profileWarning);
     });
   }
 
-  if (check.connectionChecks.port || true) {
-    document.getElementById(E.PPROFILE + pClean).addEventListener("click", () => {
+  if (!check.connectionChecks.port) {
+    document.getElementById(E.PORT + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm has no saved printer port it's aware of.",
         profileFix,
@@ -591,7 +592,7 @@ export function addHealthCheckListeners(check) {
     });
   }
 
-  if (check.connectionChecks.profile || true) {
+  if (!check.connectionChecks.profile) {
     document.getElementById(E.PPROFILE + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm has no saved printer profile it's aware of.",
@@ -601,7 +602,7 @@ export function addHealthCheckListeners(check) {
     });
   }
 
-  if (check.profileChecks || true) {
+  if (!check.profileChecks) {
     document.getElementById(E.PROFILE_CHECK + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm has no save Printer profile from OctoPrint.",
@@ -612,7 +613,7 @@ export function addHealthCheckListeners(check) {
     });
   }
 
-  if (check.webcamChecks.camSetup || true) {
+  if (check.webcamChecks.camSetup) {
     document.getElementById(E.WEBCAM + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your webcam settings from OctoPrint do not match your values in OctoFarm.",
@@ -623,7 +624,7 @@ export function addHealthCheckListeners(check) {
   }
 
   const { ffmpegPath, ffmpegVideoCodex, timelapseEnabled } = check.webcamChecks.historySetup;
-  if (ffmpegPath || true) {
+  if (ffmpegPath) {
     document.getElementById(E.H_FFMPEG + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got an FFMPEG path setup and your settings in history are utilising the timelapse functionality.",
@@ -632,7 +633,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (ffmpegVideoCodex || true) {
+  if (ffmpegVideoCodex) {
     document.getElementById(E.H_CODEC + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the correct codec setup and your settings in history are utilising the timelapse functionality.",
@@ -641,7 +642,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (timelapseEnabled || true) {
+  if (timelapseEnabled) {
     document.getElementById(E.H_TIMELAPSE + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the timelapse functionality enabled and your settings in history are utilising the timelapse functionality.",
