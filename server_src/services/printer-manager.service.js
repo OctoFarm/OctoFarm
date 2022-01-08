@@ -38,9 +38,9 @@ class PrinterManagerService {
 
   async addPrinter(printer) {
     await patchPrinterValues(printer);
-    const returnPrinter = await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
+    await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
     return {
-      printerURL: returnPrinter.printerURL
+      printerURL: printer.printerURL
     };
   }
 
@@ -52,7 +52,7 @@ class PrinterManagerService {
       for (let i = 0; i < printerLength; i += 10) {
         const requests = printer.slice(i, i + 10).map((printer) => {
           // The batch size is 100. We are processing in a set of 100 users.
-          return getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
+          return this.addPrinter(printer);
         });
 
         // requests will have 100 or less pending promises.
@@ -150,16 +150,18 @@ class PrinterManagerService {
   }
 
   updatePrinterSortIndexes(idList) {
-    for (let i = 0; i < idList.length; i++) {
-      const orderedID = idList[i];
-      logger.debug("Updating printers sort index", i);
-      getPrinterStoreCache().updatePrinterLiveValue(orderedID, {
-        sortIndex: i
-      });
-      // We have to bypass the database object here and go straight to the printer service.
-      PrinterService.findOneAndUpdate(orderedID, { sortIndex: i }).then();
+    if (!!idList) {
+      for (let i = 0; i < idList.length; i++) {
+        const orderedID = idList[i];
+        logger.debug("Updating printers sort index", i);
+        getPrinterStoreCache().updatePrinterLiveValue(orderedID, {
+          sortIndex: i
+        });
+        // We have to bypass the database object here and go straight to the printer service.
+        PrinterService.findOneAndUpdate(orderedID, { sortIndex: i }).then();
+      }
+      return "Regenerated sortIndex for all printers...";
     }
-    return "Regenerated sortIndex for all printers...";
   }
 
   updateGroupList() {

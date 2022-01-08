@@ -17,6 +17,7 @@ const { Script } = require("../lib/serverScripts.js");
 const _ = require("lodash");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
+const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -25,7 +26,7 @@ router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) =
   logger.info("Update printers request: ", printers);
   const p = await getPrinterManagerCache().addPrinter(printers);
   // Return printers added...
-  res.send({ printersAdded: p, status: 200 });
+  res.send({ printersAdded: [p], status: 200 });
 });
 
 router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
@@ -230,18 +231,17 @@ router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, asyn
 
   res.send(connectionLogs);
 });
-router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
+router.get("/pluginList", ensureAuthenticated, async (req, res) => {
   let id = req.params.id;
 
-  if (id !== "all") {
-    logger.info("Grabbing plugin list for: ", id);
-    let pluginList = await Runner.returnPluginList(id);
-    res.send(pluginList);
-  } else {
-    logger.info("Grabbing global plugin list");
-    let pluginList = await Runner.returnPluginList();
-    res.send(pluginList);
-  }
+  logger.info("Grabbing global plugin list");
+  res.send(getPluginList());
+});
+router.get("/pluginNoticesList", ensureAuthenticated, async (req, res) => {
+  let id = req.params.id;
+
+  logger.info("Grabbing global plugin notices list");
+  res.send(getPluginNoticesList());
 });
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const { searchForDevicesOnNetwork } = require("../../server_src/runners/autoDiscovery.js");

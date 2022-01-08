@@ -267,7 +267,11 @@ class PrinterClean {
   static grabPrinterName(settingsAppearance, printerURL) {
     const randomisedName = generateRandomName();
     if (!!settingsAppearance) {
-      if (settingsAppearance.name === "" || settingsAppearance.name === null) {
+      if (
+        settingsAppearance.name === "" ||
+        settingsAppearance.name === null ||
+        settingsAppearance.name === " "
+      ) {
         return randomisedName ? randomisedName : printerURL;
       } else {
         return settingsAppearance.name;

@@ -29,29 +29,6 @@ const acquireWebCamData = (currentURL, printerURL, streamURL) => {
   }
 };
 
-/**
- * Function to convert octoprints camera data to usable stream
- * @param oldAppearance
- * @param newAppearance
- * @returns {object}
- */
-const acquirePrinterNameData = (oldAppearance, newAppearance) => {
-  // Check if user left blank, grab from OctoPrint... dis-regard if not blank
-  console.log(oldAppearance.name);
-  if (oldAppearance?.name === "" || oldAppearance?.name === " ") {
-    oldAppearance.name = newAppearance.name;
-    oldAppearance.color = newAppearance.color;
-    oldAppearance.colorIcon = newAppearance.colorIcon;
-  } else {
-    if (newAppearance.name !== "" || newAppearance.name !== " ") {
-      oldAppearance.name = newAppearance.name;
-    } else {
-      oldAppearance = newAppearance;
-    }
-  }
-  return oldAppearance;
-};
-
 const acquirePrinterFilesAndFolderData = function (fileList) {
   const printerFiles = [];
   const printerLocations = [];
@@ -157,6 +134,5 @@ const acquirePrinterFilesAndFolderData = function (fileList) {
 
 module.exports = {
   acquireWebCamData,
-  acquirePrinterNameData,
   acquirePrinterFilesAndFolderData
 };

@@ -14,36 +14,33 @@ import {
   updateOctoPrintClient
 } from "../../../octoprint/octoprint-client-commands";
 import {
-  printerPreHeatBed,
-  printerPreHeatTool,
-  printerPreHeatChamber,
-  printerStartPrint,
+  printerHomeAxis,
+  printerMoveAxis,
   printerPausePrint,
+  printerPreHeatBed,
+  printerPreHeatChamber,
+  printerPreHeatTool,
   printerRestartPrint,
   printerResumePrint,
-  printerStopPrint,
-  printerMoveAxis,
-  printerHomeAxis,
-  printerSendGcode
+  printerSendGcode,
+  printerStartPrint,
+  printerStopPrint
 } from "../../../octoprint/octoprint-printer-commands";
-import {
-  setupOctoPrintForFilamentManager,
-  setupOctoPrintForVirtualPrinter
-} from "../../../octoprint/octoprint-settings.actions";
+import { setupOctoPrintForVirtualPrinter } from "../../../octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
 import {
+  generateTableRows,
   showBulkActionsModal,
   updateBulkActionsProgress,
-  generateTableRows,
   updateTableRow
 } from "./bulk-actions-progress.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../../lib/modules/clientQueue.js";
 import OctoPrintClient from "../../../lib/octoprint";
-import { filamentManagerPluginActionElements } from "../../system/server.options";
+
 const fileUploads = new Queue();
 
 let selectedFolder = "";
@@ -1042,15 +1039,8 @@ export async function bulkOctoPrintPluginAction(action) {
   const printersForPluginAction = await getCurrentlySelectedPrinterList();
   try {
     let pluginList = [];
-    let printerPluginList = null;
-    if (action === "install") {
-      printerPluginList = await OctoFarmClient.get(
-        "printers/pluginList/" + printersForPluginAction[0]._id
-      );
-    } else {
-      printerPluginList = await OctoFarmClient.get("printers/pluginList/all");
-    }
-    printerPluginList.forEach((plugin) => {
+    const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
+    pluginRepositoryList.forEach((plugin) => {
       if (action === "install") {
         pluginList.push({
           text: returnPluginListTemplate(plugin),
@@ -1063,14 +1053,12 @@ export async function bulkOctoPrintPluginAction(action) {
         });
       }
     });
+    console.log(pluginList);
     pluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
       }
     ]);
-    pluginList = _.uniqBy(pluginList, function (e) {
-      return e.text;
-    });
 
     //Install Promt
     bootbox.prompt({

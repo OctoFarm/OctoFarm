@@ -11,7 +11,6 @@ const { isEmpty, assign, findIndex } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
 const {
   acquireWebCamData,
-  acquirePrinterNameData,
   acquirePrinterFilesAndFolderData
 } = require("../octoprint/utils/printer-data.utils");
 const {
@@ -159,6 +158,7 @@ class OctoPrintPrinter {
     this.webSocketURL = printer.webSocketURL;
     this.camURL = printer.camURL;
     this.category = printer.category;
+    this.group = printer.group;
     this.settingsAppearance = printer.settingsAppearance;
     if (!!printer?._id) {
       this.#updatePrinterRecordsFromDatabase(printer);
@@ -315,9 +315,6 @@ class OctoPrintPrinter {
     }
     if (!!core) {
       this.core = core;
-    }
-    if (!!settingsAppearance) {
-      this.settingsAppearance = settingsAppearance;
     }
     if (!!disabled) {
       this.disabled = disabled;
@@ -684,11 +681,7 @@ class OctoPrintPrinter {
 
     // If printer ID doesn't exist, we need to create the database record
     if (!this?._id) {
-      this.settingsAppearance.name = PrinterClean.grabPrinterName(
-        this.settingsAppearance,
-        this.printerURL
-      );
-      this.printerName = this.settingsAppearance.name;
+      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
       const newPrinter = new printerModel(this);
       this._id = newPrinter._id.toString();
       await newPrinter
@@ -717,6 +710,7 @@ class OctoPrintPrinter {
       this.#db.update({
         disabled: this.disabled,
         sortIndex: this.sortIndex,
+        group: this.group,
         apikey: this.apikey,
         printerURL: this.printerURL,
         webSocketURL: this.webSocketURL,
@@ -790,7 +784,6 @@ class OctoPrintPrinter {
 
     return await Promise.allSettled([
       this.acquireOctoPrintSystemInfoData(force),
-      this.acquireOctoPrintPluginsListData(force),
       this.acquireOctoPrintUpdatesData(force),
       this.acquireOctoPrintFilesData(force),
       this.acquireOctoPrintPiPluginData(force)
@@ -1180,7 +1173,6 @@ class OctoPrintPrinter {
 
         //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
         if (!force) {
-          this.settingsAppearance = acquirePrinterNameData(this.settingsAppearance, appearance);
           this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
           this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
           this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
@@ -1274,41 +1266,41 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintPluginsListData(force = true) {
-    if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
-    this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
-    if (!this.pluginsList || this.pluginsList.length === 0 || force) {
-      this.pluginsList = [];
-      const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
-        return false;
-      });
-      const globalStatusCode = checkApiStatusResponse(pluginList);
-
-      if (globalStatusCode === 200) {
-        const { repository } = await pluginList.json();
-        this.pluginsList = repository.plugins;
-        this.#db.update({
-          pluginsList: repository.plugins
-        });
-        this.#apiPrinterTickerWrap("Acquired plugin lists data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
-        return true;
-      } else {
-        this.#apiPrinterTickerWrap(
-          "Failed to acquire plugin lists data",
-          "Offline",
-          "Error Code: " + globalStatusCode
-        );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
-        return globalStatusCode;
-      }
-    } else {
-      this.#apiPrinterTickerWrap("Plugin lists data acquired previously... skipped!", "Complete");
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success");
-      return true;
-    }
-  }
+  // async acquireOctoPrintPluginsListData(force = true) {
+  //   if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+  //   this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
+  //   this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
+  //   if (!this.pluginsList || this.pluginsList.length === 0 || force) {
+  //     this.pluginsList = [];
+  //     const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
+  //       return false;
+  //     });
+  //     const globalStatusCode = checkApiStatusResponse(pluginList);
+  //
+  //     if (globalStatusCode === 200) {
+  //       const { repository } = await pluginList.json();
+  //       // this.pluginsList = repository.plugins;
+  //       // this.#db.update({
+  //       //   pluginsList: repository.plugins
+  //       // });
+  //       this.#apiPrinterTickerWrap("Acquired plugin lists data!", "Complete");
+  //       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
+  //       return true;
+  //     } else {
+  //       this.#apiPrinterTickerWrap(
+  //         "Failed to acquire plugin lists data",
+  //         "Offline",
+  //         "Error Code: " + globalStatusCode
+  //       );
+  //       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
+  //       return globalStatusCode;
+  //     }
+  //   } else {
+  //     this.#apiPrinterTickerWrap("Plugin lists data acquired previously... skipped!", "Complete");
+  //     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success");
+  //     return true;
+  //   }
+  // }
 
   async acquireOctoPrintUpdatesData(force = false) {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
@@ -1614,7 +1606,7 @@ class OctoPrintPrinter {
     if (this.#fileInformationTimeout[cleanFileName].timer > 15000) {
       logger.debug("Deleting timeout", cleanFileName);
       clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-      delete this.#fileInformationTimeout[cleanFileName];
+      this.#fileInformationTimeout[cleanFileName] = undefined;
       logger.debug("Deleted timeout", cleanFileName);
     } else {
       // Try to update file information...
@@ -1647,14 +1639,14 @@ class OctoPrintPrinter {
 
           logger.debug("Deleting timeout", cleanFileName);
           clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-          delete this.#fileInformationTimeout[cleanFileName];
+          this.#fileInformationTimeout[cleanFileName] = undefined;
           logger.debug("Deleted timeout", cleanFileName);
         }
       } else {
         // Call failed, clear and delete the timeout...
         logger.warning("Call failed due to network issue, deleting timeout...", cleanFileName);
         clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-        delete this.#fileInformationTimeout[cleanFileName];
+        this.#fileInformationTimeout[cleanFileName] = undefined;
         logger.debug("Deleted timeout", cleanFileName);
       }
     }

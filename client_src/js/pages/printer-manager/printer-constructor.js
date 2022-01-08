@@ -139,8 +139,8 @@ export class PrintersManagement {
           if (typeof importPrinters[index].printerURL !== "undefined") {
             printer.printerURL = importPrinters[index].printerURL;
           }
-          if (typeof importPrinters[index].camURL !== "undefined") {
-            printer.camURL = importPrinters[index].camURL;
+          if (typeof importPrinters[index].cameraURL !== "undefined") {
+            printer.camURL = importPrinters[index].cameraURL;
           }
           if (typeof importPrinters[index].group !== "undefined") {
             printer.group = importPrinters[index].group;
@@ -174,8 +174,10 @@ export class PrintersManagement {
       );
       try {
         const printersToRemove = await OctoFarmClient.post("printers/remove", deletedPrinters);
+        const { printersRemoved } = printersToRemove;
         deletingAlert.close();
-        printersToRemove.forEach((printer) => {
+        printersRemoved.forEach((printer) => {
+          console.log(printer);
           UI.createAlert(
             "success",
             `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
@@ -270,7 +272,8 @@ export class PrintersManagement {
           printerName.value
         ).build();
         const printersToAdd = await OctoFarmClient.post("printers/add", printer);
-        printersToAdd.forEach((printer) => {
+        const { printersAdded } = printersToAdd;
+        printersAdded.forEach((printer) => {
           UI.createAlert(
             "success",
             `Printer: ${printer.printerURL} has successfully been added to the farm...`,

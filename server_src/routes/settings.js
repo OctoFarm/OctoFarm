@@ -86,7 +86,7 @@ router.get(
   async (req, res) => {
     const databaseName = req.params.name;
     await getPrinterManagerCache().killAllConnections();
-    if (databaseName === "nukeEverything") {
+    if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
       await ClientSettingsDB.deleteMany({});
       await HistoryDB.deleteMany({});

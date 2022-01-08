@@ -158,7 +158,7 @@ router.post("/register", async (req, res) => {
               newUser
                 .save()
                 .then(async () => {
-                  const currentSettings = ServerSettingsDB.find({});
+                  const currentSettings = await ServerSettingsDB.find({});
                   currentSettings[0].server.registration = false;
                   currentSettings[0].markModified("server.registration");
                   currentSettings[0].save();

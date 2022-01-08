@@ -69,8 +69,10 @@ async function setupOctoPrintForVirtualPrinter(printers) {
   let failedPrinters = "";
 
   let virtualPrinterSettings = {
-    virtual_printer: {
-      enabled: true
+    plugins: {
+      virtual_printer: {
+        enabled: true
+      }
     }
   };
   for (let i = 0; i < printers.length; i++) {
