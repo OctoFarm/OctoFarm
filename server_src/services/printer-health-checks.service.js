@@ -219,7 +219,7 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
         throttleMS: 0
       });
     }
-    const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
+    const responsesAverage = log?.responseTimes?.reduce((a, b) => a + b) / log.responseTimes.length;
 
     if (responsesAverage) {
       logger.debug("Throttle Generation", {

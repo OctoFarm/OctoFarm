@@ -214,6 +214,21 @@ class PrinterStore {
     return printer.tempTriggers;
   }
 
+  getDisabledPluginsList(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.pluginsListDisabled;
+  }
+
+  getEnabledPluginsList(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.pluginsListEnabled;
+  }
+
+  getAllPluginsList(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.pluginsListEnabled.concat(printer.pluginsListDisabled);
+  }
+
   addPrinterEvent(id, event) {
     const printer = this.#findMePrinter(id);
     if (!printer[event + "Event"]) {

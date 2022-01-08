@@ -108,7 +108,8 @@ class OctoPrintPrinter {
   current = undefined;
   options = undefined;
   profiles = undefined;
-  pluginsList = undefined;
+  pluginListEnabled = undefined;
+  pluginsListDisabled = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
   corsCheck = true;
@@ -195,7 +196,8 @@ class OctoPrintPrinter {
       current,
       options,
       profiles,
-      pluginsList,
+      pluginsListEnabled,
+      pluginsListDisabled,
       octoPrintUpdate,
       octoPrintPluginUpdates,
       corsCheck,
@@ -271,8 +273,11 @@ class OctoPrintPrinter {
     if (!!profiles) {
       this.profiles = profiles;
     }
-    if (!!pluginsList) {
-      this.pluginsList = pluginsList;
+    if (!!pluginsListEnabled) {
+      this.pluginsListEnabled = pluginsListEnabled;
+    }
+    if (!!pluginsListDisabled) {
+      this.pluginsListDisabled = pluginsListDisabled;
     }
     if (!!octoPrintUpdate) {
       this.octoPrintUpdate = octoPrintUpdate;
@@ -786,7 +791,8 @@ class OctoPrintPrinter {
       this.acquireOctoPrintSystemInfoData(force),
       this.acquireOctoPrintUpdatesData(force),
       this.acquireOctoPrintFilesData(force),
-      this.acquireOctoPrintPiPluginData(force)
+      this.acquireOctoPrintPiPluginData(force),
+      this.acquireOctoPrintPluginsListData(force)
     ]);
   }
 
@@ -1266,41 +1272,48 @@ class OctoPrintPrinter {
     }
   }
 
-  // async acquireOctoPrintPluginsListData(force = true) {
-  //   if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
-  //   this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
-  //   this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
-  //   if (!this.pluginsList || this.pluginsList.length === 0 || force) {
-  //     this.pluginsList = [];
-  //     const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
-  //       return false;
-  //     });
-  //     const globalStatusCode = checkApiStatusResponse(pluginList);
-  //
-  //     if (globalStatusCode === 200) {
-  //       const { repository } = await pluginList.json();
-  //       // this.pluginsList = repository.plugins;
-  //       // this.#db.update({
-  //       //   pluginsList: repository.plugins
-  //       // });
-  //       this.#apiPrinterTickerWrap("Acquired plugin lists data!", "Complete");
-  //       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
-  //       return true;
-  //     } else {
-  //       this.#apiPrinterTickerWrap(
-  //         "Failed to acquire plugin lists data",
-  //         "Offline",
-  //         "Error Code: " + globalStatusCode
-  //       );
-  //       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
-  //       return globalStatusCode;
-  //     }
-  //   } else {
-  //     this.#apiPrinterTickerWrap("Plugin lists data acquired previously... skipped!", "Complete");
-  //     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success");
-  //     return true;
-  //   }
-  // }
+  async acquireOctoPrintPluginsListData(force = true) {
+    if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+    this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
+    if (!this.pluginsList || this.pluginsList.length === 0 || force) {
+      this.pluginsList = [];
+      const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
+        return false;
+      });
+      const globalStatusCode = checkApiStatusResponse(pluginList);
+
+      if (globalStatusCode === 200) {
+        const { plugins } = await pluginList.json();
+        this.pluginsListEnabled = plugins.filter(function (plugin) {
+          return plugin.enabled;
+        });
+        this.pluginsListDisabled = plugins.filter(function (plugin) {
+          return !plugin.enabled;
+        });
+
+        this.#db.update({
+          pluginsListEnabled: this.pluginsListEnabled,
+          pluginsListDisabled: this.pluginsListDisabled
+        });
+        this.#apiPrinterTickerWrap("Acquired plugin lists data!", "Complete");
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
+        return true;
+      } else {
+        this.#apiPrinterTickerWrap(
+          "Failed to acquire plugin lists data",
+          "Offline",
+          "Error Code: " + globalStatusCode
+        );
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
+        return globalStatusCode;
+      }
+    } else {
+      this.#apiPrinterTickerWrap("Plugin lists data acquired previously... skipped!", "Complete");
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success");
+      return true;
+    }
+  }
 
   async acquireOctoPrintUpdatesData(force = false) {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;

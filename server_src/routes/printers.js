@@ -232,17 +232,29 @@ router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, asyn
   res.send(connectionLogs);
 });
 router.get("/pluginList", ensureAuthenticated, async (req, res) => {
-  let id = req.params.id;
-
   logger.info("Grabbing global plugin list");
   res.send(getPluginList());
 });
 router.get("/pluginNoticesList", ensureAuthenticated, async (req, res) => {
-  let id = req.params.id;
-
   logger.info("Grabbing global plugin notices list");
   res.send(getPluginNoticesList());
 });
+router.get("/disabledPluginList/:id", ensureAuthenticated, async (req, res) => {
+  const id = req.params.id;
+  logger.info("Grabbing disabled plugin list");
+  res.send(getPrinterStoreCache().getDisabledPluginsList(id));
+});
+router.get("/enabledPluginList/:id", ensureAuthenticated, async (req, res) => {
+  const id = req.params.id;
+  logger.info("Grabbing enabled plugin list");
+  res.send(getPrinterStoreCache().getEnabledPluginsList(id));
+});
+router.get("/allPluginsList/:id", ensureAuthenticated, async (req, res) => {
+  const id = req.params.id;
+  logger.info("Grabbing installed plugin list");
+  res.send(getPrinterStoreCache().getAllPluginsList(id));
+});
+
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const { searchForDevicesOnNetwork } = require("../../server_src/runners/autoDiscovery.js");
 

@@ -29,7 +29,10 @@ import {
 import { setupOctoPrintForVirtualPrinter } from "../../../octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
-import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
+import {
+  returnPluginListTemplate,
+  returnPluginSelectTemplate
+} from "../templates/octoprint-plugin-list.template";
 import {
   generateTableRows,
   showBulkActionsModal,
@@ -1039,34 +1042,84 @@ export async function bulkOctoPrintPluginAction(action) {
   const printersForPluginAction = await getCurrentlySelectedPrinterList();
   try {
     let pluginList = [];
-    const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
-    pluginRepositoryList.forEach((plugin) => {
-      if (action === "install") {
+    if (action === "install") {
+      const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
+      pluginRepositoryList.forEach((plugin) => {
         pluginList.push({
           text: returnPluginListTemplate(plugin),
           value: plugin.archive
         });
-      } else {
-        pluginList.push({
-          text: returnPluginListTemplate(plugin),
-          value: plugin.id
-        });
+      });
+    } else {
+      const idList = printersForPluginAction.map(function (printer) {
+        return printer._id;
+      });
+      for (let i = 0; i < idList.length; i++) {
+        if (action === "enable") {
+          try {
+            const disabledPluginList = await OctoFarmClient.get(
+              "printers/disabledPluginList/" + idList[i]
+            );
+            disabledPluginList.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab disabled plugin list... ignoring.", e);
+          }
+        }
+        if (action === "disable") {
+          try {
+            const enabledPluginList = await OctoFarmClient.get(
+              "printers/enabledPluginList/" + idList[i]
+            );
+            enabledPluginList.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab enabled plugin list... ignoring.", e);
+          }
+        }
+        if (action === "uninstall") {
+          try {
+            const allInstalledPlugins = await OctoFarmClient.get(
+              "printers/allPluginsList/" + idList[i]
+            );
+            allInstalledPlugins.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab installed plugin list... ignoring.", e);
+          }
+        }
       }
-    });
-    console.log(pluginList);
+    }
+
     pluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
       }
     ]);
 
+    pluginList = _.uniqBy(pluginList, function (e) {
+      return e.text;
+    });
+
     //Install Promt
     bootbox.prompt({
       size: "large",
       title: `<form class="form-inline float-right">
-                  <div class="form-group">
-                    <label for="searchPlugins">
-                      Please choose the plugin you'd like to install... or: &nbsp;
+                  <div class="form-group text-wrap">
+                    <label for="searchPlugins text-wrap">
+                      Please choose the plugin you'd like to ${action}.. or: &nbsp;
                     </label>
                     <input width="75%" id="searchPlugins" type="text" placeholder="Search for your plugin name here..." class="search-control search-control-underlined">
                   </div>
