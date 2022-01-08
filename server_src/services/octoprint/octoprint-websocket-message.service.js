@@ -144,13 +144,13 @@ class OctoprintWebsocketMessageService {
     captureTemperatureData(printerID, current[OP_WS_MSG_KEYS.temps]);
 
     captureJobData(printerID, current[OP_WS_MSG_KEYS.job]);
-
+    //
     captureLogData(printerID, current[OP_WS_MSG_KEYS.logs]);
-
+    //
     captureResendsData(printerID, current[OP_WS_MSG_KEYS.resends]);
-
+    //
     capturePrinterProgress(printerID, current[OP_WS_MSG_KEYS.progress]);
-
+    //
     captureCurrentZ(printerID, current[OP_WS_MSG_KEYS.currentZ]);
   }
   static handleHistoryData(printerID, data) {
@@ -261,8 +261,7 @@ class OctoprintWebsocketMessageService {
       case EVENT_TYPES.ZChange:
         break;
     }
-
-    // logger.error(printerID + "EVENT DATA RECEIVED", data);
+    //logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
@@ -275,7 +274,7 @@ class OctoprintWebsocketMessageService {
         capturePluginManagerData(printerID, type, data);
         break;
       case OP_WS_PLUGIN_KEYS.klipper:
-        console.log(type);
+        //console.log(type);
         //captureKlipperPluginData(printerID, data);
         break;
     }

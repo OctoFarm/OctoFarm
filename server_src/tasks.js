@@ -176,7 +176,7 @@ function TaskStart(task, preset, milliseconds = 0) {
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
-    TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_5000MS),
+    TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
     TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),

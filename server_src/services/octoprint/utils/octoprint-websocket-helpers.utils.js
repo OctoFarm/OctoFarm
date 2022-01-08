@@ -13,8 +13,11 @@ const tempTimers = {};
 
 const captureLogData = (id, data) => {
   if (!!data) {
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      terminal: PrinterClean.sortTerminal(data, getPrinterStoreCache().getTerminalData(id))
+    data.forEach((log) => {
+      getPrinterStoreCache().pushTerminalData(id, log);
+      if (getPrinterStoreCache().getTerminalDataLength(id) >= 200) {
+        getPrinterStoreCache().shiftTerminalData(id);
+      }
     });
   }
 };

@@ -138,9 +138,19 @@ class PrinterStore {
     return printer.costSettings;
   }
 
-  getTerminalData(id) {
+  pushTerminalData(id, line) {
     const printer = this.#findMePrinter(id);
-    return printer.terminal;
+    printer.terminal.push(line);
+  }
+
+  shiftTerminalData(id) {
+    const printer = this.#findMePrinter(id);
+    printer.terminal.shift();
+  }
+
+  getTerminalDataLength(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.terminal.length;
   }
 
   getOctoPrintVersion(id) {

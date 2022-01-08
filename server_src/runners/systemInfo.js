@@ -37,13 +37,13 @@ class SystemRunner {
   }
 
   static async profileCPUUsagePercent() {
-    const CPUPercent = await getCPULoadAVG(5000, 100);
+    const CPUPercent = await getCPULoadAVG(1000, 100);
     logger.debug("Current CPU Usage", { CPUPercent });
     cpuUsageHistory.push({
       x: new Date(),
       y: CPUPercent
     });
-    if (cpuUsageHistory.length >= 5000) {
+    if (cpuUsageHistory.length >= 300) {
       cpuUsageHistory.shift();
     }
   }
@@ -60,7 +60,7 @@ class SystemRunner {
         x: new Date(),
         y: memoryPercent
       });
-      if (memoryUsageHistory.length >= 5000) {
+      if (memoryUsageHistory.length >= 300) {
         memoryUsageHistory.shift();
       }
     }

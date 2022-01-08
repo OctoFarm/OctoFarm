@@ -212,18 +212,7 @@ class PrinterClean {
     return otherSettings;
   }
 
-  static sortTerminal(logs, currentLogs) {
-    if (!!logs) {
-      logs.forEach((log) => {
-        currentLogs.push(log);
-      });
-
-      if (currentLogs.length >= 100) {
-        currentLogs.shift();
-      }
-    }
-    return currentLogs;
-  }
+  static sortTerminal(logs, currentLogs) {}
 
   static sortGCODE(settings) {
     if (typeof settings !== "undefined") {
