@@ -280,6 +280,15 @@ class PrinterManagerService {
       }
     }
   }
+
+  async checkForOctoPrintUpdates() {
+    const printerList = getPrinterStoreCache().listPrinters();
+    logger.debug(printerList.length + " printers updating state counters...");
+    for (let i = 0; i < printerList.length; i++) {
+      const printer = printerList[i];
+      await printer.acquireOctoPrintUpdatesData(true);
+    }
+  }
 }
 
 module.exports = PrinterManagerService;

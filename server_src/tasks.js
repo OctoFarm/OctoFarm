@@ -166,6 +166,10 @@ const UPDATE_OCTOPRINT_PLUGINS = async () => {
   await updatePluginStore();
 };
 
+const CHECK_FOR_OCTOPRINT_UPDATES = async () => {
+  await getPrinterManagerCache().checkForOctoPrintUpdates();
+};
+
 /**
  * @param task
  * @param preset
@@ -200,7 +204,8 @@ class OctoFarmTasks {
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE)
+    TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
+    TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

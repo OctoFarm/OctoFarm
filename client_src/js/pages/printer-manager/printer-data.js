@@ -130,6 +130,7 @@ function reconnectingWebsocketIn(printer) {
 
 function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
+
   if (printer?.octoPrintUpdate?.updateAvailable) {
     UI.addDisplayNoneToElement(updateButton);
     updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
@@ -141,6 +142,7 @@ function checkForOctoPrintUpdate(printer) {
 
 function checkForOctoPrintPluginUpdates(printer) {
   let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
+
   if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
     UI.addDisplayNoneToElement(updatePluginButton);
     updatePluginButton.title = "You have OctoPrint plugin updates to install!";

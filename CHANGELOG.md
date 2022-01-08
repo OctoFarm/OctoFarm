@@ -89,16 +89,16 @@ All notable changes to this project will be documented in this file.
   - Refine the printer map layout with borders and printer quick actions (page not public yet).
   - Reduced logging (we will bring it back later in different shape with an Exception handler)
   - Replaced fetch with axios in the local OctoFarm client calls.
-  - Moved all error handling for client connections into axios calls
-  - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
-  - Updated the system page layout.
-  - Moved filament manager plugin actions to separate service file.
-  - Printer offline logs (specifically connection refused) are now silenced after the first one.
-  - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
-  - Custom gcode editor has been moved -> Files Manager and given a functionality boost.
+- Moved all error handling for client connections into axios calls
+- Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
+- Updated the system page layout.
+- Moved filament manager plugin actions to separate service file.
+- Printer offline logs (specifically connection refused) are now silenced after the first one.
+- Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
+- Custom gcode editor has been moved -> Files Manager and given a functionality boost.
     - You can now change the colour of the button displayed in the UI. Old buttons will default to "Green".
     - You can now filter the buttons by printers. Old buttons will default to ALL printers.
-  - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
+- All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
 - Cleaned up OctoPrint Management icons, no longer all the plug.
 - Continual work on improving readability and contrast across the application.
 - Dashboard statistics are now produced on demand, should improve loading times a touch.
@@ -151,7 +151,10 @@ All notable changes to this project will be documented in this file.
 - Due to the inclusion of User CRUD manager registration is now disabled after creation of first admin user.
 - Plugin lists/notices are now grabbed from octoprint.org not the printer. Removed one api call per printer and a lot of
   pointless duplicated data chunking.
-
+- Plugin enable now only shows disabled plugins available on all printers.
+- Plugin disable now only shows enabled plugins available on all printers.
+- Plugin uninstall now only shows plugins installed available on all printers.
+- OctoFarm now periodically (once per day) will run a scan to see if any updates are available for your instances
 ### Removed
 
 - Gulp packages and gulp as bundler

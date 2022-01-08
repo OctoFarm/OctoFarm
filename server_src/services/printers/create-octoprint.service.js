@@ -1356,7 +1356,8 @@ class OctoPrintPrinter {
             }
           }
         }
-
+        this.octoPrintUpdate = octoPrintUpdate;
+        this.octoPrintPluginUpdates = pluginUpdates;
         this.#db.update({
           octoPrintUpdate: octoPrintUpdate,
           octoPrintPluginUpdates: pluginUpdates
