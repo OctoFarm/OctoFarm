@@ -196,7 +196,7 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
     if (responsesAverage) {
       responses.push({
         url: log.url,
-        initialTimeout: responsesAverage < timeout.apiTimeout,
+        initialTimeout: responsesAverage < timeout.apiTimeout + 1000,
         cutOffTimeout: responsesAverage < timeout.apiRetryCutoff,
         responsesAverage: responsesAverage,
         timeoutSettings: timeout

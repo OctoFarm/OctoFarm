@@ -169,7 +169,7 @@ const returnNetworkConnection = (issues) => {
 
     totalInitial += issue.initialTimeout ? 1 : 0;
 
-    totalCutOff += issue.initialTimeout ? 1 : 0;
+    totalCutOff += issue.cutOffTimeout ? 1 : 0;
 
     html += `
         <small>${endPoint}: ${returnButton(
@@ -212,13 +212,13 @@ const returnNetworkConnection = (issues) => {
     ${printerURL} 
     </a><br>
     ${returnButton(
-      totalInitial,
+      totalInitial > 1,
       '<i class="fas fa-history"></i>',
       E.NETWORK + pClean + "initial",
       VALID_TIMEOUT("All Initial")
     )}
     ${returnButton(
-      totalCutOff,
+      totalCutOff > 1,
       '<i class="fas fa-stopwatch"></i>',
       E.NETWORK + pClean + "cuttOff",
       VALID_TIMEOUT("All Cut Off")
