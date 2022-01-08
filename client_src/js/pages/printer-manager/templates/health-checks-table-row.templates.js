@@ -32,7 +32,6 @@ const E = {
   PROFILE: "profile",
   OP_SYS_INFO: "opSystemInfo",
   OP_UPDATES: "opUptates",
-  OP_PLUGIN: "opPlugin",
   BAUD: "baud",
   PORT: "port",
   PPROFILE: "profile",
@@ -373,13 +372,6 @@ export function returnHealthCheckRow(check) {
        E.FILES + pClean,
        VALID_API("Files")
      )}
-
-     ${returnButton(
-       check.apiChecksOptional.octoPrintPluginsCheck,
-       '<i class="fas fa-plug"></i>',
-       E.OP_PLUGIN + pClean,
-       VALID_API("Plugin Updates")
-     )}
           </td>
           <td>
           ${returnNetworkConnection(check.connectionIssues)}
@@ -541,14 +533,6 @@ export function addHealthCheckListeners(check) {
     document.getElementById(E.FILES + pClean).addEventListener("click", (e) => {
       returnBootBox(
         "This endpoint is not required unless you want to use OctoFarm to action Prints and manage files. The system will handle no files been available.",
-        apiFixText
-      );
-    });
-  }
-  if (!check.apiChecksOptional.octoPrintPluginsCheck) {
-    document.getElementById(E.OP_PLUGIN + pClean).addEventListener("click", (e) => {
-      returnBootBox(
-        "This endpoint will require OctoPrint to have some active internet connection, without it OctoFarm will not scan. The information is only used to alert OctoFarm users of plugin updates and allow the installation of plugins through OctoFarm, it's not required.",
         apiFixText
       );
     });

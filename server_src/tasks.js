@@ -8,6 +8,10 @@ const { detectFarmPi } = require("./services/farmpi-detection.service");
 const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("./cache/printer-store.cache");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
+const {
+  updatePluginNoticesStore,
+  updatePluginStore
+} = require("./store/octoprint-plugin-list.store");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { FileClean } = require("./lib/dataFunctions/fileClean");
 const Logger = require("./handlers/logger");
@@ -157,6 +161,11 @@ const INIT_FARM_INFORMATION = async () => {
   await PrinterClean.initFarmInformation();
 };
 
+const UPDATE_OCTOPRINT_PLUGINS = async () => {
+  await updatePluginNoticesStore();
+  await updatePluginStore();
+};
+
 /**
  * @param task
  * @param preset
@@ -176,12 +185,13 @@ function TaskStart(task, preset, milliseconds = 0) {
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(UPDATE_OCTOPRINT_PLUGINS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
     TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),
-    TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_5000MS),

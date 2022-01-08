@@ -69,8 +69,7 @@ const apiChecksOptional = (checks) => {
   return {
     filesCheck: checks.files.status === "success",
     octoPrintSystemInfo: checks.systemInfo.status === "success",
-    octoPrintUpdatesCheck: checks.updates.status === "success",
-    octoPrintPluginsCheck: checks.plugins.status === "success"
+    octoPrintUpdatesCheck: checks.updates.status === "success"
   };
 };
 
@@ -192,7 +191,7 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
     if (log.responseTimes.length === 0) {
       log.responseTimes = [0];
     }
-    const responsesAverage = log.responseTimes.reduce((a, b) => a + b) / log.responseTimes.length;
+    const responsesAverage = log?.responseTimes?.reduce((a, b) => a + b) / log.responseTimes.length;
     if (responsesAverage) {
       responses.push({
         url: log.url,

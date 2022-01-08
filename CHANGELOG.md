@@ -99,16 +99,20 @@ All notable changes to this project will be documented in this file.
     - You can now change the colour of the button displayed in the UI. Old buttons will default to "Green".
     - You can now filter the buttons by printers. Old buttons will default to ALL printers.
   - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
-  - Cleaned up OctoPrint Management icons, no longer all the plug.
-  - Continual work on improving readability and contrast across the application.
-  - Dashboard statistics are now produced on demand, should improve loading times a touch.
-  - Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer actions. Then the Printer Control from before has been split up.
-    - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places. 
-  - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
-  - File manager improvements, re-sync's are near instantaneous now.
-  - Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once. 
-  - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your remaining filament.
-  - Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup correctly. It will fail to enable if that is so.
+- Cleaned up OctoPrint Management icons, no longer all the plug.
+- Continual work on improving readability and contrast across the application.
+- Dashboard statistics are now produced on demand, should improve loading times a touch.
+- Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer
+  actions. Then the Printer Control from before has been split up.
+    - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places.
+- Client settings are no longer global. They are now attached to a user, so different users can have different
+  settings/dashboard configurations.
+- File manager improvements, re-sync's are near instantaneous now.
+- Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once.
+- Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your
+  remaining filament.
+- Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup
+  correctly. It will fail to enable if that is so.
 - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if
   required. Existing setups unaffected.
 - Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows.
@@ -145,6 +149,8 @@ All notable changes to this project will be documented in this file.
     - Attempts to grab optional information from endpoints.
 - Initial scan times changed, all data is now stored in database and will only update on a forced re-scan.
 - Due to the inclusion of User CRUD manager registration is now disabled after creation of first admin user.
+- Plugin lists/notices are now grabbed from octoprint.org not the printer. Removed one api call per printer and a lot of
+  pointless duplicated data chunking.
 
 ### Removed
 

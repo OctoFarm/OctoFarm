@@ -126,6 +126,7 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
   if (action === "install") {
     cleanAction = cleanAction + "ing";
   }
+
   if (printer.printerState.colour.category !== "Active") {
     for (let r = 0; r < pluginList.length; r++) {
       let alert = UI.createAlert(
