@@ -279,6 +279,7 @@ class OctoPrintPrinter {
     if (!!pluginsListDisabled) {
       this.pluginsListDisabled = pluginsListDisabled;
     }
+
     if (!!octoPrintUpdate) {
       this.octoPrintUpdate = octoPrintUpdate;
     }
@@ -441,10 +442,6 @@ class OctoPrintPrinter {
       desc: state.webSocketDescription
     };
   }
-
-  async enableClient() {}
-
-  async disableClient() {}
 
   reConnectWebsocket() {
     if (!!this?.#ws) {
@@ -1273,7 +1270,10 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintPluginsListData(force = true) {
-    if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+    if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger");
+      return false;
+    }
     this.#apiPrinterTickerWrap("Acquiring plugin lists data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
     if (!this.pluginsList || this.pluginsList.length === 0 || force) {

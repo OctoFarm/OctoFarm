@@ -1098,6 +1098,7 @@ class PrinterSettings {
           settingsCheck: document.getElementById("settingsCheck"),
           systemCheck: document.getElementById("systemCheck"),
           systemInfoCheck: document.getElementById("systemInfoCheck"),
+          pluginsCheck: document.getElementById("pluginsCheck"),
           updatesCheck: document.getElementById("updatesCheck"),
           portNotAvailableMessage: document.getElementById("portNotAvailableMessage")
         },
@@ -1166,6 +1167,11 @@ class PrinterSettings {
       pageElements.connectPage.systemInfoCheck.disabled = true;
       pageElements.connectPage.systemInfoCheck.innerHTML = `<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Never Checked: </b>  - version not supported!`;
     }
+
+    pageElements.connectPage.pluginsCheck.innerHTML = `<i class="fas fa-plug"></i> <b>Plugins Check</b><br><b>Last Checked: </b>${Calc.dateClean(
+      currentPrinter.systemChecks.scanning.plugins.date
+    )}`;
+    pageElements.connectPage.pluginsCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.plugins.status} mb-1 btn-block`;
 
     pageElements.connectPage.updatesCheck.innerHTML = `<i class="fas fa-wrench"></i> <b>Updates Check</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.scanning.updates.date

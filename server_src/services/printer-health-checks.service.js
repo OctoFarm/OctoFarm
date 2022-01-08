@@ -69,7 +69,8 @@ const apiChecksOptional = (checks) => {
   return {
     filesCheck: checks.files.status === "success",
     octoPrintSystemInfo: checks.systemInfo.status === "success",
-    octoPrintUpdatesCheck: checks.updates.status === "success"
+    octoPrintUpdatesCheck: checks.updates.status === "success",
+    octoPrintPluginsCheck: checks.plugins.status === "success"
   };
 };
 
