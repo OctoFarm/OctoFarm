@@ -17,7 +17,8 @@ const apiUsers = apiBase + "/users";
 const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=true" : "");
 
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
-const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository";
+const apiPluginManagerRepository1_6_0 = apiBase + "/plugin/pluginmanager";
+// const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository"; // This doesn't work... wow... did he even check it?
 // TODO check if force scan actually needed at all ?force=true
 const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "" : "");
