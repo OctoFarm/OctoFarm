@@ -7,7 +7,8 @@ import {
   bulkOctoPrintClientUpdate,
   bulkOctoPrintPluginAction,
   bulkOctoPrintPluginUpdate,
-  bulkOctoPrintPowerCommand
+  bulkOctoPrintPowerCommand,
+  bulkUpdateOctoPrintSettings
 } from "./pages/printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
@@ -73,6 +74,18 @@ blkPluginsDisableBtn.addEventListener("click", async (e) => {
   await PrinterSelect.create(multiPrinterSelectModal, false, "Disable Plugins", function () {
     bulkOctoPrintPluginAction("disable");
   });
+});
+
+const blkOctoPrintSettingsUpdateBtn = document.getElementById("blkOctoPrintSettingsUpdateBtn");
+blkOctoPrintSettingsUpdateBtn.addEventListener("click", async (e) => {
+  await PrinterSelect.create(
+    multiPrinterSelectModal,
+    false,
+    "Bulk Edit OctoPrint Settings",
+    function () {
+      bulkUpdateOctoPrintSettings();
+    }
+  );
 });
 
 const reSyncAPIBtn = document.getElementById("reSyncAPI");

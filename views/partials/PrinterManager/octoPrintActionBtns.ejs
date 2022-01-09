@@ -2,7 +2,7 @@
 
 <div class="btn-group float-left">
     <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false" <%= disable_btn_air_gapped %>>
+            aria-expanded="false">
         <i class="fab fa-octopus-deploy"></i> OctoPrint Manager
     </button>
     <div class="dropdown-menu">
@@ -13,7 +13,7 @@
                 class="dropdown-item"
                 href="#"
                 aria-expanded="false"
-                data-toggle="modal" data-target="#printerSelectModal"
+                data-toggle="modal" data-target="#printerSelectModal" <%= disable_btn_air_gapped %>
         >
             <i class="fas fa-download"></i> Install Plugins
         </button>
@@ -59,7 +59,7 @@
                 class="dropdown-item"
                 href="#"
         >
-            <i class="fas fa-sync"></i> Update Plugins
+            <i class="fas fa-sync"></i> Update Plugins <%= disable_btn_air_gapped %>
         </button>
         <button
                 title="Update multiple OctoPrint's at once."
@@ -68,8 +68,19 @@
                     class="dropdown-item"
                     href="#"
             >
-                <i class="fab fa-raspberry-pi"></i> Update Clients
+                <i class="fab fa-raspberry-pi"></i> Update Clients <%= disable_btn_air_gapped %>
             </button>
+        <button
+                title="Update multiple OctoPrint's at once."
+                id="blkOctoPrintSettingsUpdateBtn"
+                type="button"
+                class="dropdown-item"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+            <i class="fas fa-cogs"></i> Bulk Settings Update<%= disable_btn_air_gapped %>
+        </button>
             <button
                     title="Install multiple plugins at once."
                     id="blkOctoPrintBackupBtn"
@@ -80,7 +91,7 @@
                     data-toggle="modal" data-target="#printerSelectModal"
                     disabled
             >
-                <i class="fas fa-plug"></i> Backup OctoPrint
+                <i class="fas fa-plug"></i> Backup Clients
             </button>
             <button
                     title="Install multiple plugins at once."
@@ -92,7 +103,7 @@
                     data-toggle="modal" data-target="#printerSelectModal"
                     disabled
             >
-                <i class="fas fa-plug"></i> Restore OctoPrint
+                <i class="fas fa-plug"></i> Restore Client
             </button>
         </div>
     </div>

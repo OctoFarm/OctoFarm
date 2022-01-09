@@ -1178,6 +1178,11 @@ export async function bulkEnableVirtualPrinter() {
   bootbox.alert(successfulPrinters + failedPrinters);
 }
 
+export async function bulkUpdateOctoPrintSettings() {
+  const printersForSettingsAction = await getCurrentlySelectedPrinterList();
+  console.log(printersForSettingsAction);
+}
+
 setInterval(async () => {
   //Auto refresh of files
   // If there are files in the queue, plow through until uploaded... currently single file at a time.
