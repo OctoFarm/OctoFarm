@@ -52,6 +52,7 @@ const EVENT_TYPES = {
   Disconnecting: "Disconnecting",
   Disconnected: "Disconnected",
   Dwelling: "Dwelling",
+  Error: "Error",
   FileAdded: "FileAdded",
   FileDeselected: "FileDeselected",
   FileRemoved: "FileRemoved",
@@ -75,6 +76,7 @@ const EVENT_TYPES = {
   UpdatedFiles: "UpdatedFiles",
   Upload: "Upload",
   UserLoggedIn: "UserLoggedIn",
+  UserLoggedOut: "UserLoggedOut",
   ZChange: "ZChange"
 };
 
@@ -89,15 +91,24 @@ const OP_WS_MSG = {
   slicingProgress: "slicingProgress"
 };
 
-const OP_WS_SKIP = [OP_WS_MSG.slicingProgress, OP_WS_MSG.timelapse];
-
-const WS_STATE = {
-  unopened: "unopened",
-  opening: "opening",
+const OP_WS_MSG_KEYS = {
+  state: "state",
+  temps: "temps",
+  job: "job",
+  logs: "logs",
+  current: "current",
   connected: "connected",
-  authed: "authed",
-  errored: "errored", // Not a disconnect error
-  closed: "closed" // Closing error received
+  resends: "resends",
+  progress: "progress",
+  currentZ: "currentZ"
+};
+
+const OP_WS_PLUGIN_KEYS = {
+  pluginmanager: "pluginmanager",
+  klipper: "klipper",
+  displayLayerProgress: "DisplayLayerProgress",
+  softwareupdate: "softwareupdate",
+  psucontrol: "psucontrol" //Not used
 };
 
 module.exports = {
@@ -106,7 +117,7 @@ module.exports = {
   getDefaultPrinterState,
   getDefaultCurrentState,
   EVENT_TYPES,
-  WS_STATE,
   OP_WS_MSG,
-  OP_WS_SKIP
+  OP_WS_MSG_KEYS,
+  OP_WS_PLUGIN_KEYS
 };

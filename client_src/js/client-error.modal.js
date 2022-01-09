@@ -59,5 +59,4 @@ window.onunhandledrejection = function (event) {
     handleEvent(event.reason);
     dealingWithError = true;
   }
-  event.preventDefault();
 };

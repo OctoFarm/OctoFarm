@@ -1,7 +1,3 @@
-const filamentClean = require("../lib/dataFunctions/filamentClean.js");
-
-const { FilamentClean } = filamentClean;
-
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-FilamentManager");
@@ -9,11 +5,14 @@ const logger = new Logger("OctoFarm-FilamentManager");
 const Spool = require("../models/Filament.js");
 const Profile = require("../models/Profiles.js");
 const fetch = require("node-fetch");
+
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { TaskManager } = require("./task.manager");
+
 class FilamentManagerPlugin {
   static async filamentManagerReSync(addSpool) {
     try {
-      const { Runner } = require("./state.js");
-      const printerList = Runner.returnFarmPrinters();
+      const printerList = getPrinterStoreCache().listPrinters();
       let printer = null;
       for (let i = 0; i < printerList.length; i++) {
         if (
@@ -126,7 +125,7 @@ class FilamentManagerPlugin {
           }
         }
       }
-      FilamentClean.start(true);
+      await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
       logger.info("Successfully synced filament manager with octofarm.");
       if (addSpool) {
         return {
@@ -144,7 +143,7 @@ class FilamentManagerPlugin {
         };
       }
     } catch (e) {
-      console.error("SYNC", e);
+      logger.error("Failed to resync filament manager plugin", e);
     }
   }
 }

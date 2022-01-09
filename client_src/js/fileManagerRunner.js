@@ -2,9 +2,8 @@ import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
-import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
+import { createFilamentSelector } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
-import gcodeScript from "./services/gcode-scripts.service";
 
 let lastId = null;
 
@@ -17,13 +16,10 @@ if (multiUploadBtn) {
 }
 
 class Manager {
-  static async init() {
-    // Draw printers
+  static async drawPrinterList() {
     let printers = await OctoFarmClient.listPrinters();
-
-    // Draw first printer list...
-    const filamentDropDown = await returnDropDown();
     const printerList = document.getElementById("printerList");
+    printerList.innerHTML = "";
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
@@ -31,7 +27,6 @@ class Manager {
         onlinePrinterList.push(printer);
       }
     });
-
     onlinePrinterList.forEach((printer, index) => {
       let storageWarning = "";
       if (printer?.storage) {
@@ -54,6 +49,7 @@ class Manager {
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
       }
+
       printerList.insertAdjacentHTML(
         "beforeend",
         `
@@ -76,11 +72,11 @@ class Manager {
                       <span title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill ${printer.printerState.colour.category}">
                           ${printer.printerState.state}
                       </span>
-                      <span class="badge badge-dark badge-pill">
-                        Files: ${printer.fileList.filecount}
+                      <span id="fileManagerfileCount-${printer._id}" class="badge badge-dark badge-pill">
+                        Files: ${printer.fileList.fileList.length}
                     </span>
-                    <span class="badge badge-dark badge-pill">
-                       Folders: ${printer.fileList.folderCount}
+                    <span id="fileManagerFolderCount-${printer._id}" class="badge badge-dark badge-pill">
+                       Folders: ${printer.fileList.folderList.length}
                     </span>
                   </small>
                   </small>
@@ -90,23 +86,8 @@ class Manager {
               <div class="col-lg-10">
                 <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0px; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
                 ${storageWarning}
-                <div
-                  class="float-right btn-group flex-wrap btn-group-sm"
-                  role="group"
-                  aria-label="Basic example"
-                >
-                </div>
                 <div class="row">
-                  <div class="col-lg-2">
-                    <i class="fas fa-file-upload"></i><span id="fileCounts-${printer._id}"> 0 </span>
-                  </div>
-                  <div class="col-lg-10">
-                    <div class="progress">
-                      <div id="fileProgress-${printer._id}" class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                        0%
-                      </div>
-                    </div>
-                  </div>
+
                 </div>
                   <small class="pt-2 float-left"
                   ><i class="fas fa-cube"></i> <b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm</small
@@ -135,23 +116,7 @@ class Manager {
 
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
         const filamentDrop = document.getElementById("tool" + i + "-" + printer._id);
-        filamentDrop.innerHTML = "";
-        filamentDropDown.forEach((filament) => {
-          filamentDrop.insertAdjacentHTML("beforeend", filament);
-        });
-        if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
-          if (
-            typeof printer.selectedFilament[i] !== "undefined" &&
-            printer.selectedFilament[i] !== null
-          ) {
-            filamentDrop.value = printer.selectedFilament[i]._id;
-          }
-        }
-        filamentDrop.addEventListener("change", async (event) => {
-          selectFilament(printer._id, event.target.value, i);
-          let updatePrinter = await OctoFarmClient.getPrinter(lastId);
-          FileManager.refreshFiles(updatePrinter);
-        });
+        createFilamentSelector(filamentDrop, printer, i);
       }
 
       if (index === 0) {
@@ -161,10 +126,14 @@ class Manager {
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
         firstElement.innerHTML = `<i class="fas fa-print"></i> ${printer.printerName}`;
-        FileSorting.loadSort(printer);
         Manager.updatePrinterList(printer._id);
       }
     });
+  }
+
+  static async init() {
+    // Draw printer list from server
+    await Manager.drawPrinterList();
   }
 
   static changePrinter(e, target) {
@@ -233,7 +202,7 @@ class Manager {
 
     let printer = await OctoFarmClient.getPrinter(id);
 
-    FileSorting.loadSort(printer);
+    await FileSorting.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
       '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
     const fileButtons = {
@@ -248,7 +217,7 @@ class Manager {
         createFolderBtn: document.getElementById("createFolderBtn")
       }
     };
-    fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
+    fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.fileList.length} <i class="fas fa-folder"></i> ${printer.fileList.folderList.length}`;
     if (typeof printer.storage !== "undefined") {
       fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
         printer.storage.free
@@ -268,17 +237,17 @@ class Manager {
     fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
       FileManager.search(printer._id);
     });
-    fileButtons.fileManager.uploadPrintFile.addEventListener("change", function () {
-      FileManager.handleFiles(this.files, printer, "print");
+    fileButtons.fileManager.uploadPrintFile.addEventListener("change", async function () {
+      await FileManager.handleFiles(this.files, printer, "print");
     });
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
-    fileButtons.fileManager.back.addEventListener("click", (e) => {
-      FileManager.openFolder(undefined, undefined, printer);
+    fileButtons.fileManager.back.addEventListener("click", async (e) => {
+      await FileManager.openFolder(undefined, undefined, printer);
     });
-    fileButtons.fileManager.syncFiles.addEventListener("click", (e) => {
-      FileManager.reSyncFiles(e, printer);
+    fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
+      await FileManager.reSyncFiles(e, printer);
     });
   }
 }

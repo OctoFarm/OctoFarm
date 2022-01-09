@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 // User Modal
-const runner = require("../runners/state.js");
-const Runner = runner.Runner;
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 const Alerts = require("../models/Alerts.js");

@@ -1,3 +1,6 @@
+const Logger = require("../handlers/logger");
+
+const logger = new Logger("OctoFarm-State");
 const currentIssues = [];
 const octoprintLogs = [];
 
@@ -42,7 +45,7 @@ class PrinterTicker {
       state: state
     };
     currentIssues.push(newIssue);
-    if (currentIssues.length >= 1001) {
+    if (currentIssues.length >= 2001) {
       currentIssues.shift();
     }
   }

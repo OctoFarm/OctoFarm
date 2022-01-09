@@ -3,7 +3,7 @@ const Logger = require("../handlers/logger");
 
 const logger = new Logger("OctoFarm-Server");
 
-const fileLocation = "./farmpi_version";
+const fileLocation = "/etc/farmpi_version";
 
 let farmPiVersion = false;
 

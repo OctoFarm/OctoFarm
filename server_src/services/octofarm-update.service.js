@@ -32,14 +32,16 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
   await getGithubReleasesPromise()
     .then((githubReleases) => {
       airGapped = !githubReleases;
+      if (githubReleases?.message?.includes("API rate")) {
+        logger.debug("Latest release check failed due to API rate limiting...");
+        lastReleaseCheckFailed = true;
+        return Promise.resolve(null);
+      }
       if (!githubReleases) {
         return Promise.resolve(null);
       } else {
         if (!!githubReleases && githubReleases.length > 0) {
-          const latestRelease = findGithubRelease(
-            githubReleases,
-            includePrereleases
-          );
+          const latestRelease = findGithubRelease(githubReleases, includePrereleases);
           // Whether the package version exists at all - developer at work if not!
           installedReleaseFound = !!findGithubRelease(
             githubReleases,
@@ -54,22 +56,17 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
             lastReleaseCheckFailed = false;
             latestReleaseKnown = latestRelease;
             notificationReady =
-              latestRelease.tag_name !== packageVersion &&
-              !!installedReleaseFound;
+              latestRelease.tag_name !== packageVersion && !!installedReleaseFound;
           } else if (!latestRelease.tag_name) {
             // Falsy tag_name is very unlikely - probably tests only
             lastReleaseCheckFailed = false;
             notificationReady = false;
           } else {
-            console.log(
-              "Latest release check failed because latestRelease not set"
-            );
+            logger.debug("Latest release check failed because latestRelease not set");
             lastReleaseCheckFailed = true;
           }
         } else {
-          console.log(
-            "Latest release check failed because releases from gitty empty"
-          );
+          logger.debug("Latest release check failed because releases from gitty empty");
           lastReleaseCheckFailed = true;
         }
       }
@@ -145,10 +142,9 @@ function checkReleaseAndLogUpdate() {
   const latestReleaseTag = latestRelease.tag_name;
   if (!installedReleaseFound) {
     logger.info(
-      `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
-    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
-    Appreciate the hard work, you rock!`
+      `\x1b[36mHey thanks for helping out with OctoFarm!!\x1b[0m
+    Github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
+    Your release tag: \x1b[32m${packageVersion}\x1b[0m`
     );
     return;
   }
@@ -168,9 +164,7 @@ function checkReleaseAndLogUpdate() {
       "Cant check release as package.json version environment variable is not set. Make sure OctoFarm is run from a 'package.json' or NPM context."
     );
   } else {
-    return logger.debug(
-      `Installed release: ${packageVersion}. You are up to date!`
-    );
+    return logger.debug(`Installed release: ${packageVersion}. You are up to date!`);
   }
 }
 

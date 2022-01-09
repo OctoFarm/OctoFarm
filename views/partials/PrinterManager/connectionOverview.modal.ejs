@@ -11,13 +11,15 @@
 <div class="col-lg-12">
     <div class="collapse" id="collapseExample">
         <div class="alert alert-secondary" role="alert">
-            <p> This is to get a understanding into how well your network / OctoFarm is performing at keeping the printers connected. The table below will list your printer totals (blue bar) and then below (grey and dark grey bars) a break down of each request url. There is the Average response time, success percentage and retry count tracked whilst OctoFarm is running.</p>
+            <p> This is an overview screen of the current connection responses OctoFarm gets from your OctoPrint instances</p>
             <hr>
-            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. If your seeing response times higher than 1000ms (blue is total and can be ignored) you will want to increase OctoFarms default connection timeout and see if that helps. If you have a wired connection then it's a good indication there's some network congestion somewhere / If wireless your results may vary. The slowest of OctoPrints api endpoints is "api/settings" and this is a good one to base your API Initial Timeout on, just make sure API Secondary Timeout is higher than that.
+            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. </p>
             <hr>
-            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests. This is a good indication that there are connection issues, especially with a high retry count. If your OctoPrint instances are usually offline and only turned on when printing it's probably safe to dis-regard this and Retry Counts as those both will increment as those connections are failing. </p>
+            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests.  </p>
             <hr>
-            <b>Retry Counts: </b> <p>This is how many times any request was retried. This is a good indication that OctoFarms default timeout settings are too fast for your network or you have issues with the OctoPrint host. </p>
+            <b>API Timeout Retries: </b> <p>How many times your timeout settings has stalled a connection Attempt.</p>
+            <hr>
+            <b>API Connection Errors: </b> <p>How many times the connection resulted in a total error. Usually from the OctoPrint host / incorrect printer settings.</p>
         </div>
     </div>
 </div>
@@ -25,6 +27,7 @@
 <% printerConnectionStats.forEach((url, index) => { %>
     <% const currentPrinter = url; %>
     <% const toCalc = []; %>
+        <% console.log(currentPrinter.conn) %>
     <% currentPrinter.connections.forEach(con => { %>
         <% const log = con.log; %>
         <% const url = con.url; %>
@@ -32,9 +35,10 @@
         <% const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
         <% const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections %>
         <% const failedPercent = (log.totalRequestsFailed * 100) / totalConnections %>
+        <% const apiFailures = log.connectionFailures %>
         <% const retryCount = log.totalRetries %>
 
-        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount }%>
+        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures }%>
 
         <% toCalc.push(toPush) %>
     <% })%>
@@ -45,10 +49,12 @@
     <table id="" class="table table-dark table-striped text-center">
         <thead>
         <tr>
+            <th scope="col"></th>
             <th scope="col" class="sticky-table table-dark" style="">URL</th>
             <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
             <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
-            <th scope="col" class="sticky-table table-dark" style="">Retry Count</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Timeout Retry</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Connection Errors</th>
             <th scope="col" class="sticky-table table-dark" style="">WebSocket Ping/Pong Failure Count</th>
         </tr>
         </thead>
@@ -59,9 +65,19 @@
             <% const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0) %>
             <% const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length %>
             <% const actualFailedPercent = totalFailedPercent / totalsArray[index].length %>
+            <% let averageTotalCountLength = 0; %>
+            <% const averageTotalCount = totalsArray[index].reduce( function(a, b){
+                averageTotalCountLength = averageTotalCountLength + 1;
+                return a + b["totalResponse"]
+            }, 0) %>
+            <% const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0) %>
+            <% const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0; %>
                 <tr class="bg-primary">
+                    <th> <a class="btn btn-secondary" data-toggle="collapse" href="#connectionCollapse-<%= index %>" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="far fa-caret-square-down"></i>
+                        </a> </th>
                     <th scope="row"><%= currentPrinter.printerURL  %></th>
-                    <th> <%= helpers.generateMilisecondsTime(totalsArray[index].reduce( function(a, b){ return a + b["totalResponse"] }, 0)) %> </th>
+                    <th> <%= helpers.generateMilisecondsTime(averageTotalCalc) %> </th>
                     <th>
                         <div class="progress">
                             <div class="progress-bar bg-success" role="progressbar" style="width: <%=actualSuccessPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
@@ -69,6 +85,9 @@
                         </div>
                     </th>
                     <th> <%= totalsArray[index].reduce( function(a, b){ return a + b["retryCount"] }, 0) %> </th>
+                    <th>
+                        <%= totalAPIFailed %>
+                    </th>
                     <th>  </th>
                 </tr>
                 <% currentPrinter.connections.forEach(con => { %>
@@ -89,13 +108,15 @@
                         <%} %>
 
                     <% const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+                    <% const averageCalculation = (averageCount / log.lastResponseTimes.length) || 0; %>
                     <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
                     <% const successPercent = (log.totalRequestsSuccess * 100) / totalConnections %>
                     <% const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections %>
-                    <tr>
+                    <tr class="collapse" id="connectionCollapse-<%= index %>">
+                        <th>  </th>
                         <th class="p-1"><%= url %></th>
 
-                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCount) %></th>
+                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCalculation) %></th>
                         <th class="p-1">
                             <div class="progress">
                                 <div class="progress-bar bg-success" role="progressbar" style="width: <%=successPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=successPercent.toFixed(0) %>%</div>
@@ -103,7 +124,8 @@
                             </div>
                         </th>
                         <th class="p-1"><%= log.totalRetries %></th>
-                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "" %></th>
+                        <th class="p-1"><%= log.connectionFailures %></th>
+                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "-" %></th>
                     </tr>
                 <% })%>
 

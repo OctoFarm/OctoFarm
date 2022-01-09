@@ -189,7 +189,7 @@ export default class PowerButton {
   }
 
   static async applyBtn(printer) {
-    if (typeof printer.otherSettings.system !== "undefined" && !listenersApplied) {
+    if (typeof printer?.otherSettings?.system !== "undefined" && !listenersApplied) {
       if (
         (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
           printer.otherSettings.system.commands.serverRestartCommand !== null) ||
@@ -238,7 +238,7 @@ export default class PowerButton {
         listenersApplied = true;
       }
     }
-    if (printer.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
+    if (printer?.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
       if (printer.powerSettings.powerOnURL !== "") {
         PowerButton.powerButtons(printer);
       }

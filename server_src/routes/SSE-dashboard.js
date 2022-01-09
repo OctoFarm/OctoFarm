@@ -2,10 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { stringify } = require("flatted");
 const { ensureAuthenticated } = require("../config/auth");
-const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const {
+  getDashboardStatistics,
+  getCurrentOperations,
+  generateDashboardStatistics
+} = require("../services/printer-statistics.service");
 
 // Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
@@ -37,11 +42,11 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async functi
 });
 
 async function sendData() {
-  await PrinterClean.statisticsStart();
+  await generateDashboardStatistics();
 
-  const currentOperations = await PrinterClean.returnCurrentOperations();
-  const dashStatistics = await PrinterClean.returnDashboardStatistics();
-  const printerInformation = await PrinterClean.listPrintersInformation();
+  const currentOperations = getCurrentOperations();
+  const dashStatistics = getDashboardStatistics();
+  const printerInformation = getPrinterStoreCache().listPrintersInformation();
 
   for (clientId in clients) {
     let clientsSettingsCache = await SettingsClean.returnClientSettings(

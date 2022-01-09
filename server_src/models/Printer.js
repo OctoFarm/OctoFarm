@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  disabled: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   apikey: {
     type: String,
     required: true // !
@@ -26,6 +31,10 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  printerFirmware: {
+    type: String,
+    required: false
+  },
   currentUser: {
     type: String,
     required: false
@@ -46,7 +55,6 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     require: false
   },
-  // Non-essentials below
   powerSettings: {
     type: Object,
     required: false
@@ -85,11 +93,8 @@ const PrinterSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: false
-  },
-  type: {
-    type: String,
-    required: false
+    required: false,
+    default: "OctoPrint"
   },
   ip: {
     type: String,
@@ -113,6 +118,78 @@ const PrinterSchema = new mongoose.Schema({
   },
   storage: {
     type: Object,
+    required: false
+  },
+  current: {
+    type: Object,
+    required: false
+  },
+  options: {
+    type: Object,
+    required: false
+  },
+  profiles: {
+    type: Object,
+    required: false
+  },
+  pluginsListDisabled: {
+    type: Array,
+    required: false
+  },
+  pluginsListEnabled: {
+    type: Array,
+    required: false
+  },
+  octoPrintUpdate: {
+    type: Object,
+    required: false
+  },
+  octoPrintPluginUpdates: {
+    type: Array,
+    required: false
+  },
+  corsCheck: {
+    type: Boolean,
+    required: false
+  },
+  settingsApi: {
+    type: Object,
+    required: false
+  },
+  settingsFeature: {
+    type: Object,
+    required: false
+  },
+  settingsFolder: {
+    type: Object,
+    required: false
+  },
+  settingsPlugins: {
+    type: Object,
+    required: false
+  },
+  settingsScripts: {
+    type: Object,
+    required: false
+  },
+  settingsSerial: {
+    type: Object,
+    required: false
+  },
+  settingsServer: {
+    type: Object,
+    required: false
+  },
+  settingsSystem: {
+    type: Object,
+    required: false
+  },
+  settingsWebcam: {
+    type: Object,
+    required: false
+  },
+  core: {
+    type: Array,
     required: false
   }
 });

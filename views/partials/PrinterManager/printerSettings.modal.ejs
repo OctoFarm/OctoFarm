@@ -31,6 +31,29 @@
         <div class="tab-pane fade active show" id="printer-connection" role="tabpanel"
              aria-labelledby="system-panel-view-list">
             <p id="offlineMessage"></p>
+            <h5>Current Status</h5>
+            <hr>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                    <button id="psHost" type="button" class="btn btn-warning mb-1"
+                            href="#" target="_blank" disabled> <i
+                                class="fas fa-spinner fa-spin"></i> Checking..
+                    </button>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                    <button id="psStatus" type="button" class="btn btn-warning mb-1"
+                            href="#" target="_blank" disabled> <i
+                                class="fas fa-spinner fa-spin"></i> Checking..
+                    </button>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                    <button id="psWebSocket" type="button"
+                            class="btn btn-warning mb-1" href="#" target="_blank"
+                            disabled> <i
+                                class="fas fa-spinner fa-spin"></i> Checking..
+                    </button>
+                </div>
+            </div>
             <h5>OctoPrint Host</h5>
             <hr>
             <p>Set your OctoPrint Host connection details</p>
@@ -115,57 +138,54 @@
                 </div>
             </div>
             <div id="psCurrentConnection" class="row">
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
-                    <h5>Current Status</h5>
-                    <hr>
-                    <button id="psHost" type="button" class="btn btn-warning mb-1 btn-block"
-                            href="#" target="_blank" disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
-                    </button>
-                    <button id="psStatus" type="button" class="btn btn-warning mb-1 btn-block"
-                            href="#" target="_blank" disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
-                    </button>
-                    <button id="psWebSocket" type="button"
-                            class="btn btn-warning mb-1 btn-block" href="#" target="_blank"
-                            disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
-                    </button>
-                </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                     <h5>API Status</h5>
                     <hr>
-                    <button title="Click to re-sync your OctoPrint instance"
-                            class="btn btn-danger mb-1 btn-block" id="apiCheck"><i
-                                class="fas fa-link"></i></button>
-                    <button title="Click to recheck printers Files"
-                            class="btn btn-danger mb-1 btn-block" id="filesCheck"><i
-                                class="fas fa-file-code"></i></button>
-                    <button title="Click to recheck printers State"
-                            class="btn btn-danger mb-1 btn-block" id="stateCheck"><i
-                                class="fas fa-info-circle"></i></button>
-                    <button title="Click to recheck printers Profile"
-                            class="btn btn-danger mb-1 btn-block" id="profileCheck"><i
-                                class="fas fa-id-card"></i></button>
-                    <button title="Click to recheck printers Settings"
-                            class="btn btn-danger mb-1 btn-block" id="settingsCheck"><i
-                                class="fas fa-cog"></i></button>
-                    <button title="Click to recheck printers System"
-                            class="btn btn-danger mb-1 btn-block" id="systemCheck"><i
-                                class="fas fa-server"></i></button>
-                </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
-                    <h5>Cleaner Status</h5>
-                    <hr>
-                    <button title="Printers Information cleaning status"
-                            class="btn btn-danger mb-1 btn-block" id="apiClean"><i
-                                class="fas fa-id-card"></i></button>
-                    <button title="Printers Job Information cleaning status"
-                            class="btn btn-danger mb-1 btn-block" id="filesClean"><i
-                                class="fas fa-info-circle"></i></button>
-                    <button title="Printers File Information cleaning status"
-                            class="btn btn-danger mb-1 btn-block" id="stateClean"><i
-                                class="fas fa-file-code"></i></button>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="apiCheck"><i class="fas fa-users"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="stateCheck"><i
+                                        class="fas fa-info-circle"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="settingsCheck"><i
+                                        class="fas fa-cog"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="systemInfoCheck"><i class="fas fa-question-circle"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="updatesCheck"><i class="fas fa-wrench"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="filesCheck"><i
+                                        class="fas fa-file-code"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="profileCheck"><i
+                                        class="fas fa-id-card"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="systemCheck"><i
+                                        class="fas fa-server"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-2 col-lg-4">
+                            <button
+                                    class="btn btn-danger mb-1 btn-block" id="pluginsCheck"><i class="fas fa-plug"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

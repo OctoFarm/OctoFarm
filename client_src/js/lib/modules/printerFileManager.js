@@ -1,5 +1,4 @@
 import OctoPrintClient from "../octoprint";
-import OctoFarmClient from "../../services/octofarm-client.service";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
@@ -222,7 +221,7 @@ export default class PrinterFileManager {
 
           </div>
             `;
-      FileSorting.loadSort(printer);
+      FileSorting.loadSort(printer._id);
 
       CustomGenerator.generateButtons(printer);
     } catch (e) {

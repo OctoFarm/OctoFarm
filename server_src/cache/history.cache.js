@@ -1,7 +1,6 @@
 const { HistoryClean } = require("../lib/dataFunctions/historyClean");
 
-// TODO what an utterly pointless file... history clean is the cache you absolute melt! I know let's complicate shit and make two cache...
-// This is why the history ain't refreshing there's no way to actual refresh the cache!
+//TODO change, remove clean up
 
 let historyCleanState = new HistoryClean();
 

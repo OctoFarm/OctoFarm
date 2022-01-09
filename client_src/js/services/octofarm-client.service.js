@@ -55,12 +55,16 @@ axios.interceptors.response.use(
 export default class OctoFarmClient {
   static base = "/api";
   static printerRoute = "/printers";
+  static disablePrinterRoute = this.printerRoute + "/disable/";
+  static enablePrinterRoute = this.printerRoute + "/enable/";
   static serverSettingsRoute = "/settings/server";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
   static userRoute = `/users/users`;
+  static healthCheckRoute = `${this.printerRoute}/healthChecks`;
+  static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -95,6 +99,14 @@ export default class OctoFarmClient {
 
   static async listPrinters() {
     return this.post(`${this.printerRoute}/printerInfo/`);
+  }
+
+  static async disablePrinter(id) {
+    return this.patch(`${this.disablePrinterRoute}${id}`);
+  }
+
+  static async enablePrinter(id) {
+    return this.patch(`${this.enablePrinterRoute}${id}`);
   }
 
   static async refreshPrinterSettings(id) {
@@ -168,6 +180,15 @@ export default class OctoFarmClient {
   static getCurrentOpState() {
     return this.get("client/currentOpSorting");
   }
+
+  static getHealthChecks() {
+    return this.get(this.healthCheckRoute);
+  }
+
+  static getFarmOverview() {
+    return this.get(this.farmOverviewRoute);
+  }
+
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });
   }

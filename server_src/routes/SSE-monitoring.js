@@ -4,6 +4,11 @@ const { ensureAuthenticated } = require("../config/auth");
 const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
+const {
+  getDashboardStatistics,
+  getCurrentOperations,
+  generateDashboardStatistics
+} = require("../services/printer-statistics.service");
 
 const logger = new Logger("OctoFarm-API");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
@@ -12,16 +17,13 @@ let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
 let interval = false;
 
-const printerClean = require("../lib/dataFunctions/printerClean.js");
-const PrinterClean = printerClean.PrinterClean;
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-const SettingsClean = settingsClean.SettingsClean;
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const { writePoints } = require("../lib/influxExport.js");
 // User Modal
-const runner = require("../runners/state.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const Runner = runner.Runner;
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 let influxCounter = 2000;
 
@@ -39,7 +41,7 @@ const sortMe = function (printers) {
 };
 const filterMe = function (printers) {
   let filterBy = getFilter();
-  let currentGroups = Runner.returnGroupList();
+  let currentGroups = getPrinterManagerCache().returnGroupList();
   if (filterBy === "All Printers") {
     return printers;
   } else if (filterBy === "State: Active") {
@@ -97,13 +99,13 @@ const filterMe = function (printers) {
   }
 };
 async function sendData() {
-  const currentOperations = PrinterClean.returnCurrentOperations();
+  const currentOperations = getCurrentOperations();
 
-  let printersInformation = PrinterClean.listPrintersInformation();
+  let printersInformation = getPrinterStoreCache().listPrintersInformation();
 
   printersInformation = await filterMe(printersInformation);
   printersInformation = sortMe(printersInformation);
-  const printerControlList = PrinterClean.returnPrinterControlList();
+  const printerControlList = getPrinterManagerCache().getPrinterControlList();
 
   let serverSettings = SettingsClean.returnSystemSettings();
   if (typeof serverSettings === "undefined") {

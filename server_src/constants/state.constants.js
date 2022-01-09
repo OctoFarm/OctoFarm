@@ -6,61 +6,6 @@ const getFilterDefaults = () => [
   "State: Disconnected"
 ];
 
-const SYSTEM_CHECKS = {
-  api: "api",
-  files: "files",
-  state: "state",
-  profile: "profile",
-  settings: "settings",
-  system: "system"
-
-  //Special
-  // cleaning: "cleaning"
-};
-
-const getSystemChecksDefault = () => {
-  return {
-    [SYSTEM_CHECKS.api]: {
-      status: "danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.files]: {
-      status: "danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.state]: {
-      status: "danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.profile]: {
-      status: "danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.settings]: {
-      status: "danger",
-      date: null
-    },
-    [SYSTEM_CHECKS.system]: {
-      status: "danger",
-      date: null
-    },
-    // TODO Hmm
-    cleaning: {
-      information: {
-        date: null
-      },
-      job: {
-        date: null
-      },
-      file: {
-        date: null
-      },
-      status: "danger",
-      date: null
-    }
-  };
-};
-
 // State category
 const CATEGORY = {
   Idle: "Idle",
@@ -112,6 +57,7 @@ const OP_STATE_FLAGS = {
 
 // All states of the app. Nice to share between server and client
 const PSTATE = {
+  SettingUp: "Setting Up",
   Offline: "Offline",
   GlobalAPIKey: "Global API Key Issue",
   Searching: "Searching...",
@@ -130,169 +76,54 @@ const PSTATE = {
   Online: "Online"
 };
 
-const OF_STATE_REMAP = {
-  [OP_STATE.Offline]: {
-    state: PSTATE.Disconnected, // hard remap!
-    desc: "Your printer is disconnected"
-  },
-  [OP_STATE.OpeningSerial]: {
-    state: PSTATE.Searching, // Lack of better
-    desc: "Your printer is connecting to serial"
-  },
-  [OP_STATE.DetectingSerial]: {
-    state: PSTATE.Searching, // Lack of better
-    desc: "Your printer is detecting serial connections"
-  },
-  [OP_STATE.Connecting]: {
-    state: PSTATE.Connecting,
-    desc: "Your printer is connecting to serial"
-  },
-  [OP_STATE.Operational]: {
-    state: PSTATE.Operational,
-    desc: "Printer is ready to print"
-  },
-  [OP_STATE.StartingPrintFromSD]: {
-    state: PSTATE.Searching,
-    desc: "STARTING PRINT FROM SD!"
-  },
-  [OP_STATE.StartSendingPrintToSD]: {
-    state: PSTATE.Searching,
-    desc: "Starting to send file to SD"
-  },
-  [OP_STATE.Starting]: {
-    state: PSTATE.Starting,
-    desc: "Printing right now"
-  },
-  [OP_STATE.TransferringFileToSD]: {
-    state: PSTATE.Searching,
-    desc: "Transferring to SD"
-  },
-  [OP_STATE.SendingFileToSD]: {
-    state: PSTATE.Searching,
-    desc: "Busy sending file to SD"
-  },
-  [OP_STATE.PrintingFromSD]: {
-    state: PSTATE.Printing,
-    desc: "PRINTING FROM SD!"
-  },
-  [OP_STATE.Printing]: {
-    state: PSTATE.Printing,
-    desc: "Printing right now"
-  },
-  [OP_STATE.Cancelling]: {
-    state: PSTATE.Cancelling,
-    desc: "Print is cancelling"
-  },
-  [OP_STATE.Pausing]: {
-    state: PSTATE.Pausing,
-    desc: "Printing paused"
-  },
-  [OP_STATE.Paused]: {
-    state: PSTATE.Paused,
-    desc: "Printing paused"
-  },
-  [OP_STATE.Resuming]: {
-    state: PSTATE.Starting,
-    desc: "Print resuming"
-  },
-  [OP_STATE.Finishing]: {
-    state: PSTATE.Complete,
-    desc: "Print finishing"
-  },
-  [OP_STATE.UnknownState]: {
-    state: "Unknown state",
-    desc: "Unknown state"
-  }
+const STATE_DESCRIPTION = {
+  PrinterSettingUp: "Setting up your Printer...",
+  SocketOffline: "Websocket is Offline..."
 };
 
-function remapOctoPrintState(octoPrintState) {
-  // Handy stuff!
-  const flags = octoPrintState.flags;
-  const stateLabel = octoPrintState.text;
-
-  if (stateLabel.includes("Error:") || stateLabel.includes("error")) {
-    return {
-      state: PSTATE.Error,
-      flags,
-      desc: stateLabel
-    };
+const getBootstrapColour = (state) => {
+  switch (state) {
+    case PSTATE.Operational:
+      return { name: "secondary", category: CATEGORY.Idle };
+    case PSTATE.Paused:
+      return { name: "warning", category: CATEGORY.Idle };
+    case PSTATE.Printing:
+      return { name: "warning", category: CATEGORY.Active };
+    case PSTATE.Pausing:
+      return { name: "warning", category: CATEGORY.Active };
+    case PSTATE.Cancelling:
+      return { name: "warning", category: CATEGORY.Active };
+    case PSTATE.Starting:
+      return { name: "warning", category: CATEGORY.Active };
+    case PSTATE.Offline:
+      return { name: "danger", category: CATEGORY.Offline };
+    case PSTATE.Error:
+      return { name: "danger", category: CATEGORY.Offline };
+    case PSTATE.Searching:
+      return { name: "danger", category: CATEGORY.Offline };
+    case PSTATE.Disconnected:
+      return { name: "danger", category: CATEGORY.Disconnected };
+    case PSTATE.NoAPI:
+      return { name: "danger", category: CATEGORY.Offline };
+    case PSTATE.Complete:
+      return { name: "success", category: CATEGORY.Complete };
+    case PSTATE.Shutdown:
+      return { name: "danger", category: CATEGORY.Offline };
+    case PSTATE.Online:
+      return { name: "success", category: CATEGORY.Idle };
+    case PSTATE.OfflineAfterError:
+      return { name: "danger", category: CATEGORY.Error };
+    default:
+      // Fall back to danger to alert the user and Active to stop any commands going through
+      return { name: "danger", category: CATEGORY.Active };
   }
-
-  const mapping = OF_STATE_REMAP[stateLabel];
-  mapping.flags = flags;
-  if (!!mapping) return mapping;
-
-  return {
-    state: stateLabel,
-    flags,
-    desc: "OctoPrint's state was not recognized"
-  };
-}
-
-const mapStateToColor = (state) => {
-  if (state === PSTATE.Loading) {
-    return { name: "dark", hex: "#262626", category: CATEGORY.Idle };
-  }
-  if (state === PSTATE.Operational) {
-    return { name: "dark", hex: "#262626", category: CATEGORY.Idle };
-  }
-  if (state === PSTATE.Online) {
-    return { name: "success", hex: "#00330e", category: CATEGORY.Idle };
-  }
-  if (state === PSTATE.Paused) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Idle };
-  }
-  if (state === PSTATE.Printing) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
-  }
-  if (state === PSTATE.Pausing) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
-  }
-  if (state === PSTATE.Cancelling) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
-  }
-  if (state === PSTATE.Starting) {
-    return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
-  }
-  if (state === PSTATE.Offline) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
-  }
-  if (state === PSTATE.Searching) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
-  }
-  if (state === PSTATE.NoAPI) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
-  }
-  if (state === PSTATE.Disconnected) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
-  }
-  if (state === PSTATE.Shutdown) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
-  }
-  if (state === PSTATE.Complete) {
-    return { name: "success", hex: "#00330e", category: CATEGORY.Complete };
-  }
-  if (state === PSTATE.GlobalAPIKey) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
-  }
-  if (state === PSTATE.Error) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
-  }
-  if (state === PSTATE.OfflineAfterError) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
-  }
-
-  console.warn("Provided PSTATE not recognized:", state);
-  return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
 };
 
 module.exports = {
-  getSystemChecksDefault,
   getFilterDefaults,
-  mapStateToColor,
-  remapOctoPrintState,
+  getBootstrapColour,
+  STATE_DESCRIPTION,
   PSTATE,
   OP_STATE,
-  CATEGORY,
-  SYSTEM_CHECKS
+  CATEGORY
 };

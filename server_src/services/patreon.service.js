@@ -15,7 +15,7 @@ async function grabLatestPatreonData() {
   if (latestPatreonData.status === 200) {
     const getJSON = await latestPatreonData.json();
     patreonData = getJSON.patreons.applicationPledges;
-    logger.info("Successfully grabbed remote patreon data!");
+    logger.debug("Successfully grabbed remote patreon data!");
   } else {
     logger.error("Falling back to local patreon data...");
   }

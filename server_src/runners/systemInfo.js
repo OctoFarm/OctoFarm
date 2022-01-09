@@ -1,10 +1,10 @@
-const si = require("systeminformation");
+const { time, fsSize } = require("systeminformation");
 const os = require("os");
 const process = require("process");
 const Logger = require("../handlers/logger");
-const { bench } = require("../utils/benchmark.util");
 const logger = new Logger("OctoFarm-Server");
 const { farmPiStatus } = require("../services/farmpi-detection.service");
+const { getCPULoadAVG } = require("../services/cpu-profiling.service");
 
 const diskVeryFullWarning =
   "Warning your disk is getting full... Please clean up some space or move to a larger hard drive.";
@@ -12,55 +12,97 @@ const diskAlmostFullWarning =
   "Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.";
 const diskRisk =
   "Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.";
-let systemInfo = {};
+const memoryUsageHistory = [];
+const cpuUsageHistory = [];
 
-const queryRunner = {
-  cpuCurrentSpeed: si.cpuCurrentSpeed,
-  cpuLoad: si.currentLoad,
-  memoryInfo: si.mem,
-  sysUptime: si.time,
-  processUptime: process.uptime,
-  fileSize: si.fsSize // Converted to system disk and warnings later
+let systemInfo = {
+  distro: "",
+  architecture: "",
+  totalMemory: 0,
+  uptime: 0,
+  osUptime: 0,
+  cpuLoadHistory: [],
+  memoryLoadHistory: [],
+  networkIpAddresses: []
 };
 
 class SystemRunner {
-  static returnInfo() {
+  static returnInfo(profile = false) {
+    if (profile) {
+      SystemRunner.updateSystemInformation().then((res) => {
+        logger.debug("System successfully profiled", res);
+      });
+    }
     return systemInfo;
   }
 
-  /**
-   * Query the systemInfo with an updated values for currentProcess
-   * @returns {Promise<{}>}
-   */
-  static async queryWithFreshCurrentProcess() {
-    let currentProcess;
-
-    const systemProcesses = await bench(si.processes);
-    // // Find our process and assign it
-    systemProcesses.list.forEach((systemProcess) => {
-      if (systemProcess.pid === process.pid) {
-        currentProcess = systemProcess;
-      }
+  static async profileCPUUsagePercent() {
+    const CPUPercent = await getCPULoadAVG(1000, 100);
+    logger.debug("Current CPU Usage", { CPUPercent });
+    cpuUsageHistory.push({
+      x: new Date(),
+      y: CPUPercent
     });
-
-    systemInfo.currentProcess = currentProcess;
-
-    return this.returnInfo();
+    if (cpuUsageHistory.length >= 300) {
+      cpuUsageHistory.shift();
+    }
   }
 
-  static async queryStaticBench() {
-    const benchResults = {};
-    const queryResults = {};
-    for (const [key, query] of Object.entries(queryRunner)) {
-      const benchmarkReport = await bench(query, true);
-      benchResults[key] = benchmarkReport.time;
-      queryResults[key] = benchmarkReport.result;
+  static profileMemoryUsagePercent() {
+    const used = process.memoryUsage();
+    const total = used.heapUsed + used.external;
+    const totalUsed = Math.round((total / 1024 / 1024) * 100) / 100;
+
+    if (systemInfo.totalMemory !== 0) {
+      const totalSystemMemoryInMB = Math.round((systemInfo.totalMemory / 1024 / 1024) * 100) / 100;
+      const memoryPercent = Math.round((100 * totalUsed) / totalSystemMemoryInMB) / 100;
+      logger.debug("Current Memory Usage", { memoryPercent });
+      memoryUsageHistory.push({
+        x: new Date(),
+        y: memoryPercent
+      });
+      if (memoryUsageHistory.length >= 300) {
+        memoryUsageHistory.shift();
+      }
+    }
+  }
+
+  static async initialiseSystemInformation() {
+    await SystemRunner.profileSystem();
+  }
+
+  // Grab updating information
+  static async updateSystemInformation() {
+    systemInfo.uptime = process.uptime();
+    systemInfo.osUptime = os.uptime();
+    const fileSize = await fsSize().catch((error) => logger.error(error));
+    const systemDisk = fileSize[0];
+    systemInfo.systemDisk = systemDisk;
+
+    systemInfo.warnings = SystemRunner.getDiskWarnings(systemDisk);
+  }
+
+  // Grab one time information
+  static async profileSystem() {
+    await SystemRunner.updateSystemInformation();
+
+    systemInfo.architecture = process.arch;
+
+    const siTime = time();
+    systemInfo.timezone = siTime.timezone;
+    systemInfo.timezoneName = siTime.timezoneName;
+
+    if (farmPiStatus()) {
+      systemInfo.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
+    } else {
+      systemInfo.distro = `${os.type()} ${os.release()} (${os.platform()})`;
     }
 
-    return {
-      benchResults,
-      queryResults
-    };
+    systemInfo.networkIpAddresses = SystemRunner.getIpAddressList();
+    systemInfo.totalMemory = os.totalmem();
+
+    systemInfo.cpuLoadHistory = cpuUsageHistory;
+    systemInfo.memoryLoadHistory = memoryUsageHistory;
   }
 
   static getDiskWarnings(disk) {
@@ -100,7 +142,6 @@ class SystemRunner {
     }
     return results;
   }
-
   /**
    * Call and collect quite heavy system information queries
    * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
@@ -144,48 +185,6 @@ class SystemRunner {
     }
   }
 }
-
-// BENCHMARK BOTTLENECKS
-// API query
-// === Uptime
-// ✓ sysUptime?.uptime
-// ✓ processUptime
-// === CPU chart
-// ... just accepted it 300ms is ok-ish X currentProc?.cpuu ==> octoLoad
-// ✓ cpuLoad?.currentLoadSystem ==> systemLoad
-// ✓ cpuLoad?.currentLoadUser ==> userLoad
-// === Memory chart
-// ✓ memoryInfo.used ==> systemUsedRAM
-// ✓ memoryInfo.free ==> freeRAM
-// ... just accepted it 300ms is ok-ish X currentProc?.memRss || currentProc?.mem ==> octoFarmRAM
-
-// View
-// ✓ warnings.status
-// ✓ warnings.message
-// ✓ isPm2
-// ✓ isNodemon
-// ✓ sysUptime.uptime
-// ✓✓✓ X osInfo.distro
-// ✓✓✓ X osInfo.arch
-// ✓ cpuCurrentSpeed.cores.forEach (cpuCurrentSpeed, cpuSpeed)
-// ✓ memoryInfo.total
-// === 90 - 93ms
-// ✓ systemDisk.mount
-// ✓ systemDisk.fs
-// ✓ systemDisk.used
-// ✓ systemDisk.size
-// ✓ systemDisk.use.toFixed(2)
-
-// ✓ processUptime
-//  ? update?.current_version
-//  ? update?.latestReleaseKnown
-//  ? update?.current_version
-//  ? update?.latestReleaseKnown.html_url
-//  ? update?.latestReleaseKnown.name
-//  ? update?.latestReleaseKnown.tag_name
-// ✓ sysUptime.timezoneName
-// ✓ sysUptime.timezone
-// ... just accepted it 300ms is ok-ish X currentProcess?.command
 
 module.exports = {
   SystemRunner

@@ -4,6 +4,8 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../constants/cleaner.constants");
 const { checkNested, checkNestedIndex } = require("./array.util");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const Profiles = require("../models/Profiles");
 
 /**
  * Calculate spool weight static (has nothing to do with cleaning state)
@@ -294,11 +296,25 @@ function getCost(filamentSelection, units) {
   return strings;
 }
 
+const attachProfileToSpool = async (spool) => {
+  let profile = null;
+  if (SettingsClean.returnFilamentManagerSettings()) {
+    profile = await Profiles.findOne({
+      "profile.index": spool.spools.profile
+    });
+  } else {
+    profile = await Profiles.findById(spool.spools.profile);
+  }
+  spool.spools.profile = profile.profile;
+  return spool;
+};
+
 module.exports = {
   calcSpoolWeightAsString,
   processHistorySpools,
   getSpool,
   getUnits,
   getCost,
-  getCostAsString
+  getCostAsString,
+  attachProfileToSpool
 };

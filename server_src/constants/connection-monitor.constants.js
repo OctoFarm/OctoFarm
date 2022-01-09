@@ -11,6 +11,7 @@ module.exports = {
     FAILED_RESPONSE: "totalRequestsFailed",
     SUCCESS_RESPONSE: "totalRequestsSuccess",
     RETRY_REQUESTED: "totalRetries",
+    CONNECTION_FAILURES: "connectionFailures",
     TOTAL_PING_PONG: "totalPingPong"
   }
 };

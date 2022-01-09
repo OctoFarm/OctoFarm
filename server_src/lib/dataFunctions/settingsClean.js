@@ -1,8 +1,9 @@
 "use strict";
 
-const ClientSettings = require("../../models/ClientSettings.js");
-const ServerSettings = require("../../models/ServerSettings.js");
+const ClientSettingsDB = require("../../models/ClientSettings.js");
+const ServerSettingsDB = require("../../models/ServerSettings.js");
 const { findIndex } = require("lodash");
+const { SERVER_ISSUES } = require("../../constants/server-issues.constants");
 
 let systemClean = [];
 let clientClean = [];
@@ -10,6 +11,14 @@ let clientClean = [];
 class SettingsClean {
   static returnSystemSettings() {
     return systemClean;
+  }
+
+  static returnTimeoutSettings() {
+    return systemClean.timeout;
+  }
+
+  static returnFilamentManagerSettings() {
+    return systemClean.filamentManager;
   }
 
   static returnClientSettings(id) {
@@ -29,10 +38,49 @@ class SettingsClean {
    * @returns {Promise<void>}
    */
   static async start() {
-    const clientSettings = await ClientSettings.find({});
-    const serverSettings = await ServerSettings.find({});
+    const clientSettings = await ClientSettingsDB.find({});
+    const serverSettings = await ServerSettingsDB.find({});
     systemClean = serverSettings[0];
     clientClean = clientSettings;
+  }
+
+  static async initialise() {
+    await this.initialiseServerSettings();
+    await this.initaliseClientSettings();
+    await this.start();
+  }
+
+  static async initialiseServerSettings() {
+    const serverSettings = await ServerSettingsDB.find({});
+    if (serverSettings.length < 1) {
+      // No settings... save default.
+      const newSettingsDefaults = new ServerSettingsDB();
+      await newSettingsDefaults.save().catch((e) => {
+        throw new Error(SERVER_ISSUES.SERVER_SETTINGS_FAIL_INIT + e);
+      });
+    } else {
+      // Make sure to update records with any new additions
+      serverSettings[0].save().catch((e) => {
+        throw new Error(SERVER_ISSUES.SERVER_SETTINGS_FAIL_UPDATE + e);
+      });
+    }
+  }
+  static async initaliseClientSettings() {
+    const clientSettings = await ClientSettingsDB.find({});
+
+    if (clientSettings.length < 1) {
+      const newClientDefaults = new ClientSettingsDB();
+      newClientDefaults.save().catch((e) => {
+        throw new Error(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT + e);
+      });
+    } else {
+      for (let i = 0; i < clientSettings.length; i++) {
+        const existingSettings = clientSettings[i];
+        existingSettings.save().catch((e) => {
+          throw new Error(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_UPDATE + e);
+        });
+      }
+    }
   }
 }
 

@@ -15,7 +15,7 @@ function returnActionBtnTemplate(id) {
             <i class="fas fa-toggle-off"></i>
       </button>
       <button  
-         title="Re-establish the OctoFarm -> OctoPrint Connection"
+         title="Terminate and reconnect OctoPrints Socket connection."
          id="printerSyncButton-${id}"
          type="button"
          class="tag btn btn-success btn-sm"
@@ -227,7 +227,7 @@ function addGroupEventListeners(printers) {
               const data = {
                 id: printer._id
               };
-              let post = await OctoFarmClient.post("printers/reScanOcto", data);
+              let post = await OctoFarmClient.post("printers/reSyncSockets", data);
               if (post.msg.status !== "error") {
                 UI.createAlert(
                   "success",
@@ -383,11 +383,11 @@ function addEventListeners(printer) {
       const data = {
         id: printer._id
       };
-      let post = await OctoFarmClient.post("printers/reScanOcto", data);
-      if (post.msg.status !== "error") {
-        UI.createAlert("success", post.msg.msg, 3000, "clicked");
+      let post = await OctoFarmClient.post("printers/reSyncSockets", data);
+      if (post.status !== "error") {
+        UI.createAlert("success", post.msg, 3000, "clicked");
       } else {
-        UI.createAlert("error", post.msg.msg, 3000, "clicked");
+        UI.createAlert("error", post.msg, 3000, "clicked");
       }
 
       e.target.innerHTML = "<i class='fas fa-sync'></i>";
@@ -396,8 +396,12 @@ function addEventListeners(printer) {
 }
 
 function checkQuickConnectState(printer) {
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
-    printer.printerState.colour.category === "Offline";
+  const isDisabledOrOffline =
+    printer.printerState.colour.category === "Offline" ||
+    printer.printerState.colour.category === "Disabled";
+  document.getElementById("printerQuickConnect-" + printer._id).disabled = isDisabledOrOffline;
+
+  document.getElementById("printerSyncButton-" + printer._id).disabled = isDisabledOrOffline;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||

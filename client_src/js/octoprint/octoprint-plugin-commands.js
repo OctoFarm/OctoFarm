@@ -1,7 +1,7 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import OctoFarmClient from "../services/octofarm-client.service.js";
 import UI from "../lib/functions/ui";
-import bulkActionsStates from "../printer-manager/bulk-actions.constants";
+import bulkActionsStates from "../pages/printer-manager/bulk-actions.constants";
 
 const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
@@ -126,6 +126,7 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
   if (action === "install") {
     cleanAction = cleanAction + "ing";
   }
+
   if (printer.printerState.colour.category !== "Active") {
     for (let r = 0; r < pluginList.length; r++) {
       let alert = UI.createAlert(

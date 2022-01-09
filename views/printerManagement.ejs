@@ -44,20 +44,19 @@
 
 <div class="row">
     <%- include(table, {
-        table:{
-            id:"printerTable", contentId:"printerList", headers: [
-                { title:"Sort Index" ,style:"min-width:100px;" },
-                { title:"Name" ,style:"", wrap:" text-wrap" },
-                { title:"Actions" ,style:"min-width:150px;" },
-                { title:"Manage" ,style:"min-width:150px;" },
-                { title:"Host State" ,style:"min-width:50px;" },
-                { title:"Printer State" ,style:"min-width:50px;" },
-                { title:"WebSocket" ,style:"min-width:150px;" },
-                { title:"Group" ,style:"min-width:10px;" },
-                { title:"Printer" ,style:"min-width:50px;", wrap:" text-wrap"},
-                { title:"OctoPrint" ,style:"min-width:100px;", wrap:" text-wrap"},
-            ]
-        }
+    table:{
+    id:"printerTable", contentId:"printerList", headers: [
+    { title:"Sort Index" ,style:"min-width:100px;" },
+    { title:"Name" ,style:"", wrap:" text-wrap" },
+    { title:"Host State" ,style:"min-width:50px;" },
+    { title:"Printer State" ,style:"min-width:50px;" },
+    { title:"WebSocket" ,style:"min-width:150px;" },
+    { title:"Group" ,style:"min-width:10px;" },
+    { title:"Quick Actions" ,style:"min-width:150px;" },
+    { title:"Manage" ,style:"min-width:150px;" },
+    { title:"Alerts" ,style:"min-width:150px;" },
+    ]
+    }
     })
     %>
 </div>
@@ -95,6 +94,13 @@ bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
         id:"printerStatistics", title:"Printer Statistics"
     },
     bodyFile:'./PrinterManager/printerStatistics.modal.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"healthChecks", title: "Printers Health Checks"
+},
+bodyFile:'./PrinterManager/healthChecks.modal.ejs'
 })
 %>
 

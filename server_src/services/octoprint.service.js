@@ -1,25 +1,24 @@
 const fetch = require("node-fetch");
 const { findIndex } = require("lodash");
-const runner = require("../runners/state.js");
-const { Runner } = runner;
 const Spool = require("../models/Filament.js");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const getOnlinePrinterList = async function () {
-  const printerList = Runner.returnFarmPrinters();
+  const printerList = getPrinterStoreCache().listPrintersInformation();
   const onlinePrintersList = [];
   for (let i = 0; i < printerList.length; i++) {
     if (
-      printerList[i].stateColour.category === "Disconnected" ||
-      printerList[i].stateColour.category === "Idle" ||
-      printerList[i].stateColour.category === "Active" ||
-      printerList[i].stateColour.category === "Complete"
+      printerList[i].printerState.colour.category === "Disconnected" ||
+      printerList[i].printerState.colour.category === "Idle" ||
+      printerList[i].printerState.colour.category === "Active" ||
+      printerList[i].printerState.colour.category === "Complete"
     ) {
       onlinePrintersList.push(printerList[i]);
     }
   }
   return onlinePrintersList;
 };
-
+// TODO needs to not check for offline printers
 const checkIfFilamentManagerPluginExists = async function (printers) {
   const missingPlugin = [];
 
@@ -65,7 +64,7 @@ const checkFilamentManagerPluginSettings = async function (printers) {
 };
 
 const checkIfSpoolAttachedToPrinter = function (spoolId) {
-  const printerList = Runner.returnFarmPrinters();
+  const printerList = getPrinterStoreCache().listPrinters();
   const filteredList = printerList.filter((printer) => printer.selectedFilament.length > 0);
   let isSpoolAttached = false;
   for (let i = 0; i < filteredList.length; i++) {
