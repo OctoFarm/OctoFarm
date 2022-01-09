@@ -22,38 +22,47 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 
 export default class PrinterManager {
   static async init(index, printers, printerControlList) {
-    //clear camera
-    if (index !== "") {
-      if (document.getElementById("printerControlCamera")) {
-        document.getElementById("printerControlCamera").src = "";
+    try {
+      //clear camera
+      if (index !== "") {
+        if (document.getElementById("printerControlCamera")) {
+          document.getElementById("printerControlCamera").src = "";
+        }
+
+        currentIndex = index;
+        const id = _.findIndex(printers, function (o) {
+          return o._id == index;
+        });
+        currentPrinter = printers[id];
+
+        const changeFunction = function (value) {
+          PrinterManager.init(value, printers, printerControlList);
+        };
+        setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+        await PrinterManager.loadPrinter(currentPrinter, printerControlList);
+        const elements = PrinterManager.grabPage();
+        elements.printerControls["step" + currentPrinter.stepRate].className =
+          "btn btn-dark active";
+        PrinterManager.applyState(currentPrinter, elements);
+        PrinterManager.applyTemps(currentPrinter, elements);
+        PrinterManager.applyListeners(elements, printers);
+      } else {
+        const id = _.findIndex(printers, function (o) {
+          return o._id == currentIndex;
+        });
+        currentPrinter = printers[id];
+        const elements = await PrinterManager.grabPage();
+        PrinterManager.applyState(currentPrinter, elements);
+        PrinterManager.applyTemps(currentPrinter, elements);
+        document.getElementById("printerManagerModal").style.overflow = "auto";
       }
-
-      currentIndex = index;
-      const id = _.findIndex(printers, function (o) {
-        return o._id == index;
-      });
-      currentPrinter = printers[id];
-
-      const changeFunction = function (value) {
-        PrinterManager.init(value, printers, printerControlList);
-      };
-
-      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
-      await PrinterManager.loadPrinter(currentPrinter, printerControlList);
-      const elements = PrinterManager.grabPage();
-      elements.printerControls["step" + currentPrinter.stepRate].className = "btn btn-dark active";
-      PrinterManager.applyState(currentPrinter, elements);
-      PrinterManager.applyTemps(currentPrinter, elements);
-      PrinterManager.applyListeners(elements, printers);
-    } else {
-      const id = _.findIndex(printers, function (o) {
-        return o._id == currentIndex;
-      });
-      currentPrinter = printers[id];
-      const elements = await PrinterManager.grabPage();
-      PrinterManager.applyState(currentPrinter, elements);
-      PrinterManager.applyTemps(currentPrinter, elements);
-      document.getElementById("printerManagerModal").style.overflow = "auto";
+    } catch (e) {
+      UI.createAlert(
+        "danger",
+        "The volatility of this is astounding... Error:" + JSON.stringify(e),
+        0,
+        "Clicked"
+      );
     }
   }
 

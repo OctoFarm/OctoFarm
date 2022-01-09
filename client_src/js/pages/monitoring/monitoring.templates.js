@@ -1131,8 +1131,8 @@ export function drawGroupViewPrinters(printer, clientSettings) {
         groupContainer.insertAdjacentHTML(
           "beforeend",
           `
-        <div class="col-sm-12 col-md-6 col-lg-${panelColumns}">
-          <div id="panel-${printer._id}" class="card text-white bg-dark">
+        <div id="panel-${printer._id}" class="col-sm-12 col-md-6 col-lg-${panelColumns}">
+          <div  class="card text-white bg-dark">
             <div class="card-header dashHeader text-truncate">
                 <button id="name-${printer._id}" class="btn btn-block btn-sm text-truncate ${buttonStyle}" style="${colourStyle}" disabled>${printer.printerName}</button>
                 <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">

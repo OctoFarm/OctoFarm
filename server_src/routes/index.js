@@ -19,8 +19,7 @@ const { generatePrinterStatistics } = require("../services/printer-statistics.se
 const { TaskManager } = require("../runners/task.manager");
 const {
   getDashboardStatistics,
-  getCurrentOperations,
-  generateDashboardStatistics
+  getCurrentOperations
 } = require("../services/printer-statistics.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
@@ -153,7 +152,7 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
   const currentSort = getSorting();
   const currentFilter = getFilter();
   const serverSettings = SettingsClean.returnSystemSettings();
-
+  getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
@@ -182,7 +181,7 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
-
+  getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
@@ -210,7 +209,7 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 
   const currentSort = getSorting();
   const currentFilter = getFilter();
-
+  getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
@@ -239,7 +238,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
-
+  getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];
@@ -268,7 +267,7 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
-
+  getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
     printGroups = [];

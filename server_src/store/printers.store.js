@@ -517,7 +517,9 @@ class PrinterStore {
       for (let p = 0; p < ids.length; p++) {
         const currentPrinter = this.#findMePrinter(ids[p]);
         const fileList = currentPrinter?.fileList?.fileList;
-        fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
+        if (!!fileList) {
+          fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
+        }
       }
       if (
         fileChecks.every(function (e) {

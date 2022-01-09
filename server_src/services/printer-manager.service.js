@@ -168,6 +168,7 @@ class PrinterManagerService {
   }
 
   updateGroupList() {
+    this.#printerGroupList = [];
     const defaultGroupList = [
       "All Printers",
       "State: Idle",
@@ -315,7 +316,7 @@ class PrinterManagerService {
     });
   }
 
-  async getPrinterControlList() {
+  getPrinterControlList() {
     return this.#printerControlList;
   }
 }
