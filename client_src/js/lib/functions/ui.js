@@ -94,16 +94,18 @@ export default class UI {
   static addSelectListeners(elementValue) {
     let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
     inputBoxes.forEach((input) => {
-      input.addEventListener("focus", (e) => {
-        if (input.value !== input.placeholder) {
-          input.value = input.placeholder;
-        }
-      });
-      input.addEventListener("focusout", (e) => {
-        if (input.value !== input.placeholder) {
-          input.placeholder = input.value;
-        }
-      });
+      if (input.localName === "input") {
+        input.addEventListener("focus", (e) => {
+          if (input.value !== input.placeholder) {
+            input.value = input.placeholder;
+          }
+        });
+        input.addEventListener("focusout", (e) => {
+          if (input.value !== input.placeholder) {
+            input.placeholder = input.value;
+          }
+        });
+      }
     });
   }
   //TODO: Move to a templates folder
@@ -265,6 +267,64 @@ export default class UI {
         string = "No Interval";
       }
       return string;
+    }
+  }
+
+  static isPrinterDisabled(e) {
+    if (e.target.innerHTML.includes("running")) {
+      return false;
+    } else if (e.target.innerHTML.includes("wheelchair")) {
+      return true;
+    }
+  }
+
+  static addDisplayNoneToElement(element) {
+    if (element.classList.contains("d-none")) {
+      element.classList.remove("d-none");
+    }
+  }
+
+  static removeDisplayNoneFromElement(element) {
+    if (!element.classList.contains("d-none")) {
+      element.classList.add("d-none");
+    }
+  }
+
+  static togglePrinterDisableState(e, id) {
+    const printerCard = document.getElementById(`printerCard-${id}`);
+
+    if (e.target.innerHTML.includes("running")) {
+      e.target.classList = "btn btn-outline-light btn-sm";
+      e.target.innerHTML = '<i class="fas fa-wheelchair"></i> Disabled';
+      e.target.title = "Printer is Disabled, click to enable";
+      printerCard.classList = "printerDisabled";
+    } else if (e.target.innerHTML.includes("wheelchair")) {
+      e.target.classList = "btn btn-outline-success btn-sm";
+      e.target.innerHTML = '<i class="fas fa-running"></i> Enabled';
+      e.target.title = "Printer is Enabled, click to disable";
+      printerCard.classList = "";
+    }
+  }
+
+  static getValueOrPlaceHolder(element) {
+    if (element) {
+      if (element.value === "") {
+        return undefined;
+      } else {
+        return element.value;
+      }
+    } else {
+      return undefined;
+    }
+  }
+
+  static returnProgressColour(percent, reverse) {
+    if (percent < 45) {
+      return reverse ? "bg-danger" : "bg-success";
+    } else if (percent < 75) {
+      return "bg-warning";
+    } else {
+      return reverse ? "bg-success" : "bg-danger";
     }
   }
 }

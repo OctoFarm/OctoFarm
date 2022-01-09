@@ -11,7 +11,11 @@ import PrinterSelect from "../../../lib/modules/printerSelect";
 import FileOperations from "../../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
 import PrinterFileManager from "../../../lib/modules/printerFileManager";
-import { returnHealthCheckRow } from "../templates/health-checks-table-row.templates";
+import {
+  addHealthCheckListeners,
+  returnFarmOverviewTableRow,
+  returnHealthCheckRow
+} from "../templates/health-checks-table-row.templates";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -104,22 +108,18 @@ export async function scanNetworkForDevices(e) {
   e.target.disabled = false;
 }
 
-export async function reSyncPrinters(force = false) {
-  let searchOffline = document.getElementById("searchOfflineBtn");
+export async function reSyncAPI(force = false, id = null) {
+  let reSyncAPIBtn = document.getElementById("reSyncAPI");
 
-  if (force) {
-    searchOffline = document.getElementById("forceSearchOffline");
-  }
-
-  searchOffline.disabled = true;
+  reSyncAPIBtn.disabled = true;
   let alert = UI.createAlert(
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
   try {
-    const post = await OctoFarmClient.post("printers/reScanOcto", {
-      id: null,
+    const post = await OctoFarmClient.post("printers/reSyncAPI", {
+      id: id,
       force: force
     });
   } catch (e) {
@@ -128,12 +128,30 @@ export async function reSyncPrinters(force = false) {
   }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
-  if (force) {
-    searchOffline.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Force Re-Setup';
-  } else {
-    searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Connect';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm"></i> ReScan All API\'s';
+  reSyncAPIBtn.disabled = false;
+}
+export async function reSyncWebsockets() {
+  let reSyncSocketsBtn = document.getElementById("reSyncSockets");
+
+  reSyncSocketsBtn.disabled = true;
+  let alert = UI.createAlert(
+    "info",
+    "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
+  );
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing Sockets...';
+  try {
+    const post = await OctoFarmClient.post("printers/reSyncSockets", {
+      id: null
+    });
+  } catch (e) {
+    console.error(e);
+    UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
   }
-  searchOffline.disabled = false;
+  alert.close();
+  UI.createAlert("success", "Background sync started successfully!", 3000, "clicked");
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets';
+  reSyncSocketsBtn.disabled = false;
 }
 
 export async function bulkEditPrinters() {
@@ -225,7 +243,7 @@ export async function exportPrintersToJson() {
         name: printers[r].printerName,
         group: printers[r].group,
         printerURL: printers[r].printerURL,
-        cameraURL: printers[r].cameraURL,
+        cameraURL: printers[r].camURL,
         apikey: printers[r].apikey
       };
       printersExport.push(printer);
@@ -296,11 +314,56 @@ export async function saveAllOnAddPrinterTable() {
   deleteAllBtn.disabled = true;
 }
 
-export async function loadPrinterHealthChecks() {
+export async function loadPrinterHealthChecks(id = undefined) {
   const healthChecks = await OctoFarmClient.getHealthChecks();
   const table = document.getElementById("healthChecksTable");
   table.innerHTML = "";
-  healthChecks.forEach((check) => {
-    table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+  if (!!id) {
+    const filteredCheck = healthChecks.filter(function (check) {
+      return check.printerID === id;
+    });
+    filteredCheck.forEach((check) => {
+      table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+      addHealthCheckListeners(check);
+    });
+  } else {
+    healthChecks.forEach((check) => {
+      table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+      addHealthCheckListeners(check);
+    });
+  }
+}
+
+export async function loadFarmOverviewInformation() {
+  const farmOverview = await OctoFarmClient.getFarmOverview();
+  const farmOverviewInformation = document.getElementById("farmOverviewInformation");
+  farmOverviewInformation.innerHTML = "";
+  console.log(farmOverview);
+  farmOverview.forEach((printer) => {
+    const currentPrinter = printer.statistics;
+    if (!!currentPrinter) {
+      const printTotal =
+        currentPrinter.printSuccessTotal +
+        currentPrinter.printCancelTotal +
+        currentPrinter.printErrorTotal;
+      const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
+      const printUtilisationTotal =
+        currentPrinter.activeTimeTotal +
+        currentPrinter.idleTimeTotal +
+        currentPrinter.offlineTimeTotal;
+      const printerActivityRate =
+        (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0;
+      const octoSysInfo = currentPrinter.octoPrintSystemInfo;
+      farmOverviewInformation.insertAdjacentHTML(
+        "beforeend",
+        returnFarmOverviewTableRow(
+          currentPrinter,
+          printer,
+          octoSysInfo,
+          printerSuccessRate,
+          printerActivityRate
+        )
+      );
+    }
   });
 }

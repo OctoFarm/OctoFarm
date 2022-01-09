@@ -142,10 +142,9 @@ function checkReleaseAndLogUpdate() {
   const latestReleaseTag = latestRelease.tag_name;
   if (!installedReleaseFound) {
     logger.info(
-      `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
-    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
-    Here's your release tag: \x1b[32m${packageVersion}\x1b[0m
-    Appreciate the hard work, you rock!`
+      `\x1b[36mHey thanks for helping out with OctoFarm!!\x1b[0m
+    Github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
+    Your release tag: \x1b[32m${packageVersion}\x1b[0m`
     );
     return;
   }

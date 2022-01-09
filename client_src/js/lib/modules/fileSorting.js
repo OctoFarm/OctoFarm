@@ -1,39 +1,41 @@
 import FileManager from "./fileManager.js";
+import OctoFarmClient from "../../services/octofarm-client.service";
 
 export default class FileSorting {
   static saveSort(meta, reverse) {
     localStorage.setItem("fileSort", JSON.stringify({ meta, reverse }));
   }
 
-  static loadSort(printer, recursive) {
+  static async loadSort(id, recursive) {
+    const updatedPrinter = await OctoFarmClient.getPrinter(id);
     const fileSortStorage = JSON.parse(localStorage.getItem("fileSort"));
     if (fileSortStorage !== null) {
       const reverse = fileSortStorage.reverse;
       if (fileSortStorage.meta === "file") {
         if (typeof recursive !== "undefined") {
-          this.sortFileName(printer, reverse, recursive);
+          this.sortFileName(updatedPrinter, reverse, recursive);
         } else {
-          this.sortFileName(printer, reverse);
+          this.sortFileName(updatedPrinter, reverse);
         }
       }
       if (fileSortStorage.meta === "date") {
         if (typeof recursive !== "undefined") {
-          this.sortUploadDate(printer, reverse, recursive);
+          this.sortUploadDate(updatedPrinter, reverse, recursive);
         } else {
-          this.sortUploadDate(printer, reverse);
+          this.sortUploadDate(updatedPrinter, reverse);
         }
       }
       if (fileSortStorage.meta === "time") {
         if (typeof recursive !== "undefined") {
-          this.sortPrintTime(printer, reverse, recursive);
+          this.sortPrintTime(updatedPrinter, reverse, recursive);
         } else {
-          this.sortPrintTime(printer, reverse);
+          this.sortPrintTime(updatedPrinter, reverse);
         }
       }
     } else {
-      this.sortUploadDate(printer, true);
+      this.sortUploadDate(updatedPrinter, true);
     }
-    this.setListeners(printer);
+    this.setListeners(updatedPrinter);
   }
 
   static setListeners(printer) {
@@ -97,7 +99,7 @@ export default class FileSorting {
         sortHeader.innerHTML = '<i class="fas fa-sort-alpha-down"></i> File Name';
         this.saveSort("file", false);
       }
-      FileManager.drawFiles(printer, recursive);
+      FileManager.drawFiles(printer, true);
     }
   }
 

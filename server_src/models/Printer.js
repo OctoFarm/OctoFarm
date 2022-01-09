@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  disabled: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   apikey: {
     type: String,
     required: true // !
@@ -24,6 +29,10 @@ const PrinterSchema = new mongoose.Schema({
   // Auto-generated below
   settingsAppearance: {
     type: Object,
+    required: false
+  },
+  printerFirmware: {
+    type: String,
     required: false
   },
   currentUser: {
@@ -84,11 +93,8 @@ const PrinterSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: false
-  },
-  type: {
-    type: String,
-    required: false
+    required: false,
+    default: "OctoPrint"
   },
   ip: {
     type: String,
@@ -126,12 +132,16 @@ const PrinterSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
-  pluginsList: {
+  pluginsListDisabled: {
+    type: Array,
+    required: false
+  },
+  pluginsListEnabled: {
     type: Array,
     required: false
   },
   octoPrintUpdate: {
-    type: Array,
+    type: Object,
     required: false
   },
   octoPrintPluginUpdates: {

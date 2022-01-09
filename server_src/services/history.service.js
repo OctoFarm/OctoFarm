@@ -9,7 +9,7 @@ const {
 
 const defaultHistoryObject = {
   printHistory: {
-    printerName: "TEST PRINTER",
+    printerName: "OctoPrint-0",
     costSettings: {
       powerConsumption: 0.5,
       electricityCosts: 0.15,
@@ -87,14 +87,30 @@ async function generateYearsWorthOfHistory() {
     return days;
   }
 
-  const monthList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  let successRatePerDay = [];
 
-  const successRatePerDay = ["success", "success", "success"];
+  function generateRandom() {
+    var y = Math.random();
+    if (y < 0.5) return 0;
+    else return 1;
+  }
+
+  function generateSuccessRate() {
+    successRatePerDay = [];
+    for (let i = 0; i < 20; i++) {
+      successRatePerDay.push(generateRandom() ? "success" : "cancelled");
+    }
+  }
+
+  generateSuccessRate();
+
+  const monthList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
   for (let i = 0; i < monthList.length; i++) {
     const currentMonth = monthList[i];
-    const dayList = getDaysInMonth(currentMonth, 2021);
+    const dayList = getDaysInMonth(currentMonth, 2022);
     for (let d = 0; d < dayList.length; d++) {
+      generateSuccessRate();
       for (let r = 0; r < successRatePerDay.length; r++) {
         const currentState = successRatePerDay[r];
         if (currentState === "success") {

@@ -5,13 +5,13 @@ import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
 import { ELEMENTS, HISTORY_CONSTANTS, SORT_CONSTANTS } from "./constants/history.constants";
 import {
+  returnHistoryFilterDefaultSelected,
   returnHistoryPagination,
-  returnHistoryTableRow,
-  returnHistoryFilterDefaultSelected
+  returnHistoryTableRow
 } from "./pages/history/history.templates";
 import { daysBetweenTwoDates, getFirstDayOfLastMonth } from "./utils/date.utils";
 import Litepicker from "litepicker";
-import { dashboardOptions } from "./dashboard/dashboard.options";
+import { dashboardOptions } from "./pages/dashboard/dashboard.options";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {

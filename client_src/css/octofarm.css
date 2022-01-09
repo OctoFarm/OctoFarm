@@ -150,23 +150,33 @@ li {
   color: #262626;
 }
 .textActive {
-  color: #63450f;
+  color: #6b5103;
 }
+
 .textOffline {
-  color: #630c05;
+  color: #721c24;
 }
+
 .textClosed {
-  color: #630a05;
+  color: #721c24;
 }
+
 .textComplete {
-  color: #006311;
+  color: #155724;
 }
+
+.textInfo {
+  color: #004085;
+}
+
 .text-offline {
   color: #401418;
 }
+
 .Info {
   background-color: #25386e;
 }
+
 .Idle {
   background-color: #262626;
 }
@@ -291,6 +301,16 @@ a.notyet {
 }
 .printerSelected {
   border-left: #f39c12 4px solid;
+}
+.printerDisabled {
+  border-left: #e74c3c 4px solid;
+  background-color: transparent;
+  opacity: 0.8;
+}
+.printerEnabled {
+  border-left: green 4px solid;
+  background-color: transparent;
+  opacity: 1.0;
 }
 .fileFooter {
   padding: 5px;

@@ -11,8 +11,9 @@ const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const { TaskManager, TimedBookTask } = require("./runners/task.manager");
+const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
+const { SERVER_ISSUES } = require("./constants/server-issues.constants");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -104,18 +105,11 @@ function serveOctoFarmRoutes(app) {
 
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
-    logger.info("Initialising FarmInformation...");
-    await PrinterClean.initFarmInformation();
+    logger.info("Starting OctoFarm server tasks...");
 
-    const promises = await Promise.allSettled(OctoFarmTasks.TIMED_BOOT_TASTS);
-    console.log(promises)
     for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
-      const task = OctoFarmTasks.RECURRING_BOOT_TASKS[i];
-      TaskManager.registerJobOrTask(task);
+      TaskManager.registerJobOrTask(OctoFarmTasks.RECURRING_BOOT_TASKS[i]);
     }
-    // TODO attempt to run in sequence
-
-
     await optionalInfluxDatabaseSetup();
   }
 

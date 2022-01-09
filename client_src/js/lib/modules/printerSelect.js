@@ -295,7 +295,7 @@ export default class PrinterSelect {
           state: printer.printerState.colour.category,
           group: printer.group,
           spool: spoolName,
-          cameraURL: printer.cameraURL,
+          cameraURL: printer.camURL,
           apikey: printer.apikey
         };
         printerList.push(forList);

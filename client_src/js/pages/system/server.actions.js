@@ -3,8 +3,8 @@ import UI from "../../lib/functions/ui";
 import Calc from "../../lib/functions/calc";
 import FileOperations from "../../lib/functions/file";
 import {
-  setupOctoPrintForTimelapses,
-  setupOctoPrintForFilamentManager
+  setupOctoPrintForFilamentManager,
+  setupOctoPrintForTimelapses
 } from "../../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
@@ -13,18 +13,155 @@ import {
   setupFilamentManagerSyncBtn
 } from "../../services/filament-manager-plugin.service";
 import {
+  filamentManagerPluginActionElements,
   returnSaveBtn,
   settingsElements,
-  userActionElements,
-  filamentManagerPluginActionElements
+  userActionElements
 } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
-import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
-
 import ApexCharts from "apexcharts";
 
-let systemChartCPU;
-let systemChartMemory;
+let historicUsageGraph;
+let cpuUsageDonut;
+let memoryUsageDonut;
+
+const options = {
+  series: [],
+  chart: {
+    id: "realtime",
+    height: 300,
+    type: "line",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    },
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "Loading Data..."
+  },
+  stroke: {
+    curve: "smooth"
+  },
+  title: {
+    text: "CPU and Memory Usage History",
+    align: "left"
+  },
+  markers: {
+    size: 0
+  },
+  xaxis: {
+    type: "datetime"
+  },
+  yaxis: {
+    max: 100
+  },
+  legend: {
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: "bottom",
+    horizontalAlign: "center",
+    floating: false,
+    fontSize: "14px",
+    fontFamily: "Helvetica, Arial",
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    customLegendItems: [],
+    offsetX: 0,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false
+    },
+    markers: {
+      width: 12,
+      height: 12,
+      strokeWidth: 0,
+      strokeColor: "#fff",
+      fillColors: undefined,
+      radius: 12,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0
+    },
+    itemMargin: {
+      horizontal: 5,
+      vertical: 0
+    },
+    onItemClick: {
+      toggleDataSeries: true
+    },
+    onItemHover: {
+      highlightDataSeries: true
+    }
+  }
+};
+const cpuOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    }
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "Loading Data..."
+  },
+  series: [],
+  labels: ["CPU Usage"]
+};
+const memoryOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    background: "#303030",
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000
+      }
+    }
+  },
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "Loading Data..."
+  },
+  series: [],
+  labels: ["Memory Usage"]
+};
 
 async function setupOPTimelapseSettings() {
   const printers = await OctoFarmClient.listPrinters();
@@ -356,75 +493,71 @@ async function grabOctoFarmLogList() {
   });
 }
 
-function renderSystemCharts() {
-  systemChartCPU = new ApexCharts(document.querySelector("#systemChartCPU"), cpuChartOptions);
-  systemChartCPU.render();
-  systemChartMemory = new ApexCharts(
-    document.querySelector("#systemChartMemory"),
-    memoryChartOptions
-  );
-  systemChartMemory.render();
+async function renderSystemCharts() {
+  historicUsageGraph = new ApexCharts(document.querySelector("#historicUsageGraph"), options);
+  await historicUsageGraph.render();
+  cpuUsageDonut = new ApexCharts(document.querySelector("#cpuUsageDonut"), cpuOptions);
+  await cpuUsageDonut.render();
+  memoryUsageDonut = new ApexCharts(document.querySelector("#memoryUsageDonut"), memoryOptions);
+  await memoryUsageDonut.render();
 }
 
-function startUpdateInfoRunner() {
-  setInterval(async function updateStatus() {
-    const systemInformation = await OctoFarmClient.get("system/info");
-
-    const sysUptimeElem = document.getElementById("systemUptime");
-    const procUptimeElem = document.getElementById("processUpdate");
-
-    if (systemInformation.sysUptime?.uptime && !!sysUptimeElem) {
-      sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.sysUptime.uptime);
+async function updateLiveSystemInformation() {
+  const options = {
+    noData: {
+      text: "No data to display yet!"
     }
+  };
+  const systemInformation = await OctoFarmClient.get("system/info");
+  const sysUptimeElem = document.getElementById("systemUptime");
+  const procUptimeElem = document.getElementById("processUpdate");
 
-    if (systemInformation.processUptime && !!sysUptimeElem) {
-      procUptimeElem.innerHTML = Calc.generateTime(systemInformation.processUptime);
-    }
+  if (systemInformation?.uptime && !!procUptimeElem) {
+    procUptimeElem.innerHTML = Calc.generateTime(systemInformation.uptime);
+  }
 
-    const currentProc = systemInformation?.currentProcess;
-    const cpuLoad = systemInformation?.cpuLoad;
+  if (systemInformation?.osUptime && !!sysUptimeElem) {
+    sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
+  }
 
-    const currentCPULoad = document.getElementById("currentCPUUsage");
-    const currentMemoryLoad = document.getElementById("currentMemoryUsage");
+  if (systemInformation.memoryLoadHistory.length > 0) {
+    await memoryUsageDonut.updateSeries([
+      systemInformation.memoryLoadHistory[systemInformation.memoryLoadHistory.length - 1].y
+    ]);
+  } else {
+    await historicUsageGraph.updateOptions(options);
+  }
 
-    if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
-      const systemLoad = cpuLoad.currentLoadSystem;
-      const userLoad = cpuLoad.currentLoadUser;
-      const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
-      currentCPULoad.innerHTML = octoLoad.toFixed(10) + "%";
-      const remain = systemLoad + octoLoad + userLoad;
+  if (systemInformation.cpuLoadHistory) {
+    await cpuUsageDonut.updateSeries([
+      systemInformation.cpuLoadHistory[systemInformation.cpuLoadHistory.length - 1].y
+    ]);
+  } else {
+    await historicUsageGraph.updateOptions(options);
+  }
 
-      // labels: ['System', 'OctoFarm', 'User', 'Free'],
-      systemChartCPU.updateSeries([systemLoad, octoLoad, userLoad, 100 - remain]);
-    }
-
-    const memoryInfo = systemInformation?.memoryInfo;
-
-    if (!!memoryInfo) {
-      const systemUsedRAM = memoryInfo.used;
-      const freeRAM = memoryInfo.free;
-
-      if (!!(currentProc?.memRss || currentProc?.mem)) {
-        let octoFarmRAM = currentProc?.memRss * 1000;
-        if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
-          octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
-        }
-        if (Number.isNaN(octoFarmRAM)) {
-          // labels: ['System', 'OctoFarm', 'Free'],
-          systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
-        } else {
-          currentMemoryLoad.innerHTML =
-            ((100 * currentProc?.mem) / memoryInfo.total).toFixed(10) + "%";
-          systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
-        }
-      } else {
-        systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
+  if (systemInformation.memoryLoadHistory.length > 5) {
+    const dataSeriesForCharts = [
+      {
+        name: "Memory",
+        data: systemInformation.memoryLoadHistory
+      },
+      {
+        name: "CPU",
+        data: systemInformation.cpuLoadHistory
       }
-    } else {
-      systemChartMemory.updateSeries([0, 0, 0]);
-    }
-  }, 15000);
+    ];
+    await historicUsageGraph.updateSeries(dataSeriesForCharts);
+  } else {
+    await historicUsageGraph.updateOptions(options);
+  }
 }
+
+async function startUpdateInfoRunner() {
+  await updateLiveSystemInformation();
+  setInterval(await updateLiveSystemInformation, 5000);
+}
+
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
     const taskManagerState = await OctoFarmClient.get("system/tasks");

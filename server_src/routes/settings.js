@@ -15,10 +15,8 @@ const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
-const runner = require("../runners/state.js");
 const multer = require("multer");
 const { isEqual } = require("lodash");
-const { Runner } = runner;
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
@@ -27,6 +25,8 @@ const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
 } = require("../services/octofarm-update.service.js");
+const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 module.exports = router;
 
@@ -85,8 +85,8 @@ router.get(
   ensureAdministrator,
   async (req, res) => {
     const databaseName = req.params.name;
-    await Runner.pause();
-    if (databaseName === "nukeEverything") {
+    await getPrinterManagerCache().killAllConnections();
+    if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
       await ClientSettingsDB.deleteMany({});
       await HistoryDB.deleteMany({});
@@ -203,7 +203,7 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
 
   ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
     .then(async () => {
-      SettingsClean.start();
+      await SettingsClean.start();
       await fetchUsers(true);
       res.send({ msg: "Settings Saved" });
     })
@@ -234,10 +234,10 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     let restartRequired = false;
 
     const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
-    const serverChanges = isEqual(checked[0].server, req.body.onlinePolling);
-    const timeoutChanges = isEqual(checked[0].timeout, req.body.onlinePolling);
-    const filamentChanges = isEqual(checked[0].filament, req.body.onlinePolling);
-    const historyChanges = isEqual(checked[0].history, req.body.onlinePolling);
+    const serverChanges = isEqual(checked[0].server, req.body.server);
+    const timeoutChanges = isEqual(checked[0].timeout, req.body.timeout);
+    const filamentChanges = isEqual(checked[0].filament, req.body.filament);
+    const historyChanges = isEqual(checked[0].history, req.body.history);
     const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
 
     checked[0].onlinePolling = req.body.onlinePolling;
@@ -259,7 +259,12 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
       ].includes(false)
     ) {
       restartRequired = true;
-      await Runner.updatePoll();
+    }
+
+    if (onlineChanges) {
+      await getPrinterStoreCache().updateAllPrintersSocketThrottle(
+        checked[0].onlinePolling.seconds
+      );
     }
 
     //Check the influx export to see if all information exists... disable if not...

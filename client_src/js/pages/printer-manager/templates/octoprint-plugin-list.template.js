@@ -62,3 +62,19 @@ export function returnPluginListTemplate(plugin) {
                     </div>
   `;
 }
+
+export function returnPluginSelectTemplate(plugin) {
+  return `
+      <div class="entry" id="plugin-${plugin.key.replace(/ /g, "_")}">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <div>
+                                    <span>${plugin.name}</span>
+
+       
+                                </div>
+                            </div>
+                    </div>
+      </div>
+  `;
+}

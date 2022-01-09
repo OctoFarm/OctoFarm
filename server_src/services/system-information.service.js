@@ -8,8 +8,7 @@ const isDocker = require("is-docker");
 const { getUpdateNotificationIfAny } = require("./octofarm-update.service.js");
 
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
-const systemInfo = require("../runners/systemInfo.js");
-const SystemInfo = systemInfo.SystemRunner;
+const { SystemInfo } = require("../runners/systemInfo.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
@@ -20,6 +19,7 @@ const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js")
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
 const { TaskManager } = require("../runners/task.manager");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const systemInformationFileName = "system_information.txt";
 
@@ -138,7 +138,7 @@ function generateSystemInformationContents() {
     }
   }
 
-  const printerVersions = PrinterClean.returnAllOctoPrintVersions();
+  const printerVersions = getPrinterStoreCache().listAllOctoPrintVersions();
 
   if (printerVersions) {
     systemInformationContents += "\n --- OctoPrint Information ---\n\n";

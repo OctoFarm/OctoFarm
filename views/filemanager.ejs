@@ -46,8 +46,32 @@
                     </div>
                     <div class="card-body pt-2 pb-0">
                         <div class="row">
+                            <div class="col-12">
+                                <div class="progress">
+                                    <div id="uploadCurrentProgress" class="progress-bar progress-bar-striped bg-success"
+                                         role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0"
+                                         aria-valuemax="100">0%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <h5>Upload Queue <span id="uploadsSpinnerIcon"><i
+                                                class="fas fa-spinner"></i></span><span
+                                            class="badge badge-success float-right" id="uploadsRemaining">0</span></h5>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <small>Printer: <span id="uploadsPrinterName"></span></small><br>
+                                        <small>File: <span id="uploadsFileName"></span></small><br>
+                                    </div>
+
+                                </div>
+                            </div>
                             <div class="col-lg-4">
-                                <h5>Printers</h5>
+                                <h5>Manage</h5>
                                 <hr>
                                 <div class="row">
                                     <div class="col-12">
@@ -75,8 +99,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-8">
-                                <h5>Files</h5>
+                            <div class="col-lg-6">
+                                <h5>File Actions</h5>
                                 <hr>
                                 <div id="fileManagerManagement">
 
@@ -104,16 +128,6 @@
                                 <i class="fas fa-print"></i> Printers
                             </button>
                         </h5>
-                        <button
-                                type="button"
-                                class="btn btn-secondary float-right d-block"
-                                href="#"
-                                aria-expanded="false"
-                                disabled
-                        >
-                            <i id="fileUploadCountSpinner" class="fas fa-spinner"></i></span> <span
-                                    id="fileUploadCount"> File Queue: 0</span>
-                        </button>
                     </div>
                     <div class="card-body fileBody">
                         <div id="printerList" class="list-group">

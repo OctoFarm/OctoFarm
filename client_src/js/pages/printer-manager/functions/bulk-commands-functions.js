@@ -14,36 +14,36 @@ import {
   updateOctoPrintClient
 } from "../../../octoprint/octoprint-client-commands";
 import {
-  printerPreHeatBed,
-  printerPreHeatTool,
-  printerPreHeatChamber,
-  printerStartPrint,
+  printerHomeAxis,
+  printerMoveAxis,
   printerPausePrint,
+  printerPreHeatBed,
+  printerPreHeatChamber,
+  printerPreHeatTool,
   printerRestartPrint,
   printerResumePrint,
-  printerStopPrint,
-  printerMoveAxis,
-  printerHomeAxis,
-  printerSendGcode
+  printerSendGcode,
+  printerStartPrint,
+  printerStopPrint
 } from "../../../octoprint/octoprint-printer-commands";
-import {
-  setupOctoPrintForFilamentManager,
-  setupOctoPrintForVirtualPrinter
-} from "../../../octoprint/octoprint-settings.actions";
+import { setupOctoPrintForVirtualPrinter } from "../../../octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
-import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
 import {
+  returnPluginListTemplate,
+  returnPluginSelectTemplate
+} from "../templates/octoprint-plugin-list.template";
+import {
+  generateTableRows,
   showBulkActionsModal,
   updateBulkActionsProgress,
-  generateTableRows,
   updateTableRow
 } from "./bulk-actions-progress.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../../lib/modules/clientQueue.js";
 import OctoPrintClient from "../../../lib/octoprint";
-import { filamentManagerPluginActionElements } from "../../system/server.options";
+
 const fileUploads = new Queue();
 
 let selectedFolder = "";
@@ -708,10 +708,10 @@ export async function bulkOctoPrintControlCommand() {
   const printersToControl = await getCurrentlySelectedPrinterList();
   let cameraBlock = "";
   printersToControl.forEach((printer) => {
-    if (printer.cameraURL && printer.cameraURL.length !== 0) {
+    if (printer.camURL && printer.camURL.length !== 0) {
       cameraBlock += `
         <div class="col-lg-3">
-            <img width="100%" src="${printer.cameraURL}">
+            <img width="100%" src="${printer.camURL}">
         </div>
         `;
     }
@@ -1042,32 +1042,73 @@ export async function bulkOctoPrintPluginAction(action) {
   const printersForPluginAction = await getCurrentlySelectedPrinterList();
   try {
     let pluginList = [];
-    let printerPluginList = null;
     if (action === "install") {
-      printerPluginList = await OctoFarmClient.get(
-        "printers/pluginList/" + printersForPluginAction[0]._id
-      );
-    } else {
-      printerPluginList = await OctoFarmClient.get("printers/pluginList/all");
-    }
-    printerPluginList.forEach((plugin) => {
-      if (action === "install") {
+      const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
+      pluginRepositoryList.forEach((plugin) => {
         pluginList.push({
           text: returnPluginListTemplate(plugin),
           value: plugin.archive
         });
-      } else {
-        pluginList.push({
-          text: returnPluginListTemplate(plugin),
-          value: plugin.id
-        });
+      });
+    } else {
+      const idList = printersForPluginAction.map(function (printer) {
+        return printer._id;
+      });
+      for (let i = 0; i < idList.length; i++) {
+        if (action === "enable") {
+          try {
+            const disabledPluginList = await OctoFarmClient.get(
+              "printers/disabledPluginList/" + idList[i]
+            );
+            disabledPluginList.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab disabled plugin list... ignoring.", e);
+          }
+        }
+        if (action === "disable") {
+          try {
+            const enabledPluginList = await OctoFarmClient.get(
+              "printers/enabledPluginList/" + idList[i]
+            );
+            enabledPluginList.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab enabled plugin list... ignoring.", e);
+          }
+        }
+        if (action === "uninstall") {
+          try {
+            const allInstalledPlugins = await OctoFarmClient.get(
+              "printers/allPluginsList/" + idList[i]
+            );
+            allInstalledPlugins.forEach((plugin) => {
+              pluginList.push({
+                text: returnPluginSelectTemplate(plugin),
+                value: plugin.key
+              });
+            });
+          } catch (e) {
+            console.error("Couldn't grab installed plugin list... ignoring.", e);
+          }
+        }
       }
-    });
+    }
+
     pluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
       }
     ]);
+
     pluginList = _.uniqBy(pluginList, function (e) {
       return e.text;
     });
@@ -1076,9 +1117,9 @@ export async function bulkOctoPrintPluginAction(action) {
     bootbox.prompt({
       size: "large",
       title: `<form class="form-inline float-right">
-                  <div class="form-group">
-                    <label for="searchPlugins">
-                      Please choose the plugin you'd like to install... or: &nbsp;
+                  <div class="form-group text-wrap">
+                    <label for="searchPlugins text-wrap">
+                      Please choose the plugin you'd like to ${action}.. or: &nbsp;
                     </label>
                     <input width="75%" id="searchPlugins" type="text" placeholder="Search for your plugin name here..." class="search-control search-control-underlined">
                   </div>

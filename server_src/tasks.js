@@ -2,23 +2,36 @@ const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
-const { Runner } = require("./runners/state.js");
-const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const ConnectionMonitorService = require("./services/connection-monitor.service");
-const { REQUEST_TYPE, REQUEST_KEYS } = require("./constants/connection-monitor.constants");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
-const { PrinterTicker } = require("./runners/printerTicker");
-const Logger = require("./handlers/logger.js");
+const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
+const { getPrinterStoreCache } = require("./cache/printer-store.cache");
+const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
+const {
+  updatePluginNoticesStore,
+  updatePluginStore
+} = require("./store/octoprint-plugin-list.store");
+const { FileClean } = require("./lib/dataFunctions/fileClean");
+const { sortCurrentOperations } = require("./services/printer-statistics.service");
+const { initFarmInformation } = require("./services/farm-information.service");
+const Logger = require("./handlers/logger");
 const logger = new Logger("OctoFarm-TaskManager");
+const INITIALISE_PRINTERS = async () => {
+  await getPrinterManagerCache().initialisePrinters();
+};
 
-const PRINTER_CLEAN_TASK = async () => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const printersInformation = PrinterClean.listPrintersInformation();
-  await PrinterClean.sortCurrentOperations(printersInformation);
-  await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+// const INIT_FILE_UPLOAD_QUEUE = async () => {
+//   getFileUploadQueueCache().actionQueueState();
+// };
+
+const INITIALIST_PRINTERS_STORE = async () => {
+  await getPrinterStoreCache();
+};
+
+const SORT_CURRENT_OPERATIONS = async () => {
+  const printerList = getPrinterStoreCache().listPrintersInformation();
+  await sortCurrentOperations(printerList);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -36,8 +49,7 @@ const HISTORY_CACHE_TASK = async () => {
 };
 
 const FILAMENT_CLEAN_TASK = async () => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  await FilamentClean.start(serverSettings.filamentManager);
+  await FilamentClean.start();
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
@@ -47,49 +59,23 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
 };
 
 const SYSTEM_INFO_CHECK_TASK = async () => {
-  await SystemRunner.querySystemInfo();
+  await SystemRunner.initialiseSystemInformation();
+};
+
+const CPU_PROFILING_TASK = async () => {
+  await SystemRunner.profileCPUUsagePercent();
+};
+
+const MEMORY_PROFILING_TASK = () => {
+  SystemRunner.profileMemoryUsagePercent();
 };
 
 const GENERATE_MONTHLY_HISTORY_STATS = async () => {
   await getHistoryCache().generateMonthlyStats();
 };
 
-const WEBSOCKET_HEARTBEAT_TASK = () => {
-  const farmPrinters = Runner.returnFarmPrinters();
-  farmPrinters.forEach(function each(client) {
-    if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
-      if (
-        client.ws.instance.readyState !== 0 &&
-        client.ws.instance.readyState !== 2 &&
-        client.ws.instance.readyState !== 3
-      ) {
-        if (client.ws.isAlive === false) {
-          ConnectionMonitorService.updateOrAddResponse(
-            client.webSocketURL + "/sockjs/websocket",
-            REQUEST_TYPE.PING_PONG,
-            REQUEST_KEYS.TOTAL_PING_PONG
-          );
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[client.ws.index].printerURL,
-            "Ping/Pong check failed! Destroying printer and re-setting up!",
-            "Offline",
-            farmPrinters[client.ws.index]._id
-          );
-          return Runner.reScanOcto(farmPrinters[client.ws.index]._id);
-        }
-        const triggerStates = ["Offline", "Searching...", "Shutdown"];
-        if (!triggerStates.includes(farmPrinters[client.ws.index].state)) {
-          // Retry connecting if failed...
-          farmPrinters[client.ws.index].webSocket = "info";
-          farmPrinters[client.ws.index].webSocketDescription =
-            "Checking if Websocket is still alive";
-          client.ws.isAlive = false;
-          client.ws.instance.ping(function noop() {});
-        }
-      }
-    }
-  });
+const RUN_PRINTER_HEALTH_CHECKS = async () => {
+  await updatePrinterHealthChecks(true);
 };
 
 const SSE_TASK = () => {
@@ -153,8 +139,14 @@ const SSE_DASHBOARD = () => {
   // }
 };
 
+const GENERATE_FILE_STATISTICS = async () => {
+  const pList = getPrinterStoreCache().listPrintersInformation();
+  const stats = FileClean.statistics(pList);
+  logger.debug("File Statistics Run", stats);
+};
+
 const STATE_TRACK_COUNTERS = async () => {
-  await Runner.trackCounters();
+  await getPrinterManagerCache().updateStateCounters();
 };
 
 const GRAB_LATEST_PATREON_DATA = async () => {
@@ -166,8 +158,25 @@ const DATABASE_MIGRATIONS_TASK = async () => {
   console.log(migrations);
 };
 
-const INITITIALISE_PRINTERS = async () => {
-  await Runner.init();
+const GENERATE_PRINTER_CONTROL_LIST = async () => {
+  await getPrinterManagerCache().generatePrintersControlDropList();
+};
+
+const INIT_FARM_INFORMATION = async () => {
+  await initFarmInformation();
+};
+
+const UPDATE_OCTOPRINT_PLUGINS_LIST = async () => {
+  await updatePluginNoticesStore();
+  await updatePluginStore();
+};
+
+const CHECK_FOR_OCTOPRINT_UPDATES = async () => {
+  await getPrinterManagerCache().checkForOctoPrintUpdates();
+};
+
+const GENERATE_PRINTER_SPECIFIC_STATISTICS = async () => {
+  await getPrinterManagerCache().generatePrintersStatisticsCache();
 };
 
 /**
@@ -186,30 +195,30 @@ function TaskStart(task, preset, milliseconds = 0) {
   };
 }
 
-async function TimedBookTask(name, input){
-  const started = Date.now();
-  const task =  await input();
-  logger.info(`Boot Task '${name}' first completion. ${Date.now() - started}ms  ${task}`)
-  return true
-}
-
 class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
-    TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNDELAYED),
+    TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(UPDATE_OCTOPRINT_PLUGINS_LIST, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
-    TaskStart(WEBSOCKET_HEARTBEAT_TASK, TaskPresets.PERIODIC_10000MS),
-    TaskStart(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
+    TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+    TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+    TaskStart(FARMPI_DETECTION_TASK, TaskPresets.RUNONCE),
+    TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),
+    TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
+    TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
+    TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_5000MS),
+    TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
-    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
+    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
+    TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
+    TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
+    TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS)
+    // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
-  static TIMED_BOOT_TASTS = [
-    TimedBookTask("SYSTEM_INFO_CHECK_TASK", SystemRunner.querySystemInfo),
-    TimedBookTask("FARMPI_DETECTION_TASK", detectFarmPi),
-    // TimedBookTask("INITITIALISE_PRINTERS ", Runner.init)
-    ]
 }
 
 module.exports = {

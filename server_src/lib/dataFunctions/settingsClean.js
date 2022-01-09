@@ -13,6 +13,14 @@ class SettingsClean {
     return systemClean;
   }
 
+  static returnTimeoutSettings() {
+    return systemClean.timeout;
+  }
+
+  static returnFilamentManagerSettings() {
+    return systemClean.filamentManager;
+  }
+
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {

@@ -2,7 +2,7 @@ import OctoPrintClient from "../octoprint";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import { returnDropDown, selectFilament } from "../../services/filament-manager-plugin.service";
+import { createFilamentSelector } from "../../services/filament-manager-plugin.service";
 import CustomGenerator from "./customScripts.js";
 import { setupClientSwitchDropDown } from "../../services/client-modal.service";
 
@@ -22,44 +22,51 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 
 export default class PrinterManager {
   static async init(index, printers, printerControlList) {
-    //clear camera
-    if (index !== "") {
-      if (document.getElementById("printerControlCamera")) {
-        document.getElementById("printerControlCamera").src = "";
+    try {
+      //clear camera
+      if (index !== "") {
+        if (document.getElementById("printerControlCamera")) {
+          document.getElementById("printerControlCamera").src = "";
+        }
+
+        currentIndex = index;
+        const id = _.findIndex(printers, function (o) {
+          return o._id == index;
+        });
+        currentPrinter = printers[id];
+
+        const changeFunction = function (value) {
+          PrinterManager.init(value, printers, printerControlList);
+        };
+        setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+        await PrinterManager.loadPrinter(currentPrinter, printerControlList);
+        const elements = PrinterManager.grabPage();
+        elements.printerControls["step" + currentPrinter.stepRate].className =
+          "btn btn-dark active";
+        PrinterManager.applyState(currentPrinter, elements);
+        PrinterManager.applyTemps(currentPrinter, elements);
+        PrinterManager.applyListeners(elements, printers);
+      } else {
+        const id = _.findIndex(printers, function (o) {
+          return o._id == currentIndex;
+        });
+        currentPrinter = printers[id];
+        const elements = await PrinterManager.grabPage();
+        PrinterManager.applyState(currentPrinter, elements);
+        PrinterManager.applyTemps(currentPrinter, elements);
+        document.getElementById("printerManagerModal").style.overflow = "auto";
       }
-
-      currentIndex = index;
-      const id = _.findIndex(printers, function (o) {
-        return o._id == index;
-      });
-      currentPrinter = printers[id];
-
-      const changeFunction = function (value) {
-        PrinterManager.init(value, printers, printerControlList);
-      };
-
-      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
-
-      const filamentDropDown = await returnDropDown();
-      await PrinterManager.loadPrinter(currentPrinter, printerControlList, filamentDropDown);
-      const elements = PrinterManager.grabPage();
-      elements.printerControls["step" + currentPrinter.stepRate].className = "btn btn-dark active";
-      PrinterManager.applyState(currentPrinter, elements);
-      PrinterManager.applyTemps(currentPrinter, elements);
-      PrinterManager.applyListeners(elements, printers, filamentDropDown);
-    } else {
-      const id = _.findIndex(printers, function (o) {
-        return o._id == currentIndex;
-      });
-      currentPrinter = printers[id];
-      const elements = await PrinterManager.grabPage();
-      PrinterManager.applyState(currentPrinter, elements);
-      PrinterManager.applyTemps(currentPrinter, elements);
-      document.getElementById("printerManagerModal").style.overflow = "auto";
+    } catch (e) {
+      UI.createAlert(
+        "danger",
+        "The volatility of this is astounding... Error:" + JSON.stringify(e),
+        0,
+        "Clicked"
+      );
     }
   }
 
-  static async loadPrinter(printer, printerControlList, filamentDropDown) {
+  static async loadPrinter(printer, printerControlList) {
     //Load Connection Panel
 
     try {
@@ -372,8 +379,8 @@ export default class PrinterManager {
             `;
 
       let camURL = "";
-      if (typeof printer.cameraURL !== "undefined" && printer.cameraURL.includes("http")) {
-        camURL = printer.cameraURL;
+      if (typeof printer.camURL !== "undefined" && printer.camURL.includes("http")) {
+        camURL = printer.camURL;
       } else {
         camURL = "../../../images/noCamera.jpg";
       }
@@ -392,6 +399,7 @@ export default class PrinterManager {
       const printerToolTemps = document.getElementById("pmToolTemps");
       document.getElementById("pmOtherTemps").innerHTML = "";
       printerToolTemps.innerHTML = "";
+
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         const keys = Object.keys(printer.currentProfile);
         for (let t = 0; t < keys.length; t++) {
@@ -418,24 +426,7 @@ export default class PrinterManager {
                                 `
               );
               const pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
-              pmFilamentDrop.innerHTML = "";
-              filamentDropDown.forEach((filament) => {
-                pmFilamentDrop.insertAdjacentHTML("beforeend", filament);
-              });
-              if (
-                Array.isArray(printer.selectedFilament) &&
-                printer.selectedFilament.length !== 0
-              ) {
-                if (
-                  typeof printer.selectedFilament[i] !== "undefined" &&
-                  printer.selectedFilament[i] !== null
-                ) {
-                  pmFilamentDrop.value = printer.selectedFilament[i]._id;
-                }
-              }
-              pmFilamentDrop.addEventListener("change", (event) => {
-                selectFilament(printer._id, event.target.value, `${i}`);
-              });
+              await createFilamentSelector(pmFilamentDrop, printer, i);
             }
           } else if (keys[t].includes("heatedBed")) {
             if (printer.currentProfile[keys[t]]) {
@@ -487,7 +478,7 @@ export default class PrinterManager {
         }
       }
 
-      CustomGenerator.generateButtons(printer);
+      await CustomGenerator.generateButtons(printer);
 
       return true;
     } catch (e) {
@@ -502,7 +493,7 @@ export default class PrinterManager {
     }
   }
 
-  static applyListeners(elements, printers, filamentDropDown) {
+  static applyListeners(elements, printers) {
     const rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach((slider) => {
       slider.addEventListener("input", (e) => {
@@ -586,6 +577,7 @@ export default class PrinterManager {
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step01.className = "btn btn-light";
     });
+
     if (currentPrinter.currentProfile !== null) {
       const keys = Object.keys(currentPrinter.currentProfile);
       for (let t = 0; t < keys.length; t++) {
