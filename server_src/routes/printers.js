@@ -2,10 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
-// User Modal
-const runner = require("../runners/state.js");
-
-const { Runner } = runner;
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -18,6 +14,7 @@ const _ = require("lodash");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
+const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -265,6 +262,27 @@ router.get("/listUnifiedFiles/:ids", ensureAuthenticated, async (req, res) => {
 
 router.get("/healthChecks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   res.send(returnPrinterHealthChecks(true));
+});
+
+router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const returnArray = [];
+  const printers = getPrinterStoreCache().listPrintersInformation();
+
+  for (let i = 0; i < printers.length; i++) {
+    let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
+    if (!stats) {
+      stats = await generatePrinterStatistics(printers[i]._id);
+      getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
+    }
+
+    returnArray.push({
+      octoPrintVersion: printers[i]?.octoPrintVersion,
+      printerFirmware: printers[i]?.printerFirmware,
+      statistics: stats
+    });
+  }
+
+  res.send(returnArray);
 });
 
 router.patch("/disable/:id", ensureAuthenticated, ensureAdministrator, (req, res) => {

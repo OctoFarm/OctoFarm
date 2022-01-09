@@ -317,4 +317,14 @@ export default class UI {
       return undefined;
     }
   }
+
+  static returnProgressColour(percent, reverse) {
+    if (percent < 45) {
+      return reverse ? "bg-danger" : "bg-success";
+    } else if (percent < 75) {
+      return "bg-warning";
+    } else {
+      return reverse ? "bg-success" : "bg-danger";
+    }
+  }
 }

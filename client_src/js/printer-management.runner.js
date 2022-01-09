@@ -16,6 +16,7 @@ import {
   deleteAllOnAddPrinterTable,
   exportPrintersToJson,
   importPrintersFromJsonFile,
+  loadFarmOverviewInformation,
   loadPrinterHealthChecks,
   reSyncAPI,
   reSyncWebsockets,
@@ -164,6 +165,11 @@ saveAllBtn.addEventListener("click", async (e) => {
 const printerHealthCheckBtn = document.getElementById("printerHealthCheckBtn");
 printerHealthCheckBtn.addEventListener("click", async (e) => {
   await loadPrinterHealthChecks();
+});
+
+const farmOverviewInformationBtn = document.getElementById("farmOverviewModalBtn");
+farmOverviewInformationBtn.addEventListener("click", async (e) => {
+  await loadFarmOverviewInformation();
 });
 
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");

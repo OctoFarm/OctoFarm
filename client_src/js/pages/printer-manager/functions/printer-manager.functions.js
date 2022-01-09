@@ -13,6 +13,7 @@ import { createPrinterAddInstructions } from "../templates/printer-add-instructi
 import PrinterFileManager from "../../../lib/modules/printerFileManager";
 import {
   addHealthCheckListeners,
+  returnFarmOverviewTableRow,
   returnHealthCheckRow
 } from "../templates/health-checks-table-row.templates";
 
@@ -331,4 +332,38 @@ export async function loadPrinterHealthChecks(id = undefined) {
       addHealthCheckListeners(check);
     });
   }
+}
+
+export async function loadFarmOverviewInformation() {
+  const farmOverview = await OctoFarmClient.getFarmOverview();
+  const farmOverviewInformation = document.getElementById("farmOverviewInformation");
+  farmOverviewInformation.innerHTML = "";
+  console.log(farmOverview);
+  farmOverview.forEach((printer) => {
+    const currentPrinter = printer.statistics;
+    if (!!currentPrinter) {
+      const printTotal =
+        currentPrinter.printSuccessTotal +
+        currentPrinter.printCancelTotal +
+        currentPrinter.printErrorTotal;
+      const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
+      const printUtilisationTotal =
+        currentPrinter.activeTimeTotal +
+        currentPrinter.idleTimeTotal +
+        currentPrinter.offlineTimeTotal;
+      const printerActivityRate =
+        (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0;
+      const octoSysInfo = currentPrinter.octoPrintSystemInfo;
+      farmOverviewInformation.insertAdjacentHTML(
+        "beforeend",
+        returnFarmOverviewTableRow(
+          currentPrinter,
+          printer,
+          octoSysInfo,
+          printerSuccessRate,
+          printerActivityRate
+        )
+      );
+    }
+  });
 }

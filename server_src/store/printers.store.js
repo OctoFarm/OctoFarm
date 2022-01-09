@@ -750,6 +750,16 @@ class PrinterStore {
   updateFlowRate(id, flowRate) {
     this.updatePrinterDatabase(id, { flowRate: flowRate });
   }
+
+  updatePrinterStatistics(id, statistics) {
+    const printer = this.#findMePrinter(id);
+    printer.updatePrinterStatistics(statistics);
+  }
+
+  getPrinterStatistics(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.getPrinterStatistics();
+  }
 }
 
 module.exports = PrinterStore;

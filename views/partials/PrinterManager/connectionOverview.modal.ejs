@@ -27,6 +27,7 @@
 <% printerConnectionStats.forEach((url, index) => { %>
     <% const currentPrinter = url; %>
     <% const toCalc = []; %>
+        <% console.log(currentPrinter.conn) %>
     <% currentPrinter.connections.forEach(con => { %>
         <% const log = con.log; %>
         <% const url = con.url; %>

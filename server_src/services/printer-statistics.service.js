@@ -31,14 +31,17 @@ const getCurrentHistoryTemp = () => {
   return currentHistoryTemp;
 };
 
-const generatePrinterStatistics = (id) => {
-  const historyCache = getHistoryCache().historyClean;
-  let currentHistory = JSON.parse(JSON.stringify(historyCache));
-  let currentPrinters = getPrinterStoreCache().listPrintersInformation();
-  const i = _.findIndex(currentPrinters, function (o) {
-    return JSON.stringify(o._id) === JSON.stringify(id);
-  });
-  let printer = Object.assign({}, currentPrinters[i]);
+const generatePrinterStatistics = async (id) => {
+  const printer = getPrinterStoreCache().getPrinterInformation(id);
+
+  const { historyClean } = await getHistoryCache().initCache(
+    { "printHistory.printerName": printer.printerName },
+    {
+      page: 1,
+      limit: 1000,
+      sort: { _id: -1 }
+    }
+  );
 
   // Calculate time printer has existed...
   let dateAdded = new Date(printer.dateAdded);
@@ -57,6 +60,7 @@ const generatePrinterStatistics = (id) => {
     activeTimeTotal: printer.currentActive,
     idleTimeTotal: printer.currentIdle,
     offlineTimeTotal: printer.currentOffline,
+    overallPrintTimeAcuracy: [],
     printerUtilisation: [],
     filamentUsedWeightTotal: [],
     filamentUsedLengthTotal: [],
@@ -93,92 +97,104 @@ const generatePrinterStatistics = (id) => {
   printerStatistics.printerUtilisation.push((printer.currentIdle / totalTime) * 100);
   printerStatistics.printerUtilisation.push((printer.currentOffline / totalTime) * 100);
 
-  currentHistory.forEach((h) => {
-    // Parse the date from history....
+  if (!!historyClean) {
+    historyClean.forEach((h) => {
+      // Parse the date from history....
 
-    let dateParse = new Date(h.endDate);
-    if (h.printer === printerStatistics.printerName) {
-      //Collate totals
-      printerStatistics.filamentUsedWeightTotal.push(h.totalWeight);
-      printerStatistics.filamentUsedLengthTotal.push(h.totalLength);
-      printerStatistics.printerCostTotal.push(parseFloat(h.totalCost));
-      printerStatistics.filamentCostTotal.push(h.spoolCost);
-      if (typeof h.resend !== "undefined") {
-        printerStatistics.printerResendRatioTotal.push(h.resend.ratio);
-      }
+      let dateParse = new Date(h.endDate);
+      if (h.printer === printerStatistics.printerName) {
+        //Collate totals
+        printerStatistics.filamentUsedWeightTotal.push(h.totalWeight);
+        printerStatistics.filamentUsedLengthTotal.push(h.totalLength);
+        printerStatistics.printerCostTotal.push(parseFloat(h.totalCost));
+        printerStatistics.filamentCostTotal.push(h.spoolCost);
 
-      if (h.state.includes("success")) {
-        printerStatistics.printSuccessTotal.push(1);
-      } else if (h.state.includes("warning")) {
-        printerStatistics.printCancelTotal.push(1);
-      } else if (h.state.includes("danger")) {
-        printerStatistics.printErrorTotal.push(1);
-      }
+        if (!!h?.job?.printTimeAccuracy) {
+          printerStatistics.overallPrintTimeAcuracy.push(
+            h?.job?.printTimeAccuracy.toFixed(0) / 100
+          );
+        }
 
-      if (dateParse.getTime() > todaysDate.getTime()) {
-        historyDaily.push(h);
-      }
-      // Capture Weekly..
-      if (dateParse.getTime() > sevenDaysAgo.getTime()) {
-        historyWeekly.push(h);
-      }
-      let successEntry = checkNested("Success", printerStatistics.historyByDay);
-      //
-      if (typeof successEntry !== "undefined") {
-        let checkNestedIndexHistoryRates = null;
+        if (typeof h.resend !== "undefined") {
+          printerStatistics.printerResendRatioTotal.push(h.resend.ratio);
+        }
+
         if (h.state.includes("success")) {
-          checkNestedIndexHistoryRates = checkNestedIndex(
-            "Success",
-            printerStatistics.historyByDay
-          );
+          printerStatistics.printSuccessTotal.push(1);
         } else if (h.state.includes("warning")) {
-          checkNestedIndexHistoryRates = checkNestedIndex(
-            "Cancelled",
-            printerStatistics.historyByDay
-          );
+          printerStatistics.printCancelTotal.push(1);
         } else if (h.state.includes("danger")) {
-          checkNestedIndexHistoryRates = checkNestedIndex("Failed", printerStatistics.historyByDay);
-        } else {
-          return;
+          printerStatistics.printErrorTotal.push(1);
         }
 
-        //Check if more than 30 days ago...
-        if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
-          printerStatistics.historyByDay[checkNestedIndexHistoryRates].data.push({
-            x: dateParse,
-            y: 1
-          });
-          // printerStatistics.historyByDayIncremental[
-          //   checkNestedIndexHistoryRates
-          // ].data.push({
-          //   x: dateParse,
-          //   y: 1,
-          // });
+        if (dateParse.getTime() > todaysDate.getTime()) {
+          historyDaily.push(h);
         }
-      } else {
-        let successKey = {
-          name: "Success",
-          data: []
-        };
-        let cancellKey = {
-          name: "Cancelled",
-          data: []
-        };
-        let failedKey = {
-          name: "Failed",
-          data: []
-        };
-        if (typeof printerStatistics.historyByDay[0] === "undefined") {
-          printerStatistics.historyByDay.push(successKey);
-          printerStatistics.historyByDay.push(cancellKey);
-          printerStatistics.historyByDay.push(failedKey);
-          // printerStatistics.historyByDayIncremental.push(successKey);
-          // printerStatistics.historyByDayIncremental.push(cancellKey);
-          // printerStatistics.historyByDayIncremental.push(failedKey);
+        // Capture Weekly..
+        if (dateParse.getTime() > sevenDaysAgo.getTime()) {
+          historyWeekly.push(h);
+        }
+        let successEntry = checkNested("Success", printerStatistics.historyByDay);
+        //
+        if (typeof successEntry !== "undefined") {
+          let checkNestedIndexHistoryRates = null;
+          if (h.state.includes("success")) {
+            checkNestedIndexHistoryRates = checkNestedIndex(
+              "Success",
+              printerStatistics.historyByDay
+            );
+          } else if (h.state.includes("warning")) {
+            checkNestedIndexHistoryRates = checkNestedIndex(
+              "Cancelled",
+              printerStatistics.historyByDay
+            );
+          } else if (h.state.includes("danger")) {
+            checkNestedIndexHistoryRates = checkNestedIndex(
+              "Failed",
+              printerStatistics.historyByDay
+            );
+          } else {
+            return;
+          }
+
+          //Check if more than 30 days ago...
+          if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
+            printerStatistics.historyByDay[checkNestedIndexHistoryRates].data.push({
+              x: dateParse,
+              y: 1
+            });
+            // printerStatistics.historyByDayIncremental[
+            //   checkNestedIndexHistoryRates
+            // ].data.push({
+            //   x: dateParse,
+            //   y: 1,
+            // });
+          }
+        } else {
+          let successKey = {
+            name: "Success",
+            data: []
+          };
+          let cancellKey = {
+            name: "Cancelled",
+            data: []
+          };
+          let failedKey = {
+            name: "Failed",
+            data: []
+          };
+          if (typeof printerStatistics.historyByDay[0] === "undefined") {
+            printerStatistics.historyByDay.push(successKey);
+            printerStatistics.historyByDay.push(cancellKey);
+            printerStatistics.historyByDay.push(failedKey);
+            // printerStatistics.historyByDayIncremental.push(successKey);
+            // printerStatistics.historyByDayIncremental.push(cancellKey);
+            // printerStatistics.historyByDayIncremental.push(failedKey);
+          }
         }
       }
-    }
-  });
+    });
+  }
 
   // Collate daily stats
   historyDaily.forEach((d) => {
@@ -220,7 +236,10 @@ const generatePrinterStatistics = (id) => {
   // Reduce all the values and update the variable.
   Object.keys(printerStatistics).forEach(function (key) {
     if (Array.isArray(printerStatistics[key])) {
-      if (
+      if (key === "overallPrintTimeAcuracy") {
+        const total = printerStatistics[key].reduce((a, b) => a + b, 0);
+        printerStatistics[key] = total / historyClean?.length ? historyClean.length : 1;
+      } else if (
         key !== "historyByDay" &&
         key !== "historyByDayIncremental" &&
         key !== "printerUtilisation"

@@ -286,6 +286,7 @@ export default class PrinterLogs {
     let osPlatform = "Unknown";
     let hardwareCores = "Unknown";
     let hardwareRam = "Unknown";
+    let overallPrintTimeStatistics = "Unknown";
 
     printerFirmware = !!stats.printerFirmware;
 
@@ -600,6 +601,7 @@ export default class PrinterLogs {
   }
   static async loadStatistics(id) {
     let get = await OctoFarmClient.get("history/statistics/" + id);
+    console.log(get);
     //Setup page
     let printerStatsWrapper = document.getElementById("printerStatistics");
     printerStatsWrapper.innerHTML = "";

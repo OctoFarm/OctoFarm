@@ -70,15 +70,6 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
-  const returnArray = [];
-  for (let i = 0; i < printers.length; i++) {
-    returnArray.push({
-      octoPrintVersion: printers[i]?.octoPrintVersion,
-      printerFirmware: printers[i]?.printerFirmware,
-      statistics: await generatePrinterStatistics(printers[i]._id)
-    });
-  }
-
   const development_mode = process.env.NODE_ENV === "development";
 
   res.render("printerManagement", {
@@ -92,7 +83,6 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
     clientSettings: req.user.clientSettings,
-    printersList: returnArray,
     printerConnectionStats: sortBy(ConnectionMonitorService.returnConnectionLogs(), ["printerURL"]),
     development_mode
   });

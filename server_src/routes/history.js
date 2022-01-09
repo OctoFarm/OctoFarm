@@ -11,6 +11,7 @@ const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { sortOptions } = require("../constants/history-sort.constants");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
@@ -236,7 +237,11 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
 });
 router.get("/statistics/:id", ensureAuthenticated, async function (req, res) {
   const printerID = req.params.id;
-  let stats = await generatePrinterStatistics(printerID);
+  let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
+  if (!stats) {
+    stats = await generatePrinterStatistics(printerID);
+    getPrinterStoreCache().updatePrinterStatistics(printerID, stats);
+  }
   res.send(stats);
 });
 

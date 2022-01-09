@@ -10,6 +10,7 @@ const _ = require("lodash");
 const Filament = require("../models/Filament");
 const Printers = require("../models/Printer");
 const { FileClean } = require("../lib/dataFunctions/fileClean");
+const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 
 const logger = new Logger("OctoFarm-PrinterManager");
 
@@ -287,7 +288,7 @@ class PrinterManagerService {
 
   async checkForOctoPrintUpdates() {
     const printerList = getPrinterStoreCache().listPrinters();
-    logger.debug(printerList.length + " printers updating state counters...");
+    logger.debug(printerList.length + " checking for any octoprint updates");
     for (let i = 0; i < printerList.length; i++) {
       const printer = printerList[i];
       await printer.acquireOctoPrintUpdatesData(true);
@@ -318,6 +319,17 @@ class PrinterManagerService {
 
   getPrinterControlList() {
     return this.#printerControlList;
+  }
+
+  async generatePrintersStatisticsCache() {
+    const pList = getPrinterStoreCache().listPrinters();
+    if (pList?.length > 0) {
+      for (let i = 0; i < pList.length; i++) {
+        const printer = pList[i];
+        const printerStatistics = await generatePrinterStatistics(printer._id);
+        getPrinterStoreCache().updatePrinterStatistics(printer._id, printerStatistics);
+      }
+    }
   }
 }
 

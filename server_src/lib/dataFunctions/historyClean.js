@@ -749,7 +749,7 @@ class HistoryClean {
    */
   async initCache(findOptions = undefined, paginationOptions = undefined) {
     let returnData = false;
-    if (paginationOptions) {
+    if (!!paginationOptions) {
       returnData = true;
     }
 

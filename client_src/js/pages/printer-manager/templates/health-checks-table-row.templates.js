@@ -14,6 +14,8 @@
 // <!--                                Webcam Settings-->
 // <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
 // Bootbox over bootstrap modal fix for scrolling...
+import UI from "../../../lib/functions/ui";
+
 $(document).on("hidden.bs.modal", ".bootbox.modal", function (e) {
   if ($(".modal").hasClass("show")) {
     $("body").addClass("modal-open");
@@ -789,4 +791,60 @@ export function addHealthCheckListeners(check) {
       "This will not really effect OctoFarms operations much. It will however effect the user experience as messages may not arrive in the expected time or initial scans of offline printers could take to long to resolve."
     );
   });
+}
+
+export function returnFarmOverviewTableRow(
+  currentPrinter,
+  printer,
+  octoSysInfo,
+  printerSuccessRate,
+  printerActivityRate
+) {
+  const NO_DATA = "No Data";
+  return `
+  <tr>
+      <th scope="row">${currentPrinter.printerName}  </th>
+      <td>${printer?.octoPrintVersion ? printer.octoPrintVersion : NO_DATA}</td>
+      <td>${printer?.printerFirmware ? printer.printerFirmware : NO_DATA} </td>
+      <td>${
+        octoSysInfo?.["env.python.version"] ? octoSysInfo?.["env.python.version"] : NO_DATA
+      } </td>
+      <td>${octoSysInfo?.["env.python.pip"] ? octoSysInfo?.["env.python.pip"] : NO_DATA} </td>
+      <td>${octoSysInfo?.["env.os.platform"] ? octoSysInfo?.["env.os.platform"] : NO_DATA} </td>
+      <td>${
+        octoSysInfo?.["env.hardware.cores"] ? octoSysInfo?.["env.hardware.cores"] : NO_DATA
+      } </td>
+      <td>${
+        octoSysInfo?.["env.hardware.ram"]
+          ? helpers.generateBytes(octoSysInfo?.["env.hardware.ram"])
+          : NO_DATA
+      }  </td>
+      <td>${
+        octoSysInfo?.["octoprint.safe_mode"]
+          ? '<i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>'
+          : '<i title="Something maybe wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>'
+      } </td>
+      <td>
+        <div class="progress">
+          <div class="progress-bar ${UI.returnProgressColour(
+            printerSuccessRate,
+            true
+          )}  progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerSuccessRate}  %"> ${printerSuccessRate.toFixed(
+    0
+  )}  % </div>
+        </div>
+      </td>
+      <td>
+        <div class="progress">
+          <div class="progress-bar ${UI.returnProgressColour(
+            printerActivityRate
+          )} progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerActivityRate}  %"> ${printerActivityRate.toFixed(
+    0
+  )}  % </div>
+        </div>
+      </td>
+      <td>${currentPrinter.printerResendRatioTotal} %</td>
+    </tr>
+  
+  `;
 }

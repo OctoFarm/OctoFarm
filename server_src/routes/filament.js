@@ -8,10 +8,6 @@ const Spool = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 
-const runner = require("../runners/state.js");
-
-const { Runner } = runner;
-
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 
 const { SettingsClean } = settingsClean;
@@ -216,7 +212,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
   if (isSpoolAttached) return res.send({ spool: false });
 
   if (filamentManager) {
-    const printerList = Runner.returnFarmPrinters();
+    // const printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < printerList.length; i++) {
       if (
@@ -340,11 +336,11 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     spools.markModified("spools");
   }
   await spools.save();
-  await Runner.updateFilament();
+  // await Runner.updateFilament();
   Spool.find({}).then((spools) => {
     logger.info("New spool details saved: ", req.body.spool);
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-    Runner.updateFilament();
+    // Runner.updateFilament();
     res.send({ spools });
   });
 });
@@ -357,7 +353,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   logger.info("Saving Filament Manager Profile: ", newProfile);
   const filamentManagerID = null;
   if (filamentManager) {
-    const printerList = Runner.returnFarmPrinters();
+    // const printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
       if (
@@ -423,7 +419,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   const newContent = req.body.profile;
   logger.info("Profile Edit Request: ", newContent);
   if (filamentManager) {
-    const printerList = Runner.returnFarmPrinters();
+    // const printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < printerList.length; i++) {
       if (
@@ -483,7 +479,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   logger.info("Profile saved successfully");
   TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   Profiles.find({}).then((profiles) => {
-    Runner.updateFilament();
+    // Runner.updateFilament();
     res.send({ profiles });
   });
 });

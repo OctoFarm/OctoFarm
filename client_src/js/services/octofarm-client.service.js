@@ -64,6 +64,7 @@ export default class OctoFarmClient {
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
   static userRoute = `/users/users`;
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
+  static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -182,6 +183,10 @@ export default class OctoFarmClient {
 
   static getHealthChecks() {
     return this.get(this.healthCheckRoute);
+  }
+
+  static getFarmOverview() {
+    return this.get(this.farmOverviewRoute);
   }
 
   static updateCurrentOpState({ iterie, order }) {

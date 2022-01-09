@@ -51,6 +51,7 @@ class OctoPrintPrinter {
   #ws = undefined;
   #db = undefined;
   #apiRetry = undefined;
+  #printerStatistics = undefined;
   timeout = undefined;
   #reconnectTimeout = undefined;
   reconnectingIn = 0;
@@ -1723,6 +1724,14 @@ class OctoPrintPrinter {
         return "Scan already planned, ignoring extra scan";
       }
     }
+  }
+
+  updatePrinterStatistics(statistics) {
+    this.#printerStatistics = statistics;
+  }
+
+  getPrinterStatistics() {
+    return this.#printerStatistics;
   }
 }
 

@@ -13,7 +13,7 @@ const myCustomLabels = {
 const defaultPaginationOptions = {
   page: 1,
   limit: 100,
-  sort: { "printHistory.historyIndex": -1 }
+  sort: { _id: -1 }
 };
 
 const defaultInputFilters = {
