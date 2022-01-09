@@ -6,11 +6,6 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -yq
 # Install package utils
 RUN DEBIAN_FRONT=noninteractive apt-get install -yq apt-utils
-# Install MongoDB
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-RUN apt-get update
-RUN apt-get install -y mongodb-org
 
 # Remove package files fetched for install
 RUN apt-get clean
