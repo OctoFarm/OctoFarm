@@ -313,12 +313,22 @@ export async function saveAllOnAddPrinterTable() {
   deleteAllBtn.disabled = true;
 }
 
-export async function loadPrinterHealthChecks() {
+export async function loadPrinterHealthChecks(id = undefined) {
   const healthChecks = await OctoFarmClient.getHealthChecks();
   const table = document.getElementById("healthChecksTable");
   table.innerHTML = "";
-  healthChecks.forEach((check) => {
-    table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
-    addHealthCheckListeners(check);
-  });
+  if (!!id) {
+    const filteredCheck = healthChecks.filter(function (check) {
+      return check.printerID === id;
+    });
+    filteredCheck.forEach((check) => {
+      table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+      addHealthCheckListeners(check);
+    });
+  } else {
+    healthChecks.forEach((check) => {
+      table.insertAdjacentHTML("beforeend", returnHealthCheckRow(check));
+      addHealthCheckListeners(check);
+    });
+  }
 }

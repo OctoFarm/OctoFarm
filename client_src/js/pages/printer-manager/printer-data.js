@@ -12,7 +12,22 @@ import UI from "../../lib/functions/ui.js";
 import PrinterLogs from "../../lib/modules/printerLogs.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
-import { reSyncAPI } from "./functions/printer-manager.functions";
+import { loadPrinterHealthChecks, reSyncAPI } from "./functions/printer-manager.functions";
+
+//TODO move to UI util
+function findPos(obj) {
+  console.log("FIND", obj);
+  console.log("OFFSET", obj.offsetParent);
+  let curtop = 0;
+  if (obj.offsetParent) {
+    console.log(obj.offsetParent);
+    do {
+      curtop += obj.offsetTop;
+      console.log(curtop);
+    } while ((obj = obj.offsetParent));
+    return [curtop];
+  }
+}
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
@@ -351,6 +366,12 @@ export function createOrUpdatePrinterTableRow(printers) {
           }
         });
       });
+
+      document
+        .getElementById("healthIssues-" + printer._id)
+        .addEventListener("click", async (e) => {
+          await loadPrinterHealthChecks(printer._id);
+        });
     }
   });
 }

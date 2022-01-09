@@ -13,6 +13,12 @@
 // <th scope="col" className="sticky-table table-dark" style="">Printer Profile</th>
 // <!--                                Webcam Settings-->
 // <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
+// Bootbox over bootstrap modal fix for scrolling...
+$(document).on("hidden.bs.modal", ".bootbox.modal", function (e) {
+  if ($(".modal").hasClass("show")) {
+    $("body").addClass("modal-open");
+  }
+});
 
 const E = {
   API_CHECK_STATE: "apiCheckState-",
@@ -167,9 +173,12 @@ const returnNetworkConnection = (issues) => {
       ? issue.url.replace(printerURL + "/" + urlSplit[3] + "/", "")
       : issue.url.replace(printerURL + "/plugin/", "");
 
-    totalInitial += issue.initialTimeout ? 1 : 0;
-
-    totalCutOff += issue.cutOffTimeout ? 1 : 0;
+    if (totalInitial !== 1) {
+      totalInitial = issue.initialTimeout ? 0 : 1;
+    }
+    if (totalCutOff !== 1) {
+      totalCutOff = issue.cutOffTimeout ? 0 : 1;
+    }
 
     html += `
         <small>${endPoint}: ${returnButton(
@@ -185,6 +194,7 @@ const returnNetworkConnection = (issues) => {
     )} </small>
         `;
   });
+
   webSocketResponses.forEach((issue) => {
     const urlSplit_W = webSocketResponses[0].url.split("/");
     const printerURL_W = urlSplit_W[0] + "//" + urlSplit_W[2];
@@ -212,13 +222,13 @@ const returnNetworkConnection = (issues) => {
     ${printerURL} 
     </a><br>
     ${returnButton(
-      totalInitial > 1,
+      totalInitial < 1,
       '<i class="fas fa-history"></i>',
       E.NETWORK + pClean + "initial",
       VALID_TIMEOUT("All Initial")
     )}
     ${returnButton(
-      totalCutOff > 1,
+      totalCutOff < 1,
       '<i class="fas fa-stopwatch"></i>',
       E.NETWORK + pClean + "cuttOff",
       VALID_TIMEOUT("All Cut Off")
@@ -282,9 +292,8 @@ const VALID_CONN = (check) => {
 
 export function returnHealthCheckRow(check) {
   const pClean = check.printerName.replace(/[^\w\-]+/g, "-").toLowerCase();
-
   return `
-        <tr>
+        <tr id="healthCheckRow-${check.printerID}">
         <td>${check.printerName}</td>
         <td>       
         ${returnButton(

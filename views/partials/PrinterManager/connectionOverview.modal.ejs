@@ -48,6 +48,7 @@
     <table id="" class="table table-dark table-striped text-center">
         <thead>
         <tr>
+            <th scope="col"></th>
             <th scope="col" class="sticky-table table-dark" style="">URL</th>
             <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
             <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
@@ -71,6 +72,9 @@
             <% const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0) %>
             <% const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0; %>
                 <tr class="bg-primary">
+                    <th> <a class="btn btn-secondary" data-toggle="collapse" href="#connectionCollapse-<%= index %>" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="far fa-caret-square-down"></i>
+                        </a> </th>
                     <th scope="row"><%= currentPrinter.printerURL  %></th>
                     <th> <%= helpers.generateMilisecondsTime(averageTotalCalc) %> </th>
                     <th>
@@ -107,7 +111,8 @@
                     <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
                     <% const successPercent = (log.totalRequestsSuccess * 100) / totalConnections %>
                     <% const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections %>
-                    <tr>
+                    <tr class="collapse" id="connectionCollapse-<%= index %>">
+                        <th>  </th>
                         <th class="p-1"><%= url %></th>
 
                         <th class="p-1"><%= helpers.generateMilisecondsTime(averageCalculation) %></th>

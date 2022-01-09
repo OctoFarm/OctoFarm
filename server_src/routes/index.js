@@ -1,4 +1,4 @@
-const _ = require("lodash");
+const { sortBy } = require("lodash");
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
@@ -94,7 +94,7 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     serverSettings,
     clientSettings: req.user.clientSettings,
     printersList: returnArray,
-    printerConnectionStats: ConnectionMonitorService.returnConnectionLogs(),
+    printerConnectionStats: sortBy(ConnectionMonitorService.returnConnectionLogs(), ["printerURL"]),
     development_mode
   });
 });

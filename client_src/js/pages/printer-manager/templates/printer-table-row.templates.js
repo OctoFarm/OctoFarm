@@ -16,6 +16,8 @@ const returnAlerts = (id) => {
             id="healthIssues-${id}"
             type="button"
             class="tag btn btn-outline-warning btn-sm d-none"
+            data-toggle="modal"
+            data-target="#healthChecksModal"
     >
         <i class="fas fa-heartbeat"></i>
     </button>

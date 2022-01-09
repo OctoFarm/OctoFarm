@@ -34,6 +34,7 @@ const updatePrinterHealthChecks = async () => {
       const printerCheck = {
         dateChecked: new Date(),
         printerName: farmPrinters[i].printerName,
+        printerID: farmPrinters[i]._id,
         printerChecks: printerChecks(farmPrinters[i]),
         apiChecksRequired: apiChecksRequired(farmPrinters[i].systemChecks.scanning),
         apiChecksOptional: apiChecksOptional(farmPrinters[i].systemChecks.scanning),
