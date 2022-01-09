@@ -141,7 +141,7 @@ const PrinterSchema = new mongoose.Schema({
     required: false
   },
   octoPrintUpdate: {
-    type: Array,
+    type: Object,
     required: false
   },
   octoPrintPluginUpdates: {

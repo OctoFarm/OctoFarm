@@ -15,6 +15,7 @@ const logger = new Logger("OctoFarm-PrinterManager");
 
 class PrinterManagerService {
   #printerGroupList = [];
+  #printerControlList = [];
 
   async initialisePrinters() {
     // Grab printers from database
@@ -132,6 +133,8 @@ class PrinterManagerService {
       const id = deleteList[d];
       const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
+      // TODO Remove from Printer Control List
+      // TODO Remove from temperature trigger list
       removedPrinterList.push({
         printerURL: printer.printerURL,
         printerId: printer._id
@@ -288,6 +291,32 @@ class PrinterManagerService {
       const printer = printerList[i];
       await printer.acquireOctoPrintUpdatesData(true);
     }
+  }
+
+  async generatePrintersControlDropList() {
+    const printersInformation = getPrinterStoreCache().listPrintersInformation();
+    printersInformation.forEach((sortedPrinter) => {
+      const printerIndex = _.findIndex(this.#printerControlList, function (o) {
+        return o.printerName === sortedPrinter.printerName;
+      });
+      if (printerIndex !== -1) {
+        this.#printerControlList[printerIndex] = {
+          printerName: sortedPrinter.printerName,
+          printerID: sortedPrinter._id,
+          state: sortedPrinter.printerState.colour
+        };
+      } else {
+        this.#printerControlList.push({
+          printerName: sortedPrinter.printerName,
+          printerID: sortedPrinter._id,
+          state: sortedPrinter.printerState.colour
+        });
+      }
+    });
+  }
+
+  async getPrinterControlList() {
+    return this.#printerControlList;
   }
 }
 

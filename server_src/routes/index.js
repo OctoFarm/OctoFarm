@@ -6,7 +6,6 @@ const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const { AppConstants } = require("../app.constants");
@@ -18,6 +17,11 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { TaskManager } = require("../runners/task.manager");
+const {
+  getDashboardStatistics,
+  getCurrentOperations,
+  generateDashboardStatistics
+} = require("../services/printer-statistics.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -47,7 +51,7 @@ router.get("/", async (req, res) => {
 router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
-  const dashStatistics = PrinterClean.returnDashboardStatistics();
+  const dashStatistics = getDashboardStatistics();
   let dashboardSettings = req.user.clientSettings?.dashboard || getDefaultDashboardSettings();
 
   res.render("dashboard", {
@@ -99,7 +103,7 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
   const printers = getPrinterStoreCache().listPrintersInformation();
   await TaskManager.forceRunTask("GENERATE_FILE_STATISTICS");
   const serverSettings = SettingsClean.returnSystemSettings();
-  const currentOperations = PrinterClean.returnCurrentOperations();
+  const currentOperations = getCurrentOperations();
   const fileStatistics = FileClean.returnStatistics();
   res.render("filemanager", {
     name: req.user.name,
@@ -145,7 +149,7 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
 // Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const dashStatistics = PrinterClean.returnDashboardStatistics();
+  const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -175,7 +179,7 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
-  const dashStatistics = PrinterClean.returnDashboardStatistics();
+  const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
@@ -232,7 +236,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
   const clientSettings = SettingsClean.returnClientSettings();
-  const dashStatistics = PrinterClean.returnDashboardStatistics();
+  const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
 
@@ -261,7 +265,7 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
-  const dashStatistics = PrinterClean.returnDashboardStatistics();
+  const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
 

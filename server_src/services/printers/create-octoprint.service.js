@@ -95,12 +95,39 @@ class OctoPrintPrinter {
   currentConnection = undefined;
   connectionOptions = undefined;
   terminal = [];
-  otherSettings = undefined;
+  otherSettings = PrinterClean.sortOtherSettings(
+    this.tempTriggers,
+    this.settingsWebcam,
+    this.settingsServer
+  );
 
   //Updated by API / database
   octoPi = undefined;
-  costSettings = null;
-  powerSettings = null;
+  costSettings = {
+    powerConsumption: 0.5,
+    electricityCosts: 0.15,
+    purchasePrice: 500,
+    estimateLifespan: 43800,
+    maintenanceCosts: 0.25
+  };
+  powerSettings = {
+    powerOnCommand: "",
+    powerOnURL: "",
+    powerOffCommand: "",
+    powerOffURL: "",
+    powerToggleCommand: "",
+    powerToggleURL: "",
+    powerStatusCommand: "",
+    powerStatusURL: "",
+    wol: {
+      enabled: false,
+      ip: "255.255.255.0",
+      packets: "3",
+      port: "9",
+      interval: "100",
+      MAC: ""
+    }
+  };
   klipperFirmwareVersion = undefined;
   printerFirmware = undefined;
   octoPrintVersion = undefined;
@@ -1319,10 +1346,12 @@ class OctoPrintPrinter {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
     this.#apiPrinterTickerWrap("Acquiring OctoPrint updates data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "warning");
-    if (!this?.octoPrintUpdate || !this?.octoPrintPluginUpdates || force) {
-      this.octoPrintUpdate = [];
-      this.octoPrintPluginUpdates = [];
-
+    if (
+      !this?.octoPrintUpdate ||
+      !this?.octoPrintPluginUpdates ||
+      this?.octoPrintPluginUpdates.length === 0 ||
+      force
+    ) {
       const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch(() => {
         return false;
       });
@@ -1330,6 +1359,10 @@ class OctoPrintPrinter {
 
       if (globalStatusCode === 200) {
         const { information } = await updateCheck.json();
+
+        this.octoPrintUpdate = [];
+        this.octoPrintPluginUpdates = [];
+
         let octoPrintUpdate = false;
         const pluginUpdates = [];
 

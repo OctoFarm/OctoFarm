@@ -12,8 +12,9 @@ const {
   updatePluginNoticesStore,
   updatePluginStore
 } = require("./store/octoprint-plugin-list.store");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { FileClean } = require("./lib/dataFunctions/fileClean");
+const { sortCurrentOperations } = require("./services/printer-statistics.service");
+const { initFarmInformation } = require("./services/farm-information.service");
 const Logger = require("./handlers/logger");
 const logger = new Logger("OctoFarm-TaskManager");
 const INITIALISE_PRINTERS = async () => {
@@ -30,7 +31,7 @@ const INITIALIST_PRINTERS_STORE = async () => {
 
 const SORT_CURRENT_OPERATIONS = async () => {
   const printerList = getPrinterStoreCache().listPrintersInformation();
-  await PrinterClean.sortCurrentOperations(printerList);
+  await sortCurrentOperations(printerList);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -157,11 +158,15 @@ const DATABASE_MIGRATIONS_TASK = async () => {
   console.log(migrations);
 };
 
-const INIT_FARM_INFORMATION = async () => {
-  await PrinterClean.initFarmInformation();
+const GENERATE_PRINTER_CONTROL_LIST = async () => {
+  await getPrinterManagerCache().generatePrintersControlDropList();
 };
 
-const UPDATE_OCTOPRINT_PLUGINS = async () => {
+const INIT_FARM_INFORMATION = async () => {
+  await initFarmInformation();
+};
+
+const UPDATE_OCTOPRINT_PLUGINS_LIST = async () => {
   await updatePluginNoticesStore();
   await updatePluginStore();
 };
@@ -190,7 +195,7 @@ class OctoFarmTasks {
   static RECURRING_BOOT_TASKS = [
     TaskStart(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    TaskStart(UPDATE_OCTOPRINT_PLUGINS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
+    TaskStart(UPDATE_OCTOPRINT_PLUGINS_LIST, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
     TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
@@ -199,6 +204,7 @@ class OctoFarmTasks {
     TaskStart(INITIALIST_PRINTERS_STORE, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_5000MS),
+    TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
