@@ -128,8 +128,8 @@ export class DashUpdate {
     const currentDate = new Date();
     document.getElementById("timeAndDateBody").innerHTML = `
     <div class="d-flex justify-content-center flex-column align-self-center">
-      <h4 class="mb-0 ">${currentDate.toLocaleDateString()}</h4>
-      <h2 class="mb-0">${currentDate.toLocaleTimeString()}</h2>
+      <h1 class="mb-0 mt-4">${currentDate.toLocaleTimeString()}</h1>
+      <h3 class="mb-0 mt-2">${currentDate.toLocaleDateString()}</h3>
     </div>
 
     `;
