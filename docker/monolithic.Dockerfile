@@ -1,4 +1,4 @@
-FROM node:14.17-stretch
+FROM node:lts-stretch
 
 # Update Local Repository Index
 RUN apt-get update
@@ -16,7 +16,9 @@ RUN rm -rf /var/lib/apt/lists/
 COPY . /app
 WORKDIR /app
 
-RUN npm ci --production
+ENV NODE_ENV=production
+
+RUN npm ci
 RUN npm install -g pm2
 
 EXPOSE 4000
