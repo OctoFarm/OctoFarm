@@ -5,6 +5,10 @@ nohup sh -c mongod --dbpath /data/db &
 pwd
 ENV MONGO=mongodb://127.0.0.1:27017/octofarm
 
+sudo systemctl enable mongod
+
+sudo systemctl start mongod
+
 if [ -d "logs" ]
 then
     mkdir -p logs
