@@ -1,5 +1,6 @@
 FROM node:14.17.6-stretch
 
+
 # Update Local Repository Index
 RUN apt-get update
 # Upgrade packages in the base image and apply security updates
@@ -18,7 +19,9 @@ RUN rm -rf /var/lib/apt/lists/
 COPY . /app
 WORKDIR /app
 
-RUN npm ci --production
+ENV NODE_ENV=production
+
+RUN npm ci
 RUN npm install -g pm2
 
 EXPOSE 4000
