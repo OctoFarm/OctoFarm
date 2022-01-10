@@ -15,7 +15,7 @@ const instructionsReferralURL = "https://github.com/OctoFarm/OctoFarm/blob/maste
 const deprecatedConfigFolder = "../config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
-const dotEnvPath = path.join(__dirname, ".env");
+const dotEnvPath = path.join(__dirname, "../.env");
 
 /**
  * Set and write the environment name to file, if applicable

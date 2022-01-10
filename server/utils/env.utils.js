@@ -46,7 +46,7 @@ function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
     logger.error("Tried to persist setting to .env in docker mode. Avoided that.");
     return;
   }
-  const latestDotEnvConfig = dotenv.config();
+  const latestDotEnvConfig = dotenv.config({ path: "../.env" });
   if (latestDotEnvConfig?.error?.code === "ENOENT") {
     logger.warning("Creating .env file for you as it was not found.");
   } else if (!!latestDotEnvConfig.error) {
@@ -90,7 +90,7 @@ function verifyPackageJsonRequirements(rootPath) {
 
 function ensureBackgroundImageExists(rootPath) {
   // Explicit relative folder
-  const targetBgDir = "./images";
+  const targetBgDir = "../images";
   const targetBgPath = path.join(targetBgDir, "bg.jpg");
   if (!fs.existsSync(targetBgDir)) {
     fs.mkdirSync(targetBgDir);

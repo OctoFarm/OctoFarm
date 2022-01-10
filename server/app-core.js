@@ -1,6 +1,6 @@
 const express = require("express");
 const flash = require("connect-flash");
-const session = require("express-session");
+const session = require("cookie-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const ServerSettingsDB = require("./models/ServerSettings");
@@ -9,11 +9,9 @@ const Logger = require("./handlers/logger.js");
 const { OctoFarmTasks } = require("./tasks");
 const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
-const { SERVER_ISSUES } = require("./constants/server-issues.constants");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -36,7 +34,7 @@ function setupExpressServer() {
   app.use(expressLayouts);
   app.use(express.static(viewsPath));
 
-  app.use("/images", express.static("./images"));
+  app.use("/images", express.static("../images"));
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false }));
   app.use(
