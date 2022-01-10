@@ -8,7 +8,7 @@ if (!process.env.MONGO) {
 const mongoDbString = fetchMongoDBConnectionString();
 
 if (!mongoDbString) {
-  throw new Error(`Cant migrate as the MONGO= environment variable was not resolved.`);
+  throw new Error("Cant migrate as the MONGO= environment variable was not resolved.");
 }
 
 const config = {
