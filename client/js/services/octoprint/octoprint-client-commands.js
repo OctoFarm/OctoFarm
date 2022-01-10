@@ -1,7 +1,7 @@
-import OctoPrintClient from "../services/octoprint-client.service.js";
-import UI from "../utils/ui";
-import OctoFarmClient from "../services/octofarm-client.service";
-import bulkActionsStates from "../pages/printer-manager/bulk-actions.constants";
+import OctoPrintClient from "../octoprint-client.service.js";
+import UI from "../../utils/ui";
+import OctoFarmClient from "../octofarm-client.service";
+import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 
 async function updateBtnOnClick(printerID) {
   try {

@@ -3,13 +3,16 @@ import {findIndex} from "lodash";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import UI from "../../../utils/ui";
 import PrinterSelectionService from "../../../services/printer-selection.service";
-import {octoPrintPluginInstallAction, updateOctoPrintPlugins} from "../../../octoprint/octoprint-plugin-commands";
+import {
+  octoPrintPluginInstallAction,
+  updateOctoPrintPlugins
+} from "../../../services/octoprint/octoprint-plugin-commands";
 import {
   disconnectPrinterFromOctoPrint,
   quickConnectPrinterToOctoPrint,
   sendPowerCommandToOctoPrint,
   updateOctoPrintClient
-} from "../../../octoprint/octoprint-client-commands";
+} from "../../../services/octoprint/octoprint-client-commands";
 import {
   printerHomeAxis,
   printerMoveAxis,
@@ -22,8 +25,8 @@ import {
   printerSendGcode,
   printerStartPrint,
   printerStopPrint
-} from "../../../octoprint/octoprint-printer-commands";
-import {setupOctoPrintForVirtualPrinter} from "../../../octoprint/octoprint-settings.actions";
+} from "../../../services/octoprint/octoprint-printer-commands";
+import {setupOctoPrintForVirtualPrinter} from "../../../services/octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service";
 import {setupPluginSearch} from "./plugin-search.function";
 import {returnPluginListTemplate, returnPluginSelectTemplate} from "../templates/octoprint-plugin-list.template";

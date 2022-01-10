@@ -3,20 +3,20 @@ import UI from "../../utils/ui";
 import Calc from "../../utils/calc";
 import FileOperations from "../../utils/file";
 import {
-    setupOctoPrintForFilamentManager,
-    setupOctoPrintForTimelapses
-} from "../../octoprint/octoprint-settings.actions";
+  setupOctoPrintForFilamentManager,
+  setupOctoPrintForTimelapses
+} from "../../services/octoprint/octoprint-settings.actions";
 import {
-    isFilamentManagerPluginSyncEnabled,
-    setupFilamentManagerDisableBtn,
-    setupFilamentManagerReSyncBtn,
-    setupFilamentManagerSyncBtn
+  isFilamentManagerPluginSyncEnabled,
+  setupFilamentManagerDisableBtn,
+  setupFilamentManagerReSyncBtn,
+  setupFilamentManagerSyncBtn
 } from "../../services/filament-manager-plugin.service";
 import {
-    filamentManagerPluginActionElements,
-    returnSaveBtn,
-    settingsElements,
-    userActionElements
+  filamentManagerPluginActionElements,
+  returnSaveBtn,
+  settingsElements,
+  userActionElements
 } from "./server.options";
 import {serverBootBoxOptions} from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";

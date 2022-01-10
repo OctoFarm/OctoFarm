@@ -1,7 +1,7 @@
-import OctoPrintClient from "../services/octoprint-client.service.js";
-import OctoFarmClient from "../services/octofarm-client.service.js";
-import UI from "../utils/ui";
-import bulkActionsStates from "../pages/printer-manager/bulk-actions.constants";
+import OctoPrintClient from "../octoprint-client.service.js";
+import OctoFarmClient from "../octofarm-client.service.js";
+import UI from "../../utils/ui";
+import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 
 const printerBase = "printers";
 const printerInfoURL = "/printerInfo";

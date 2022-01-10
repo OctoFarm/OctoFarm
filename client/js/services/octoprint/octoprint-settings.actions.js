@@ -1,5 +1,5 @@
-import OctoPrintClient from "../services/octoprint-client.service";
-import OctoFarmClient from "../services/octofarm-client.service";
+import OctoPrintClient from "../octoprint-client.service";
+import OctoFarmClient from "../octofarm-client.service";
 
 async function setupOctoPrintForTimelapses(printers) {
   let successfulPrinters = "";

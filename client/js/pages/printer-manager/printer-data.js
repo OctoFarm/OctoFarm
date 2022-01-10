@@ -1,7 +1,7 @@
 import {returnDisabledPrinterTableRow, returnPrinterTableRow} from "./templates/printer-table-row.templates.js";
 import {checkQuickConnectState, init as actionButtonInit} from "../../services/printer-action-buttons.service";
-import {setupUpdateOctoPrintClientBtn} from "../../octoprint/octoprint-client-commands";
-import {setupUpdateOctoPrintPluginsBtn} from "../../octoprint/octoprint-plugin-commands";
+import {setupUpdateOctoPrintClientBtn} from "../../services/octoprint/octoprint-client-commands";
+import {setupUpdateOctoPrintPluginsBtn} from "../../services/octoprint/octoprint-plugin-commands";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "../../services/printer-logs.service.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
