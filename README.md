@@ -100,6 +100,12 @@ _This is for devs or testers only! It is not practical to use `nodemon` for norm
 git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```
 
+2. CD into the 'server' directory
+
+```sh
+cd server/
+```
+
 2. Install NPM packages
 
 ```sh
@@ -112,8 +118,6 @@ npm install
 npm run dev
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
-- The developer version will skip some basic sanity checks, if your pages don't load right after server boot then it's
-  because those sanity checks haven't finished.
 
 ### Development Installation for the client.
 _If your making changes to the client then you will need to build this manually._
@@ -121,7 +125,7 @@ _If your making changes to the client then you will need to build this manually.
 1. cd into the "client_src" folder.
 
 ```sh
-cd client_src
+cd client
 ```
 
 2. Start the client development file watcher

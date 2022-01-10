@@ -14,13 +14,13 @@ jobs:
         with:
           node-version: 14.x
       - run: npm ci --no-optional
-        working-directory: ./client_src
+        working-directory: ./client
       - run: npm test
-        working-directory: ./client_src
+        working-directory: ./client
       - run: npm run build
-        working-directory: ./client_src
+        working-directory: ./client
       - uses: JS-DevTools/npm-publish@v1
         with:
           dry-run: ${{ github.event_name == 'pull_request' }}
           token: ${{ secrets.NPM_TOKEN }}
-          package: ./client_src/package.json
+          package: ./client/package.json
