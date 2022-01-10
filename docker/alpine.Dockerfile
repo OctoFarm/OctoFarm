@@ -7,6 +7,8 @@ RUN apk add --no-cache --virtual .base-deps \
     npm \
     tini
 
+ENV NODE_ENV=production
+
 RUN npm install -g pm2
 
 RUN adduser -D octofarm --home /app && \

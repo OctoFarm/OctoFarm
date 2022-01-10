@@ -1,6 +1,8 @@
 FROM node:14.17-stretch-slim
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 RUN npm install -g pm2
 
 COPY . /app
