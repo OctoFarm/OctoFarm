@@ -24,7 +24,8 @@ RUN apk add --no-cache --virtual .build-deps \
     g++ \
     python3
 
-WORKDIR /tmp/app
+WORKDIR /tmp/app/server
+
 COPY ./server/package.json .
 
 WORKDIR /tmp/app/server
