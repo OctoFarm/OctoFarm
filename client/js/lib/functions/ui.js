@@ -342,10 +342,28 @@ export default class UI {
       `
     }
     if(typeof value === "number"){
-      //return number template
+      return `
+        <div class="input-group mb-3 col">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">${VALUE_NAME}</span>
+          </div>
+          <input id="${ELEMENT_ID}" type="number" class="form-control" placeholder="${value}" aria-label="Username" aria-describedby="basic-addon1">
+        </div>
+      `
     }
+
     if(typeof value === "boolean"){
-      //return checkbox
+      const checked = value ? "checked": ""
+      return `
+        <div class="custom-control custom-checkbox has-validation mb-3 col">
+          <input id="${ELEMENT_ID}" type="checkbox" class="custom-control-input" required ${checked}>
+            <label class="custom-control-label"
+                   for="${ELEMENT_ID}">${VALUE_NAME}</label>
+            <div class="valid-feedback">${VALUE_NAME} is on.
+            <div class="invalid-feedback">${VALUE_NAME} is off.
+            </div>
+        </div>
+      `
     }
     if(value instanceof Array){
       //return select box
