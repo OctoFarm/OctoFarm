@@ -1,6 +1,6 @@
 const express = require("express");
 const flash = require("connect-flash");
-const session = require("cookie-session");
+const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const ServerSettingsDB = require("./models/ServerSettings");
@@ -40,7 +40,7 @@ function setupExpressServer() {
   app.use(
     session({
       secret: "supersecret",
-      resave: true,
+      resave: false,
       saveUninitialized: true
     })
   );

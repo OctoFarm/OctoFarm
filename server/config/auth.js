@@ -2,6 +2,8 @@ const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 
 module.exports = {
   async ensureAuthenticated(req, res, next) {
+    console.log("AUTHENTICATED");
+    return next();
     const serverSettings = SettingsClean.returnSystemSettings();
 
     if (serverSettings.server.loginRequired === false) {
@@ -15,6 +17,8 @@ module.exports = {
     res.redirect("/users/login");
   },
   async ensureAdministrator(req, res, next) {
+    console.log("ADMINISTRATOR");
+    return next();
     const serverSettings = SettingsClean.returnSystemSettings();
 
     if (serverSettings.server.loginRequired === false) {

@@ -17,6 +17,7 @@ module.exports = {
         clientSettings: clientSettings
       };
     } else {
+      console.log("ENSURE USER GROUP", req.user);
       if (req?.user) {
         req.user.clientSettings = clientSettings;
       }

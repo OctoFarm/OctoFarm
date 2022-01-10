@@ -38,10 +38,11 @@ router.post(
     failureFlash: true
   }),
   async function (req, res, next) {
+    console.log("AUTH");
+    console.log(req.user);
     if (!req.body.remember_me) {
       return next();
     }
-
     await UserTokenService.issueTokenWithDone(req.user, function (err, token) {
       if (err) {
         return next(err);

@@ -15,7 +15,6 @@ const softwareUpdateChecker = require("../services/octofarm-update.service");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
-const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { TaskManager } = require("../runners/task.manager");
 const {
   getDashboardStatistics,
