@@ -7,9 +7,9 @@ const ServerSettingsDB = require("./models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./handlers/logger.js");
 const { OctoFarmTasks } = require("./tasks");
-const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
+const { optionalInfluxDatabaseSetup } = require("./services/influx-export.service.js");
 const { getViewsPath } = require("./app-env");
-const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("./services/settings-cleaner.service");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
 

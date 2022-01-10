@@ -1,6 +1,6 @@
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
-const serverScripts = require("../lib/serverScripts.js");
+const serverScripts = require("../services/server-scripts.service.js");
 const Script = serverScripts.Script;
 const Alerts = require("../models/Alerts.js");
 

@@ -4,7 +4,7 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../constants/cleaner.constants");
 const { checkNested, checkNestedIndex } = require("./array.util");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 const Profiles = require("../models/Profiles");
 
 /**

@@ -5,7 +5,7 @@ const { stringify } = require("flatted");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
 
-const printerClean = require("../lib/dataFunctions/printerClean.js");
+const printerClean = require("../services/printer-cleaner.service.js");
 const PrinterClean = printerClean.PrinterClean;
 
 const printerTicker = require("../runners/printerTicker.js");

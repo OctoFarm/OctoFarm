@@ -1,6 +1,6 @@
 const WebSocket = require("ws");
 
-const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("../settings-cleaner.service");
 const { WS_STATE, WS_DESC, WS_ERRORS } = require("../printers/constants/websocket-constants");
 const {
   OF_WS_DESC,

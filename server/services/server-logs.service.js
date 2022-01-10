@@ -5,7 +5,7 @@ const { createZipFile } = require("../utils/zip.utils.js");
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 const {
   generateOctoFarmSystemInformationTxt
-} = require("../services/system-information.service.js");
+} = require("./system-information.service.js");
 
 // Grab Logs
 class Logs {

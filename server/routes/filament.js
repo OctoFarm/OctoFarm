@@ -8,7 +8,7 @@ const Spool = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const settingsClean = require("../services/settings-cleaner.service.js");
 
 const { SettingsClean } = settingsClean;
 
@@ -16,7 +16,7 @@ const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-FilamentManager");
 
-const filamentClean = require("../lib/dataFunctions/filamentClean.js");
+const filamentClean = require("../services/filament-cleaner.service.js");
 
 const { FilamentClean } = filamentClean;
 

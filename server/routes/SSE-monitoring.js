@@ -17,9 +17,9 @@ let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
 let interval = false;
 
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const { getSorting, getFilter } = require("../lib/sorting.js");
-const { writePoints } = require("../lib/influxExport.js");
+const { SettingsClean } = require("../services/settings-cleaner.service.js");
+const { getSorting, getFilter } = require("../services/front-end-sorting.service.js");
+const { writePoints } = require("../services/influx-export.service.js");
 // User Modal
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");

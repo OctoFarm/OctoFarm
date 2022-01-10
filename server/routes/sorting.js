@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 
-const { updateSorting, updateFilter } = require("../lib/sorting.js");
+const { updateSorting, updateFilter } = require("../services/front-end-sorting.service.js");
 const {
   returnCurrentOrdering,
   updateOrdering

@@ -8,7 +8,7 @@ const isDocker = require("is-docker");
 const envUtils = require("../utils/env.utils");
 const { AppConstants } = require("../app.constants");
 const { fetchMongoDBConnectionString } = require("../app-env");
-const { SystemCommands } = require("../lib/serverCommands.js");
+const { SystemCommands } = require("../services/server-commands.service.js");
 
 const router = express.Router();
 const logger = new Logger("OctoFarm-Server");

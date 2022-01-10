@@ -1,5 +1,5 @@
 const { returnConnectionLogs } = require("./connection-monitor.service");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("./settings-cleaner.service");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Server");
 //TODO move to utils

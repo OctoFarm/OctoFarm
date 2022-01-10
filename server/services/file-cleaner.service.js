@@ -1,16 +1,16 @@
 "use strict";
 
 const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
-const { getPrintCostNumeric } = require("../../utils/print-cost.util");
+const Logger = require("../handlers/logger.js");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
 
-const { getDefaultFileCleanStatistics } = require("../providers/cleaner.constants");
+const { getDefaultFileCleanStatistics } = require("../constants/cleaner.constants");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 const cleanFileList = [];
 const fileStatistics = getDefaultFileCleanStatistics();
 
-class FileClean {
+class FileCleanerService {
   static returnFiles(p) {
     return cleanFileList[p];
   }
@@ -115,8 +115,8 @@ class FileClean {
           filamentLength: file.length,
           printCost: getPrintCostNumeric(file.time, printCost)
         };
-        sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
-        sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
+        sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+        sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
         sortedFileList.push(sortedFile);
       }
     }
@@ -151,8 +151,8 @@ class FileClean {
       filamentLength: file.length,
       printCost: getPrintCostNumeric(file.time, costSettings)
     };
-    sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
-    sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
+    sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+    sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
     return sortedFile;
   }
 
@@ -251,5 +251,5 @@ class FileClean {
 }
 
 module.exports = {
-  FileClean
+  FileClean: FileCleanerService
 };

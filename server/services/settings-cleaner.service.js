@@ -1,14 +1,14 @@
 "use strict";
 
-const ClientSettingsDB = require("../../models/ClientSettings.js");
-const ServerSettingsDB = require("../../models/ServerSettings.js");
+const ClientSettingsDB = require("../models/ClientSettings.js");
+const ServerSettingsDB = require("../models/ServerSettings.js");
 const { findIndex } = require("lodash");
-const { SERVER_ISSUES } = require("../../constants/server-issues.constants");
+const { SERVER_ISSUES } = require("../constants/server-issues.constants");
 
 let systemClean = [];
 let clientClean = [];
 
-class SettingsClean {
+class SettingsCleanerService {
   static returnSystemSettings() {
     return systemClean;
   }
@@ -85,5 +85,5 @@ class SettingsClean {
 }
 
 module.exports = {
-  SettingsClean
+  SettingsClean: SettingsCleanerService
 };

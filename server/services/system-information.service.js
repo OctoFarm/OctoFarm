@@ -7,12 +7,12 @@ const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const isDocker = require("is-docker");
 const { getUpdateNotificationIfAny } = require("./octofarm-update.service.js");
 
-const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
+const { PrinterClean } = require("./printer-cleaner.service.js");
 const { SystemInfo } = require("../runners/systemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("./settings-cleaner.service");
 
 const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 

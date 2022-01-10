@@ -17,9 +17,9 @@ const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 const multer = require("multer");
 const { isEqual } = require("lodash");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const { Logs } = require("../lib/serverLogs.js");
-const { SystemCommands } = require("../lib/serverCommands.js");
+const { SettingsClean } = require("../services/settings-cleaner.service.js");
+const { Logs } = require("../services/server-logs.service.js");
+const { SystemCommands } = require("../services/server-commands.service.js");
 const { fetchUsers } = require("../services/user-service");
 const {
   checkReleaseAndLogUpdate,

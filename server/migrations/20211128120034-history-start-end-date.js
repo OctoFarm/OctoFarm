@@ -1,4 +1,4 @@
-const { ALL_MONTHS } = require("../lib/providers/cleaner.constants");
+const { ALL_MONTHS } = require("../constants/cleaner.constants");
 const convertDateStringToDateTime = function (date) {
   let dateSplit = date.split(" ");
   let month = ALL_MONTHS.indexOf(dateSplit[1]);

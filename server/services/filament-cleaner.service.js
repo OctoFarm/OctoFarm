@@ -1,11 +1,11 @@
 "use strict";
 
 const _ = require("lodash");
-const Logger = require("../../handlers/logger.js");
-const Spools = require("../../models/Filament.js");
-const Profiles = require("../../models/Profiles.js");
-const { SettingsClean } = require("../dataFunctions/settingsClean");
-const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
+const Logger = require("../handlers/logger.js");
+const Spools = require("../models/Filament.js");
+const Profiles = require("../models/Profiles.js");
+const { SettingsClean } = require("./settings-cleaner.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 
@@ -20,7 +20,7 @@ let dropDownList = {
 
 let printerFilamentList = [];
 
-class FilamentClean {
+class FilamentCleanerService {
   static noSpoolOptions = '<option value="0">No Spool Selected</option>';
 
   static returnFilamentList() {
@@ -82,7 +82,7 @@ class FilamentClean {
         percent: 100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
         tempOffset: spools[sp].spools.tempOffset,
         bedOffset: spools[sp].spools.bedOffset,
-        printerAssignment: FilamentClean.getPrinterAssignment(spools[sp]._id, farmPrinters),
+        printerAssignment: FilamentCleanerService.getPrinterAssignment(spools[sp]._id, farmPrinters),
         fmID: spools[sp].spools.fmID
       };
       spoolsArray.push(spool);
@@ -90,14 +90,14 @@ class FilamentClean {
     spoolsClean = spoolsArray;
     profilesClean = profilesArray;
 
-    selectedFilamentList = await FilamentClean.selectedFilament(farmPrinters);
-    statisticsClean = FilamentClean.createStatistics(
+    selectedFilamentList = await FilamentCleanerService.selectedFilament(farmPrinters);
+    statisticsClean = FilamentCleanerService.createStatistics(
       spoolsArray,
       profilesArray,
       selectedFilamentList
     );
-    await FilamentClean.createPrinterList(farmPrinters, filamentManager);
-    await FilamentClean.dropDownList(spools, profiles, filamentManager, selectedFilamentList);
+    await FilamentCleanerService.createPrinterList(farmPrinters, filamentManager);
+    await FilamentCleanerService.dropDownList(spools, profiles, filamentManager, selectedFilamentList);
     logger.info("Filament information cleaned and ready for consumption...");
   }
 
@@ -338,5 +338,5 @@ class FilamentClean {
 }
 
 module.exports = {
-  FilamentClean
+  FilamentClean: FilamentCleanerService
 };

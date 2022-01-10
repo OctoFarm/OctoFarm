@@ -1,4 +1,4 @@
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
+const { SettingsClean } = require("../services/settings-cleaner.service.js");
 
 module.exports = {
   async ensureAuthenticated(req, res, next) {

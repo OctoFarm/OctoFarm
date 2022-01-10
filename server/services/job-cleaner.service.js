@@ -2,13 +2,13 @@
 
 const { findIndex } = require("lodash");
 const { DateTime } = require("luxon");
-const { getPrintCostNumeric } = require("../../utils/print-cost.util");
-const { HistoryClean } = require("./historyClean.js");
-const { floatOrZero } = require("../../utils/number.util");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { HistoryClean } = require("./history-cleaner.service.js");
+const { floatOrZero } = require("../utils/number.util");
 
 const cleanJobs = [];
 
-class JobClean {
+class JobCleanerService {
   static getCompletionDate(printTimeLeftSeconds, completion) {
     if (completion === 100) {
       return "No Active Job";
@@ -119,7 +119,7 @@ class JobClean {
       currentJob.printTimeElapsed = printerProgress.printTime;
       currentJob.expectedPrintTime =
         Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
-      currentJob.expectedCompletionDate = JobClean.getCompletionDate(
+      currentJob.expectedCompletionDate = JobCleanerService.getCompletionDate(
         printerProgress.printTimeLeft,
         printerProgress.completion
       );
@@ -130,5 +130,5 @@ class JobClean {
 }
 
 module.exports = {
-  JobClean
+  JobClean: JobCleanerService
 };

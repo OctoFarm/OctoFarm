@@ -8,7 +8,7 @@ const logger = new Logger("OctoFarm-API");
 
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
-const { Script } = require("../lib/serverScripts.js");
+const { Script } = require("../services/server-scripts.service.js");
 
 const _ = require("lodash");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");

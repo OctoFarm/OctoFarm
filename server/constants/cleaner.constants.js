@@ -56,7 +56,6 @@ function getDefaultDashboardStatisticsObject() {
 
 const DEFAULT_SPOOL_DENSITY = 1.24;
 const DEFAULT_SPOOL_RATIO = 1.75 / 2;
-
 /**
  * Get an empty history statistics object (inflate to class when methods and meta is required!)
  * @returns {{currentFailed: number, totalPrinterCost: number, highestFilamentUsage: number, completed: number, failed: number, lowestFilamentUsage: number, printerLoad: number, totalFilamentUsage: number, totalSpoolCost: number, highestSpoolCost: number, longestPrintTime: number, printerMost: number, highestPrinterCost: number, shortestPrintTime: number, averageFilamentUsage: number, averagePrintTime: number, cancelled: number, mostPrintedFile: number}}

@@ -1,7 +1,7 @@
 // Support for influx v1.X
 
 const Influx = require("influx");
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const settingsClean = require("./settings-cleaner.service.js");
 const SettingsClean = settingsClean.SettingsClean;
 const Logger = require("../handlers/logger.js");
 

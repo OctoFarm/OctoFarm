@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ClientSettings = require("../models/ClientSettings.js");
 const { AppConstants } = require("../app.constants");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 
 const User = require("../models/User.js");

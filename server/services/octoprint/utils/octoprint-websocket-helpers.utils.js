@@ -1,7 +1,7 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { OP_WS_MSG_KEYS } = require("../constants/octoprint-websocket.constants");
-const { PrinterClean } = require("../../../lib/dataFunctions/printerClean");
-const { JobClean } = require("../../../lib/dataFunctions/jobClean");
+const { PrinterClean } = require("../../printer-cleaner.service");
+const { JobClean } = require("../../job-cleaner.service");
 const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
 

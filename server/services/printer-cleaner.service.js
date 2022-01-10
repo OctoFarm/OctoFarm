@@ -1,18 +1,18 @@
 "use strict";
 const { orderBy } = require("lodash");
 
-const ErrorLogs = require("../../models/ErrorLog.js");
-const TempHistory = require("../../models/TempHistory.js");
-const { PrinterTicker } = require("../../runners/printerTicker.js");
-const { generateRandomName } = require("../../services/printer-name-generator.service");
+const ErrorLogs = require("../models/ErrorLog.js");
+const TempHistory = require("../models/TempHistory.js");
+const { PrinterTicker } = require("../runners/printerTicker.js");
+const { generateRandomName } = require("./printer-name-generator.service");
 const {
   tempTriggers,
   webCamSettings,
   systemCommands
-} = require("../../services/printers/constants/printer-defaults.constants");
+} = require("./printers/constants/printer-defaults.constants");
 
 let printerConnectionLogs = [];
-class PrinterClean {
+class PrinterCleanerService {
   static returnPrinterLogs(sortIndex) {
     if (typeof sortIndex !== "undefined") {
       return printerConnectionLogs[sortIndex];
@@ -287,5 +287,5 @@ class PrinterClean {
 }
 
 module.exports = {
-  PrinterClean
+  PrinterClean: PrinterCleanerService
 };

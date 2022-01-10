@@ -5,13 +5,13 @@ const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
-const { PrinterClean } = require("../lib/dataFunctions/printerClean");
+const { PrinterClean } = require("../services/printer-cleaner.service");
 const Filament = require("../models/Filament");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../runners/task.manager");
-const { FileClean } = require("../lib/dataFunctions/fileClean");
+const { FileClean } = require("../services/file-cleaner.service");
 const { generate } = require("rxjs");
 const logger = new Logger("OctoFarm-State");
 

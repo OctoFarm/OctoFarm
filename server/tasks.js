@@ -1,5 +1,5 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
+const { FilamentClean } = require("./services/filament-cleaner.service");
 const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { SystemRunner } = require("./runners/systemInfo");
@@ -12,7 +12,7 @@ const {
   updatePluginNoticesStore,
   updatePluginStore
 } = require("./store/octoprint-plugin-list.store");
-const { FileClean } = require("./lib/dataFunctions/fileClean");
+const { FileClean } = require("./services/file-cleaner.service");
 const { sortCurrentOperations } = require("./services/printer-statistics.service");
 const { initFarmInformation } = require("./services/farm-information.service");
 const Logger = require("./handlers/logger");

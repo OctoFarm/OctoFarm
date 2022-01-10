@@ -9,7 +9,7 @@ const { isEmpty } = require("lodash");
 const _ = require("lodash");
 const Filament = require("../models/Filament");
 const Printers = require("../models/Printer");
-const { FileClean } = require("../lib/dataFunctions/fileClean");
+const { FileClean } = require("./file-cleaner.service");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 
 const logger = new Logger("OctoFarm-PrinterManager");

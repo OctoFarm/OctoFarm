@@ -7,10 +7,10 @@ const {
   getDefaultDashboardStatisticsObject,
   getEmptyOperationsObject,
   getEmptyToolTemperatureArray
-} = require("../lib/providers/cleaner.constants");
+} = require("../constants/cleaner.constants");
 const { returnCurrentOrdering } = require("./current-operations-order.service");
 const { getHeatMap, heatMapping } = require("./farm-information.service");
-const { PrinterClean } = require("../lib/dataFunctions/printerClean");
+const { PrinterClean } = require("./printer-cleaner.service");
 const Logger = require("../handlers/logger");
 
 const logger = new Logger("OctoFarm-Server");

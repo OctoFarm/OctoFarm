@@ -1,6 +1,6 @@
 const FarmStatisticsService = require("./farm-statistics.service");
 const { getDayName } = require("../utils/time.util");
-const { getEmptyHeatmap } = require("../lib/providers/cleaner.constants");
+const { getEmptyHeatmap } = require("../constants/cleaner.constants");
 const Logger = require("../handlers/logger");
 const arrayTotal = [];
 let heatMap = getEmptyHeatmap();

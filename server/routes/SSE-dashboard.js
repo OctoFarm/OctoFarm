@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { stringify } = require("flatted");
 const { ensureAuthenticated } = require("../config/auth");
-const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
+const { SettingsClean } = require("../services/settings-cleaner.service.js");
+const { getDefaultDashboardSettings } = require("../constants/settings.constants");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const {

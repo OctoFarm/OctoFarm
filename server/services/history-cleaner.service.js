@@ -1,27 +1,27 @@
 "use strict";
 
-const { arrayCounts, checkNested, checkNestedIndex } = require("../../utils/array.util");
-const { getPrintCostNumeric } = require("../../utils/print-cost.util");
+const { arrayCounts, checkNested, checkNestedIndex } = require("../utils/array.util");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
 const {
   getDefaultHistoryStatistics,
   ALL_MONTHS,
   DEFAULT_SPOOL_RATIO,
   DEFAULT_SPOOL_DENSITY
-} = require("../providers/cleaner.constants");
-const historyService = require("../../services/history.service");
-const Logger = require("../../handlers/logger.js");
-const { noCostSettingsMessage } = require("../../utils/print-cost.util");
-const { stateToHtml } = require("../../utils/html.util");
-const { toDefinedKeyValue } = require("../../utils/property.util");
-const { floatOrZero } = require("../../utils/number.util");
-const { toTimeFormat } = require("../../utils/time.util");
-const { last12Month } = require("../../utils/date.utils");
+} = require("../constants/cleaner.constants");
+const historyService = require("./history.service");
+const Logger = require("../handlers/logger.js");
+const { noCostSettingsMessage } = require("../utils/print-cost.util");
+const { stateToHtml } = require("../utils/html.util");
+const { toDefinedKeyValue } = require("../utils/property.util");
+const { floatOrZero } = require("../utils/number.util");
+const { toTimeFormat } = require("../utils/time.util");
+const { last12Month } = require("../utils/date.utils");
 const { orderBy } = require("lodash");
-const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
+const { SettingsClean } = require("./settings-cleaner.service");
 
 let logger;
 
-class HistoryClean {
+class HistoryCleanerService {
   // Might seem weird, but this is V2 prep-work
   historyService = null;
   enableLogging = false;
@@ -161,12 +161,12 @@ class HistoryClean {
       if (metric !== null) {
         let completionRatio = success ? 1.0 : printPercentage / 100;
 
-        const spoolWeight = HistoryClean.calcSpoolWeightAsString(
+        const spoolWeight = HistoryCleanerService.calcSpoolWeightAsString(
           metric.length / 1000,
           filamentEntry,
           completionRatio
         );
-        const spoolName = HistoryClean.getSpoolLabel(filamentEntry);
+        const spoolName = HistoryCleanerService.getSpoolLabel(filamentEntry);
         spools.push({
           [key]: {
             toolName: "Tool " + key.substring(4, 5),
@@ -175,7 +175,11 @@ class HistoryClean {
             volume: (completionRatio * metric.volume).toFixed(2),
             length: ((completionRatio * metric.length) / 1000).toFixed(2),
             weight: spoolWeight,
-            cost: HistoryClean.getCostAsString(spoolWeight, filamentEntry, completionRatio),
+            cost: HistoryCleanerService.getCostAsString(
+              spoolWeight,
+              filamentEntry,
+              completionRatio
+            ),
             type: filamentEntry?.spools?.profile?.material || "",
             manufacturer: filamentEntry?.spools?.profile?.manufacturer || ""
           }
@@ -387,8 +391,8 @@ class HistoryClean {
       topFilesList.push(topFileState);
       topPrinterList.push(topPrinterState);
       filamentCost.push(spoolCost);
-      HistoryClean.processHistoryCounts(currentHistory[h], historyByDay, totalOverTime);
-      HistoryClean.processHistorySpools(currentHistory[h], usageOverTime, totalByDay);
+      HistoryCleanerService.processHistoryCounts(currentHistory[h], historyByDay, totalOverTime);
+      HistoryCleanerService.processHistorySpools(currentHistory[h], usageOverTime, totalByDay);
     }
 
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
@@ -414,20 +418,20 @@ class HistoryClean {
     const statTotal = completedJobsCount + cancelledCount + failedCount;
 
     totalByDay.forEach((usage) => {
-      usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
+      usage.data = HistoryCleanerService.sumValuesGroupByDate(usage.data);
     });
     totalOverTime.forEach((usage) => {
-      usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
+      usage.data = HistoryCleanerService.sumValuesGroupByDate(usage.data);
     });
 
     usageOverTime.forEach((usage) => {
-      usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
+      usage.data = HistoryCleanerService.sumValuesGroupByDate(usage.data);
     });
     usageOverTime.forEach((usage) => {
-      usage.data = HistoryClean.assignYCumSum(usage.data);
+      usage.data = HistoryCleanerService.assignYCumSum(usage.data);
     });
     historyByDay.forEach((usage) => {
-      usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
+      usage.data = HistoryCleanerService.sumValuesGroupByDate(usage.data);
     });
 
     const groupedPrinterList = topPrinterList.reduce(function (r, a) {
@@ -702,14 +706,14 @@ class HistoryClean {
         printTime: printHistory.printTime,
         notes: printHistory.notes,
         printerCost: printCost?.toFixed(2) || noCostSettingsMessage,
-        spools: HistoryClean.getSpool(
+        spools: HistoryCleanerService.getSpool(
           printHistory.filamentSelection,
           printHistory.job,
           printHistory.success,
           printHistory.printTime
         ),
         thumbnail: printHistory.thumbnail,
-        job: HistoryClean.getJobAnalysis(printHistory.job, printHistory.printTime),
+        job: HistoryCleanerService.getJobAnalysis(printHistory.job, printHistory.printTime),
         spoolCost: 0,
         totalVolume: 0,
         totalLength: 0,
@@ -776,5 +780,5 @@ class HistoryClean {
 }
 
 module.exports = {
-  HistoryClean
+  HistoryClean: HistoryCleanerService
 };

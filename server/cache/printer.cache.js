@@ -1,4 +1,4 @@
-const { PrinterClean } = require("../lib/dataFunctions/printerClean");
+const { PrinterClean } = require("../services/printer-cleaner.service");
 
 let printerCleanState = new PrinterClean();
 

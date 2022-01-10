@@ -1,4 +1,4 @@
-const { HistoryClean } = require("../lib/dataFunctions/historyClean");
+const { HistoryClean } = require("../services/history-cleaner.service");
 
 //TODO change, remove clean up
 
