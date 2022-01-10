@@ -23,7 +23,7 @@ const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;
 let errorCounter = 0;
 
-const routeBase = "./images/historyCollection";
+const routeBase = "../images/historyCollection";
 const PATHS = {
   base: routeBase,
   thumbnails: routeBase + "/thumbs",

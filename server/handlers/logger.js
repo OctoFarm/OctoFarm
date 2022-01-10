@@ -71,7 +71,7 @@ class LoggerService {
           ? [
               new winston.transports.File({
                 level: logFilterLevel,
-                filename: `./logs/${route}.log`,
+                filename: `../logs/${route}.log`,
                 maxsize: "5000000",
                 maxFiles: 1
               })
