@@ -25,7 +25,8 @@ RUN apk add --no-cache --virtual .build-deps \
     python3
 
 WORKDIR /tmp/app
-COPY ./server/package.json ./server/
+COPY ./server/package.json .
+
 RUN npm ci
 
 RUN apk del .build-deps
