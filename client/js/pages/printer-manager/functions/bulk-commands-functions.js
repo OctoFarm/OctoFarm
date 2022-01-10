@@ -36,7 +36,7 @@ import {
   updateBulkActionsProgress,
   updateTableRow
 } from "./bulk-actions-progress.functions";
-import {populateAppearanceSettings} from "./bulk-settings-update.functions";
+import {populateBulkSettingsForms} from "./bulk-settings-update.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../../services/file-manager-queue.service.js";
@@ -1178,17 +1178,27 @@ export async function bulkEnableVirtualPrinter() {
 
 export async function bulkUpdateOctoPrintSettings() {
   const printersForSettingsAction = await getCurrentlySelectedPrinterList();
-  console.log(printersForSettingsAction);
   const getSettingsList = await OctoPrintClient.get(printersForSettingsAction[0], "api/settings");
   if (getSettingsList?.status === 200) {
     const {
-      api,
       appearance,
-      feature,
-      folder,
       gcodeAnalysis,
-      plugins,
-      printer,
+      plugins, //Special Case, it's it's own settings set...
+      scripts,
+      serial,
+      server,
+      system,
+      temperature,
+      terminalFilters,
+      webcam,
+      github
+    } = await getSettingsList.json();
+
+    $("#bulkUpdateOctoPrintSettingsModal").modal("show");
+    // populate appearance settings
+    populateBulkSettingsForms({appearance,
+      gcodeAnalysis,
+      plugins, //Special Case, it's it's own settings set...
       scripts,
       serial,
       server,
@@ -1196,23 +1206,8 @@ export async function bulkUpdateOctoPrintSettings() {
       temperature,
       terminalFilters,
       webcam
-    } = await getSettingsList.json();
-    $("#bulkUpdateOctoPrintSettingsModal").modal("show");
-    // console.log(
-    //   appearance,
-    //   gcodeAnalysis,
-    //   plugins, //Special Case, it's it's own settings set...
-    //   scripts,
-    //   serial,
-    //   server,
-    //   system,
-    //   temperature,
-    //   terminalFilters,
-    //   webcam
-    //   github
-    // );
-    // populate appearance settings
-    populateAppearanceSettings(appearance);
+      //github
+    });
 
     // populate gcodeAnalysis
 

@@ -1,11 +1,24 @@
 import UI from "../../../utils/ui"
 
-const appearanceTemplate = (appearance) => {
+const formTemplate = (keyName, obj) => {
     let buttonsHTML = "";
+    let checkBoxHTML = "";
+    console.log("KEY_NAME: ", keyName)
+    console.log(obj)
+    for (const [key, value] of Object.entries(obj)) {
+        console.log(key)
+        switch(key){
+            case "plugins":
+                break;
+            default:
+                if(typeof value === "boolean"){
+                    checkBoxHTML += UI.convertValueToTemplate(key, value);
+                }else{
+                    buttonsHTML += UI.convertValueToTemplate(key, value);
+                }
+        }
 
-    for (const [key, value] of Object.entries(appearance)) {
-        console.log(`${key}: ${value}`);
-        buttonsHTML += UI.convertValueToTemplate(key, value);
+
     }
 
     return `
@@ -13,12 +26,30 @@ const appearanceTemplate = (appearance) => {
             <div class="row">  
               ${buttonsHTML}
             </div>
+            <div class="row">
+            ${checkBoxHTML}
+            </div>
         </form>
     `
 }
 
-export function populateAppearanceSettings(appearance){
-    const appearanceElement = document.getElementById("bulk-appearance-el");
-    appearanceElement.innerHTML = appearanceTemplate(appearance)
+export function populateBulkSettingsForms(settings){
 
+    for (const key of Object.keys(settings)) {
+        const appearanceElement = document.getElementById(`bulk-${key}-el`);
+        console.log(key)
+        switch(key){
+            case "scripts":
+                appearanceElement.innerHTML = formTemplate(`${key}`, settings[key].gcode)
+                break;
+            case "terminalFilters":
+                break;
+            default:
+                appearanceElement.innerHTML = formTemplate(`${key}`, settings[key])
+
+
+        }
+        UI.removeLoaderFromElementInnerHTML(document.getElementById(`bulk-${key}-settings-btn`))
+
+    }
 }

@@ -6,6 +6,53 @@
         <i class="fab fa-octopus-deploy"></i> OctoPrint Manager
     </button>
     <div class="dropdown-menu">
+        <h6 class="dropdown-header">Settings</h6>
+        <button
+                title="Update multiple OctoPrint's at once."
+                id="blkOctoPrintSettingsUpdateBtn"
+                type="button"
+                class="dropdown-item"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+            <i class="fas fa-cogs"></i> Bulk Settings Update<%= disable_btn_air_gapped %>
+        </button>
+        <h6 class="dropdown-header">Client</h6>
+        <button
+                title="Update multiple OctoPrint's at once."
+                    id="blkOctoPrintUpdate"
+                    type="button"
+                    class="dropdown-item"
+                    href="#"
+            >
+                <i class="fab fa-raspberry-pi"></i> Update Clients <%= disable_btn_air_gapped %>
+            </button>
+            <button
+                    title="Install multiple plugins at once."
+                    id="blkOctoPrintBackupBtn"
+                    type="button"
+                    class="dropdown-item d-none"
+                    href="#"
+                    aria-expanded="false"
+                    data-toggle="modal" data-target="#printerSelectModal"
+                    disabled
+            >
+                <i class="fas fa-plug"></i> Backup Clients
+            </button>
+            <button
+                    title="Install multiple plugins at once."
+                    id="blkOctoPrintRestoreBtn"
+                    type="button"
+                    class="dropdown-item d-none"
+                    href="#"
+                    aria-expanded="false"
+                    data-toggle="modal" data-target="#printerSelectModal"
+                    disabled
+            >
+                <i class="fas fa-plug"></i> Restore Client
+            </button>
+        <h6 class="dropdown-header">Plugins</h6>
         <button
                 title="Install multiple plugins at once."
                 id="blkPluginsInstallBtn"
@@ -61,49 +108,5 @@
         >
             <i class="fas fa-sync"></i> Update Plugins <%= disable_btn_air_gapped %>
         </button>
-        <button
-                title="Update multiple OctoPrint's at once."
-                    id="blkOctoPrintUpdate"
-                    type="button"
-                    class="dropdown-item"
-                    href="#"
-            >
-                <i class="fab fa-raspberry-pi"></i> Update Clients <%= disable_btn_air_gapped %>
-            </button>
-        <button
-                title="Update multiple OctoPrint's at once."
-                id="blkOctoPrintSettingsUpdateBtn"
-                type="button"
-                class="dropdown-item"
-                href="#"
-                aria-expanded="false"
-                data-toggle="modal" data-target="#printerSelectModal"
-        >
-            <i class="fas fa-cogs"></i> Bulk Settings Update<%= disable_btn_air_gapped %>
-        </button>
-            <button
-                    title="Install multiple plugins at once."
-                    id="blkOctoPrintBackupBtn"
-                    type="button"
-                    class="dropdown-item d-none"
-                    href="#"
-                    aria-expanded="false"
-                    data-toggle="modal" data-target="#printerSelectModal"
-                    disabled
-            >
-                <i class="fas fa-plug"></i> Backup Clients
-            </button>
-            <button
-                    title="Install multiple plugins at once."
-                    id="blkOctoPrintRestoreBtn"
-                    type="button"
-                    class="dropdown-item d-none"
-                    href="#"
-                    aria-expanded="false"
-                    data-toggle="modal" data-target="#printerSelectModal"
-                    disabled
-            >
-                <i class="fas fa-plug"></i> Restore Client
-            </button>
         </div>
     </div>

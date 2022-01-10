@@ -114,7 +114,7 @@ export default class UI {
   }
 
   static removeLoaderFromElementInnerHTML(element) {
-    if (element.innerHTML.includes("spinner")) {
+    if (!!element && element.innerHTML.includes("spinner")) {
       element.innerHTML = element.innerHTML.replace(UI.returnSpinnerTemplate(), "");
     }
   }
@@ -333,7 +333,7 @@ export default class UI {
     const ELEMENT_ID = `opBulk-${key}`
     if(typeof value === "string"){
       return `
-        <div class="input-group mb-3 col">
+        <div class="input-group mb-3 col-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">${VALUE_NAME}</span>
           </div>
@@ -343,7 +343,7 @@ export default class UI {
     }
     if(typeof value === "number"){
       return `
-        <div class="input-group mb-3 col">
+        <div class="input-group mb-3 col-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">${VALUE_NAME}</span>
           </div>
@@ -353,15 +353,17 @@ export default class UI {
     }
 
     if(typeof value === "boolean"){
-      const checked = value ? "checked": ""
+      const checked = value ? "checked='true'": ""
       return `
-        <div class="custom-control custom-checkbox has-validation mb-3 col">
-          <input id="${ELEMENT_ID}" type="checkbox" class="custom-control-input" required ${checked}>
-            <label class="custom-control-label"
-                   for="${ELEMENT_ID}">${VALUE_NAME}</label>
-            <div class="valid-feedback">${VALUE_NAME} is on.
-            <div class="invalid-feedback">${VALUE_NAME} is off.
+        <div class="col-4">
+          <form class="was-validated">
+            <div class="custom-control custom-checkbox mb-3">
+                <input id="${ELEMENT_ID}" type="checkbox" class="custom-control-input" required ${checked}>
+                <label class="custom-control-label" for="${ELEMENT_ID}">${VALUE_NAME}</label>
+                <div class="valid-feedback">${VALUE_NAME} is on.</div>
+                 <div class="invalid-feedback">${VALUE_NAME} is off.</div>
             </div>
+          </form>
         </div>
       `
     }
