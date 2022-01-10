@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const RememberMeStrategy = require("passport-remember-me").Strategy;
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
 
 module.exports = function (passport) {
   passport.use(
@@ -36,18 +38,16 @@ module.exports = function (passport) {
             if (err) throw err;
 
             if (isMatch) {
-              console.log(done);
               return done(null, user);
             }
             return done(null, false, { message: "Password incorrect" });
           });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => logger.error(err));
     })
   );
 
   passport.serializeUser((user, done) => {
-    console.log("SERIALISE ", user);
     done(null, user.id);
   });
 

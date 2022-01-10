@@ -19,7 +19,6 @@ class UserTokenService {
 
   static async issueTokenWithDone(user, done) {
     const token = randomString(64);
-    console.log("TOKEN", user);
     // Purge beforehand
     await this.clearUserToken(user.id);
 
