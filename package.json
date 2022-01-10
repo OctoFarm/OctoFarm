@@ -4,12 +4,17 @@
   "main": "server/app.js",
   "scripts": {
     "start": "cd server && npm run start",
+    "server-install": "cd server && npm install",
+    "server-dev": "cd server && npm run dev",
     "restart": "pm2 restart OctoFarm",
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
-    "dev": "nodemon ./server/app.js",
-    "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\""
+    "dev": "cd server && nodemon ./app.js",
+    "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\"",
+    "client-install": "cd client && npm install",
+    "client-dev": "cd client && npm run dev",
+    "client-build": "cd client && npm run build"
   },
   "repository": {
     "type": "git",
