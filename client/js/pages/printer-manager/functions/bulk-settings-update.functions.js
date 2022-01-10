@@ -1,4 +1,4 @@
-import UI from "../../../lib/functions/ui"
+import UI from "../../../utils/ui"
 
 const appearanceTemplate = (appearance) => {
     let buttonsHTML = "";

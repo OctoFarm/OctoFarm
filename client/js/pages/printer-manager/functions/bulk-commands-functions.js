@@ -1,8 +1,8 @@
 import {findIndex} from "lodash";
 
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
-import UI from "../../../lib/functions/ui";
-import PrinterSelect from "../../../lib/modules/printerSelect";
+import UI from "../../../utils/ui";
+import PrinterSelectionService from "../../../services/printer-selection.service";
 import {octoPrintPluginInstallAction, updateOctoPrintPlugins} from "../../../octoprint/octoprint-plugin-commands";
 import {
   disconnectPrinterFromOctoPrint,
@@ -24,7 +24,7 @@ import {
   printerStopPrint
 } from "../../../octoprint/octoprint-printer-commands";
 import {setupOctoPrintForVirtualPrinter} from "../../../octoprint/octoprint-settings.actions";
-import CustomGenerator from "../../../lib/modules/customScripts";
+import CustomGenerator from "../../../services/custom-gcode-scripts.service";
 import {setupPluginSearch} from "./plugin-search.function";
 import {returnPluginListTemplate, returnPluginSelectTemplate} from "../templates/octoprint-plugin-list.template";
 import {
@@ -36,8 +36,8 @@ import {
 import {populateAppearanceSettings} from "./bulk-settings-update.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
-import Queue from "../../../lib/modules/clientQueue.js";
-import OctoPrintClient from "../../../lib/octoprint";
+import Queue from "../../../services/file-manager-queue.service.js";
+import OctoPrintClient from "../../../services/octoprint-client.service";
 
 const fileUploads = new Queue();
 
@@ -49,7 +49,7 @@ async function getCurrentlySelectedPrinterList() {
     const currentPrinterList = await OctoFarmClient.listPrinters();
     const matchedPrinters = [];
     //Grab all check boxes
-    const selectedPrinters = PrinterSelect.getSelected();
+    const selectedPrinters = PrinterSelectionService.getSelected();
     selectedPrinters.forEach((element) => {
       const printerID = element.id.split("-");
       const index = findIndex(currentPrinterList, function (o) {
@@ -1249,7 +1249,7 @@ setInterval(async () => {
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
       const post = await OctoFarmClient.post("printers/newFiles", file);
-      // const update = await FileManager.updateFileList(file);
+      // const update = await FileManagerService.updateFileList(file);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
       if (fileCounts && fileCounts.innerHTML == 1) {

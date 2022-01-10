@@ -1,4 +1,4 @@
-import UI from "./lib/functions/ui.js";
+import UI from "./utils/ui.js";
 import Script from "./services/octofarm-scripts.service";
 import ClientSettings from "./pages/system/client-settings";
 import {
@@ -152,7 +152,7 @@ if (userActionElements.createUserBtn) {
 if (serverActionsElements.RESET_DASHBOARD) {
 }
 // Setup user password resets
-const passResetButtons = document.querySelectorAll('*[id^="resetPasswordBtn-"]');
+const passResetButtons = document.querySelectorAll("*[id^=\"resetPasswordBtn-\"]");
 passResetButtons.forEach((btn) => {
   const split = btn.id.split("-");
   btn.addEventListener("click", (e) => {
@@ -169,7 +169,7 @@ passResetButtons.forEach((btn) => {
 if (serverActionsElements.RESET_DASHBOARD) {
 }
 // Setup user edits
-const userEditButtons = document.querySelectorAll('*[id^="editUserBtn-"]');
+const userEditButtons = document.querySelectorAll("*[id^=\"editUserBtn-\"]");
 userEditButtons.forEach((btn) => {
   const split = btn.id.split("-");
   btn.addEventListener("click", async (e) => {
@@ -187,7 +187,7 @@ userEditButtons.forEach((btn) => {
 if (serverActionsElements.RESET_DASHBOARD) {
 }
 // Setup user deletes
-const deleteButtons = document.querySelectorAll('*[id^="deleteUserBtn-"]');
+const deleteButtons = document.querySelectorAll("*[id^=\"deleteUserBtn-\"]");
 deleteButtons.forEach((btn) => {
   const split = btn.id.split("-");
   btn.addEventListener("click", (e) => {

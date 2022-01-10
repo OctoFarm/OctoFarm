@@ -1,5 +1,5 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
-import UI from "../../lib/functions/ui";
+import UI from "../../utils/ui";
 //TODO: Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
 
 export default class ClientSettings {
@@ -24,7 +24,7 @@ export default class ClientSettings {
     }
 
     if (clientSettings.dashboard) {
-      document.getElementById("currentOperations").checked =
+      document.getElementById("currentOperationsService").checked =
         clientSettings.dashboard.farmActivity.currentOperations;
       document.getElementById("cumulativeTimes").checked =
         clientSettings.dashboard.farmActivity.cumulativeTimes;
@@ -105,7 +105,7 @@ export default class ClientSettings {
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
-          currentOperations: document.getElementById("currentOperations").checked,
+          currentOperations: document.getElementById("currentOperationsService").checked,
           cumulativeTimes: document.getElementById("cumulativeTimes").checked,
           averageTimes: document.getElementById("averageTimes").checked
         },

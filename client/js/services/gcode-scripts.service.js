@@ -1,5 +1,5 @@
 import OctoFarmClient from "./octofarm-client.service";
-import UI from "../lib/functions/ui";
+import UI from "../utils/ui";
 
 const customGcodeScripts = document.getElementById("customGcodeBtn");
 customGcodeScripts.addEventListener("click", async (e) => {

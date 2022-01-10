@@ -26,7 +26,7 @@ createClientSSEWorker(monitoringWorkerURL, monitoringSSEventHandler);
 // } from "./group/printer-quick-actions.modal";
 // import { FileActions } from "./lib/modules/fileManager";
 // import UI from "./lib/functions/ui";
-// import OctoPrintClient from "./lib/octoprint.js";
+// import OctoPrintClient from "./lib/octoprint-client.service.js";
 // import { fileListStorageSize, findOldFiles } from "./group/group.utils";
 // import { humanFileSize } from "./utils/file-size.util";
 //

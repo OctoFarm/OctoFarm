@@ -1,4 +1,4 @@
-import UI from "../lib/functions/ui.js";
+import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 
 //TODO: Rework in another PR

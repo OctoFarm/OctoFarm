@@ -1,4 +1,4 @@
-import UI from "./lib/functions/ui.js";
+import UI from "./utils/ui.js";
 import {setupFilamentManagerReSyncBtn} from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";

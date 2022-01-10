@@ -1,16 +1,16 @@
-import UI from "../../../lib/functions/ui";
+import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
-import PowerButton from "../../../lib/modules/powerButton";
-import PrinterManager from "../../../lib/modules/printerManager";
-import {updatePrinterSettingsModal} from "../../../lib/modules/printerSettings";
-import Validate from "../../../lib/functions/validate";
+import PrinterPowerService from "../../../services/printer-power-service";
+import PrinterControlManagerService from "../../../services/printer-control-manager.service";
+import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
+import Validate from "../../../utils/validate";
 import {PrintersManagement} from "../printer-constructor";
-import PrinterSelect from "../../../lib/modules/printerSelect";
-import FileOperations from "../../../lib/functions/file";
+import PrinterSelectionService from "../../../services/printer-selection.service";
+import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
-import PrinterFileManager from "../../../lib/modules/printerFileManager";
+import PrinterFileManagerService from "../../../services/printer-file-manager.service";
 import {
     addHealthCheckListeners,
     returnFarmOverviewTableRow,
@@ -38,7 +38,7 @@ export function workerEventFunction(data) {
       // TODO clean up power buttons wants to be in printer-data.js
       if (powerTimer >= 5000) {
         data.printersInformation.forEach((printer) => {
-          PowerButton.applyBtn(printer);
+          PrinterPowerService.applyBtn(printer);
         });
         powerTimer = 0;
       } else {
@@ -47,9 +47,9 @@ export function workerEventFunction(data) {
     } else {
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {
         if (currentOpenModal.innerHTML.includes("Files")) {
-          PrinterFileManager.init("", data.printersInformation, data.printerControlList);
+          PrinterFileManagerService.init("", data.printersInformation, data.printerControlList);
         } else if (currentOpenModal.innerHTML.includes("Control")) {
-          PrinterManager.init("", data.printersInformation, data.printerControlList);
+          PrinterControlManagerService.init("", data.printersInformation, data.printerControlList);
         } else if (currentOpenModal.innerHTML.includes("Terminal")) {
         }
       }
@@ -116,7 +116,7 @@ export async function reSyncAPI(force = false, id = null) {
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
+  reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Scanning APIs...";
   try {
     const post = await OctoFarmClient.post("printers/reSyncAPI", {
       id: id,
@@ -128,7 +128,7 @@ export async function reSyncAPI(force = false, id = null) {
   }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
-  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm"></i> ReScan All API\'s';
+  reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i> ReScan All API's";
   reSyncAPIBtn.disabled = false;
 }
 export async function reSyncWebsockets() {
@@ -139,7 +139,7 @@ export async function reSyncWebsockets() {
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  reSyncSocketsBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing Sockets...';
+  reSyncSocketsBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Syncing Sockets...";
   try {
     const post = await OctoFarmClient.post("printers/reSyncSockets", {
       id: null
@@ -150,7 +150,7 @@ export async function reSyncWebsockets() {
   }
   alert.close();
   UI.createAlert("success", "Background sync started successfully!", 3000, "clicked");
-  reSyncSocketsBtn.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets';
+  reSyncSocketsBtn.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i> Reconnect All Sockets";
   reSyncSocketsBtn.disabled = false;
 }
 
@@ -226,7 +226,7 @@ export async function bulkEditPrinters() {
 export async function bulkDeletePrinters() {
   const deletedPrinters = [];
   //Grab all check boxes
-  const selectedPrinters = PrinterSelect.getSelected();
+  const selectedPrinters = PrinterSelectionService.getSelected();
   selectedPrinters.forEach((element) => {
     const ca = element.id.split("-");
     deletedPrinters.push(ca[1]);
@@ -337,7 +337,7 @@ export async function loadPrinterHealthChecks(id = undefined) {
 export async function loadFarmOverviewInformation() {
   const farmOverviewInformation = document.getElementById("farmOverviewInformation");
   farmOverviewInformation.innerHTML =
-    '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><i class="fas fa-sync fa-spin"></i> Generating records, please wait...</td><td></td><td></td><td></td><td></td><td></td></tr>';
+    "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><i class=\"fas fa-sync fa-spin\"></i> Generating records, please wait...</td><td></td><td></td><td></td><td></td><td></td></tr>";
 
   const farmOverview = await OctoFarmClient.getFarmOverview();
   farmOverviewInformation.innerHTML = "";

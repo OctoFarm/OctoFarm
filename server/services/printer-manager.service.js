@@ -12,7 +12,7 @@ const Printers = require("../models/Printer");
 const { FileClean } = require("./file-cleaner.service");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 
-const logger = new Logger("OctoFarm-PrinterManager");
+const logger = new Logger("OctoFarm-PrinterControlManagerService");
 
 class PrinterManagerService {
   #printerGroupList = [];

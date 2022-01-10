@@ -1,5 +1,5 @@
-import UI from "./functions/ui.js";
-import OctoFarmClient from "../services/octofarm-client.service";
+import UI from "../utils/ui.js";
+import OctoFarmClient from "./octofarm-client.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -103,10 +103,10 @@ export default class OctoPrintClient {
       message: `Are your sure you want to ${action} ${printer.printerName}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> No'
+          label: "<i class=\"fa fa-times\"></i> No"
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Yes'
+          label: "<i class=\"fa fa-check\"></i> Yes"
         }
       },
       async callback(result) {

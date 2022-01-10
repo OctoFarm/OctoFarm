@@ -1,5 +1,5 @@
-import OctoPrintClient from "../lib/octoprint.js";
-import UI from "../lib/functions/ui";
+import OctoPrintClient from "../services/octoprint-client.service.js";
+import UI from "../utils/ui";
 import OctoFarmClient from "../services/octofarm-client.service";
 import bulkActionsStates from "../pages/printer-manager/bulk-actions.constants";
 

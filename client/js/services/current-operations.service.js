@@ -1,21 +1,6 @@
-import Calc from "./lib/functions/calc.js";
-import OctoPrintClient from "./lib/octoprint.js";
-import {createClientSSEWorker} from "./services/client-worker.service";
-import {setViewType} from "./pages/monitoring/monitoring-view.state";
-
-// TODO dupe due to unwanted monitoring.update import causing missing element exceptions
-export const monitoringWorkerURL = "/monitoringInfo/get/";
-
-setViewType("current-ops");
-createClientSSEWorker(monitoringWorkerURL, async function (data) {
-  if (!!data) {
-    currentOperationsView(
-      data.currentOperations.operations,
-      data.currentOperations.count,
-      data.printersInformation
-    );
-  }
-});
+import Calc from "../utils/calc.js";
+import OctoPrintClient from "./octoprint-client.service.js";
+import OctoFarmClient from "./octofarm-client.service";
 
 let printers = [];
 const resetFile = function (id) {
@@ -34,7 +19,6 @@ const currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach((harvest) => {
   harvest.addEventListener("click", (e) => {
     const id = harvest.id.split("-");
-    document.getElementById("viewPanel-" + id[1]).style.display = "none";
     resetFile(id[1]);
   });
 });
@@ -45,12 +29,81 @@ currentRestartPrint.forEach((harvest) => {
     rePrint(id[1]);
   });
 });
-function currentOperationsView(currentOperations, currentOperationsCount, printerInfo) {
+const currentOperationsSorting = document.getElementById("currentOperationsSort");
+
+if (currentOperationsSorting) {
+  OctoFarmClient.getCurrentOpState()
+    .then((res) => {
+      // Apply state
+      const { currentIterie, currentOrder } = res;
+      if (currentIterie === "progress" && currentOrder === "desc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-down").innerHTML;
+      }
+      if (currentIterie === "progress" && currentOrder === "asc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-up").innerHTML;
+      }
+      if (currentIterie === "timeRemaining" && currentOrder === "desc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-time-down").innerHTML;
+      }
+      if (currentIterie === "timeRemaining" && currentOrder === "asc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-time-up").innerHTML;
+      }
+      if (currentIterie === "fileName" && currentOrder === "desc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-file-down").innerHTML;
+      }
+      if (currentIterie === "fileName" && currentOrder === "asc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-file-up").innerHTML;
+      }
+      if (currentIterie === "sortIndex" && currentOrder === "desc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-index-down").innerHTML;
+      }
+      if (currentIterie === "sortIndex" && currentOrder === "asc") {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-index-up").innerHTML;
+      }
+      document.getElementById("ci-progress-up").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-up").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "progress", order: "asc" });
+      });
+      document.getElementById("ci-progress-down").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-down").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "progress", order: "desc" });
+      });
+      document.getElementById("ci-time-up").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-time-up").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "timeRemaining", order: "asc" });
+      });
+      document.getElementById("ci-time-down").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-time-down").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "timeRemaining", order: "desc" });
+      });
+      document.getElementById("ci-file-up").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-file-up").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "fileName", order: "asc" });
+      });
+      document.getElementById("ci-file-down").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-file-down").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "fileName", order: "desc" });
+      });
+      document.getElementById("ci-index-up").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-index-up").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "sortIndex", order: "asc" });
+      });
+      document.getElementById("ci-index-down").addEventListener("click", async () => {
+        currentOperationsSorting.innerHTML = document.getElementById("ci-index-down").innerHTML;
+        await OctoFarmClient.updateCurrentOpState({ iterie: "sortIndex", order: "desc" });
+      });
+    })
+    .catch((e) => {
+      // OH NOOO
+    });
+}
+
+export default function currentOperationsService(currentOperations, currentOperationsCount, printerInfo) {
   printers = printerInfo;
   if (currentOperations.length === 0) {
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
     currentCards.forEach((card) => {
-      const id = cardt.id.split("-");
+      card.remove();
     });
   }
 
@@ -69,7 +122,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     "farmProgress"
   ).classList = `progress-bar progress-bar-striped bg-${currentOperationsCount.farmProgressColour}`;
 
-  currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
+  // currentOperationsService = _.orderBy(currentOperationsService, ["progress"], ["desc"]);
 
   currentOperations.forEach((current, index) => {
     // Generate future time
@@ -81,7 +134,6 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     const dateComplete = futureDateString + ": " + futureTimeString;
     const finishedPrint = `<button id='currentHarvest-${current.index}' type='button' title="Clear your finished print from current operations" class='tag btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
     const restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' title="Restart your current selected print" class='tag btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`;
-    // check if exists, create if not....
     let fileName = null;
     if (typeof current.fileName !== undefined) {
       fileName = current.fileName.replace(".gcode", "");
@@ -89,8 +141,9 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
         fileName.substring(0, 16);
       }
     }
+
+    // check if exists, create if not....
     if (document.getElementById("currentOpCard-" + current.index)) {
-      document.getElementById("viewPanel-" + current.index).style.display = "inline-block";
       if (current.progress === 100) {
         document.getElementById("finishedPrint-" + current.index).classList.remove("d-none");
         document.getElementById("futureDate-" + current.index).classList.add("d-none");
@@ -115,16 +168,13 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
-            <div class="col-sm-6 col-md-4 col-lg-2 col-xl-1 pt-0 pb-0" id="viewPanel-${
-              current.index
-            }">
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block  text-truncate"
-                 style="width:100%;"
+                style="min-width: 200px; max-width: 200px;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">
                      ${current.name}</div>
-                  <div class="card-body pb-0 pt-2 pl-2 pr-2 pb-1">
+                  <div class="card-body  pb-0 pt-2 pl-2 pr-2">
                   <h6 id="currentFile-${
                     current.index
                   }" class="pb-0 text-center" style="font-size:0.6rem;"> ${fileName} </h6>
@@ -171,6 +221,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     }
 
     document.getElementById("currentOpCard-" + current.index).style.order = index;
+
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
     const curr = [];
     currentOperations.forEach((cur) => {
@@ -183,7 +234,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     });
     const remove = _.difference(cards, curr);
     remove.forEach((rem) => {
-      document.getElementById("viewPanel-" + rem).remove();
+      document.getElementById("currentOpCard-" + rem).remove();
     });
   });
 }

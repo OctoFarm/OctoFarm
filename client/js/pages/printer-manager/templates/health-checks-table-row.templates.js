@@ -14,7 +14,7 @@
 // <!--                                Webcam Settings-->
 // <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
 // Bootbox over bootstrap modal fix for scrolling...
-import UI from "../../../lib/functions/ui";
+import UI from "../../../utils/ui";
 
 $(document).on("hidden.bs.modal", ".bootbox.modal", function (e) {
   if ($(".modal").hasClass("show")) {
@@ -185,12 +185,12 @@ const returnNetworkConnection = (issues) => {
     html += `
         <small>${endPoint}: ${returnButton(
       issue.initialTimeout,
-      '<i class="fas fa-history"></i>',
+      "<i class=\"fas fa-history\"></i>",
       E.NETWORK + endPoint + pClean + "timeout",
       VALID_TIMEOUT("Initial")
     )} | ${returnButton(
       issue.cutOffTimeout,
-      '<i class="fas fa-stopwatch"></i>',
+      "<i class=\"fas fa-stopwatch\"></i>",
       E.NETWORK + endPoint + pClean + "cutoff",
       VALID_TIMEOUT("Cut Off")
     )} </small>
@@ -208,7 +208,7 @@ const returnNetworkConnection = (issues) => {
     html += `
         <small>${endPoint}: ${returnButton(
       issue.throttle,
-      '<i class="fas fa-motorcycle"></i>',
+      "<i class=\"fas fa-motorcycle\"></i>",
       E.NETWORK + endPoint + pClean_W + "socket",
       VALID_TIMEOUT("Websocket Throttle")
     )}
@@ -225,19 +225,19 @@ const returnNetworkConnection = (issues) => {
     </a><br>
     ${returnButton(
       totalInitial < 1,
-      '<i class="fas fa-history"></i>',
+      "<i class=\"fas fa-history\"></i>",
       E.NETWORK + pClean + "initial",
       VALID_TIMEOUT("All Initial")
     )}
     ${returnButton(
       totalCutOff < 1,
-      '<i class="fas fa-stopwatch"></i>',
+      "<i class=\"fas fa-stopwatch\"></i>",
       E.NETWORK + pClean + "cuttOff",
       VALID_TIMEOUT("All Cut Off")
     )}
     ${returnButton(
       throttle,
-      '<i class="fas fa-motorcycle"></i>',
+      "<i class=\"fas fa-motorcycle\"></i>",
       E.NETWORK + pClean_W + "throttle",
       VALID_TIMEOUT("Websocket Throttle")
     )}
@@ -256,19 +256,19 @@ const returnHistoryCamera = (pClean, history) => {
   let html = `
     ${returnButton(
       history.ffmpegPath,
-      '<i class="fas fa-terminal"></i>',
+      "<i class=\"fas fa-terminal\"></i>",
       E.H_FFMPEG + pClean,
       VALID("The FFmpeg Path")
     )}
     ${returnButton(
       history.ffmpegVideoCodex,
-      '<i class="fas fa-video"></i>',
+      "<i class=\"fas fa-video\"></i>",
       E.H_CODEC + pClean,
       VALID("The Video Codex")
     )}
     ${returnButton(
       history.timelapseEnabled,
-      '<i class="fas fa-hourglass-start"></i>',
+      "<i class=\"fas fa-hourglass-start\"></i>",
       E.H_TIMELAPSE + pClean,
       VALID("The timelapse")
     )}
@@ -300,26 +300,26 @@ export function returnHealthCheckRow(check) {
         <td>       
         ${returnButton(
           check.printerChecks.printerURL,
-          '<i class="fas fa-print"></i>',
+          "<i class=\"fas fa-print\"></i>",
           E.PRINTER_URL + pClean,
           VALID("Printer URL")
         )}
         ${returnButton(
           check.printerChecks.webSocketURL,
-          '<i class="fas fa-plug"></i>',
+          "<i class=\"fas fa-plug\"></i>",
           E.WEBSOCKET + pClean,
           VALID("WebSocket URL")
         )}
         <br>
         ${returnButton(
           check.printerChecks.match,
-          '<i class="fas fa-equals"></i>',
+          "<i class=\"fas fa-equals\"></i>",
           E.MATCH + pClean,
           VALID("Your http/https websocket connection")
         )}
         ${returnButton(
           check.printerChecks.cameraURL,
-          '<i class="fas fa-camera"></i>',
+          "<i class=\"fas fa-camera\"></i>",
           E.CAM + pClean,
           VALID("Camera URL")
         )}
@@ -328,7 +328,7 @@ export function returnHealthCheckRow(check) {
         <td>
         ${returnButton(
           parseInt(check.websocketChecks.totalPingPong) <= 5,
-          '<i class="fas fa-table-tennis"></i>',
+          "<i class=\"fas fa-table-tennis\"></i>",
           E.PING_PONG + pClean,
           VALID_NOT("Websocket Ping/Pong")
         )}
@@ -336,31 +336,31 @@ export function returnHealthCheckRow(check) {
         <td>
         ${returnButton(
           check.apiChecksRequired.userCheck,
-          '<i class="fas fa-users"></i>',
+          "<i class=\"fas fa-users\"></i>",
           E.USER + pClean,
           VALID_API("Users")
         )}
         ${returnButton(
           check.apiChecksRequired.stateCheck,
-          '<i class="fas fa-info-circle"></i>',
+          "<i class=\"fas fa-info-circle\"></i>",
           E.STATE + pClean,
           VALID_API("State")
         )}
        ${returnButton(
          check.apiChecksRequired.settingsCheck,
-         '<i class="fas fa-cog"></i>',
+         "<i class=\"fas fa-cog\"></i>",
          E.SETTINGS + pClean,
          VALID_API("Settings")
        )}
        ${returnButton(
          check.apiChecksRequired.profileCheck,
-         '<i class="fas fa-id-card"></i>',
+         "<i class=\"fas fa-id-card\"></i>",
          E.PROFILE + pClean,
          VALID_API("Profile")
        )}
        ${returnButton(
          check.apiChecksRequired.systemCheck,
-         '<i class="fas fa-server"></i>',
+         "<i class=\"fas fa-server\"></i>",
          E.SYSTEM + pClean,
          VALID_API("System Commands")
        )}
@@ -368,26 +368,26 @@ export function returnHealthCheckRow(check) {
        <td>
        ${returnButton(
          check.apiChecksOptional.octoPrintSystemInfo,
-         '<i class="fas fa-question-circle"></i>',
+         "<i class=\"fas fa-question-circle\"></i>",
          E.OP_SYS_INFO + pClean,
          VALID_API("System Information")
        )}
      ${returnButton(
        check.apiChecksOptional.octoPrintUpdatesCheck,
-       '<i class="fas fa-wrench"></i>',
+       "<i class=\"fas fa-wrench\"></i>",
        E.OP_UPDATES + pClean,
        VALID_API("System Updates")
      )}
      ${returnButton(
        check.apiChecksOptional.filesCheck,
-       '<i class="fas fa-file-code"></i>',
+       "<i class=\"fas fa-file-code\"></i>",
        E.FILES + pClean,
        VALID_API("Files")
      )}
 
      ${returnButton(
        check.apiChecksOptional.octoPrintPluginsCheck,
-       '<i class="fas fa-plug"></i>',
+       "<i class=\"fas fa-plug\"></i>",
        E.OP_PLUGIN + pClean,
        VALID_API("Plugin Updates")
      )}
@@ -398,19 +398,19 @@ export function returnHealthCheckRow(check) {
           <td>
           ${returnButton(
             check.connectionChecks.baud,
-            '<i class="fas fa-archway"></i>',
+            "<i class=\"fas fa-archway\"></i>",
             E.BAUD + pClean,
             VALID_CONN("Baudrate Default")
           )}
            ${returnButton(
              check.connectionChecks.port,
-             '<i class="fas fa-plug"></i>',
+             "<i class=\"fas fa-plug\"></i>",
              E.PORT + pClean,
              VALID_CONN("Port Default")
            )}
             ${returnButton(
               check.connectionChecks.profile,
-              '<i class="fas fa-id-card-alt"></i>',
+              "<i class=\"fas fa-id-card-alt\"></i>",
               E.PROFILE + pClean,
               VALID_CONN("Profile Default")
             )}
@@ -418,7 +418,7 @@ export function returnHealthCheckRow(check) {
         <td>
         ${returnButton(
           check.profileChecks,
-          '<i class="fas fa-print"></i>',
+          "<i class=\"fas fa-print\"></i>",
           E.PROFILE_CHECK + pClean,
           VALID_CONN("Printer Profile")
         )}
@@ -426,7 +426,7 @@ export function returnHealthCheckRow(check) {
         <td>
          ${returnButton(
            check.webcamChecks.camSetup,
-           '<i class="fas fa-camera"></i>',
+           "<i class=\"fas fa-camera\"></i>",
            E.WEBCAM + pClean,
            VALID("Webcam")
          )}
@@ -821,8 +821,8 @@ export function returnFarmOverviewTableRow(
       }  </td>
       <td>${
         octoSysInfo?.["octoprint.safe_mode"]
-          ? '<i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>'
-          : '<i title="Something maybe wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>'
+          ? "<i title=\"You are not in safe mode, all is fine\" class=\"fas fa-thumbs-down text-success\"></i>"
+          : "<i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-up text-success\"></i>"
       } </td>
       <td>
         <div class="progress">

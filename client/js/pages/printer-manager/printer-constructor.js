@@ -1,5 +1,5 @@
-import Validate from "../../lib/functions/validate";
-import UI from "../../lib/functions/ui";
+import Validate from "../../utils/validate";
+import UI from "../../utils/ui";
 import OctoFarmClient from "../../services/octofarm-client.service.js";
 
 let newPrintersIndex = 0;
@@ -261,7 +261,7 @@ export class PrintersManagement {
         });
       } else {
         const saveButton = document.getElementById(`saveButton-${newId}`);
-        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
         saveButton.disabled = true;
 
         const printer = new PrintersManagement(
@@ -282,7 +282,7 @@ export class PrintersManagement {
           );
         });
         event.parentElement.parentElement.parentElement.remove();
-        saveButton.innerHTML = '<i class="fas fa-save"></i>';
+        saveButton.innerHTML = "<i class=\"fas fa-save\"></i>";
         saveButton.disabled = false;
       }
       const table = document.getElementById("printerNewTable");

@@ -1,11 +1,11 @@
 import {returnDisabledPrinterTableRow, returnPrinterTableRow} from "./templates/printer-table-row.templates.js";
-import {checkQuickConnectState, init as actionButtonInit} from "../../lib/modules/Printers/actionButtons";
+import {checkQuickConnectState, init as actionButtonInit} from "../../services/printer-action-buttons.service";
 import {setupUpdateOctoPrintClientBtn} from "../../octoprint/octoprint-client-commands";
 import {setupUpdateOctoPrintPluginsBtn} from "../../octoprint/octoprint-plugin-commands";
-import UI from "../../lib/functions/ui.js";
-import PrinterLogs from "../../lib/modules/printerLogs.js";
+import UI from "../../utils/ui.js";
+import PrinterLogsService from "../../services/printer-logs.service.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
-import {updatePrinterSettingsModal} from "../../lib/modules/printerSettings";
+import {updatePrinterSettingsModal} from "../../services/printer-settings.service";
 import {loadPrinterHealthChecks, reSyncAPI} from "./functions/printer-manager.functions";
 
 //TODO move to UI util
@@ -104,14 +104,14 @@ function reconnectingIn(printer) {
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
-      printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
+      printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     } else {
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     }
   } else {
     UI.removeDisplayNoneFromElement(printerReScanButton);
-    printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -125,14 +125,14 @@ function reconnectingWebsocketIn(printer) {
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
-      printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm fa-spin"></i>';
+      printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     } else {
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     }
   } else {
     UI.removeDisplayNoneFromElement(printerReScanButton);
-    printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -271,13 +271,13 @@ export function createOrUpdatePrinterTableRow(printers) {
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
         let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
-        PrinterLogs.loadLogs(printerInfo, connectionLogs);
+        PrinterLogsService.loadLogs(printerInfo, connectionLogs);
       });
 
       document
         .getElementById(`printerStatistics-${printer._id}`)
         .addEventListener("click", async (e) => {
-          await PrinterLogs.loadStatistics(printer._id);
+          await PrinterLogsService.loadStatistics(printer._id);
         });
 
       document
@@ -286,8 +286,8 @@ export function createOrUpdatePrinterTableRow(printers) {
           bootbox.dialog({
             title: "Rescan All API endpoints",
             message:
-              '<p class="alert alert-warning text-dark" role="alert">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>' +
-              '<p class="alert alert-danger text-dark" role="alert">Force ReScan: Will rescan all endpoints regardless of existing data.</p>',
+              "<p class=\"alert alert-warning text-dark\" role=\"alert\">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>" +
+              "<p class=\"alert alert-danger text-dark\" role=\"alert\">Force ReScan: Will rescan all endpoints regardless of existing data.</p>",
             size: "large",
             buttons: {
               normal: {
@@ -325,10 +325,10 @@ export function createOrUpdatePrinterTableRow(printers) {
 
           buttons: {
             cancel: {
-              label: '<i class="fa fa-times"></i> Cancel'
+              label: "<i class=\"fa fa-times\"></i> Cancel"
             },
             confirm: {
-              label: '<i class="fa fa-check"></i> Confirm'
+              label: "<i class=\"fa fa-check\"></i> Confirm"
             }
           },
           callback: async function (result) {

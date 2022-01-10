@@ -15,7 +15,7 @@
         icon: "fa-info-circle",
         title: "Log Lines: "
         },
-        bodyFile:'./PrinterManager/printerConnectionLog.ejs'
+        bodyFile:'./PrinterControlManagerService/printerConnectionLog.ejs'
         })
         %>
     </div>
@@ -64,49 +64,49 @@
     modal:{
     id:"bulkUpdateOctoPrintSettings", title:"Bulk Updating OctoPrint Settings"
     },
-    bodyFile:'./PrinterManager/printerBulkSettings.modal.ejs'
+    bodyFile:'./PrinterControlManagerService/printerBulkSettings.modal.ejs'
     })
 %>
 <%- include(modal, {
     modal:{
     id:"printerLogs", title:"Printer Logs: "
     },
-    bodyFile:'./PrinterManager/printerLogs.modal.ejs'
+    bodyFile:'./PrinterControlManagerService/printerLogs.modal.ejs'
 })
 %>
 <%- include(modal, {
 modal:{
 id:"farmOverview", title:"Farm Overview"
 },
-bodyFile:'./PrinterManager/farmOverview.modal.ejs'
+bodyFile:'./PrinterControlManagerService/farmOverview.modal.ejs'
 })
 %>
 <%- include(modal, {
 modal:{
 id:"connectionsOverview", title: "Connections Overview"
 },
-bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+bodyFile:'./PrinterControlManagerService/connectionOverview.modal.ejs'
 })
 %>
 <%- include(modal, {
     modal:{
     id:"printerSettings", title:"Printer Settings: "
     },
-    bodyFile:'./PrinterManager/printerSettings.modal.ejs'
+    bodyFile:'./PrinterControlManagerService/printerSettings.modal.ejs'
 })
 %>
 <%- include(modal, {
     modal:{
         id:"printerStatistics", title:"Printer Statistics"
     },
-    bodyFile:'./PrinterManager/printerStatistics.modal.ejs'
+    bodyFile:'./PrinterControlManagerService/printerStatistics.modal.ejs'
 })
 %>
 <%- include(modal, {
 modal:{
 id:"healthChecks", title: "Printers Health Checks"
 },
-bodyFile:'./PrinterManager/healthChecks.modal.ejs'
+bodyFile:'./PrinterControlManagerService/healthChecks.modal.ejs'
 })
 %>
 

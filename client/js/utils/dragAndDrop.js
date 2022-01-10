@@ -1,4 +1,4 @@
-import FileManager from "../modules/fileManager.js";
+import FileManagerService from "../services/file-manager.service.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
 import {groupBy, mapValues} from "lodash";
@@ -163,9 +163,9 @@ function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, p
 
   // Only single files can be sent to be printed immediately after upload
   if (printAfterUpload && singleFileOnly) {
-    FileManager.handleFiles(uploadableFiles, printer, "print");
+    FileManagerService.handleFiles(uploadableFiles, printer, "print");
   } else {
-    FileManager.handleFiles(uploadableFiles, printer);
+    FileManagerService.handleFiles(uploadableFiles, printer);
   }
 }
 

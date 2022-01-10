@@ -1,7 +1,7 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
-import UI from "../../lib/functions/ui";
-import Calc from "../../lib/functions/calc";
-import FileOperations from "../../lib/functions/file";
+import UI from "../../utils/ui";
+import Calc from "../../utils/calc";
+import FileOperations from "../../utils/file";
 import {
     setupOctoPrintForFilamentManager,
     setupOctoPrintForTimelapses
@@ -584,7 +584,7 @@ function startUpdateTasksRunner() {
       UI.doesElementNeedUpdating(
         theTask.duration
           ? UI.generateMilisecondsTime(theTask.duration)
-          : '<i class="fas fa-sync fa-spin"></i>',
+          : "<i class=\"fas fa-sync fa-spin\"></i>",
         document.getElementById("duration-" + task),
         "innerHTML"
       );

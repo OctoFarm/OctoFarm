@@ -1,4 +1,4 @@
-import PrinterSelect from "./lib/modules/printerSelect";
+import PrinterSelectionService from "./services/printer-selection.service";
 import {
     bulkConnectPrinters,
     bulkDisconnectPrinters,
@@ -14,7 +14,7 @@ const multiPrintersSection = document.getElementById("multiPrintersSection");
 const multiPrintCommandBtn = document.getElementById("multiPrintCommand");
 if (multiPrintCommandBtn) {
   multiPrintCommandBtn.addEventListener("click", async (e) => {
-    await PrinterSelect.create(
+    await PrinterSelectionService.create(
       multiPrintersSection,
       false,
       "Start a Bulk Print",
@@ -25,7 +25,7 @@ if (multiPrintCommandBtn) {
 
 let bulkGcodeCommands = document.getElementById("bulkGcodeCommands");
 bulkGcodeCommands.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Send Gcode to Printers",
@@ -35,7 +35,7 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
 
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Connect Printers",
@@ -44,7 +44,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
 });
 const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
 bulkDisconnectBtn.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Disconnect Printers",
@@ -53,7 +53,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
 });
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
 bulkPowerBtn.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Power On/Off Printers",
@@ -63,7 +63,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
 
 let bulkPreHeat = document.getElementById("bulkPreHeat");
 bulkPreHeat.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Pre-Heat Printers",
@@ -73,7 +73,7 @@ bulkPreHeat.addEventListener("click", async (e) => {
 
 let bulkControl = document.getElementById("bulkControl");
 bulkControl.addEventListener("click", async (e) => {
-  await PrinterSelect.create(
+  await PrinterSelectionService.create(
     multiPrintersSection,
     false,
     "Control Printers",

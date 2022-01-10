@@ -1,6 +1,6 @@
-import Calc from "../functions/calc.js";
-import OctoFarmClient from "../../services/octofarm-client.service";
-import OctoPrintClient from "../octoprint.js";
+import Calc from "../utils/calc.js";
+import OctoFarmClient from "./octofarm-client.service";
+import OctoPrintClient from "./octoprint-client.service.js";
 import ApexCharts from "apexcharts";
 
 let chart = null;
@@ -9,7 +9,7 @@ let historyPieChart = null;
 let eventListener = false;
 let currentPrinter = null;
 
-export default class PrinterLogs {
+export default class PrinterLogsService {
   static async parseLogs(printer, url) {
     fetch(url, {
       method: "GET",
@@ -67,11 +67,11 @@ export default class PrinterLogs {
     let tempChart = document.getElementById("printerTempChart");
     let logSelect = document.getElementById("octoPrintLogsSelect");
 
-    logCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    errorCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    tempCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    octoCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    logCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    errorCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    tempCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    octoCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
 
     printerRows.innerHTML = "";
     printerErrorRows.innerHTML = "";
@@ -100,7 +100,7 @@ export default class PrinterLogs {
         }
 
         logSelect.value = res.files[mainLog].refs.download;
-        PrinterLogs.parseLogs(printer, res.files[mainLog].refs.download);
+        PrinterLogsService.parseLogs(printer, res.files[mainLog].refs.download);
       })
       .catch((e) => {
         console.log(e);
@@ -261,15 +261,15 @@ export default class PrinterLogs {
       logSelect.addEventListener("change", (e) => {
         octologsLogsRows.innerHTML = "";
 
-        octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-        PrinterLogs.parseLogs(printer, e.target.value);
+        octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+        PrinterLogsService.parseLogs(printer, e.target.value);
       });
       document.getElementById("system-refresh-list").addEventListener("click", async (e) => {
         console.log("Refresh!", currentPrinter.printerURL);
         let connectionLogs = await OctoFarmClient.get(
           "printers/connectionLogs/" + currentPrinter._id
         );
-        PrinterLogs.loadLogs(currentPrinter, connectionLogs);
+        PrinterLogsService.loadLogs(currentPrinter, connectionLogs);
       });
       eventListener = true;
     }

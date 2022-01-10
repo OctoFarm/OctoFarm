@@ -1,4 +1,4 @@
-import Calc from "../../lib/functions/calc";
+import Calc from "../../utils/calc";
 import {ChartsManager} from "./charts.manager";
 import {humidityLabel, iaqLabel, pressureLabel, temperatureLabel} from "./utils/chart.utils";
 
@@ -171,38 +171,38 @@ export class DashUpdate {
           airQualityElement.classList.remove("d-none");
         }
         if (Calc.isBetween(lastValue, 0, 50)) {
-          state = '<i class="fas fa-check-circle textComplete"></i> Excellent';
+          state = "<i class=\"fas fa-check-circle textComplete\"></i> Excellent";
           impact = "Pure air; best for well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 51, 100)) {
-          state = '<i class="fas fa-check-circle"></i> Good';
+          state = "<i class=\"fas fa-check-circle\"></i> Good";
           impact = "No irritation or impact on well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 101, 150)) {
-          state = '<i class="fas fa-exclamation-triangle"></i>  Lightly Polluted';
+          state = "<i class=\"fas fa-exclamation-triangle\"></i>  Lightly Polluted";
           impact = "Reduction of well-being possible";
           suggestedActions = "Ventilation suggested";
         }
         if (Calc.isBetween(lastValue, 151, 200)) {
-          state = '<i class="fas fa-exclamation-triangle"></i>  Moderately Polluted';
+          state = "<i class=\"fas fa-exclamation-triangle\"></i>  Moderately Polluted";
           impact = "More significant irritation possible";
           suggestedActions = "Increase ventilation with clean air";
         }
         if (Calc.isBetween(lastValue, 201, 250)) {
-          state = '<i class="fas fa-exclamation-triangle"></i>  Heavily Polluted';
+          state = "<i class=\"fas fa-exclamation-triangle\"></i>  Heavily Polluted";
           impact = "Exposition might lead to effects like headache depending on type of VOCs";
           suggestedActions = "Optimize ventilation";
         }
         if (Calc.isBetween(lastValue, 251, 350)) {
-          state = '<i class="fas fa-exclamation-triangle"></i>  Severely Polluted';
+          state = "<i class=\"fas fa-exclamation-triangle\"></i>  Severely Polluted";
           impact = "More severe health issue possible if harmful VOC present";
           suggestedActions =
             "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
         }
         if (Calc.isBetween(lastValue, 350, 500)) {
-          state = '<i class="fas fa-exclamation-triangle"></i>  Extremely Polluted';
+          state = "<i class=\"fas fa-exclamation-triangle\"></i>  Extremely Polluted";
           impact = "Headaches, additional neurotoxic effects possible";
           suggestedActions =
             "Contamination needs to be identified; avoid presence in room and maximize ventilation";

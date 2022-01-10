@@ -35,7 +35,7 @@ import {
     utilisationConnectionLabels,
     xAxisConnectionCategories
 } from "./utils/chart.options";
-import UI from "../../lib/functions/ui";
+import UI from "../../utils/ui";
 
 const optionsHourlyTemperature = {
   chart: {

@@ -1,9 +1,9 @@
 import OctoFarmClient from "./services/octofarm-client.service";
-import Calc from "./lib/functions/calc.js";
-import FileManager from "./lib/modules/fileManager.js";
-import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
+import Calc from "./utils/calc.js";
+import FileManagerService from "./services/file-manager.service.js";
+import {dragAndDropEnable} from "./utils/dragAndDrop.js";
 import {createFilamentSelector} from "./services/filament-manager-plugin.service";
-import FileSorting from "./lib/modules/fileSorting.js";
+import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 
 let lastId = null;
 
@@ -11,7 +11,7 @@ let lastId = null;
 const multiUploadBtn = document.getElementById("multUploadBtn");
 if (multiUploadBtn) {
   multiUploadBtn.addEventListener("click", (e) => {
-    FileManager.multiUpload();
+    FileManagerService.multiUpload();
   });
 }
 
@@ -202,9 +202,9 @@ class Manager {
 
     let printer = await OctoFarmClient.getPrinter(id);
 
-    await FileSorting.loadSort(printer._id);
+    await FileManagerSortingService.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
-      '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
+      "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";
     const fileButtons = {
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),
@@ -229,25 +229,25 @@ class Manager {
     }
 
     fileButtons.fileManager.uploadFiles.addEventListener("change", function () {
-      FileManager.handleFiles(this.files, printer);
+      FileManagerService.handleFiles(this.files, printer);
     });
     fileButtons.fileManager.createFolderBtn.addEventListener("click", (e) => {
-      FileManager.createFolder(printer);
+      FileManagerService.createFolder(printer);
     });
     fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
-      FileManager.search(printer._id);
+      FileManagerService.search(printer._id);
     });
     fileButtons.fileManager.uploadPrintFile.addEventListener("change", async function () {
-      await FileManager.handleFiles(this.files, printer, "print");
+      await FileManagerService.handleFiles(this.files, printer, "print");
     });
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
     fileButtons.fileManager.back.addEventListener("click", async (e) => {
-      await FileManager.openFolder(undefined, undefined, printer);
+      await FileManagerService.openFolder(undefined, undefined, printer);
     });
     fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
-      await FileManager.reSyncFiles(e, printer);
+      await FileManagerService.reSyncFiles(e, printer);
     });
   }
 }

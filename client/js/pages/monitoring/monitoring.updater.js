@@ -1,17 +1,17 @@
-import {dragAndDropEnable, dragAndDropGroupEnable, dragCheck} from "../../lib/functions/dragAndDrop.js";
-import PrinterManager from "../../lib/modules/printerManager.js";
-import PrinterFileManager from "../../lib/modules/printerFileManager.js";
-import UI from "../../lib/functions/ui.js";
-import Calc from "../../lib/functions/calc.js";
+import {dragAndDropEnable, dragAndDropGroupEnable, dragCheck} from "../../utils/dragAndDrop.js";
+import PrinterControlManagerService from "../../services/printer-control-manager.service.js";
+import PrinterFileManagerService from "../../services/printer-file-manager.service.js";
+import UI from "../../utils/ui.js";
+import Calc from "../../utils/calc.js";
 import {
     checkGroupQuickConnectState,
     checkQuickConnectState,
     groupInit as actionButtonGroupInit,
     init as actionButtonInit
-} from "../../lib/modules/Printers/actionButtons.js";
-import OctoPrintClient from "../../lib/octoprint.js";
-import {checkTemps} from "../../lib/modules/temperatureCheck.js";
-import doubleClickFullScreen from "../../lib/functions/fullscreen.js";
+} from "../../services/printer-action-buttons.service.js";
+import OctoPrintClient from "../../services/octoprint-client.service.js";
+import {checkTemps} from "../../services/temperature-check.util.js";
+import doubleClickFullScreen from "../../utils/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import {getControlList, getPrinterInfo} from "./monitoring-view.state";
 import {
@@ -22,9 +22,9 @@ import {
     drawListView,
     drawPanelView
 } from "./monitoring.templates";
-import PrinterTerminalManager from "../../lib/modules/printerTerminalManager";
+import PrinterTerminalManagerService from "../../services/printer-terminal-manager.service";
 import {groupBy, mapValues} from "lodash";
-import {FileActions} from "../../lib/modules/fileManager";
+import {FileActions} from "../../services/file-manager.service";
 
 let elems = [];
 let groupElems = [];
@@ -67,13 +67,13 @@ function addListeners(printer) {
     currentOpenModal.innerHTML = "Printer Control: ";
     const printerInfo = getPrinterInfo();
     const controlList = getControlList();
-    await PrinterManager.init(printer._id, printerInfo, controlList);
+    await PrinterControlManagerService.init(printer._id, printerInfo, controlList);
   });
   document.getElementById(`printerFilesBtn-${printer._id}`).addEventListener("click", async () => {
     currentOpenModal.innerHTML = "Printer Files: ";
     const printerInfo = getPrinterInfo();
     const controlList = getControlList();
-    await PrinterFileManager.init(printer._id, printerInfo, controlList);
+    await PrinterFileManagerService.init(printer._id, printerInfo, controlList);
   });
   document
     .getElementById(`printerTerminalButton-${printer._id}`)
@@ -81,7 +81,7 @@ function addListeners(printer) {
       currentOpenModal.innerHTML = "Printer Terminal: ";
       const printerInfo = getPrinterInfo();
       const controlList = getControlList();
-      await PrinterTerminalManager.init(printer._id, printerInfo, controlList);
+      await PrinterTerminalManagerService.init(printer._id, printerInfo, controlList);
     });
 
   //Play button listeners
@@ -105,10 +105,10 @@ function addListeners(printer) {
         message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: '<i class="fa fa-times"></i> Cancel'
+            label: "<i class=\"fa fa-times\"></i> Cancel"
           },
           confirm: {
-            label: '<i class="fa fa-check"></i> Confirm'
+            label: "<i class=\"fa fa-check\"></i> Confirm"
           }
         },
         callback(result) {
@@ -212,7 +212,7 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
           file.toolUnits.forEach((unit, index) => {
             toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
           });
-          let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+          let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
           if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
             thumbnail = `<center><img src='${printers[0].printerURL}/${file.thumbnail}' width="100%"></center>`;
           }
@@ -365,10 +365,10 @@ function addGroupListeners(printers) {
             message: "Are you sure you want to cancel the ongoing prints?",
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel'
+                label: "<i class=\"fa fa-times\"></i> Cancel"
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm'
+                label: "<i class=\"fa fa-check\"></i> Confirm"
               }
             },
             callback(result) {
@@ -583,7 +583,7 @@ async function updateState(printer, clientSettings, view, index) {
     elements.progress.style.width = progress + "%";
     elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     elements.currentFile.innerHTML =
-      '<i class="fas fa-file-code"></i> ' + printer.currentJob.fileDisplay;
+      "<i class=\"fas fa-file-code\"></i> " + printer.currentJob.fileDisplay;
     if (printer.printerState.colour.category === "Active") {
       // Active Job
       let printTimeElapsedFormat = `
@@ -692,7 +692,7 @@ async function updateState(printer, clientSettings, view, index) {
     UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
     UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     elements.currentFile.setAttribute("title", "No File Selected");
-    elements.currentFile.innerHTML = '<i class="fas fa-file-code"></i> ' + "No File Selected";
+    elements.currentFile.innerHTML = "<i class=\"fas fa-file-code\"></i> " + "No File Selected";
   }
 
   if (!!printer?.layerData) {
@@ -1286,11 +1286,11 @@ export async function initMonitoring(printers, clientSettings, view) {
     case true:
       // Run printer manager updater
       if (currentOpenModal.innerHTML.includes("Files")) {
-        await PrinterFileManager.init("", printers, getControlList());
+        await PrinterFileManagerService.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Control")) {
-        await PrinterManager.init("", printers, getControlList());
+        await PrinterControlManagerService.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
-        await PrinterTerminalManager.init("", printers, getControlList());
+        await PrinterTerminalManagerService.init("", printers, getControlList());
       }
       break;
     case false:
@@ -1347,7 +1347,7 @@ export async function initMonitoring(printers, clientSettings, view) {
                 }
               }
               if (powerTimer >= 20000) {
-                //await PowerButton.applyBtn(printers[p]);
+                //await PrinterPowerService.applyBtn(printers[p]);
                 powerTimer = 0;
               } else {
                 powerTimer += 500;

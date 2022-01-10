@@ -1,7 +1,7 @@
-import PowerButton from "../powerButton.js";
-import UI from "../../functions/ui";
-import OctoPrintClient from "../../octoprint";
-import OctoFarmClient from "../../../services/octofarm-client.service";
+import PrinterPowerService from "./printer-power-service.js";
+import UI from "../utils/ui";
+import OctoPrintClient from "./octoprint-client.service";
+import OctoFarmClient from "./octofarm-client.service";
 import {groupBy, mapValues} from "lodash";
 
 function returnActionBtnTemplate(id) {
@@ -58,14 +58,14 @@ export function printerWebBtn(id, webURL) {
 
 function printerQuickConnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
   connectBtn.title = "Press to connect your printer!";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
   connectBtn.title = "Press to connect your printer!";
@@ -95,7 +95,7 @@ function groupInit(printers) {
         printer.printerState.colour.category === "Offline";
     }
   });
-  // PowerButton.applyBtn(groupId);
+  // PrinterPowerService.applyBtn(groupId);
   addGroupEventListeners(printers);
 }
 
@@ -252,7 +252,7 @@ function init(printer, element) {
     ${printerWebBtn(printer._id, printer.printerURL)}
     ${returnActionBtnTemplate(printer._id)}
   `;
-  PowerButton.applyBtn(printer);
+  PrinterPowerService.applyBtn(printer);
   if (
     printer.currentConnection != null &&
     printer.currentConnection.port != null &&

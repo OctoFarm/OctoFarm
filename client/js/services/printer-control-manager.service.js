@@ -1,10 +1,10 @@
-import OctoPrintClient from "../octoprint";
-import OctoFarmClient from "../../services/octofarm-client.service";
-import Calc from "../functions/calc.js";
-import UI from "../functions/ui.js";
-import {createFilamentSelector} from "../../services/filament-manager-plugin.service";
-import CustomGenerator from "./customScripts.js";
-import {setupClientSwitchDropDown} from "../../services/client-modal.service";
+import OctoPrintClient from "./octoprint-client.service";
+import OctoFarmClient from "./octofarm-client.service";
+import Calc from "../utils/calc.js";
+import UI from "../utils/ui.js";
+import {createFilamentSelector} from "./filament-manager-plugin.service";
+import CustomGenerator from "./custom-gcode-scripts.service.js";
+import {setupClientSwitchDropDown} from "./client-modal.service";
 
 let currentIndex = 0;
 
@@ -20,7 +20,7 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
   }
 });
 
-export default class PrinterManager {
+export default class PrinterControlManagerService {
   static async init(index, printers, printerControlList) {
     try {
       //clear camera
@@ -36,24 +36,24 @@ export default class PrinterManager {
         currentPrinter = printers[id];
 
         const changeFunction = function (value) {
-          PrinterManager.init(value, printers, printerControlList);
+          PrinterControlManagerService.init(value, printers, printerControlList);
         };
         setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
-        await PrinterManager.loadPrinter(currentPrinter, printerControlList);
-        const elements = PrinterManager.grabPage();
+        await PrinterControlManagerService.loadPrinter(currentPrinter, printerControlList);
+        const elements = PrinterControlManagerService.grabPage();
         elements.printerControls["step" + currentPrinter.stepRate].className =
           "btn btn-dark active";
-        PrinterManager.applyState(currentPrinter, elements);
-        PrinterManager.applyTemps(currentPrinter, elements);
-        PrinterManager.applyListeners(elements, printers);
+        PrinterControlManagerService.applyState(currentPrinter, elements);
+        PrinterControlManagerService.applyTemps(currentPrinter, elements);
+        PrinterControlManagerService.applyListeners(elements, printers);
       } else {
         const id = _.findIndex(printers, function (o) {
           return o._id == currentIndex;
         });
         currentPrinter = printers[id];
-        const elements = await PrinterManager.grabPage();
-        PrinterManager.applyState(currentPrinter, elements);
-        PrinterManager.applyTemps(currentPrinter, elements);
+        const elements = await PrinterControlManagerService.grabPage();
+        PrinterControlManagerService.applyState(currentPrinter, elements);
+        PrinterControlManagerService.applyTemps(currentPrinter, elements);
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     } catch (e) {
@@ -123,27 +123,27 @@ export default class PrinterManager {
         printer.printerState.state === "Error!"
       ) {
         printerConnect.innerHTML =
-          '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button><a title="Open your Printers Web Interface" id="pmWebBtn" type="button" class="tag btn btn-info ml-1" target="_blank" href="' +
+          "<center> <button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
-          '" role="button"><i class="fas fa-globe-europe"></i></a><div id="powerBtn-' +
+          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
           printer._id +
-          '" class="btn-group ml-1"></div></center>';
+          "\" class=\"btn-group ml-1\"></div></center>";
         document.getElementById("pmSerialPort").disabled = false;
         document.getElementById("pmBaudrate").disabled = false;
         document.getElementById("pmProfile").disabled = false;
       } else {
         printerConnect.innerHTML =
-          '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button><a title="Open your Printers Web Interface" id="pmWebBtn" type="button" class="tag btn btn-info ml-1" target="_blank" href="' +
+          "<center> <button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
-          '" role="button"><i class="fas fa-globe-europe"></i></a><div id="pmPowerBtn-' +
+          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
           printer._id +
-          '" class="btn-group ml-1"></div></center>';
+          "\" class=\"btn-group ml-1\"></div></center>";
         document.getElementById("pmSerialPort").disabled = true;
         document.getElementById("pmBaudrate").disabled = true;
         document.getElementById("pmProfile").disabled = true;
       }
       //setup power btn
-      // await PowerButton.applyBtn(printer, "pmPowerBtn-");
+      // await PrinterPowerService.applyBtn(printer, "pmPowerBtn-");
 
       let flipH = "";
       let flipV = "";
@@ -939,10 +939,10 @@ export default class PrinterManager {
         message: `${currentPrinter.printerName}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: '<i class="fa fa-times"></i> Cancel'
+            label: "<i class=\"fa fa-times\"></i> Cancel"
           },
           confirm: {
-            label: '<i class="fa fa-check"></i> Confirm'
+            label: "<i class=\"fa fa-check\"></i> Confirm"
           }
         },
         callback(result) {
@@ -1181,7 +1181,7 @@ export default class PrinterManager {
     }
 
     if (printer.printerState.colour.category === "Active") {
-      PrinterManager.controls(true, true);
+      PrinterControlManagerService.controls(true, true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
       elements.printerControls.printPause.disabled = false;
@@ -1196,7 +1196,7 @@ export default class PrinterManager {
       printer.printerState.colour.category === "Idle" ||
       printer.printerState.colour.category === "Complete"
     ) {
-      PrinterManager.controls(false);
+      PrinterControlManagerService.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
       elements.connectPage.connectButton.classList = "btn btn-danger inline";
@@ -1217,7 +1217,7 @@ export default class PrinterManager {
         elements.printerControls.printResume.style.display = "none";
       } else {
         if (printer.printerState.state === "Paused") {
-          PrinterManager.controls(false);
+          PrinterControlManagerService.controls(false);
           elements.printerControls.printStart.disabled = true;
           elements.printerControls.printStart.style.display = "none";
           elements.printerControls.printPause.disabled = true;
@@ -1254,7 +1254,7 @@ export default class PrinterManager {
       elements.connectPage.connectButton.innerHTML = "Connect";
       elements.connectPage.connectButton.classList = "btn btn-success inline";
       elements.connectPage.connectButton.disabled = false;
-      PrinterManager.controls(true);
+      PrinterControlManagerService.controls(true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
       elements.printerControls.printPause.disabled = true;
@@ -1279,7 +1279,7 @@ export default class PrinterManager {
     if (printer.tools !== null) {
       const currentTemp = printer.tools[0];
       elements.temperatures.tempTime.innerHTML =
-        'Updated: <i class="far fa-clock"></i> ' + new Date().toTimeString().substring(1, 8);
+        "Updated: <i class=\"far fa-clock\"></i> " + new Date().toTimeString().substring(1, 8);
       if (currentTemp.bed.actual !== null) {
         elements.temperatures.bed[0].innerHTML = currentTemp.bed.actual + "°C";
         elements.temperatures.bed[1].placeholder = currentTemp.bed.target + "°C";
@@ -1308,7 +1308,7 @@ export default class PrinterManager {
   }
 
   static async controls(enable, printing) {
-    let elements = await PrinterManager.grabPage();
+    let elements = await PrinterControlManagerService.grabPage();
     const { filamentDrops } = elements;
     elements = elements.printerControls;
     let spool = true;

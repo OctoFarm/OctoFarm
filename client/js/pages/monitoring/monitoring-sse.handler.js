@@ -1,4 +1,4 @@
-import currentOperations from "../../lib/modules/currentOperations";
+import currentOperationsService from "../../services/current-operations.service";
 import {getViewType, setMonitoringPrinterInfo} from "./monitoring-view.state";
 import {initMonitoring} from "./monitoring.updater";
 
@@ -21,7 +21,7 @@ export async function monitoringSSEventHandler(data) {
     await initMonitoring(printerInfo, data.clientSettings, getViewType());
     if (data.clientSettings.views.currentOperations) {
       const currentOperationsData = data.currentOperations;
-      currentOperations(currentOperationsData.operations, currentOperationsData.count, printerInfo);
+      currentOperationsService(currentOperationsData.operations, currentOperationsData.count, printerInfo);
     }
   }
 }

@@ -1,7 +1,7 @@
-import FileManager from "./fileManager.js";
-import OctoFarmClient from "../../services/octofarm-client.service";
+import FileManagerService from "./file-manager.service.js";
+import OctoFarmClient from "./octofarm-client.service";
 
-export default class FileSorting {
+export default class FileManagerSortingService {
   static saveSort(meta, reverse) {
     localStorage.setItem("fileSort", JSON.stringify({ meta, reverse }));
   }
@@ -93,13 +93,13 @@ export default class FileSorting {
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = '<i class="fas fa-sort-alpha-up"></i> File Name';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-alpha-up\"></i> File Name";
         this.saveSort("file", true);
       } else {
-        sortHeader.innerHTML = '<i class="fas fa-sort-alpha-down"></i> File Name';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-alpha-down\"></i> File Name";
         this.saveSort("file", false);
       }
-      FileManager.drawFiles(printer, true);
+      FileManagerService.drawFiles(printer, true);
     }
   }
 
@@ -119,13 +119,13 @@ export default class FileSorting {
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = '<i class="fas fa-sort-numeric-down"></i> Upload Date';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Upload Date";
         this.saveSort("date", true);
       } else {
-        sortHeader.innerHTML = '<i class="fas fa-sort-numeric-up"></i> Upload Date';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Upload Date";
         this.saveSort("date", false);
       }
-      FileManager.drawFiles(printer, recursive);
+      FileManagerService.drawFiles(printer, recursive);
     }
   }
 
@@ -145,13 +145,13 @@ export default class FileSorting {
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = '<i class="fas fa-sort-numeric-up"></i> Print Time';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Print Time";
         this.saveSort("time", false);
       } else {
-        sortHeader.innerHTML = '<i class="fas fa-sort-numeric-down"></i> Print Time';
+        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Print Time";
         this.saveSort("time", true);
       }
-      FileManager.drawFiles(printer, recursive);
+      FileManagerService.drawFiles(printer, recursive);
     }
   }
 }

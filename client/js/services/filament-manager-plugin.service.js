@@ -1,5 +1,5 @@
 import OctoFarmClient from "../services/octofarm-client.service";
-import UI from "../lib/functions/ui";
+import UI from "../utils/ui";
 
 let settings;
 

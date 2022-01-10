@@ -1,17 +1,17 @@
-import OctoPrintClient from "../octoprint";
-import Queue from "./clientQueue.js";
-import Calc from "../functions/calc.js";
-import UI from "../functions/ui.js";
-import {dragAndDropEnableMultiplePrinters} from "../functions/dragAndDrop.js";
-import FileSorting from "./fileSorting.js";
-import PrinterSelect from "./printerSelect.js";
-import OctoFarmClient from "../../services/octofarm-client.service";
+import OctoPrintClient from "./octoprint-client.service";
+import Queue from "./file-manager-queue.service.js";
+import Calc from "../utils/calc.js";
+import UI from "../utils/ui.js";
+import {dragAndDropEnableMultiplePrinters} from "../utils/dragAndDrop.js";
+import FileManagerSortingService from "./file-manager-sorting.service.js";
+import PrinterSelectionService from "./printer-selection.service.js";
+import OctoFarmClient from "./octofarm-client.service";
 import {
     generateTableRows,
     showBulkActionsModal,
     updateBulkActionsProgress,
     updateTableRow
-} from "../../pages/printer-manager/functions/bulk-actions-progress.functions";
+} from "../pages/printer-manager/functions/bulk-actions-progress.functions";
 
 const fileUploads = new Queue();
 
@@ -33,7 +33,7 @@ setInterval(async () => {
       file.uploadDate = currentDate.getTime() / 1000;
       fileUploads.remove();
       await OctoFarmClient.post("printers/newFiles", file);
-      await FileSorting.loadSort(current.index);
+      await FileManagerSortingService.loadSort(current.index);
       const uploadsRemaining = document.getElementById("uploadsRemaining");
       if (uploadsRemaining) {
         uploadsRemaining.innerHTML = `${fileUploads.size()}`;
@@ -60,7 +60,7 @@ setInterval(async () => {
   });
 }, 1000);
 
-export default class FileManager {
+export default class FileManagerService {
   static async handleFiles(Afiles, printerInfo, print) {
     Afiles = [...Afiles];
     for (let i = 0; i < Afiles.length; i++) {
@@ -88,7 +88,7 @@ export default class FileManager {
       } else {
         newObject.currentFolder = "local/";
       }
-      newObject.upload = FileManager.fileUpload;
+      newObject.upload = FileManagerService.fileUpload;
       fileUploads.add(newObject);
     }
   }
@@ -169,7 +169,7 @@ export default class FileManager {
 
   static fileUpload(file) {
     return new Promise(function (resolve, reject) {
-      FileManager.removeNoFiles();
+      FileManagerService.removeNoFiles();
       // Grab folder location
       const { currentFolder } = file;
       // Grab Client Info
@@ -205,17 +205,17 @@ export default class FileManager {
       xhr.open("POST", url);
       xhr.upload.onprogress = function (e) {
         if (e.lengthComputable) {
-          FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+          FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
         }
       };
 
       // xhr.setRequestHeader("Content-Type", "multipart/form-data");
       xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
       xhr.onloadstart = function (e) {
-        FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
       };
       xhr.onloadend = async function (e) {
-        FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
           UI.createAlert(
@@ -302,13 +302,13 @@ export default class FileManager {
     }
 
     printer.fileList = how;
-    await FileSorting.loadSort(printer._id);
+    await FileManagerSortingService.loadSort(printer._id);
   }
 
   static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
     if (typeof target !== "undefined" && target.type === "button") {
-      await FileSorting.loadSort(printer._id);
+      await FileManagerSortingService.loadSort(printer._id);
       return;
     }
     if (typeof folder !== "undefined") {
@@ -326,7 +326,7 @@ export default class FileManager {
         fileBackButtonElement.disabled = true;
       }
     }
-    await FileSorting.loadSort(printer._id);
+    await FileManagerSortingService.loadSort(printer._id);
   }
 
   // static async drawFile(file) {
@@ -443,7 +443,7 @@ export default class FileManager {
   //       // Gate Keeper listener for file action buttons
   //       if (btn.id.includes(printer._id)) {
   //         btn.addEventListener("click", async (e) => {
-  //           FileManager.actionBtnGate(printer, btn.id);
+  //           FileManagerService.actionBtnGate(printer, btn.id);
   //         });
   //       }
   //     });
@@ -473,7 +473,7 @@ export default class FileManager {
               });
             }
 
-            let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
             if (!!file.thumbnail) {
               thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
             }
@@ -484,7 +484,7 @@ export default class FileManager {
             fileDate = `${dateString} ${timeString}`;
             document.getElementById("fileHistoryRate-" + file.fullPath).innerHTML =
               spinnerIcon +
-              '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
+              "<i class=\"fas fa-thumbs-up\"></i> 0 / <i class=\"fas fa-thumbs-down\"></i> 0";
             document.getElementById(`fileDate-${file.fullPath}`).innerHTML = ` ${fileDate}`;
             document.getElementById(`fileSize-${file.fullPath}`).innerHTML = ` ${Calc.bytes(
               file.fileSize
@@ -601,7 +601,7 @@ export default class FileManager {
             file.toolUnits.forEach((unit, index) => {
               toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
             });
-            let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
             if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
               thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
             }
@@ -745,7 +745,7 @@ export default class FileManager {
           );
         }
 
-        FileManager.updateListeners(printer);
+        FileManagerService.updateListeners(printer);
       }
     } catch (e) {
       console.log(e);
@@ -767,7 +767,7 @@ export default class FileManager {
     folders.forEach((folder) => {
       folder.addEventListener("click", async (e) => {
         const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
-        await FileManager.openFolder(folder.id, e.target, updatedPrinter);
+        await FileManagerService.openFolder(folder.id, e.target, updatedPrinter);
       });
     });
     const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
@@ -775,7 +775,7 @@ export default class FileManager {
       // Gate Keeper listener for file action buttons
       btn.addEventListener("click", async (e) => {
         const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
-        await FileManager.actionBtnGate(updatedPrinter, btn.id);
+        await FileManagerService.actionBtnGate(updatedPrinter, btn.id);
       });
     });
     const folderActionBtns = document.querySelectorAll("[id*='*folderAction']");
@@ -783,7 +783,7 @@ export default class FileManager {
       // Gate Keeper listener for file action buttons
       btn.addEventListener("click", async (e) => {
         const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
-        await FileManager.actionBtnGate(updatedPrinter, btn.id);
+        await FileManagerService.actionBtnGate(updatedPrinter, btn.id);
       });
     });
   }
@@ -793,7 +793,7 @@ export default class FileManager {
     let selectedFolder = "";
     let printAfterUpload = true;
     let selectedFile = null;
-    await PrinterSelect.create(document.getElementById("multiPrinterSection"));
+    await PrinterSelectionService.create(document.getElementById("multiPrinterSection"));
 
     async function chooseOrCreateFolder() {
       const multiFolderInput = document.getElementById("multi-UploadFolderSelect");
@@ -825,7 +825,7 @@ export default class FileManager {
       document.getElementById("multiFolderSection").classList.remove("hidden");
       document.getElementById("multiFileSection").classList.add("hidden");
       document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right">Next</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
       document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
         selectedFolder = document.getElementById("multiNewFolder").value;
         let newFolder = document.getElementById("multiNewFolderNew").value;
@@ -897,11 +897,11 @@ export default class FileManager {
         const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
         if (doesFolderExist === 200) {
           document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
-            '<i class="fas fa-folder-plus text-success"></i> Folder exists!';
+            "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
           selectedPrinters[i].folderExists = true;
         } else {
           document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
-            '<i class="fas fa-folder-minus text-warning"></i> Folder will be created!';
+            "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
           selectedPrinters[i].folderExists = false;
         }
       }
@@ -917,7 +917,7 @@ export default class FileManager {
       document.getElementById("multiFolderSection").classList.add("hidden");
 
       document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\" data-dismiss=\"modal\">Start!</button>";
       document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
         initiateTheUpload();
       });
@@ -930,12 +930,12 @@ export default class FileManager {
         if (state) {
           fileBtn.removeAttribute("multiple", "");
           fileBtn.setAttribute("single", "");
-          fileBtnLabel.innerHTML = '<i class="fas fa-file-import"></i> Upload File';
+          fileBtnLabel.innerHTML = "<i class=\"fas fa-file-import\"></i> Upload File";
           printAfterUpload = true;
         } else {
           fileBtn.setAttribute("multiple", "");
           fileBtn.removeAttribute("single", "");
-          fileBtnLabel.innerHTML = '<i class="fas fa-file-import"></i> Upload Files';
+          fileBtnLabel.innerHTML = "<i class=\"fas fa-file-import\"></i> Upload Files";
           printAfterUpload = false;
         }
       });
@@ -975,7 +975,7 @@ export default class FileManager {
           newObject.file = file;
           newObject.index = num;
           newObject.printerInfo = currentPrinter.printerInfo;
-          newObject.upload = FileManager.fileUpload;
+          newObject.upload = FileManagerService.fileUpload;
           newObject.currentFolder = "local/" + selectedFolder;
 
           if (printAfterUpload) {
@@ -1022,9 +1022,9 @@ export default class FileManager {
     document.getElementById("multiFolderSection").classList.add("hidden");
     document.getElementById("multiFileSection").classList.add("hidden");
     document.getElementById("multiUploadFooter").innerHTML =
-      '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+      "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-warning float-right\">Next</button>";
     document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
-      selectedPrinters = PrinterSelect.getSelected();
+      selectedPrinters = PrinterSelectionService.getSelected();
       if (selectedPrinters.length < 2) {
         UI.createAlert(
           "error",
@@ -1049,15 +1049,15 @@ export class FileActions {
     if (input === "") {
       // No search term so reset view
       document.getElementById("currentFolder").value = "local/";
-      await FileSorting.loadSort(printer._id);
-      //FileManager.drawFiles(printer, "Recursive");
+      await FileManagerSortingService.loadSort(printer._id);
+      //FileManagerService.drawFiles(printer, "Recursive");
     } else {
       document.getElementById("currentFolder").value = "local/";
-      await FileSorting.loadSort(printer._id, "recursive");
-      //FileManager.drawFiles(printer, "Recursive");
+      await FileManagerSortingService.loadSort(printer._id, "recursive");
+      //FileManagerService.drawFiles(printer, "Recursive");
     }
     if (fileList) {
-      const button = fileList.querySelectorAll('*[id^="file-"]');
+      const button = fileList.querySelectorAll("*[id^=\"file-\"]");
 
       for (let i = 0; i < button.length; i++) {
         const file = button[i].id.replace("file-", "");
@@ -1093,7 +1093,7 @@ export class FileActions {
             path: currentFolder
           };
           await OctoFarmClient.post("printers/newFolder", opts);
-          await FileSorting.loadSort(printer._id);
+          await FileManagerSortingService.loadSort(printer._id);
           UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
         } else {
           UI.createAlert("error", "Sorry your folder couldn't be saved...", 3000, "clicked");
@@ -1126,7 +1126,7 @@ export class FileActions {
           path: octofarmPath
         };
         await OctoFarmClient.post("printers/newFolder", opts);
-        await FileSorting.loadSort(post.files);
+        await FileManagerSortingService.loadSort(post.files);
         return {
           status: "success",
           message: "Successfully created your missing folder!"
@@ -1198,15 +1198,15 @@ export class FileActions {
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
     const btnName = null;
-    refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing...';
+    refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Syncing...";
     const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id,
       fullPath
     });
     if (how) {
-      await FileSorting.loadSort(printer._id);
+      await FileManagerSortingService.loadSort(printer._id);
     }
-    refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Re-Sync';
+    refreshBtn.innerHTML = "<i class=\"fas fa-sync\"></i> Re-Sync";
     const flashReturn = function () {
       refreshBtn.classList = "btn btn-dark";
     };
@@ -1268,7 +1268,7 @@ export class FileActions {
             };
             UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
             await OctoFarmClient.post("printers/moveFile", opts);
-            await FileSorting.loadSort(printer._id);
+            await FileManagerSortingService.loadSort(printer._id);
             setTimeout(function () {
               UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
             }, 3000);
@@ -1283,10 +1283,10 @@ export class FileActions {
       message: `Are you sure you want to delete ${fullPath}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel'
+          label: "<i class=\"fa fa-times\"></i> Cancel"
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm'
+          label: "<i class=\"fa fa-check\"></i> Confirm"
         }
       },
       async callback(result) {
@@ -1308,10 +1308,10 @@ export class FileActions {
       message: `Are you sure you want to delete ${fullPath}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel'
+          label: "<i class=\"fa fa-times\"></i> Cancel"
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm'
+          label: "<i class=\"fa fa-check\"></i> Confirm"
         }
       },
       async callback(result) {
@@ -1378,7 +1378,7 @@ export class FileActions {
             };
             UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
             await OctoFarmClient.post("printers/moveFolder", opts);
-            await FileSorting.loadSort(printer._id);
+            await FileManagerSortingService.loadSort(printer._id);
             UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
           }
         }

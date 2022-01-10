@@ -1,5 +1,5 @@
-import OctoFarmClient from "../../services/octofarm-client.service";
-import UI from "../functions/ui.js";
+import OctoFarmClient from "./octofarm-client.service";
+import UI from "../utils/ui.js";
 
 const editMessage = `
 <div class="alert alert-info" role="alert">
@@ -163,7 +163,7 @@ const printersTable = `
 </table>
 `;
 
-export default class PrinterSelect {
+export default class PrinterSelectionService {
   static getSelectableList(printer) {
     return `
 <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
@@ -336,7 +336,7 @@ export default class PrinterSelect {
       printerGroupList.innerHTML = "";
       printerGroupList.insertAdjacentHTML(
         "beforeend",
-        '<option selected value="all" data-path="default">Filter</option>'
+        "<option selected value=\"all\" data-path=\"default\">Filter</option>"
       );
 
       groupListUnique.forEach((group, index) => {
@@ -362,7 +362,7 @@ export default class PrinterSelect {
       const tableBody = document.getElementById("printerSelectBody");
       tableBody.insertAdjacentHTML("beforeend", "<tr><td>No Online Printers</td></tr>");
     }
-    PrinterSelect.addListeners(editable, callback);
+    PrinterSelectionService.addListeners(editable, callback);
   }
 
   static addListeners(editable, callback) {
@@ -372,13 +372,13 @@ export default class PrinterSelect {
                     <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
             `;
       document.getElementById("selectAll").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
+        const checkBoxes = document.querySelectorAll("input[type=\"checkbox\"]:not(:checked)");
         checkBoxes.forEach((box) => {
           box.checked = true;
         });
       });
       document.getElementById("selectNone").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        const checkBoxes = document.querySelectorAll("input[type=\"checkbox\"]:checked");
         checkBoxes.forEach((box) => {
           box.checked = false;
         });
@@ -399,7 +399,7 @@ export default class PrinterSelect {
   }
 
   static getSelected() {
-    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const checkedBoxes = document.querySelectorAll("input[type=\"checkbox\"]:checked");
     const printers = [];
     checkedBoxes.forEach((box) => {
       if (box.id.includes("checkBox")) {

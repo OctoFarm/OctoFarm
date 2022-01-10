@@ -1,5 +1,5 @@
 import {actualToolSeriesName, darkColor, dataLabelBackground, defaultLoadingText, defaultTheme} from "./chart.options";
-import Calc from "../../../lib/functions/calc";
+import Calc from "../../../utils/calc";
 
 export const toFixedTempCelciusFormatter = (value) => {
   return `${value}°C`;

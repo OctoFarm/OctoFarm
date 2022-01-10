@@ -1,6 +1,6 @@
-import OctoPrintClient from "../octoprint";
-import UI from "../functions/ui.js";
-import OctoFarmClient from "../../services/octofarm-client.service";
+import OctoPrintClient from "./octoprint-client.service";
+import UI from "../utils/ui.js";
+import OctoFarmClient from "./octofarm-client.service";
 
 export default class CustomGenerator {
   static getButton(button) {

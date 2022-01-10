@@ -1,9 +1,9 @@
-import OctoPrintClient from "../octoprint";
-import OctoFarmClient from "../../services/octofarm-client.service";
+import OctoPrintClient from "./octoprint-client.service";
+import OctoFarmClient from "./octofarm-client.service";
 
 let listenersApplied = false;
 
-export default class PowerButton {
+export default class PrinterPowerService {
   static revealBulkPower() {
     let bulkPowerBtn = document.getElementById("bulkPowerBtn");
     if (bulkPowerBtn) {
@@ -240,7 +240,7 @@ export default class PowerButton {
     }
     if (printer?.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
       if (printer.powerSettings.powerOnURL !== "") {
-        PowerButton.powerButtons(printer);
+        PrinterPowerService.powerButtons(printer);
       }
       if (typeof printer.powerSettings.wol !== "undefined") {
         if (printer.powerSettings.wol.enabled) {

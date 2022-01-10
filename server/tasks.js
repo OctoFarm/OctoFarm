@@ -79,7 +79,7 @@ const RUN_PRINTER_HEALTH_CHECKS = async () => {
 };
 
 const SSE_TASK = () => {
-  //     const currentOperations = await PrinterClean.returnCurrentOperations();
+  //     const currentOperationsService = await PrinterClean.returnCurrentOperations();
   //     let printersInformation = await PrinterClean.listPrintersInformation();
   //     printersInformation = await filterMe(printersInformation);
   //     printersInformation = await sortMe(printersInformation);
@@ -96,7 +96,7 @@ const SSE_TASK = () => {
   //     }
   //     const infoDrop = {
   //       printersInformation: printersInformation,
-  //       currentOperations: currentOperations,
+  //       currentOperationsService: currentOperationsService,
   //       printerControlList: printerControlList,
   //       clientSettings: clientSettings
   //     };
@@ -120,12 +120,12 @@ const SSE_DASHBOARD = () => {
   //       dashboardSettings = getDefaultDashboardSettings();
   //     }
   //
-  //     const currentOperations = await PrinterClean.returnCurrentOperations();
+  //     const currentOperationsService = await PrinterClean.returnCurrentOperations();
   //     const dashStatistics = await PrinterClean.returnDashboardStatistics();
   //     const printerInformation = await PrinterClean.listPrintersInformation();
   //     const infoDrop = {
   //       printerInformation,
-  //       currentOperations,
+  //       currentOperationsService,
   //       dashStatistics,
   //       dashboardSettings
   //     };
