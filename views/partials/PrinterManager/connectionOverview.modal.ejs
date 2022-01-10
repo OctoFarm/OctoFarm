@@ -27,7 +27,6 @@
 <% printerConnectionStats.forEach((url, index) => { %>
     <% const currentPrinter = url; %>
     <% const toCalc = []; %>
-        <% console.log(currentPrinter.conn) %>
     <% currentPrinter.connections.forEach(con => { %>
         <% const log = con.log; %>
         <% const url = con.url; %>
@@ -37,8 +36,9 @@
         <% const failedPercent = (log.totalRequestsFailed * 100) / totalConnections %>
         <% const apiFailures = log.connectionFailures %>
         <% const retryCount = log.totalRetries %>
+        <% const totalPingPong = log?.totalPingPong %>
 
-        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures }%>
+        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures, totalPingPong }%>
 
         <% toCalc.push(toPush) %>
     <% })%>
@@ -72,6 +72,7 @@
             }, 0) %>
             <% const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0) %>
             <% const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0; %>
+            <%   const totalPingPongFails = totalsArray[index].reduce( function(a, b){ return a + b["totalPingPong"] }, 0)  %>
                 <tr class="bg-primary">
                     <th> <a class="btn btn-secondary" data-toggle="collapse" href="#connectionCollapse-<%= index %>" role="button" aria-expanded="false" aria-controls="collapseExample">
                             <i class="far fa-caret-square-down"></i>
@@ -88,7 +89,7 @@
                     <th>
                         <%= totalAPIFailed %>
                     </th>
-                    <th>  </th>
+                    <th> <%= totalPingPongFails %> </th>
                 </tr>
                 <% currentPrinter.connections.forEach(con => { %>
                     <% let url = con.url %>

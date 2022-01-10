@@ -50,7 +50,6 @@ router.post("/removefile", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const file = req.body;
   logger.info("File deletion request: ", file.i);
-  console.log(file);
   getPrinterStoreCache().deleteFile(file.i, file.fullPath);
   res.send("success");
 });
