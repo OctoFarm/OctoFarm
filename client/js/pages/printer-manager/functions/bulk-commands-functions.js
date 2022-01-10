@@ -5,34 +5,35 @@ import UI from "../../../lib/functions/ui";
 import PrinterSelect from "../../../lib/modules/printerSelect";
 import {octoPrintPluginInstallAction, updateOctoPrintPlugins} from "../../../octoprint/octoprint-plugin-commands";
 import {
-    disconnectPrinterFromOctoPrint,
-    quickConnectPrinterToOctoPrint,
-    sendPowerCommandToOctoPrint,
-    updateOctoPrintClient
+  disconnectPrinterFromOctoPrint,
+  quickConnectPrinterToOctoPrint,
+  sendPowerCommandToOctoPrint,
+  updateOctoPrintClient
 } from "../../../octoprint/octoprint-client-commands";
 import {
-    printerHomeAxis,
-    printerMoveAxis,
-    printerPausePrint,
-    printerPreHeatBed,
-    printerPreHeatChamber,
-    printerPreHeatTool,
-    printerRestartPrint,
-    printerResumePrint,
-    printerSendGcode,
-    printerStartPrint,
-    printerStopPrint
+  printerHomeAxis,
+  printerMoveAxis,
+  printerPausePrint,
+  printerPreHeatBed,
+  printerPreHeatChamber,
+  printerPreHeatTool,
+  printerRestartPrint,
+  printerResumePrint,
+  printerSendGcode,
+  printerStartPrint,
+  printerStopPrint
 } from "../../../octoprint/octoprint-printer-commands";
 import {setupOctoPrintForVirtualPrinter} from "../../../octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../lib/modules/customScripts";
 import {setupPluginSearch} from "./plugin-search.function";
 import {returnPluginListTemplate, returnPluginSelectTemplate} from "../templates/octoprint-plugin-list.template";
 import {
-    generateTableRows,
-    showBulkActionsModal,
-    updateBulkActionsProgress,
-    updateTableRow
+  generateTableRows,
+  showBulkActionsModal,
+  updateBulkActionsProgress,
+  updateTableRow
 } from "./bulk-actions-progress.functions";
+import {populateAppearanceSettings} from "./bulk-settings-update.functions";
 import bulkActionsStates from "../bulk-actions.constants";
 
 import Queue from "../../../lib/modules/clientQueue.js";
@@ -284,7 +285,7 @@ function fileUpload(file) {
 
 export async function bulkPrintFileSetup() {
   document.getElementById("bpActionButtonElement").innerHTML =
-    '<button id="bpActionButton" type="button" class="btn btn-success" disabled>Start Prints!</button>';
+    "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
   document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
           <input type="file" accept=".gcode,.gco" class="custom-file-input" id="bpFileUpload" multiple>
           <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
@@ -510,11 +511,11 @@ export async function bulkPrintFileSetup() {
 
       if (doesFolderExist === 200) {
         document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
-          '<i class="fas fa-folder-plus text-success"></i> Folder exists!';
+          "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
         printersToControl[i].folderExists = true;
       } else {
         document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
-          '<i class="fas fa-folder-minus text-warning"></i> Folder will be created!';
+          "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
         printersToControl[i].folderExists = false;
       }
     }
@@ -661,7 +662,7 @@ export function bulkOctoPrintPreHeatCommand() {
     closeButton: true,
     buttons: {
       action: {
-        label: '<i class="fas fa-fire"></i> Heat!',
+        label: "<i class=\"fas fa-fire\"></i> Heat!",
         className: "btn-success",
         callback: async function () {
           let toolNumber = document.getElementById("preHeatToolSelect");
@@ -842,10 +843,10 @@ export async function bulkOctoPrintControlCommand() {
           message: "Are you sure you want to cancel all of your ongoing print?",
           buttons: {
             cancel: {
-              label: '<i class="fa fa-times"></i> Cancel'
+              label: "<i class=\"fa fa-times\"></i> Cancel"
             },
             confirm: {
-              label: '<i class="fa fa-check"></i> Confirm'
+              label: "<i class=\"fa fa-check\"></i> Confirm"
             }
           },
           callback(result) {
@@ -1193,23 +1194,43 @@ export async function bulkUpdateOctoPrintSettings() {
       terminalFilters,
       webcam
     } = await getSettingsList.json();
+    $("#bulkUpdateOctoPrintSettingsModal").modal("show");
+    // console.log(
+    //   appearance,
+    //   gcodeAnalysis,
+    //   plugins, //Special Case, it's it's own settings set...
+    //   scripts,
+    //   serial,
+    //   server,
+    //   system,
+    //   temperature,
+    //   terminalFilters,
+    //   webcam
+    //   github
+    // );
+    // populate appearance settings
+    populateAppearanceSettings(appearance);
 
-    console.log(
-      api,
-      appearance,
-      feature,
-      folder,
-      gcodeAnalysis,
-      plugins,
-      printer,
-      scripts,
-      serial,
-      server,
-      system,
-      temperature,
-      terminalFilters,
-      webcam
-    );
+    // populate gcodeAnalysis
+
+    // populate plugins
+
+    // populate scripts
+
+    // populate serial
+
+    // populate server
+
+    // populate system
+
+    // populate temperature
+
+    // populate terminal filters
+
+    // populate webcam
+
+    // populate github
+
   } else {
     UI.createAlert("danger", "Failed to grab latest settings list...", 3000, "Clicked");
   }

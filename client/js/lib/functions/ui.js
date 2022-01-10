@@ -110,7 +110,7 @@ export default class UI {
   }
   //TODO: Move to a templates folder
   static returnSpinnerTemplate() {
-    return '<i class="fas fa-spinner fa-spin"></i>';
+    return "<i class=\"fas fa-spinner fa-spin\"></i>";
   }
 
   static removeLoaderFromElementInnerHTML(element) {
@@ -295,12 +295,12 @@ export default class UI {
 
     if (e.target.innerHTML.includes("running")) {
       e.target.classList = "btn btn-outline-light btn-sm";
-      e.target.innerHTML = '<i class="fas fa-wheelchair"></i> Disabled';
+      e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disabled";
       e.target.title = "Printer is Disabled, click to enable";
       printerCard.classList = "printerDisabled";
     } else if (e.target.innerHTML.includes("wheelchair")) {
       e.target.classList = "btn btn-outline-success btn-sm";
-      e.target.innerHTML = '<i class="fas fa-running"></i> Enabled';
+      e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enabled";
       e.target.title = "Printer is Enabled, click to disable";
       printerCard.classList = "";
     }
@@ -327,4 +327,34 @@ export default class UI {
       return reverse ? "bg-success" : "bg-danger";
     }
   }
+
+  static convertValueToTemplate(key, value){
+    const VALUE_NAME = UI.camelCaseToWords(key);
+    const ELEMENT_ID = `opBulk-${key}`
+    if(typeof value === "string"){
+      return `
+        <div class="input-group mb-3 col">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">${VALUE_NAME}</span>
+          </div>
+          <input id="${ELEMENT_ID}" type="text" class="form-control" placeholder="${value}" aria-label="Username" aria-describedby="basic-addon1">
+        </div>
+      `
+    }
+    if(typeof value === "number"){
+      //return number template
+    }
+    if(typeof value === "boolean"){
+      //return checkbox
+    }
+    if(value instanceof Array){
+      //return select box
+    }
+  }
+
+  static camelCaseToWords(str){
+    return str.match(/^[a-z]+|[A-Z][a-z]*/g).map(function(x){
+      return x[0].toUpperCase() + x.substr(1).toLowerCase();
+    }).join(" ");
+  };
 }

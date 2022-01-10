@@ -60,7 +60,13 @@
     })
     %>
 </div>
-
+<%- include(modal, {
+    modal:{
+    id:"bulkUpdateOctoPrintSettings", title:"Bulk Updating OctoPrint Settings"
+    },
+    bodyFile:'./PrinterManager/printerBulkSettings.modal.ejs'
+    })
+%>
 <%- include(modal, {
     modal:{
     id:"printerLogs", title:"Printer Logs: "
