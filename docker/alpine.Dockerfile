@@ -27,6 +27,8 @@ RUN apk add --no-cache --virtual .build-deps \
 WORKDIR /tmp/app
 COPY ./server/package.json .
 
+WORKDIR /tmp/app/server
+
 RUN npm ci
 
 RUN apk del .build-deps
