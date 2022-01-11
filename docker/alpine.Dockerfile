@@ -26,10 +26,10 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /tmp/app
 
-RUN ls /
+COPY server/package.json ./server/
+COPY server/package-lock.json ./server/
 
-COPY server/package.json .
-COPY server/package-lock.json .
+WORKDIR /tmp/app/server
 
 RUN npm ci
 
