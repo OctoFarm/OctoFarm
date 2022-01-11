@@ -37,7 +37,6 @@ export function populateBulkSettingsForms(settings){
 
     for (const key of Object.keys(settings)) {
         const appearanceElement = document.getElementById(`bulk-${key}-el`);
-        console.log(key)
         switch(key){
             case "scripts":
                 appearanceElement.innerHTML = formTemplate(`${key}`, settings[key].gcode)
