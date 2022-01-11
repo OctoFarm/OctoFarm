@@ -14,7 +14,9 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/
 
 COPY . /app
-WORKDIR /app
+WORKDIR /app/server
+
+ENV NODE_ENV=production
 
 RUN npm ci
 RUN npm install -g pm2
