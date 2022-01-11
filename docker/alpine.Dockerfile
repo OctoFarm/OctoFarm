@@ -24,10 +24,12 @@ RUN apk add --no-cache --virtual .build-deps \
     g++ \
     python3
 
-WORKDIR /tmp/app/server
+WORKDIR /tmp/app
 
-COPY package.json .
-COPY package-lock.json .
+RUN ls /tmp/app
+
+COPY server/package.json .
+COPY server/package-lock.json .
 
 RUN npm ci
 
