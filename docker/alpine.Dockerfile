@@ -26,7 +26,7 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /tmp/app
 
-RUN ls /tmp/app
+RUN ls /
 
 COPY server/package.json .
 COPY server/package-lock.json .
