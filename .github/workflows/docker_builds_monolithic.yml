@@ -2,6 +2,8 @@ name: Docker Monolithic
 on:
   pull_request:
   push:
+    tags:
+      - '*'
     branches:
       - 'master'
       - 'development'

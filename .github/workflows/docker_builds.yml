@@ -7,7 +7,6 @@ on:
     branches:
       - 'master'
       - 'development'
-      - 'canary'
 jobs:
   docker:
     runs-on: ubuntu-latest
