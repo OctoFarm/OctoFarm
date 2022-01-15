@@ -11,7 +11,7 @@ const { status, up } = require("migrate-mongo");
 const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
-const instructionsReferralURL = "https://github.com/OctoFarm/OctoFarm/blob/master/README.md"; // TODO replace with environment setup markdown
+const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";
 const deprecatedConfigFolder = "../config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
@@ -87,7 +87,6 @@ function setupPackageJsonVersionOrThrow() {
   const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, "../server"));
   if (!result) {
     if (envUtils.isPm2()) {
-      // TODO test this works under docker as well
       removePm2Service("didnt pass startup validation (package.json)");
     }
     throw new Error("Aborting OctoFarm server.");

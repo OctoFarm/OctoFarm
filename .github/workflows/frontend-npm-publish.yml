@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - 'development'
+      - 'canary'
 jobs:
   publish:
     runs-on: ubuntu-latest
