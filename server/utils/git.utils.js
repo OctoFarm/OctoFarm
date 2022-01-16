@@ -1,5 +1,12 @@
 const simpleGit = require("simple-git");
-const git = simpleGit();
+const { resolve } = require("path");
+
+const path = resolve(__dirname, "../../");
+const git = simpleGit(path);
+
+function getCurrentBranch() {
+  return git.branch();
+}
 
 function makeSureBranchIsUpToDateWithRemote() {
   return git.fetch();
@@ -41,5 +48,6 @@ module.exports = {
   getListOfModifiedFiles,
   pullLatestRepository,
   checkIfWereInAGitRepo,
-  makeSureBranchIsUpToDateWithRemote
+  makeSureBranchIsUpToDateWithRemote,
+  getCurrentBranch
 };
