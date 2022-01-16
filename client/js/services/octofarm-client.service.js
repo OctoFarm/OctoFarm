@@ -23,8 +23,12 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
+    //Guard clause - Server offline then these commands will always error...
+    if(window.serverOffline) return { data: false }
+
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
+
     switch (error?.response?.status) {
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);

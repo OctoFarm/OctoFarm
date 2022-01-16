@@ -24,7 +24,7 @@ export default class ClientSettings {
     }
 
     if (clientSettings.dashboard) {
-      document.getElementById("currentOperationsService").checked =
+      document.getElementById("panelCurrentOpOn").checked =
         clientSettings.dashboard.farmActivity.currentOperations;
       document.getElementById("cumulativeTimes").checked =
         clientSettings.dashboard.farmActivity.cumulativeTimes;
@@ -105,7 +105,7 @@ export default class ClientSettings {
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
-          currentOperations: document.getElementById("currentOperationsService").checked,
+          currentOperations: document.getElementById("panelCurrentOpOn").checked,
           cumulativeTimes: document.getElementById("cumulativeTimes").checked,
           averageTimes: document.getElementById("averageTimes").checked
         },
