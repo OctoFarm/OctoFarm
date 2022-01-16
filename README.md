@@ -103,30 +103,28 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 2. Install NPM packages
 
 ```sh
-npm install
+npm server-install
 ```
 
 3. Start the server
 
 ```sh
-npm run dev
+npm run server-dev
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
-- The developer version will skip some basic sanity checks, if your pages don't load right after server boot then it's
-  because those sanity checks haven't finished.
 
 ### Development Installation for the client.
 _If your making changes to the client then you will need to build this manually._
 
-1. cd into the "client_src" folder.
+1. Install NPM packages
 
 ```sh
-cd client_src
+npm client-install
 ```
 
 2. Start the client development file watcher
 ```sh
-npm run dev
+npm run client-dev
 ```
 
 ## License

@@ -1,10 +1,10 @@
 **/.idea/
 **/node_modules/
-server_src/middleware/db.js
+server/middleware/db.js
 **/logs/
 **/.clinic/
 **/dist/
-**/.env
+.env
 **/docker-compose.yml
 **/.build
 **/.cache
@@ -14,14 +14,7 @@ server_src/middleware/db.js
 # Ignore any local release zips
 octofarm.zip
 /dist/
-/views/assets/dist/
+/server/views/assets/dist/
 package/
-
-# Client
-/web-client/
-client_2x/build/
-
-# V2 Server
-server_2x/assets/public/assets/
 
 *.tgz

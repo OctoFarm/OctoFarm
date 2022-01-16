@@ -26,4 +26,4 @@ else
     echo "Logs folder already exists..."
 fi
 
-pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --wait-ready --listen-timeout 10000 --restart-delay=1000 --shutdown-with-message --update-env --exp-backoff-restart-delay=1500
+cd server && pm2 flush && pm2 start ecosystem.config.js

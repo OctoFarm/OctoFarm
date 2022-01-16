@@ -38,31 +38,32 @@ All notable changes to this project will be documented in this file.
     - There is a special cut down file list you can bring up that collates all available files on each printer in the group. You may start prints from here. Note: There is no folders and the list may get large. The file name becomes the path to halp see which file is which. Search isn't available yet. 
   - Added a quick setup button for Filament Manager Plugin in System. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
-- System manager can now view the running OctoFarm tasks.
-- History now has server side pagination, should reduce resources some and make the history page load snappier.
-- Any history data requests are now filtered starting from the first day of the last month. You should see at least 1
-  months worth of data( when available ) as well as any from the current month.
-- Filament Manager has some new settings in System -> Server -> Filament Manager:
-    - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main
-      printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
-    - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to
-      the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
-    - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using
-      OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament
-      manager Plugin).
-- New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it
-  will automatically choose this user to use.
-- Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections
-  before killing itself.
-- Added the ability to set the logging level by environment variables. Example: LOG_LEVEL=info. Accepted
-  values=info,debug,verbose
-- New alerts section on printer manager, moved all the OP updates, and printer issues to here with their own dedicated
-  icon and action button.
-- New button to do a Re-Scan and Forced Re-Scan of OctoPrint's API. This is to update information from OctoPrint ->
-  OctoFarm. Does nothing to your websocket connection.
-- New button to do a websocket reconnect if one is available. It will close the socket and re-open to refresh.
-- New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
-  purposefully closed.
+  - System manager can now view the running OctoFarm tasks.
+  - History now has server side pagination, should reduce resources some and make the history page load snappier.
+  - Any history data requests are now filtered starting from the first day of the last month. You should see at least 1
+    months worth of data( when available ) as well as any from the current month.
+  - Filament Manager has some new settings in System -> Server -> Filament Manager:
+      - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main
+        printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
+      - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to
+        the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
+      - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using
+        OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament
+        manager Plugin).
+  - New detection for multiple user OctoPrint setups. If your user is named "OctoFarm" / "octofarm" & an Administrator it
+    will automatically choose this user to use.
+  - Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections
+    before killing itself.
+  - Added the ability to set the logging level by environment variables. Example: LOG_LEVEL=info. Accepted
+    values=info,debug,verbose
+  - New alerts section on printer manager, moved all the OP updates, and printer issues to here with their own dedicated
+    icon and action button.
+  - New button to do a Re-Scan and Forced Re-Scan of OctoPrint's API. This is to update information from OctoPrint ->
+    OctoFarm. Does nothing to your websocket connection.
+  - New button to do a websocket reconnect if one is available. It will close the socket and re-open to refresh.
+  - New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
+    purposefully closed.
+  - Added git repo information to system page, and also added git check for update commands. 
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -89,72 +90,75 @@ All notable changes to this project will be documented in this file.
   - Refine the printer map layout with borders and printer quick actions (page not public yet).
   - Reduced logging (we will bring it back later in different shape with an Exception handler)
   - Replaced fetch with axios in the local OctoFarm client calls.
-- Moved all error handling for client connections into axios calls
-- Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
-- Updated the system page layout.
-- Moved filament manager plugin actions to separate service file.
-- Printer offline logs (specifically connection refused) are now silenced after the first one.
-- Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
-- Custom gcode editor has been moved -> Files Manager and given a functionality boost.
-    - You can now change the colour of the button displayed in the UI. Old buttons will default to "Green".
-    - You can now filter the buttons by printers. Old buttons will default to ALL printers.
-- All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
-- Cleaned up OctoPrint Management icons, no longer all the plug.
-- Continual work on improving readability and contrast across the application.
-- Dashboard statistics are now produced on demand, should improve loading times a touch.
-- Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer
-  actions. Then the Printer Control from before has been split up.
-    - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places.
-- Client settings are no longer global. They are now attached to a user, so different users can have different
-  settings/dashboard configurations.
-- File manager improvements, re-sync's are near instantaneous now.
-- Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once.
-- Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your
-  remaining filament.
-- Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup
-  correctly. It will fail to enable if that is so.
-- Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if
-  required. Existing setups unaffected.
-- Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows.
-- Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the
-  first spool to apply an offset.
-- Filament Manager can no longer delete spools if attached to printer.
-- Filament Manager can no longer delete profiles if attached to spool.
-- Filament Manager totals are now displayed in KG.
-- Re-enabled the filament manager spool assignment:
-    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or
-      normal left click to select a single.
-    - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the
-      plugins requirements.
-- Printers with selected spools are now disabled from selection without filament manager plugin.
-- System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
-- Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost.
-  All other info is inspectable in the "view" button.
-- Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics
-  Modal, Pagination, Sorting, Range and Filters.
-- Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action.
-- Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value
-  from OctoPrint which is often wildly inaccurate.
-- Completely reworked the history UI.
-- Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API.
-- OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the
-  printer has been scanned online once!
-- If OctoFarm detects OctoPrint a multiple user setup then it will warn you rather than just producing a stale
-  connection with no indication to what's happening.
-- Decoupled the API and Websocket calls. Printers will now connect in the following manor following fail hard and fast.
-    - Attempt to grab the octoprint version
-    - Attempt to grab both Settings and Users endpoints for initial multi-user setup and global api key checks
-    - Attempts to grab all required information from OctoPrint.
-    - Creates Websocket Client.
-    - Attempts to grab optional information from endpoints.
-- Initial scan times changed, all data is now stored in database and will only update on a forced re-scan.
-- Due to the inclusion of User CRUD manager registration is now disabled after creation of first admin user.
-- Plugin lists/notices are now grabbed from octoprint.org not the printer. Removed one api call per printer and a lot of
-  pointless duplicated data chunking.
-- Plugin enable now only shows disabled plugins available on all printers.
-- Plugin disable now only shows enabled plugins available on all printers.
-- Plugin uninstall now only shows plugins installed available on all printers.
-- OctoFarm now periodically (once per day) will run a scan to see if any updates are available for your instances
+  - Moved all error handling for client connections into axios calls
+  - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
+  - Updated the system page layout.
+  - Moved filament manager plugin actions to separate service file.
+  - Printer offline logs (specifically connection refused) are now silenced after the first one.
+  - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
+  - Custom gcode editor has been moved -> Files Manager and given a functionality boost.
+      - You can now change the colour of the button displayed in the UI. Old buttons will default to "Green".
+      - You can now filter the buttons by printers. Old buttons will default to ALL printers.
+  - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
+  - Cleaned up OctoPrint Management icons, no longer all the plug.
+  - Continual work on improving readability and contrast across the application.
+  - Dashboard statistics are now produced on demand, should improve loading times a touch.
+  - Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer
+    actions. Then the Printer Control from before has been split up.
+      - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places.
+  - Client settings are no longer global. They are now attached to a user, so different users can have different
+    settings/dashboard configurations.
+  - File manager improvements, re-sync's are near instantaneous now.
+  - Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once.
+  - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your
+    remaining filament.
+  - Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup
+    correctly. It will fail to enable if that is so.
+  - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if
+    required. Existing setups unaffected.
+  - Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows.
+  - Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the
+    first spool to apply an offset.
+  - Filament Manager can no longer delete spools if attached to printer.
+  - Filament Manager can no longer delete profiles if attached to spool.
+  - Filament Manager totals are now displayed in KG.
+  - Re-enabled the filament manager spool assignment:
+      - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or
+        normal left click to select a single.
+      - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the
+        plugins requirements.
+  - Printers with selected spools are now disabled from selection without filament manager plugin.
+  - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
+  - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost.
+    All other info is inspectable in the "view" button.
+  - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics
+    Modal, Pagination, Sorting, Range and Filters.
+  - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action.
+  - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value
+    from OctoPrint which is often wildly inaccurate.
+  - Completely reworked the history UI.
+  - Client's Am I Alive server check is now through the Server Side Events, rather than constantly polling the API.
+  - OctoPi-Plugin/OctoPrint-SystemInfoPlugin are now saved to the database. Printer firmware is remembered as long as the
+    printer has been scanned online once!
+  - If OctoFarm detects OctoPrint a multiple user setup then it will warn you rather than just producing a stale
+    connection with no indication to what's happening.
+  - Decoupled the API and Websocket calls. Printers will now connect in the following manor following fail hard and fast.
+      - Attempt to grab the octoprint version
+      - Attempt to grab both Settings and Users endpoints for initial multi-user setup and global api key checks
+      - Attempts to grab all required information from OctoPrint.
+      - Creates Websocket Client.
+      - Attempts to grab optional information from endpoints.
+  - Initial scan times changed, all data is now stored in database and will only update on a forced re-scan.
+  - Due to the inclusion of User CRUD manager registration is now disabled after creation of first admin user.
+  - Plugin lists/notices are now grabbed from octoprint.org not the printer. Removed one api call per printer and a lot of
+    pointless duplicated data chunking.
+  - Plugin enable now only shows disabled plugins available on all printers.
+  - Plugin disable now only shows enabled plugins available on all printers.
+  - Plugin uninstall now only shows plugins installed available on all printers.
+  - OctoFarm now periodically (once per day) will run a scan to see if any updates are available for your instances
+  - Converted to a basic mono-repo to aid in development. Scripts have been created for backwards compatibility with current start instructions.
+  - Restart, Check for Update and Update OctoFarm buttons have been moved to the top of the "System" tab on the System page. This is to aid in security and stop users messing with system functions.
+
 ### Removed
 
 - Gulp packages and gulp as bundler
@@ -167,8 +171,8 @@ All notable changes to this project will be documented in this file.
 
   - Fixed #531 - Updated settings are not grabbed when opening settings modal
   - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
-  - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
-  - Fixed #576, #577: correct some function calls in PrinterClean
+  - Fixed #567: heatmap error (race condition) in PrinterCleanerService for any newly created database
+  - Fixed #576, #577: correct some function calls in PrinterCleanerService
   - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved
   - Fixed #598: printer settingsAppearance missing will not cause failure anymore
   - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check

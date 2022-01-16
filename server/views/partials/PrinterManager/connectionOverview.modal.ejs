@@ -1,0 +1,136 @@
+
+<div class="col-lg-12">
+    <p>
+        <a class="btn btn-info float-left" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fas fa-info"></i> Help
+        </a>
+    </p>
+    <% const today = new Date() %>
+    <h5 class="float-right">Last Updated: <%= today.toLocaleTimeString() %></h5>
+</div>
+<div class="col-lg-12">
+    <div class="collapse" id="collapseExample">
+        <div class="alert alert-secondary" role="alert">
+            <p> This is an overview screen of the current connection responses OctoFarm gets from your OctoPrint instances</p>
+            <hr>
+            <b>Average Response Time: </b> <p>This is the total time your printer takes to respond to a request. </p>
+            <hr>
+            <b>Success Percentage: </b> <p>This is the percentage of Failed vs Successful requests.  </p>
+            <hr>
+            <b>API Timeout Retries: </b> <p>How many times your timeout settings has stalled a connection Attempt.</p>
+            <hr>
+            <b>API Connection Errors: </b> <p>How many times the connection resulted in a total error. Usually from the OctoPrint host / incorrect printer settings.</p>
+        </div>
+    </div>
+</div>
+<% const totalsArray = []; %>
+<% printerConnectionStats.forEach((url, index) => { %>
+    <% const currentPrinter = url; %>
+    <% const toCalc = []; %>
+    <% currentPrinter.connections.forEach(con => { %>
+        <% const log = con.log; %>
+        <% const url = con.url; %>
+        <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
+        <% const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+        <% const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections %>
+        <% const failedPercent = (log.totalRequestsFailed * 100) / totalConnections %>
+        <% const apiFailures = log.connectionFailures %>
+        <% const retryCount = log.totalRetries %>
+        <% const totalPingPong = log?.totalPingPong %>
+
+        <% const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures, totalPingPong }%>
+
+        <% toCalc.push(toPush) %>
+    <% })%>
+    <% totalsArray[index] = toCalc %>
+<% })%>
+
+<div class="col-lg-12">
+    <table id="" class="table table-dark table-striped text-center">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col" class="sticky-table table-dark" style="">URL</th>
+            <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
+            <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Timeout Retry</th>
+            <th scope="col" class="sticky-table table-dark" style="">API Connection Errors</th>
+            <th scope="col" class="sticky-table table-dark" style="">WebSocket Ping/Pong Failure Count</th>
+        </tr>
+        </thead>
+        <tbody id="" style="height:100%; overflow-y:auto;">
+        <% printerConnectionStats.forEach((url, index) => { %>
+            <% const currentPrinter = url; %>
+            <% const totalSuccessPercent = totalsArray[index].reduce( function(a, b){ return a + b["successPercentage"] }, 0) %>
+            <% const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0) %>
+            <% const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length %>
+            <% const actualFailedPercent = totalFailedPercent / totalsArray[index].length %>
+            <% let averageTotalCountLength = 0; %>
+            <% const averageTotalCount = totalsArray[index].reduce( function(a, b){
+                averageTotalCountLength = averageTotalCountLength + 1;
+                return a + b["totalResponse"]
+            }, 0) %>
+            <% const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0) %>
+            <% const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0; %>
+            <%   const totalPingPongFails = totalsArray[index].reduce( function(a, b){ return a + b["totalPingPong"] }, 0)  %>
+                <tr class="bg-primary">
+                    <th> <a class="btn btn-secondary" data-toggle="collapse" href="#connectionCollapse-<%= index %>" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <i class="far fa-caret-square-down"></i>
+                        </a> </th>
+                    <th scope="row"><%= currentPrinter.printerURL  %></th>
+                    <th> <%= helpers.generateMilisecondsTime(averageTotalCalc) %> </th>
+                    <th>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: <%=actualSuccessPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: <%=actualFailedPercent %>%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><%=actualSuccessPercent.toFixed(0) %>%</div>
+                        </div>
+                    </th>
+                    <th> <%= totalsArray[index].reduce( function(a, b){ return a + b["retryCount"] }, 0) %> </th>
+                    <th>
+                        <%= totalAPIFailed %>
+                    </th>
+                    <th> <%= totalPingPongFails %> </th>
+                </tr>
+                <% currentPrinter.connections.forEach(con => { %>
+                    <% let url = con.url %>
+                    <% const log = con.log %>
+                        <% if(url.includes("http")){ %>
+                        <%   if(url.includes("https")){ %>
+                        <%       url = url.replace("https://"+currentPrinter.printerURL, "") %>
+                        <%   }else{ %>
+                        <%        url = url.replace("http://"+currentPrinter.printerURL, "") %>
+                        <%    } %>
+                        <%}else if(url.includes("ws")){ %>
+                        <%   if(url.includes("wss")){ %>
+                        <%        url = url.replace("wss://"+currentPrinter.printerURL, "") %>
+                        <%    }else{ %>
+                        <%        url = url.replace("ws://"+currentPrinter.printerURL, "") %>
+                        <%    } %>
+                        <%} %>
+
+                    <% const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0) %>
+                    <% const averageCalculation = (averageCount / log.lastResponseTimes.length) || 0; %>
+                    <% const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed) %>
+                    <% const successPercent = (log.totalRequestsSuccess * 100) / totalConnections %>
+                    <% const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections %>
+                    <tr class="collapse" id="connectionCollapse-<%= index %>">
+                        <th>  </th>
+                        <th class="p-1"><%= url %></th>
+
+                        <th class="p-1"><%= helpers.generateMilisecondsTime(averageCalculation) %></th>
+                        <th class="p-1">
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: <%=successPercent %>%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><%=successPercent.toFixed(0) %>%</div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: <%=failedPercent %>%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><%=failedPercent.toFixed(0) %>%</div>
+                            </div>
+                        </th>
+                        <th class="p-1"><%= log.totalRetries %></th>
+                        <th class="p-1"><%= log.connectionFailures %></th>
+                        <th class="p-1"><%= (url.includes("websocket")) ? log.totalPingPong : "-" %></th>
+                    </tr>
+                <% })%>
+
+        <% })%>
+        </tbody>
+    </table>
+</div>
