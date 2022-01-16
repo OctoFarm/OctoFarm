@@ -512,6 +512,8 @@ async function updateLiveSystemInformation() {
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
+  if(!systemInformation) return;
+
   if (systemInformation?.uptime && !!procUptimeElem) {
     procUptimeElem.innerHTML = Calc.generateTime(systemInformation.uptime);
   }
@@ -528,7 +530,7 @@ async function updateLiveSystemInformation() {
     await historicUsageGraph.updateOptions(options);
   }
 
-  if (systemInformation.cpuLoadHistory) {
+  if (systemInformation.cpuLoadHistory.length > 0) {
     await cpuUsageDonut.updateSeries([
       systemInformation.cpuLoadHistory[systemInformation.cpuLoadHistory.length - 1].y
     ]);

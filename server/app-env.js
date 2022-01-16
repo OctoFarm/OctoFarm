@@ -15,6 +15,8 @@ const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-en
 const deprecatedConfigFolder = "../config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
+const clientPackageJsonPath = path.join(__dirname, "../client/package.json");
+const clientPackageJson = require(clientPackageJsonPath);
 const dotEnvPath = path.join(__dirname, "../.env");
 
 /**
@@ -313,11 +315,16 @@ function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
+function fetchClientVersion() {
+  return clientPackageJson.version;
+}
+
 module.exports = {
   isEnvProd,
   setupEnvConfig,
   runMigrations,
   fetchMongoDBConnectionString,
   fetchOctoFarmPort,
-  getViewsPath
+  getViewsPath,
+  fetchClientVersion
 };

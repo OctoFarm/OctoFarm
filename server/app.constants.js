@@ -15,6 +15,8 @@ const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
 const knownLogLevels = ["info", "debug", "silly"];
 const defaultLogLevel = "info";
+const currentReleaseBranch = "master";
+const releaseBranches = ["master", "development"];
 
 // Make sure the client is up to date with this
 const jsonStringify = false;

@@ -9,6 +9,10 @@ let systemClean = [];
 let clientClean = [];
 
 class SettingsCleanerService {
+  static isLogonRequired() {
+    return systemClean.server.loginRequired;
+  }
+
   static returnSystemSettings() {
     return systemClean;
   }

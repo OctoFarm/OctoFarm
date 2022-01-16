@@ -1,7 +1,79 @@
 <% const base = '../' %>
 <% const modal = base + '/octofarm-modal.ejs' %>
 
+<% const instructionsURL = "https://docs.octofarm.net/installation/setup-service.html" %>
+<% const updateURL = "https://docs.octofarm.net/getting-started/octofarm-updating.html" %>
+<% const installationURL = "https://docs.octofarm.net/installation/" %>
 
+<% if(systemInformation?.warnings?.status){ %>
+    <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
+        <%= systemInformation.warnings?.message; %>
+    </div>
+<% } %>
+<% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        Your system is not running with PM2! Some commands below may not work... Please
+        setup your system correctly as instructed here: <a
+                href='<%= instructionsURL %>' target='_blank'>Click Here</a>
+    </div>
+<% } %>
+<% if(serviceInformation?.isNodemon){ %>
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-heart text-danger"></i> Hey lovely developer! Thanks for helping make OctoFarm great!
+    </div>
+<% } %>
+<% let systemButtonsDisabled = false; %>
+<% if(serviceInformation?.isDockerContainer){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to
+        Docker having it's own update mechanism
+        Please check the <a
+                href="<%= updateURL %>">Installation
+            Instructions</a> for more information on how to update
+        your docker container.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to not been
+        able to detect the use of the pm2 process manager.
+        Please re-install OctoFarm following the <a target="_blank" href="<%= instructionsURL %>">Installation
+            Instructions</a>.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<% if(!areWeGitRepo && !serviceInformation?.isDockerContainer){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to not been
+        able to detect a git repository.
+        Please check the <a target="_blank" href="<%= instructionsURL %>">Installation
+            Instructions</a> for more information on how to set this
+        up.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<div class="row">
+    <div class="col-12">
+        <button title="Performs a restart of the OctoFarm service"
+                id="restartOctoFarmBtn" type="button"
+                class="btn btn-danger mr-3 btn-lg">
+            <i class="fas fa-sync"></i> Restart
+        </button>
+        <button title="Performs a check for latest updates of OctoFarm"
+                id="checkUpdatesForOctoFarmBtn" type="button"
+                class="btn btn-info ml-3 float-right btn-lg">
+            <i class="fab fa-github"></i> Check for Update
+        </button>
+        <button title="Performs an update command on OctoFarm to the latest version"
+                id="updateOctoFarmBtn" type="button"
+                class="btn btn-success ml-3 float-right btn-lg"
+                disabled>
+            <i class="fas fa-thumbs-up"></i> Update OctoFarm
+        </button>
+    </div>
+</div>
+<hr>
 <div class="row">
     <ul class="nav nav-tabs">
         <li class="nav-item">

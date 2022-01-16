@@ -3,11 +3,12 @@ const express = require("express");
 const router = express.Router();
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const { stringify } = require("flatted");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
 let interval = false;
-const string = stringify({ ok: true });
+const string = stringify({ ok: true, loginRequired: SettingsClean.isLogonRequired() });
 
 router.get("/", ensureCurrentUserAndGroup, async (req, res) => {
   //req.socket.setTimeout(Number.MAX_VALUE);
