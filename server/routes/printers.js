@@ -15,6 +15,8 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
+const { validateBodyMiddleware } = require("../handlers/validators");
+const P_VALID = require("../constants/printer-validation.constants");
 
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
@@ -111,16 +113,21 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
   res.send(groups);
 });
 
-router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
-  const id = req.body.i;
-  let returnedPrinterInformation;
-  if (!id) {
-    returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
-  } else {
-    returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
+router.post(
+  "/printerInfo",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.PRINTER_ID),
+  async (req, res) => {
+    const id = req.body.i;
+    let returnedPrinterInformation;
+    if (!id) {
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
+    } else {
+      returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
+    }
+    res.send(returnedPrinterInformation);
   }
-  res.send(returnedPrinterInformation);
-});
+);
 
 router.post(
   "/updatePrinterSettings",

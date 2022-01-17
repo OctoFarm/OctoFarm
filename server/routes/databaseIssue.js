@@ -18,14 +18,14 @@ function validateMongoURL(mongoURL) {
   const hasMongoPrefix =
     mongoString.toLowerCase().includes("mongodb://") ||
     mongoString.toLowerCase().includes("mongodb+srv://");
-  const hasOctoFarmTable = mongoString.includes("/octofarm");
 
   return {
     hasMongoPrefix,
-    hasOctoFarmTable,
-    isValid: hasOctoFarmTable || hasMongoPrefix
+    isValid: hasMongoPrefix
   };
 }
+
+//TODO wow, these need importing not duplcating...
 
 router.get("/", (req, res) =>
   res.render("databaseIssue", {
