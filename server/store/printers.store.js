@@ -444,7 +444,7 @@ class PrinterStore {
     const versionArray = [];
 
     printers.forEach((printer) => {
-      if (!versionArray.includes(printer.octoPrintVersion))
+      if (!!printer?.octoPrintVersion && !versionArray.includes(printer.octoPrintVersion))
         versionArray.push(printer.octoPrintVersion);
     });
     return versionArray;
