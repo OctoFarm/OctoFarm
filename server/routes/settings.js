@@ -27,6 +27,7 @@ const {
 } = require("../services/octofarm-update.service.js");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getImagesPath } = require("../utils/system-paths.utils");
 
 module.exports = router;
 
@@ -35,7 +36,7 @@ module.exports = router;
 
 const Storage = multer.diskStorage({
   destination: function (req, file, callback) {
-    callback(null, "./images");
+    callback(null, getImagesPath());
   },
   filename: function (req, file, callback) {
     callback(null, "bg.jpg");
@@ -233,12 +234,25 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   ServerSettingsDB.find({}).then(async (checked) => {
     let restartRequired = false;
 
+    const sentOnline = JSON.stringify(JSON.parse(req.body.onlinePolling));
+    const actualOnline = JSON.stringify(JSON.parse(checked[0].onlinePolling));
+
     const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
+    console.log(checked[0].onlinePolling, req.body.onlinePolling);
+    console.log(isEqual(sentOnline, actualOnline));
     const serverChanges = isEqual(checked[0].server, req.body.server);
     const timeoutChanges = isEqual(checked[0].timeout, req.body.timeout);
     const filamentChanges = isEqual(checked[0].filament, req.body.filament);
     const historyChanges = isEqual(checked[0].history, req.body.history);
     const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
+    console.log(
+      onlineChanges,
+      serverChanges,
+      timeoutChanges,
+      filamentChanges,
+      historyChanges,
+      influxExport
+    );
 
     checked[0].onlinePolling = req.body.onlinePolling;
     checked[0].server = req.body.server;
