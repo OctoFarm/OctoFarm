@@ -21,13 +21,24 @@ const COLOUR_MAP = {
   warn: COLOURS.ORANGE,
   debug: COLOURS.ORANGE,
   error: COLOURS.RED,
+  http : COLOURS.PURPLE,
   silly: COLOURS.CYAN
 };
+
+const LEVELS = {
+    error: 0,
+    warn: 1,
+    http: 2,
+    info: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6
+}
 
 dateFormat = () => {
   return dtFormat.format(new Date());
 };
-//TODO Log level filter should be set by environment variable
+
 class LoggerService {
   constructor(route, enableFileLogs = true, logFilterLevel = undefined) {
     if (!logFilterLevel) {
@@ -84,10 +95,12 @@ class LoggerService {
     );
 
     this.logger = winston.createLogger({
+      levels: LEVELS,
       transports: [
         new winston.transports.Console({
           level: logFilterLevel,
-          format: alignColorsAndTime
+          format: alignColorsAndTime,
+          handleExceptions: true
         }),
         ...(enableFileLogs
           ? [
@@ -95,8 +108,8 @@ class LoggerService {
                 level: logFilterLevel,
                 format: prettyPrintMyLogs,
                 filename: `../logs/${route}.log`,
-                maxsize: "5000000",
-                maxFiles: 1
+                maxsize: 5242880,
+                maxFiles: 3
               })
             ]
           : [])
@@ -114,6 +127,13 @@ class LoggerService {
     this.logger.log("warn", message, {
       meta
     });
+  }
+
+  http(message, meta){
+      console.log(message)
+      this.logger.log("http", message, {
+          meta
+      })
   }
 
   debug(message, meta) {

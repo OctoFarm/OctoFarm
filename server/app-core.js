@@ -2,6 +2,8 @@ const express = require("express");
 const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const morganMiddleware = require("./config/morgan");
 const passport = require("passport");
 const ServerSettingsDB = require("./models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
@@ -15,10 +17,31 @@ const exceptionHandler = require("./exceptions/exception.handler");
 
 const logger = new Logger("OctoFarm-Server");
 
+/**
+ *
+ * @returns {*|Express}
+ */
 function setupExpressServer() {
   let app = express();
 
   require("./config/passport.js")(passport);
+
+  //Morgan config
+  app.use(morganMiddleware);
+
+  // Helmet config. Anymore and would require customising by the user...
+  app.use(helmet.dnsPrefetchControl());
+  app.use(helmet.expectCt());
+  app.use(helmet.frameguard());
+  app.use(helmet.hidePoweredBy());
+  app.use(helmet.hsts());
+  app.use(helmet.ieNoOpen());
+  app.use(helmet.noSniff());
+  app.use(helmet.originAgentCluster());
+  app.use(helmet.permittedCrossDomainPolicies());
+  app.use(helmet.referrerPolicy());
+  app.use(helmet.xssFilter());
+
   app.use(express.json());
 
   const viewsPath = getViewsPath();
@@ -58,6 +81,10 @@ function setupExpressServer() {
   return app;
 }
 
+/**
+ *
+ * @returns {Promise<void>}
+ */
 async function ensureSystemSettingsInitiated() {
   logger.info("Checking Server Settings...");
 
@@ -73,6 +100,10 @@ async function ensureSystemSettingsInitiated() {
   return await SettingsClean.initialise();
 }
 
+/**
+ *
+ * @param app
+ */
 function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/amialive", require("./routes/SSE-amIAlive", { page: "route" }));
@@ -89,9 +120,7 @@ function serveOctoFarmRoutes(app) {
   app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
   app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
   app.get("*", function (req, res) {
-    logger.debug("Had to redirect resource request:", req.originalUrl);
     if (req.originalUrl.endsWith(".min.js")) {
-      logger.error("Javascript resource was not found " + req.originalUrl);
       res.status(404);
       res.send("Resource not found " + req.originalUrl);
       return;
@@ -101,6 +130,12 @@ function serveOctoFarmRoutes(app) {
   app.use(exceptionHandler);
 }
 
+/**
+ *
+ * @param app
+ * @param quick_boot
+ * @returns {Promise<any>}
+ */
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Starting OctoFarm server tasks...");

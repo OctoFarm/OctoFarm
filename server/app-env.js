@@ -70,11 +70,19 @@ function ensureEnvNpmVersionSet() {
   }
 }
 
+/**
+ *
+ * @param reason
+ */
 function removePm2Service(reason) {
   logger.error("Removing PM2 service as OctoFarm failed to start", reason);
   execSync("pm2 delete OctoFarm");
 }
 
+/**
+ *
+ * @param folder
+ */
 function removeFolderIfEmpty(folder) {
   return fs.rmdir(folder, function (err) {
     if (err) {
@@ -85,6 +93,9 @@ function removeFolderIfEmpty(folder) {
   });
 }
 
+/**
+ *
+ */
 function setupPackageJsonVersionOrThrow() {
   const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, "../server"));
   if (!result) {
@@ -104,12 +115,20 @@ function printInstructionsURL() {
   );
 }
 
+/**
+ *
+ */
 function removeDeprecatedMongoURIConfigFile() {
   logger.info("~ Removing deprecated config file 'config/db.js'.");
   fs.rmSync(deprecatedConfigFilePath);
   removeFolderIfEmpty(deprecatedConfigFolder);
 }
 
+/**
+ *
+ * @param persistToEnv
+ * @returns {string}
+ */
 function fetchMongoDBConnectionString(persistToEnv = false) {
   if (!process.env[AppConstants.MONGO_KEY]) {
     logger.warning(
@@ -130,6 +149,10 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
   return process.env[AppConstants.MONGO_KEY];
 }
 
+/**
+ *
+ * @returns {string}
+ */
 function fetchOctoFarmPort() {
   let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
@@ -155,7 +178,7 @@ function fetchOctoFarmPort() {
   }
   return port;
 }
-
+/**
 /**
  * Make sure that we have a valid MongoDB connection string to work with.
  */
@@ -208,6 +231,9 @@ function ensureMongoDBConnectionStringSet() {
   }
 }
 
+/**
+ *
+ */
 function ensurePortSet() {
   fetchOctoFarmPort();
 
@@ -220,6 +246,9 @@ function ensurePortSet() {
   }
 }
 
+/**
+ *
+ */
 function ensureLogLevelSet() {
   const logLevel = process.env[AppConstants.LOG_LEVEL];
 
@@ -252,6 +281,10 @@ function setupEnvConfig(skipDotEnv = false) {
   ensureLogLevelSet();
 }
 
+/**
+ *
+ * @returns {string}
+ */
 function getViewsPath() {
   logger.debug("Running in directory:", { dirname: __dirname });
   const viewsPath = path.join(__dirname, "views");
@@ -304,6 +337,9 @@ async function runMigrations(db, client) {
   }
 }
 
+/**
+ * Ensures we have a page title set
+ */
 function ensurePageTitle() {
   if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
     process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] =
@@ -311,10 +347,18 @@ function ensurePageTitle() {
   }
 }
 
+/**
+ *
+ * @returns {boolean} Is Production Environment
+ */
 function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
+/**
+ *
+ * @returns {string} Client version number #.#.#
+ */
 function fetchClientVersion() {
   return clientPackageJson.version;
 }
