@@ -1,4 +1,5 @@
 const winston = require("winston");
+const { AppConstants } = require("../app.constants")
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -42,7 +43,7 @@ dateFormat = () => {
 class LoggerService {
   constructor(route, enableFileLogs = true, logFilterLevel = undefined) {
     if (!logFilterLevel) {
-      logFilterLevel = process.env.LOG_LEVEL;
+      logFilterLevel = process.env[AppConstants.LOG_LEVEL];
     }
 
     this.log_data = null;
@@ -100,7 +101,6 @@ class LoggerService {
         new winston.transports.Console({
           level: logFilterLevel,
           format: alignColorsAndTime,
-          handleExceptions: true
         }),
         ...(enableFileLogs
           ? [

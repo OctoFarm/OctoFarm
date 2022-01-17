@@ -1,6 +1,7 @@
 const morgan = require("morgan");
 
 const Logger = require("../handlers/logger");
+const { AppConstants } = require("../app.constants");
 
 const logger = new Logger("OctoFarm-API");
 
@@ -18,7 +19,13 @@ const morganMiddleware = morgan(
   },
   {
     // specify a function for skipping requests without errors
-    skip: (req, res) => res.statusCode < 400,
+    skip: (req, res) => {
+      if (process.env[AppConstants.LOG_LEVEL] !== "silly") {
+        return res.statusCode < 400;
+      } else {
+        return false;
+      }
+    },
     stream: {
       write: (msg) => logger.http(msg)
     }
