@@ -594,7 +594,7 @@ function startUpdateTasksRunner() {
       UI.doesElementNeedUpdating(
         theTask.nextRun
           ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
-          : "Not Planned",
+          : "On Demand / One Time Task",
         document.getElementById("next-" + task),
         "innerHTML"
       );
