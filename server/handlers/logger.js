@@ -62,15 +62,38 @@ class LoggerService {
       })
     );
 
+    let prettyPrintMyLogs = winston.format.combine(
+        winston.format.printf((info) => {
+          const level = info.level.toUpperCase();
+          const date = dateFormat();
+          let metaData = undefined;
+          if (!!info?.meta) {
+            if (typeof info.meta === "string" || typeof info.meta === "number") {
+              metaData = info.meta;
+            } else {
+              metaData = Object.assign({}, info.meta);
+              metaData = JSON.stringify(metaData);
+            }
+          }
+          let message = `${date} | ${level} | ${route} \n MESSAGE: ${info.message} `;
+          message = metaData
+              ? message + `\n DATA: ${metaData}`
+              : message;
+          return message;
+        })
+    );
+
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: logFilterLevel
+          level: logFilterLevel,
+          format: alignColorsAndTime
         }),
         ...(enableFileLogs
           ? [
               new winston.transports.File({
                 level: logFilterLevel,
+                format: prettyPrintMyLogs,
                 filename: `../logs/${route}.log`,
                 maxsize: "5000000",
                 maxFiles: 1
@@ -78,7 +101,6 @@ class LoggerService {
             ]
           : [])
       ],
-      format: alignColorsAndTime
     });
   }
 
