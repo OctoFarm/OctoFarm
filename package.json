@@ -19,5 +19,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/OctoFarm/OctoFarm"
+  },
+  "dependencies": {
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.3.0"
   }
 }

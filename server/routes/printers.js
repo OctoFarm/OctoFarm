@@ -18,6 +18,61 @@ const { generatePrinterStatistics } = require("../services/printer-statistics.se
 const { validateBodyMiddleware } = require("../handlers/validators");
 const P_VALID = require("../constants/printer-validation.constants");
 
+/**
+ * @swagger
+ * /printers/add:
+ *   post:
+ *     summary: Adds a new printer
+ *     description: Add a new printer to the farm. Currently only supports a single printer at a time. The below is a bit convoluted due to some original design decisions.
+ *     parameters:
+ *       - in: settingsAppearance
+ *         name: Appearance Settings
+ *         required: true
+ *         description: Object containing some printer keys and values sent back to OctoPrint.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             color:
+ *               type: string
+ *               example: "default"
+ *             colorTransparent:
+ *               type: boolean
+ *               example: false
+ *             defaultLanguage:
+ *               type: string
+ *               example: "_default"
+ *             name:
+ *               type: string
+ *               example: "Hammock of Cheese"
+ *             showFahrenheitAlso:
+ *               type: boolean
+ *               example: false
+ *       - in: printerURL
+ *         name: Printer url
+ *         required: true
+ *         description: String containing URL for OctoPrint instance. Requires "http/https", defaults to http if not supplies
+ *       - in: camURL
+ *       - in: apikey
+ *       - in: group
+ *     responses:
+ *       200:
+ *         description: List of added printers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 printersAdded:
+ *                   type: array
+ *                   description: Array of objects containing the printers just added, will always be 1 array.
+ *                   example: [ printer: {  _id: "5d6ede6a0ba62570afcedd3a", printerURL: "http://192.168.1.5:5000" } ]
+ *                 status:
+ *                   type: number
+ *                   description: "Status code response, not needed will be removed and cleaned up!"
+ *                   example: 200
+ *       400:
+ *       500:
+ */
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
   const printers = req.body;

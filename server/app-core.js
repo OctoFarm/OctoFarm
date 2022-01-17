@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const morganMiddleware = require("./config/morgan");
 const passport = require("passport");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 const ServerSettingsDB = require("./models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./handlers/logger.js");
@@ -14,8 +16,12 @@ const { getViewsPath } = require("./app-env");
 const { SettingsClean } = require("./services/settings-cleaner.service");
 const { TaskManager } = require("./runners/task.manager");
 const exceptionHandler = require("./exceptions/exception.handler");
+const swaggerOptions = require("./config/swagger");
+const { AppConstants } = require("./app.constants");
 
 const logger = new Logger("OctoFarm-Server");
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 /**
  *
@@ -119,6 +125,9 @@ function serveOctoFarmRoutes(app) {
   app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
   app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
   app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
+  if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+  }
   app.get("*", function (req, res) {
     if (req.originalUrl.endsWith(".min.js")) {
       res.status(404);
