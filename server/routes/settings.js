@@ -27,12 +27,9 @@ const {
 } = require("../services/octofarm-update.service.js");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { getImagesPath } = require("../utils/system-paths.utils");
+const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 
 module.exports = router;
-
-// var upload = multer({ dest: "Upload_folder_name" })
-// If you do not want to use diskStorage then uncomment it
 
 const Storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -51,7 +48,8 @@ router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req,
 });
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.params.name;
-  const file = `./logs/${download}`;
+  const file = `${getLogsPath()}/${download}`;
+  console.log(file);
   res.download(file, download); // Set disposition and send it.
 });
 router.post(
@@ -70,6 +68,7 @@ router.post(
 
     try {
       zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
+      console.log(zipDumpResponse.zipDumpPath);
       zipDumpResponse.status = "success";
       zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {

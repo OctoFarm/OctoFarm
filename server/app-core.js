@@ -89,7 +89,7 @@ function serveOctoFarmRoutes(app) {
   app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
   app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
   app.get("*", function (req, res) {
-    console.debug("Had to redirect resource request:", req.originalUrl);
+    logger.debug("Had to redirect resource request:", req.originalUrl);
     if (req.originalUrl.endsWith(".min.js")) {
       logger.error("Javascript resource was not found " + req.originalUrl);
       res.status(404);
