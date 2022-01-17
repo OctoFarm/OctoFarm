@@ -242,7 +242,7 @@ async function generateLogDumpFile() {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
       window.open(
-        `${OctoFarmClient.logsRoute.replace("/logs", "")}/${logDumpResponse.zipDumpPath}`
+        `${OctoFarmClient.logsRoute}/${logDumpResponse.zipDumpPath}`
       );
     });
   }

@@ -7,8 +7,7 @@ const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const isDocker = require("is-docker");
 const { getUpdateNotificationIfAny } = require("./octofarm-update.service.js");
 
-const { PrinterClean } = require("./printer-cleaner.service.js");
-const { SystemInfo } = require("../runners/systemInfo.js");
+const { SystemRunner } = require("../runners/systemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
@@ -20,14 +19,16 @@ const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
 const { TaskManager } = require("../runners/task.manager");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { generatePrinterStatistics } = require("./printer-statistics.service");
 
 const systemInformationFileName = "system_information.txt";
+const NO_DATA = " - ";
 
 /**
  * Generates the contents for the system information files
  * @throws {String} If the SystemInformation object doesn't return
  */
-function generateSystemInformationContents() {
+async function generateSystemInformationContents() {
   let systemInformationContents = "--- OctoFarm Setup Information ---\n\n";
   systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
   const airGapped = "Are we connected to the internet?\n";
@@ -76,20 +77,37 @@ function generateSystemInformationContents() {
     systemInformationContents += `${docker} ${no}\n`;
   }
 
-  const systemInformation = SystemInfo?.returnInfo();
+  const systemInformation = SystemRunner.returnInfo();
 
   if (!systemInformation) throw "No system information found";
 
   systemInformationContents += "--- System Information ---\n\n";
 
-  systemInformationContents += `Platform\n ${systemInformation?.osInfo?.distro} \n`;
-  systemInformationContents += `Processor Arch\n ${systemInformation?.osInfo?.arch} \n`;
+  systemInformationContents += `Platform\n ${systemInformation.distro} \n`;
+  systemInformationContents += `Processor Arch\n ${systemInformation.architecture} \n`;
   systemInformationContents += `System Uptime\n ${prettyHelpers.generateTime(
-    systemInformation?.sysUptime?.uptime
+    systemInformation.osUptime
   )} \n`;
   systemInformationContents += `OctoFarm Uptime\n ${prettyHelpers.generateTime(
-    systemInformation?.processUptime
-  )} \n\n`;
+    systemInformation.uptime
+  )} \n`;
+  systemInformationContents += `Total Memory\n ${prettyHelpers.generateBytes(
+    systemInformation.totalMemory
+  )} \n`;
+  systemInformationContents += `CPU Load History\n ${JSON.stringify(
+    systemInformation.cpuLoadHistory
+  )} \n`;
+  systemInformationContents += `Memory Load History\n ${JSON.stringify(
+    systemInformation.memoryLoadHistory
+  )} \n`;
+
+  systemInformationContents += `Network IP's\n ${JSON.stringify(
+    systemInformation.networkIpAddresses
+  )} \n`;
+
+  systemInformationContents += `Disk Use\n ${JSON.stringify(systemInformation.systemDisk.use)}% \n`;
+
+  systemInformationContents += `Network IP's\n ${systemInformation.timezone} (${systemInformation.timezone}) \n\n`;
 
   const { server, timeout, history, filamentManager } = SettingsClean.returnSystemSettings();
   // System settings section
@@ -138,20 +156,52 @@ function generateSystemInformationContents() {
     }
   }
 
-  const printerVersions = getPrinterStoreCache().listAllOctoPrintVersions();
+  // Replace with printer Overviews
+  systemInformationContents += "\n --- Printer Overview ---\n\n";
+  const printers = getPrinterStoreCache().listPrintersInformation();
 
-  if (printerVersions) {
-    systemInformationContents += "\n --- OctoPrint Information ---\n\n";
-    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}\n`;
+  for (let i = 0; i < printers.length; i++) {
+    let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
+    if (!stats) {
+      stats = await generatePrinterStatistics(printers[i]._id);
+      getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
+    }
+    const { printerName, octoPrintVersion, printerFirmware } = printers[i];
+
+    const { octoPrintSystemInfo } = stats;
+
+    systemInformationContents += `${printerName} | ${octoPrintVersion} | ${printerFirmware} |  ${
+      octoPrintSystemInfo?.["env.python.version"]
+        ? octoPrintSystemInfo?.["env.python.version"]
+        : NO_DATA
+    } | ${
+      octoPrintSystemInfo?.["env.python.pip"] ? octoPrintSystemInfo?.["env.python.pip"] : NO_DATA
+    } | ${
+      octoPrintSystemInfo?.["env.os.platform"] ? octoPrintSystemInfo?.["env.os.platform"] : NO_DATA
+    } | ${
+      octoPrintSystemInfo?.["env.hardware.cores"]
+        ? octoPrintSystemInfo?.["env.hardware.cores"]
+        : NO_DATA
+    } | ${
+      octoPrintSystemInfo?.["env.hardware.ram"]
+        ? prettyHelpers.generateBytes(octoPrintSystemInfo?.["env.hardware.ram"])
+        : NO_DATA
+    } | ${octoPrintSystemInfo?.["octoprint.safe_mode"] ? "false" : "true"} \n`;
   }
 
   const latestTaskState = TaskManager.getTaskState();
 
-  systemInformationContents += "--- OctoFarm Tasks ---\n\n";
+  systemInformationContents += "\n--- OctoFarm Tasks ---\n\n";
   for (let task in latestTaskState) {
     const theTask = latestTaskState[task];
-    systemInformationContents += `${task}: duration: ${theTask.duration}ms \n`;
+    systemInformationContents += theTask?.duration
+      ? `${task}: duration: ${theTask.duration}ms \n`
+      : `${task}: duration: Not completed yet.. \n`;
   }
+
+  //Health Checks For printers...
+
+  //Connection overviews
 
   return systemInformationContents;
 }
@@ -168,7 +218,7 @@ async function generateOctoFarmSystemInformationTxt() {
   // Make sure existing zip files have been cleared from the system before continuing.
   await checkIfFileFileExistsAndDeleteIfSo(systemInformation?.path);
 
-  let systemInformationContents = generateSystemInformationContents();
+  let systemInformationContents = await generateSystemInformationContents();
 
   if (!systemInformationContents)
     throw { status: "error", msg: "Couldn't generate system_information.txt" };

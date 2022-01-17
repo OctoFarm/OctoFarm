@@ -72,7 +72,7 @@ router.post(
       zipDumpResponse.status = "success";
       zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {
-      logger.error("Error Generating Log Dump Zip File | ", e);
+      logger.error("Error Generating Log Dump Zip File | ", e.message);
     }
 
     res.send(zipDumpResponse);
