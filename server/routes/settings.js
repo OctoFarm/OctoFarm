@@ -68,7 +68,6 @@ router.post(
 
     try {
       zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
-      console.log(zipDumpResponse.zipDumpPath);
       zipDumpResponse.status = "success";
       zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {

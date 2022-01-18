@@ -1,5 +1,6 @@
 const { join } = require("path");
 const { writeFileSync } = require("fs");
+const table = require("table").table;
 
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
@@ -15,7 +16,7 @@ const { SettingsClean } = require("./settings-cleaner.service");
 
 const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 
-const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
+const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 
 const { TaskManager } = require("../runners/task.manager");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
@@ -44,6 +45,8 @@ async function generateSystemInformationContents() {
   const influxDB = "What are the influxDB database settings? \n";
   const yes = " ✓  \n";
   const no = " ✘ \n";
+  const truth = " ✓";
+  const falsth = " ✘";
 
   const updateNotification = getUpdateNotificationIfAny();
 
@@ -107,7 +110,7 @@ async function generateSystemInformationContents() {
 
   systemInformationContents += `Disk Use\n ${JSON.stringify(systemInformation.systemDisk.use)}% \n`;
 
-  systemInformationContents += `Network IP's\n ${systemInformation.timezone} (${systemInformation.timezone}) \n\n`;
+  systemInformationContents += `TimeZone \n ${systemInformation.timezoneName} (${systemInformation.timezone}) \n\n`;
 
   const { server, timeout, history, filamentManager } = SettingsClean.returnSystemSettings();
   // System settings section
@@ -158,7 +161,19 @@ async function generateSystemInformationContents() {
 
   // Replace with printer Overviews
   systemInformationContents += "\n --- Printer Overview ---\n\n";
+  const printerOverViewTable = [];
   const printers = getPrinterStoreCache().listPrintersInformation();
+  printerOverViewTable.push([
+    "Printer Name",
+    "OctoPrint Version",
+    "Printer Firmware",
+    "Python Version",
+    "Pip Version",
+    "OS Platform",
+    "Hardware Cores",
+    "Hardware Ram",
+    "Safe Mode"
+  ]);
 
   for (let i = 0; i < printers.length; i++) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
@@ -169,25 +184,26 @@ async function generateSystemInformationContents() {
     const { printerName, octoPrintVersion, printerFirmware } = printers[i];
 
     const { octoPrintSystemInfo } = stats;
-
-    systemInformationContents += `${printerName} | ${octoPrintVersion} | ${printerFirmware} |  ${
+    printerOverViewTable.push([
+      printerName,
+      octoPrintVersion ? octoPrintVersion : NO_DATA,
+      printerFirmware ? printerFirmware : NO_DATA,
       octoPrintSystemInfo?.["env.python.version"]
         ? octoPrintSystemInfo?.["env.python.version"]
-        : NO_DATA
-    } | ${
-      octoPrintSystemInfo?.["env.python.pip"] ? octoPrintSystemInfo?.["env.python.pip"] : NO_DATA
-    } | ${
-      octoPrintSystemInfo?.["env.os.platform"] ? octoPrintSystemInfo?.["env.os.platform"] : NO_DATA
-    } | ${
+        : NO_DATA,
+      octoPrintSystemInfo?.["env.python.pip"] ? octoPrintSystemInfo?.["env.python.pip"] : NO_DATA,
+      octoPrintSystemInfo?.["env.os.platform"] ? octoPrintSystemInfo?.["env.os.platform"] : NO_DATA,
       octoPrintSystemInfo?.["env.hardware.cores"]
         ? octoPrintSystemInfo?.["env.hardware.cores"]
-        : NO_DATA
-    } | ${
+        : NO_DATA,
       octoPrintSystemInfo?.["env.hardware.ram"]
         ? prettyHelpers.generateBytes(octoPrintSystemInfo?.["env.hardware.ram"])
-        : NO_DATA
-    } | ${octoPrintSystemInfo?.["octoprint.safe_mode"] ? "false" : "true"} \n`;
+        : NO_DATA,
+      octoPrintSystemInfo?.["octoprint.safe_mode"] ? truth : falsth
+    ]);
   }
+
+  systemInformationContents += table(printerOverViewTable);
 
   const latestTaskState = TaskManager.getTaskState();
 
@@ -200,8 +216,48 @@ async function generateSystemInformationContents() {
   }
 
   //Health Checks For printers...
+  const healthChecks = returnPrinterHealthChecks(true);
+  const healthCheckTable = [];
+  systemInformationContents += "\n--- Printer Health Checks ---\n\n";
+  healthCheckTable.push([
+    "Date",
+    "Printer Name",
+    "URL Format",
+    "Websocket Format",
+    "Camera URL",
+    "URL Match",
+    "User API Info",
+    "State API Info",
+    "Profile API Info",
+    "Settings API Info",
+    "System API Info",
+    "WebSocket Avg Response",
+    "Saved Baud",
+    "Saved Port",
+    "Saved Profile"
+  ]);
+  for (let i = 0; i < healthChecks.length; i++) {
+    const check = healthChecks[i];
 
-  //Connection overviews
+    healthCheckTable.push([
+      check.dateChecked,
+      check.printerName,
+      check?.printerChecks.printerURL ? truth : falsth,
+      check?.printerChecks.webSocketURL ? truth : falsth,
+      check?.printerChecks.cameraURL ? truth : falsth,
+      check?.printerChecks.match ? truth : falsth,
+      check?.apiChecksRequired.userCheck ? truth : falsth,
+      check?.apiChecksRequired.stateCheck ? truth : falsth,
+      check?.apiChecksRequired.profileCheck ? truth : falsth,
+      check?.apiChecksRequired.settingsCheck ? truth : falsth,
+      check?.apiChecksRequired.systemCheck ? truth : falsth,
+      check?.websocketChecks.lastResponseTimes ? check?.websocketChecks.lastResponseTimes : falsth,
+      check?.connectionChecks.baud ? check?.connectionChecks.baud : falsth,
+      check?.connectionChecks.port ? check?.connectionChecks.port : falsth,
+      check?.connectionChecks.profile ? check?.connectionChecks.profile : falsth
+    ]);
+  }
+  systemInformationContents += table(healthCheckTable);
 
   return systemInformationContents;
 }
