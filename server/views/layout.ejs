@@ -31,7 +31,6 @@
     <link rel="stylesheet" href="/assets/css/vendor/fa-all.min.css"/>
     <link rel="stylesheet" href="/assets/dist/octofarm.css"/>
     <title><%= octoFarmPageTitle %>: <%= page %></title>
-    <!-- Avoid trouble -->
     <script src="/assets/dist/client-error.modal.min.js"></script>
     <script src="/assets/jquery.min.js"></script>
     <script src="/assets/bootbox.min.js"></script>
@@ -233,7 +232,7 @@
                             <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
                                 <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
                                 <p id="lostConnectionText">Attempting to reconnect in... <span id="lostServerConnectionTimer"></span> seconds</p>
-                                <button class="btn btn-outline-warning d-none" id="forceReconnectServerButton"><i class="fas fa-plug"></i> Force Re-connect!</button>
+                                <button class="btn btn-outline-success" id="forceRefreshPageButton"><i class="fas fa-redo"></i> Refresh Page</button>
                             </div>
                         </div>
                     </div>
