@@ -856,6 +856,7 @@ class PrinterSettingsService {
   }
 
   static async setupSaveButton(currentPrinter) {
+    console.log(pageElements.menu.printerMenuFooter)
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
       "<button id=\"savePrinterSettingsBtn\" type=\"button\" class=\"btn btn-success btn-block\" id=\"savePrinterSettingsBtn\">Save Settings</button>"
