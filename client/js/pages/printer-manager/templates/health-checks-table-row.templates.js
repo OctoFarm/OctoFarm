@@ -624,7 +624,7 @@ export function addHealthCheckListeners(check) {
     });
   }
 
-  if (check.webcamChecks.camSetup) {
+  if (!check.webcamChecks.camSetup) {
     document.getElementById(E.WEBCAM + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your webcam settings from OctoPrint do not match your values in OctoFarm.",
@@ -635,7 +635,8 @@ export function addHealthCheckListeners(check) {
   }
 
   const { ffmpegPath, ffmpegVideoCodex, timelapseEnabled } = check.webcamChecks.historySetup;
-  if (ffmpegPath) {
+
+  if (!ffmpegPath) {
     document.getElementById(E.H_FFMPEG + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got an FFMPEG path setup and your settings in history are utilising the timelapse functionality.",
@@ -644,7 +645,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (ffmpegVideoCodex) {
+  if (!ffmpegVideoCodex) {
     document.getElementById(E.H_CODEC + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the correct codec setup and your settings in history are utilising the timelapse functionality.",
@@ -653,7 +654,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (timelapseEnabled) {
+  if (!timelapseEnabled) {
     document.getElementById(E.H_TIMELAPSE + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the timelapse functionality enabled and your settings in history are utilising the timelapse functionality.",
