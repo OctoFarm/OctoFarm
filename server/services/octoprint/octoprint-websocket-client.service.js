@@ -455,6 +455,11 @@ class WebSocketClient {
     this.sessionKey = newSession;
     this.terminate();
   }
+
+  updateConnectionInformation(webSocketURL, currentUser) {
+    this.url = webSocketURL + ENDPOINT;
+    this.currentUser = currentUser;
+  }
 }
 
 module.exports = WebSocketClient;

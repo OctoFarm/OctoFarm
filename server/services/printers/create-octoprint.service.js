@@ -1624,6 +1624,11 @@ class OctoPrintPrinter {
     this.#db.update(data);
   }
 
+  resetConnectionInformation() {
+    this.#api.updateConnectionInformation(this.printerURL, this.apikey);
+    this.#ws.updateConnectionInformation(this.webSocketURL);
+  }
+
   async resetSocketConnection() {
     await this.enablePrinter();
   }

@@ -101,6 +101,11 @@ class OctoprintApiService {
     this.#currentTimeout = timeoutSettings.apiTimeout;
   }
 
+  updateConnectionInformation(printerURL, apikey) {
+    this.printerURL = printerURL;
+    this.apikey = apikey;
+  }
+
   /**
    * Retry mechanism for slow/timeout state OctoPrint entries
    * @param item
