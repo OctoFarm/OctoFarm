@@ -1035,7 +1035,8 @@ class OctoPrintPrinter {
   async acquireOctoPrintSystemData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring system data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
-    if ((!this?.core && this.core.length === 0) || force) {
+
+    if (!this?.core || this.core.length === 0 || force) {
       let systemCheck = await this.#api.getSystemCommands(true).catch(() => {
         return false;
       });
@@ -1048,6 +1049,7 @@ class OctoPrintPrinter {
         this.#db.update({
           core: systemJson.core
         });
+
         this.#apiPrinterTickerWrap("Acquired system data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
         return true;
