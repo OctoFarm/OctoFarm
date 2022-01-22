@@ -22,6 +22,22 @@ function returnActionBtnTemplate(id) {
       >
           <i class="fas fa-sync"></i>
       </button> 
+      <button  
+         title="Runs a pre-configured gcode sequence so you can detect which printer this is."
+         id="printerFindMe-${id}"
+         type="button"
+         class="tag btn btn-warning btn-sm d-none"
+      >
+          <i class="fas fa-search text-dark"></i>
+      </button> 
+      <button  
+         title="Uses the values from your selected filament and pre-heats to those values."
+         id="printerPreHeat-${id}"
+         type="button"
+         class="tag btn btn-warning btn-sm d-none"
+      >
+                <i class="fas fa-fire"></i>
+      </button> 
       <div class="btn-group">
         <button title="Toggle your printers power"
               id="printerPowerToggle-${id}"

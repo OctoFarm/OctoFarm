@@ -261,7 +261,10 @@ class PrinterStore {
       const newPrinterInfo = newPrintersInformation[i];
 
       //Check for a printer name change...
-      if (oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name) {
+      if (
+        !!newPrinterInfo?.settingsAppearance?.name &&
+        oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name
+      ) {
         const loggerMessage = `Changed printer name from ${oldPrinter.settingsAppearance.name} to ${newPrinterInfo.settingsAppearance.name}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
@@ -290,7 +293,7 @@ class PrinterStore {
       }
 
       //Check for a printer url change...
-      if (oldPrinter.printerURL !== newPrinterInfo.printerURL) {
+      if (!!newPrinterInfo?.printerURL && oldPrinter.printerURL !== newPrinterInfo.printerURL) {
         const loggerMessage = `Changed printer url from ${oldPrinter.printerURL} to ${newPrinterInfo.printerURL}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
@@ -330,7 +333,7 @@ class PrinterStore {
       }
 
       // Check for apikey change...
-      if (oldPrinter.apikey !== newPrinterInfo.apikey) {
+      if (!!newPrinterInfo?.apikey && oldPrinter.apikey !== newPrinterInfo.apikey) {
         const loggerMessage = `Changed apiKey from ${oldPrinter.apikey} to ${newPrinterInfo.apikey}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -360,7 +363,7 @@ class PrinterStore {
       }
 
       // Check for group change...
-      if (oldPrinter.group !== newPrinterInfo.group) {
+      if (!!newPrinterInfo?.group && oldPrinter.group !== newPrinterInfo.group) {
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -386,7 +389,7 @@ class PrinterStore {
         updateGroupListing = true;
       }
       // Check for camURL change...
-      if (oldPrinter.camURL !== newPrinterInfo.camURL) {
+      if (!!newPrinterInfo.camURL && oldPrinter.camURL !== newPrinterInfo.camURL) {
         const loggerMessage = `Changed camera url from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -434,7 +437,92 @@ class PrinterStore {
   }
 
   async updatePrinterSettings(settings) {
-    console.log(settings);
+    const reConnectRequired = [];
+    const newOctoPrintSettings = {};
+
+    const { printer, connection, systemCommands, powerCommands, costSettings } = settings;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+
+    // Deal with OctoFarm connection information updates
+    const octoFarmConnectionSettings = {
+      _id: index,
+      settingsAppearance: {
+        name: printerName
+      },
+      printerURL: printerURL,
+      camURL: cameraURL,
+      apikey: apikey
+    };
+
+    // Update OctoFarms data
+    this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
+
+    const originalPrinter = this.#findMePrinter(index);
+    if (!!currentUser && currentUser !== originalPrinter.currentUser) {
+      this.updatePrinterDatabase(index, {
+        currentUser: currentUser
+      });
+      this.resetConnectionInformation([index]);
+      reConnectRequired.push(index);
+    }
+
+    const { preferredPort, preferredBaud, preferredProfile } = connection;
+    // Connection is always sent so can just update.
+    if (!!preferredPort || !!preferredBaud || !!preferredProfile) {
+      this.updatePrinterDatabase(index, {
+        options: {
+          baudrates: originalPrinter.options.baudrates,
+          baudratePreference: preferredBaud,
+          ports: originalPrinter.options.ports,
+          portPreference: preferredPort,
+          printerProfiles: originalPrinter.options.printerProfiles,
+          printerProfilePreference: preferredProfile
+        }
+      });
+      newOctoPrintSettings.serial = {
+        port: preferredPort,
+        baudrate: preferredBaud
+      };
+    }
+
+    const {
+      powerConsumption,
+      electricityCosts,
+      purchasePrice,
+      estimatedLifeSpan,
+      maintenanceCosts
+    } = costSettings;
+
+    if (
+      !!powerConsumption ||
+      !!electricityCosts ||
+      !!purchasePrice ||
+      !!estimatedLifeSpan ||
+      !!maintenanceCosts
+    ) {
+      const costSettings = {
+        ...(!!powerConsumption
+          ? { powerConsumption }
+          : { opowerConsumption: originalPrinter.costSettings.powerConsumption }),
+        ...(!!electricityCosts
+          ? { electricityCosts }
+          : { electricityCosts: originalPrinter.costSettings.electricityCosts }),
+        ...(!!purchasePrice
+          ? { purchasePrice }
+          : { purchasePrice: originalPrinter.costSettings.purchasePrice }),
+        ...(!!estimatedLifeSpan
+          ? { estimateLifespan: estimatedLifeSpan }
+          : { estimateLifespan: originalPrinter.costSettings.estimateLifespan }),
+        ...(!!maintenanceCosts
+          ? { maintenanceCosts }
+          : { maintenanceCosts: originalPrinter.costSettings.maintenanceCosts })
+      };
+      this.updatePrinterDatabase(index, { costSettings });
+    }
+
+    // Deal with OctoPrint Updates
+
+    // Refresh OctoPrint Updates
 
     // logger.info("Attempting to save: ", settings);
     //
