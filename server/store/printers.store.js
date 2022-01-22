@@ -12,7 +12,6 @@ const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../runners/task.manager");
 const { FileClean } = require("../services/file-cleaner.service");
-const { generate } = require("rxjs");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {

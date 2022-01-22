@@ -1733,6 +1733,12 @@ class OctoPrintPrinter {
   getPrinterStatistics() {
     return this.#printerStatistics;
   }
+
+  sendThrottle(seconds) {
+    if (!!this?.#ws) {
+      this.#ws.sendThrottle(seconds);
+    }
+  }
 }
 
 module.exports = {

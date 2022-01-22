@@ -314,7 +314,7 @@ async function updateServerSettings() {
     },
     server: {
       // Deprecated Port
-      port: settingsElements.server.port.value,
+      port: parseInt(settingsElements.server.port.value),
       loginRequired: settingsElements.server.loginRequired.checked,
       registration: settingsElements.server.registration.checked
     },

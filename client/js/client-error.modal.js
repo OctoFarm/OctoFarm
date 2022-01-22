@@ -42,7 +42,10 @@ function openErrorModal(options) {
   apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
-  $(octoFarmErrorModalElement).modal("show");
+  setTimeout(() => {
+    $(octoFarmErrorModalElement).modal("show");
+  }, 3000)
+
 }
 
 function handleEvent() {

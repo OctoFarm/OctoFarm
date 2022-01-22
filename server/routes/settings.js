@@ -232,25 +232,15 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   ServerSettingsDB.find({}).then(async (checked) => {
     let restartRequired = false;
 
-    const sentOnline = JSON.stringify(JSON.parse(req.body.onlinePolling));
-    const actualOnline = JSON.stringify(JSON.parse(checked[0].onlinePolling));
+    const sentOnline = JSON.parse(JSON.stringify(req.body));
+    const actualOnline = JSON.parse(JSON.stringify(checked[0]));
 
-    const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
-    console.log(checked[0].onlinePolling, req.body.onlinePolling);
-    console.log(isEqual(sentOnline, actualOnline));
-    const serverChanges = isEqual(checked[0].server, req.body.server);
-    const timeoutChanges = isEqual(checked[0].timeout, req.body.timeout);
-    const filamentChanges = isEqual(checked[0].filament, req.body.filament);
-    const historyChanges = isEqual(checked[0].history, req.body.history);
-    const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
-    console.log(
-      onlineChanges,
-      serverChanges,
-      timeoutChanges,
-      filamentChanges,
-      historyChanges,
-      influxExport
-    );
+    const onlineChanges = isEqual(actualOnline.onlinePolling, sentOnline.onlinePolling);
+    const serverChanges = isEqual(actualOnline.server, sentOnline.server);
+    const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
+    const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
+    const historyChanges = isEqual(actualOnline.history, sentOnline.history);
+    const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
     checked[0].onlinePolling = req.body.onlinePolling;
     checked[0].server = req.body.server;
