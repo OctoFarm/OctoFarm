@@ -6,7 +6,7 @@ const Alerts = require("../models/Alerts.js");
 
 class ScriptRunner {
   /**
-   * Save alert - TODO Trigger, message and location validation lacking
+   * Save alert
    * @param printer
    * @param trigger
    * @param message

@@ -488,8 +488,8 @@ class PrinterStore {
       const costSettings = {
         ...(!!powerConsumption
           ? { powerConsumption }
-          : { opowerConsumption: originalPrinter.costSettings.powerConsumption }),
-        ...(!!electricityCostsestimateLifespan
+          : { powerConsumption: originalPrinter.costSettings.powerConsumption }),
+        ...(!!electricityCosts
           ? { electricityCosts }
           : { electricityCosts: originalPrinter.costSettings.electricityCosts }),
         ...(!!purchasePrice
