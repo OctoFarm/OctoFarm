@@ -51,7 +51,7 @@ export function updateAlertsLog(alert) {
     currentAlerts.push(alert.id);
     tickerMessageBox.insertAdjacentHTML(
       "afterbegin",
-      `<div id="${alert.id}" style="width: 100%; font-size:14px;" class="text-left ${alert.colour} text-wrap"><i class="pl-2 fas fa-exclamation-triangle"></i> ${alert.printerName} | ${alert.name}</div>`
+      `<div id="${alert.id}" style="width: 100%; font-size:11px;" class="text-left ${alert.colour} text-wrap"><i class="pl-2 fas fa-exclamation-triangle"></i> ${alert.printerName} | ${alert.name}</div>`
     );
     updateAlertsStatus();
   }
