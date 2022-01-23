@@ -425,7 +425,8 @@ class PrinterStore {
     const reConnectRequired = [];
     const newOctoPrintSettings = {};
 
-    const { printer, connection, systemCommands, powerCommands, costSettings } = settings;
+    const { printer, connection, systemCommands, powerCommands, costSettings, profile, profileID } =
+      settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
 
     // Deal with OctoFarm connection information updates
@@ -462,6 +463,12 @@ class PrinterStore {
           portPreference: preferredPort,
           printerProfiles: originalPrinter.options.printerProfiles,
           printerProfilePreference: preferredProfile
+        },
+        current: {
+          baudrate: preferredBaud,
+          port: preferredPort,
+          printerProfile: preferredProfile,
+          state: "Not Used"
         }
       });
       newOctoPrintSettings.serial = {
@@ -505,6 +512,158 @@ class PrinterStore {
       this.updatePrinterDatabase(index, { costSettings });
     }
 
+    const { name, model, volume, heatedBed, heatedChamber, axes, extruder } = profile;
+
+    if (!!name || !!model || !!volume || !!heatedBed || !!heatedChamber || !!axes || !!extruder) {
+      const originalProfile = originalPrinter.profiles[profileID];
+      const newAxes = {
+        x: {
+          ...(!!axes?.x?.speed ? { speed: axes.x.speed } : { speed: originalProfile.axes.x.speed }),
+          inverted: axes.x.inverted
+        },
+        y: {
+          ...(!!axes?.y?.speed ? { speed: axes.y.speed } : { speed: originalProfile.axes.y.speed }),
+          inverted: axes.y.inverted
+        },
+        z: {
+          ...(!!axes?.z?.speed ? { speed: axes.z.speed } : { speed: originalProfile.axes.z.speed }),
+          inverted: axes.z.inverted
+        },
+        e: {
+          ...(!!axes?.e?.speed ? { speed: axes.e.speed } : { speed: originalProfile.axes.e.speed }),
+          inverted: axes.e.inverted
+        }
+      };
+      const newExtruder = {
+        count: extruder.count,
+        nozzleDiameter: extruder.nozzleDiameter,
+        offsets: originalProfile.extruder.offsets,
+        sharedNozzle: extruder.sharedNozzle
+      };
+      const newVolume = {
+        formFactor: volume.formFactor,
+        width: volume?.width ? volume.width : originalProfile.volume.width,
+        depth: volume?.depth ? volume.depth : originalProfile.volume.depth,
+        height: volume?.height ? volume.height : originalProfile.volume.height,
+        custom_box: originalProfile.volume.custom_box,
+        origin: originalProfile.volume.origin
+      };
+
+      originalPrinter.profiles[profileID] = {
+        axes: newAxes,
+        color: originalProfile.color,
+        current: originalProfile.current,
+        default: originalProfile.default,
+        extruder: newExtruder,
+        heatedBed,
+        heatedChamber,
+        id: originalProfile.id,
+        model: !!model ? model : originalProfile.model,
+        name: !!name ? name : originalProfile.name,
+        resource: originalProfile.resource,
+        volume: newVolume
+      };
+
+      this.updatePrinterDatabase(index, {
+        profiles: originalPrinter.profiles
+      });
+
+      newOctoPrintSettings.profiles = originalPrinter.profiles;
+    }
+
+    const {
+      powerOnCommand,
+      powerOnURL,
+      powerOffURL,
+      powerOffCommand,
+      powerToggleCommand,
+      powerToggleURL,
+      powerStatusCommand,
+      powerStatusURL,
+      wol
+    } = powerCommands;
+
+    if (
+      !!powerOnCommand ||
+      !!powerOnURL ||
+      !!powerOffURL ||
+      !!powerOffCommand ||
+      !!powerToggleCommand ||
+      !!powerToggleURL ||
+      !!powerStatusCommand ||
+      !!powerStatusURL ||
+      !!wol
+    ) {
+      const { enabled, ip, port, interval, packet, MAC } = wol;
+      const newWOL = {
+        enabled,
+        ...(!!ip ? { ip } : { ip: originalPrinter.powerSettings.wol.ip }),
+        ...(!!port ? { port } : { port: originalPrinter.powerSettings.wol.port }),
+        ...(!!interval ? { interval } : { interval: originalPrinter.powerSettings.wol.interval }),
+        ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
+        ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
+      };
+      const newPowerSettings = {
+        ...(!!powerOnCommand
+          ? { powerOnCommand }
+          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
+        ...(!!powerOnURL
+          ? { powerOnURL }
+          : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
+        ...(!!powerOffURL
+          ? { powerOffURL }
+          : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
+        ...(!!powerOffCommand
+          ? { powerOffCommand }
+          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
+        ...(!!powerToggleCommand
+          ? { powerToggleCommand }
+          : { powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand }),
+        ...(!!powerToggleURL
+          ? { powerToggleURL }
+          : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
+        ...(!!powerStatusCommand
+          ? { powerStatusCommand }
+          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
+        ...(!!powerStatusURL
+          ? { powerStatusURL }
+          : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),
+        wol: newWOL
+      };
+
+      this.updatePrinterDatabase(index, {
+        powerSettings: newPowerSettings
+      });
+    }
+
+    const { systemShutdown, systemRestart, serverRestart } = systemCommands;
+
+    if (!!systemShutdown || !!systemRestart || !!serverRestart) {
+      newOctoPrintSettings.server = {
+        allowFraming: originalPrinter.settingsServer.allowFraming,
+        commands: {
+          systemShutdownCommand: systemShutdown
+            ? systemShutdown
+            : originalPrinter.settingsServer.commands.systemShutdownCommand,
+          systemRestartCommand: systemRestart
+            ? systemRestart
+            : originalPrinter.settingsServer.commands.systemRestartCommand,
+          serverRestartCommand: serverRestart
+            ? serverRestart
+            : originalPrinter.settingsServer.commands.serverRestartCommand
+        },
+        diskspace: originalPrinter.settingsServer.diskspace,
+        onlineCheck: originalPrinter.settingsServer.onlineCheck,
+        pluginBlacklist: originalPrinter.settingsServer.pluginBlacklist
+      };
+
+      this.updatePrinterDatabase(index, {
+        settingsServer: newOctoPrintSettings.server
+      });
+    }
+
+    //TODO Clean printers information...
+    return {};
     // Deal with OctoPrint Updates
 
     // Refresh OctoPrint Updates

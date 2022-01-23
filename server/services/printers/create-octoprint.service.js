@@ -1746,6 +1746,8 @@ class OctoPrintPrinter {
       this.#ws.sendThrottle(seconds);
     }
   }
+
+  cleanPrintersInformation() {}
 }
 
 module.exports = {
