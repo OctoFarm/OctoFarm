@@ -7,21 +7,20 @@ import PrinterLogsService from "../../services/printer-logs.service.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import {updatePrinterSettingsModal} from "../../services/printer-settings.service";
 import {loadPrinterHealthChecks, reSyncAPI} from "./functions/printer-manager.functions";
+import {removeAlertsLog, updateAlertsLog} from "./alerts-log";
 
 //TODO move to UI util
-function findPos(obj) {
-  console.log("FIND", obj);
-  console.log("OFFSET", obj.offsetParent);
-  let curtop = 0;
-  if (obj.offsetParent) {
-    console.log(obj.offsetParent);
-    do {
-      curtop += obj.offsetTop;
-      console.log(curtop);
-    } while ((obj = obj.offsetParent));
-    return [curtop];
-  }
-}
+// function findPos(obj) {
+//   let curtop = 0;
+//   if (obj.offsetParent) {
+//     console.log(obj.offsetParent);
+//     do {
+//       curtop += obj.offsetTop;
+//       console.log(curtop);
+//     } while ((obj = obj.offsetParent));
+//     return [curtop];
+//   }
+// }
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
@@ -81,16 +80,20 @@ function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
   if (!printer.healthChecksPass) {
     UI.addDisplayNoneToElement(healthAlert);
+    updateAlertsLog({id: "healthCheck-"+printer._id, name: "Failed health check!", printerName: printer.printerName, colour: "Active"})
   } else {
     UI.removeDisplayNoneFromElement(healthAlert);
+    removeAlertsLog({id: "healthCheck-"+printer._id})
   }
 }
 
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
+    updateAlertsLog({id: "corsCheck-"+printer._id, name: "Cors is not enabled!", printerName: printer.printerName, colour: "danger"})
     UI.addDisplayNoneToElement(corsAlert);
   } else {
+    removeAlertsLog({id: "corsCheck-"+printer._id})
     UI.removeDisplayNoneFromElement(corsAlert);
   }
 }
@@ -103,6 +106,7 @@ function reconnectingIn(printer) {
   const reconnectingInCalculation = reconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
+    updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "danger"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
@@ -110,6 +114,7 @@ function reconnectingIn(printer) {
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     }
   } else {
+    removeAlertsLog({id: "apiReconnect-"+printer._id})
     UI.removeDisplayNoneFromElement(printerReScanButton);
     printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
@@ -124,6 +129,7 @@ function reconnectingWebsocketIn(printer) {
   const reconnectingInCalculation = websocketReconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
+    updateAlertsLog({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
@@ -132,6 +138,7 @@ function reconnectingWebsocketIn(printer) {
     }
   } else {
     UI.removeDisplayNoneFromElement(printerReScanButton);
+    removeAlertsLog({id: "socketReconnect-"+printer._id})
     printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
@@ -142,9 +149,11 @@ function checkForOctoPrintUpdate(printer) {
 
   if (printer?.octoPrintUpdate?.updateAvailable) {
     UI.addDisplayNoneToElement(updateButton);
+    updateAlertsLog({id: "opUpdate-"+printer._id, name: "OctoPrint update available!", printerName: printer.printerName, colour: "Info"})
     updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
   } else {
     UI.removeDisplayNoneFromElement(updateButton);
+    removeAlertsLog({id: "opUpdate-"+printer._id})
     updateButton.setAttribute("title", "No OctoPrint updates available!");
   }
 }
@@ -154,9 +163,11 @@ function checkForOctoPrintPluginUpdates(printer) {
 
   if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
     UI.addDisplayNoneToElement(updatePluginButton);
+    updateAlertsLog({id: "pluginUpdate-"+printer._id, name: "OctoPrint plugin update(s) available!", printerName: printer.printerName, colour: "Info"})
     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
   } else {
     UI.removeDisplayNoneFromElement(updatePluginButton);
+    removeAlertsLog({id: "pluginUpdate-"+printer._id})
     updatePluginButton.title = "No OctoPrint plugin updates available!";
   }
 }
@@ -164,8 +175,10 @@ function checkForOctoPrintPluginUpdates(printer) {
 function checkIfRestartRequired(printer) {
   const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
   if (restartRequiredTag && printer?.restartRequired) {
+    updateAlertsLog({id: "restartWaiting-"+printer._id, name: "Waiting for OctoPrint restart", printerName: printer.printerName, colour: "Active"})
     UI.addDisplayNoneToElement(restartRequiredTag);
   } else {
+    removeAlertsLog({id: "restartWaiting-"+printer._id})
     UI.removeDisplayNoneFromElement(restartRequiredTag);
   }
 }
@@ -173,8 +186,10 @@ function checkIfRestartRequired(printer) {
 function checkIfMultiUserIssueFlagged(printer) {
   const multiUserIssueAlert = document.getElementById("multiUserIssue-" + printer._id);
   if (printer?.multiUserIssue) {
+    updateAlertsLog({id: "userIssue-"+printer._id, name: "Couldn't determine which user to use!", printerName: printer.printerName, colour: "Offline"})
     UI.addDisplayNoneToElement(multiUserIssueAlert);
   } else {
+    removeAlertsLog({id: "userIssue-"+printer._id})
     UI.removeDisplayNoneFromElement(multiUserIssueAlert);
   }
 }
@@ -194,9 +209,11 @@ function checkForApiErrors(printer) {
       }
 
       if (apiErrors > 0) {
+        removeAlertsLog({id: "apiIssue-"+printer._id})
         UI.removeDisplayNoneFromElement(apiErrorTag);
       }
     } else {
+      updateAlertsLog({id: "apiIssue-"+printer._id, name: "API Scan has issues!", printerName: printer.printerName, colour: "Offline"})
       UI.addDisplayNoneToElement(apiErrorTag);
     }
   }

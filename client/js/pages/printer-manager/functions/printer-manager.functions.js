@@ -12,10 +12,11 @@ import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
 import PrinterFileManagerService from "../../../services/printer-file-manager.service";
 import {
-    addHealthCheckListeners,
-    returnFarmOverviewTableRow,
-    returnHealthCheckRow
+  addHealthCheckListeners,
+  returnFarmOverviewTableRow,
+  returnHealthCheckRow
 } from "../templates/health-checks-table-row.templates";
+import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -28,8 +29,10 @@ export function workerEventFunction(data) {
     if (!modalVisibility) {
       if (data.currentTickerList.length > 0) {
         checkIfLoaderExistsAndRemove();
+        checkIfAlertsLoaderExistsAndRemove();
         updateConnectionLog(data.currentTickerList);
       } else {
+        checkIfAlertsLoaderExistsAndRemove(true);
         checkIfLoaderExistsAndRemove(true);
       }
       if (data.printersInformation.length > 0) {
