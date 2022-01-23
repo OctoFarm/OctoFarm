@@ -1,5 +1,4 @@
 const { findIndex, cloneDeep } = require("lodash");
-const { EventEmitter } = require("events");
 const { ScriptRunner } = require("../runners/scriptCheck");
 const { PrinterTicker } = require("../runners/printerTicker");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -12,6 +11,7 @@ const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../runners/task.manager");
 const { FileClean } = require("../services/file-cleaner.service");
+const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -186,17 +186,16 @@ class PrinterStore {
     return this.#findMePrinter(id);
   }
 
-  getPrinterEvent(id, event) {
-    const printer = this.#findMePrinter(id);
-    return printer[event + "Event"];
+  addPrinterEvent(id, event) {
+    getEventEmitterCache().once(`${id}-${event}`, function (...args) {
+      console.log("ONCE ARGS", ...args);
+      return ScriptRunner.check(...args);
+    });
   }
 
-  firePrinterEvent(id, event) {
+  emitPrinterEvent(id, event) {
     const printer = this.#findMePrinter(id);
-    if (!!printer[event + "Event"]) {
-      logger.info("Fired printer event", event);
-      printer[event + "Event"].emit(event.toLowerCase());
-    }
+    getEventEmitterCache().emit(`${id}-${event}`, printer, event.toLowerCase(), undefined);
   }
 
   getPrinterState(id) {
@@ -226,19 +225,6 @@ class PrinterStore {
   getAllPluginsList(id) {
     const printer = this.#findMePrinter(id);
     return printer.pluginsListEnabled.concat(printer.pluginsListDisabled);
-  }
-
-  addPrinterEvent(id, event) {
-    const printer = this.#findMePrinter(id);
-    if (!printer[event + "Event"]) {
-      printer[event + "Event"] = new EventEmitter();
-      if (!printer[event + "Event"]._events[event.toLowerCase()]) {
-        logger.info("Added new event to printer: ", event);
-        printer[event + "Event"].once(event.toLowerCase(), (stream) => {
-          ScriptRunner.check(printer, event.toLowerCase(), undefined);
-        });
-      }
-    }
   }
 
   updateAllPrintersSocketThrottle(seconds) {
@@ -504,7 +490,7 @@ class PrinterStore {
         ...(!!powerConsumption
           ? { powerConsumption }
           : { opowerConsumption: originalPrinter.costSettings.powerConsumption }),
-        ...(!!electricityCosts
+        ...(!!electricityCostsestimateLifespan
           ? { electricityCosts }
           : { electricityCosts: originalPrinter.costSettings.electricityCosts }),
         ...(!!purchasePrice

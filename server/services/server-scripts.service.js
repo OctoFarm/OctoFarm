@@ -11,7 +11,7 @@ class Script {
     try {
       const { stdout, stderr } = await exec(`${scriptLocation} ${message}`);
       logger.info("stdout:", stdout);
-      logger.info("stderr:", stderr);
+      logger.error("stderr:", stderr);
       return scriptLocation + ": " + stdout;
     } catch (err) {
       logger.error(err);

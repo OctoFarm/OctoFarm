@@ -6,6 +6,8 @@ const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
 
 const Logger = require("../../../handlers/logger");
+const { getEventEmitterCache } = require("../../../cache/event-emitter.cache");
+const { ScriptRunner } = require("../../../runners/scriptCheck");
 const logger = new Logger("OctoFarm-State");
 
 //TODO, could potentially build up if not careful.
@@ -58,20 +60,19 @@ const captureTemperatureData = (id, data) => {
 };
 
 const coolDownEvent = (id, temps) => {
-  const currentEvent = getPrinterStoreCache().getPrinterEvent(id, "coolDown");
+  // const currentEvent = getEventEmitterCache().getPrinterEvent(id, "coolDown");
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {
-    if (!currentEvent) {
-      getPrinterStoreCache().addPrinterEvent(id, "coolDown");
-    }
-  } else if (printerState.colour.category === "Complete") {
+    getPrinterStoreCache().addPrinterEvent(id, "coolDown");
+  }
+  if (printerState.colour.category === "Complete") {
     const { coolDown } = getPrinterStoreCache().getTempTriggers(id);
     if (
       parseFloat(temps[0].tool0.actual) < parseFloat(coolDown) &&
       parseFloat(temps[0].bed.actual) < parseFloat(coolDown)
     ) {
-      getPrinterStoreCache().firePrinterEvent(id, "coolDown");
+      getPrinterStoreCache().emitPrinterEvent(id, "coolDown");
     }
   }
 };

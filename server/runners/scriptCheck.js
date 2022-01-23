@@ -54,6 +54,7 @@ class ScriptRunner {
    * @returns {Promise<void>}
    */
   static async check(printer, trigger, historyID) {
+    console.log("CHECKING", printer.printerName, trigger, historyID);
     let currentAlerts = await Alerts.find({});
     for (let i = 0; i < currentAlerts.length; i++) {
       if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
@@ -76,7 +77,7 @@ class ScriptRunner {
   }
 
   static async fire(scriptLocation, message) {
-    logger.info("Alert Fire: " + scriptLocation + " " + message);
+    logger.warning("Alert Fire: " + scriptLocation + " " + message);
     return await Script.fire(scriptLocation, message);
   }
 
@@ -132,7 +133,7 @@ class ScriptRunner {
       message = message.replace(/\[ETA\]/g, dateComplete);
     }
     if (message.includes("[PrinterName]")) {
-      message = message.replace(/\[PrinterName\]/g, printer.settingsApperance.name);
+      message = message.replace(/\[PrinterName\]/g, printer.printerName);
     }
     if (message.includes("[PrinterURL]")) {
       message = message.replace(/\[PrinterURL\]/g, printer.printerURL);
