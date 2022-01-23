@@ -54,7 +54,6 @@ class ScriptRunner {
    * @returns {Promise<void>}
    */
   static async check(printer, trigger, historyID) {
-    console.log("CHECKING", printer.printerName, trigger, historyID);
     let currentAlerts = await Alerts.find({});
     for (let i = 0; i < currentAlerts.length; i++) {
       if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
