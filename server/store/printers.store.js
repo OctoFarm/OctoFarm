@@ -188,7 +188,6 @@ class PrinterStore {
 
   addPrinterEvent(id, event) {
     getEventEmitterCache().once(`${id}-${event}`, function (...args) {
-      console.log("ONCE ARGS", ...args);
       return ScriptRunner.check(...args);
     });
   }
