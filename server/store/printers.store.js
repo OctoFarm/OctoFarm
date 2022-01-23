@@ -425,8 +425,17 @@ class PrinterStore {
     const reConnectRequired = [];
     const newOctoPrintSettings = {};
 
-    const { printer, connection, systemCommands, powerCommands, costSettings, profile, profileID } =
-      settings;
+    const {
+      printer,
+      connection,
+      systemCommands,
+      powerCommands,
+      costSettings,
+      profile,
+      profileID,
+      gcode,
+      other
+    } = settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
 
     // Deal with OctoFarm connection information updates
@@ -662,9 +671,72 @@ class PrinterStore {
       });
     }
 
+    const {
+      afterPrintCancelled,
+      afterPrintDone,
+      afterPrintPaused,
+      afterPrinterConnected,
+      afterToolChange,
+      beforePrintResumed,
+      beforePrintStarted,
+      beforePrinterDisconnected,
+      beforeToolChange
+    } = gcode;
+
+    if (
+      !!afterPrintCancelled ||
+      !!afterPrintDone ||
+      !!afterPrintPaused ||
+      !!afterPrinterConnected ||
+      !!afterToolChange ||
+      !!beforePrintResumed ||
+      !!beforePrintStarted ||
+      !!beforePrinterDisconnected ||
+      !!beforeToolChange
+    ) {
+      const newCustomGcode = {
+        ...(!!afterPrintCancelled
+          ? { afterPrintCancelled }
+          : { afterPrintCancelled: originalPrinter?.settingsScripts?.afterPrintCancelled }),
+        ...(!!afterPrintDone
+          ? { afterPrintDone }
+          : { afterPrintDone: originalPrinter?.settingsScripts?.afterPrintDone }),
+        ...(!!afterPrintPaused
+          ? { afterPrintPaused }
+          : { afterPrintPaused: originalPrinter?.settingsScripts?.afterPrintPaused }),
+        ...(!!afterPrinterConnected
+          ? { afterPrinterConnected }
+          : { afterPrinterConnected: originalPrinter?.settingsScripts?.afterPrinterConnected }),
+        ...(!!afterToolChange
+          ? { afterToolChange }
+          : { afterToolChange: originalPrinter?.settingsScripts?.afterToolChange }),
+        ...(!!beforePrintResumed
+          ? { beforePrintResumed }
+          : { beforePrintResumed: originalPrinter?.settingsScripts?.beforePrintResumed }),
+        ...(!!beforePrintStarted
+          ? { beforePrintStarted }
+          : { beforePrintStarted: originalPrinter?.settingsScripts?.beforePrintStarted }),
+        ...(!!beforePrinterDisconnected
+          ? { beforePrinterDisconnected }
+          : {
+              beforePrinterDisconnected: originalPrinter?.settingsScripts?.beforePrinterDisconnected
+            }),
+        ...(!!beforeToolChange
+          ? { beforeToolChange }
+          : { beforeToolChange: originalPrinter?.settingsScripts?.beforeToolChange })
+      };
+      this.updatePrinterDatabase(index, {
+        settingsScripts: newCustomGcode
+      });
+      newOctoPrintSettings.scripts = {
+        gcode: newCustomGcode
+      };
+    }
+
+    console.log(other);
+
     //TODO Clean printers information...
     return {};
-    // Deal with OctoPrint Updates
 
     // Refresh OctoPrint Updates
 

@@ -90,7 +90,7 @@ function checkIfPrinterHealthOK(printer) {
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
-    updateAlertsLog({id: "corsCheck-"+printer._id, name: "Cors is not enabled!", printerName: printer.printerName, colour: "danger"})
+    updateAlertsLog({id: "corsCheck-"+printer._id, name: "Cors is not enabled!", printerName: printer.printerName, colour: "Offline"})
     UI.addDisplayNoneToElement(corsAlert);
   } else {
     removeAlertsLog({id: "corsCheck-"+printer._id})
@@ -106,7 +106,7 @@ function reconnectingIn(printer) {
   const reconnectingInCalculation = reconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
-    updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "danger"})
+    updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
