@@ -425,7 +425,7 @@ class PrinterStore {
     const newOctoPrintSettings = {};
     let octoPrintProfiles = {};
 
-    let octofarmCheck = 900;
+    let octofarmCheck = 200;
     let profileCheck = 900;
     let settingsCheck = 900;
 
@@ -443,7 +443,7 @@ class PrinterStore {
     const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
     const originalPrinter = this.#findMePrinter(index);
 
-    if (!!currentUser && currentUser !== originalPrinter.currentUser) {
+    if (!!currentUser && currentUser !== originalPrinter.currentUser && currentUser !== 0) {
       this.updatePrinterDatabase(index, {
         currentUser: currentUser
       });
@@ -546,9 +546,10 @@ class PrinterStore {
         }
       };
       const newExtruder = {
-        count: extruder.count,
-        nozzleDiameter: extruder.nozzleDiameter,
-        offsets: originalProfile.extruder.offsets,
+        count: extruder?.count ? extruder.count : originalProfile.extruder.count,
+        nozzleDiameter: extruder?.nozzleDiameter
+          ? extruder.nozzleDiameter
+          : originalProfile.extruder.nozzleDiameter,
         sharedNozzle: extruder.sharedNozzle
       };
       const newVolume = {
@@ -769,7 +770,7 @@ class PrinterStore {
         ffmpegVideoCodec: originalPrinter.settingsWebcam.ffmpegVideoCodec,
         flipH: flipHCamera,
         flipV: flipVCamera,
-        rotate90: rotate90,
+        rotate90: rotateCamera,
         snapshotSslValidation: originalPrinter.settingsWebcam.snapshotSslValidation,
         snapshotTimeout: originalPrinter.settingsWebcam.snapshotTimeout,
         snapshotUrl: originalPrinter.settingsWebcam.snapshotUrl,
@@ -791,8 +792,11 @@ class PrinterStore {
 
     originalPrinter.cleanPrintersInformation();
 
-    await originalPrinter.updateOctoPrintProfileData(octoPrintProfiles[profileID]);
-    await originalPrinter.updateOctoPrintSettingsData(newOctoPrintSettings);
+    profileCheck = await originalPrinter.updateOctoPrintProfileData(
+      { profile: octoPrintProfiles[profileID] },
+      profileID
+    );
+    settingsCheck = await originalPrinter.updateOctoPrintSettingsData(newOctoPrintSettings);
 
     await Promise.allSettled([
       originalPrinter.acquireOctoPrintProfileData(true),
@@ -805,6 +809,13 @@ class PrinterStore {
     return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
 
     // Refresh OctoPrint Updates
+  }
+
+  resetPrintersSocketConnections(idList) {
+    idList.forEach((id) => {
+      const printer = this.#findMePrinter(id);
+      printer.resetSocketConnection();
+    });
   }
 
   listUniqueFolderPaths() {
@@ -863,6 +874,11 @@ class PrinterStore {
       }
     }
     return filesThatExistOnAllPrinters;
+  }
+
+  async generatePrinterConnectionLogs(id) {
+    const printer = this.#findMePrinter(id);
+    return await PrinterClean.generateConnectionLogs(printer);
   }
 
   disablePrinter(id) {

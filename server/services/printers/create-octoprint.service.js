@@ -874,7 +874,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintUsersList(force = false) {
+  async acquireOctoPrintUsersList(force = true) {
     this.#apiPrinterTickerWrap("Acquiring User List", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
     let usersCheck = await this.#api.getUsers(true).catch(() => {
@@ -887,10 +887,8 @@ class OctoPrintPrinter {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
-
       // If we have no idea who the user is then
       if (!this?.currentUser || force) {
-        console.log(isEmpty(userList));
         if (isEmpty(userList)) {
           //If user list is empty then we can assume that an admin user is only one available.
           //Only relevant for OctoPrint < 1.4.2.
@@ -1600,16 +1598,18 @@ class OctoPrintPrinter {
 
   async updateOctoPrintProfileData(profile, profileID) {
     this.#apiPrinterTickerWrap("Updating OctoPrint profile data", "Info");
-    return await this.#api.patchProfile(profile, profileID).catch(() => {
+    const profilePatch = await this.#api.patchProfile(profile, profileID).catch(() => {
       return 900;
     });
+    return checkApiStatusResponse(profilePatch);
   }
 
   async updateOctoPrintSettingsData(settings) {
     this.#apiPrinterTickerWrap("Updating OctoPrint settings data", "Info");
-    return await this.#api.postSettings(settings).catch(() => {
+    const settingsPost = await this.#api.postSettings(settings).catch(() => {
       return 900;
     });
+    return checkApiStatusResponse(settingsPost);
   }
 
   updateStateTrackingCounters(counter, value) {
@@ -1642,6 +1642,7 @@ class OctoPrintPrinter {
   resetConnectionInformation() {
     this.#api.updateConnectionInformation(this.printerURL, this.apikey);
     this.#ws.updateConnectionInformation(this.webSocketURL);
+    //this.resetSocketConnection().then();
   }
 
   async resetSocketConnection() {

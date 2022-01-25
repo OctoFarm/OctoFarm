@@ -139,7 +139,14 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async patchProfile(data, profileID) {
-    return await this.patch(apiProfiles + profileID, data);
+    try {
+      const toPatch = await this.patch(apiProfiles + profileID, data);
+      console.log(toPatch);
+      return toPatch;
+    } catch (e) {
+      console.log(e);
+      return e;
+    }
   }
 
   async postSettings(data) {

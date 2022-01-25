@@ -161,6 +161,8 @@ All notable changes to this project will be documented in this file.
   - Restart, Check for Update and Update OctoFarm buttons have been moved to the top of the "System" tab on the System page. This is to aid in security and stop users messing with system functions.
   - Changed server API logging over to morgan.
   - Moved the change background functionality out of client and into Server settings for admins only. 
+  - Quick actions is now a Quick Connect, Power Toggle, Menu. Menu contains: 
+    - OctoPrint Web, Resync Socket, Power settings. More coming soon!
 
 ### Removed
 
