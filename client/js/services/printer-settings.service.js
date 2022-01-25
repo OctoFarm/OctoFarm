@@ -564,8 +564,9 @@ class PrinterSettingsService {
         </div>
         <hr>
         <h5><u>Custom Power Commands</u></h5>
-        <p class="mb-0">Setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button toggle on all Views and allow Power On and Power Off selections in the dropdown.</p>
-         <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
+        <p class="mb-0">Custom power commands is designed to work with all available plugins, and also custom API endpoints.</p>
+        <p class="mb-0">If your endpoint requires url params, and not an object then please leave the command boxes empty.</p>
+        <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at <a href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">OctoFarm Documentation</a></p>
         <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
         <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
         
