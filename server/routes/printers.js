@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -298,7 +298,7 @@ router.get("/allPluginsList/:id", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const { searchForDevicesOnNetwork } = require("../runners/autoDiscovery.js");
+  const { searchForDevicesOnNetwork } = require("../services/octoprint-auto-discovery.service.js");
 
   let devices = await searchForDevicesOnNetwork();
 

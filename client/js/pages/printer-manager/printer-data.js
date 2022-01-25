@@ -106,7 +106,7 @@ function reconnectingIn(printer) {
   const reconnectingInCalculation = reconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
-    updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
+    // updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
@@ -114,7 +114,7 @@ function reconnectingIn(printer) {
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
     }
   } else {
-    removeAlertsLog({id: "apiReconnect-"+printer._id})
+    // removeAlertsLog({id: "apiReconnect-"+printer._id})
     UI.removeDisplayNoneFromElement(printerReScanButton);
     printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
@@ -129,7 +129,7 @@ function reconnectingWebsocketIn(printer) {
   const reconnectingInCalculation = websocketReconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
     UI.addDisplayNoneToElement(printerReScanButton);
-    updateAlertsLog({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
+    // updateAlertsLog({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(reconnectingInCalculation);
@@ -138,7 +138,7 @@ function reconnectingWebsocketIn(printer) {
     }
   } else {
     UI.removeDisplayNoneFromElement(printerReScanButton);
-    removeAlertsLog({id: "socketReconnect-"+printer._id})
+    // removeAlertsLog({id: "socketReconnect-"+printer._id})
     printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }

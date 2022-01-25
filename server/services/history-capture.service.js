@@ -5,16 +5,18 @@ const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../handlers/logger.js");
 const filamentProfiles = require("../models/Profiles.js");
-const { SettingsClean } = require("../services/settings-cleaner.service");
+const { SettingsClean } = require("./settings-cleaner.service");
 const Spool = require("../models/Filament.js");
-const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
-const { ScriptRunner } = require("./scriptCheck.js");
+const {
+  FilamentManagerPlugin
+} = require("./octoprint/octoprint-filament-manager-plugin.service.js");
+const { ScriptRunner } = require("./local-scripts.service.js");
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
-const { writePoints } = require("../services/influx-export.service.js");
+const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
-const { OctoprintApiClientService } = require("../services/octoprint/octoprint-api-client.service");
+const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;

@@ -7,10 +7,7 @@ try {
 
 if (!!majorVersion && majorVersion < 14) {
   // Dont require this in the normal flow (or NODE_ENV can not be fixed before start)
-  const {
-    serveNodeVersionFallback,
-    setupFallbackExpressServer
-  } = require("./app-fallbacks");
+  const { serveNodeVersionFallback, setupFallbackExpressServer } = require("./app-fallbacks");
 
   const octoFarmServer = setupFallbackExpressServer();
   serveNodeVersionFallback(octoFarmServer);
@@ -23,7 +20,7 @@ if (!!majorVersion && majorVersion < 14) {
   } = require("./app-env");
 
   function bootAutoDiscovery() {
-    require("./runners/autoDiscovery.js");
+    require("./services/octoprint-auto-discovery.service.js");
   }
 
   // Set environment/.env file and NODE_ENV if not set. Will call startup checks.

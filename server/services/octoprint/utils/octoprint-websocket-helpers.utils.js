@@ -7,7 +7,7 @@ const { mapStateToCategory } = require("../../printers/utils/printer-state.utils
 
 const Logger = require("../../../handlers/logger");
 const { getEventEmitterCache } = require("../../../cache/event-emitter.cache");
-const { ScriptRunner } = require("../../../runners/scriptCheck");
+const { ScriptRunner } = require("../../local-scripts.service");
 const logger = new Logger("OctoFarm-State");
 
 //TODO, could potentially build up if not careful.

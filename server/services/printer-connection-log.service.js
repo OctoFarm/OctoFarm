@@ -4,7 +4,7 @@ const logger = new Logger("OctoFarm-State");
 const currentIssues = [];
 const octoprintLogs = [];
 
-class PrinterTicker {
+class PrinterConnectionLogService {
   static addOctoPrintLog(printer, message, state, plugin) {
     let id = null;
     if (octoprintLogs.length === 0) {
@@ -67,5 +67,5 @@ class PrinterTicker {
 }
 
 module.exports = {
-  PrinterTicker
+  PrinterTicker: PrinterConnectionLogService
 };

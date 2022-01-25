@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const { stringify } = require("flatted");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
@@ -8,8 +8,8 @@ let clientInformation = null;
 const printerClean = require("../services/printer-cleaner.service.js");
 const PrinterClean = printerClean.PrinterClean;
 
-const printerTicker = require("../runners/printerTicker.js");
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const printerTicker = require("../services/printer-connection-log.service.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 
 const { PrinterTicker } = printerTicker;
 

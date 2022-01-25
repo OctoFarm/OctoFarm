@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
@@ -21,7 +21,7 @@ const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { getSorting, getFilter } = require("../services/front-end-sorting.service.js");
 const { writePoints } = require("../services/influx-export.service.js");
 // User Modal
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 

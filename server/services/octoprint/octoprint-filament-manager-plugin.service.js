@@ -1,15 +1,15 @@
-const Logger = require("../handlers/logger.js");
+const Logger = require("../../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-FilamentManager");
 
-const Spool = require("../models/Filament.js");
-const Profile = require("../models/Profiles.js");
+const Spool = require("../../models/Filament.js");
+const Profile = require("../../models/Profiles.js");
 const fetch = require("node-fetch");
 
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { TaskManager } = require("./task.manager");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
+const { TaskManager } = require("../task-manager.service");
 
-class FilamentManagerPlugin {
+class OctoprintFilamentManagerPluginService {
   static async filamentManagerReSync(addSpool) {
     try {
       const printerList = getPrinterStoreCache().listPrinters();
@@ -149,5 +149,5 @@ class FilamentManagerPlugin {
 }
 
 module.exports = {
-  FilamentManagerPlugin
+  FilamentManagerPlugin: OctoprintFilamentManagerPluginService
 };

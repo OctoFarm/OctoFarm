@@ -1,286 +1,192 @@
-const { join } = require("path");
-const { writeFileSync } = require("fs");
-const table = require("table").table;
+const { time, fsSize } = require("systeminformation");
+const os = require("os");
+const process = require("process");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
+const { farmPiStatus } = require("./farmpi-detection.service");
+const { getCPULoadAVG } = require("./cpu-profiling.service");
 
-const { getLogsPath } = require("../utils/system-paths.utils.js");
-const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
+const diskVeryFullWarning =
+  "Warning your disk is getting full... Please clean up some space or move to a larger hard drive.";
+const diskAlmostFullWarning =
+  "Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.";
+const diskRisk =
+  "Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.";
+const memoryUsageHistory = [];
+const cpuUsageHistory = [];
 
-const isDocker = require("is-docker");
-const { getUpdateNotificationIfAny } = require("./octofarm-update.service.js");
+let systemInformationService = {
+  distro: "",
+  architecture: "",
+  totalMemory: 0,
+  uptime: 0,
+  osUptime: 0,
+  cpuLoadHistory: [],
+  memoryLoadHistory: [],
+  networkIpAddresses: []
+};
 
-const { SystemRunner } = require("../runners/systemInfo.js");
-const prettyHelpers = require("../views/partials/functions/pretty.js");
-const { AppConstants } = require("../app.constants");
-const currentVersion = process?.env[AppConstants.VERSION_KEY];
-const { SettingsClean } = require("./settings-cleaner.service");
-
-const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
-
-const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
-
-const { TaskManager } = require("../runners/task.manager");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { generatePrinterStatistics } = require("./printer-statistics.service");
-
-const systemInformationFileName = "system_information.txt";
-const NO_DATA = " - ";
-
-/**
- * Generates the contents for the system information files
- * @throws {String} If the SystemInformation object doesn't return
- */
-async function generateSystemInformationContents() {
-  let systemInformationContents = "--- OctoFarm Setup Information ---\n\n";
-  systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
-  const airGapped = "Are we connected to the internet?\n";
-  const pm2 = "Are we running under pm2?\n";
-  const nodemon = "Are we running under nodemon?\n";
-  const node = "Are we running with node?\n";
-  const docker = "Are we in a docker container?\n";
-  const loginRequires = "Is login required on the server?\n";
-  const registration = "Is registration turned on the server?\n";
-  const apiTimeout = "What are the API timeout settings?\n";
-  const filamentManagerPlugin = "Is the filament manager plugin enabled?\n";
-  const historySnapshot = "What are the history snapshot settings?\n";
-  const influxDB = "What are the influxDB database settings? \n";
-  const yes = " ✓  \n";
-  const no = " ✘ \n";
-  const truth = " ✓";
-  const falsth = " ✘";
-
-  const updateNotification = getUpdateNotificationIfAny();
-
-  if (!updateNotification?.air_gapped) {
-    systemInformationContents += `${airGapped} ${yes}`;
-  } else {
-    systemInformationContents += `${airGapped} ${no}`;
-  }
-
-  if (isNode()) {
-    systemInformationContents += `${node} ${yes}`;
-  } else {
-    systemInformationContents += `${node} ${no}`;
-  }
-
-  if (isPm2()) {
-    systemInformationContents += `${pm2} ${yes}`;
-  } else {
-    systemInformationContents += `${pm2} ${no}`;
-  }
-
-  if (isNodemon()) {
-    systemInformationContents += `${nodemon} ${yes}`;
-  } else {
-    systemInformationContents += `${nodemon} ${no}`;
-  }
-
-  if (isDocker()) {
-    systemInformationContents += `${docker} ${yes}`;
-  } else {
-    systemInformationContents += `${docker} ${no}\n`;
-  }
-
-  const systemInformation = SystemRunner.returnInfo();
-
-  if (!systemInformation) throw "No system information found";
-
-  systemInformationContents += "--- System Information ---\n\n";
-
-  systemInformationContents += `Platform\n ${systemInformation.distro} \n`;
-  systemInformationContents += `Processor Arch\n ${systemInformation.architecture} \n`;
-  systemInformationContents += `System Uptime\n ${prettyHelpers.generateTime(
-    systemInformation.osUptime
-  )} \n`;
-  systemInformationContents += `OctoFarm Uptime\n ${prettyHelpers.generateTime(
-    systemInformation.uptime
-  )} \n`;
-  systemInformationContents += `Total Memory\n ${prettyHelpers.generateBytes(
-    systemInformation.totalMemory
-  )} \n`;
-  systemInformationContents += `CPU Load History\n ${JSON.stringify(
-    systemInformation.cpuLoadHistory
-  )} \n`;
-  systemInformationContents += `Memory Load History\n ${JSON.stringify(
-    systemInformation.memoryLoadHistory
-  )} \n`;
-
-  systemInformationContents += `Network IP's\n ${JSON.stringify(
-    systemInformation.networkIpAddresses
-  )} \n`;
-
-  systemInformationContents += `Disk Use\n ${JSON.stringify(systemInformation.systemDisk.use)}% \n`;
-
-  systemInformationContents += `TimeZone \n ${systemInformation.timezoneName} (${systemInformation.timezone}) \n\n`;
-
-  const { server, timeout, history, filamentManager } = SettingsClean.returnSystemSettings();
-  // System settings section
-
-  systemInformationContents += "--- OctoFarm System Settings ---\n\n";
-
-  if (server.loginRequired) {
-    systemInformationContents += `${loginRequires} ${yes}`;
-  } else {
-    systemInformationContents += `${loginRequires} ${no}`;
-  }
-  if (server.registration) {
-    systemInformationContents += `${registration} ${yes}`;
-  } else {
-    systemInformationContents += `${registration} ${no}`;
-  }
-  if (filamentManager) {
-    systemInformationContents += `${filamentManagerPlugin} ${yes}\n`;
-  } else {
-    systemInformationContents += `${filamentManagerPlugin} ${no}\n`;
-  }
-  systemInformationContents += "-- History Settings --\n\n";
-  for (const key in history) {
-    if (history.hasOwnProperty(key)) {
-      if (history[key].onComplete) {
-        systemInformationContents += `History ${key} on complete? \n${yes}`;
-      } else {
-        systemInformationContents += `History ${key} on complete? \n${no}`;
-      }
-      if (history[key].onFailure) {
-        systemInformationContents += `History ${key} on failure? \n${yes}`;
-      } else {
-        systemInformationContents += `History ${key} on failure? \n${no}`;
-      }
-      if (history[key]?.deleteAfter) {
-        systemInformationContents += `History ${key} delete after?\n ${yes}`;
-      } else {
-        systemInformationContents += `History ${key} delete after?\n ${no}`;
-      }
+class SystemRunner {
+  static returnInfo(profile = false) {
+    if (profile) {
+      SystemRunner.updateSystemInformation().then((res) => {
+        logger.debug("System successfully profiled", res);
+      });
     }
+    return systemInformationService;
   }
-  systemInformationContents += "\n-- API Settings --\n\n";
-  for (const key in timeout) {
-    if (timeout.hasOwnProperty(key)) {
-      systemInformationContents += `${key}\n${timeout[key]}\n`;
+
+  static async profileCPUUsagePercent() {
+    const CPUPercent = await getCPULoadAVG(1000, 100);
+    logger.debug("Current CPU Usage", { CPUPercent });
+    cpuUsageHistory.push({
+      x: new Date(),
+      y: CPUPercent
+    });
+    if (cpuUsageHistory.length >= 300) {
+      cpuUsageHistory.shift();
     }
   }
 
-  // Replace with printer Overviews
-  systemInformationContents += "\n --- Printer Overview ---\n\n";
-  const printerOverViewTable = [];
-  const printers = getPrinterStoreCache().listPrintersInformation();
-  printerOverViewTable.push([
-    "Printer Name",
-    "OctoPrint Version",
-    "Printer Firmware",
-    "Python Version",
-    "Pip Version",
-    "OS Platform",
-    "Hardware Cores",
-    "Hardware Ram",
-    "Safe Mode"
-  ]);
+  static profileMemoryUsagePercent() {
+    const used = process.memoryUsage();
+    const total = used.heapUsed + used.external;
+    const totalUsed = Math.round((total / 1024 / 1024) * 100) / 100;
 
-  for (let i = 0; i < printers.length; i++) {
-    let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
-    if (!stats) {
-      stats = await generatePrinterStatistics(printers[i]._id);
-      getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
+    if (systemInformationService.totalMemory !== 0) {
+      const totalSystemMemoryInMB =
+        Math.round((systemInformationService.totalMemory / 1024 / 1024) * 100) / 100;
+      const memoryPercent = Math.round((100 * totalUsed) / totalSystemMemoryInMB) / 100;
+      logger.debug("Current Memory Usage", { memoryPercent });
+      memoryUsageHistory.push({
+        x: new Date(),
+        y: memoryPercent
+      });
+      if (memoryUsageHistory.length >= 300) {
+        memoryUsageHistory.shift();
+      }
     }
-    const { printerName, octoPrintVersion, printerFirmware } = printers[i];
-
-    const { octoPrintSystemInfo } = stats;
-    printerOverViewTable.push([
-      printerName,
-      octoPrintVersion ? octoPrintVersion : NO_DATA,
-      printerFirmware ? printerFirmware : NO_DATA,
-      octoPrintSystemInfo?.["env.python.version"]
-        ? octoPrintSystemInfo?.["env.python.version"]
-        : NO_DATA,
-      octoPrintSystemInfo?.["env.python.pip"] ? octoPrintSystemInfo?.["env.python.pip"] : NO_DATA,
-      octoPrintSystemInfo?.["env.os.platform"] ? octoPrintSystemInfo?.["env.os.platform"] : NO_DATA,
-      octoPrintSystemInfo?.["env.hardware.cores"]
-        ? octoPrintSystemInfo?.["env.hardware.cores"]
-        : NO_DATA,
-      octoPrintSystemInfo?.["env.hardware.ram"]
-        ? prettyHelpers.generateBytes(octoPrintSystemInfo?.["env.hardware.ram"])
-        : NO_DATA,
-      octoPrintSystemInfo?.["octoprint.safe_mode"] ? truth : falsth
-    ]);
   }
 
-  systemInformationContents += table(printerOverViewTable);
-
-  const latestTaskState = TaskManager.getTaskState();
-
-  systemInformationContents += "\n--- OctoFarm Tasks ---\n\n";
-  for (let task in latestTaskState) {
-    const theTask = latestTaskState[task];
-    systemInformationContents += theTask?.duration
-      ? `${task}: duration: ${theTask.duration}ms \n`
-      : `${task}: duration: Not completed yet.. \n`;
+  static async initialiseSystemInformation() {
+    await SystemRunner.profileSystem();
   }
 
-  //Health Checks For printers...
-  const healthChecks = returnPrinterHealthChecks(true);
-  const healthCheckTable = [];
-  systemInformationContents += "\n--- Printer Health Checks ---\n\n";
-  healthCheckTable.push([
-    "Date",
-    "Printer Name",
-    "URL Format",
-    "Websocket Format",
-    "Camera URL",
-    "URL Match",
-    "User API Info",
-    "State API Info",
-    "Profile API Info",
-    "Settings API Info",
-    "System API Info",
-    "WebSocket Avg Response",
-    "Saved Baud",
-    "Saved Port",
-    "Saved Profile"
-  ]);
-  for (let i = 0; i < healthChecks.length; i++) {
-    const check = healthChecks[i];
+  // Grab updating information
+  static async updateSystemInformation() {
+    systemInformationService.uptime = process.uptime();
+    systemInformationService.osUptime = os.uptime();
+    const fileSize = await fsSize().catch((error) => logger.error(error));
+    const systemDisk = fileSize[0];
+    systemInformationService.systemDisk = systemDisk;
 
-    healthCheckTable.push([
-      check.dateChecked,
-      check.printerName,
-      check?.printerChecks.printerURL ? truth : falsth,
-      check?.printerChecks.webSocketURL ? truth : falsth,
-      check?.printerChecks.cameraURL ? truth : falsth,
-      check?.printerChecks.match ? truth : falsth,
-      check?.apiChecksRequired.userCheck ? truth : falsth,
-      check?.apiChecksRequired.stateCheck ? truth : falsth,
-      check?.apiChecksRequired.profileCheck ? truth : falsth,
-      check?.apiChecksRequired.settingsCheck ? truth : falsth,
-      check?.apiChecksRequired.systemCheck ? truth : falsth,
-      check?.websocketChecks.lastResponseTimes ? check?.websocketChecks.lastResponseTimes : falsth,
-      check?.connectionChecks.baud ? check?.connectionChecks.baud : falsth,
-      check?.connectionChecks.port ? check?.connectionChecks.port : falsth,
-      check?.connectionChecks.profile ? check?.connectionChecks.profile : falsth
-    ]);
+    systemInformationService.warnings = SystemRunner.getDiskWarnings(systemDisk);
   }
-  systemInformationContents += table(healthCheckTable);
 
-  return systemInformationContents;
+  // Grab one time information
+  static async profileSystem() {
+    await SystemRunner.updateSystemInformation();
+
+    systemInformationService.architecture = process.arch;
+
+    const siTime = time();
+    systemInformationService.timezone = siTime.timezone;
+    systemInformationService.timezoneName = siTime.timezoneName;
+
+    if (farmPiStatus()) {
+      systemInformationService.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
+    } else {
+      systemInformationService.distro = `${os.type()} ${os.release()} (${os.platform()})`;
+    }
+
+    systemInformationService.networkIpAddresses = SystemRunner.getIpAddressList();
+    systemInformationService.totalMemory = os.totalmem();
+
+    systemInformationService.cpuLoadHistory = cpuUsageHistory;
+    systemInformationService.memoryLoadHistory = memoryUsageHistory;
+  }
+
+  static getDiskWarnings(disk) {
+    if (!disk) {
+      return {};
+    }
+
+    if (disk.use >= 99) {
+      return {
+        status: "danger",
+        message: diskRisk
+      };
+    } else if (disk.use >= 95) {
+      return {
+        status: "warning",
+        message: diskAlmostFullWarning
+      };
+    } else if (disk.use >= 90) {
+      return {
+        status: "warning",
+        message: diskVeryFullWarning
+      };
+    }
+    return {};
+  }
+
+  static getIpAddressList() {
+    const nets = os.networkInterfaces();
+    const results = [];
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+        if (net.family === "IPv4" && !net.internal) {
+          results.push(net.address);
+        }
+      }
+    }
+    return results;
+  }
+  /**
+   * Call and collect quite heavy system information queries
+   * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
+   */
+  static async querySystemInfo() {
+    try {
+      await this.queryWithFreshCurrentProcess();
+      const { benchResults, queryResults } = await this.queryStaticBench();
+
+      //This maybe related to node 13.12.0 possibly. Issue #341.
+      const systemDisk = queryResults.fileSize[0];
+      let warnings = this.getDiskWarnings(systemDisk);
+
+      systemInformationService = {
+        cpuCurrentSpeed: queryResults.cpuCurrentSpeed,
+        cpuLoad: queryResults.cpuLoad,
+        memoryInfo: queryResults.memoryInfo,
+        sysUptime: queryResults.sysUptime,
+        processUptime: queryResults.processUptime,
+        // Custom data
+        warnings,
+        osInfo: {
+          arch: process.arch,
+          distro: `${os.type()} ${os.release()} (${os.platform()})`
+        },
+        systemDisk,
+        currentProcess: systemInformationService.currentProcess,
+        benchmarkTimes: benchResults,
+        networkIpAddresses: this.getIpAddressList()
+      };
+
+      if (farmPiStatus()) {
+        systemInformationService.osInfo.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
+      }
+
+      return systemInformationService;
+    } catch (e) {
+      logger.error("Some system information has failed to generate:", e.message);
+
+      return false;
+    }
+  }
 }
 
-/**
- * Generates a txt file containing the current system and octofarm information
- * @throws {Object} If the systemInformationContents doesn't return anything
- */
-async function generateOctoFarmSystemInformationTxt() {
-  let systemInformation = {
-    name: systemInformationFileName,
-    path: join(getLogsPath(), systemInformationFileName)
-  };
-  // Make sure existing zip files have been cleared from the system before continuing.
-  await checkIfFileFileExistsAndDeleteIfSo(systemInformation?.path);
-
-  let systemInformationContents = await generateSystemInformationContents();
-
-  if (!systemInformationContents)
-    throw { status: "error", msg: "Couldn't generate system_information.txt" };
-  await writeFileSync(systemInformation?.path, systemInformationContents);
-
-  return systemInformation;
-}
-
-module.exports = { generateOctoFarmSystemInformationTxt };
+module.exports = {
+  SystemRunner
+};

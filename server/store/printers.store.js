@@ -1,6 +1,6 @@
 const { findIndex, cloneDeep } = require("lodash");
-const { ScriptRunner } = require("../runners/scriptCheck");
-const { PrinterTicker } = require("../runners/printerTicker");
+const { ScriptRunner } = require("../services/local-scripts.service");
+const { PrinterTicker } = require("../services/printer-connection-log.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
@@ -9,7 +9,7 @@ const Filament = require("../models/Filament");
 const { SettingsClean } = require("../services/settings-cleaner.service");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const logger = new Logger("OctoFarm-State");

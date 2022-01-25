@@ -64,6 +64,7 @@ All notable changes to this project will be documented in this file.
   - New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
     purposefully closed.
   - Added git repo information to system page, and also added git check for update commands.
+  - Printer manager now has a ticker for the printer alerts. Displays planned websocket/api scans, octoprint updates, plugin updates and more.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -159,6 +160,7 @@ All notable changes to this project will be documented in this file.
   - Converted to a basic mono-repo to aid in development. Scripts have been created for backwards compatibility with current start instructions.
   - Restart, Check for Update and Update OctoFarm buttons have been moved to the top of the "System" tab on the System page. This is to aid in security and stop users messing with system functions.
   - Changed server API logging over to morgan.
+  - Moved the change background functionality out of client and into Server settings for admins only. 
 
 ### Removed
 
@@ -1160,7 +1162,7 @@ All notable changes to this project will be documented in this file.
 
   - Printer Management, see changed regarding dashboard.
   - History and file statistics from Dashboard.
-  - Removed systemInfo from database, extra uneeded steps as data is all gathered live anyway.
+  - Removed systemInformationService from database, extra uneeded steps as data is all gathered live anyway.
 
 ### Fixed
 

@@ -1,8 +1,8 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureCurrentUserAndGroup } = require("../config/users");
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureCurrentUserAndGroup } = require("../middleware/users");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const HistoryDB = require("../models/History");

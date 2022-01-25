@@ -12,7 +12,7 @@ const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";
-const deprecatedConfigFolder = "../config";
+const deprecatedConfigFolder = "../middleware";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
 const clientPackageJsonPath = path.join(__dirname, "../client/package.json");
@@ -119,7 +119,7 @@ function printInstructionsURL() {
  *
  */
 function removeDeprecatedMongoURIConfigFile() {
-  logger.info("~ Removing deprecated config file 'config/db.js'.");
+  logger.info("~ Removing deprecated middleware file 'middleware/db.js'.");
   fs.rmSync(deprecatedConfigFilePath);
   removeFolderIfEmpty(deprecatedConfigFolder);
 }
@@ -172,7 +172,7 @@ function fetchOctoFarmPort() {
       );
     }
 
-    // Update config immediately
+    // Update middleware immediately
     process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
     port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   }
@@ -199,7 +199,7 @@ function ensureMongoDBConnectionStringSet() {
     const mongoFallbackURI = require(deprecatedConfigFilePath).MongoURI;
     if (!mongoFallbackURI) {
       logger.info(
-        "~ Found deprecated config file 'config/db.js', but the MongoURI variable was not set (or possibly invalid)."
+        "~ Found deprecated middleware file 'middleware/db.js', but the MongoURI variable was not set (or possibly invalid)."
       );
       removeDeprecatedMongoURIConfigFile();
       logger.info(
@@ -211,7 +211,7 @@ function ensureMongoDBConnectionStringSet() {
       // We're not in docker, so we have some patch-work to do.
       removeDeprecatedMongoURIConfigFile();
       logger.info(
-        "~ Found deprecated config file 'config/db.js', performing small migration task to '.env'."
+        "~ Found deprecated middleware file 'middleware/db.js', performing small migration task to '.env'."
       );
       envUtils.writeVariableToEnvFile(
         path.resolve(dotEnvPath),
@@ -223,7 +223,7 @@ function ensureMongoDBConnectionStringSet() {
   } else {
     if (fs.existsSync(deprecatedConfigFilePath)) {
       logger.info(
-        "~ Found deprecated config file 'config/db.js', but it is redundant. Clearing this up for you."
+        "~ Found deprecated middleware file 'middleware/db.js', but it is redundant. Clearing this up for you."
       );
       removeDeprecatedMongoURIConfigFile();
     }
@@ -262,7 +262,7 @@ function ensureLogLevelSet() {
 
 /**
  * Parse and consume the .env file. Validate everything before starting OctoFarm.
- * Later this will switch to parsing a `config.yaml` file.
+ * Later this will switch to parsing a `middleware.yaml` file.
  */
 function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {

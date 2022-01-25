@@ -1,6 +1,3 @@
-import OctoPrintClient from "./octoprint-client.service";
-import OctoFarmClient from "./octofarm-client.service";
-
 let listenersApplied = false;
 
 export default class PrinterPowerService {
@@ -189,79 +186,79 @@ export default class PrinterPowerService {
   }
 
   static async applyBtn(printer) {
-    if (typeof printer?.otherSettings?.system !== "undefined" && !listenersApplied) {
-      if (
-        (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-          printer.otherSettings.system.commands.serverRestartCommand !== null) ||
-        (printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-          printer.otherSettings.system.commands.systemRestartCommand !== null) ||
-        (printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-          printer.otherSettings.system.commands.systemShutdownCommand !== null)
-      ) {
-        if (
-          printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-          printer.otherSettings.system.commands.serverRestartCommand !== null
-        ) {
-          const restartOctoPrint = document.getElementById(
-            "printerRestartOctoPrint-" + printer._id
-          );
-          const divider = document.getElementById("printerDropDownMaker-" + printer._id);
-          if (divider.classList.contains("d-none")) {
-            divider.classList.remove("d-none");
-          }
-          restartOctoPrint.classList.remove("d-none");
-          restartOctoPrint.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "restart");
-          });
-        }
-        if (
-          printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-          printer.otherSettings.system.commands.systemRestartCommand !== null
-        ) {
-          const restartHost = document.getElementById("printerRestartHost-" + printer._id);
-          restartHost.classList.remove("d-none");
-          restartHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "reboot");
-          });
-        }
-
-        if (
-          printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-          printer.otherSettings.system.commands.systemShutdownCommand !== null
-        ) {
-          const shutdownHost = document.getElementById("printerShutdownHost-" + printer._id);
-          shutdownHost.classList.remove("d-none");
-          shutdownHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "shutdown");
-          });
-        }
-        listenersApplied = true;
-      }
-    }
-    if (printer?.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
-      if (printer.powerSettings.powerOnURL !== "") {
-        PrinterPowerService.powerButtons(printer);
-      }
-      if (typeof printer.powerSettings.wol !== "undefined") {
-        if (printer.powerSettings.wol.enabled) {
-          if (
-            printer.powerSettings.wol.ip === "" ||
-            printer.powerSettings.wol.port === "" ||
-            printer.powerSettings.wol.interval === "" ||
-            printer.powerSettings.wol.count === ""
-          ) {
-            console.log("ISSUE WITH WAKE ON LAN SETTINGS");
-          } else {
-            const wakeButton = document.getElementById("printerWakeHost-" + printer._id);
-            if (wakeButton.classList.contains("d-none")) {
-              wakeButton.classList.remove("d-none");
-              wakeButton.addEventListener("click", (e) => {
-                OctoFarmClient.post("printers/wakeHost", printer.powerSettings.wol);
-              });
-            }
-          }
-        }
-      }
-    }
+    // if (typeof printer?.otherSettings?.system !== "undefined" && !listenersApplied) {
+    //   if (
+    //     (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
+    //       printer.otherSettings.system.commands.serverRestartCommand !== null) ||
+    //     (printer.otherSettings.system.commands.systemRestartCommand !== "" &&
+    //       printer.otherSettings.system.commands.systemRestartCommand !== null) ||
+    //     (printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
+    //       printer.otherSettings.system.commands.systemShutdownCommand !== null)
+    //   ) {
+    //     if (
+    //       printer.otherSettings.system.commands.serverRestartCommand !== "" &&
+    //       printer.otherSettings.system.commands.serverRestartCommand !== null
+    //     ) {
+    //       const restartOctoPrint = document.getElementById(
+    //         "printerRestartOctoPrint-" + printer._id
+    //       );
+    //       const divider = document.getElementById("printerDropDownMaker-" + printer._id);
+    //       if (divider.classList.contains("d-none")) {
+    //         divider.classList.remove("d-none");
+    //       }
+    //       restartOctoPrint.classList.remove("d-none");
+    //       restartOctoPrint.addEventListener("click", (event) => {
+    //         OctoPrintClient.system(printer, "restart");
+    //       });
+    //     }
+    //     if (
+    //       printer.otherSettings.system.commands.systemRestartCommand !== "" &&
+    //       printer.otherSettings.system.commands.systemRestartCommand !== null
+    //     ) {
+    //       const restartHost = document.getElementById("printerRestartHost-" + printer._id);
+    //       restartHost.classList.remove("d-none");
+    //       restartHost.addEventListener("click", (event) => {
+    //         OctoPrintClient.system(printer, "reboot");
+    //       });
+    //     }
+    //
+    //     if (
+    //       printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
+    //       printer.otherSettings.system.commands.systemShutdownCommand !== null
+    //     ) {
+    //       const shutdownHost = document.getElementById("printerShutdownHost-" + printer._id);
+    //       shutdownHost.classList.remove("d-none");
+    //       shutdownHost.addEventListener("click", (event) => {
+    //         OctoPrintClient.system(printer, "shutdown");
+    //       });
+    //     }
+    //     listenersApplied = true;
+    //   }
+    // }
+    // if (printer?.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
+    //   if (printer.powerSettings.powerOnURL !== "") {
+    //     PrinterPowerService.powerButtons(printer);
+    //   }
+    //   if (typeof printer.powerSettings.wol !== "undefined") {
+    //     if (printer.powerSettings.wol.enabled) {
+    //       if (
+    //         printer.powerSettings.wol.ip === "" ||
+    //         printer.powerSettings.wol.port === "" ||
+    //         printer.powerSettings.wol.interval === "" ||
+    //         printer.powerSettings.wol.count === ""
+    //       ) {
+    //         console.log("ISSUE WITH WAKE ON LAN SETTINGS");
+    //       } else {
+    //         const wakeButton = document.getElementById("printerWakeHost-" + printer._id);
+    //         if (wakeButton.classList.contains("d-none")) {
+    //           wakeButton.classList.remove("d-none");
+    //           wakeButton.addEventListener("click", (e) => {
+    //             OctoFarmClient.post("printers/wakeHost", printer.powerSettings.wol);
+    //           });
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 }

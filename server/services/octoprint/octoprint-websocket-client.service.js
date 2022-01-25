@@ -7,7 +7,7 @@ const {
   OF_C_DESC,
   PRINTER_STATES
 } = require("../printers/constants/printer-state.constants");
-const { PrinterTicker } = require("../../runners/printerTicker");
+const { PrinterTicker } = require("../printer-connection-log.service");
 const Logger = require("../../handlers/logger");
 const ConnectionMonitorService = require("../../services/connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
@@ -83,7 +83,7 @@ class WebSocketClient {
     );
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
     this.#instance.on("ping", () => {
-      logger.error("PING RECEIVED");
+      logger.debug("PING RECEIVED");
     });
 
     this.#instance.on("pong", () => {
@@ -102,7 +102,7 @@ class WebSocketClient {
           this.id
         );
         ConnectionMonitorService.updateOrAddResponse(
-          this.url + ENDPOINT,
+          this.url,
           REQUEST_TYPE.WEBSOCKET,
           REQUEST_KEYS.TOTAL_PING_PONG
         );

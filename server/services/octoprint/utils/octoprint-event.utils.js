@@ -1,11 +1,11 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const Logger = require("../../../handlers/logger");
-const { PrinterTicker } = require("../../../runners/printerTicker");
-const { SystemRunner } = require("../../../runners/systemInfo");
+const { PrinterTicker } = require("../../printer-connection-log.service");
+const { SystemRunner } = require("../../system-information.service");
 const { AppConstants } = require("../../../app.constants");
-const { ScriptRunner } = require("../../../runners/scriptCheck");
+const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
-const { HistoryCollection } = require("../../../runners/history.runner.js");
+const { HistoryCollection } = require("../../history-capture.service.js");
 
 const logger = new Logger("OctoFarm-State");
 

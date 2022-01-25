@@ -5,7 +5,7 @@ const { createZipFile } = require("../utils/zip.utils.js");
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 const {
   generateOctoFarmSystemInformationTxt
-} = require("./system-information.service.js");
+} = require("./system-information-text-generator.service.js");
 
 // Grab Logs
 class Logs {
@@ -32,8 +32,7 @@ class Logs {
 
     // Generate nice text file of system information
     let octofarmInformationTxt = await generateOctoFarmSystemInformationTxt();
-    if (!octofarmInformationTxt)
-      throw "Couldn't generate octofarms_information.txt file...";
+    if (!octofarmInformationTxt) throw "Couldn't generate octofarms_information.txt file...";
 
     fileList.push(octofarmInformationTxt);
 

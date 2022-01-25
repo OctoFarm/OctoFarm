@@ -3,7 +3,7 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
-const morganMiddleware = require("./config/morgan");
+const morganMiddleware = require("./middleware/morgan");
 const passport = require("passport");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
@@ -14,9 +14,9 @@ const { OctoFarmTasks } = require("./tasks");
 const { optionalInfluxDatabaseSetup } = require("./services/influx-export.service.js");
 const { getViewsPath } = require("./app-env");
 const { SettingsClean } = require("./services/settings-cleaner.service");
-const { TaskManager } = require("./runners/task.manager");
+const { TaskManager } = require("./services/task-manager.service");
 const exceptionHandler = require("./exceptions/exception.handler");
-const swaggerOptions = require("./config/swagger");
+const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./app.constants");
 
 const logger = new Logger("OctoFarm-Server");
@@ -30,12 +30,12 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 function setupExpressServer() {
   let app = express();
 
-  require("./config/passport.js")(passport);
+  require("./middleware/passport.js")(passport);
 
-  //Morgan config
+  //Morgan middleware
   app.use(morganMiddleware);
 
-  // Helmet config. Anymore and would require customising by the user...
+  // Helmet middleware. Anymore and would require customising by the user...
   app.use(helmet.dnsPrefetchControl());
   app.use(helmet.expectCt());
   app.use(helmet.frameguard());

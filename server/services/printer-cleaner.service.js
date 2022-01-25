@@ -3,7 +3,7 @@ const { orderBy } = require("lodash");
 
 const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
-const { PrinterTicker } = require("../runners/printerTicker.js");
+const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
   tempTriggers,

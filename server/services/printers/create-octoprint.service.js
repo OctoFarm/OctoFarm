@@ -25,7 +25,7 @@ const {
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
 const { handleMessage } = require("../octoprint/octoprint-websocket-message.service");
-const { PrinterTicker } = require("../../runners/printerTicker");
+const { PrinterTicker } = require("../printer-connection-log.service");
 const { FileClean } = require("../file-cleaner.service");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");

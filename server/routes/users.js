@@ -9,7 +9,7 @@ const ServerSettingsDB = require("../models/ServerSettings.js");
 
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const {
   fetchUsers,
   createUser,

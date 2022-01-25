@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { stringify } = require("flatted");
 const { SettingsClean } = require("../services/settings-cleaner.service");
 
