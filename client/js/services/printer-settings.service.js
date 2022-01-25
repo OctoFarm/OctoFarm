@@ -107,15 +107,17 @@ class PrinterSettingsService {
     const userDropDown = document.getElementById("psOctoPrintUser");
     userDropDown.innerHTML = "";
     userDropDown.disabled = false;
-    if (currentPrinter?.userList) {
+
+    if (!!currentPrinter?.userList && currentPrinter.userList.length !== 0) {
       userDropDown.innerHTML = "";
       currentPrinter.userList.forEach((user) => {
         userDropDown.insertAdjacentHTML("beforeend", `<option value="${user}">${user}</option>`);
       });
       userDropDown.value = currentPrinter.currentUser;
     } else {
+      console.log("EH")
       userDropDown.disabled = true;
-      userDropDown.insertAdjacentHTML("beforeend", "<option value=\"0\">No users available</option>");
+      userDropDown.insertAdjacentHTML("beforeend", "<option value='0'>No users available</option>");
       userDropDown.value = 0;
     }
 
@@ -857,7 +859,7 @@ class PrinterSettingsService {
   }
 
   static async setupSaveButton(currentPrinter) {
-    console.log(pageElements.menu.printerMenuFooter)
+
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
       "<button id=\"savePrinterSettingsBtn\" type=\"button\" class=\"btn btn-success btn-block\" id=\"savePrinterSettingsBtn\">Save Settings</button>"

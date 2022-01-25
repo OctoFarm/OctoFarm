@@ -15,6 +15,8 @@ const apiSystemCommands = apiSystem + "/commands";
 const apiVersion = apiBase + "/version";
 const apiUsers = apiBase + "/users";
 const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=true" : "");
+const apiProfiles = apiBase + "/printerprofiles/"; //expects a profile id param
+const apiSettings = apiBase + "/settings";
 
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
 const apiPluginManagerRepository1_6_0 = apiBase + "/plugin/pluginmanager";
@@ -134,6 +136,14 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getTimelapses(unrendered = true) {
     return await this.getWithOptionalRetry(apiTimelapse(unrendered), true);
+  }
+
+  async patchProfile(data, profileID) {
+    return await this.patch(apiProfiles + profileID, data);
+  }
+
+  async postSettings(data) {
+    return await this.post(apiSettings, data);
   }
 }
 

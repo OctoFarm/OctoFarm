@@ -169,6 +169,8 @@ All notable changes to this project will be documented in this file.
 - Ping/Pong message on connection log, redundant and ends up flooding the log.
 - Removed Offline count from Current Operations. Feel it's pointless please open an issue if it's required back.
 - state.js - WOOP HAPPY DAYS! Ripped out and gone for good!
+- runners folder - Boom more feel goods!
+- Reset Power Settings Option - No longer needed after settings saving refactor.
 
 ### Fixed
 
@@ -232,6 +234,7 @@ All notable changes to this project will be documented in this file.
   - Fixed File manager been an outright bag of crap. Files now load correctly after commands, instantly too.
   - Fixed Improved the OctoPrint file update grab so it doesn't end up making multiple calls.
   - Fixed Fix an issue with folders not reflecting their state correctly after command in file manager.
+  - Fixed the utter mess of saving printer settings.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

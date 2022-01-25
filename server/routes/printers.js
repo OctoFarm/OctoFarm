@@ -151,8 +151,12 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
   // Check required fields
   const settings = req.body;
   logger.info("Update printers request: ", settings);
-  const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
-  res.send({});
+  try {
+    const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
+    res.send(updateSets);
+  } catch (e) {
+    res.send({ octofarm: 500, profile: 500, settings: 500 });
+  }
 });
 
 router.get("/groups", ensureAuthenticated, async (req, res) => {

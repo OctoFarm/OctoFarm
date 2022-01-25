@@ -195,32 +195,6 @@ class OctoprintApiService {
       timeout ? this.#currentTimeout : false,
       data
     );
-    // const endTime = ConnectionMonitorService.stopTimer();
-    //
-    // ConnectionMonitorService.updateOrAddResponse(
-    //   printerURL,
-    //   REQUEST_TYPE.POST,
-    //   REQUEST_KEYS.LAST_RESPONSE,
-    //   ConnectionMonitorService.calculateTimer(startTime, endTime)
-    // );
-    //
-    // if (
-    //   response?.status >= ACCEPTABLE_STATUS_CODES[0] &&
-    //   response?.status <= ACCEPTABLE_STATUS_CODES[1]
-    // ) {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.POST,
-    //     REQUEST_KEYS.SUCCESS_RESPONSE
-    //   );
-    // } else {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.POST,
-    //     REQUEST_KEYS.FAILED_RESPONSE
-    //   );
-    // }
-    // return response;
   }
 
   /**
@@ -232,32 +206,6 @@ class OctoprintApiService {
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
     return await fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false);
-
-    // const endTime = ConnectionMonitorService.stopTimer();
-    // ConnectionMonitorService.updateOrAddResponse(
-    //   printerURL,
-    //   REQUEST_TYPE.POST,
-    //   REQUEST_KEYS.LAST_RESPONSE,
-    //   ConnectionMonitorService.calculateTimer(startTime, endTime)
-    // );
-    //
-    // if (
-    //   response?.status >= ACCEPTABLE_STATUS_CODES[0] &&
-    //   response?.status <= ACCEPTABLE_STATUS_CODES[1]
-    // ) {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.GET,
-    //     REQUEST_KEYS.SUCCESS_RESPONSE
-    //   );
-    // } else {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.GET,
-    //     REQUEST_KEYS.FAILED_RESPONSE
-    //   );
-    // }
-    // return response;
   }
 
   /**
@@ -270,31 +218,6 @@ class OctoprintApiService {
   patch(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
     return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data);
-    // const endTime = ConnectionMonitorService.stopTimer();
-    // ConnectionMonitorService.updateOrAddResponse(
-    //   printerURL,
-    //   REQUEST_TYPE.POST,
-    //   REQUEST_KEYS.LAST_RESPONSE,
-    //   ConnectionMonitorService.calculateTimer(startTime, endTime)
-    // );
-    //
-    // if (
-    //   response?.status >= ACCEPTABLE_STATUS_CODES[0] &&
-    //   response?.status <= ACCEPTABLE_STATUS_CODES[1]
-    // ) {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.PATCH,
-    //     REQUEST_KEYS.SUCCESS_RESPONSE
-    //   );
-    // } else {
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     printerURL,
-    //     REQUEST_TYPE.PATCH,
-    //     REQUEST_KEYS.FAILED_RESPONSE
-    //   );
-    // }
-    // return response;
   }
 
   // /**

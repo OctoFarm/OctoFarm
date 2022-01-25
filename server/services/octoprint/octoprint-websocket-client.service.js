@@ -450,9 +450,10 @@ class WebSocketClient {
     return true;
   }
 
-  resetSocketConnection(newURL, newSession) {
+  resetSocketConnection(newURL, newSession, currentUser) {
     this.url = newURL;
     this.sessionKey = newSession;
+    this.currentUser = currentUser;
     this.terminate();
   }
 

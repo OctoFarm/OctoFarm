@@ -422,8 +422,12 @@ class PrinterStore {
   }
 
   async updatePrinterSettings(settings) {
-    const reConnectRequired = [];
     const newOctoPrintSettings = {};
+    let octoPrintProfiles = {};
+
+    let octofarmCheck = 900;
+    let profileCheck = 900;
+    let settingsCheck = 900;
 
     const {
       printer,
@@ -437,6 +441,13 @@ class PrinterStore {
       other
     } = settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+    const originalPrinter = this.#findMePrinter(index);
+
+    if (!!currentUser && currentUser !== originalPrinter.currentUser) {
+      this.updatePrinterDatabase(index, {
+        currentUser: currentUser
+      });
+    }
 
     // Deal with OctoFarm connection information updates
     const octoFarmConnectionSettings = {
@@ -451,15 +462,6 @@ class PrinterStore {
 
     // Update OctoFarms data
     this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
-
-    const originalPrinter = this.#findMePrinter(index);
-    if (!!currentUser && currentUser !== originalPrinter.currentUser) {
-      this.updatePrinterDatabase(index, {
-        currentUser: currentUser
-      });
-      this.resetConnectionInformation([index]);
-      reConnectRequired.push(index);
-    }
 
     const { preferredPort, preferredBaud, preferredProfile } = connection;
     // Connection is always sent so can just update.
@@ -577,7 +579,7 @@ class PrinterStore {
         profiles: originalPrinter.profiles
       });
 
-      newOctoPrintSettings.profiles = originalPrinter.profiles;
+      octoPrintProfiles = originalPrinter.profiles;
     }
 
     const {
@@ -733,411 +735,76 @@ class PrinterStore {
       };
     }
 
-    console.log(other);
+    const {
+      enableCamera,
+      rotateCamera,
+      flipHCamera,
+      flipVCamera,
+      enableTimeLapse,
+      heatingVariation,
+      coolDown
+    } = other;
 
-    //TODO Clean printers information...
-    return {};
+    if (
+      !!enableCamera ||
+      !!rotateCamera ||
+      !!flipHCamera ||
+      !!flipVCamera ||
+      !!enableTimeLapse ||
+      !!heatingVariation ||
+      coolDown
+    ) {
+      const tempTriggers = {
+        ...(!!heatingVariation
+          ? { heatingVariation: parseInt(heatingVariation) }
+          : { heatingVariation: originalPrinter?.tempTriggers?.heatingVariation }),
+        ...(!!coolDown
+          ? { coolDown: parseInt(coolDown) }
+          : { coolDown: originalPrinter?.tempTriggers?.coolDown })
+      };
+      const settingsWebcam = {
+        bitrate: originalPrinter.settingsWebcam.bitrate,
+        ffmpegPath: originalPrinter.settingsWebcam.ffmpegPath,
+        ffmpegThreads: originalPrinter.settingsWebcam.ffmpegThreads,
+        ffmpegVideoCodec: originalPrinter.settingsWebcam.ffmpegVideoCodec,
+        flipH: flipHCamera,
+        flipV: flipVCamera,
+        rotate90: rotate90,
+        snapshotSslValidation: originalPrinter.settingsWebcam.snapshotSslValidation,
+        snapshotTimeout: originalPrinter.settingsWebcam.snapshotTimeout,
+        snapshotUrl: originalPrinter.settingsWebcam.snapshotUrl,
+        streamRatio: originalPrinter.settingsWebcam.streamRatio,
+        streamTimeout: originalPrinter.settingsWebcam.streamTimeout,
+        streamUrl: originalPrinter.settingsWebcam.streamUrl,
+        timelapseEnabled: enableTimeLapse,
+        watermark: originalPrinter.settingsWebcam.watermark,
+        webcamEnabled: enableCamera
+      };
+
+      this.updatePrinterDatabase(index, {
+        tempTriggers: tempTriggers,
+        settingsWebcam: settingsWebcam
+      });
+
+      newOctoPrintSettings.webcam = settingsWebcam;
+    }
+
+    originalPrinter.cleanPrintersInformation();
+
+    await originalPrinter.updateOctoPrintProfileData(octoPrintProfiles[profileID]);
+    await originalPrinter.updateOctoPrintSettingsData(newOctoPrintSettings);
+
+    await Promise.allSettled([
+      originalPrinter.acquireOctoPrintProfileData(true),
+      originalPrinter.acquireOctoPrintSettingsData(true),
+      originalPrinter.acquireOctoPrintSystemInfoData(true),
+      originalPrinter.acquireOctoPrintUpdatesData(true),
+      originalPrinter.acquireOctoPrintPluginsListData(true)
+    ]);
+
+    return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
 
     // Refresh OctoPrint Updates
-
-    // logger.info("Attempting to save: ", settings);
-    //
-    // function difference(object, base) {
-    //   function changes(object, base) {
-    //     try {
-    //       return _.transform(object, function (result, value, key) {
-    //         if (!_.isEqual(value, base[key])) {
-    //           result[key] =
-    //               _.isObject(value) && _.isObject(base[key])
-    //                   ? changes(value, base[key])
-    //                   : value;
-    //         }
-    //       });
-    //     } catch (e) {
-    //       logger.error("Error detecting changes", e);
-    //     }
-    //   }
-    //
-    //   try {
-    //     return changes(object, base);
-    //   } catch (e) {
-    //     logger.error("Error detecting changes", e);
-    //   }
-    // }
-    //
-    // try {
-    //   const printer = await Printers.findById(settings.printer.index);
-    //   const index = _.findIndex(farmPrinters, function (o) {
-    //     return o._id == settings.printer.index;
-    //   });
-    //   let updatePrinter = false;
-    //   if (
-    //       settings.printer.printerName !== "" &&
-    //       settings.printer.printerName !==
-    //       farmPrinters[index].settingsAppearance.name
-    //   ) {
-    //     farmPrinters[index].settingsAppearance.name =
-    //         settings.printer.printerName;
-    //     printer.settingsAppearance.name = settings.printer.printerName;
-    //     printer.markModified("settingsApperance");
-    //     updatePrinter = true;
-    //   } else {
-    //   }
-    //   let profile = {};
-    //   let sett = {};
-    //   profile.status = 900;
-    //   sett.status = 900;
-    //   if (
-    //       settings.printer.printerURL !== "" &&
-    //       settings.printer.printerURL !== farmPrinters[index].printerURL
-    //   ) {
-    //     farmPrinters[index].printerURL = settings.printer.printerURL;
-    //     printer.printerURL = settings.printer.printerURL;
-    //     printer.markModified("printerURL");
-    //     updatePrinter = true;
-    //   }
-    //   if (
-    //       settings.printer.cameraURL !== "" &&
-    //       settings.printer.cameraURL !== farmPrinters[index].camURL
-    //   ) {
-    //     farmPrinters[index].camURL = settings.printer.cameraURL;
-    //     printer.camURL = settings.printer.cameraURL;
-    //     printer.markModified("camURL");
-    //   }
-    //   if (
-    //       settings.printer.apikey !== "" &&
-    //       settings.printer.apikey !== farmPrinters[index].apikey
-    //   ) {
-    //     farmPrinters[index].apikey = settings.printer.apikey;
-    //     printer.apikey = settings.printer.apikey;
-    //     printer.markModified("apikey");
-    //     updatePrinter = true;
-    //   }
-    //   // Preferred Only update on live
-    //   farmPrinters[index].options.baudratePreference =
-    //       settings.connection.preferredBaud;
-    //   farmPrinters[index].options.portPreference =
-    //       settings.connection.preferredPort;
-    //   farmPrinters[index].options.printerProfilePreference =
-    //       settings.connection.preferredProfile;
-    //
-    //   if (
-    //       typeof settings.other !== "undefined" &&
-    //       settings.other.coolDown != ""
-    //   ) {
-    //     farmPrinters[index].tempTriggers.coolDown = parseInt(
-    //         settings.other.coolDown
-    //     );
-    //     printer.tempTriggers.coolDown = parseInt(settings.other.coolDown);
-    //     printer.markModified("tempTriggers");
-    //   }
-    //   if (
-    //       typeof settings.other !== "undefined" &&
-    //       settings.other.heatingVariation != ""
-    //   ) {
-    //     farmPrinters[index].tempTriggers.heatingVariation = parseFloat(
-    //         settings.other.heatingVariation
-    //     );
-    //     printer.tempTriggers.heatingVariation = parseFloat(
-    //         settings.other.heatingVariation
-    //     );
-    //     printer.markModified("tempTriggers");
-    //   }
-    //   for (const key in settings.costSettings) {
-    //     if (!_.isNull(settings.costSettings[key])) {
-    //       farmPrinters[index].costSettings[key] = settings.costSettings[key];
-    //       printer.costSettings[key] = settings.costSettings[key];
-    //     }
-    //   }
-    //
-    //   printer.markModified("costSettings");
-    //   let differences = difference(
-    //       settings.costSettings,
-    //       farmPrinters[index].costSettings
-    //   );
-    //
-    //   for (const key in differences) {
-    //     if (differences[key] !== null && differences[key] !== "") {
-    //       farmPrinters[index].costSettings[key] = differences[key];
-    //       printer.costSettings[key] = differences[key];
-    //     }
-    //   }
-    //
-    //   if (
-    //       settings.powerCommands.powerOnCommand !== "" &&
-    //       settings.powerCommands.powerOnCommand !==
-    //       farmPrinters[index].powerSettings.powerOnCommand
-    //   ) {
-    //     farmPrinters[index].powerSettings.powerOnCommand =
-    //         settings.powerCommands.powerOnCommand;
-    //     printer.powerSettings.powerOnCommand =
-    //         settings.powerCommands.powerOnCommand;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerOnURL !== "" &&
-    //       settings.powerCommands.powerOnURL !==
-    //       farmPrinters[index].powerSettings.powerOnURL
-    //   ) {
-    //     farmPrinters[index].powerSettings.powerOnURL =
-    //         settings.powerCommands.powerOnURL;
-    //     printer.powerSettings.powerOnURL = settings.powerCommands.powerOnURL;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerOffCommand !== "" &&
-    //       settings.powerCommands.powerOffCommand !==
-    //       farmPrinters[index].powerSettings.powerOffCommand
-    //   ) {
-    //     farmPrinters[index].powerSettings.powerOffCommand =
-    //         settings.powerCommands.powerOffCommand;
-    //     printer.powerSettings.powerOffCommand =
-    //         settings.powerCommands.powerOffCommand;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerOffURL !== "" &&
-    //       settings.powerCommands.powerOffURL !==
-    //       farmPrinters[index].powerSettings.powerOffURL
-    //   ) {
-    //     printer.powerSettings.powerOffURL = settings.powerCommands.powerOffURL;
-    //     farmPrinters[index].powerSettings.powerOffURL =
-    //         settings.powerCommands.powerOffURL;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerToggleCommand !== "" &&
-    //       settings.powerCommands.powerToggleCommand !==
-    //       farmPrinters[index].powerSettings.powerToggleCommand
-    //   ) {
-    //     printer.powerSettings.powerToggleCommand =
-    //         settings.powerCommands.powerToggleCommand;
-    //     farmPrinters[index].powerSettings.powerToggleCommand =
-    //         settings.powerCommands.powerToggleCommand;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerToggleURL !== "" &&
-    //       settings.powerCommands.powerToggleURL !==
-    //       farmPrinters[index].powerSettings.powerToggleURL
-    //   ) {
-    //     printer.powerSettings.powerToggleURL =
-    //         settings.powerCommands.powerToggleURL;
-    //     farmPrinters[index].powerSettings.powerToggleURL =
-    //         settings.powerCommands.powerToggleURL;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerStatusCommand !== "" &&
-    //       settings.powerCommands.powerStatusCommand !==
-    //       farmPrinters[index].powerSettings.powerStatusCommand
-    //   ) {
-    //     farmPrinters[index].powerSettings.powerStatusCommand =
-    //         settings.powerCommands.powerStatusCommand;
-    //     printer.powerSettings.powerStatusCommand =
-    //         settings.powerCommands.powerStatusCommand;
-    //   }
-    //   if (
-    //       settings.powerCommands.powerStatusURL !== "" &&
-    //       settings.powerCommands.powerStatusURL !==
-    //       farmPrinters[index].powerSettings.powerStatusURL
-    //   ) {
-    //     farmPrinters[index].powerSettings.powerStatusURL =
-    //         settings.powerCommands.powerStatusURL;
-    //     printer.powerSettings.powerStatusURL =
-    //         settings.powerCommands.powerStatusURL;
-    //   }
-    //   if (settings.powerCommands.wol.enabled) {
-    //     farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
-    //   }
-    //
-    //   logger.info("Live power settings", farmPrinters[index].powerSettings);
-    //   logger.info("Database power settings", printer.powerSettings);
-    //
-    //   printer.markModified("powerSettings");
-    //
-    //   if (settings.systemCommands.serverRestart !== "") {
-    //     farmPrinters[index].settingsServer.commands.serverRestartCommand =
-    //         settings.systemCommands.serverRestart;
-    //   } else {
-    //     settings.systemCommands.serverRestart =
-    //         farmPrinters[index].settingsServer.commands.serverRestartCommand;
-    //   }
-    //   if (settings.systemCommands.systemRestart !== "") {
-    //     farmPrinters[index].settingsServer.commands.systemRestartCommand =
-    //         settings.systemCommands.systemRestart;
-    //   } else {
-    //     settings.systemCommands.systemRestart =
-    //         farmPrinters[index].settingsServer.commands.systemRestartCommand;
-    //   }
-    //   if (settings.systemCommands.systemShutdown !== "") {
-    //     farmPrinters[index].settingsServer.commands.systemShutdownCommand =
-    //         settings.systemCommands.systemShutdown;
-    //   } else {
-    //     settings.systemCommands.systemShutdown =
-    //         farmPrinters[index].settingsServer.commands.systemShutdownCommand;
-    //   }
-    //   logger.info(
-    //       "OctoPrint power settings: ",
-    //       farmPrinters[index].systemCommands
-    //   );
-    //
-    //   printer.save().catch((e) => {
-    //     logger.error(JSON.stringify(e), "ERROR savin power settings.");
-    //   });
-    //   if (settings.state !== "Offline") {
-    //     // Gocde update printer and Live
-    //     let updateOctoPrintGcode = {};
-    //     for (const key in settings.gcode) {
-    //       if (settings.gcode[key].length !== 0) {
-    //         updateOctoPrintGcode[key] = settings.gcode[key];
-    //         farmPrinters[index].settingsScripts.gcode[key] =
-    //             settings.gcode[key];
-    //       }
-    //     }
-    //     const opts = {
-    //       settingsAppearance: {
-    //         name: farmPrinters[index].settingsAppearance.name,
-    //       },
-    //       scripts: {
-    //         gcode: updateOctoPrintGcode,
-    //       },
-    //       serial: {
-    //         port: settings.connection.preferredPort,
-    //         baudrate: settings.connection.preferredBaud,
-    //       },
-    //       server: {
-    //         commands: {
-    //           systemShutdownCommand: settings.systemCommands.systemShutdown,
-    //           systemRestartCommand: settings.systemCommands.systemRestart,
-    //           serverRestartCommand: settings.systemCommands.serverRestart,
-    //         },
-    //       },
-    //       webcam: {
-    //         webcamEnabled: settings.other.enableCamera,
-    //         timelapseEnabled: settings.other.enableTimeLapse,
-    //         rotate90: settings.other.rotateCamera,
-    //         flipH: settings.other.flipHCamera,
-    //         flipV: settings.other.flipVCamera,
-    //       },
-    //     };
-    //
-    //     const removeObjectsWithNull = (obj) => {
-    //       return _(obj)
-    //           .pickBy(_.isObject) // get only objects
-    //           .mapValues(removeObjectsWithNull) // call only for values as objects
-    //           .assign(_.omitBy(obj, _.isObject)) // save back result that is not object
-    //           .omitBy(_.isNil) // remove null and undefined from object
-    //           .value(); // get value
-    //     };
-    //
-    //     let cleanProfile = removeObjectsWithNull(opts);
-    //
-    //     profile = await fetch(
-    //         `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
-    //         {
-    //           method: "PATCH",
-    //           headers: {
-    //             "Content-Type": "application/json",
-    //             "X-Api-Key": farmPrinters[index].apikey,
-    //           },
-    //           body: JSON.stringify({ profile: cleanProfile }),
-    //         }
-    //     );
-    //
-    //     // Update octoprint profile...
-    //     sett = await fetch(`${farmPrinters[index].printerURL}/api/settings`, {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         "X-Api-Key": farmPrinters[index].apikey,
-    //       },
-    //       body: JSON.stringify(opts),
-    //     });
-    //   }
-    //
-    //   await Runner.getProfile(settings.printer.index);
-    //   await Runner.getSettings(settings.printer.index);
-    //   await Runner.getOctoPrintSystenInfo(settings.printer.index);
-    //   Runner.getOctoPrintSystenInfo(settings.printer.index);
-    //   Runner.getUpdates(settings.printer.index);
-    //   Runner.getPluginList(settings.printer.index);
-    //   PrinterClean.generate(
-    //       farmPrinters[index],
-    //       systemSettings.filamentManager
-    //   );
-    //   // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
-    //   //
-    //   // console.log()
-    //   //
-    //   // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
-    //   // farmPrinters[i].settingsAppearance.name = opts.appearance.name;
-    //   // farmPrinters[i].settingsWebcam = opts.webcam;
-    //   // farmPrinters[i].camURL = opts.camURL;
-    //   // let printer = await Printers.findOne({ index: i });
-    //   // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
-    //   // printer.camURL = farmPrinters[i].camURL;
-    //   // printer.settingsApperarance.name = farmPrinters[i].settingsAppearance.name;
-    //   // printer.save();
-    //   if (updatePrinter) {
-    //     Runner.reScanOcto(farmPrinters[index]._id, false);
-    //   }
-    //   return {
-    //     status: {
-    //       octofarm: 200,
-    //       profile: profile.status,
-    //       settings: sett.status,
-    //     },
-    //     printer,
-    //   };
-    // } catch (e) {
-    //   logger.error("ERROR updating printer ", JSON.stringify(e.message));
-    //   return {
-    //     status: { octofarm: 400, profile: 900, settings: 900 },
-    //   };
-    // }
-  }
-
-  resetPrintersSocketConnections(idList) {
-    idList.forEach((id) => {
-      const printer = this.#findMePrinter(id);
-      printer.resetSocketConnection();
-    });
-  }
-
-  async generatePrinterConnectionLogs(id) {
-    const printer = this.#findMePrinter(id);
-    return await PrinterClean.generateConnectionLogs(printer);
-  }
-
-  listAllOctoPrintVersions() {
-    const printers = this.listPrintersInformation();
-
-    const versionArray = [];
-
-    printers.forEach((printer) => {
-      if (!!printer?.octoPrintVersion && !versionArray.includes(printer.octoPrintVersion))
-        versionArray.push(printer.octoPrintVersion);
-    });
-    return versionArray;
-  }
-
-  listUniqueFiles() {
-    const printers = this.listPrintersInformation();
-
-    const filePathsArray = [];
-
-    for (let f = 0; f < printers.length; f++) {
-      const fileList = printers[f]?.fileList?.fileList;
-      if (fileList) {
-        for (let p = 0; p < fileList.length; p++) {
-          const index = findIndex(filePathsArray, function (o) {
-            return o.display == fileList[p].display;
-          });
-          if (index === -1) {
-            filePathsArray.push({
-              name: fileList[p].name,
-              display: fileList[p].display
-            });
-          }
-        }
-      }
-    }
-    return filePathsArray;
   }
 
   listUniqueFolderPaths() {

@@ -889,7 +889,8 @@ class OctoPrintPrinter {
       const userList = userJson.users;
 
       // If we have no idea who the user is then
-      if (!this?.currentUser || this.userList.length === 0 || force) {
+      if (!this?.currentUser || force) {
+        console.log(isEmpty(userList));
         if (isEmpty(userList)) {
           //If user list is empty then we can assume that an admin user is only one available.
           //Only relevant for OctoPrint < 1.4.2.
@@ -1597,6 +1598,20 @@ class OctoPrintPrinter {
     }
   }
 
+  async updateOctoPrintProfileData(profile, profileID) {
+    this.#apiPrinterTickerWrap("Updating OctoPrint profile data", "Info");
+    return await this.#api.patchProfile(profile, profileID).catch(() => {
+      return 900;
+    });
+  }
+
+  async updateOctoPrintSettingsData(settings) {
+    this.#apiPrinterTickerWrap("Updating OctoPrint settings data", "Info");
+    return await this.#api.postSettings(settings).catch(() => {
+      return 900;
+    });
+  }
+
   updateStateTrackingCounters(counter, value) {
     const allowedCounters = [CATEGORIES.IDLE, CATEGORIES.ACTIVE, CATEGORIES.OFFLINE];
 
@@ -1747,7 +1762,24 @@ class OctoPrintPrinter {
     }
   }
 
-  cleanPrintersInformation() {}
+  cleanPrintersInformation() {
+    this.otherSettings = PrinterClean.sortOtherSettings(
+      this.tempTriggers,
+      this.settingsWebcam,
+      this.settingsServer
+    );
+    this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+
+    this.currentConnection = PrinterClean.sortConnection(this.current);
+
+    this.connectionOptions = PrinterClean.sortOptions(this.options);
+
+    this.gcodeScripts = PrinterClean.sortGCODE(this.settingsScripts);
+
+    this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+
+    this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+  }
 }
 
 module.exports = {
