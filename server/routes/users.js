@@ -3,7 +3,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ClientSettings = require("../models/ClientSettings.js");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 const { SettingsClean } = require("../services/settings-cleaner.service");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 

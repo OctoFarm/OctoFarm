@@ -17,7 +17,7 @@ const { SettingsClean } = require("./services/settings-cleaner.service");
 const { TaskManager } = require("./services/task-manager.service");
 const exceptionHandler = require("./exceptions/exception.handler");
 const swaggerOptions = require("./middleware/swagger");
-const { AppConstants } = require("./app.constants");
+const { AppConstants } = require("./constants/app.constants");
 
 const logger = new Logger("OctoFarm-Server");
 

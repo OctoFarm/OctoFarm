@@ -1,4 +1,4 @@
-const { AppConstants } = require("../../app.constants");
+const { AppConstants } = require("../../constants/app.constants");
 const githubClientService = jest.createMockFromModule("../github-client.service");
 
 /**

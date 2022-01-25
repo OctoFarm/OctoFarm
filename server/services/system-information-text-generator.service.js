@@ -10,7 +10,7 @@ const { getUpdateNotificationIfAny } = require("./octofarm-update.service.js");
 
 const { SystemRunner } = require("./system-information.service.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
 const { SettingsClean } = require("./settings-cleaner.service");
 

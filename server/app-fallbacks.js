@@ -2,7 +2,7 @@ const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
 const flash = require("connect-flash");
-const { AppConstants } = require("./app.constants");
+const { AppConstants } = require("./constants/app.constants");
 const dotenv = require("dotenv");
 const path = require("path");
 

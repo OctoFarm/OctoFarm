@@ -6,7 +6,7 @@ const Logger = require("../handlers/logger.js");
 const ServerSettingsDB = require("../models/ServerSettings");
 const isDocker = require("is-docker");
 const envUtils = require("../utils/env.utils");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 const { fetchMongoDBConnectionString } = require("../app-env");
 const { SystemCommands } = require("../services/server-commands.service.js");
 

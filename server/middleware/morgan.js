@@ -1,7 +1,7 @@
 const morgan = require("morgan");
 
 const Logger = require("../handlers/logger");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 
 const logger = new Logger("OctoFarm-API");
 

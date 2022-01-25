@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-let patreonData = require("../patreon.constants");
+let patreonData = require("../constants/patreon.constants");
 const Logger = require("../handlers/logger");
 
 const logger = new Logger("OctoFarm-Server");

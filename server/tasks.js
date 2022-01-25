@@ -1,7 +1,7 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./services/filament-cleaner.service");
 const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
-const { TaskPresets } = require("./task.presets");
+const { TaskPresets } = require("./constants/task.constants");
 const { SystemRunner } = require("./services/system-information.service");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
