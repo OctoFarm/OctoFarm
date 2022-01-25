@@ -153,8 +153,10 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
   logger.info("Update printers request: ", settings);
   try {
     const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
-    res.send(updateSets);
+    console.log(updateSets);
+    res.send({ status: updateSets });
   } catch (e) {
+    logger.error("Couldn't update settings...", e.message);
     res.send({ octofarm: 500, profile: 500, settings: 500 });
   }
 });
