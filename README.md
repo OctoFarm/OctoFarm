@@ -32,7 +32,6 @@
 - [About the Project](#about-the-project)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
@@ -47,26 +46,32 @@ it will scan and keep you up to date on the status of your printers.
 ## Prerequisites
 
 In order to have OctoFarm running using a local installation of NodeJS and MongoDB as database, please be aware of the following minimum version requirements:
-- [MongoDB](https://www.mongodb.com/) - v3.6+
-- [NodeJS](https://nodejs.org/) - v14.0.0 (Latest tested: v14.16.0)
-- [NPM](https://www.npmjs.com/) - v6.10.0+ (Latest tested: v7.6.3)
-- [OctoPrint](https://octoprint.org) - v1.3.9+
+- [MongoDB](https://www.mongodb.com/) - v3.6+ (Latest test: V4.4)
+- [NodeJS](https://nodejs.org/) - v14.0.0 (Latest tested: v14.16.1)
+- [NPM](https://www.npmjs.com/) - v6.10.0+ (Latest tested: v7.17.0)
+- [OctoPrint](https://octoprint.org) - v1.4.2+ (Tested with: 1.4.2, 1.5.3, 1.6.1, 1.7.1)
 
 ### OS / Platform for OctoFarm
 Confirmed working on:
+- Windows 10/11 (direct or with chocolatey)
+> Find the chocolatey package here: https://community.chocolatey.org/packages/octofarm 
+> This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2  
 - Linux (Ubuntu, Debian)
-- RaspberryPi (Rasbian, Raspberry Pi Lite OS)
-- Windows 10
+- FarmPi (Raspberry Pi 3A+ or newer)
+> Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
 
 Should also work on but not tested:
 - MacOS
 - _Anything else NodeJS 14+ will run on._
 
-_Note_: Raspberry Pi's Raspbian is 32 bits. In that case choose to upgrade to 64-bits Raspberry Pi Lite OS or find yourself a 32 bits MongoDB installation. Alternatively you can choose to run MongoDB on another machine.
+Avoid the following, known to be tough to get working: 
+- Raspberry Pi OS - go for the **FarmPi Ubuntu** image instead (https://github.com/mkevenaar/FarmPi/releases/latest)!
+
+_Note_: Raspberry Pi's OS must be the 64-bit version to work. Both the docker containers as well as direct install is hard to get working. The docker containers seem to fail on wrong architecture and direct install fails on a 64 bits MongoDB requirement. 
 
 ### Important note OctoPrint 1.4.1+
 
-<span style="color:red">Avoid using a **Global API Key!**</span><br/>
+<span style="color:red">Do not use the **Global API Key!**</span><br/>
 <span style="color:lime">Generate an **Application** or **User API Key!**</span><br/>
 
 OctoPrint WebSocket connection **will fail** when providing the **Global API** Key and **OctoFarm will therefore not accept this type of OctoPrint key**. You must generate an **Application Key** or **User API key** from your OctoPrint account. Your logged in user requires the groups **Admin** and **Operator** (or simply all permissions), or we cannot guarantee a 100% succesful OctoFarm experience.
@@ -86,10 +91,8 @@ Please choose the direct NodeJS installation or the Docker image.
 2) Docker image(s) [docker or docker-compose usage instructions](./docs/USING_DOCKER.md)
 3) Installation for Development (Node 14+, Nodemon)
 
-### Installation - for Development only!
+### Development Installation for the server.
 _This is for devs or testers only! It is not practical to use `nodemon` for normal usage as `nodemon` does not add a service like `pm2` (option 1) or `docker` (option 1 and 2). Please, if you are a normal user, check out [OctoFarm.net installation instructions](https://octofarm.net/installation) instead!_
-
-So nice that you want to test or develop OctoFarm!
 
 1. Clone the OctoFarm
 
@@ -100,62 +103,29 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 2. Install NPM packages
 
 ```sh
-npm install
+npm server-install
 ```
 
-3. Create an .env file with the MONGO variable:
-
-```
-MONGO=mongodb://127.0.0.1:27017/octofarm
-```
-
-3a. Custom MongoDB parameters, like from a `docker-compose.yml` file. In that case, see [docker or docker-compose usage instructions](./docs/USING_DOCKER.md) but we do expect you to be able to adapt what is needed.
-
-```
-# Docker alternative
-MONGO=mongodb://mongo_compose_service_name_here:compose_exposed_port_here/octofarm
-```
-
-3b. OR **if you have a password or other different parameters** (credentials, host, port or authSource):
-
-```
-MONGO=mongodb://USERNAME:PASSWORD@HOST:PORT/octofarm?authSource=admin
-```
-
-4. Install nodemon
+3. Start the server
 
 ```sh
-npm install --save-dev nodemon
-```
-
-5. Start the system
-
-```sh
-npm run dev
+npm run server-dev
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
-- The developer version will skip some basic sanity checks, if your pages don't load right after server boot then it's
-  because those sanity checks haven't finished.
 
-## Contributing
-The awesome project OctoFarm needs extra contributors to move even faster! If you feel like you have what it takes, and want to join the fun please head over to discord with
-the following link: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks!
+### Development Installation for the client.
+_If your making changes to the client then you will need to build this manually._
 
-### Work on version 1.1.x
-Version 1.1.x is our current OctoFarm release on the `development` branch. This has the following specs:
-- NodeJS 14+ (version 12 was dropped to support better syntax like the optional chaining operator `?`)
-- ExpressJS with `ejs` and `ejs-express-layouts`
-- Mongoose and MongoDB
+1. Install NPM packages
 
-We are working hard to prepare version 1.1.x for the upgrade to a newer Typescripty OctoFarm in version 2.0! Continue reading for that version below.
+```sh
+npm client-install
+```
 
-### Work on version 2.0
-Version 2.0 is underway on the `alpha-2x` branch. This will have the following specs:
-- Node 14+ support
-- NestJS backend with Typescript
-- TypeORM database Object-Relational Mapper with Typescript
-- SQLite (instead of MongoDB)
-- (Optional) VueJS client is introduced
+2. Start the client development file watcher
+```sh
+npm run client-dev
+```
 
 ## License
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
@@ -171,9 +141,6 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
   of Gina and everyone who helps out with that.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - [James Mackay (NotExpectedYet)](https://github.com/NotExpectedYet) - The spirit and creator of OctoFarm!
-- [David Zwart (davidzwa)](https://github.com/davidzwa) - Big help for the massive push from him to get V2 underway.
-  Brought a lot of knowledge to the table that I was lacking.
-- The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.
