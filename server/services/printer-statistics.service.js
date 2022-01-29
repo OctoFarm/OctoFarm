@@ -54,6 +54,9 @@ const generatePrinterStatistics = async (id) => {
   let historyWeekly = [];
 
   // Create the statistics object to be sent back to client
+
+  console.log("STSTISTICS GENERATE", printer.octoPrintSystemInfo);
+
   let printerStatistics = {
     printerName: printer.printerName,
     timeTotal: dateDifference,

@@ -1272,6 +1272,7 @@ class OctoPrintPrinter {
     }
     this.#apiPrinterTickerWrap("Acquiring system information data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "warning");
+    console.log(this.octoPrintSystemInfo);
     if (!this?.octoPrintSystemInfo || force) {
       let systemInfoCheck = await this.#api.getSystemInfo(true).catch((e) => {
         logger.error("Failed Aquire System Info data: " + e.message, e.stack);
@@ -1281,10 +1282,10 @@ class OctoPrintPrinter {
       const globalStatusCode = checkApiStatusResponse(systemInfoCheck);
 
       if (globalStatusCode === 200) {
-        const { systemInfo } = await systemInfoCheck.json();
-        this.octoPrintSystemInfo = systemInfo;
+        const { systeminfo } = await systemInfoCheck.json();
+        this.octoPrintSystemInfo = systeminfo;
         this.#db.update({
-          octoPrintSystemInfo: systemInfo
+          octoPrintSystemInfo: systeminfo
         });
         this.#apiPrinterTickerWrap("Acquired system information data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);

@@ -353,12 +353,17 @@ export async function loadFarmOverviewInformation() {
         currentPrinter.printCancelTotal +
         currentPrinter.printErrorTotal;
       const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
+      const printerCancelRate = (currentPrinter.printCancelTotal * 100) / printTotal || 0;
+      const printerErrorRate = (currentPrinter.printErrorTotal * 100) / printTotal || 0;
       const printUtilisationTotal =
         currentPrinter.activeTimeTotal +
         currentPrinter.idleTimeTotal +
         currentPrinter.offlineTimeTotal;
       const printerActivityRate =
         (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0;
+      const printerIdleRate =
+          (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
+      const printerOfflineRate = (currentPrinter.offlineTimeTotal * 100) / printUtilisationTotal || 0;
       const octoSysInfo = currentPrinter.octoPrintSystemInfo;
       farmOverviewInformation.insertAdjacentHTML(
         "beforeend",
@@ -367,7 +372,11 @@ export async function loadFarmOverviewInformation() {
           printer,
           octoSysInfo,
           printerSuccessRate,
-          printerActivityRate
+          printerActivityRate,
+          printerCancelRate,
+          printerErrorRate,
+          printerIdleRate,
+          printerOfflineRate
         )
       );
     }
@@ -378,6 +387,9 @@ export async function loadConnectionOverViewInformation() {
   const printerConnectionStats = await OctoFarmClient.getConnectionOverview();
 
   const connectionOverViewTableBody = document.getElementById("connectionOverViewTableBody")
+
+  const today = new Date();
+  document.getElementById("lastUpdateConnectionOverview").innerHTML = today.toLocaleTimeString()
 
    const totalsArray = []; 
    printerConnectionStats.forEach((url, index) => { 

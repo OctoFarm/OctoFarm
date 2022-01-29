@@ -339,6 +339,7 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
 
   for (let i = 0; i < printers.length; i++) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
+
     if (!stats) {
       stats = await generatePrinterStatistics(printers[i]._id);
       getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
