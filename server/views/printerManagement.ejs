@@ -1,0 +1,113 @@
+<% let base = './partials' %>
+<% let card = base + '/octofarm-card.ejs' %>
+<% let modal = base + '/octofarm-modal.ejs' %>
+<% let table = base + '/octofarm-table.ejs' %>
+
+<% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
+<div class="row">
+    <div class="col-lg-12">
+        <%- include(card, {
+        tile:{
+        id:"printerManagmentConnectionLog",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
+        },
+        status: {
+        id: "printerManagementConnectionLogStatus",
+        icon: "fa-info-circle",
+        title: "Log Lines: "
+        },
+        bodyFile:'./PrinterManager/printerConnectionLog.ejs'
+        })
+        %>
+    </div>
+
+<% } %>
+</div>
+<div class="row">
+    <%- include(table, {
+    table:{
+    id:"printerNewTable", contentId:"printerNewList", hide:true, headers: [
+    { title:"Name", style:"" },
+    { title:"Group", style:"min-width:190px;" },
+    { title:"Printer URL", style:"" },
+    { title:"Camera URL", style:"" },
+    { title:"API KEY", style:"" },
+    { title:'<button id="saveAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-save"></i></button>', style:"max-width:50px;" },
+    { title:'<button id="delAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>', style:"max-width:50px;" }
+    ]
+    }
+    })
+    %>
+</div>
+<div class="row">
+    <%- include('./partials/PrinterManager/printerManagementBtns.ejs') %>
+</div>
+
+<div class="row">
+    <%- include(table, {
+    table:{
+    id:"printerTable", contentId:"printerList", headers: [
+    { title:"Sort Index" ,style:"min-width:100px;" },
+    { title:"Name" ,style:"", wrap:" text-wrap" },
+    { title:"Host State" ,style:"min-width:50px;" },
+    { title:"Printer State" ,style:"min-width:50px;" },
+    { title:"WebSocket" ,style:"min-width:150px;" },
+    { title:"Group" ,style:"min-width:10px;" },
+    { title:"Quick Actions" ,style:"min-width:150px;" },
+    { title:"Manage" ,style:"min-width:150px;" },
+    { title:"Alerts" ,style:"min-width:150px;" },
+    ]
+    }
+    })
+    %>
+</div>
+<%- include(modal, {
+    modal:{
+    id:"bulkUpdateOctoPrintSettings", title:"Bulk Updating OctoPrint Settings"
+    },
+    bodyFile:'./PrinterManager/printerBulkSettings.modal.ejs'
+    })
+%>
+<%- include(modal, {
+    modal:{
+    id:"printerLogs", title:"Printer Logs: "
+    },
+    bodyFile:'./PrinterManager/printerLogs.modal.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"farmOverview", title:"Farm Overview"
+},
+bodyFile:'./PrinterManager/farmOverview.modal.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"connectionsOverview", title: "Connections Overview"
+},
+bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+})
+%>
+<%- include(modal, {
+    modal:{
+    id:"printerSettings", title:"Printer Settings: "
+    },
+    bodyFile:'./PrinterManager/printerSettings.modal.ejs'
+})
+%>
+<%- include(modal, {
+    modal:{
+        id:"printerStatistics", title:"Printer Statistics"
+    },
+    bodyFile:'./PrinterManager/printerStatistics.modal.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"healthChecks", title: "Printers Health Checks"
+},
+bodyFile:'./PrinterManager/healthChecks.modal.ejs'
+})
+%>
+
+<script src="/assets/dist/printer-management.runner.min.js" type="module"></script>
