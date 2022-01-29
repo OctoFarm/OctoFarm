@@ -3,7 +3,7 @@
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
 
-const logger = new Logger("OctoPrint-API-Service");
+const logger = new Logger("OctoFarm-State");
 
 const ConnectionMonitorService = require("../connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");

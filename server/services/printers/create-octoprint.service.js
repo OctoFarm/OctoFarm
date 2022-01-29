@@ -676,7 +676,7 @@ class OctoPrintPrinter {
         .then(() => logger.warning("Successfully saved enable state for printer"), {
           disabled: true
         })
-        .catch((e) => logger.warning("Successfully saved enable state for printer", e));
+        .catch((e) => logger.warning("Failed saving enable state for printer", e));
     }
     this.reconnectingIn = 0;
     this.setAllPrinterStates(PRINTER_STATES().DISABLED);
@@ -824,7 +824,8 @@ class OctoPrintPrinter {
   async globalAPIKeyCheck() {
     // Compare entered API key to settings API Key...
     this.#apiPrinterTickerWrap("Checking API key doesn't match global API key...", "Active");
-    const globalAPIKeyCheck = await this.#api.getSettings(true).catch(() => {
+    const globalAPIKeyCheck = await this.#api.getSettings(true).catch((e) => {
+      logger.error("Failed global API Key check: " + e.message, e.stack);
       return false;
     });
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
@@ -833,12 +834,12 @@ class OctoPrintPrinter {
       const { api } = await globalAPIKeyCheck.json();
 
       if (!api) {
-        // logger.error(`Settings json does not exist: ${this.printerURL}`);
+        logger.error(`Settings json does not exist: ${this.printerURL}`);
         return false;
       }
       const keyCheck = api.key !== this.apikey;
       if (keyCheck) {
-        this.#apiPrinterTickerWrap("API key is not global API", "Complete");
+        this.#apiPrinterTickerWrap("Passed Global API key check", "Complete");
         return keyCheck;
       } else {
         this.#apiPrinterTickerWrap("Failed global API key check", "Offline");
@@ -853,7 +854,8 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintSessionKey() {
     this.#apiPrinterTickerWrap("Attempting passive login", "Active");
-    const passiveLogin = await this.#api.login(true).catch(() => {
+    const passiveLogin = await this.#api.login(true).catch((e) => {
+      logger.error("Failed passive login: " + e.message, e.stack);
       return false;
     });
 
@@ -877,7 +879,8 @@ class OctoPrintPrinter {
   async acquireOctoPrintUsersList(force = true) {
     this.#apiPrinterTickerWrap("Acquiring User List", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
-    let usersCheck = await this.#api.getUsers(true).catch(() => {
+    let usersCheck = await this.#api.getUsers(true).catch((e) => {
+      logger.error("Failed to acuire user list: " + e.message, e.stack);
       return false;
     });
 
@@ -959,6 +962,7 @@ class OctoPrintPrinter {
     }
 
     let versionCheck = await this.#api.getVersion(true).catch((e) => {
+      logger.error("Failed OctoPrint version data: " + e.message, e.stack);
       return {
         status: e
       };
@@ -970,6 +974,7 @@ class OctoPrintPrinter {
       try {
         server = await versionCheck.json();
       } catch (e) {
+        logger.error("Failed version check: " + e.message, e.stack);
         return 999;
       }
 
@@ -1003,7 +1008,8 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Checking if RaspberryPi", "Info");
     // Would like to skip this if not a Pi, won't even fit in the retry/not retry system so call and fail for now.
     if (!this?.octoPi || force) {
-      let piPluginCheck = await this.#api.getPluginPiSupport(true).catch(() => {
+      let piPluginCheck = await this.#api.getPluginPiSupport(true).catch((e) => {
+        logger.error("Failed check for raspberry pi: " + e.message, e.stack);
         return false;
       });
 
@@ -1036,7 +1042,8 @@ class OctoPrintPrinter {
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
 
     if (!this?.core || this.core.length === 0 || force) {
-      let systemCheck = await this.#api.getSystemCommands(true).catch(() => {
+      let systemCheck = await this.#api.getSystemCommands(true).catch((e) => {
+        logger.error("Failed Aquire system data: " + e.message, e.stack);
         return false;
       });
 
@@ -1073,7 +1080,8 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring profile data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "warning");
     if (!this?.profiles || force) {
-      let profileCheck = await this.#api.getPrinterProfiles(true).catch(() => {
+      let profileCheck = await this.#api.getPrinterProfiles(true).catch((e) => {
+        logger.error("Failed Aquire profile data: " + e.message, e.stack);
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(profileCheck);
@@ -1110,7 +1118,8 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
     if (!this?.current || !this?.options || force) {
-      let stateCheck = await this.#api.getConnection(true).catch(() => {
+      let stateCheck = await this.#api.getConnection(true).catch((e) => {
+        logger.error("Failed Aquire state data: " + e.message, e.stack);
         return false;
       });
 
@@ -1173,7 +1182,8 @@ class OctoPrintPrinter {
       !this?.settingsAppearance ||
       force
     ) {
-      let settingsCheck = await this.#api.getSettings(true).catch(() => {
+      let settingsCheck = await this.#api.getSettings(true).catch((e) => {
+        logger.error("Failed Aquire settings data: " + e.message, e.stack);
         return false;
       });
 
@@ -1260,10 +1270,11 @@ class OctoPrintPrinter {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
       return false;
     }
-    this.#apiPrinterTickerWrap("Acquiring system information plugin data", "Info");
+    this.#apiPrinterTickerWrap("Acquiring system information data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "warning");
     if (!this?.octoPrintSystemInfo || force) {
-      let systemInfoCheck = await this.#api.getSystemInfo(true).catch(() => {
+      let systemInfoCheck = await this.#api.getSystemInfo(true).catch((e) => {
+        logger.error("Failed Aquire System Info data: " + e.message, e.stack);
         return false;
       });
 
@@ -1275,7 +1286,7 @@ class OctoPrintPrinter {
         this.#db.update({
           octoPrintSystemInfo: systemInfo
         });
-        this.#apiPrinterTickerWrap("Acquired system information plugin data!", "Complete");
+        this.#apiPrinterTickerWrap("Acquired system information data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
         return true;
       } else {
@@ -1289,7 +1300,7 @@ class OctoPrintPrinter {
       }
     } else {
       this.#apiPrinterTickerWrap(
-        "System information plugin data acquired previously... skipped!",
+        "System information data acquired previously... skipped!",
         "Complete"
       );
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success");
@@ -1307,9 +1318,12 @@ class OctoPrintPrinter {
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
     if (!this.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
-      const pluginList = await this.#api.getPluginManager(true, this.octoPrintVersion).catch(() => {
-        return false;
-      });
+      const pluginList = await this.#api
+        .getPluginManager(true, this.octoPrintVersion)
+        .catch((e) => {
+          logger.error("Failed Aquire plugin lists data: " + e.message, e.stack);
+          return false;
+        });
       const globalStatusCode = checkApiStatusResponse(pluginList);
 
       if (globalStatusCode === 200) {
@@ -1354,7 +1368,8 @@ class OctoPrintPrinter {
       this?.octoPrintPluginUpdates.length === 0 ||
       force
     ) {
-      const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch(() => {
+      const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch((e) => {
+        logger.error("Failed Aquire updates data: " + e.message, e.stack);
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(updateCheck);
@@ -1421,7 +1436,8 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintFileData(fullPath, generate = false) {
-    const filesCheck = await this.#api.getFile(fullPath, true).catch(() => {
+    const filesCheck = await this.#api.getFile(fullPath, true).catch((e) => {
+      logger.error("Failed Aquire file data: " + e.message, e.stack);
       return false;
     });
 
@@ -1529,7 +1545,8 @@ class OctoPrintPrinter {
         total: 0
       };
 
-      const filesCheck = await this.#api.getFiles(true, true).catch(() => {
+      const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
+        logger.error("Failed Aquire files data: " + e.message, e.stack);
         return false;
       });
 
@@ -1598,7 +1615,8 @@ class OctoPrintPrinter {
 
   async updateOctoPrintProfileData(profile, profileID) {
     this.#apiPrinterTickerWrap("Updating OctoPrint profile data", "Info");
-    const profilePatch = await this.#api.patchProfile(profile, profileID).catch(() => {
+    const profilePatch = await this.#api.patchProfile(profile, profileID).catch((e) => {
+      logger.error("Failed Aquire profile data: " + e.message, e.stack);
       return 900;
     });
     return checkApiStatusResponse(profilePatch);
@@ -1606,7 +1624,8 @@ class OctoPrintPrinter {
 
   async updateOctoPrintSettingsData(settings) {
     this.#apiPrinterTickerWrap("Updating OctoPrint settings data", "Info");
-    const settingsPost = await this.#api.postSettings(settings).catch(() => {
+    const settingsPost = await this.#api.postSettings(settings).catch((e) => {
+      logger.error("Failed Update settings data: " + e.message, e.stack);
       return 900;
     });
     return checkApiStatusResponse(settingsPost);
