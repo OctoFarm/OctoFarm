@@ -82,7 +82,6 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
     clientSettings: req.user.clientSettings,
-    printerConnectionStats: sortBy(ConnectionMonitorService.returnConnectionLogs(), ["printerURL"]),
     development_mode
   });
 });

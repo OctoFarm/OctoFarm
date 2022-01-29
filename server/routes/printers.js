@@ -17,6 +17,8 @@ const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plug
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { validateBodyMiddleware } = require("../handlers/validators");
 const P_VALID = require("../constants/printer-validation.constants");
+const { sortBy } = require("lodash");
+const ConnectionMonitorService = require("../services/connection-monitor.service");
 
 /**
  * @swagger
@@ -350,6 +352,12 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
   }
 
   res.send(returnArray);
+});
+router.get("/connectionOverview", ensureAuthenticated, ensureAdministrator, (req, res) => {
+  const printerConnectionStats = sortBy(ConnectionMonitorService.returnConnectionLogs(), [
+    "printerURL"
+  ]);
+  res.send(printerConnectionStats);
 });
 
 router.patch("/disable/:id", ensureAuthenticated, ensureAdministrator, (req, res) => {
