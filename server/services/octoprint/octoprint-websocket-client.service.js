@@ -93,7 +93,7 @@ class WebSocketClient {
       clearTimeout(this.#heartbeatPing);
 
       this.#heartbeatTerminate = setTimeout(() => {
-        logger.info(this.url + ": Didn't receive a pong from client, reconnecting!");
+        logger.error(this.url + ": Didn't receive a pong from client, reconnecting!");
         PrinterTicker.addIssue(
           new Date(),
           this.url,
