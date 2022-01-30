@@ -6,8 +6,6 @@ const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
 
 const Logger = require("../../../handlers/logger");
-const { getEventEmitterCache } = require("../../../cache/event-emitter.cache");
-const { ScriptRunner } = require("../../local-scripts.service");
 const logger = new Logger("OctoFarm-State");
 
 //TODO, could potentially build up if not careful.
@@ -60,7 +58,6 @@ const captureTemperatureData = (id, data) => {
 };
 
 const coolDownEvent = (id, temps) => {
-  // const currentEvent = getEventEmitterCache().getPrinterEvent(id, "coolDown");
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {

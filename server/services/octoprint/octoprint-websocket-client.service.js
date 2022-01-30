@@ -107,8 +107,8 @@ class WebSocketClient {
           REQUEST_KEYS.TOTAL_PING_PONG
         );
         this.terminate();
-      }, this.#pingPongTimer + 1000);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
+      }, this.#pingPongTimer + 5000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
       this.#heartbeatPing = setTimeout(() => {
         getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
         logger.debug(this.url + ": Pinging client");

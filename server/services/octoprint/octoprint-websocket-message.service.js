@@ -39,7 +39,6 @@ const {
   capturePositionUpdate,
   capturePrintCancelled,
   capturePrintCancelling,
-  capturePrintDone,
   captureFinishedPrint,
   capturePrintPaused,
   capturePrintStarted,
@@ -56,7 +55,6 @@ const {
   captureKlipperPluginData,
   capturePluginManagerData
 } = require("./utils/octoprint-plugin.utils");
-const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const Logger = require("../../handlers/logger");
 
@@ -202,7 +200,7 @@ class OctoprintWebsocketMessageService {
         captureFirmwareData(printerID, payload);
         break;
       case EVENT_TYPES.FolderAdded:
-        captureFolderRemoved(printerID, payload);
+        captureFolderAdded(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.FolderRemoved:
@@ -228,7 +226,7 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintCancelled:
-        capturePrintCancelling(printerID, payload);
+        capturePrintCancelled(printerID, payload);
         break;
 
       case EVENT_TYPES.PrintCancelling:
@@ -240,7 +238,8 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintFailed:
-        captureFinishedPrint(printerID, payload, false);
+        // TODO create printfialed
+        // capturePrint(printerID, payload, false);
         break;
 
       case EVENT_TYPES.PrintPaused:
