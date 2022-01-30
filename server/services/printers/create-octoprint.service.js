@@ -890,8 +890,8 @@ class OctoPrintPrinter {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
-      // If we have no idea who the user is then
-      if (!this?.currentUser || force) {
+      // Always forced... may change in future
+      if (force) {
         if (isEmpty(userList)) {
           //If user list is empty then we can assume that an admin user is only one available.
           //Only relevant for OctoPrint < 1.4.2.
@@ -909,15 +909,14 @@ class OctoPrintPrinter {
           //If the userList isn't empty then we need to parse out the users and search for octofarm user.
           for (let u = 0; u < userList.length; u++) {
             const currentUser = userList[u];
-            if (currentUser.admin) {
+            if (!!currentUser.admin) {
+              this.userList.push(currentUser.name);
               // Look for OctoFarm user and break, if not use the first admin we find
               if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
                 this.currentUser = currentUser.name;
                 this.#db.update({ currentUser: this.currentUser });
-
-                this.userList.push(currentUser.name);
-                //We only break out here because it's doubtful with a successful connection we need the other users.
-                break;
+                // Continue to collect the rest of the users...
+                continue;
               }
               // If no octofarm user then collect the rest for user choice in ui.
               if (!this?.currentUser) {
@@ -925,7 +924,6 @@ class OctoPrintPrinter {
                 this.currentUser = currentUser.name;
                 this.#db.update({ currentUser: this.currentUser });
               }
-              this.userList.push(currentUser.name);
             }
           }
           this.#apiPrinterTickerWrap(
@@ -1272,7 +1270,7 @@ class OctoPrintPrinter {
     }
     this.#apiPrinterTickerWrap("Acquiring system information data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "warning");
-    console.log(this.octoPrintSystemInfo);
+
     if (!this?.octoPrintSystemInfo || force) {
       let systemInfoCheck = await this.#api.getSystemInfo(true).catch((e) => {
         logger.error("Failed Aquire System Info data: " + e.message, e.stack);
