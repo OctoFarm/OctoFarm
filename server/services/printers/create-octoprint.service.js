@@ -349,7 +349,7 @@ class OctoPrintPrinter {
     if (!!core) {
       this.core = core;
     }
-    if (!!disabled) {
+    if (typeof disabled === "boolean") {
       this.disabled = disabled;
     }
     if (!!octoPi) {
@@ -497,7 +497,13 @@ class OctoPrintPrinter {
 
   startOctoPrintService() {
     if (!this?.disabled) {
-      this.enablePrinter().then();
+      this.enablePrinter()
+        .then((res) => {
+          logger.warning(res);
+        })
+        .catch((e) => {
+          logger.error("Failed starting service", e);
+        });
     } else {
       this.disablePrinter();
     }
@@ -783,7 +789,13 @@ class OctoPrintPrinter {
         );
       }
       this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
-      this.enablePrinter().then();
+      this.enablePrinter()
+        .then((res) => {
+          logger.warning(res);
+        })
+        .catch((e) => {
+          logger.error("Failed starting service", e);
+        });
       this.#reconnectTimeout = false;
     }, this.#apiRetry);
   }
@@ -1656,13 +1668,25 @@ class OctoPrintPrinter {
   }
 
   resetConnectionInformation() {
-    this.#api.updateConnectionInformation(this.printerURL, this.apikey);
-    this.#ws.updateConnectionInformation(this.webSocketURL);
-    //this.resetSocketConnection().then();
+    if (!!this?.#api) {
+      this.#api.updateConnectionInformation(this.printerURL, this.apikey);
+    }
+
+    if (!!this?.#ws) {
+      this.#ws.updateConnectionInformation(this.webSocketURL, this.currentUser);
+    }
+
+    this.resetSocketConnection().then();
   }
 
   async resetSocketConnection() {
-    await this.enablePrinter();
+    return await this.enablePrinter()
+      .then((res) => {
+        logger.warning(res);
+      })
+      .catch((e) => {
+        logger.error("Failed starting service", e);
+      });
   }
 
   async acquireOctoPrintLatestSettings(force = false) {

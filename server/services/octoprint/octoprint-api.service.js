@@ -40,6 +40,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
+        logger.error("Failed to fetch", e);
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -72,6 +73,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
+      logger.error("Failed fetch timeout!", e);
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
@@ -148,9 +150,9 @@ class OctoprintApiService {
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
           if (cutOffIn === 0) {
-            logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
+            logger.error(`${this.printerURL} | Cutoff reached! marking offline!`);
           } else {
-            logger.debug(
+            logger.error(
               `${this.printerURL} | Current Timeout: ${
                 this.#currentTimeout
               } | Cut off in ${cutOffIn}`

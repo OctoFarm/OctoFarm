@@ -57,6 +57,8 @@ const {
 } = require("./utils/octoprint-plugin.utils");
 
 const Logger = require("../../handlers/logger");
+const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -153,6 +155,14 @@ class OctoprintWebsocketMessageService {
   }
   static handleHistoryData(printerID, data) {
     removeMultiUserFlag(printerID);
+    // force update state here after connection established.
+    const currentState = {
+      state: "Disconnected",
+      stateColour: mapStateToCategory("Disconnected"),
+      stateDescription: "Websocket Connected but in Tentative state until receiving data"
+    };
+
+    getPrinterStoreCache().updatePrinterState(printerID, currentState);
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static handleEventData(printerID, data) {
