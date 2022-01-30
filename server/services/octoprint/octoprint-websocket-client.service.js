@@ -31,6 +31,7 @@ class WebSocketClient {
   #lastMessage = Date.now();
   #instance = undefined;
   #pingPongTimer = 10000;
+  #pongFailCount = 0;
   #heartbeatTerminate = undefined;
   #heartbeatPing = undefined;
   #onMessage = undefined;
@@ -43,7 +44,6 @@ class WebSocketClient {
   currentUser = undefined;
   sessionKey = undefined;
   reconnectingIn = 0;
-  pongTimer = 0;
 
   constructor(
     webSocketURL = undefined,
@@ -89,7 +89,7 @@ class WebSocketClient {
     // TODO fix
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
-      logger.info(this.url + " received pong message from server");
+      logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
 
@@ -115,11 +115,10 @@ class WebSocketClient {
           REQUEST_TYPE.WEBSOCKET,
           REQUEST_KEYS.TOTAL_PING_PONG
         );
-
         this.terminate();
         // consider a minute without response a dead connection! Should cover WiFi devices better.
-      }, this.#pingPongTimer + this.#pingPongTimer);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + this.#pingPongTimer);
+      }, this.#pingPongTimer + 2000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 2000);
     });
 
     this.#instance.on("unexpected-response", (err) => {
