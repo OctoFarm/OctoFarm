@@ -678,7 +678,6 @@ class OctoPrintPrinter {
         })
         .catch((e) => logger.warning("Failed saving enable state for printer", e));
     }
-    this.reconnectingIn = 0;
     this.setAllPrinterStates(PRINTER_STATES().DISABLED);
     this.killAllConnections();
     logger.debug(this.printerURL + ": client set as disabled...");
@@ -1678,6 +1677,7 @@ class OctoPrintPrinter {
   killApiTimeout() {
     logger.debug("Clearning API Timeout");
     clearTimeout(this.#reconnectTimeout);
+    this.reconnectingIn = 0;
   }
 
   killAllConnections() {
