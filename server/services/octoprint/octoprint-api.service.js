@@ -117,6 +117,7 @@ class OctoprintApiService {
     try {
       return await this.get(item);
     } catch (e) {
+      logger.error("Error with get request", e);
       switch (e.code) {
         case "ECONNREFUSED":
           ConnectionMonitorService.updateOrAddResponse(

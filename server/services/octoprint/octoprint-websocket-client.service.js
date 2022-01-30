@@ -30,7 +30,7 @@ class WebSocketClient {
   #retryNumber = 0;
   #lastMessage = Date.now();
   #instance = undefined;
-  #pingPongTimer = 60000;
+  #pingPongTimer = 30000;
   #heartbeatTerminate = undefined;
   #heartbeatPing = undefined;
   #onMessage = undefined;
@@ -43,6 +43,7 @@ class WebSocketClient {
   currentUser = undefined;
   sessionKey = undefined;
   reconnectingIn = 0;
+  pongTimer = 0;
 
   constructor(
     webSocketURL = undefined,
@@ -88,7 +89,7 @@ class WebSocketClient {
 
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
-      logger.info(this.url + " received pong message from server");
+      logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
 
@@ -107,15 +108,19 @@ class WebSocketClient {
           REQUEST_KEYS.TOTAL_PING_PONG
         );
         this.terminate();
-      }, this.#pingPongTimer + 5000);
-      logger.info(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
+      }, this.#pingPongTimer + this.#pingPongTimer / 2);
+      logger.debug(
+        this.url + " terminate timeout set",
+        this.#pingPongTimer + this.#pingPongTimer / 2
+      );
 
       this.#heartbeatPing = setTimeout(() => {
         getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
         logger.debug(this.url + ": Pinging client");
         this.#instance.ping();
+        this.pongTimer = Date.now();
       }, this.#pingPongTimer);
-      logger.info(this.url + " ping timout set", this.#pingPongTimer);
+      logger.debug(this.url + " ping timout set", this.#pingPongTimer);
     });
 
     this.#instance.on("unexpected-response", (err) => {
