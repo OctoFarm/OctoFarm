@@ -30,7 +30,7 @@ const patchSortIndex = (printer) => {
   if (currentPrinterCount === 0) {
     printer.sortIndex = 0;
   } else if (currentPrinterCount > 0) {
-    printer.sortIndex = currentPrinterCount - 1;
+    printer.sortIndex = currentPrinterCount;
   }
 };
 
