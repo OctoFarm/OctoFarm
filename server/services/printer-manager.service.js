@@ -40,6 +40,7 @@ class PrinterManagerService {
 
   async addPrinter(printer) {
     await patchPrinterValues(printer);
+
     await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
     return {
       printerURL: printer.printerURL
@@ -145,7 +146,7 @@ class PrinterManagerService {
     this.updateGroupList();
 
     // Regenerate sort indexs
-    this.updatePrinterSortIndexes();
+    await this.updatePrinterSortIndexes();
     return removedPrinterList;
   }
 
@@ -153,7 +154,7 @@ class PrinterManagerService {
     return this.#printerGroupList;
   }
 
-  updatePrinterSortIndexes(idList = undefined) {
+  async updatePrinterSortIndexes(idList = undefined) {
     if (!idList) {
       idList = getPrinterStoreCache().listPrinters();
     }
@@ -163,10 +164,11 @@ class PrinterManagerService {
         const orderedID = idList[i];
         logger.debug("Updating printers sort index", i);
         getPrinterStoreCache().updatePrinterLiveValue(orderedID, {
+          order: i,
           sortIndex: i
         });
-        // We have to bypass the database object here and go straight to the printer service.
-        PrinterService.findOneAndUpdate(orderedID, { sortIndex: i }).then();
+        // We have to bypass the database object here and go straight to the printer service as the printer might not have this existing.
+        await PrinterService.findOneAndUpdate(orderedID, { sortIndex: i });
       }
       return "Regenerated sortIndex for all printers...";
     }

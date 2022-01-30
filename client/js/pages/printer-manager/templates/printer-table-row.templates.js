@@ -75,6 +75,9 @@ export function returnPrinterTableRow(printer) {
             };"></i></span>
             <span id="printerName-${printer._id}"></span>
         </td>
+        <td class="align-middle">
+            <span id="printerURL-${printer._id}"></span>
+        </td>
                 <td class="align-middle">
             <small>
                 <span data-title="${printer.hostState.desc}" id="hostBadge-${
@@ -111,7 +114,7 @@ export function returnPrinterTableRow(printer) {
             <button  title="ReScan your printers API"
                  id="printerAPIReScan-${printer._id}"
                  type="button"
-                 class="tag btn btn-outline-danger btn-sm"
+                 class="tag btn btn-outline-danger btn-sm mb-2"
                 >
                 <i class="fab fa-searchengin"></i> Scan API
                 
@@ -119,11 +122,11 @@ export function returnPrinterTableRow(printer) {
             <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${printer._id}"
                  type="button"
-                 class="tag btn btn-outline-success btn-sm"
+                 class="tag btn btn-outline-success btn-sm mb-2"
                 >
                 <i class="fas fa-running"></i> Enabled
             </button>
-            
+            <br>
             <button  title="Change your Printer Settings"
                  id="printerSettings-${printer._id}"
                  type="button"
@@ -187,6 +190,9 @@ export function returnDisabledPrinterTableRow(printer) {
                  };"></i></span>
             <span id="printerName-${printer._id}"></span>
             </td>
+                    <td class="align-middle">
+            <span id="printerURL-${printer._id}"></span>
+        </td>
                 <td class="align-middle">
             <small>
                 <span data-title="${printer.hostState.desc}" id="hostBadge-${
@@ -222,7 +228,7 @@ export function returnDisabledPrinterTableRow(printer) {
             <button  title="ReScan your printers API"
                  id="printerAPIReScan-${printer._id}"
                  type="button"
-                 class="tag btn btn-outline-danger btn-sm"
+                 class="tag btn btn-outline-danger btn-sm mb-2"
                  disabled
                 >
                  <i class="fab fa-searchengin"></i> Scan API
@@ -230,11 +236,11 @@ export function returnDisabledPrinterTableRow(printer) {
             <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${printer._id}"
                  type="button"
-                 class="tag btn btn-outline-light btn-sm"
+                 class="tag btn btn-outline-light btn-sm mb-2"
                 >
                 <i class="fas fa-wheelchair"></i> Disabled
             </button>
-            
+            <br>
             <button  title="Change your Printer Settings"
                  id="printerSettings-${printer._id}"
                  type="button"

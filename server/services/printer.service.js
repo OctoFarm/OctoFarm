@@ -29,7 +29,7 @@ const findOneAndUpdate = (id, obj) => {
       logger.debug("Successfully updated printer database!", obj);
     })
     .catch((e) => {
-      logger.error("Failed to update printer database!", obj);
+      logger.error("Failed to update printer database!", e);
     });
 };
 
@@ -40,7 +40,7 @@ const findOneAndPush = (id, pushKey, obj) => {
       logger.debug("Successfully updated printer database! Key Push: " + pushKey, obj);
     })
     .catch((e) => {
-      logger.error("Failed to update printer database!! Key Push: " + pushKey, obj);
+      logger.error("Failed to update printer database!! Key Push: " + pushKey, e);
     });
 };
 

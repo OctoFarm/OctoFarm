@@ -26,7 +26,9 @@ const categoryPatch = (printer) => {
 
 const patchSortIndex = (printer) => {
   const currentPrinterCount = getPrinterStoreCache().getPrinterCount();
-  if (printer?.sortIndex) return;
+
+  if (!isNaN(printer?.sortIndex)) return;
+
   if (currentPrinterCount === 0) {
     printer.sortIndex = 0;
   } else if (currentPrinterCount > 0) {

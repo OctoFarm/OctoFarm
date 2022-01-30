@@ -178,7 +178,6 @@ class OctoPrintPrinter {
             settingsAppearance: printer?.settingsAppearance
           })
       );
-
     this.sortIndex = printer.sortIndex;
     // Old cleaner patching
     this.order = printer.sortIndex;
@@ -1652,7 +1651,7 @@ class OctoPrintPrinter {
   }
 
   updatePrinterData(data) {
-    logger.debug("Updating printer database: ", data);
+    logger.silly("Updating printer database: ", data);
     this.#db.update(data);
   }
 
