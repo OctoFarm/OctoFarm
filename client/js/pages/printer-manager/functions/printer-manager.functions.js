@@ -388,6 +388,8 @@ export async function loadConnectionOverViewInformation() {
 
   const connectionOverViewTableBody = document.getElementById("connectionOverViewTableBody")
 
+  connectionOverViewTableBody.innerHTML = "";
+
   const today = new Date();
   document.getElementById("lastUpdateConnectionOverview").innerHTML = today.toLocaleTimeString()
 
