@@ -156,7 +156,7 @@ class PrinterManagerService {
 
   async updatePrinterSortIndexes(idList = undefined) {
     if (!idList) {
-      idList = getPrinterStoreCache().listPrinters();
+      idList = getPrinterStoreCache().listPrintersIDs();
     }
 
     if (!!idList) {

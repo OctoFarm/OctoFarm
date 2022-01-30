@@ -70,6 +70,10 @@ class PrinterStore {
     return this.#printersList;
   }
 
+  listPrintersIDs() {
+    return this.#printersList.map((item) => item._id);
+  }
+
   addPrinter(printer) {
     return this.#printersList.push(printer);
   }

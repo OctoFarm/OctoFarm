@@ -88,7 +88,7 @@ class WebSocketClient {
 
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
-      logger.debug(this.url + " received pong message from server");
+      logger.info(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
 
@@ -108,13 +108,14 @@ class WebSocketClient {
         );
         this.terminate();
       }, this.#pingPongTimer + 5000);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
+      logger.info(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
+
       this.#heartbeatPing = setTimeout(() => {
         getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
         logger.debug(this.url + ": Pinging client");
         this.#instance.ping();
-      }, this.#pingPongTimer - 1000);
-      logger.debug(this.url + " ping timout set", this.#pingPongTimer - 1000);
+      }, this.#pingPongTimer);
+      logger.info(this.url + " ping timout set", this.#pingPongTimer);
     });
 
     this.#instance.on("unexpected-response", (err) => {
