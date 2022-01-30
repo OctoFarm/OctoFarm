@@ -15,14 +15,12 @@ const Profiles = require("../models/Profiles");
  * @returns {string|*|number}
  */
 function calcSpoolWeightAsString(length, filament, completionRatio) {
-  // TODO ... this is not a weight being returned at all? maths... yes it fucking is
   if (!length) {
     return length === 0 ? 0 : length;
   }
 
   let density = DEFAULT_SPOOL_DENSITY;
   let radius = DEFAULT_SPOOL_RATIO;
-  // TODO improve illegality checks (if one is non-numeric, the weight becomes NaN)
   if (!!filament?.spools?.profile) {
     radius = parseFloat(filament.spools.profile.diameter) / 2;
     density = parseFloat(filament.spools.profile.density);
@@ -46,7 +44,6 @@ function getSpoolLabel(id) {
   }
 
   let spoolLeftoverConditional = "";
-  // TODO move this logic back up to filament store
   // if (this.#settingsStore.isFilamentEnabled()) {
   //   const spoolWeight = (spool.weight - spool.used).toFixed(0);
   //   spoolLeftoverConditional = `(${spoolWeight}g)`;
@@ -62,10 +59,9 @@ function getSpool(filamentSelection, job, success, time) {
 
   let printPercentage = 0;
   if (!success) {
-    // TODO what if estimatedPrintTime is falsy? Should become partial result.
     printPercentage = (time / job.estimatedPrintTime) * 100;
   }
-  // TODO ehm?
+
   job = job.filament;
 
   const spools = [];
@@ -87,7 +83,7 @@ function getSpool(filamentSelection, job, success, time) {
       [key]: {
         toolName: "Tool " + key.substring(4, 5),
         spoolName,
-        spoolId: filamentEntry?._id || null, // TODO discuss fallback null or undefined
+        spoolId: filamentEntry?._id || null,
         volume: (completionRatio * metric.volume).toFixed(2),
         length: ((completionRatio * metric.length) / 1000).toFixed(2),
         weight: spoolWeight,
@@ -114,7 +110,6 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
         let searchKeyword = "";
         let checkNestedResult = checkNested(spool[key].type, totalByDay);
         if (!!checkNestedResult) {
-          // TODO state is being rechecked uselessly
           let checkNestedIndexHistoryRates = null;
           if (historyState.includes("success")) {
             searchKeyword = "Success";
@@ -123,7 +118,6 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
           } else if (historyState.includes("danger")) {
             searchKeyword = "Failed";
           } else {
-            // TODO why return? Not continue?
             return;
           }
           checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
@@ -203,7 +197,6 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
 }
 
 /**
- * TODO get units of what? Be explicit.
  * @param filamentSelection
  * @param fileLength
  * @returns {*[]}
@@ -252,7 +245,7 @@ function getUnits(filamentSelection, fileLength) {
 }
 
 /**
- * TODO get cost of what? Be explicit.
+ *
  * @param filamentSelection
  * @param units
  * @returns {*[]}
@@ -271,7 +264,6 @@ function getCost(filamentSelection, units) {
     if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
       if (filamentSelection[u] === "SKIP") {
       } else if (typeof filamentSelection[u] !== "undefined" && filamentSelection[u] !== null) {
-        // TODO hacky reversal of the number... avoid formatting to string to begin with
         let newUnit = units[u].split(" / ");
         newUnit = newUnit[1].replace("g", "");
         if (!units[u].includes("Total")) {
