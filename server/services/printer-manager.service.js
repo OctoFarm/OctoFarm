@@ -153,7 +153,11 @@ class PrinterManagerService {
     return this.#printerGroupList;
   }
 
-  updatePrinterSortIndexes(idList) {
+  updatePrinterSortIndexes(idList = undefined) {
+    if (!idList) {
+      idList = getPrinterStoreCache().listPrinters();
+    }
+
     if (!!idList) {
       for (let i = 0; i < idList.length; i++) {
         const orderedID = idList[i];
