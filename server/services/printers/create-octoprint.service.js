@@ -911,7 +911,7 @@ class OctoPrintPrinter {
             const currentUser = userList[u];
             if (!!currentUser.admin) {
               this.userList.push(currentUser.name);
-              // Look for OctoFarm user and break, if not use the first admin we find
+              // Look for OctoFarm user and skip the rest, if not use the first admin we find
               if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
                 this.currentUser = currentUser.name;
                 this.#db.update({ currentUser: this.currentUser });
@@ -951,7 +951,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintVersionData() {
-    logger.debug(this.printerURL + ": Acquiring OctoPrint Version.", {
+    logger.warning(this.printerURL + ": Acquiring OctoPrint Version.", {
       alreadyAvailable: this?.octoPrintVersion,
       currentVersion: this.octoPrintVersion
     });
