@@ -477,20 +477,62 @@ async function grabOctoFarmLogList() {
     logTable.insertAdjacentHTML(
       "beforeend",
       `
-            <tr>
+            <tr id="log-${logs.name}">
                 <td>${logs.name}</td>
+                <td>${new Date(logs.created).toString().substring(0, 21)}</td>
                 <td>${new Date(logs.modified).toString().substring(0, 21)}</td>
                 <td>${Calc.bytes(logs.size)}</td>
-                <td><button id="${
+                <td>
+                <button id="${
                   logs.name
-                }" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
+                }-download" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button>
+                <button id="${
+                    logs.name
+                }-delete" type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                </td>
             </tr>
         `
     );
-    document.getElementById(logs.name).addEventListener("click", async (event) => {
+    document.getElementById(logs.name+"-download").addEventListener("click",  (event) => {
       window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
     });
+    document.getElementById(logs.name+"-delete").addEventListener("click", async (event) => {
+      event.target.disabled = true;
+      try{
+        await OctoFarmClient.deleteLogFile(logs.name);
+        const logLine = document.getElementById(`log-${logs.name}`)
+        logLine.remove();
+        UI.createAlert("success", "Successfully deleted " + logs.name + "!", 3000, "clicked")
+      }catch(e){
+        event.target.disabled = false;
+        UI.createAlert("error", "Failed to delete " + logs.name + "!", 3000, "clicked")
+      }
+    });
   });
+}
+
+async function clearOldLogs(){
+  try {
+    const deletedLogs = await OctoFarmClient.clearOldLogs();
+    if(deletedLogs.length === 0){
+      UI.createAlert("warning", "No logs older than 1 day to delete!", 3000, "clicked")
+    }else{
+      let message = "";
+
+      deletedLogs.forEach(log => {
+        message += `${log}<br>`
+        const logLine = document.getElementById(`log-${log}`)
+        if(!!logLine){
+          logLine.remove();
+        }
+      })
+
+      UI.createAlert("success", "Successfully cleaned house! <br>" + message, 3000, "clicked")
+    }
+
+  }catch (e) {
+    UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked")
+  }
 }
 
 async function renderSystemCharts() {
@@ -793,5 +835,6 @@ export {
   deleteUser,
   resetUserPassword,
   fillInEditInformation,
-  setupOPFilamentManagerPluginSettings
+  setupOPFilamentManagerPluginSettings,
+  clearOldLogs
 };

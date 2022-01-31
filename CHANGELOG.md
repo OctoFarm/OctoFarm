@@ -65,6 +65,11 @@ All notable changes to this project will be documented in this file.
     purposefully closed.
   - Added git repo information to system page, and also added git check for update commands.
   - Printer manager now has a ticker for the printer alerts. Displays planned websocket/api scans, octoprint updates, plugin updates and more.
+  - Add current Miliseconds since Jan 1970 string to log dump zip name.
+  - Made enhancements to the log system:
+    - Logs now show created date, as well as modified.
+    - Log files can now be deleted.
+    - Additional button to house keep log files. Cleans any logs older than a day.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2

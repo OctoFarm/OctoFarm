@@ -1,4 +1,4 @@
-const { readdirSync, statSync } = require("fs");
+const { readdirSync, statSync, unlinkSync } = require("fs");
 const { join } = require("path");
 
 const { createZipFile } = require("../utils/zip.utils.js");
@@ -6,16 +6,20 @@ const { getLogsPath } = require("../utils/system-paths.utils.js");
 const {
   generateOctoFarmSystemInformationTxt
 } = require("./system-information-text-generator.service.js");
+const { generateTodayTextString } = require("../utils/date.utils");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
+
+const logFolder = getLogsPath();
 
 // Grab Logs
 class Logs {
   static async grabLogs() {
     const fileArray = [];
-    const testFolder = getLogsPath();
-    const folderContents = await readdirSync(testFolder);
+    const folderContents = readdirSync(logFolder);
     for (let i = 0; i < folderContents.length; i++) {
-      const logFilePath = join(testFolder, folderContents[i]);
-      const stats = await statSync(logFilePath);
+      const logFilePath = join(logFolder, folderContents[i]);
+      const stats = statSync(logFilePath);
       const logFile = {
         name: folderContents[i],
         path: logFilePath,
@@ -27,6 +31,45 @@ class Logs {
     }
     return fileArray;
   }
+
+  /**
+   * Deletes a log file by name
+   * @param name
+   * @returns {void}
+   */
+  static deleteLogByName(name = undefined) {
+    if (!name) return;
+    const logFilePath = join(logFolder, name);
+    logger.debug("Deleting log file: " + logFilePath);
+    return unlinkSync(logFilePath);
+  }
+
+  /**
+   * Clears old log files older than the number of days supplied.
+   * @param days
+   * @returns {*[]}
+   */
+  static clearLogsOlderThan(days = 1) {
+    const deletedFiles = [];
+    const folderContents = readdirSync(logFolder);
+    const now = new Date();
+    const yesterday = now.setDate(now.getDate() - days);
+    for (let i = 0; i < folderContents.length; i++) {
+      const logFilePath = join(logFolder, folderContents[i]);
+      const stats = statSync(logFilePath);
+      const endTime = new Date(stats.birthtime).getTime() + 3600000;
+      if (yesterday > endTime) {
+        Logs.deleteLogByName(logFilePath);
+        deletedFiles.push(logFilePath);
+      }
+    }
+    return deletedFiles;
+  }
+
+  /**
+   * Generates a downloadable "*.zip" file containing all system  logs.
+   * @returns {Promise<string>}
+   */
   static async generateOctoFarmLogDump() {
     const fileList = [];
 
@@ -50,7 +93,7 @@ class Logs {
       }
     });
     // Create the zip file and return the path.
-    return createZipFile("octofarm_dump.zip", fileList);
+    return createZipFile(`octofarm_dump-${generateTodayTextString()}.zip`, fileList);
   }
 }
 

@@ -6,17 +6,25 @@
         <button
                 id="logDumpGenerateBtn"
                 type="button"
-                class="btn btn-info"
+                class="btn btn-info float-left"
                 href="#"
                 aria-expanded="false"
         >
             <i class="fas fa-file-archive"></i> Log Dump
         </button>
-
+        <button
+                id="clearOldLogs"
+                type="button"
+                class="btn btn-warning text-dark float-right"
+                href="#"
+                aria-expanded="false"
+        >
+            <i class="fas fa-broom text-dark"></i> House Keeping
+        </button>
         <button
                 id="logDumpDownloadBtn"
                 type="button"
-                class="btn btn-success d-none"
+                class="btn btn-success float-left ml-1 d-none"
                 href="#"
                 aria-expanded="false"
         >
@@ -34,10 +42,10 @@
             <thead>
             <tr>
                 <th scope="col">File Name</th>
+                <th scope="col">Created</th>
                 <th scope="col">Last Modified</th>
                 <th scope="col">Size</th>
-                <th scope="col">Download</th>
-                <!--                                                    <th scope="col">Delete</th>-->
+                <th scope="col">Actions</th>
             </tr>
             </thead>
             <tbody id="serverLogs">

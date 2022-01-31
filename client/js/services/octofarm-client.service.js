@@ -125,6 +125,14 @@ export default class OctoFarmClient {
     return this.post(`${this.logsRoute}/generateLogDump`, {});
   }
 
+  static async deleteLogFile(filename) {
+    return this.delete(`${this.logsRoute}/${filename}`)
+  }
+
+  static async clearOldLogs() {
+    return this.delete(`${this.logsRoute}/clear-old`)
+  }
+
   static async getHistoryStatistics() {
     return this.get("history/statisticsData");
   }

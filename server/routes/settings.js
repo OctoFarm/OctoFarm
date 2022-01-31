@@ -46,6 +46,31 @@ router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req,
   const serverLogs = await Logs.grabLogs();
   res.send(serverLogs);
 });
+router.delete(
+  "/server/logs/clear-old",
+  ensureAuthenticated,
+  ensureAdministrator,
+  async (req, res) => {
+    try {
+      const deletedLogs = Logs.clearLogsOlderThan(1);
+      res.send(deletedLogs);
+    } catch (e) {
+      logger.error("Failed to clear logs!", e);
+      res.sendStatus(500);
+    }
+  }
+);
+router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const fileName = req.params.name;
+  try {
+    Logs.deleteLogByName(fileName);
+    res.sendStatus(201);
+  } catch (e) {
+    logger.error("Couldn't delete log path!", e);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.params.name;
   const file = `${getLogsPath()}/${download}`;
