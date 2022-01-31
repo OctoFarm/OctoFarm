@@ -150,7 +150,7 @@ class OctoprintApiService {
         default:
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
-          if (cutOffIn === 0) {
+          if (cutOffIn <= 0) {
             logger.error(`${this.printerURL} | Cutoff reached! marking offline!`);
           } else {
             logger.error(
@@ -164,7 +164,7 @@ class OctoprintApiService {
             REQUEST_TYPE.GET,
             REQUEST_KEYS.RETRY_REQUESTED
           );
-          if (this.#currentTimeout >= this.timeout.apiRetryCutoff) {
+          if (cutOffIn <= 0) {
             logger.error(
               `${this.printerURL} | Timeout Exceeded: ${item} | Timeout: ${this.#currentTimeout}`
             );
