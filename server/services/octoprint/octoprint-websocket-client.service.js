@@ -30,7 +30,8 @@ class WebSocketClient {
   #retryNumber = 0;
   #lastMessage = Date.now();
   #instance = undefined;
-  #pingPongTimer = 20000;
+  #pingPongTimer = 10000;
+  #pongFailCount = 0;
   #heartbeatTerminate = undefined;
   #heartbeatPing = undefined;
   #onMessage = undefined;
@@ -85,12 +86,20 @@ class WebSocketClient {
     this.#instance.on("ping", () => {
       logger.debug("PING RECEIVED");
     });
-
+    // TODO fix
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
+
+      this.#heartbeatPing = setTimeout(() => {
+        getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
+        logger.debug(this.url + ": Pinging client");
+        this.#instance.ping();
+        this.pongTimer = Date.now();
+      }, this.#pingPongTimer);
+      logger.debug(this.url + " ping timout set", this.#pingPongTimer);
 
       this.#heartbeatTerminate = setTimeout(() => {
         logger.error(this.url + ": Didn't receive a pong from client, reconnecting!");
@@ -107,14 +116,9 @@ class WebSocketClient {
           REQUEST_KEYS.TOTAL_PING_PONG
         );
         this.terminate();
-      }, this.#pingPongTimer + 1000);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
-      this.#heartbeatPing = setTimeout(() => {
-        getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
-        logger.debug(this.url + ": Pinging client");
-        this.#instance.ping();
-      }, this.#pingPongTimer - 1000);
-      logger.debug(this.url + " ping timout set", this.#pingPongTimer - 1000);
+        // consider a minute without response a dead connection! Should cover WiFi devices better.
+      }, this.#pingPongTimer + 2000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 2000);
     });
 
     this.#instance.on("unexpected-response", (err) => {
@@ -157,7 +161,6 @@ class WebSocketClient {
           timeDifference - this.#lastMessage
         }ms since last message`
       );
-      logger.debug(`${timeDifference - this.#lastMessage}ms since last message`);
       ConnectionMonitorService.updateOrAddResponse(
         this.url,
         REQUEST_TYPE.WEBSOCKET,

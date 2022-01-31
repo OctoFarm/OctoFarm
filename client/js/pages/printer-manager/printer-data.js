@@ -63,6 +63,7 @@ function updatePrinterState(printer) {
 }
 function updatePrinterInfo(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
+  const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
 
   const printerSortIndex = document.getElementById(`printerSortIndex-${printer._id}`);
@@ -70,6 +71,7 @@ function updatePrinterInfo(printer) {
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
+  UI.doesElementNeedUpdating(printer.printerURL, printerURL, "innerHTML");
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 

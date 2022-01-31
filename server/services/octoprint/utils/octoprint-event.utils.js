@@ -5,6 +5,7 @@ const { SystemRunner } = require("../../system-information.service");
 const { AppConstants } = require("../../../constants/app.constants");
 const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
+const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
 
 const logger = new Logger("OctoFarm-State");
@@ -20,10 +21,10 @@ const captureClientAuthed = (id, data) => {
 
   let detectedAddress = "Socked Authed for: ";
 
-  if (networkIpAddresses.includes(remoteAddress)) {
+  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
     detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress += remoteAddress;
+    detectedAddress += parseOutIPAddress(remoteAddress);
   } else {
     detectedAddress += "Unknown IP";
   }
@@ -60,10 +61,10 @@ const captureClientClosed = (id, data) => {
   const { remoteAddress } = data;
 
   let detectedAddress = "Socket was closed for: ";
-  if (networkIpAddresses.includes(remoteAddress)) {
+  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
     detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress += remoteAddress;
+    detectedAddress += parseOutIPAddress(remoteAddress);
   } else {
     detectedAddress += "Unknown IP";
   }
@@ -85,10 +86,10 @@ const captureClientOpened = (id, data) => {
   const { remoteAddress } = data;
 
   let detectedAddress = "Socket Opened for: ";
-  if (networkIpAddresses.includes(remoteAddress)) {
+  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
     detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
   } else if (!!remoteAddress) {
-    detectedAddress += remoteAddress;
+    detectedAddress += parseOutIPAddress(remoteAddress);
   } else {
     detectedAddress += "Unknown IP";
   }

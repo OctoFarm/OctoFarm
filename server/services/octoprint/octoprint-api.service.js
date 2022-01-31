@@ -3,7 +3,7 @@
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-State");
+const logger = new Logger("OctoFarm-OctoPrint-API");
 
 const ConnectionMonitorService = require("../connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
@@ -40,6 +40,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
+        logger.error("Failed to fetch", e);
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -72,6 +73,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
+      logger.error("Failed fetch timeout!", e);
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
@@ -115,6 +117,7 @@ class OctoprintApiService {
     try {
       return await this.get(item);
     } catch (e) {
+      logger.error("Error with get request", e);
       switch (e.code) {
         case "ECONNREFUSED":
           ConnectionMonitorService.updateOrAddResponse(
@@ -148,9 +151,9 @@ class OctoprintApiService {
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
           if (cutOffIn === 0) {
-            logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
+            logger.error(`${this.printerURL} | Cutoff reached! marking offline!`);
           } else {
-            logger.debug(
+            logger.error(
               `${this.printerURL} | Current Timeout: ${
                 this.#currentTimeout
               } | Cut off in ${cutOffIn}`
@@ -170,7 +173,7 @@ class OctoprintApiService {
             throw 408;
           }
           // Make sure to use the settings for api retry.
-          this.#currentTimeout = this.#currentTimeout + 9000;
+          this.#currentTimeout = this.#currentTimeout + 5000;
           logger.error(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });

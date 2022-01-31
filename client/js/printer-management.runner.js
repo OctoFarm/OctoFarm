@@ -194,7 +194,7 @@ connectionOverviewInformationBtn.addEventListener("click", async (e) => {
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Connect Printers",
     await bulkConnectPrinters
@@ -203,7 +203,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
 const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
 bulkDisconnectBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Disconnect Printers",
     await bulkDisconnectPrinters
@@ -212,7 +212,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
 bulkPowerBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Power On/Off Printers",
     await bulkOctoPrintPowerCommand

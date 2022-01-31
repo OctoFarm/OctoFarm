@@ -75,7 +75,7 @@
     "toad-scheduler": "^1.6.0",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
-    "ws": "^8.3.0",
+    "ws": "^8.4.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
