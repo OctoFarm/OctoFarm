@@ -9,7 +9,6 @@ on:
 jobs:
   bump-client-version:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: 'Checkout source code'
         uses: 'actions/checkout@v2'
@@ -36,7 +35,6 @@ jobs:
 
   bump-server-version:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: 'Checkout source code'
         uses: 'actions/checkout@v2'
