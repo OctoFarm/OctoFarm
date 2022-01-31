@@ -880,7 +880,7 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring User List", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
     let usersCheck = await this.#api.getUsers(true).catch((e) => {
-      logger.error("Failed to acuire user list: " + e.message, e);
+      logger.error("Failed to acuire user list: " + e?.message, e);
       return false;
     });
 

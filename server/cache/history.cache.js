@@ -1,7 +1,5 @@
 const { HistoryClean } = require("../services/history-cleaner.service");
 
-//TODO change, remove clean up
-
 let historyCleanState = new HistoryClean();
 
 function getHistoryCache() {

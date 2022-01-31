@@ -25,8 +25,6 @@ function validateMongoURL(mongoURL) {
   };
 }
 
-//TODO wow, these need importing not duplcating...
-
 router.get("/", (req, res) =>
   res.render("databaseIssue", {
     page: "Database Warning",
