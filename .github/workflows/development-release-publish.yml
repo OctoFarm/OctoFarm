@@ -1,4 +1,4 @@
-name: Frontend Webpack and NPM Publish
+name: Development Release Publish
 on:
   pull_request:
     types: [ closed ]
