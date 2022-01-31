@@ -1,61 +1,20 @@
-
-name: Development Release Bump and Publish
-
+name: Bump Server Version
 on:
   push:
     branches:
       - development
-
+    paths-ignore:
+      - 'server/package.json'
+      - 'CHANGELOG.md'
 jobs:
-  bump-client-version:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v2'
+      - name: Check out repo
+        uses: actions/checkout@v2
+      - name: Use Node
+        uses: actions/setup-node@v2
         with:
-          ref: ${{ github.ref }}
-      - name: 'Automated Client Version Bump'
-        id: version-bump
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'client'
-        with:
-          major-wording: '[Major]'
-          minor-wording: '[Minor],add,Adds,new'
-          patch-wording: '[Patch],patch,fixes,fixed'
-          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-          preid: 'rc'
-          target-branch: 'development'
-          commit-message: 'CI: bumps client version to {{version}}'
-      - name: 'Output Step'
-        env:
-          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-        run: echo "new tag $NEW_TAG"
-
-  bump-server-version:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v2'
-        with:
-          ref: ${{ github.ref }}
-      - name: 'Automated Server Version Bump'
-        id: version-bump
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'server'
-        with:
-          major-wording: '[Major]'
-          minor-wording: '[Minor],add,Adds,new'
-          patch-wording: '[Patch],patch,fixes,fixed'
-          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-          preid: 'rc'
-          target-branch: 'development'
-          commit-message: 'CI: bumps client version to {{version}}'
-      - name: 'Output Step'
-        env:
-          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-        run: echo "new tag $NEW_TAG"
-
+          node-version: '14.x'
+      - run: npm version prerelease --preid=rc
+        working-directory: ./server
