@@ -59,8 +59,8 @@ const options = {
     curve: "smooth"
   },
   title: {
-    text: "CPU and Memory Usage History",
-    align: "left"
+    text: "System CPU and Memory Usage History",
+    align: "center"
   },
   markers: {
     size: 0
@@ -131,6 +131,10 @@ const cpuOptions = {
       }
     }
   },
+  title: {
+    text: "Current System CPU Usage (%)",
+    align: "center"
+  },
   theme: {
     mode: "dark"
   },
@@ -138,7 +142,7 @@ const cpuOptions = {
     text: "Loading Data..."
   },
   series: [],
-  labels: ["CPU Usage"]
+  labels: ["CPU (%)"]
 };
 const memoryOptions = {
   chart: {
@@ -153,6 +157,10 @@ const memoryOptions = {
       }
     }
   },
+  title: {
+    text: "Current System Memory Usage (%)",
+    align: "center"
+  },
   theme: {
     mode: "dark"
   },
@@ -160,7 +168,7 @@ const memoryOptions = {
     text: "Loading Data..."
   },
   series: [],
-  labels: ["Memory Usage"]
+  labels: ["Memory (%)"]
 };
 
 async function setupOPTimelapseSettings() {

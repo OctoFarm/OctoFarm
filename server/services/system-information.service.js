@@ -49,14 +49,11 @@ class SystemRunner {
   }
 
   static profileMemoryUsagePercent() {
-    const used = process.memoryUsage();
-    const total = used.heapUsed + used.external;
-    const totalUsed = Math.round((total / 1024 / 1024) * 100) / 100;
+    const used = os.freemem();
+    const total = os.totalmem();
 
     if (systemInformationService.totalMemory !== 0) {
-      const totalSystemMemoryInMB =
-        Math.round((systemInformationService.totalMemory / 1024 / 1024) * 100) / 100;
-      const memoryPercent = Math.round((100 * totalUsed) / totalSystemMemoryInMB) / 100;
+      const memoryPercent = Math.round((100 * used) / total) / 100;
       logger.debug("Current Memory Usage", { memoryPercent });
       memoryUsageHistory.push({
         x: new Date(),
