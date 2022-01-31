@@ -184,7 +184,8 @@ router.post(
     const id = req.body.i;
     let returnedPrinterInformation;
     if (!id) {
-      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
+      const disabled = req.query.disabled === "true";
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(false, disabled);
     } else {
       returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
     }

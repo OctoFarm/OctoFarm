@@ -50,18 +50,26 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
-  listPrintersInformation(disabled = false) {
+  listPrintersInformation(disabled = false, onlyDisabled = false) {
     const returnList = [];
 
-    this.#printersList.forEach((printer) => {
-      if (disabled) {
-        returnList.push(Object.assign({}, printer));
-      } else {
-        if (!printer.disabled) {
+    if (onlyDisabled) {
+      this.#printersList.forEach((printer) => {
+        if (printer?.disabled) {
           returnList.push(Object.assign({}, printer));
         }
-      }
-    });
+      });
+    } else {
+      this.#printersList.forEach((printer) => {
+        if (disabled) {
+          returnList.push(Object.assign({}, printer));
+        } else {
+          if (!printer.disabled) {
+            returnList.push(Object.assign({}, printer));
+          }
+        }
+      });
+    }
 
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }

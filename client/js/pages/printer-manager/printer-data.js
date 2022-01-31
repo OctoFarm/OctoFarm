@@ -71,7 +71,7 @@ function updatePrinterInfo(printer) {
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerURL, printerURL, "innerHTML");
+  UI.doesElementNeedUpdating(`${printer.printerURL} <br> ${printer.webSocketURL}`, printerURL, "innerHTML");
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 

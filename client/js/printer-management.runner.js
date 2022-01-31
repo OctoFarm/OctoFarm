@@ -2,7 +2,9 @@ import {createClientSSEWorker} from "./services/client-worker.service";
 import PrinterSelectionService from "./services/printer-selection.service";
 import {
     bulkConnectPrinters,
+    bulkDisablePrinters,
     bulkDisconnectPrinters,
+    bulkEnablePrinters,
     bulkEnableVirtualPrinter,
     bulkOctoPrintClientUpdate,
     bulkOctoPrintPluginAction,
@@ -42,6 +44,19 @@ bulkPluginUpdateButton.addEventListener("click", async () => {
 let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   await bulkOctoPrintClientUpdate();
+});
+
+let bulkDisablePrintersButton = document.getElementById("disablePrintersBtn");
+bulkDisablePrintersButton.addEventListener("click", async (e) => {
+    await PrinterSelectionService.create(multiPrinterSelectModal, false, "Disable Printers", function () {
+        bulkDisablePrinters();
+    });
+});
+let bulkEnablePrintersButton = document.getElementById("enablePrintersBtn");
+bulkEnablePrintersButton.addEventListener("click", async (e) => {
+    await PrinterSelectionService.create(multiPrinterSelectModal, false, "Enable Printers", function () {
+        bulkEnablePrinters();
+    });
 });
 
 let scanNetworkBtn = document.getElementById("scanNetworkBtn");

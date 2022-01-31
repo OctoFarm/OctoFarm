@@ -102,8 +102,14 @@ export default class OctoFarmClient {
     return await this.post(`${this.printerRoute}/printerInfo/`, body);
   }
 
-  static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfo/`);
+  static async listPrinters(disabled = false) {
+    let path = `${this.printerRoute}/printerInfo`
+
+    if(disabled){
+      path += "?disabled=true"
+    }
+
+    return this.post(path);
   }
 
   static async disablePrinter(id) {

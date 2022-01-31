@@ -17,10 +17,16 @@
                            href="#"
                            aria-expanded="false"><i class="fas fa-plus fa-sm"></i> Add</a>
                         <a class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit"></i> Edit</a>
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit"></i> Bulk Edit</a>
                         <a class="dropdown-item" title="Delete Printers from your farm"
                            id="deletePrintersBtn"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash"></i> Delete</a>
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash"></i> Bulk Delete</a>
+                        <a class="dropdown-item" title="Delete Printers from your farm"
+                           id="enablePrintersBtn"
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-running"></i> Bulk Enable</a>
+                        <a class="dropdown-item" title="Delete Printers from your farm"
+                           id="disablePrintersBtn"
+                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-wheelchair"></i> Bulk Disable</a>
                         <h6 class="dropdown-header">Actions</h6>
                         <label>
                             <input class="fileElem"
@@ -28,16 +34,16 @@
                                    id="importPrinterBtn"
                                    accept=".json" style="display: none;">
                             <a title="Import printers from a json file" class="dropdown-item"><i
-                                        class="fas fa-file-import"></i> Import</a>
+                                        class="fas fa-file-import"></i> Bulk Import</a>
                         </label>
                         <a class="dropdown-item" title="Export printers from OctoFarm"
                            id="exportPrinterBtn">
-                            <i class="fas fa-file-export"></i> Export
+                            <i class="fas fa-file-export"></i> Bulk Export
                         </a>
                         <a class="dropdown-item"
                            title="Add printers by scanning your network for online OctoPrint instances."
                            id="scanNetworkBtn">
-                            <i class="fas fa-wifi"></i> Scan
+                            <i class="fas fa-wifi"></i> Scan Network
                         </a>
                         <h6 class="dropdown-header">Printer Commands</h6>
                         <a class="dropdown-item"
@@ -45,21 +51,21 @@
                            id="bulkConnectBtn"
                            aria-expanded="false"
                            data-toggle="modal" data-target="#printerSelectModal">
-                            <i class="fas fa-link"></i> Connect
+                            <i class="fas fa-link"></i> Bulk Connect
                         </a>
                         <a class="dropdown-item"
                            title="Add printers by scanning your network for online OctoPrint instances."
                            id="bulkDisconnectBtn"
                            aria-expanded="false"
                            data-toggle="modal" data-target="#printerSelectModal">
-                            <i class="fas fa-unlink"></i> Disconnect
+                            <i class="fas fa-unlink"></i> Bulk Disconnect
                         </a>
                         <a class="dropdown-item"
                            title="Add printers by scanning your network for online OctoPrint instances."
                            id="bulkPowerBtn">
                             <i class="fas fa-power-off"
                                aria-expanded="false"
-                               data-toggle="modal" data-target="#printerSelectModal"></i> Power
+                               data-toggle="modal" data-target="#printerSelectModal"></i> Bulk Power
                         </a>
                     </div>
                 </div>
