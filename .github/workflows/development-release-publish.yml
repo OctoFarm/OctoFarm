@@ -1,4 +1,6 @@
-name: Development Release Publish
+
+name: Development Release Bump and Publish
+
 on:
   pull_request:
     types: [ closed ]
@@ -7,6 +9,7 @@ on:
 
 jobs:
   bump-client-version:
+    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
       - name: 'Checkout source code'
@@ -33,6 +36,7 @@ jobs:
         run: echo "new tag $NEW_TAG"
 
   bump-server-version:
+    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
       - name: 'Checkout source code'
