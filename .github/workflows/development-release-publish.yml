@@ -1,4 +1,4 @@
-name: Development Release Publish
+name: Development Release Bump and Publish
 on:
   pull_request:
     types: [ closed ]
