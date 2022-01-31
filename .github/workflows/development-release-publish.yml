@@ -2,10 +2,9 @@
 name: Development Release Bump and Publish
 
 on:
-  pull_request:
-    types: [ closed ]
-    branches:
-      - development
+  workflow_dispatch:
+  push:
+    branches: [ development ]
 
 jobs:
   bump-client-version:
@@ -23,8 +22,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGEJSON_DIR: 'client'
         with:
+          major-wording: '[Major]'
           minor-wording: '[Minor],add,Adds,new'
-          major-wording: '[Major],'
           patch-wording: '[Patch],patch,fixes,fixed'
           rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
           preid: 'rc'
@@ -50,8 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGEJSON_DIR: 'server'
         with:
+          major-wording: '[Major]'
           minor-wording: '[Minor],add,Adds,new'
-          major-wording: '[Major],'
           patch-wording: '[Patch],patch,fixes,fixed'
           rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
           preid: 'rc'
