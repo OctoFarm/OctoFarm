@@ -2,9 +2,9 @@
 name: Development Release Bump and Publish
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ development ]
+    branches:
+      - development
 
 jobs:
   bump-client-version:
