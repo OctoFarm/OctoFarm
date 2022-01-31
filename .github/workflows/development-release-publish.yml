@@ -1,20 +1,62 @@
 name: Bump Server Version
 on:
-  push:
+  pull_request:
+    types: [ closed ]
     branches:
+      - master
       - development
     paths-ignore:
       - 'server/package.json'
-      - 'CHANGELOG.md'
+      - 'client/package.json'
+
 jobs:
-  build:
+  bump-server-version:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'server/**'
+            frontend:
+              - 'client/**'
+
+        # run only if server changes detected
+      - name: backend tests
+        if: steps.filter.outputs.backend == 'true'
+
       - name: Use Node
         uses: actions/setup-node@v2
         with:
           node-version: '14.x'
       - run: npm version prerelease --preid=rc
         working-directory: ./server
+      - run: npm install
+        working-directory: ./server
+
+      # run only if client changes detected
+      - name: frontend tests
+        if: steps.filter.outputs.frontend == 'true'
+      - name: Use Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - run: npm version prerelease --preid=rc
+        working-directory: ./client
+      - run: npm install
+        working-directory: ./client
+      - run: npm ci --no-optional
+        working-directory: ./client
+      - run: npm run build
+        working-directory: ./client
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./client/package.json
+      # once pushed to npm, we can update the server version in it's package.json
