@@ -8,30 +8,53 @@ on:
 jobs:
   bump-client-version:
     if: github.event.pull_request.merged == true
-    uses: 'phips28/gh-action-bump-version@master'
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PACKAGEJSON_DIR:  'client'
-    with:
-      minor-wording: '[Minor],add,Adds,new'
-      major-wording: '[Major],'
-      patch-wording: '[Patch],patch,fixes,fixed'
-      rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-      preid: 'rc'
-      target-branch: 'development'
-      commit-message: 'CI: bumps client version to {{version}}'
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v2'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Automated Client Version Bump'
+        id: version-bump
+        uses: 'phips28/gh-action-bump-version@master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGEJSON_DIR: 'client'
+        with:
+          minor-wording: '[Minor],add,Adds,new'
+          major-wording: '[Major],'
+          patch-wording: '[Patch],patch,fixes,fixed'
+          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
+          preid: 'rc'
+          target-branch: 'development'
+          commit-message: 'CI: bumps client version to {{version}}'
+      - name: 'Output Step'
+        env:
+          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+        run: echo "new tag $NEW_TAG"
+
   bump-server-version:
     if: github.event.pull_request.merged == true
-    uses: 'phips28/gh-action-bump-version@master'
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      PACKAGEJSON_DIR:  'server'
-    with:
-      minor-wording: '[Minor],add,Adds,new'
-      major-wording: '[Major],'
-      patch-wording: '[Patch],patch,fixes,fixed'
-      rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-      preid: 'rc'
-      target-branch: 'development'
-      commit-message: 'CI: bumps server version to {{version}}'     `
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v2'
+        with:
+          ref: ${{ github.ref }}
+      - name: 'Automated Server Version Bump'
+        id: version-bump
+        uses: 'phips28/gh-action-bump-version@master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGEJSON_DIR: 'server'
+        with:
+          minor-wording: '[Minor],add,Adds,new'
+          major-wording: '[Major],'
+          patch-wording: '[Patch],patch,fixes,fixed'
+          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
+          preid: 'rc'
+          target-branch: 'development'
+          commit-message: 'CI: bumps client version to {{version}}'
+      - name: 'Output Step'
+        env:
+          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+        run: echo "new tag $NEW_TAG"
 
