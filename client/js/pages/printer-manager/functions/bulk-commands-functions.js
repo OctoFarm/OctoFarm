@@ -47,9 +47,9 @@ const fileUploads = new Queue();
 let selectedFolder = "";
 
 //REFACTOR this should come from printer select to save the extra call, re-iteration and matching.
-async function getCurrentlySelectedPrinterList() {
+async function getCurrentlySelectedPrinterList(disabled) {
   try {
-    const currentPrinterList = await OctoFarmClient.listPrinters();
+    const currentPrinterList = await OctoFarmClient.listPrinters(disabled);
     const matchedPrinters = [];
     //Grab all check boxes
     const selectedPrinters = PrinterSelectionService.getSelected();
@@ -210,23 +210,23 @@ export async function bulkDisablePrinters() {
   updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
-export async function bulkEnablePrinters() {
-  const printersToControl = await getCurrentlySelectedPrinterList();
-  showBulkActionsModal();
-  updateBulkActionsProgress(0, printersToControl.length);
-  generateTableRows(printersToControl);
-  for (let p = 0; p < printersToControl.length; p++) {
-    await OctoFarmClient.enablePrinter(printersToControl[p]._id);
-    const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
-    const enableButton = document.getElementById("printerEnable-"+printersToControl[p]._id);
-    enableButton.classList = "btn btn-outline-success btn-sm";
-    enableButton.innerHTML = "<i class=\"fas fa-running\"></i> Enabled";
-    enableButton.title = "Printer is Enabled, click to disable";
-    printerCard.classList = "";
-    updateTableRow(printersToControl[p]._id, "success", "Successfully Disabled your printer!");
-    updateBulkActionsProgress(p, printersToControl.length);
-  }
-  updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+export async function bulkEnablePrinters(disabled) {
+    const printersToControl = await getCurrentlySelectedPrinterList(disabled);
+    showBulkActionsModal();
+    updateBulkActionsProgress(0, printersToControl.length);
+    generateTableRows(printersToControl);
+    for (let p = 0; p < printersToControl.length; p++) {
+      await OctoFarmClient.enablePrinter(printersToControl[p]._id);
+      const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
+      const enableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
+      enableButton.classList = "btn btn-outline-success btn-sm";
+      enableButton.innerHTML = "<i class=\"fas fa-running\"></i> Enabled";
+      enableButton.title = "Printer is Enabled, click to disable";
+      printerCard.classList = "";
+      updateTableRow(printersToControl[p]._id, "success", "Successfully Enabled your printer!");
+      updateBulkActionsProgress(p, printersToControl.length);
+    }
+    updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
 function setupSingleFileMode(printers, file = "No File", selectedFolder = "") {

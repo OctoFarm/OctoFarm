@@ -55,7 +55,7 @@ bulkDisablePrintersButton.addEventListener("click", async (e) => {
 let bulkEnablePrintersButton = document.getElementById("enablePrintersBtn");
 bulkEnablePrintersButton.addEventListener("click", async (e) => {
     await PrinterSelectionService.create(multiPrinterSelectModal, false, "Enable Printers", function () {
-        bulkEnablePrinters();
+        bulkEnablePrinters(true);
     });
 });
 
