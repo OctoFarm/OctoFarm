@@ -1,21 +1,22 @@
 name: Bump Server Version Pre-Release
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
     branches:
       - development
     paths-ignore:
-      - 'server/package.json'
-      - 'client/package.json'
+      - "server/package.json"
+      - "client/package.json"
 
 jobs:
   bump-versions-pre-release:
+    name: Bump Versions for pre-release
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
       # Checkout the development repository
       - name: Check out repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
@@ -32,9 +33,9 @@ jobs:
               - 'client/**'
       # Install node v14 to use.
       - name: Use Node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v2
         with:
-          node-version: '14.x'
+          node-version: "14.x"
       # Up revision the rc version for development
       - name: server up revision
         if: steps.filter.outputs.server == 'true'
@@ -62,7 +63,7 @@ jobs:
       # Grab the client package version into a variable.
       - name: get-client-current-version
         id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@master
+      - uses: martinbeentjes/npm-get-version-action@master
         with:
           path: client/package.json
       # Update Server Package with latest client package
@@ -72,7 +73,7 @@ jobs:
       # Commit changes to the current development repository
       - name: get-server-current-version
         id: server-package-version
-        uses: martinbeentjes/npm-get-version-action@master
+      - uses: martinbeentjes/npm-get-version-action@master
         with:
           path: server/package.json
 
