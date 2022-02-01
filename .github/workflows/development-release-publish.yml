@@ -1,9 +1,8 @@
-name: Bump Server Version
+name: Bump Server Version Pre-Release
 on:
   pull_request:
     types: [ closed ]
     branches:
-      - master
       - development
     paths-ignore:
       - 'server/package.json'
@@ -18,38 +17,36 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN_ACTION }}
       - uses: dorny/paths-filter@v2
         id: filter
         with:
           filters: |
-            backend:
+            server:
               - 'server/**'
-            frontend:
+            client:
               - 'client/**'
 
         # run only if server changes detected
-      - name: backend tests
-        if: steps.filter.outputs.backend == 'true'
+      - name: server up revision
+        if: steps.filter.outputs.server == 'true'
 
       - name: Use Node
         uses: actions/setup-node@v2
         with:
           node-version: '14.x'
       - run: npm version prerelease --preid=rc
-        working-directory: ./server
-      - run: npm install
         working-directory: ./server
 
       # run only if client changes detected
-      - name: frontend tests
-        if: steps.filter.outputs.frontend == 'true'
+      - name: client up revision
+        if: steps.filter.outputs.client == 'true'
       - name: Use Node
         uses: actions/setup-node@v2
         with:
           node-version: '14.x'
       - run: npm version prerelease --preid=rc
-        working-directory: ./client
-      - run: npm install
         working-directory: ./client
       - run: npm ci --no-optional
         working-directory: ./client
@@ -60,3 +57,27 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./client/package.json
       # once pushed to npm, we can update the server version in it's package.json
+      - run:
+        working-directory: ./client
+
+      - name: commit changes
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+      - name: get-npm-version
+        id: server-package-version
+        uses: martinbeentjes/npm-get-version-action@master
+        with:
+          path: server/package.json
+      - name: get-npm-version
+        id: client-package-version
+        uses: martinbeentjes/npm-get-version-action@master
+        with:
+          path: client/package.json
+        ## commit to repo, and prep pre-release
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: development
+          commit_message: "[Bot] Bump development versions!"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          tagging_message: ${{ steps.server-package-version.outputs.current-version }}
