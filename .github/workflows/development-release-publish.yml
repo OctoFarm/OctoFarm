@@ -10,7 +10,6 @@ on:
 
 jobs:
   bump-versions-pre-release:
-    name: Bump Versions for pre-release
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
