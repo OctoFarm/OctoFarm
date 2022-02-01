@@ -15,12 +15,12 @@ jobs:
     if: github.event.pull_request.merged == true
     steps:
       # Checkout the development repository
-      - name: Check out repo
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
           token: ${{ secrets.TOKEN_ACTION }}
+
       # Check to see if changes have occurred in client / server directories
       - name: Detect path changes
       - uses: dorny/paths-filter@v2
@@ -28,14 +28,16 @@ jobs:
         with:
           filters: |
             server:
-              - 'server/**'
+            - 'server/**'
             client:
-              - 'client/**'
+            - 'client/**'+
+
       # Install node v14 to use.
       - name: Use Node
       - uses: actions/setup-node@v2
         with:
           node-version: "14.x"
+
       # Up revision the rc version for development
       - name: server up revision
         if: steps.filter.outputs.server == 'true'
@@ -47,6 +49,7 @@ jobs:
         if: steps.filter.outputs.client == 'true'
       - run: npm version prerelease --preid=rc
         working-directory: ./client
+
       # Build the client for npm publish
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
@@ -54,21 +57,25 @@ jobs:
         working-directory: ./client
       - run: npm run build
         working-directory: ./client
+
       # Publish the new build to npm
       - name: publish to npm
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./client/package.json
+
       # Grab the client package version into a variable.
       - name: get-client-current-version
         id: client-package-version
       - uses: martinbeentjes/npm-get-version-action@master
         with:
           path: client/package.json
+
       # Update Server Package with latest client package
       - name: update server client version
         run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
+        working-directory: ./server
 
       # Commit changes to the current development repository
       - name: get-server-current-version
