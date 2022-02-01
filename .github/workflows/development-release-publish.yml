@@ -54,13 +54,13 @@ jobs:
       - run: npm run build
         working-directory: ./client
       # Publish the new build to npm
-      - name publish to npm
+      - name: publish to npm
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./client/package.json
       # Grab the client package version into a variable.
-      - name: get-npm-version
+      - name: get-client-current-version
         id: client-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
@@ -75,11 +75,7 @@ jobs:
         uses: martinbeentjes/npm-get-version-action@master
         with:
           path: server/package.json
-      - name: get-npm-version
-        id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@master
-        with:
-          path: client/package.json
+
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
         if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
