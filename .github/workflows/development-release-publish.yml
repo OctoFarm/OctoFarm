@@ -10,8 +10,9 @@ on:
 
 jobs:
   bump-versions-pre-release:
-    runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
     steps:
       # Checkout the development repository
       - uses: actions/checkout@v2
@@ -38,23 +39,23 @@ jobs:
           node-version: "14.x"
 
       # Up revision the rc version for development
-      - name: server up revision
-        if: steps.filter.outputs.server == 'true'
-      - run: npm version prerelease --preid=rc
+      - if: steps.filter.outputs.server == 'true'
+        name: server up revision
+        run: npm version prerelease --preid=rc
         working-directory: ./server
 
         # Up revision the rc version for development
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
-      - run: npm version prerelease --preid=rc
+        run: npm version prerelease --preid=rc
         working-directory: ./client
 
       # Build the client for npm publish
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
-      - run: npm ci --no-optional
+        run: npm ci --no-optional
         working-directory: ./client
-      - run: npm run build
+        run: npm run build
         working-directory: ./client
 
       # Publish the new build to npm
