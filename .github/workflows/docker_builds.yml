@@ -18,8 +18,6 @@ jobs:
             echo 'TAG_EDGE=latest' >> $GITHUB_ENV
           elif ${{ github.ref == 'refs/heads/development' }} == true; then
             echo 'TAG_EDGE=dev' >> $GITHUB_ENV
-          else
-            echo 'TAG_EDGE=canary' >> $GITHUB_ENV
           fi
       -
         name: Docker meta
