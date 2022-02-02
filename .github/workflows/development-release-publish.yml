@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          ref: development
           token: ${{ secrets.TOKEN_ACTION }}
 
       # Check to see if changes have occurred in client / server directories
