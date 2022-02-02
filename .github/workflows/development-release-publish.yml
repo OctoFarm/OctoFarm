@@ -51,7 +51,7 @@ jobs:
         working-directory: ./client
 
       # Build the client for npm publish
-      - name: client up revision
+      - name: client build
         if: steps.filter.outputs.client == 'true'
         run: |
           cd ./client
