@@ -17,7 +17,8 @@
     "build-client": "cd client && npm run build",
     "commit": "git-cz",
     "semantic-release": "semantic-release",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "pre-commit": "lint-staged"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^7.0.0",
+    "lint-staged": "^12.3.3",
     "semantic-release": "^19.0.2"
   },
   "config": {

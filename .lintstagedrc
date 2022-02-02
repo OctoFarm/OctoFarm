@@ -1,0 +1,4 @@
+{
+  "server/**/*.+(js)": ["eslint", "prettier --write"],
+  "client/**/*.+(js)": ["eslint" , "prettier --write"]
+}
