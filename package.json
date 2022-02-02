@@ -16,7 +16,8 @@
     "dev-client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
     "commit": "git-cz",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,7 @@
     "@commitlint/config-conventional": "^16.0.0",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
-    "husky": "^7.0.4",
+    "husky": "^7.0.0",
     "semantic-release": "^19.0.2"
   },
   "config": {
@@ -37,6 +38,7 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "npm run prettier",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
