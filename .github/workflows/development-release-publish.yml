@@ -1,61 +1,101 @@
-
-name: Development Release Bump and Publish
-
+name: Bump Server Version Alpha
 on:
-  push:
+  pull_request:
+    types: [ closed ]
     branches:
       - development
+    paths-ignore:
+      - "server/package.json"
+      - "client/package.json"
 
 jobs:
-  bump-client-version:
+  bump-versions-pre-release:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v2'
-        with:
-          ref: ${{ github.ref }}
-      - name: 'Automated Client Version Bump'
-        id: version-bump
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'client'
-        with:
-          major-wording: '[Major]'
-          minor-wording: '[Minor],add,Adds,new'
-          patch-wording: '[Patch],patch,fixes,fixed'
-          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-          preid: 'rc'
-          target-branch: 'development'
-          commit-message: 'CI: bumps client version to {{version}}'
-      - name: 'Output Step'
-        env:
-          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-        run: echo "new tag $NEW_TAG"
 
-  bump-server-version:
-    runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout source code'
-        uses: 'actions/checkout@v2'
+      # Checkout the development repository
+      - uses: actions/checkout@v2
         with:
-          ref: ${{ github.ref }}
-      - name: 'Automated Server Version Bump'
-        id: version-bump
-        uses: 'phips28/gh-action-bump-version@master'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGEJSON_DIR: 'server'
-        with:
-          major-wording: '[Major]'
-          minor-wording: '[Minor],add,Adds,new'
-          patch-wording: '[Patch],patch,fixes,fixed'
-          rc-wording: '[RC],rc, RC, beta, Beta, Alpha, alpha'
-          preid: 'rc'
-          target-branch: 'development'
-          commit-message: 'CI: bumps client version to {{version}}'
-      - name: 'Output Step'
-        env:
-          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-        run: echo "new tag $NEW_TAG"
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN_ACTION }}
 
+      # Check to see if changes have occurred in client / server directories
+      - name: Detecting changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            server:
+            - 'server/**'
+            client:
+            - 'client/**'+
+
+      # Install node v14 to use.
+      - name: Use Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+
+      # Up revision the rc version for development
+      - if: steps.filter.outputs.server == 'true'
+        name: server up revision
+        run: npm version prerelease --preid=alpha
+        working-directory: ./server
+
+        # Up revision the rc version for development
+      - name: client up revision
+        if: steps.filter.outputs.client == 'true'
+        run: npm version prerelease --preid=alpha
+        working-directory: ./client
+
+      # Build the client for npm publish
+      - name: client up revision
+        if: steps.filter.outputs.client == 'true'
+        run: npm ci --no-optional
+        working-directory: ./client
+        run: npm run build
+        working-directory: ./client
+
+      # Publish the new build to npm
+      - name: publish to npm
+        if: steps.filter.outputs.client == 'true'
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./client/package.json
+
+      # Grab the client package version into a variable.
+      - name: get-client-current-version
+        if: steps.filter.outputs.client == 'true'
+        id: client-package-version
+        uses: martinbeentjes/npm-get-version-action@master
+        with:
+          path: client/package.json
+
+      # Update Server Package with latest client package
+      - name: update server client version
+        if: steps.filter.outputs.client == 'true'
+        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
+        working-directory: ./server
+
+      # Commit changes to the current development repository
+      - name: get-server-current-version
+        if: steps.filter.outputs.server == 'true'
+        id: server-package-version
+        uses: martinbeentjes/npm-get-version-action@master
+        with:
+          path: server/package.json
+
+        ## commit to repo, and prep pre-release
+      - name: commit-changes-made
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: development
+          commit_message: "[Bot] Bump Alpha Version!"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          tagging_message: ${{ steps.server-package-version.outputs.current-version }}
