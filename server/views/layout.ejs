@@ -126,7 +126,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li id="menuPrinters">
-                <% if(process.env.npm_package_version && process.env.npm_package_version.includes("rc")){ %>
+                <% if(process.env.npm_package_version && process.env.npm_package_version.includes("rc") || process.env.npm_package_version.includes("alpha")){ %>
                     <a title="Current development version" class="nav-link text-center notyet">
                         <i class="fas fa-code-branch"></i> <%= process.env.npm_package_version %>
                     </a>
