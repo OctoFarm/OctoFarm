@@ -15,6 +15,7 @@
     "install-client": "cd client && npm install",
     "dev-client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
+    "commit": "git-cz",
     "semantic-release": "semantic-release"
   },
   "repository": {
@@ -22,6 +23,21 @@
     "url": "https://github.com/OctoFarm/OctoFarm"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.1.0",
+    "@commitlint/config-conventional": "^16.0.0",
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^7.0.4",
     "semantic-release": "^19.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }
