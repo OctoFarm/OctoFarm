@@ -1,4 +1,4 @@
-name: Bump Server Version Pre-Release
+name: Bump Server Version Alpha
 on:
   pull_request:
     types: [ closed ]
@@ -41,13 +41,13 @@ jobs:
       # Up revision the rc version for development
       - if: steps.filter.outputs.server == 'true'
         name: server up revision
-        run: npm version prerelease --preid=rc
+        run: npm version prerelease --preid=alpha
         working-directory: ./server
 
         # Up revision the rc version for development
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
-        run: npm version prerelease --preid=rc
+        run: npm version prerelease --preid=alpha
         working-directory: ./client
 
       # Build the client for npm publish
@@ -60,6 +60,7 @@ jobs:
 
       # Publish the new build to npm
       - name: publish to npm
+        if: steps.filter.outputs.client == 'true'
         uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
@@ -67,6 +68,7 @@ jobs:
 
       # Grab the client package version into a variable.
       - name: get-client-current-version
+        if: steps.filter.outputs.client == 'true'
         id: client-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
@@ -74,24 +76,26 @@ jobs:
 
       # Update Server Package with latest client package
       - name: update server client version
+        if: steps.filter.outputs.client == 'true'
         run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
         working-directory: ./server
 
       # Commit changes to the current development repository
       - name: get-server-current-version
+        if: steps.filter.outputs.server == 'true'
         id: server-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
           path: server/package.json
 
         ## commit to repo, and prep pre-release
-#      - name: commit-changes-made
-#        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
-#      - uses: stefanzweifel/git-auto-commit-action@v4
-#        with:
-#          branch: development
-#          commit_message: "[Bot] Bump development versions!"
-#          commit_user_name: NotExpectedYet
-#          commit_user_email: online@notexpectedyet.com
-#          commit_author: James Mackay <online@notexpectedyet.com>
-#          tagging_message: ${{ steps.server-package-version.outputs.current-version }}
+      - name: commit-changes-made
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: development
+          commit_message: "[Bot] Bump Alpha Version!"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          tagging_message: ${{ steps.server-package-version.outputs.current-version }}
