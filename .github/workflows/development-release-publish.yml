@@ -69,15 +69,15 @@ jobs:
       # Grab the client package version into a variable.
       - name: get-client-current-version
         if: steps.filter.outputs.client == 'true'
-        id: client-package-version
+        id: package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
-          path: client/package.json
+          path: client
 
       # Update Server Package with latest client package
       - name: update server client version
         if: steps.filter.outputs.client == 'true'
-        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
+        run: npm install @notexpectedyet/octofarm-client@${{ steps.package-version.outputs.current-version }} --save
         working-directory: ./server
 
       # Commit changes to the current development repository
@@ -86,7 +86,7 @@ jobs:
         id: server-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
-          path: server/package.json
+          path: server
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
@@ -94,7 +94,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: development
-          commit_message: "[Bot] Bump Alpha Version!"
+          commit_message: "[Bot] Bump Alpha Version! - v${{ steps.server-package-version.outputs.current-version }}"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>
