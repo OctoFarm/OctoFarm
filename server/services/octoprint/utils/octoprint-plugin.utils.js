@@ -1,5 +1,5 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
-const { PrinterTicker } = require("../../../runners/printerTicker");
+const { PrinterTicker } = require("../../printer-connection-log.service");
 
 const addOctoPrintLogWrapper = (id, message, state) => {
   PrinterTicker.addOctoPrintLog(

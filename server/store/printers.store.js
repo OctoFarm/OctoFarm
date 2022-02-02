@@ -1,7 +1,6 @@
 const { findIndex, cloneDeep } = require("lodash");
-const { EventEmitter } = require("events");
-const { ScriptRunner } = require("../runners/scriptCheck");
-const { PrinterTicker } = require("../runners/printerTicker");
+const { ScriptRunner } = require("../services/local-scripts.service");
+const { PrinterTicker } = require("../services/printer-connection-log.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
@@ -10,9 +9,9 @@ const Filament = require("../models/Filament");
 const { SettingsClean } = require("../services/settings-cleaner.service");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
-const { generate } = require("rxjs");
+const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -51,24 +50,36 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
-  listPrintersInformation(disabled = false) {
+  listPrintersInformation(disabled = false, onlyDisabled = false) {
     const returnList = [];
 
-    this.#printersList.forEach((printer) => {
-      if (disabled) {
-        returnList.push(Object.assign({}, printer));
-      } else {
-        if (!printer.disabled) {
+    if (onlyDisabled) {
+      this.#printersList.forEach((printer) => {
+        if (printer?.disabled) {
           returnList.push(Object.assign({}, printer));
         }
-      }
-    });
+      });
+    } else {
+      this.#printersList.forEach((printer) => {
+        if (disabled) {
+          returnList.push(Object.assign({}, printer));
+        } else {
+          if (!printer.disabled) {
+            returnList.push(Object.assign({}, printer));
+          }
+        }
+      });
+    }
 
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }
 
   listPrinters() {
     return this.#printersList;
+  }
+
+  listPrintersIDs() {
+    return this.#printersList.map((item) => item._id);
   }
 
   addPrinter(printer) {
@@ -187,17 +198,15 @@ class PrinterStore {
     return this.#findMePrinter(id);
   }
 
-  getPrinterEvent(id, event) {
-    const printer = this.#findMePrinter(id);
-    return printer[event + "Event"];
+  addPrinterEvent(id, event) {
+    getEventEmitterCache().once(`${id}-${event}`, function (...args) {
+      return ScriptRunner.check(...args);
+    });
   }
 
-  firePrinterEvent(id, event) {
+  emitPrinterEvent(id, event) {
     const printer = this.#findMePrinter(id);
-    if (!!printer[event + "Event"]) {
-      logger.info("Fired printer event", event);
-      printer[event + "Event"].emit(event.toLowerCase());
-    }
+    getEventEmitterCache().emit(`${id}-${event}`, printer, event.toLowerCase(), undefined);
   }
 
   getPrinterState(id) {
@@ -229,19 +238,6 @@ class PrinterStore {
     return printer.pluginsListEnabled.concat(printer.pluginsListDisabled);
   }
 
-  addPrinterEvent(id, event) {
-    const printer = this.#findMePrinter(id);
-    if (!printer[event + "Event"]) {
-      printer[event + "Event"] = new EventEmitter();
-      if (!printer[event + "Event"]._events[event.toLowerCase()]) {
-        logger.info("Added new event to printer: ", event);
-        printer[event + "Event"].once(event.toLowerCase(), (stream) => {
-          ScriptRunner.check(printer, event.toLowerCase(), undefined);
-        });
-      }
-    }
-  }
-
   updateAllPrintersSocketThrottle(seconds) {
     const printerList = this.listPrinters();
     printerList.forEach((printer) => {
@@ -262,7 +258,10 @@ class PrinterStore {
       const newPrinterInfo = newPrintersInformation[i];
 
       //Check for a printer name change...
-      if (oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name) {
+      if (
+        !!newPrinterInfo?.settingsAppearance?.name &&
+        oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name
+      ) {
         const loggerMessage = `Changed printer name from ${oldPrinter.settingsAppearance.name} to ${newPrinterInfo.settingsAppearance.name}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
@@ -291,7 +290,7 @@ class PrinterStore {
       }
 
       //Check for a printer url change...
-      if (oldPrinter.printerURL !== newPrinterInfo.printerURL) {
+      if (!!newPrinterInfo?.printerURL && oldPrinter.printerURL !== newPrinterInfo.printerURL) {
         const loggerMessage = `Changed printer url from ${oldPrinter.printerURL} to ${newPrinterInfo.printerURL}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
@@ -314,7 +313,6 @@ class PrinterStore {
           printerURL: newPrinterInfo.printerURL,
           webSocketURL: convertHttpUrlToWebsocket(newPrinterInfo.printerURL)
         });
-
         if (
           findIndex(this.#printersList, function (o) {
             return o._id === newPrinterInfo._id;
@@ -332,7 +330,7 @@ class PrinterStore {
       }
 
       // Check for apikey change...
-      if (oldPrinter.apikey !== newPrinterInfo.apikey) {
+      if (!!newPrinterInfo?.apikey && oldPrinter.apikey !== newPrinterInfo.apikey) {
         const loggerMessage = `Changed apiKey from ${oldPrinter.apikey} to ${newPrinterInfo.apikey}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -362,7 +360,7 @@ class PrinterStore {
       }
 
       // Check for group change...
-      if (oldPrinter.group !== newPrinterInfo.group) {
+      if (!!newPrinterInfo?.group && oldPrinter.group !== newPrinterInfo.group) {
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -388,16 +386,16 @@ class PrinterStore {
         updateGroupListing = true;
       }
       // Check for camURL change...
-      const loggerMessage = `Changed camera url from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
-      logger.info(loggerMessage);
-      PrinterTicker.addIssue(
-        new Date(),
-        oldPrinter.printerURL,
-        loggerMessage,
-        "Active",
-        oldPrinter._id
-      );
-      if (oldPrinter.camURL !== newPrinterInfo.camURL) {
+      if (!!newPrinterInfo.camURL && oldPrinter.camURL !== newPrinterInfo.camURL) {
+        const loggerMessage = `Changed camera url from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
+        );
         this.updatePrinterDatabase(newPrinterInfo._id, {
           camURL: newPrinterInfo.camURL
         });
@@ -415,6 +413,10 @@ class PrinterStore {
       }
     }
 
+    if (socketsNeedTerminating.length > 0) {
+      this.resetConnectionInformation(socketsNeedTerminating);
+    }
+
     return {
       updateGroupListing,
       changesList,
@@ -422,8 +424,403 @@ class PrinterStore {
     };
   }
 
+  resetConnectionInformation(idList) {
+    if (!!idList) {
+      idList.forEach((id) => {
+        const printer = this.#findMePrinter(id);
+        printer.resetConnectionInformation();
+      });
+    }
+  }
+
   async updatePrinterSettings(settings) {
-    console.log(settings);
+    const newOctoPrintSettings = {};
+    let octoPrintProfiles = {};
+
+    let octofarmCheck = 200;
+    let profileCheck = 900;
+    let settingsCheck = 900;
+
+    const {
+      printer,
+      connection,
+      systemCommands,
+      powerCommands,
+      costSettings,
+      profile,
+      profileID,
+      gcode,
+      other
+    } = settings;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+    const originalPrinter = this.#findMePrinter(index);
+
+    if (!!currentUser && currentUser !== originalPrinter.currentUser && currentUser !== 0) {
+      this.updatePrinterDatabase(index, {
+        currentUser: currentUser
+      });
+    }
+
+    // Deal with OctoFarm connection information updates
+    const octoFarmConnectionSettings = {
+      _id: index,
+      settingsAppearance: {
+        name: printerName
+      },
+      printerURL: printerURL,
+      camURL: cameraURL,
+      apikey: apikey
+    };
+
+    // Update OctoFarms data
+    this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
+
+    const { preferredPort, preferredBaud, preferredProfile } = connection;
+    // Connection is always sent so can just update.
+    if (!!preferredPort || !!preferredBaud || !!preferredProfile) {
+      this.updatePrinterDatabase(index, {
+        options: {
+          baudrates: originalPrinter.options.baudrates,
+          baudratePreference: preferredBaud,
+          ports: originalPrinter.options.ports,
+          portPreference: preferredPort,
+          printerProfiles: originalPrinter.options.printerProfiles,
+          printerProfilePreference: preferredProfile
+        },
+        current: {
+          baudrate: preferredBaud,
+          port: preferredPort,
+          printerProfile: preferredProfile,
+          state: "Not Used"
+        }
+      });
+      newOctoPrintSettings.serial = {
+        port: preferredPort,
+        baudrate: preferredBaud
+      };
+    }
+
+    const {
+      powerConsumption,
+      electricityCosts,
+      purchasePrice,
+      estimatedLifeSpan,
+      maintenanceCosts
+    } = costSettings;
+
+    if (
+      !!powerConsumption ||
+      !!electricityCosts ||
+      !!purchasePrice ||
+      !!estimatedLifeSpan ||
+      !!maintenanceCosts
+    ) {
+      const costSettings = {
+        ...(!!powerConsumption
+          ? { powerConsumption }
+          : { powerConsumption: originalPrinter.costSettings.powerConsumption }),
+        ...(!!electricityCosts
+          ? { electricityCosts }
+          : { electricityCosts: originalPrinter.costSettings.electricityCosts }),
+        ...(!!purchasePrice
+          ? { purchasePrice }
+          : { purchasePrice: originalPrinter.costSettings.purchasePrice }),
+        ...(!!estimatedLifeSpan
+          ? { estimateLifespan: estimatedLifeSpan }
+          : { estimateLifespan: originalPrinter.costSettings.estimateLifespan }),
+        ...(!!maintenanceCosts
+          ? { maintenanceCosts }
+          : { maintenanceCosts: originalPrinter.costSettings.maintenanceCosts })
+      };
+      this.updatePrinterDatabase(index, { costSettings });
+    }
+
+    const { name, model, volume, heatedBed, heatedChamber, axes, extruder } = profile;
+
+    if (!!name || !!model || !!volume || !!heatedBed || !!heatedChamber || !!axes || !!extruder) {
+      const originalProfile = originalPrinter.profiles[profileID];
+      const newAxes = {
+        x: {
+          ...(!!axes?.x?.speed ? { speed: axes.x.speed } : { speed: originalProfile.axes.x.speed }),
+          inverted: axes.x.inverted
+        },
+        y: {
+          ...(!!axes?.y?.speed ? { speed: axes.y.speed } : { speed: originalProfile.axes.y.speed }),
+          inverted: axes.y.inverted
+        },
+        z: {
+          ...(!!axes?.z?.speed ? { speed: axes.z.speed } : { speed: originalProfile.axes.z.speed }),
+          inverted: axes.z.inverted
+        },
+        e: {
+          ...(!!axes?.e?.speed ? { speed: axes.e.speed } : { speed: originalProfile.axes.e.speed }),
+          inverted: axes.e.inverted
+        }
+      };
+      const newExtruder = {
+        count: extruder?.count ? extruder.count : originalProfile.extruder.count,
+        nozzleDiameter: extruder?.nozzleDiameter
+          ? extruder.nozzleDiameter
+          : originalProfile.extruder.nozzleDiameter,
+        sharedNozzle: extruder.sharedNozzle
+      };
+      const newVolume = {
+        formFactor: volume.formFactor,
+        width: volume?.width ? volume.width : originalProfile.volume.width,
+        depth: volume?.depth ? volume.depth : originalProfile.volume.depth,
+        height: volume?.height ? volume.height : originalProfile.volume.height,
+        custom_box: originalProfile.volume.custom_box,
+        origin: originalProfile.volume.origin
+      };
+
+      originalPrinter.profiles[profileID] = {
+        axes: newAxes,
+        color: originalProfile.color,
+        current: originalProfile.current,
+        default: originalProfile.default,
+        extruder: newExtruder,
+        heatedBed,
+        heatedChamber,
+        id: originalProfile.id,
+        model: !!model ? model : originalProfile.model,
+        name: !!name ? name : originalProfile.name,
+        resource: originalProfile.resource,
+        volume: newVolume
+      };
+
+      this.updatePrinterDatabase(index, {
+        profiles: originalPrinter.profiles
+      });
+
+      octoPrintProfiles = originalPrinter.profiles;
+    }
+
+    const {
+      powerOnCommand,
+      powerOnURL,
+      powerOffURL,
+      powerOffCommand,
+      powerToggleCommand,
+      powerToggleURL,
+      powerStatusCommand,
+      powerStatusURL,
+      wol
+    } = powerCommands;
+
+    if (
+      !!powerOnCommand ||
+      !!powerOnURL ||
+      !!powerOffURL ||
+      !!powerOffCommand ||
+      !!powerToggleCommand ||
+      !!powerToggleURL ||
+      !!powerStatusCommand ||
+      !!powerStatusURL ||
+      !!wol
+    ) {
+      const { enabled, ip, port, interval, packet, MAC } = wol;
+      const newWOL = {
+        enabled,
+        ...(!!ip ? { ip } : { ip: originalPrinter.powerSettings.wol.ip }),
+        ...(!!port ? { port } : { port: originalPrinter.powerSettings.wol.port }),
+        ...(!!interval ? { interval } : { interval: originalPrinter.powerSettings.wol.interval }),
+        ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
+        ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
+      };
+      const newPowerSettings = {
+        ...(!!powerOnCommand
+          ? { powerOnCommand }
+          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
+        ...(!!powerOnURL
+          ? { powerOnURL }
+          : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
+        ...(!!powerOffURL
+          ? { powerOffURL }
+          : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
+        ...(!!powerOffCommand
+          ? { powerOffCommand }
+          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
+        ...(!!powerToggleCommand
+          ? { powerToggleCommand }
+          : { powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand }),
+        ...(!!powerToggleURL
+          ? { powerToggleURL }
+          : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
+        ...(!!powerStatusCommand
+          ? { powerStatusCommand }
+          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
+        ...(!!powerStatusURL
+          ? { powerStatusURL }
+          : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),
+        wol: newWOL
+      };
+
+      this.updatePrinterDatabase(index, {
+        powerSettings: newPowerSettings
+      });
+    }
+
+    const { systemShutdown, systemRestart, serverRestart } = systemCommands;
+
+    if (!!systemShutdown || !!systemRestart || !!serverRestart) {
+      newOctoPrintSettings.server = {
+        allowFraming: originalPrinter.settingsServer.allowFraming,
+        commands: {
+          systemShutdownCommand: systemShutdown
+            ? systemShutdown
+            : originalPrinter.settingsServer.commands.systemShutdownCommand,
+          systemRestartCommand: systemRestart
+            ? systemRestart
+            : originalPrinter.settingsServer.commands.systemRestartCommand,
+          serverRestartCommand: serverRestart
+            ? serverRestart
+            : originalPrinter.settingsServer.commands.serverRestartCommand
+        },
+        diskspace: originalPrinter.settingsServer.diskspace,
+        onlineCheck: originalPrinter.settingsServer.onlineCheck,
+        pluginBlacklist: originalPrinter.settingsServer.pluginBlacklist
+      };
+
+      this.updatePrinterDatabase(index, {
+        settingsServer: newOctoPrintSettings.server
+      });
+    }
+
+    const {
+      afterPrintCancelled,
+      afterPrintDone,
+      afterPrintPaused,
+      afterPrinterConnected,
+      afterToolChange,
+      beforePrintResumed,
+      beforePrintStarted,
+      beforePrinterDisconnected,
+      beforeToolChange
+    } = gcode;
+
+    if (
+      !!afterPrintCancelled ||
+      !!afterPrintDone ||
+      !!afterPrintPaused ||
+      !!afterPrinterConnected ||
+      !!afterToolChange ||
+      !!beforePrintResumed ||
+      !!beforePrintStarted ||
+      !!beforePrinterDisconnected ||
+      !!beforeToolChange
+    ) {
+      const newCustomGcode = {
+        ...(!!afterPrintCancelled
+          ? { afterPrintCancelled }
+          : { afterPrintCancelled: originalPrinter?.settingsScripts?.afterPrintCancelled }),
+        ...(!!afterPrintDone
+          ? { afterPrintDone }
+          : { afterPrintDone: originalPrinter?.settingsScripts?.afterPrintDone }),
+        ...(!!afterPrintPaused
+          ? { afterPrintPaused }
+          : { afterPrintPaused: originalPrinter?.settingsScripts?.afterPrintPaused }),
+        ...(!!afterPrinterConnected
+          ? { afterPrinterConnected }
+          : { afterPrinterConnected: originalPrinter?.settingsScripts?.afterPrinterConnected }),
+        ...(!!afterToolChange
+          ? { afterToolChange }
+          : { afterToolChange: originalPrinter?.settingsScripts?.afterToolChange }),
+        ...(!!beforePrintResumed
+          ? { beforePrintResumed }
+          : { beforePrintResumed: originalPrinter?.settingsScripts?.beforePrintResumed }),
+        ...(!!beforePrintStarted
+          ? { beforePrintStarted }
+          : { beforePrintStarted: originalPrinter?.settingsScripts?.beforePrintStarted }),
+        ...(!!beforePrinterDisconnected
+          ? { beforePrinterDisconnected }
+          : {
+              beforePrinterDisconnected: originalPrinter?.settingsScripts?.beforePrinterDisconnected
+            }),
+        ...(!!beforeToolChange
+          ? { beforeToolChange }
+          : { beforeToolChange: originalPrinter?.settingsScripts?.beforeToolChange })
+      };
+      this.updatePrinterDatabase(index, {
+        settingsScripts: newCustomGcode
+      });
+      newOctoPrintSettings.scripts = {
+        gcode: newCustomGcode
+      };
+    }
+
+    const {
+      enableCamera,
+      rotateCamera,
+      flipHCamera,
+      flipVCamera,
+      enableTimeLapse,
+      heatingVariation,
+      coolDown
+    } = other;
+
+    if (
+      !!enableCamera ||
+      !!rotateCamera ||
+      !!flipHCamera ||
+      !!flipVCamera ||
+      !!enableTimeLapse ||
+      !!heatingVariation ||
+      coolDown
+    ) {
+      const tempTriggers = {
+        ...(!!heatingVariation
+          ? { heatingVariation: parseInt(heatingVariation) }
+          : { heatingVariation: originalPrinter?.tempTriggers?.heatingVariation }),
+        ...(!!coolDown
+          ? { coolDown: parseInt(coolDown) }
+          : { coolDown: originalPrinter?.tempTriggers?.coolDown })
+      };
+      const settingsWebcam = {
+        bitrate: originalPrinter.settingsWebcam.bitrate,
+        ffmpegPath: originalPrinter.settingsWebcam.ffmpegPath,
+        ffmpegThreads: originalPrinter.settingsWebcam.ffmpegThreads,
+        ffmpegVideoCodec: originalPrinter.settingsWebcam.ffmpegVideoCodec,
+        flipH: flipHCamera,
+        flipV: flipVCamera,
+        rotate90: rotateCamera,
+        snapshotSslValidation: originalPrinter.settingsWebcam.snapshotSslValidation,
+        snapshotTimeout: originalPrinter.settingsWebcam.snapshotTimeout,
+        snapshotUrl: originalPrinter.settingsWebcam.snapshotUrl,
+        streamRatio: originalPrinter.settingsWebcam.streamRatio,
+        streamTimeout: originalPrinter.settingsWebcam.streamTimeout,
+        streamUrl: originalPrinter.settingsWebcam.streamUrl,
+        timelapseEnabled: enableTimeLapse,
+        watermark: originalPrinter.settingsWebcam.watermark,
+        webcamEnabled: enableCamera
+      };
+
+      this.updatePrinterDatabase(index, {
+        tempTriggers: tempTriggers,
+        settingsWebcam: settingsWebcam
+      });
+
+      newOctoPrintSettings.webcam = settingsWebcam;
+    }
+
+    originalPrinter.cleanPrintersInformation();
+
+    profileCheck = await originalPrinter.updateOctoPrintProfileData(
+      { profile: octoPrintProfiles[profileID] },
+      profileID
+    );
+    settingsCheck = await originalPrinter.updateOctoPrintSettingsData(newOctoPrintSettings);
+
+    await Promise.allSettled([
+      originalPrinter.acquireOctoPrintProfileData(true),
+      originalPrinter.acquireOctoPrintSettingsData(true),
+      originalPrinter.acquireOctoPrintSystemInfoData(true),
+      originalPrinter.acquireOctoPrintUpdatesData(true),
+      originalPrinter.acquireOctoPrintPluginsListData(true)
+    ]);
+
+    return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
+
+    // Refresh OctoPrint Updates
   }
 
   resetPrintersSocketConnections(idList) {
@@ -431,47 +828,6 @@ class PrinterStore {
       const printer = this.#findMePrinter(id);
       printer.resetSocketConnection();
     });
-  }
-
-  async generatePrinterConnectionLogs(id) {
-    const printer = this.#findMePrinter(id);
-    return await PrinterClean.generateConnectionLogs(printer);
-  }
-
-  listAllOctoPrintVersions() {
-    const printers = this.listPrintersInformation();
-
-    const versionArray = [];
-
-    printers.forEach((printer) => {
-      if (!versionArray.includes(printer.octoPrintVersion))
-        versionArray.push(printer.octoPrintVersion);
-    });
-    return versionArray;
-  }
-
-  listUniqueFiles() {
-    const printers = this.listPrintersInformation();
-
-    const filePathsArray = [];
-
-    for (let f = 0; f < printers.length; f++) {
-      const fileList = printers[f]?.fileList?.fileList;
-      if (fileList) {
-        for (let p = 0; p < fileList.length; p++) {
-          const index = findIndex(filePathsArray, function (o) {
-            return o.display == fileList[p].display;
-          });
-          if (index === -1) {
-            filePathsArray.push({
-              name: fileList[p].name,
-              display: fileList[p].display
-            });
-          }
-        }
-      }
-    }
-    return filePathsArray;
   }
 
   listUniqueFolderPaths() {
@@ -530,6 +886,11 @@ class PrinterStore {
       }
     }
     return filesThatExistOnAllPrinters;
+  }
+
+  async generatePrinterConnectionLogs(id) {
+    const printer = this.#findMePrinter(id);
+    return await PrinterClean.generateConnectionLogs(printer);
   }
 
   disablePrinter(id) {

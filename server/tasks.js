@@ -1,12 +1,13 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./services/filament-cleaner.service");
 const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
-const { TaskPresets } = require("./task.presets");
-const { SystemRunner } = require("./runners/systemInfo");
+const { TaskPresets } = require("./constants/task.constants");
+const { SystemRunner } = require("./services/system-information.service");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { detectFarmPi } = require("./services/farmpi-detection.service");
 const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("./cache/printer-store.cache");
+const { getEventEmitterCache } = require("./cache/event-emitter.cache");
 const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
 const {
   updatePluginNoticesStore,
@@ -27,6 +28,10 @@ const INITIALISE_PRINTERS = async () => {
 
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
+};
+
+const INITIALIST_EVENT_EMITTER_CACHE = async () => {
+  await getEventEmitterCache();
 };
 
 const SORT_CURRENT_OPERATIONS = async () => {
@@ -209,6 +214,7 @@ class OctoFarmTasks {
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_5000MS),
     TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
+    TaskStart(INITIALIST_EVENT_EMITTER_CACHE, TaskPresets.RUNONCE),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),

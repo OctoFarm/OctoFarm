@@ -1,10 +1,7 @@
-const Logger = require("../handlers/logger");
-
-const logger = new Logger("OctoFarm-State");
 const currentIssues = [];
 const octoprintLogs = [];
 
-class PrinterTicker {
+class PrinterConnectionLogService {
   static addOctoPrintLog(printer, message, state, plugin) {
     let id = null;
     if (octoprintLogs.length === 0) {
@@ -45,7 +42,8 @@ class PrinterTicker {
       state: state
     };
     currentIssues.push(newIssue);
-    if (currentIssues.length >= 2001) {
+    const loggerAmmount = 5000;
+    if (currentIssues.length >= loggerAmmount) {
       currentIssues.shift();
     }
   }
@@ -67,5 +65,5 @@ class PrinterTicker {
 }
 
 module.exports = {
-  PrinterTicker
+  PrinterTicker: PrinterConnectionLogService
 };

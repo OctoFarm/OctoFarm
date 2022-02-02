@@ -58,20 +58,18 @@ const captureTemperatureData = (id, data) => {
 };
 
 const coolDownEvent = (id, temps) => {
-  const currentEvent = getPrinterStoreCache().getPrinterEvent(id, "coolDown");
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {
-    if (!currentEvent) {
-      getPrinterStoreCache().addPrinterEvent(id, "coolDown");
-    }
-  } else if (printerState.colour.category === "Complete") {
+    getPrinterStoreCache().addPrinterEvent(id, "coolDown");
+  }
+  if (printerState.colour.category === "Complete") {
     const { coolDown } = getPrinterStoreCache().getTempTriggers(id);
     if (
       parseFloat(temps[0].tool0.actual) < parseFloat(coolDown) &&
       parseFloat(temps[0].bed.actual) < parseFloat(coolDown)
     ) {
-      getPrinterStoreCache().firePrinterEvent(id, "coolDown");
+      getPrinterStoreCache().emitPrinterEvent(id, "coolDown");
     }
   }
 };

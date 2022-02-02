@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 // User Modal
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 const Alerts = require("../models/Alerts.js");
 
-const script = require("../runners/scriptCheck.js");
+const script = require("../services/local-scripts.service.js");
 const Script = script.ScriptRunner;
 router.get("/get", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body

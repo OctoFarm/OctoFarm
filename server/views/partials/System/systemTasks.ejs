@@ -22,7 +22,7 @@
                     <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
                     <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
                     <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
-                    <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "Not Planned" %></td>
+                    <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "On Demand / One Time Task" %></td>
                 </tr>
             <%     } %>
             </tbody>

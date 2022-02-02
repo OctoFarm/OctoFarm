@@ -82,6 +82,7 @@ let evtSource;
 let countDownInterval = false;
 let triggerTimeout = false;
 let countDownSeconds = 0;
+let reloadListenerAdded = false;
 
 const reconnectFunc = debounce(
   function () {
@@ -160,6 +161,12 @@ function setupEventSource() {
 }
 
 const drawModal = async function () {
+  if(!reloadListenerAdded){
+    document.getElementById("forceRefreshPageButton").addEventListener("click", () => {
+      reloadWindow();
+    })
+  }
+
   if(!triggerTimeout){
     triggerTimeout = setTimeout(() => {
       $("#lostServerConnection").modal("show");

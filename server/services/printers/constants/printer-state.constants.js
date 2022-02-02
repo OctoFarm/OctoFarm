@@ -4,7 +4,8 @@ const OF_COLOURS = {
   SUCCESS: "success",
   WARNING: "warning",
   INFO: "info",
-  DANGER: "danger"
+  DANGER: "danger",
+  DISABLED: "dark"
 };
 
 const CATEGORIES = {
@@ -80,7 +81,7 @@ const PRINTER_STATES = (customStates = {}) => {
       stateColour: mapStateToCategory(OF_C_STATE.DISABLED),
       hostState: OF_C_STATE.DISABLED,
       hostStateColour: mapStateToCategory(OF_C_STATE.DISABLED),
-      webSocket: OF_COLOURS.DANGER,
+      webSocket: OF_COLOURS.DISABLED,
       stateDescription: OF_C_DESC.DISABLED,
       hostDescription: OF_C_DESC.DISABLED,
       webSocketDescription: OF_C_DESC.DISABLED

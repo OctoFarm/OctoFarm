@@ -2,7 +2,7 @@ const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const session = require("express-session");
 const flash = require("connect-flash");
-const { AppConstants } = require("./app.constants");
+const { AppConstants } = require("./constants/app.constants");
 const dotenv = require("dotenv");
 const path = require("path");
 
@@ -51,7 +51,7 @@ function fetchOctoFarmPort() {
       `~ The ${AppConstants.OCTOFARM_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
     );
 
-    // Update config immediately
+    // Update middleware immediately
     process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
     port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   }

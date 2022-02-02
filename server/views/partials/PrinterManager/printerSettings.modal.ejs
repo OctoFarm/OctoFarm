@@ -74,8 +74,7 @@
 
                             </select>
                             <small class="form-text text-muted">Current OctoPrint User that
-                                OctoFarm is using to connect with. (automatic and not
-                                editable)</small>
+                                OctoFarm is using to connect with.</small>
                         </div>
                     </div>
                     <div class="row pb-1">
@@ -89,11 +88,11 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="psWebSocketProtocol">Printer WebSocket Protocol:</label>
-                            <select id="psWebSocketProtocol" class="custom-select">
+                            <select id="psWebSocketProtocol" class="custom-select" disabled>
                                 <option value="ws://">ws://</option>
                                 <option value="wss://">wss://</option>
                             </select>
-                            <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on Printer URL. Override here.</small>
+                            <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on http/https value in Printer URL. (disabled)</small>
                             <small>Example: <code>"ws:// (http) " or "wss:// (https)" </code></small>
                         </div>
                     </div>

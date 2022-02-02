@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -15,7 +15,66 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
+const { validateBodyMiddleware } = require("../handlers/validators");
+const P_VALID = require("../constants/printer-validation.constants");
+const { sortBy } = require("lodash");
+const ConnectionMonitorService = require("../services/connection-monitor.service");
 
+/**
+ * @swagger
+ * /printers/add:
+ *   post:
+ *     summary: Adds a new printer
+ *     description: Add a new printer to the farm. Currently only supports a single printer at a time. The below is a bit convoluted due to some original design decisions.
+ *     parameters:
+ *       - in: settingsAppearance
+ *         name: Appearance Settings
+ *         required: true
+ *         description: Object containing some printer keys and values sent back to OctoPrint.
+ *         schema:
+ *           type: object
+ *           properties:
+ *             color:
+ *               type: string
+ *               example: "default"
+ *             colorTransparent:
+ *               type: boolean
+ *               example: false
+ *             defaultLanguage:
+ *               type: string
+ *               example: "_default"
+ *             name:
+ *               type: string
+ *               example: "Hammock of Cheese"
+ *             showFahrenheitAlso:
+ *               type: boolean
+ *               example: false
+ *       - in: printerURL
+ *         name: Printer url
+ *         required: true
+ *         description: String containing URL for OctoPrint instance. Requires "http/https", defaults to http if not supplies
+ *       - in: camURL
+ *       - in: apikey
+ *       - in: group
+ *     responses:
+ *       200:
+ *         description: List of added printers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 printersAdded:
+ *                   type: array
+ *                   description: Array of objects containing the printers just added, will always be 1 array.
+ *                   example: [ printer: {  _id: "5d6ede6a0ba62570afcedd3a", printerURL: "http://192.168.1.5:5000" } ]
+ *                 status:
+ *                   type: number
+ *                   description: "Status code response, not needed will be removed and cleaned up!"
+ *                   example: 200
+ *       400:
+ *       500:
+ */
 router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Grab the API body
   const printers = req.body;
@@ -94,8 +153,14 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
   // Check required fields
   const settings = req.body;
   logger.info("Update printers request: ", settings);
-  const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
-  res.send({});
+  try {
+    const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
+    console.log(updateSets);
+    res.send({ status: updateSets });
+  } catch (e) {
+    logger.error("Couldn't update settings...", e.message);
+    res.send({ octofarm: 500, profile: 500, settings: 500 });
+  }
 });
 
 router.get("/groups", ensureAuthenticated, async (req, res) => {
@@ -111,16 +176,22 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
   res.send(groups);
 });
 
-router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
-  const id = req.body.i;
-  let returnedPrinterInformation;
-  if (!id) {
-    returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation();
-  } else {
-    returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
+router.post(
+  "/printerInfo",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.PRINTER_ID),
+  async (req, res) => {
+    const id = req.body.i;
+    let returnedPrinterInformation;
+    if (!id) {
+      const disabled = req.query.disabled === "true";
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(false, disabled);
+    } else {
+      returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
+    }
+    res.send(returnedPrinterInformation);
   }
-  res.send(returnedPrinterInformation);
-});
+);
 
 router.post(
   "/updatePrinterSettings",
@@ -199,10 +270,10 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   logger.info("Action wake host: ", data);
   await Script.wol(data);
 });
-router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, (req, res) => {
+router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const data = req.body;
   logger.info("Update printer sort indexes: ", data);
-  res.send(getPrinterManagerCache().updatePrinterSortIndexes(data));
+  res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
 });
 router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let id = req.params.id;
@@ -236,7 +307,7 @@ router.get("/allPluginsList/:id", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const { searchForDevicesOnNetwork } = require("../runners/autoDiscovery.js");
+  const { searchForDevicesOnNetwork } = require("../services/octoprint-auto-discovery.service.js");
 
   let devices = await searchForDevicesOnNetwork();
 
@@ -269,6 +340,7 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
 
   for (let i = 0; i < printers.length; i++) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
+
     if (!stats) {
       stats = await generatePrinterStatistics(printers[i]._id);
       getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
@@ -282,6 +354,12 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
   }
 
   res.send(returnArray);
+});
+router.get("/connectionOverview", ensureAuthenticated, ensureAdministrator, (req, res) => {
+  const printerConnectionStats = sortBy(ConnectionMonitorService.returnConnectionLogs(), [
+    "printerURL"
+  ]);
+  res.send(printerConnectionStats);
 });
 
 router.patch("/disable/:id", ensureAuthenticated, ensureAdministrator, (req, res) => {

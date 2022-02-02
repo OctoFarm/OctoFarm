@@ -3,6 +3,14 @@ function sanitizeURL(url) {
   return new URL(url).href;
 }
 
+function parseOutIPAddress(string) {
+  const r = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
+
+  const t = string.match(r);
+
+  return t[0];
+}
+
 function convertHttpUrlToWebsocket(url) {
   if (!url.includes("http")) {
     url = "http://" + url;
@@ -20,5 +28,6 @@ function convertHttpUrlToWebsocket(url) {
 
 module.exports = {
   convertHttpUrlToWebsocket,
-  sanitizeURL
+  sanitizeURL,
+  parseOutIPAddress
 };

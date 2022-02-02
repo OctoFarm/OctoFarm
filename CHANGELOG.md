@@ -63,7 +63,13 @@ All notable changes to this project will be documented in this file.
   - New button to do a websocket reconnect if one is available. It will close the socket and re-open to refresh.
   - New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
     purposefully closed.
-  - Added git repo information to system page, and also added git check for update commands. 
+  - Added git repo information to system page, and also added git check for update commands.
+  - Printer manager now has a ticker for the printer alerts. Displays planned websocket/api scans, octoprint updates, plugin updates and more.
+  - Add current Miliseconds since Jan 1970 string to log dump zip name.
+  - Made enhancements to the log system:
+    - Logs now show created date, as well as modified.
+    - Log files can now be deleted.
+    - Additional button to house keep log files. Cleans any logs older than a day.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -158,6 +164,10 @@ All notable changes to this project will be documented in this file.
   - OctoFarm now periodically (once per day) will run a scan to see if any updates are available for your instances
   - Converted to a basic mono-repo to aid in development. Scripts have been created for backwards compatibility with current start instructions.
   - Restart, Check for Update and Update OctoFarm buttons have been moved to the top of the "System" tab on the System page. This is to aid in security and stop users messing with system functions.
+  - Changed server API logging over to morgan.
+  - Moved the change background functionality out of client and into Server settings for admins only. 
+  - Quick actions is now a Quick Connect, Power Toggle, Menu. Menu contains: 
+    - OctoPrint Web, Resync Socket, Power settings. More coming soon!
 
 ### Removed
 
@@ -166,6 +176,8 @@ All notable changes to this project will be documented in this file.
 - Ping/Pong message on connection log, redundant and ends up flooding the log.
 - Removed Offline count from Current Operations. Feel it's pointless please open an issue if it's required back.
 - state.js - WOOP HAPPY DAYS! Ripped out and gone for good!
+- runners folder - Boom more feel goods!
+- Reset Power Settings Option - No longer needed after settings saving refactor.
 
 ### Fixed
 
@@ -216,8 +228,7 @@ All notable changes to this project will be documented in this file.
   - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
   - Fixed changelog been considered a block via parsers.
   - Fixed the buggy behaviour of the printer swap drop down in Printer Control.
-  - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot
-    if required.
+  - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot if required.
   - Fixed history chart colours for Failed and Cancelled been mixed up.
   - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
   - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
@@ -229,7 +240,8 @@ All notable changes to this project will be documented in this file.
   - Fixed an issue where SSE would lose the connection url if server connection lost.
   - Fixed File manager been an outright bag of crap. Files now load correctly after commands, instantly too.
   - Fixed Improved the OctoPrint file update grab so it doesn't end up making multiple calls.
-  - Fixed Fix an issue with folders not relecting their state correctly after command in file manager.
+  - Fixed Fix an issue with folders not reflecting their state correctly after command in file manager.
+  - Fixed the utter mess of saving printer settings.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.
@@ -238,6 +250,7 @@ All notable changes to this project will be documented in this file.
   - Protected Filament Manager Plugin Enable and Filament Manager Full Resync endpoints by ensuring user is
     Administrator.
   - Protected all administrator only actions as additional protection.
+  - Added basic http server protection to express with helmet. 
   
 ## [v1.1.13-hotfix]
 
@@ -1159,7 +1172,7 @@ All notable changes to this project will be documented in this file.
 
   - Printer Management, see changed regarding dashboard.
   - History and file statistics from Dashboard.
-  - Removed systemInfo from database, extra uneeded steps as data is all gathered live anyway.
+  - Removed systemInformationService from database, extra uneeded steps as data is all gathered live anyway.
 
 ### Fixed
 

@@ -1,21 +1,21 @@
 const { sortBy } = require("lodash");
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth.js");
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { ensureAuthenticated } = require("../middleware/auth.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const { FilamentClean } = require("../services/filament-cleaner.service.js");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { FileClean } = require("../services/file-cleaner.service.js");
 const { getSorting, getFilter } = require("../services/front-end-sorting.service.js");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 const { getDefaultDashboardSettings } = require("../constants/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("../services/task-manager.service");
 const {
   getDashboardStatistics,
   getCurrentOperations
@@ -82,7 +82,6 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
     serverSettings,
     clientSettings: req.user.clientSettings,
-    printerConnectionStats: sortBy(ConnectionMonitorService.returnConnectionLogs(), ["printerURL"]),
     development_mode
   });
 });

@@ -220,25 +220,29 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
         throttleMS: 0
       });
     }
-    const responsesAverage = log?.responseTimes?.reduce((a, b) => a + b) / log.responseTimes.length;
 
-    if (responsesAverage) {
-      logger.debug("Throttle Generation", {
-        url: log.url,
-        throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 400,
-        over: responsesAverage > THROTTLE_MS + 400,
-        under: responsesAverage < THROTTLE_MS - 500,
-        responsesAverage: responsesAverage,
-        throttleMS: THROTTLE_MS
-      });
-      WS_responses.push({
-        url: log.url,
-        throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 500,
-        over: responsesAverage > THROTTLE_MS + 400,
-        under: responsesAverage < THROTTLE_MS - 500,
-        responsesAverage: responsesAverage,
-        throttleMS: THROTTLE_MS
-      });
+    if (log?.responseTimes?.length > 1) {
+      const responsesAverage =
+        log?.responseTimes?.reduce((a, b) => a + b) / log?.responseTimes?.length;
+
+      if (responsesAverage) {
+        logger.debug("Throttle Generation", {
+          url: log.url,
+          throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 400,
+          over: responsesAverage > THROTTLE_MS + 400,
+          under: responsesAverage < THROTTLE_MS - 500,
+          responsesAverage: responsesAverage,
+          throttleMS: THROTTLE_MS
+        });
+        WS_responses.push({
+          url: log.url,
+          throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 500,
+          over: responsesAverage > THROTTLE_MS + 400,
+          under: responsesAverage < THROTTLE_MS - 500,
+          responsesAverage: responsesAverage,
+          throttleMS: THROTTLE_MS
+        });
+      }
     }
   }
 

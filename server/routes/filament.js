@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
 const _ = require("lodash");
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const Spool = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
@@ -20,7 +20,7 @@ const filamentClean = require("../services/filament-cleaner.service.js");
 
 const { FilamentClean } = filamentClean;
 
-const filamentManagerPlugin = require("../runners/filamentManagerPlugin.js");
+const filamentManagerPlugin = require("../services/octoprint/octoprint-filament-manager-plugin.service.js");
 
 const { FilamentManagerPlugin } = filamentManagerPlugin;
 
@@ -32,7 +32,7 @@ const {
   checkIfProfileAttachedToSpool
 } = require("../services/octoprint.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("../services/task-manager.service");
 
 router.get("/get/printerList", ensureAuthenticated, (req, res) => {
   const printerList = FilamentClean.returnFilamentList();

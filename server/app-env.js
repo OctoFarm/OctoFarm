@@ -4,7 +4,7 @@ const { execSync } = require("child_process");
 const isDocker = require("is-docker");
 const envUtils = require("./utils/env.utils");
 const dotenv = require("dotenv");
-const { AppConstants } = require("./app.constants");
+const { AppConstants } = require("./constants/app.constants");
 
 const Logger = require("./handlers/logger.js");
 const { status, up } = require("migrate-mongo");
@@ -12,7 +12,7 @@ const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";
-const deprecatedConfigFolder = "../config";
+const deprecatedConfigFolder = "../middleware";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
 const clientPackageJsonPath = path.join(__dirname, "../client/package.json");
@@ -70,11 +70,19 @@ function ensureEnvNpmVersionSet() {
   }
 }
 
+/**
+ *
+ * @param reason
+ */
 function removePm2Service(reason) {
   logger.error("Removing PM2 service as OctoFarm failed to start", reason);
   execSync("pm2 delete OctoFarm");
 }
 
+/**
+ *
+ * @param folder
+ */
 function removeFolderIfEmpty(folder) {
   return fs.rmdir(folder, function (err) {
     if (err) {
@@ -85,6 +93,9 @@ function removeFolderIfEmpty(folder) {
   });
 }
 
+/**
+ *
+ */
 function setupPackageJsonVersionOrThrow() {
   const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, "../server"));
   if (!result) {
@@ -104,12 +115,20 @@ function printInstructionsURL() {
   );
 }
 
+/**
+ *
+ */
 function removeDeprecatedMongoURIConfigFile() {
-  logger.info("~ Removing deprecated config file 'config/db.js'.");
+  logger.info("~ Removing deprecated middleware file 'middleware/db.js'.");
   fs.rmSync(deprecatedConfigFilePath);
   removeFolderIfEmpty(deprecatedConfigFolder);
 }
 
+/**
+ *
+ * @param persistToEnv
+ * @returns {string}
+ */
 function fetchMongoDBConnectionString(persistToEnv = false) {
   if (!process.env[AppConstants.MONGO_KEY]) {
     logger.warning(
@@ -130,6 +149,10 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
   return process.env[AppConstants.MONGO_KEY];
 }
 
+/**
+ *
+ * @returns {string}
+ */
 function fetchOctoFarmPort() {
   let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
@@ -149,13 +172,13 @@ function fetchOctoFarmPort() {
       );
     }
 
-    // Update config immediately
+    // Update middleware immediately
     process.env[AppConstants.OCTOFARM_PORT_KEY] = AppConstants.defaultOctoFarmPort.toString();
     port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   }
   return port;
 }
-
+/**
 /**
  * Make sure that we have a valid MongoDB connection string to work with.
  */
@@ -176,7 +199,7 @@ function ensureMongoDBConnectionStringSet() {
     const mongoFallbackURI = require(deprecatedConfigFilePath).MongoURI;
     if (!mongoFallbackURI) {
       logger.info(
-        "~ Found deprecated config file 'config/db.js', but the MongoURI variable was not set (or possibly invalid)."
+        "~ Found deprecated middleware file 'middleware/db.js', but the MongoURI variable was not set (or possibly invalid)."
       );
       removeDeprecatedMongoURIConfigFile();
       logger.info(
@@ -188,7 +211,7 @@ function ensureMongoDBConnectionStringSet() {
       // We're not in docker, so we have some patch-work to do.
       removeDeprecatedMongoURIConfigFile();
       logger.info(
-        "~ Found deprecated config file 'config/db.js', performing small migration task to '.env'."
+        "~ Found deprecated middleware file 'middleware/db.js', performing small migration task to '.env'."
       );
       envUtils.writeVariableToEnvFile(
         path.resolve(dotEnvPath),
@@ -200,7 +223,7 @@ function ensureMongoDBConnectionStringSet() {
   } else {
     if (fs.existsSync(deprecatedConfigFilePath)) {
       logger.info(
-        "~ Found deprecated config file 'config/db.js', but it is redundant. Clearing this up for you."
+        "~ Found deprecated middleware file 'middleware/db.js', but it is redundant. Clearing this up for you."
       );
       removeDeprecatedMongoURIConfigFile();
     }
@@ -208,6 +231,9 @@ function ensureMongoDBConnectionStringSet() {
   }
 }
 
+/**
+ *
+ */
 function ensurePortSet() {
   fetchOctoFarmPort();
 
@@ -220,6 +246,9 @@ function ensurePortSet() {
   }
 }
 
+/**
+ *
+ */
 function ensureLogLevelSet() {
   const logLevel = process.env[AppConstants.LOG_LEVEL];
 
@@ -233,7 +262,7 @@ function ensureLogLevelSet() {
 
 /**
  * Parse and consume the .env file. Validate everything before starting OctoFarm.
- * Later this will switch to parsing a `config.yaml` file.
+ * Later this will switch to parsing a `middleware.yaml` file.
  */
 function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
@@ -252,6 +281,10 @@ function setupEnvConfig(skipDotEnv = false) {
   ensureLogLevelSet();
 }
 
+/**
+ *
+ * @returns {string}
+ */
 function getViewsPath() {
   logger.debug("Running in directory:", { dirname: __dirname });
   const viewsPath = path.join(__dirname, "views");
@@ -304,6 +337,9 @@ async function runMigrations(db, client) {
   }
 }
 
+/**
+ * Ensures we have a page title set
+ */
 function ensurePageTitle() {
   if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
     process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] =
@@ -311,10 +347,18 @@ function ensurePageTitle() {
   }
 }
 
+/**
+ *
+ * @returns {boolean} Is Production Environment
+ */
 function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
 }
 
+/**
+ *
+ * @returns {string} Client version number #.#.#
+ */
 function fetchClientVersion() {
   return clientPackageJson.version;
 }

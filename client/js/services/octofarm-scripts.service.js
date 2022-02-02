@@ -5,11 +5,40 @@ import OctoFarmClient from "./octofarm-client.service";
 
 const alertsDrop = `
 <option selected value="0">Choose...</option>
+<optgroup label = "Print Events">
 <option value="done">Print Done</option>
+<option value="started">Print Started</option>
 <option value="failed">Print Failed</option>
+<option value="cancelling">Print Cancelling</option>
+<option value="cancelled">Print Cancelled</option>
 <option value="paused">Print Paused</option>
 <option value="cooldown">Print Cooled</option>
 <option value="error">Print Error</option>
+<optgroup label = "Printer Events">
+<option value="statechange">Printer State Change</option>
+<option value="connected">Printer Connected</option>
+<option value="disconnecting">Printer Disconnecting</option>
+<option value="disconnected">Printer Disconnected</option>
+<option value="dwelling">Printer Dwelling</option>
+<option value="homed">Printer Homed</option>
+<option value="positionupdated">Position Updated</option>
+<option value="zchange">Z Changed</option>
+<optgroup label = "Client Events">
+<option value="clientauthed">Client Authed</option>
+<option value="clientopened">Client Opened</option>
+<option value="clientclosed">Client Closed</option>
+<optgroup label = "File/Folder Events">
+<option value="fileuploading">File Uploading</option>
+<option value="fileupload">File Uploaded</option>
+<option value="fileupdate">File Updated</option>
+<option value="fileadded">File Added</option>
+<option value="filedeselected">File Deselected</option>
+<option value="fileremoved">File Removed</option>
+<option value="folderadded">Folder Added</option>
+<option value="folderremoved">Folder Removed</option>
+<option value="metadatafinished">Metadata Analysis Finished</option>
+<option value="metadatastarted">Metadata Analysis Started</option>
+<option value="metadataupdated">Metadata Analysis Updated</option>
 `;
 let testScriptBtn = document.getElementById("testScript");
 if (testScriptBtn) {

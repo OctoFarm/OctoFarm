@@ -1,8 +1,8 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureCurrentUserAndGroup } = require("../config/users");
-const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const { ensureCurrentUserAndGroup } = require("../middleware/users");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const HistoryDB = require("../models/History");
@@ -27,15 +27,13 @@ const {
 } = require("../services/octofarm-update.service.js");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 
 module.exports = router;
 
-// var upload = multer({ dest: "Upload_folder_name" })
-// If you do not want to use diskStorage then uncomment it
-
 const Storage = multer.diskStorage({
   destination: function (req, file, callback) {
-    callback(null, "./images");
+    callback(null, getImagesPath());
   },
   filename: function (req, file, callback) {
     callback(null, "bg.jpg");
@@ -48,9 +46,35 @@ router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req,
   const serverLogs = await Logs.grabLogs();
   res.send(serverLogs);
 });
+router.delete(
+  "/server/logs/clear-old",
+  ensureAuthenticated,
+  ensureAdministrator,
+  async (req, res) => {
+    try {
+      const deletedLogs = Logs.clearLogsOlderThan(1);
+      res.send(deletedLogs);
+    } catch (e) {
+      logger.error("Failed to clear logs!", e);
+      res.sendStatus(500);
+    }
+  }
+);
+router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const fileName = req.params.name;
+  try {
+    Logs.deleteLogByName(fileName);
+    res.sendStatus(201);
+  } catch (e) {
+    logger.error("Couldn't delete log path!", e);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.params.name;
-  const file = `./logs/${download}`;
+  const file = `${getLogsPath()}/${download}`;
+  console.log(file);
   res.download(file, download); // Set disposition and send it.
 });
 router.post(
@@ -72,7 +96,7 @@ router.post(
       zipDumpResponse.status = "success";
       zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {
-      logger.error("Error Generating Log Dump Zip File | ", e);
+      logger.error("Error Generating Log Dump Zip File | ", e.message);
     }
 
     res.send(zipDumpResponse);
@@ -233,12 +257,15 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   ServerSettingsDB.find({}).then(async (checked) => {
     let restartRequired = false;
 
-    const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
-    const serverChanges = isEqual(checked[0].server, req.body.server);
-    const timeoutChanges = isEqual(checked[0].timeout, req.body.timeout);
-    const filamentChanges = isEqual(checked[0].filament, req.body.filament);
-    const historyChanges = isEqual(checked[0].history, req.body.history);
-    const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
+    const sentOnline = JSON.parse(JSON.stringify(req.body));
+    const actualOnline = JSON.parse(JSON.stringify(checked[0]));
+
+    const onlineChanges = isEqual(actualOnline.onlinePolling, sentOnline.onlinePolling);
+    const serverChanges = isEqual(actualOnline.server, sentOnline.server);
+    const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
+    const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
+    const historyChanges = isEqual(actualOnline.history, sentOnline.history);
+    const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
     checked[0].onlinePolling = req.body.onlinePolling;
     checked[0].server = req.body.server;

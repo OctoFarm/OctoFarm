@@ -2,11 +2,6 @@
     <ul class="nav nav-tabs">
         <li class="nav-item">
             <a class="nav-link active"
-               id="client-settings-list" data-toggle="list" href="#client-settings"
-               role="tab" aria-controls="system"><i class="fas fa-desktop"></i> General</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link"
                id="system-monitoring-list" data-toggle="list"
                href="#system-monitoring" role="tab"
                aria-controls="dashboard"><i class="fas fa-eye"></i> Views</a>
@@ -20,32 +15,7 @@
 
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="client-settings"
-                 role="tabpanel" aria-labelledby="client-settings-list">
-                <div class="row">
-                    <div class="col-12 col-md-4">
-                        <p class="font-weight-bold">Change Background</p>
-                        <p>Click the button below to upload your background
-                            image.</p>
-                        <small>NOTE: You may need to refresh your browser cache if
-                            this doesn't apply straight away.</small>
-                        <form action="/settings/backgroundUpload"
-                              enctype="multipart/form-data" method="POST">
-                            <input class="btn bg-secondary" type="file"
-                                   name="myFile"
-                                   accept="image/jpeg,image/png,image/jpg"/>
-                            <input id="backgroundSubmit" class="btn btn-primary"
-                                   type="submit" value="Upload"
-                                   accept="image/jpeg,image/png">
-                        </form>
-                        <p> Supports <code>PNG, JPG</code></p>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <img width="100%" src="/images/bg.jpg">
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="system-monitoring" role="tabpanel"
+            <div class="tab-pane fade show active" id="system-monitoring" role="tabpanel"
                  aria-labelledby="dashboard-monitoring-list">
                 <h4>Views Visibility</h4><hr>
                 <p>Enable and disable different parts of the UI on any of the views

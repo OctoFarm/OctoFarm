@@ -69,6 +69,7 @@ export default class OctoFarmClient {
   static userRoute = `/users/users`;
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
   static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
+  static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -101,8 +102,14 @@ export default class OctoFarmClient {
     return await this.post(`${this.printerRoute}/printerInfo/`, body);
   }
 
-  static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfo/`);
+  static async listPrinters(disabled = false) {
+    let path = `${this.printerRoute}/printerInfo`
+
+    if(disabled){
+      path += "?disabled=true"
+    }
+
+    return this.post(path);
   }
 
   static async disablePrinter(id) {
@@ -122,6 +129,14 @@ export default class OctoFarmClient {
 
   static async generateLogDump() {
     return this.post(`${this.logsRoute}/generateLogDump`, {});
+  }
+
+  static async deleteLogFile(filename) {
+    return this.delete(`${this.logsRoute}/${filename}`)
+  }
+
+  static async clearOldLogs() {
+    return this.delete(`${this.logsRoute}/clear-old`)
   }
 
   static async getHistoryStatistics() {
@@ -192,6 +207,11 @@ export default class OctoFarmClient {
   static getFarmOverview() {
     return this.get(this.farmOverviewRoute);
   }
+
+  static getConnectionOverview() {
+    return this.get(this.connectionOverviewRoute);
+  }
+
 
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });

@@ -19,7 +19,8 @@ const serverActionsElements = {
   RESTART_OCTOFARM: document.getElementById("restartOctoFarmBtn"),
   UPDATE_OCTOFARM: document.getElementById("updateOctoFarmBtn"),
   CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn"),
-  OP_FILAMENT_SETUP: document.getElementById("filamentManagerPluginSetupBtn")
+  OP_FILAMENT_SETUP: document.getElementById("filamentManagerPluginSetupBtn"),
+  CLEAR_OLD_LOGS: document.getElementById("clearOldLogs")
 };
 
 const filamentManagerPluginActionElements = {

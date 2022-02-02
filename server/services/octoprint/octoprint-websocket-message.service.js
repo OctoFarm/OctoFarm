@@ -39,7 +39,6 @@ const {
   capturePositionUpdate,
   capturePrintCancelled,
   capturePrintCancelling,
-  capturePrintDone,
   captureFinishedPrint,
   capturePrintPaused,
   capturePrintStarted,
@@ -56,9 +55,10 @@ const {
   captureKlipperPluginData,
   capturePluginManagerData
 } = require("./utils/octoprint-plugin.utils");
-const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const Logger = require("../../handlers/logger");
+const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
+const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -155,6 +155,14 @@ class OctoprintWebsocketMessageService {
   }
   static handleHistoryData(printerID, data) {
     removeMultiUserFlag(printerID);
+    // force update state here after connection established.
+    const currentState = {
+      state: "Disconnected",
+      stateColour: mapStateToCategory("Disconnected"),
+      stateDescription: "Websocket Connected but in Tentative state until receiving data"
+    };
+
+    getPrinterStoreCache().updatePrinterState(printerID, currentState);
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static handleEventData(printerID, data) {
@@ -172,22 +180,29 @@ class OctoprintWebsocketMessageService {
         captureClientOpened(printerID, payload);
         break;
       case EVENT_TYPES.Connected:
+        captureConnected(printerID, payload);
         break;
       case EVENT_TYPES.Disconnecting:
+        captureDisconnecting(printerID, payload);
         break;
       case EVENT_TYPES.Disconnected:
+        captureDisconnected(printerID, payload);
         break;
       case EVENT_TYPES.Dwelling:
+        captureDwelling(printerID, payload);
         break;
       case EVENT_TYPES.Error:
         captureError(printerID, payload);
         break;
       case EVENT_TYPES.FileAdded:
+        captureFileAdded(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.FileDeselected:
+        captureFileDeselected(printerID, payload);
         break;
       case EVENT_TYPES.FileRemoved:
+        captureFileRemoved(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.FirmwareData:
@@ -195,28 +210,37 @@ class OctoprintWebsocketMessageService {
         captureFirmwareData(printerID, payload);
         break;
       case EVENT_TYPES.FolderAdded:
+        captureFolderAdded(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.FolderRemoved:
+        captureFolderRemoved(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.Home:
+        captureHome(printerID, payload);
         break;
       case EVENT_TYPES.MetadataAnalysisFinished:
+        captureMetadataAnalysisFinished(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.MetadataAnalysisStarted:
+        captureMetadataAnalysisStarted(printerID, payload);
         break;
       case EVENT_TYPES.MetadataStatisticsUpdated:
+        captureMetadataStatisticsUpdated(printerID, payload);
         break;
 
       case EVENT_TYPES.PositionUpdate:
+        capturePositionUpdate(printerID, payload);
         break;
 
       case EVENT_TYPES.PrintCancelled:
+        capturePrintCancelled(printerID, payload);
         break;
 
       case EVENT_TYPES.PrintCancelling:
+        capturePrintCancelling(printerID, payload);
         break;
 
       case EVENT_TYPES.PrintDone:
@@ -224,7 +248,8 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintFailed:
-        captureFinishedPrint(printerID, payload, false);
+        // TODO create printfialed
+        // capturePrint(printerID, payload, false);
         break;
 
       case EVENT_TYPES.PrintPaused:
@@ -232,22 +257,28 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintStarted:
+        capturePrintStarted(printerID, payload);
         break;
 
       case EVENT_TYPES.PrinterStateChanged:
+        capturePrinterStateChanged(printerID, payload);
         break;
 
       case EVENT_TYPES.TransferDone:
+        captureTransferDone(printerID, payload);
         break;
 
       case EVENT_TYPES.TransferStarted:
+        captureTransferStarted(printerID, payload);
         break;
 
       case EVENT_TYPES.UpdatedFiles:
+        captureUpdatedFiles(printerID, payload);
         // Trigger resyncs
         break;
 
       case EVENT_TYPES.Upload:
+        captureUpload(printerID, payload);
         break;
 
       case EVENT_TYPES.UserLoggedIn:
@@ -259,6 +290,7 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.ZChange:
+        captureZChange(printerID, payload);
         break;
     }
     //logger.error(printerID + "EVENT DATA RECEIVED", data);

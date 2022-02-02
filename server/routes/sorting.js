@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 
 const { updateSorting, updateFilter } = require("../services/front-end-sorting.service.js");
 const {

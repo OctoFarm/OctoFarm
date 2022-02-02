@@ -2,13 +2,13 @@ const Logger = require("../handlers/logger.js");
 const { JobValidationException } = require("../exceptions/job.exceptions");
 const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
 
-const logger = new Logger("OctoFarm-TaskManager");
+const logger = new Logger("OctoFarm-TaskManagerService");
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
  * Note: this class ought NOT TO BE USED FOR SYNCHRONOUS REQUEST MIDDLEWARE
  */
-class TaskManager {
+class TaskManagerService {
   static jobScheduler = new ToadScheduler();
   static taskStates = {};
 
@@ -169,5 +169,5 @@ class TaskManager {
 }
 
 module.exports = {
-  TaskManager
+  TaskManager: TaskManagerService
 };

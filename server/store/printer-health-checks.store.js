@@ -14,6 +14,11 @@ const logger = new Logger("OctoFarm-HealthChecks");
 
 let printerHealthChecks = [];
 
+/**
+ * Returns the current printer health checks, pass a boolean to force the health check.
+ * @param {Boolean} force
+ * @returns {*[]}
+ */
 const returnPrinterHealthChecks = (force = false) => {
   if (force) {
     logger.info("Running printer health check.", { force });

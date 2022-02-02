@@ -2,31 +2,32 @@ import UI from "./utils/ui.js";
 import Script from "./services/octofarm-scripts.service";
 import ClientSettings from "./pages/system/client-settings";
 import {
-    localStorageKeys,
-    returnSaveBtn,
-    serverActionsElements,
-    serverDatabaseKeys,
-    userActionElements
+  localStorageKeys,
+  returnSaveBtn,
+  serverActionsElements,
+  serverDatabaseKeys,
+  userActionElements
 } from "./pages/system/server.options";
 import {
-    checkFilamentManagerPluginState,
-    checkForOctoFarmUpdates,
-    createNewUser,
-    deleteUser,
-    editUser,
-    exportDatabases,
-    fillInEditInformation,
-    generateLogDumpFile,
-    grabOctoFarmLogList,
-    nukeDatabases,
-    renderSystemCharts,
-    resetUserPassword,
-    restartOctoFarmServer,
-    setupOPFilamentManagerPluginSettings,
-    startUpdateInfoRunner,
-    startUpdateTasksRunner,
-    updateOctoFarmCommand,
-    updateServerSettings
+  checkFilamentManagerPluginState,
+  checkForOctoFarmUpdates,
+  clearOldLogs,
+  createNewUser,
+  deleteUser,
+  editUser,
+  exportDatabases,
+  fillInEditInformation,
+  generateLogDumpFile,
+  grabOctoFarmLogList,
+  nukeDatabases,
+  renderSystemCharts,
+  resetUserPassword,
+  restartOctoFarmServer,
+  setupOPFilamentManagerPluginSettings,
+  startUpdateInfoRunner,
+  startUpdateTasksRunner,
+  updateOctoFarmCommand,
+  updateServerSettings
 } from "./pages/system/server.actions";
 import {serverBootBoxOptions} from "./pages/system/utils/bootbox.options";
 import {removeLocalStorage} from "./services/local-storage.service";
@@ -62,7 +63,7 @@ for (const key in serverDatabaseKeys) {
     }
   }
 }
-
+// FIXME should be decoupled from LOG_DUMP_GENERATE element, scripts and plugins are not reliant on that.
 if (serverActionsElements.LOG_DUMP_GENERATE) {
   checkFilamentManagerPluginState().then();
   grabOctoFarmLogList().then();
@@ -73,6 +74,12 @@ renderSystemCharts().then();
 startUpdateTasksRunner();
 startUpdateInfoRunner().then();
 ClientSettings.init().then();
+
+if(serverActionsElements.CLEAR_OLD_LOGS){
+  serverActionsElements.CLEAR_OLD_LOGS.addEventListener("click", async (e) => {
+    await clearOldLogs();
+  })
+}
 
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
   serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {

@@ -12,10 +12,12 @@ import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
 import PrinterFileManagerService from "../../../services/printer-file-manager.service";
 import {
-    addHealthCheckListeners,
-    returnFarmOverviewTableRow,
-    returnHealthCheckRow
+  addHealthCheckListeners,
+  returnFarmOverviewTableRow,
+  returnHealthCheckRow
 } from "../templates/health-checks-table-row.templates";
+import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
+import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates"
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -28,8 +30,10 @@ export function workerEventFunction(data) {
     if (!modalVisibility) {
       if (data.currentTickerList.length > 0) {
         checkIfLoaderExistsAndRemove();
+        checkIfAlertsLoaderExistsAndRemove();
         updateConnectionLog(data.currentTickerList);
       } else {
+        checkIfAlertsLoaderExistsAndRemove(true);
         checkIfLoaderExistsAndRemove(true);
       }
       if (data.printersInformation.length > 0) {
@@ -349,12 +353,17 @@ export async function loadFarmOverviewInformation() {
         currentPrinter.printCancelTotal +
         currentPrinter.printErrorTotal;
       const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
+      const printerCancelRate = (currentPrinter.printCancelTotal * 100) / printTotal || 0;
+      const printerErrorRate = (currentPrinter.printErrorTotal * 100) / printTotal || 0;
       const printUtilisationTotal =
         currentPrinter.activeTimeTotal +
         currentPrinter.idleTimeTotal +
         currentPrinter.offlineTimeTotal;
       const printerActivityRate =
         (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0;
+      const printerIdleRate =
+          (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
+      const printerOfflineRate = (currentPrinter.offlineTimeTotal * 100) / printUtilisationTotal || 0;
       const octoSysInfo = currentPrinter.octoPrintSystemInfo;
       farmOverviewInformation.insertAdjacentHTML(
         "beforeend",
@@ -363,9 +372,96 @@ export async function loadFarmOverviewInformation() {
           printer,
           octoSysInfo,
           printerSuccessRate,
-          printerActivityRate
+          printerActivityRate,
+          printerCancelRate,
+          printerErrorRate,
+          printerIdleRate,
+          printerOfflineRate
         )
       );
     }
   });
+}
+
+export async function loadConnectionOverViewInformation() {
+  const printerConnectionStats = await OctoFarmClient.getConnectionOverview();
+
+  const connectionOverViewTableBody = document.getElementById("connectionOverViewTableBody")
+
+  connectionOverViewTableBody.innerHTML = "";
+
+  const today = new Date();
+  document.getElementById("lastUpdateConnectionOverview").innerHTML = today.toLocaleTimeString()
+
+   const totalsArray = []; 
+   printerConnectionStats.forEach((url, index) => { 
+     const currentPrinter = url;
+     const toCalc = [];
+     currentPrinter.connections.forEach(con => {
+       const log = con.log;
+       const url = con.url;
+       const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
+       const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0)
+       const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections
+       const failedPercent = (log.totalRequestsFailed * 100) / totalConnections
+       const apiFailures = log.connectionFailures
+       const retryCount = log.totalRetries
+       const totalPingPong = log?.totalPingPong
+
+       const toPush = { totalResponse, successPercentage, failedPercent, retryCount, apiFailures, totalPingPong }
+
+       toCalc.push(toPush)
+       })
+     totalsArray[index] = toCalc
+   })
+
+    printerConnectionStats.forEach((url, index) => {
+    const currentPrinter = url;
+    const totalSuccessPercent = totalsArray[index].reduce( function(a, b){ return a + b["successPercentage"] }, 0)
+    const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0)
+    const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length
+    const actualFailedPercent = totalFailedPercent / totalsArray[index].length
+    let averageTotalCountLength = 0;
+    const averageTotalCount = totalsArray[index].reduce( function(a, b){
+           averageTotalCountLength = averageTotalCountLength + 1;
+           return a + b["totalResponse"]
+         }, 0)
+    const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0)
+    const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0;
+      const totalPingPongFails = totalsArray[index].reduce( function(a, b){ return a + b["totalPingPong"] }, 0)
+
+      const collapseableRow = collapsableRow(index, currentPrinter.printerURL, averageTotalCalc, actualSuccessPercent,actualFailedPercent, totalsArray, totalAPIFailed, totalPingPongFails)
+
+      connectionOverViewTableBody.insertAdjacentHTML("beforeend", collapseableRow);
+
+      currentPrinter.connections.forEach(con => {
+      let url = con.url
+            const log = con.log
+            if(url.includes("http")){
+          if(url.includes("https")){
+                url = url.replace("https://"+currentPrinter.printerURL, "")
+                  }else{
+                 url = url.replace("http://"+currentPrinter.printerURL, "")
+                   }
+       }else if(url.includes("ws")){
+          if(url.includes("wss")){
+                 url = url.replace("wss://"+currentPrinter.printerURL, "")
+                   }else{
+                 url = url.replace("ws://"+currentPrinter.printerURL, "")
+                   }
+       }
+
+      const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0);
+      const averageCalculation = (averageCount / log.lastResponseTimes.length) || 0;
+      const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
+      const successPercent = (log.totalRequestsSuccess * 100) / totalConnections;
+      const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections;
+      const connectionInnerElement = collapsableContent(index, url, averageCalculation, successPercent, failedPercent, log);
+
+      connectionOverViewTableBody.insertAdjacentHTML("beforeend", connectionInnerElement)
+
+      })
+
+      })
+
 }

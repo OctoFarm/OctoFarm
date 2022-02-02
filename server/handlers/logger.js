@@ -1,4 +1,5 @@
 const winston = require("winston");
+const { AppConstants } = require("../constants/app.constants")
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -21,17 +22,28 @@ const COLOUR_MAP = {
   warn: COLOURS.ORANGE,
   debug: COLOURS.ORANGE,
   error: COLOURS.RED,
+  http : COLOURS.PURPLE,
   silly: COLOURS.CYAN
 };
+
+const LEVELS = {
+    error: 0,
+    warn: 1,
+    http: 2,
+    info: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6
+}
 
 dateFormat = () => {
   return dtFormat.format(new Date());
 };
-//TODO Log level filter should be set by environment variable
+
 class LoggerService {
   constructor(route, enableFileLogs = true, logFilterLevel = undefined) {
     if (!logFilterLevel) {
-      logFilterLevel = process.env.LOG_LEVEL;
+      logFilterLevel = process.env[AppConstants.LOG_LEVEL];
     }
 
     this.log_data = null;
@@ -62,23 +74,46 @@ class LoggerService {
       })
     );
 
+    let prettyPrintMyLogs = winston.format.combine(
+        winston.format.printf((info) => {
+          const level = info.level.toUpperCase();
+          const date = dateFormat();
+          let metaData = undefined;
+          if (!!info?.meta) {
+            if (typeof info.meta === "string" || typeof info.meta === "number") {
+              metaData = info.meta;
+            } else {
+              metaData = Object.assign({}, info.meta);
+              metaData = JSON.stringify(metaData);
+            }
+          }
+          let message = `${date} | ${level} | ${route} \n MESSAGE: ${info.message} `;
+          message = metaData
+              ? message + `\n DATA: ${metaData}`
+              : message;
+          return message;
+        })
+    );
+
     this.logger = winston.createLogger({
+      levels: LEVELS,
       transports: [
         new winston.transports.Console({
-          level: logFilterLevel
+          level: logFilterLevel,
+          format: alignColorsAndTime,
         }),
         ...(enableFileLogs
           ? [
               new winston.transports.File({
                 level: logFilterLevel,
+                format: prettyPrintMyLogs,
                 filename: `../logs/${route}.log`,
-                maxsize: "5000000",
-                maxFiles: 1
+                maxsize: 5242880,
+                maxFiles: 3
               })
             ]
           : [])
       ],
-      format: alignColorsAndTime
     });
   }
 
@@ -92,6 +127,13 @@ class LoggerService {
     this.logger.log("warn", message, {
       meta
     });
+  }
+
+  http(message, meta){
+      console.log(message)
+      this.logger.log("http", message, {
+          meta
+      })
   }
 
   debug(message, meta) {

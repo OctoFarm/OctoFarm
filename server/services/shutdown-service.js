@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Server");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("./task-manager.service");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
 function killMongoDBConnection() {

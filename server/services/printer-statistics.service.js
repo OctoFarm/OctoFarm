@@ -54,6 +54,7 @@ const generatePrinterStatistics = async (id) => {
   let historyWeekly = [];
 
   // Create the statistics object to be sent back to client
+
   let printerStatistics = {
     printerName: printer.printerName,
     timeTotal: dateDifference,

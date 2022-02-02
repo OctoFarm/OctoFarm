@@ -10,11 +10,12 @@ class Script {
     logger.info("Message: ", message);
     try {
       const { stdout, stderr } = await exec(`${scriptLocation} ${message}`);
-      logger.info("stdout:", stdout);
-      logger.info("stderr:", stderr);
+      if (!!stdout) logger.info("stdout:", stdout);
+      if (!!stderr) logger.error("stderr:", stderr);
+
       return scriptLocation + ": " + stdout;
     } catch (err) {
-      logger.error(err);
+      logger.error("Error firing script!", err.message);
       return err;
     }
   }
@@ -30,7 +31,7 @@ class Script {
 
     wol.wake(mac, function (error) {
       if (error) {
-        logger.error("Couldn't fire wake packet", error);
+        logger.error("Couldn't fire wake packet", error.message);
       } else {
         logger.info("Successfully fired wake packet: ", mac, opts);
       }

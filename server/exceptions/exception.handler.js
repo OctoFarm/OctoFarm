@@ -1,5 +1,5 @@
 const { ValidationException, NotFoundException } = require("./runtime.exceptions");
-const { AppConstants } = require("../app.constants");
+const { AppConstants } = require("../constants/app.constants");
 
 // https://dev.to/rajajaganathan/express-scalable-way-to-handle-errors-1kd6
 function exceptionHandler(err, req, res, next) {

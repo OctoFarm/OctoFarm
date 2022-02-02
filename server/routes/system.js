@@ -3,13 +3,13 @@ const express = require("express");
 const router = express.Router();
 
 const prettyHelpers = require("../views/partials/functions/pretty.js");
-const { SystemRunner } = require("../runners/systemInfo.js");
+const { SystemRunner } = require("../services/system-information.service.js");
 
 const isDocker = require("is-docker");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
-const { ensureAuthenticated } = require("../config/auth");
-const { ensureCurrentUserAndGroup } = require("../config/users");
-const { AppConstants } = require("../app.constants");
+const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureCurrentUserAndGroup } = require("../middleware/users");
+const { AppConstants } = require("../constants/app.constants");
 const { getDefaultDashboardSettings } = require("../constants/settings.constants");
 const { fetchMongoDBConnectionString, fetchClientVersion } = require("../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
@@ -18,7 +18,7 @@ const fs = require("fs");
 const marked = require("marked");
 const { fetchUsers } = require("../services/user-service");
 const { returnPatreonData } = require("../services/patreon.service");
-const { TaskManager } = require("../runners/task.manager");
+const { TaskManager } = require("../services/task-manager.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
 

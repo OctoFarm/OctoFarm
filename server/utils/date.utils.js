@@ -44,4 +44,17 @@ const getDatesBetweenDates = function (startDate, endDate) {
   return dates;
 };
 
-module.exports = { getFirstDayOfLastMonth, last12Month, getDatesBetweenDates };
+const generateTodayTextString = () => {
+  let dateString = "";
+  const today = new Date();
+  dateString += today.toLocaleDateString().replace(/\//g, "-");
+  dateString += "-" + today.toLocaleTimeString().replace(/:/g, "-");
+  return dateString;
+};
+
+module.exports = {
+  getFirstDayOfLastMonth,
+  last12Month,
+  getDatesBetweenDates,
+  generateTodayTextString
+};

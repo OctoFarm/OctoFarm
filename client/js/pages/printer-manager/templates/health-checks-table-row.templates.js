@@ -14,7 +14,7 @@
 // <!--                                Webcam Settings-->
 // <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
 // Bootbox over bootstrap modal fix for scrolling...
-import UI from "../../../utils/ui";
+import Calc from "../../../utils/calc"
 
 $(document).on("hidden.bs.modal", ".bootbox.modal", function (e) {
   if ($(".modal").hasClass("show")) {
@@ -624,7 +624,7 @@ export function addHealthCheckListeners(check) {
     });
   }
 
-  if (check.webcamChecks.camSetup) {
+  if (!check.webcamChecks.camSetup) {
     document.getElementById(E.WEBCAM + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your webcam settings from OctoPrint do not match your values in OctoFarm.",
@@ -635,7 +635,8 @@ export function addHealthCheckListeners(check) {
   }
 
   const { ffmpegPath, ffmpegVideoCodex, timelapseEnabled } = check.webcamChecks.historySetup;
-  if (ffmpegPath) {
+
+  if (!ffmpegPath) {
     document.getElementById(E.H_FFMPEG + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got an FFMPEG path setup and your settings in history are utilising the timelapse functionality.",
@@ -644,7 +645,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (ffmpegVideoCodex) {
+  if (!ffmpegVideoCodex) {
     document.getElementById(E.H_CODEC + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the correct codec setup and your settings in history are utilising the timelapse functionality.",
@@ -653,7 +654,7 @@ export function addHealthCheckListeners(check) {
       );
     });
   }
-  if (timelapseEnabled) {
+  if (!timelapseEnabled) {
     document.getElementById(E.H_TIMELAPSE + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoPrint hasn't got the timelapse functionality enabled and your settings in history are utilising the timelapse functionality.",
@@ -798,7 +799,11 @@ export function returnFarmOverviewTableRow(
   printer,
   octoSysInfo,
   printerSuccessRate,
-  printerActivityRate
+  printerActivityRate,
+  printerCancelRate,
+  printerErrorRate,
+  printerIdleRate,
+  printerOfflineRate
 ) {
   const NO_DATA = "No Data";
   return `
@@ -816,7 +821,7 @@ export function returnFarmOverviewTableRow(
       } </td>
       <td>${
         octoSysInfo?.["env.hardware.ram"]
-          ? helpers.generateBytes(octoSysInfo?.["env.hardware.ram"])
+          ? Calc.bytes(octoSysInfo?.["env.hardware.ram"])
           : NO_DATA
       }  </td>
       <td>${
@@ -825,22 +830,17 @@ export function returnFarmOverviewTableRow(
           : "<i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-up text-success\"></i>"
       } </td>
       <td>
-        <div class="progress">
-          <div class="progress-bar ${UI.returnProgressColour(
-            printerSuccessRate,
-            true
-          )}  progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerSuccessRate}  %"> ${printerSuccessRate.toFixed(
-    0
-  )}  % </div>
+        <div class="progress" title="Success:  ${printerSuccessRate.toFixed(0)}% / Cancel: ${printerCancelRate.toFixed(0)}% / Error: ${printerErrorRate.toFixed(0)}%">
+          <div class="progress-bar bg-success progress-bar-striped text-dark" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerSuccessRate}%;"> ${printerSuccessRate.toFixed(0)}% </div>
+          <div class="progress-bar bg-warning progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerCancelRate}%;"> ${printerCancelRate.toFixed(0)}% </div>
+          <div class="progress-bar bg-danger progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerErrorRate}%;"> ${printerErrorRate.toFixed(0)}% </div>
         </div>
       </td>
       <td>
-        <div class="progress">
-          <div class="progress-bar ${UI.returnProgressColour(
-            printerActivityRate
-          )} progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerActivityRate}  %"> ${printerActivityRate.toFixed(
-    0
-  )}  % </div>
+        <div class="progress" title="Active:  ${printerActivityRate.toFixed(0)}% / Idle: ${printerIdleRate.toFixed(0)}% / Offline: ${printerOfflineRate.toFixed(0)}%">
+          <div class="progress-bar bg-success progress-bar-striped text-dark" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerActivityRate}%;"> ${printerActivityRate.toFixed(0)}%</div>
+          <div class="progress-bar bg-secondary progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerIdleRate}%;"> ${printerIdleRate.toFixed(0)}%</div>
+          <div class="progress-bar bg-danger progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"  style="width: ${printerOfflineRate}%;"> ${printerOfflineRate.toFixed(0)}%</div>
         </div>
       </td>
       <td>${currentPrinter.printerResendRatioTotal} %</td>

@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { stringify } = require("flatted");
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { getDefaultDashboardSettings } = require("../constants/settings.constants");
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const {
   getDashboardStatistics,

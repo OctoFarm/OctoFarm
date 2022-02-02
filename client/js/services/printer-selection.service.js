@@ -85,7 +85,7 @@ const controlPrintersMessage = `
 `;
 
 const gcodePrintersMessage = `
-<div class="alert alert-info" role="alert">
+<div class="alert alert-info text-dark" role="alert">
   Please select your list of printers you'd like to send gcode commands to.
 </div>
 <div class="alert alert-info text-dark" role="alert">
@@ -93,6 +93,22 @@ const gcodePrintersMessage = `
 </div>
 <div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for gcode commands to be sent on the fly it will not check printer state before doing so.
+</div>
+`;
+const disablePrintersMessage = `
+<div class="alert alert-info" role="alert">
+  Please select the list of printers you'd like to disable.
+</div>
+<div class="alert alert-warning text-dark" role="alert">
+  A disabled printer will not make any connection attempts until re-enabled. You will not see it in the UI and it will not effect any stats like Offline printer count.
+</div>
+`;
+const enablePrintersMessage = `
+<div class="alert alert-info" role="alert">
+  Please select the list of printers you'd like to enable.
+</div>
+<div class="alert alert-warning text-dark" role="alert">
+    Enabling a printer will restore it to it's previous functionality.
 </div>
 `;
 
@@ -263,12 +279,22 @@ export default class PrinterSelectionService {
       messageBox.innerHTML = gcodePrintersMessage;
     } else if (action === "Start a Bulk Print") {
       messageBox.innerHTML = multiPrintMessage;
+    } else if (action === "Disable Printers"){
+      messageBox.innerHTML = disablePrintersMessage;
+    } else if(action === "Enable Printers"){
+      messageBox.innerHTML = enablePrintersMessage;
     }
 
     const groupList = [];
     const printerList = [];
 
-    const printers = await OctoFarmClient.listPrinters();
+    let disabled = false;
+
+    if(action === "Enable Printers"){
+      disabled = true
+    }
+
+    const printers = await OctoFarmClient.listPrinters(disabled);
 
     printers.forEach((printer) => {
       if (

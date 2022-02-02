@@ -1,12 +1,12 @@
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
-const serverScripts = require("../services/server-scripts.service.js");
+const serverScripts = require("./server-scripts.service.js");
 const Script = serverScripts.Script;
 const Alerts = require("../models/Alerts.js");
 
 class ScriptRunner {
   /**
-   * Save alert - TODO Trigger, message and location validation lacking
+   * Save alert
    * @param printer
    * @param trigger
    * @param message
@@ -76,7 +76,7 @@ class ScriptRunner {
   }
 
   static async fire(scriptLocation, message) {
-    logger.info("Alert Fire: " + scriptLocation + " " + message);
+    logger.warning("Alert Fire: " + scriptLocation + " " + message);
     return await Script.fire(scriptLocation, message);
   }
 
@@ -132,7 +132,7 @@ class ScriptRunner {
       message = message.replace(/\[ETA\]/g, dateComplete);
     }
     if (message.includes("[PrinterName]")) {
-      message = message.replace(/\[PrinterName\]/g, printer.settingsApperance.name);
+      message = message.replace(/\[PrinterName\]/g, printer.printerName);
     }
     if (message.includes("[PrinterURL]")) {
       message = message.replace(/\[PrinterURL\]/g, printer.printerURL);

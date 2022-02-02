@@ -2,7 +2,9 @@ import {createClientSSEWorker} from "./services/client-worker.service";
 import PrinterSelectionService from "./services/printer-selection.service";
 import {
     bulkConnectPrinters,
+    bulkDisablePrinters,
     bulkDisconnectPrinters,
+    bulkEnablePrinters,
     bulkEnableVirtualPrinter,
     bulkOctoPrintClientUpdate,
     bulkOctoPrintPluginAction,
@@ -17,6 +19,7 @@ import {
     deleteAllOnAddPrinterTable,
     exportPrintersToJson,
     importPrintersFromJsonFile,
+    loadConnectionOverViewInformation,
     loadFarmOverviewInformation,
     loadPrinterHealthChecks,
     reSyncAPI,
@@ -41,6 +44,19 @@ bulkPluginUpdateButton.addEventListener("click", async () => {
 let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   await bulkOctoPrintClientUpdate();
+});
+
+let bulkDisablePrintersButton = document.getElementById("disablePrintersBtn");
+bulkDisablePrintersButton.addEventListener("click", async (e) => {
+    await PrinterSelectionService.create(multiPrinterSelectModal, false, "Disable Printers", function () {
+        bulkDisablePrinters();
+    });
+});
+let bulkEnablePrintersButton = document.getElementById("enablePrintersBtn");
+bulkEnablePrintersButton.addEventListener("click", async (e) => {
+    await PrinterSelectionService.create(multiPrinterSelectModal, false, "Enable Printers", function () {
+        bulkEnablePrinters(true);
+    });
 });
 
 let scanNetworkBtn = document.getElementById("scanNetworkBtn");
@@ -185,10 +201,15 @@ farmOverviewInformationBtn.addEventListener("click", async (e) => {
   await loadFarmOverviewInformation();
 });
 
+const connectionOverviewInformationBtn = document.getElementById("connectionsOverviewModalBtn");
+connectionOverviewInformationBtn.addEventListener("click", async (e) => {
+    await loadConnectionOverViewInformation();
+});
+
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Connect Printers",
     await bulkConnectPrinters
@@ -197,7 +218,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
 const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
 bulkDisconnectBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Disconnect Printers",
     await bulkDisconnectPrinters
@@ -206,7 +227,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
 bulkPowerBtn.addEventListener("click", async (e) => {
   await PrinterSelectionService.create(
-    multiPrintersSection,
+      multiPrinterSelectModal,
     false,
     "Power On/Off Printers",
     await bulkOctoPrintPowerCommand
