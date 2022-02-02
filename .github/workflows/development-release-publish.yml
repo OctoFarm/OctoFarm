@@ -53,9 +53,9 @@ jobs:
       # Build the client for npm publish
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
-        run: npm ci --no-optional
-        working-directory: ./client
-        run: npm run build
+        run: |
+        npm ci --no-optional
+        npm run build
         working-directory: ./client
 
       # Publish the new build to npm
@@ -91,7 +91,7 @@ jobs:
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
         if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
-      - uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: development
           commit_message: "[Bot] Bump Alpha Version!"
