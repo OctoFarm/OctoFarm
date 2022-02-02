@@ -18,7 +18,8 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "prepare": "husky install",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "setup-dev": "npm install && npm prepare && npm install-server && npm install-client"
   },
   "repository": {
     "type": "git",
