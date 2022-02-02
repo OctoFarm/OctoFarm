@@ -53,9 +53,9 @@ jobs:
       # Build the client for npm publish
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
-        run: npm ci --no-optional
-        working-directory: ./client
-        run: npm run build
+        run: |
+        npm ci --no-optional
+        npm run build
         working-directory: ./client
 
       # Publish the new build to npm
