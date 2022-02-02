@@ -1,6 +1,6 @@
 {
   "name": "octofarm-entry",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "main": "server/app.js",
   "scripts": {
     "start": "cd server && npm run start",
@@ -14,10 +14,14 @@
     "dev-server": "cd server && npm run dev",
     "install-client": "cd client && npm install",
     "dev-client": "cd client && npm run dev",
-    "build-client": "cd client && npm run build"
+    "build-client": "cd client && npm run build",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/OctoFarm/OctoFarm"
+  },
+  "devDependencies": {
+    "semantic-release": "^19.0.2"
   }
 }
