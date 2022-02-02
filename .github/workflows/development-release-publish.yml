@@ -30,7 +30,7 @@ jobs:
             server:
             - 'server/**'
             client:
-            - 'client/**'+
+            - 'client/**'
 
       # Install node v14 to use.
       - name: Use Node
