@@ -1,4 +1,4 @@
-name: Release Master and Development Builds - Needs working on
+name: Release Master and Development Builds
 
 on:
   push:
