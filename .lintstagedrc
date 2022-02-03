@@ -1,4 +1,4 @@
 {
-  "server/**/*.+(js)": ["eslint", "prettier --write"],
-  "client/**/*.+(js)": ["eslint" , "prettier --write"]
+  "server/**/*.js": ["eslint --fix", "prettier --write"],
+  "client/**/*.js": ["eslint --fix" , "prettier --write"]
 }
