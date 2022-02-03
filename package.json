@@ -19,7 +19,7 @@
     "semantic-release": "semantic-release",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
-    "setup-dev": "npm install && npm prepare && npm install-server && npm install-client"
+    "setup-dev": "npm install && npm run prepare && npm run install-server && npm run install-client"
   },
   "repository": {
     "type": "git",
