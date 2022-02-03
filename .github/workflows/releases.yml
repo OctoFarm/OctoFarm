@@ -1,4 +1,4 @@
-name: Release Master and Development Builds
+name: Release Master and Development Builds - Nah, Custom...
 
 on:
   push:
