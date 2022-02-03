@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [Security Policy](#security-policy)
+  - [Security Policy](#security-policy)
   - [Supported Versions](#supported-versions)
   - [Reporting a Vulnerability](#reporting-a-vulnerability)
 
