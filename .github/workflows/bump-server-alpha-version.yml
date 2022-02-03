@@ -18,7 +18,8 @@ jobs:
   bump-versions-pre-release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
+    env:
+      INPUT_TOKEN: ''
     steps:
       # Checkout the development repository
       - uses: actions/checkout@v2
