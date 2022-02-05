@@ -6,6 +6,7 @@ import {returnDropDown} from "./filament-manager-plugin.service";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./client-modal.service";
+import {allowedFileTypes} from "../constants/file-types.constants";
 
 let currentIndex = 0;
 let currentPrinter = null;
@@ -196,9 +197,9 @@ export default class PrinterFileManagerService {
                     </div>
                   </div>
                   <label class="btn btn-success float-left mr-1 mb-0 bg-colour-1" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
-                  <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-1" id="uploadFileBtn">
+                  <input id="fileUploadBtn" multiple accept="${allowedFileTypes}" type="file" class="btn btn-success float-left bg-colour-1" id="uploadFileBtn">
                   <label class="btn btn-info float-left mr-1 mb-0 bg-colour-2" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
-                  <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-2" id="uploadFileBtn">
+                  <input id="fileUploadPrintBtn" accept="${allowedFileTypes}" type="file" class="btn btn-success float-left bg-colour-2" id="uploadFileBtn">
                 <button
                   id="createFolderBtn"
                   type="button"
