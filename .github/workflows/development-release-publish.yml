@@ -12,6 +12,8 @@ jobs:
   bump-versions-pre-release:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    env:
+      INPUT_TOKEN: ''
 
     steps:
       # Checkout the development repository
@@ -69,7 +71,7 @@ jobs:
       # Grab the client package version into a variable.
       - name: get-client-current-version
         if: steps.filter.outputs.client == 'true'
-        id: package-version
+        id: client-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
           path: client
@@ -77,7 +79,7 @@ jobs:
       # Update Server Package with latest client package
       - name: update server client version
         if: steps.filter.outputs.client == 'true'
-        run: npm install @notexpectedyet/octofarm-client@${{ steps.package-version.outputs.current-version }} --save
+        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
         working-directory: ./server
 
       # Commit changes to the current development repository
