@@ -38,6 +38,7 @@ import {
 } from "./bulk-actions-progress.functions";
 import {populateBulkSettingsForms} from "./bulk-settings-update.functions";
 import bulkActionsStates from "../bulk-actions.constants";
+import {allowedFileTypes} from "../../../constants/file-types.constants";
 
 import Queue from "../../../services/file-manager-queue.service.js";
 import OctoPrintClient from "../../../services/octoprint-client.service";
@@ -328,7 +329,7 @@ export async function bulkPrintFileSetup() {
   document.getElementById("bpActionButtonElement").innerHTML =
     "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
   document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
-          <input type="file" accept=".gcode,.gco" class="custom-file-input" id="bpFileUpload" multiple>
+          <input type="file" accept="${allowedFileTypes}" class="custom-file-input" id="bpFileUpload" multiple>
           <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
       </div>
     `;

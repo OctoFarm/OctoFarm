@@ -4,6 +4,7 @@ import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
 import {createFilamentSelector} from "./services/filament-manager-plugin.service";
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
+import {allowedFileTypes} from "./constants/file-types.constants"
 
 let lastId = null;
 
@@ -172,9 +173,9 @@ class Manager {
          <div class="row mb-1">
           <div class="col-12">
             <label class="btn btn-success float-left mr-1 mb-0 bg-colour-1" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
-            <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-1" id="uploadFileBtn">
+            <input id="fileUploadBtn" multiple accept="${allowedFileTypes}" type="file" class="btn btn-success float-left bg-colour-1">
             <label class="btn btn-info float-left mr-1 mb-0 bg-colour-2" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
-            <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-2" id="uploadFileBtn">
+            <input id="fileUploadPrintBtn" accept="${allowedFileTypes}" type="file" class="btn btn-success float-left bg-colour-2">
             <button
                     id="createFolderBtn"
                     type="button"
