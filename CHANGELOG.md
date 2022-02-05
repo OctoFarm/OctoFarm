@@ -70,7 +70,7 @@ All notable changes to this project will be documented in this file.
     - Logs now show created date, as well as modified.
     - Log files can now be deleted.
     - Additional button to house keep log files. Cleans any logs older than a day.
-  - Added support for additional file types. These should allow the further support of OctoPrint-BetterGrblSupport Plugin and OctoPrint-Chituboard Plugin ".gcode,.gco,.g,.ctb,.fdg,.nc,.gc" 
+  - Added support for additional file types. These should allow the further support of OctoPrint-BetterGrblSupport Plugin and OctoPrint-Chituboard Plugin ".gcode,.gco,.g,.ctb,.fdg,.nc,.gc" - Added to docs.octofarm.net 
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
