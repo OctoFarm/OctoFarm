@@ -7,6 +7,8 @@ on:
     paths-ignore:
       - "server/package.json"
       - "client/package.json"
+      - "server/package-lock.json"
+      - "client/package-lock.json"
 
 jobs:
   bump-versions-pre-release:
@@ -96,8 +98,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: development
-          commit_message: "[Bot] Bump Alpha Version! - v${{ steps.server-package-version.outputs.current-version }}"
+          commit_message: "bot: bump alpha version - v${{ steps.server-package-version.outputs.current-version }}"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>
-          tagging_message: ${{ steps.server-package-version.outputs.current-version }}
