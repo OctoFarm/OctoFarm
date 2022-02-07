@@ -149,25 +149,10 @@ const captureError = (id, data) => {
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-
   // Register cancelled print...
   HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
     .then((res) => {
       logger.info("Successfully captured error", res);
-      setTimeout(async function () {
-        // Register cancelled print...
-
-        // await Runner.updateFilament();
-        // TODO Update Printer Manager call to update filament... or maybe register as a task and call
-
-        setTimeout(async function () {
-          // TODO This is something that can be fired from the store...
-          // await Runner.reSyncFile(
-          //   farmPrinters[that.index]._id,
-          //   farmPrinters[that.index].job.file.path
-          // );
-        }, 5000);
-      }, 10000);
     })
     .catch((e) => {
       logger.error("Failed to capture error", e);
@@ -241,6 +226,11 @@ const captureHome = (id, data) => {
     });
 };
 const captureMetadataAnalysisFinished = (id, data) => {
+  logger.info("Meta data finished!", data)
+
+  getPrinterStoreCache().updateFileInformation(id, data);
+
+
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadatafinished", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata finished script", res);
@@ -308,21 +298,6 @@ const captureFinishedPrint = (id, data, success) => {
   HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success)
     .then((res) => {
       logger.info("Successfully captured print!", res);
-
-      setTimeout(async function () {
-        // Register cancelled print...
-
-        // await Runner.updateFilament();
-        // TODO Update Printer Manager call to update filament... or maybe register as a task and call
-
-        setTimeout(async function () {
-          // TODO This is something that can be fired from the store...
-          // await Runner.reSyncFile(
-          //   farmPrinters[that.index]._id,
-          //   farmPrinters[that.index].job.file.path
-          // );
-        }, 5000);
-      }, 10000);
     })
     .catch((e) => {
       logger.error("Failed to capture print!", e);
@@ -445,7 +420,7 @@ const captureUserLoggedIn = (id, data) => {
 const captureZChange = (id, data) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "zchange", undefined)
     .then((res) => {
-      logger.info("Successfully checked zchange script", res);
+      logger.debug("Successfully checked zchange script", res);
       return res;
     })
     .catch((e) => {

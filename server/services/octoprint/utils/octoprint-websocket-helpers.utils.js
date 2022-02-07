@@ -39,6 +39,7 @@ const captureTemperatureData = (id, data) => {
         currentTemp: temps[0],
         printer_id: id
       };
+      // REFACTOR Needs to be abstracted out into a store
       const newTemp = new TempHistoryDB(datebaseTemp);
       newTemp
         .save()
