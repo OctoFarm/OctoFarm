@@ -954,7 +954,7 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data);
+    PrinterService.findOneAndPush(index, "fileList.files", data).then(r => console.log(r));
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );

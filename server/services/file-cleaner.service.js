@@ -74,7 +74,7 @@ class FileCleanerService {
         : Math.floor((fileStatistics.storageUsed / storageTotalTotal) * 100);
     fileStatistics.fileCount = fileCount.length;
     fileStatistics.folderCount = folderCount.length;
-    // TODO repeated calls?
+
     if (fileSizes.length !== 0) {
       fileStatistics.biggestFile = Math.max(...fileSizes);
       fileStatistics.smallestFile = Math.min(...fileSizes);
@@ -157,7 +157,6 @@ class FileCleanerService {
   }
 
   /**
-   * TODO get units of what? Be explicit. Your in a file called FILECLEAN... maybe just maybe the cost of the file!? follow your own god damn rules
    * @param filamentSelection
    * @param fileLength
    * @returns {*[]}
@@ -206,7 +205,6 @@ class FileCleanerService {
   }
 
   /**
-   * TODO get cost of what? Be explicit.
    * @param filamentSelection
    * @param units
    * @returns {*[]}

@@ -11,7 +11,7 @@ import {
 } from "./pages/history/history.templates";
 import {daysBetweenTwoDates, getFirstDayOfLastMonth} from "./utils/date.utils";
 import Litepicker from "litepicker";
-import {dashboardOptions} from "./pages/dashboard/dashboard.options";
+import {dashboardOptions} from "./pages/charts/dashboard.options";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -987,7 +987,7 @@ class History {
       return;
     }
 
-    // TODO: Load statistics EJS renders currently, want's to be dynamic as well.
+    // REFACTOR: Load statistics EJS renders currently, want's to be dynamic as well.
     //this.updateStatistics(statisticsClean);
     this.historyList = history;
     // Load history filters
@@ -996,7 +996,6 @@ class History {
 
     // Load history table...
     this.drawHistoryTable(history);
-    // TODO: Add Listeners
 
     // Load monthly statistics
     this.drawMonthlyStatistics(monthlyStatistics);

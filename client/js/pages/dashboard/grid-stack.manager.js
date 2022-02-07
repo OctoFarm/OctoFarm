@@ -15,7 +15,6 @@ const gridStack = GridStack.init({
 export async function loadGrid() {
   const dashConfig = DashboardStorage.fetchConfig();
 
-  // TODO phase 2 cleanup
   if (dashConfig !== null && dashConfig.length !== 0) {
     const items = GridStack.Utils.sort(dashConfig);
     gridStack.batchUpdate();

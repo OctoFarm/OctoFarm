@@ -1,6 +1,6 @@
 import Calc from "../../utils/calc";
-import {ChartsManager} from "./charts.manager";
-import {humidityLabel, iaqLabel, pressureLabel, temperatureLabel} from "./utils/chart.utils";
+import {ChartsManager} from "../charts/charts.manager";
+import {humidityLabel, iaqLabel, pressureLabel, temperatureLabel} from "../charts/chart.utils";
 
 let environmentDataChartExists = false;
 

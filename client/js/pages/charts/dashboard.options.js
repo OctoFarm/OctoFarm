@@ -20,7 +20,7 @@ import {
     tooltipDataPointFormatter,
     valueToLocaleDateStringFormatter,
     valueToLocaleTimeStringFormatter
-} from "./utils/chart.utils";
+} from "./chart.utils";
 import {
     defaultEnvironmentalYAxisAnnotations,
     defaultHeatmapColorScaleOptions,
@@ -34,7 +34,7 @@ import {
     utilisationConnectionColors,
     utilisationConnectionLabels,
     xAxisConnectionCategories
-} from "./utils/chart.options";
+} from "./chart.options";
 import UI from "../../utils/ui";
 
 const optionsHourlyTemperature = {

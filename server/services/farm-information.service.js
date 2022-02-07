@@ -138,7 +138,6 @@ const heatMapping = async (complete, active, offline, idle, disconnected) => {
       heatMap[4].data.shift();
     }
 
-    // TODO this line throws errors regularly when its not queried yet
     farmStats[0].heatMap = heatMap;
     farmStats[0].markModified("heatMap");
     farmStats[0].save().catch((e) => logger.error(e));

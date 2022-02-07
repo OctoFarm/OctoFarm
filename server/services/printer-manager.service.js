@@ -137,6 +137,7 @@ class PrinterManagerService {
       await getPrinterStoreCache().deletePrinter(printer._id);
       // TODO Remove from Printer Control List
       // TODO Remove from temperature trigger list
+      // TODO whatever other lists...
       removedPrinterList.push({
         printerURL: printer.printerURL,
         printerId: printer._id

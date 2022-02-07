@@ -104,7 +104,6 @@ class JobCleanerService {
       }
       spoolCost = floatOrZero(spoolCost);
       currentJob.expectedTotals = {
-        // TODO String a good idea?
         totalCost: (parseFloat(currentJob.expectedPrinterCosts) + spoolCost).toFixed(2),
         totalVolume,
         totalLength,

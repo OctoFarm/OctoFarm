@@ -86,7 +86,7 @@ class WebSocketClient {
     this.#instance.on("ping", () => {
       logger.debug("PING RECEIVED");
     });
-    // TODO fix
+    // TODO ReWrite Ping/Pong Checking
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");

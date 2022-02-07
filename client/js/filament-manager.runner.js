@@ -2,7 +2,7 @@ import UI from "./utils/ui.js";
 import {setupFilamentManagerReSyncBtn} from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
-import {dashboardOptions} from "./pages/dashboard/dashboard.options";
+import {dashboardOptions} from "./pages/charts/dashboard.options";
 
 const pageElements = {
   filamentProfileTotals: document.getElementById("filamentProfileTotals"),

@@ -218,7 +218,7 @@ class ScriptRunner {
   }
 }
 
-// TODO replace with luxon formatter
+//REFACTOR split for usage of customisable time display (later feature)
 const generateTime = function (seconds) {
   let string = "";
   if (seconds === undefined || isNaN(seconds) || seconds === null) {

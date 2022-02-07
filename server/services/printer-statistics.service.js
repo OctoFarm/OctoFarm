@@ -593,7 +593,7 @@ const generateDashboardStatistics = async () => {
   };
   dashboardStatistics.utilisationGraph = getHeatMap();
 
-  // TODO this is old old code
+  // REFACTOR - More love needed for this feature.
   //Find min / max values for gas_resistance to tweak calulation...
   RoomData.find({})
     .sort({ _id: -1 })

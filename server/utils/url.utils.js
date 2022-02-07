@@ -1,3 +1,27 @@
+
+function isValidHttpUrl(string) {
+  let url;
+  try {
+    url = new URL(string);
+  } catch (e) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function isValidWebsocketUrl(string) {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "ws:" || url.protocol === "wss:";
+}
+
 function sanitizeURL(url) {
   if (!url) return;
   return new URL(url).href;
@@ -29,5 +53,7 @@ function convertHttpUrlToWebsocket(url) {
 module.exports = {
   convertHttpUrlToWebsocket,
   sanitizeURL,
-  parseOutIPAddress
+  parseOutIPAddress,
+  isValidHttpUrl,
+  isValidWebsocketUrl
 };

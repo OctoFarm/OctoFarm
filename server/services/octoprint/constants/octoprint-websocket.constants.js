@@ -1,5 +1,5 @@
 const { mapStateToColor, PSTATE } = require("../../../constants/state.constants");
-
+// REFACTOR old david file, not really used anymore...
 function getDefaultProgressState() {
   return {
     completion: undefined,
@@ -40,7 +40,7 @@ function getDefaultCurrentState() {
     logs: undefined,
     messages: undefined,
     resends: undefined,
-    plugins: undefined // TODO might be better in different state
+    plugins: undefined
   };
 }
 

@@ -1,7 +1,7 @@
 import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 
-//TODO: Rework in another PR
+//REFACTOR: Rework in another PR
 
 const alertsDrop = `
 <option selected value="0">Choose...</option>

@@ -2,31 +2,7 @@ const { returnConnectionLogs } = require("./connection-monitor.service");
 const { SettingsClean } = require("./settings-cleaner.service");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Server");
-//TODO move to utils
-function isValidHttpUrl(string) {
-  let url;
-
-  try {
-    url = new URL(string);
-  } catch (e) {
-    logger.error("Webcamera not valid URL!", e);
-    return false;
-  }
-
-  return url.protocol === "http:" || url.protocol === "https:";
-}
-//TODO move to utils
-function isValidWebsocketUrl(string) {
-  let url;
-
-  try {
-    url = new URL(string);
-  } catch (_) {
-    return false;
-  }
-
-  return url.protocol === "ws:" || url.protocol === "wss:";
-}
+const { isValidWebsocketUrl, isValidHttpUrl } = require("../utils/url.utils")
 
 const printerChecks = (printer) => {
   const { printerURL, webSocketURL, camURL } = printer;
@@ -112,7 +88,7 @@ const printerConnectionCheck = (currentConnection, connectionOptions) => {
 
   return connectionDefaults;
 };
-// TODO this need to be better, no different than the API check at minute.
+// REFACTOR this need to be better, no different than the API check at minute.
 const profileChecks = (profile) => {
   return !!profile;
 };

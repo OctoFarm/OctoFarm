@@ -88,13 +88,13 @@ class HistoryCleanerService {
       ? {
           actualPrintTime: printTime,
           estimatedPrintTime: job.estimatedPrintTime,
-          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000 // TODO can become NaN (2x)
+          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000
         }
       : null;
   }
 
   /**
-   * TODO needs cleanup or annotation
+   *
    * @param input
    * @returns {{x: Date, y: *}[]}
    */
@@ -171,7 +171,7 @@ class HistoryCleanerService {
           [key]: {
             toolName: "Tool " + key.substring(4, 5),
             spoolName,
-            spoolId: filamentEntry?._id || null, // TODO discuss fallback null or undefined
+            spoolId: filamentEntry?._id || null,
             volume: (completionRatio * metric.volume).toFixed(2),
             length: ((completionRatio * metric.length) / 1000).toFixed(2),
             weight: spoolWeight,

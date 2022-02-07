@@ -69,7 +69,7 @@ function getFileFromHistoricJob(history) {
   return {
     name: history.fileName,
     uploadDate: historyJobFile?.date || null,
-    path: historyJobFile?.path || history.filePath, // TODO discuss this alternative
+    path: historyJobFile?.path || history.filePath,
     size: historyJobFile?.size || null,
     averagePrintTime: historyJob?.averagePrintTime || null,
     lastPrintTime: historyJob?.lastPrintTime || null
