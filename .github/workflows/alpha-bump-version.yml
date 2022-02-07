@@ -79,7 +79,6 @@ jobs:
 
       # Update Server Package with latest client package
       - name: update server client version
-        if: steps.filter.outputs.client == 'true'
         run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
         working-directory: ./server
 
