@@ -32,7 +32,7 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "@notexpectedyet/octofarm-client": "^0.9.9-alpha.4",
+    "@notexpectedyet/octofarm-client": "^0.9.9-alpha.6",
     "archiver": "^5.3.0",
     "awilix": "^6.0.0",
     "awilix-express": "^6.0.0",

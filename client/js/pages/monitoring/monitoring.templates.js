@@ -1,5 +1,6 @@
 import {sortAlphaNum} from "../system/utils/array.utils";
 import {
+  checkPrinterRows,
   checkCameraState,
   imageOrCamera,
   checkGroupColumns,
