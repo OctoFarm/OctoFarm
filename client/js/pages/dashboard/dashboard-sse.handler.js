@@ -4,6 +4,7 @@ import currentOperationsService from "../../services/current-operations.service"
 
 export const workerURL = "/dashboardInfo/get/";
 
+//REFACTOR move over the proper SSE Handler... no need for it to have it's own.
 export async function dashboardSSEventHandler(data) {
   if (data) {
     const currentOperationsData = data.currentOperations;

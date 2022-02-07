@@ -55,10 +55,6 @@ const localStorageKeys = {
   DASHBOARD_SETTINGS: "dashboardConfiguration"
 };
 
-// TODO clean up with a settings migration...
-// onlinePolling.seconds -> octoprintThrottle
-// timeout.apiRetry <-> timeout.apiRetryCutoff
-// filament.filamentCheck -> filamentManager.isFilamentSelected
 const settingsElements = {
   onlinePolling: {
     seconds: document.getElementById("webSocketThrottle")

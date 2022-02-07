@@ -9,19 +9,6 @@ import {updatePrinterSettingsModal} from "../../services/printer-settings.servic
 import {loadPrinterHealthChecks, reSyncAPI} from "./functions/printer-manager.functions";
 import {removeAlertsLog, updateAlertsLog} from "./alerts-log";
 
-//TODO move to UI util
-// function findPos(obj) {
-//   let curtop = 0;
-//   if (obj.offsetParent) {
-//     console.log(obj.offsetParent);
-//     do {
-//       curtop += obj.offsetTop;
-//       console.log(curtop);
-//     } while ((obj = obj.offsetParent));
-//     return [curtop];
-//   }
-// }
-
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
   "Shutdown",

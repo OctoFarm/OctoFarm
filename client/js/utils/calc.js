@@ -1,4 +1,5 @@
 // Calculation Functions
+// REFACTOR this can be shared between server and client
 export default class Calculate {
   // Generate a random string
   static randomString() {
@@ -60,29 +61,6 @@ export default class Calculate {
   // Check if values are between another value.
   static isBetween(n, a, b) {
     return (n - a) * (n - b) <= 0;
-  }
-
-  // TODO EXACT COPY FROM SERVER print-cost.util.js!!
-  static returnPrintCost(costSettings, time) {
-    if (typeof costSettings === "undefined") {
-      // Attempt to update cost settings in history...
-      return "No cost settings to calculate from";
-    }
-    // calculating electricity cost
-    const powerConsumption = parseFloat(costSettings.powerConsumption);
-    const costOfElectricity = parseFloat(costSettings.electricityCosts);
-    const costPerHour = powerConsumption * costOfElectricity;
-    const estimatedPrintTime = time / 3600; // h
-    const electricityCost = costPerHour * estimatedPrintTime;
-    // calculating printer cost
-    const purchasePrice = parseFloat(costSettings.purchasePrice);
-    const lifespan = parseFloat(costSettings.estimateLifespan);
-    const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
-    const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-    const printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
-    // assembling string
-    const estimatedCost = electricityCost + printerCost;
-    return estimatedCost.toFixed(2);
   }
 
   static bytes(a, b) {

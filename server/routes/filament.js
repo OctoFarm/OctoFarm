@@ -95,7 +95,6 @@ router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   // const filamentManager = await SettingsClean.returnFilamentManagerSettings();
   logger.info("Request to change selected spool:", req.body.printers);
-  // TODO with filament manager plugin
   // if (filamentManager && req.body.spoolId != 0) {
   //   const printerList = Runner.returnFarmPrinters();
   //   const i = _.findIndex(printerList, function (o) {
@@ -165,7 +164,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       temp_offset: filament.spoolsTempOffset
     };
     logger.info("Updating OctoPrint: ", spool);
-    // TODO move to octoprint service
+    // REFACTOR move to octoprint service
     const url = `${printer.printerURL}/plugin/filamentmanager/spools`;
     let updateFilamentManager = await fetch(url, {
       method: "POST",
@@ -506,7 +505,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
       }
     }
     logger.info("Updating OctoPrint: ", searchId);
-    // TODO move to api service
+    // REFACTOR move to api service
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${searchId}`;
     const updateFilamentManager = await fetch(url, {
       method: "DELETE",

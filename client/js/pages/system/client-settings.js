@@ -1,6 +1,6 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
 import UI from "../../utils/ui";
-//TODO: Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
+//REFACTOR: Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
 
 export default class ClientSettings {
   static async init() {

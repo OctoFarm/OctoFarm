@@ -3,7 +3,7 @@ import OctoPrintClient from "./services/octoprint-client.service.js";
 import {createClientSSEWorker} from "./services/client-worker.service";
 import {setViewType} from "./pages/monitoring/monitoring-view.state";
 
-// TODO dupe due to unwanted monitoring.update import causing missing element exceptions
+// REFACTOR move over to see.client
 export const monitoringWorkerURL = "/monitoringInfo/get/";
 
 setViewType("current-ops");

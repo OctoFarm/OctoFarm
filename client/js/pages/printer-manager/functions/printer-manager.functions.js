@@ -39,7 +39,7 @@ export function workerEventFunction(data) {
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
       }
-      // TODO clean up power buttons wants to be in printer-data.js
+      // REFACTOR clean up power buttons wants to be in printer-data.js
       if (powerTimer >= 5000) {
         data.printersInformation.forEach((printer) => {
           PrinterPowerService.applyBtn(printer);

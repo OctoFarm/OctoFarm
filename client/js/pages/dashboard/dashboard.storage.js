@@ -1,5 +1,6 @@
 const storageKey = "dashboardConfiguration";
 
+//REFACTOR Use the local storage service here...
 export class DashboardStorage {
   /**
    * Fetch the tile configuration from LocalStorage without guarantee

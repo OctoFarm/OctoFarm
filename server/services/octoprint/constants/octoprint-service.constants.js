@@ -2,7 +2,6 @@ class OPClientErrors {
   static filamentIDNotANumber = "FilamentID provided was not numeric";
 }
 
-// TODO ofc this is lazy - but I'd rather have working code and optimize later
 function getCurrentProfileDefault() {
   return {
     id: "_default",

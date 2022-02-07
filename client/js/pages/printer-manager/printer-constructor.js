@@ -4,7 +4,7 @@ import OctoFarmClient from "../../services/octofarm-client.service.js";
 
 let newPrintersIndex = 0;
 
-// TODO: clean up this file is a mess jim
+// REFACTOR clean up this file is a mess jim
 
 class Printer {
   constructor(printerURL, camURL, apikey, group, name) {
