@@ -1,6 +1,6 @@
 {
   "name": "octofarm-entry",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "main": "server/app.js",
   "scripts": {
     "start": "cd server && npm run start",
@@ -10,11 +10,12 @@
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
     "prettier": "prettier --write \".server/**/*.js\" \"./client/**/*.js\"\"",
-    "install-server": "cd server && npm install",
-    "dev-server": "cd server && npm run dev",
-    "install-client": "cd client && npm install",
-    "dev-client": "cd client && npm run dev",
-    "build-client": "cd client && npm run build",
+    "server-install": "cd server && npm install",
+    "server-dev": "cd server && npm run dev",
+    "dev-setup": "npm run server-dev && npm run client-dev",
+    "client-install": "cd client && npm install",
+    "client-dev": "cd client && npm run dev",
+    "client-build": "cd client && npm run build",
     "start-alpha": "cd server && npm run start-alpha"
   },
   "repository": {

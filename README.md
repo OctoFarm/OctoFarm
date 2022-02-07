@@ -54,8 +54,8 @@ In order to have OctoFarm running using a local installation of NodeJS and Mongo
 ### OS / Platform for OctoFarm
 Confirmed working on:
 - Windows 10/11 (direct or with chocolatey)
-> Find the chocolatey package here: https://community.chocolatey.org/packages/octofarm 
-> This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2  
+> Find the chocolatey package here: https://community.chocolatey.org/packages/octofarm
+> This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2
 - Linux (Ubuntu, Debian)
 - FarmPi (Raspberry Pi 3A+ or newer)
 > Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
@@ -64,10 +64,10 @@ Should also work on but not tested:
 - MacOS
 - _Anything else NodeJS 14+ will run on._
 
-Avoid the following, known to be tough to get working: 
+Avoid the following, known to be tough to get working:
 - Raspberry Pi OS - go for the **FarmPi Ubuntu** image instead (https://github.com/mkevenaar/FarmPi/releases/latest)!
 
-_Note_: Raspberry Pi's OS must be the 64-bit version to work. Both the docker containers as well as direct install is hard to get working. The docker containers seem to fail on wrong architecture and direct install fails on a 64 bits MongoDB requirement. 
+_Note_: Raspberry Pi's OS must be the 64-bit version to work. Both the docker containers as well as direct install is hard to get working. The docker containers seem to fail on wrong architecture and direct install fails on a 64 bits MongoDB requirement.
 
 ### Important note OctoPrint 1.4.1+
 
@@ -87,12 +87,14 @@ Follow all these steps **on the specific OctoPrint website**:
 
 ## Getting Started
 Please choose the direct NodeJS installation or the Docker image.
-1) Installing OctoFarm - read the following: [OctoFarm.net installation instructions](https://octofarm.net/installation) 
+1) Installing OctoFarm - read the following: [OctoFarm.net installation instructions](https://octofarm.net/installation)
 2) Docker image(s) [docker or docker-compose usage instructions](./docs/USING_DOCKER.md)
 3) Installation for Development (Node 14+, Nodemon)
 
-### Development Installation for the server.
-_This is for devs or testers only! It is not practical to use `nodemon` for normal usage as `nodemon` does not add a service like `pm2` (option 1) or `docker` (option 1 and 2). Please, if you are a normal user, check out [OctoFarm.net installation instructions](https://octofarm.net/installation) instead!_
+### Development Installation
+_This is for devs or testers only! It is not practical to use `nodemon` for normal usage as `nodemon` does not add a service like `pm2` (option 1) or `docker` (option 1 and 2). Please, if you are a normal user, check out [OctoFarm.net installation instructions](https://docs.octofarm.net/installation/) instead!_
+
+OctoFarm is now setup as a basic mono-repo. There are 3 package.jsons to deal with, a top level one and then one in the client and server sections on the app.
 
 1. Clone the OctoFarm
 
@@ -100,31 +102,24 @@ _This is for devs or testers only! It is not practical to use `nodemon` for norm
 git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```
 
-2. Install NPM packages
+2. Setup and Install the repo's requirements, will install both client / server dependencies.
 
 ```sh
-npm server-install
+npm run dev-setup
 ```
 
-3. Start the server
+### Start the development server
 
 ```sh
-npm run server-dev
+npm run dev-server
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
-### Development Installation for the client.
-_If your making changes to the client then you will need to build this manually._
-
-1. Install NPM packages
+## Start the client listener
+_If your making changes to the client then you will need to build this manually. Start the webpack server._
 
 ```sh
-npm client-install
-```
-
-2. Start the client development file watcher
-```sh
-npm run client-dev
+npm run dev-client
 ```
 
 ## License
@@ -133,14 +128,13 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 ## Contact
 - Email: [Email NotExpectedYet](mailto:info@notexpectedyet.com)
 - Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
-- Discord: [Discord](https://discord.gg/vjabMUn)
+- Discord: [Discord](http://discord.octofarm.net/)
 
 ## Acknowledgements
 
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
   of Gina and everyone who helps out with that.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
-- [James Mackay (NotExpectedYet)](https://github.com/NotExpectedYet) - The spirit and creator of OctoFarm!
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.
