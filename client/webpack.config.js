@@ -5,6 +5,7 @@ const WebpackBeforeBuildPlugin = require("before-build-webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const webpack = require("webpack");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 // Source
 const basePath = "./";
@@ -127,7 +128,8 @@ module.exports = (env, options) => {
           callback();
         },
         ["done"]
-      )
+      ),
+      new BundleAnalyzerPlugin()
     ]
   };
 };
