@@ -14,7 +14,8 @@
     "dev-server": "cd server && npm run dev",
     "install-client": "cd client && npm install",
     "dev-client": "cd client && npm run dev",
-    "build-client": "cd client && npm run build"
+    "build-client": "cd client && npm run build",
+    "start-alpha": "cd server && npm run start-alpha"
   },
   "repository": {
     "type": "git",
