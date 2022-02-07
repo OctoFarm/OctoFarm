@@ -12,6 +12,7 @@ import {
     updateBulkActionsProgress,
     updateTableRow
 } from "../pages/printer-manager/functions/bulk-actions-progress.functions";
+import {allowedFileTypes} from "../constants/file-types.constants"
 
 const fileUploads = new Queue();
 
@@ -247,16 +248,20 @@ export default class FileManagerService {
         );
         fileUploads.remove();
       };
-      if (file.name.includes(".gcode")) {
+
+      const fileTypes = allowedFileTypes.split(",");
+
+      if (fileTypes.some(type => file.name.includes(type))) {
         xhr.send(formData);
       } else {
         UI.createAlert(
-          "error",
-          `Sorry but ${file.name} is not a gcode file, could not be uploading.`,
-          3000,
-          ""
+            "error",
+            `Sorry but ${file.name} is not a gcode file, could not be uploading.`,
+            3000,
+            ""
         );
       }
+
     });
   }
 
