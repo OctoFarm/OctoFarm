@@ -169,6 +169,7 @@ All notable changes to this project will be documented in this file.
   - Moved the change background functionality out of client and into Server settings for admins only. 
   - Quick actions is now a Quick Connect, Power Toggle, Menu. Menu contains: 
     - OctoPrint Web, Resync Socket, Power settings. More coming soon!
+  - PR titles are now validated on submittal   
 
 ### Removed
 
