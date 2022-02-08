@@ -72,7 +72,6 @@ jobs:
 
       # Grab the client package version into a variable.
       - name: get-client-current-version
-        if: steps.filter.outputs.client == 'true'
         id: client-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
@@ -86,7 +85,6 @@ jobs:
 
       # Commit changes to the current development repository
       - name: get-server-current-version
-        if: steps.filter.outputs.server == 'true'
         id: server-package-version
         uses: martinbeentjes/npm-get-version-action@master
         with:
