@@ -99,7 +99,7 @@ export function imageOrCamera(printer) {
     if (!!printer.otherSettings) {
         //Check if URL actually exists...
         if (printer.camURL !== "") {
-            return drawCamera({
+            return drawCamera(printer._id, {
                 url: printer.camURL,
                 flipV,
                 flipH,
@@ -107,14 +107,14 @@ export function imageOrCamera(printer) {
             });
         } else {
             if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
-                return drawCamera({
+                return drawCamera(printer._id, {
                     url: printer.printerURL + "/" + printer.currentJob.thumbnail,
                     flipV,
                     flipH,
                     rotate90
                 });
             } else {
-                return drawCamera({
+                return drawCamera(printer._id, {
                     url: "../images/noCamera.jpg",
                     flipV,
                     flipH,
@@ -124,14 +124,14 @@ export function imageOrCamera(printer) {
         }
     } else {
         if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
-            return drawCamera({
+            return drawCamera(printer._id, {
                 url: printer.printerURL + "/" + printer.currentJob.thumbnail,
                 flipV,
                 flipH,
                 rotate90
             });
         } else {
-            return drawCamera({ url: "", flipV, flipH, rotate90 });
+            return drawCamera(printer._id, { url: "", flipV, flipH, rotate90 });
         }
     }
 }
