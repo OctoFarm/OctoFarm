@@ -140,7 +140,6 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
   of Gina and everyone who helps out with that.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
-- [James Mackay (NotExpectedYet)](https://github.com/NotExpectedYet) - The spirit and creator of OctoFarm!
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.
