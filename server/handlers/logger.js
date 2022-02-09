@@ -65,11 +65,9 @@ class LoggerService {
         let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
           COLOUR_MAP[info.level]
         }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route} ${COLOURS.WHITE} \n ${
-          COLOUR_MAP[info.level]
-        }MESSAGE: ${COLOURS.WHITE}${info.message} `;
-        message = metaData
-          ? message + `\n ${COLOUR_MAP[info.level]}DATA: ${COLOURS.WHITE}${metaData}`
-          : message;
+            COLOUR_MAP[info.level]
+        }${level} MESSAGE: ${COLOURS.WHITE}${info.message} `;
+        message = metaData ? message + `| ${COLOURS.WHITE}${metaData}` : message;
         return message;
       })
     );
