@@ -715,7 +715,6 @@ class OctoPrintPrinter {
 
     // If printer ID doesn't exist, we need to create the database record
     if (!this?._id) {
-      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
       const newPrinter = new printerModel(this);
       this._id = newPrinter._id.toString();
       await newPrinter
@@ -1231,10 +1230,7 @@ class OctoPrintPrinter {
           this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
           this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
         }
-        this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
-        if (this.printerName !== this.settingsAppearance.name) {
-          this.settingsAppearance.name = this.printerName;
-        }
+        this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
         if (this.settingsAppearance.color !== appearance.color) {
           this.settingsAppearance.color = appearance.color;
         }
