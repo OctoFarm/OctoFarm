@@ -1,0 +1,21 @@
+
+<% let hideEmpty = serverSettings.filament.hideEmpty %>
+<% spools.forEach(spool => { %>
+    <% if(!hideEmpty || (spool.weight - spool.used) > 1){ %>
+    <tr>
+        <th style="display: none;"> </th>
+        <th><i class="fas fa-toilet-paper"></i></th>
+        <th scope="row"><%=spool.name%></th>
+        <td id="spoolsListMaterial-<%=spool._id%>">
+        </td>
+        <td id="spoolsListManufacture-<%=spool._id%>">
+        </td>
+        <td><%=(spool.weight / 1000)%>KG</td>
+        <td><%=(spool.weight - spool.used).toFixed(0)%>g</td>
+        <td><%= spool.tempOffset %></td>
+        <td><%= spool.bedOffset || 0 %></td>
+        <td id="spoolsListPrinterAssignment-<%=spool._id%>"></td>
+    </tr>
+    <% } %>
+
+<%   }) %>
