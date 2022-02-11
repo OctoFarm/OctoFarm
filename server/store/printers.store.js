@@ -958,7 +958,11 @@ class PrinterStore {
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );
-    // TODO move statistics to run after generate
+    // IMPROVE Utilise the websocket event to trigger updating a file's information
+    // OctoFarm shouldn't be repeatedly calling the API for information after a file has uploaded.
+    // We can use the websocket event trigger to update OctoFarms records. - TESTING seeing if I can use IMPROVE
+
+
     // Trigger file update check service
     this.triggerOctoPrintFileScan(index, data);
 

@@ -1,0 +1,23 @@
+name: TODO Analysis
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run tdg-github-action
+        uses: ribtoks/tdg-github-action@master
+        with:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          REF: ${{ github.ref }}
+          LABEL: needs-triage
+          EXCLUDE_PATTERN: "\\.*/assets|vendor/"

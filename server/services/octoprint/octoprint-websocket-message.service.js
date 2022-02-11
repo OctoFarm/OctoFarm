@@ -248,7 +248,7 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintFailed:
-        // TODO create printfialed
+        // TODO Create a print failed event function
         // capturePrint(printerID, payload, false);
         break;
 

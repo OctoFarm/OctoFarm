@@ -111,7 +111,7 @@ function ensureBackgroundImageExists(rootPath) {
     const fileBuffer = fs.readFileSync(path.resolve(__dirname, defaultBgPath));
     fs.writeFileSync(targetBgPath, fileBuffer);
 
-    // Bug in PKG
+    // Can't use fs.copy inside of PKG environment...
     // fs.copyFileSync(defaultBgPath, "C:\\Users\\USER_HERE\\Projects\\NodeJS\\OctoFarm\\package\\images\\roll.jpg");
 
     logger.info(`✓ Copyied default background image to ${targetBgPath} as it was not found.`);
