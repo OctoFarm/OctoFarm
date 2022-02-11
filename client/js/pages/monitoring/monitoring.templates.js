@@ -5,8 +5,8 @@ import {
   imageOrCamera,
   checkGroupColumns,
   isHidden,
-  getNameColour
 } from "../../utils/octofarm.utils";
+import { getPrinterNameBadge } from "../../templates/printer.templates"
 
 export function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
@@ -47,23 +47,13 @@ export function drawListView(printer, clientSettings) {
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
-  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
+
   return `
         <tr
           class="p-0 ${stateCategory} ${hidden}"
           id="panel-${printer._id}">
-          <td class="text-center">
-             <button
-                id="name-${printer._id}"
-                type="button"
-                class="btn ${buttonStyle} mb-0 btn-sm btn-block text-truncate"
-                role="button"
-                style="${colourStyle}"
-               
-                disabled
-              >
-                ${name}
-              </button>
+          <td class="text-center" style="max-width:200px;">
+               ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
           </td>
           <td id="state-${printer._id}" class="py-auto">
            ${printer.printerState.state}
@@ -215,33 +205,15 @@ export function drawPanelView(printer, clientSettings) {
           </small>`;
     }
   }
-  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
 
   return `
         <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
           <div class="row">
-            <div class="col-6">
-              <button
-                id="name-${printer._id}"
-                type="button"
-                class="btn ${buttonStyle} mb-0 btn-sm btn-block 
-                
-                
-                text-truncate"
-                role="button"
-                style="${colourStyle}"
-               
-                disabled
-              >
-                ${name}
-              </button>
-            </div>
-            <div class="col-6">
-                <small class="float-right" id="printerActionBtns-${printer._id}">
-
-                </small>
+            <div class="col-lg-12">
+              ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
+               <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
           </div>
 
@@ -431,7 +403,6 @@ export function drawCameraView(printer, clientSettings) {
  `;
     }
   }
-  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
 
   return `
   <div
@@ -444,22 +415,9 @@ export function drawCameraView(printer, clientSettings) {
           id="camHeader-${printer._id}"
         >
         <div class="row">
-            <div class="col-lg-6">
-                     <button
-              id="name-${printer._id}"
-              type="button"
-              class="btn ${buttonStyle} btn-block p-0 pl-2 pt-1"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-              style="${colourStyle}"
-              disabled
-            >
-                ${name}
-            </button>
-            </div>
-              <div class="col-lg-6">
-                 <small id="printerActionBtns-${printer._id}" class="float-right">
-          </small>
+            <div class="col-lg-12">
+              ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
+               <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
         </div>
    
@@ -653,7 +611,7 @@ export function drawCombinedView(printer, clientSettings) {
     columns.cameraColumn = "d-none";
     columns.mainColumn = "col-12";
   }
-  const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
+
   return `
      <div class="card ${hidden} mb-3" id="panel-${printer._id}">
         <div class="d-none index">${printer.sortIndex}</div>
@@ -671,16 +629,7 @@ export function drawCombinedView(printer, clientSettings) {
      
                    <div class="row">
                         <div class="col-sm-12 col-md-12 col-lg-6">
-                          <button
-                            id="name-${printer._id}"
-                            type="button"
-                            class="btn btn-block ${buttonStyle} btn-sm text-left"
-                            role="button"
-                            style="${colourStyle}"
-                            disabled
-                          >
-                            ${name}
-                          </button>
+                          ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4">
                           <button
@@ -973,7 +922,6 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
 export function drawGroupViewPrinters(printer, clientSettings) {
   printer.forEach((printer) => {
     if (printer.group !== "") {
-      const { buttonStyle, colourStyle } = getNameColour(printer.settingsAppearance.color);
       const cleanGroup = encodeURIComponent(printer.group);
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
       const skipElement = document.getElementById(`panel-${printer._id}`);
@@ -1008,7 +956,7 @@ export function drawGroupViewPrinters(printer, clientSettings) {
         <div id="panel-${printer._id}" class="col-sm-12 col-md-6 col-lg-${panelColumns}">
           <div  class="card text-white bg-dark">
             <div class="card-header dashHeader text-truncate">
-                <button id="name-${printer._id}" class="btn btn-block btn-sm text-truncate ${buttonStyle}" style="${colourStyle}" disabled>${printer.printerName}</button>
+                ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
                 <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                     <div id="filesViewProgressBar-${printer._id}" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
                 </div>

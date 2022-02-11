@@ -1,6 +1,6 @@
 **/.idea/
 **/node_modules/
-server/middleware/db.js
+/server/middleware/db.js
 **/logs/
 **/.clinic/
 **/dist/
@@ -13,8 +13,9 @@ server/middleware/db.js
 
 # Ignore any local release zips
 octofarm.zip
-dist/
-server/views/assets/dist/
-package/
+/dist/
+/server/views/assets/dist/
+/package/
 
 *.tgz
+
