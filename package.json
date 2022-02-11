@@ -12,7 +12,7 @@
     "prettier": "prettier --write \".server/**/*.js\" \"./client/**/*.js\"\"",
     "server-install": "cd server && npm install",
     "server-dev": "cd server && npm run dev",
-    "dev-setup": "npm run server-dev && npm run client-dev",
+    "dev-install": "npm run server-install && npm run client-install",
     "client-install": "cd client && npm install",
     "client-dev": "cd client && npm run dev",
     "client-build": "cd client && npm run build",

@@ -49,6 +49,8 @@ class LoggerService {
     this.log_data = null;
     this.route = route;
 
+
+    // REFACTOR these can be merged with a key for the different return message templates
     let alignColorsAndTime = winston.format.combine(
       winston.format.printf((info) => {
         const level = info.level.toUpperCase();
@@ -62,6 +64,7 @@ class LoggerService {
             metaData = JSON.stringify(metaData);
           }
         }
+        // REFACTOR Put in a template
         let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
           COLOUR_MAP[info.level]
         }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route} ${COLOURS.WHITE} \n ${

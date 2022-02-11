@@ -11,6 +11,12 @@ const logger = new Logger("OctoFarm-State");
 //TODO Add delete of timer into printer delete
 const tempTimers = {};
 
+// ADDLIMITS Need to make these limts based on hardware...
+/**
+ * Captures log data and updates printer object
+ * @param id
+ * @param data
+ */
 const captureLogData = (id, data) => {
   if (!!data) {
     data.forEach((log) => {
@@ -21,6 +27,13 @@ const captureLogData = (id, data) => {
     });
   }
 };
+/**
+ * Only to be run on printer delete, cleans up any in memory stuff here.
+ * @param id
+ */
+const deleteTempTimer = (id) => {
+  delete tempTimers[id];
+}
 
 const captureTemperatureData = (id, data) => {
   if (!!data && data.length !== 0) {
@@ -216,5 +229,6 @@ module.exports = {
   setWebsocketAlive,
   captureResendsData,
   capturePrinterProgress,
-  captureCurrentZ
+  captureCurrentZ,
+  deleteTempTimer
 };
