@@ -63,7 +63,7 @@ for (const key in serverDatabaseKeys) {
     }
   }
 }
-// FIXME should be decoupled from LOG_DUMP_GENERATE element, scripts and plugins are not reliant on that.
+// HACK Filament Manager and Script functions do not need to be coupled to LOG_DUMP element.
 if (serverActionsElements.LOG_DUMP_GENERATE) {
   checkFilamentManagerPluginState().then();
   grabOctoFarmLogList().then();

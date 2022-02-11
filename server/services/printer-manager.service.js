@@ -135,9 +135,9 @@ class PrinterManagerService {
       const id = deleteList[d];
       const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
-      // TODO Remove from Printer Control List
-      // TODO Remove from temperature trigger list
-      // TODO whatever other lists...
+      // FIXME Make sure printers are cleaned up on deletion...
+      // Printer Control List, Printer Filament Selects, Printer Temp Trackers...
+
       removedPrinterList.push({
         printerURL: printer.printerURL,
         printerId: printer._id
