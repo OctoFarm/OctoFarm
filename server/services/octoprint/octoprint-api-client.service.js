@@ -21,7 +21,6 @@ const apiSettings = apiBase + "/settings";
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
 const apiPluginManagerRepository1_6_0 = apiBase + "/plugin/pluginmanager";
 // const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository"; // This doesn't work... wow... did he even check it?
-// TODO check if force scan actually needed at all ?force=true
 const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
