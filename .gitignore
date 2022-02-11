@@ -13,8 +13,8 @@ server/middleware/db.js
 
 # Ignore any local release zips
 octofarm.zip
-/dist/
-/server/views/assets/dist/
+dist/
+server/views/assets/dist/
 package/
 
 *.tgz
