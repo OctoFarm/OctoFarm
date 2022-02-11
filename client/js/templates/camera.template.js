@@ -1,4 +1,5 @@
-//FIXME - Camera work https://github.com/OctoFarm/OctoFarm/projects/34
+//FIXME - Improve the camera template
+//The camera template isn't very robust, doesn't support multiple stream types, not a custom overlay / full screen option.
 export const drawCamera = (id, { url, flipV, flipH, rotate90 }) => {
     return `<img
         loading="lazy"

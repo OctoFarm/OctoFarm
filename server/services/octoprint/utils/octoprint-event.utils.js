@@ -158,10 +158,8 @@ const captureError = (id, data) => {
         // Register cancelled print...
 
         // await Runner.updateFilament();
-        // TODO Update Printer Manager call to update filament... or maybe register as a task and call
 
         setTimeout(async function () {
-          // TODO This is something that can be fired from the store...
           // await Runner.reSyncFile(
           //   farmPrinters[that.index]._id,
           //   farmPrinters[that.index].job.file.path
@@ -313,10 +311,14 @@ const captureFinishedPrint = (id, data, success) => {
         // Register cancelled print...
 
         // await Runner.updateFilament();
-        // TODO Update Printer Manager call to update filament... or maybe register as a task and call
+        // TODO Decide how we're going to update filament after a printer has been captured
+        // This is specifically the filament cache which isn't very fleshed out at the moment.
+        // Exactly the same for the failed event.
 
         setTimeout(async function () {
-          // TODO This is something that can be fired from the store...
+          // TODO Decide to manually update files after print job, or utilise OctoPrints Event system.
+          // I feel the event structure should be best avoided in future as it makes supporting multiple
+          // Exactly the same for the failed event.
           // await Runner.reSyncFile(
           //   farmPrinters[that.index]._id,
           //   farmPrinters[that.index].job.file.path

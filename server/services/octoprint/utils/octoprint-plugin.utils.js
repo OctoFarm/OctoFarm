@@ -95,7 +95,7 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   }
 };
 
-//TODO check this actually works...
+//HACK Make sure the Klipper Plugin Data capture works.
 const captureKlipperPluginData = (id, data) => {
   const { payload } = data;
   if (payload.includes("Firmware version:")) {
