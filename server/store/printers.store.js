@@ -918,6 +918,11 @@ class PrinterStore {
     return await printer.acquireOctoPrintFileData(fullPath, true);
   }
 
+  triggerOctoPrintFileScan(id, file) {
+    const printer = this.#findMePrinter(id);
+    return printer.triggerFileInformationScan(file);
+  }
+
   addNewFile(file) {
     const { index, files } = file;
     const printer = this.#findMePrinter(index);
@@ -949,10 +954,14 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data).then();
+    PrinterService.findOneAndPush(index, "fileList.files", data).then(r => console.log(r));
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );
+    // TODO move statistics to run after generate
+    // Trigger file update check service
+    this.triggerOctoPrintFileScan(index, data);
+
     return printer;
   }
 
@@ -1008,30 +1017,6 @@ class PrinterStore {
     printer.fileList.fileList[file].path = newPath;
     printer.fileList.fileList[file].fullPath = fullPath;
     return printer;
-  }
-
-  updateFileInformation(id, data){
-    const printer = this.#findMePrinter(id);
-
-    const { name, result } = data;
-
-    const fileIndex = findIndex(printer.fileList.fileList, function (o) {
-      return o.name === name;
-    });
-
-    if(!!fileIndex){
-      logger.warning("Updating file information with generated OctoPrint data", data)
-      const { estimatedPrintTime, filament } = result;
-
-      printer.fileList.fileList[fileIndex].estimatedPrintTime = {
-        ...estimatedPrintTime,
-        ...filament
-      }
-
-    }else{
-      logger.error("Couldn't find file index to update!", data)
-    }
-
   }
 
   deleteFile(id, fullPath) {

@@ -9,8 +9,6 @@ on:
       - "client/package.json"
       - "server/package-lock.json"
       - "client/package-lock.json"
-    tags-ignore:
-      - "**"
 
 jobs:
   bump-versions-pre-release:

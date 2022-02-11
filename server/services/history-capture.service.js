@@ -225,8 +225,7 @@ class HistoryCollection {
               } else {
                 History.findByIdAndUpdate(id, { "printHistory.timelapse": "" })
                   .then((res) => {
-                    // TODO what is snapshot!?
-                    //logger.debug("Successfully updated history records timelapse with: ", snapshot);
+                    logger.debug("Successfully updated history records timelapse with: ", snapshot);
                   })
                   .catch((e) => {
                     console.error("Failed to update history record timelapse!", e);
