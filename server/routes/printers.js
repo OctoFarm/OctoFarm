@@ -17,7 +17,7 @@ const { returnPrinterHealthChecks } = require("../store/printer-health-checks.st
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { validateBodyMiddleware } = require("../middleware/validators");
-const P_VALID = require("../constants/printer-validation.constants");
+const P_VALID = require("../constants/validate-printers.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 

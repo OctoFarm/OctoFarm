@@ -23,18 +23,3 @@ module.exports = {
     "infoList.*.settingsAppearance": "settings_appearance"
   }
 };
-// {
-//   "0": {
-//   "_id": "61f749be18a5349701139a15",
-//       "apikey": "4D8B445D749543668AE5E06BF438E066",
-//       "camURL": "",
-//       "group": "1.7.2",
-//       "printerURL": "http://10.50.0.103",
-//       "settingsAppearance": {
-//     "color": "default",
-//         "colorTransparent": false,
-//         "defaultLanguage": "_default",
-//         "name": "Showcase of Cottage Cheese That's even longer than expected",
-//         "showFahrenheitAlso": false
-//   }
-// }

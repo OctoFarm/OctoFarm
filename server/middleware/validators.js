@@ -1,5 +1,6 @@
 const nodeInputValidator = require("node-input-validator");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
+const { databaseNamesList } = require("../constants/database.constants")
 const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
@@ -33,7 +34,7 @@ function validateMongoURL(mongoURL) {
     isValid: hasMongoPrefix
   };
 }
-
+//REFACTOR this needs splitting up for each section of the app
 function getExtendedValidator() {
   nodeInputValidator.extend("wss_url", ({ value, args }) => {
     const url = new URL(value).href;
@@ -69,13 +70,8 @@ function getExtendedValidator() {
       showFahrenheitAlsoValid
     ].includes(false);
   });
-  nodeInputValidator.extend("apikey", async ({ value, args }) => {
-    const { apikey } = value;
-    return !!apikey && typeof apikey === "string" && apikey.length === 32;
-  });
-  nodeInputValidator.extend("group", async ({ value, args }) => {
-    const { group } = value;
-    return (!!group && group.length === 0) || group.length < 50;
+  nodeInputValidator.extend("database_name", async ({ value, args }) => {
+    return databaseNamesList.includes(value);
   });
   return nodeInputValidator;
 }
@@ -121,8 +117,26 @@ function validateBodyMiddleware(rules) {
   };
 }
 
-async function validateParamsMiddleware() {
-  // return validateInput(req.params, rules);
+function validateParamsMiddleware(rules) {
+  return function (req, res, next) {
+    validateInput(req.params, rules)
+      .then(() => {
+        logger.debug("Validated Params Middleware");
+        return next();
+      })
+      .catch((e) => {
+        const errorMessage =
+          "Invalid body input detected in " +
+          req.protocol +
+          "://" +
+          req.get("host") +
+          req.originalUrl;
+        logger.error(errorMessage, e);
+        res.statusCode = 400;
+        res.statusMessage = e;
+        return res.send(e);
+      });
+  };
 }
 
 module.exports = {

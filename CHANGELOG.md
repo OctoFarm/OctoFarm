@@ -255,7 +255,8 @@ All notable changes to this project will be documented in this file.
   - Added rate limiting to all endpoints, 100 requests in 5 seconds will trigger the global one protecting all endpoints. 
     - /printers: 100 requests in 1 minute.
   - Validated inputs on endpoints: 
-    - /printers: update/add/delete
+    - /printers: update, add, delete, 
+    - /settings: server/delete/database, server/get/database
   
 ## [v1.1.13-hotfix]
 
