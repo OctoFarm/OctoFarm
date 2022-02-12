@@ -1,19 +1,30 @@
 const rateLimit = require("express-rate-limit");
 
-// This will at least catch something, may remove if it becomes a problem.
+//Something seriously wrong if they're requesting 10000 in a minute...
 const octofarmGlobalLimits = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hrs in milliseconds
-  max: 20000,
-  message: "You have exceeded the 20000 requests in 1 hr limit!",
-  headers: true
+  windowMs: 5 * 1000, // 5 seconds in milliseconds
+  max: 100,
+  headers: true,
+  handler: function (req, res, /*next*/) {
+    return res.status(429).json({
+      error: "You have exceeded the 100 requests in 5 second limit! What in the hell we're you doing?"
+    })
+  }
 });
 
+// Just to protect printer actions further, don't let multiple calls break things.
 const printerActionLimits = rateLimit({
   windowMs: 60 * 1000, // 1 minute in milliseconds
   max: 100,
-  message: "You have exceeded the 5 requests in 1 minute limit!",
-  headers: true
+  headers: true,
+  handler: function (req, res, /*next*/) {
+    return res.status(429).json({
+      error: "You have exceeded the 100 requests in 1 minute limit! Please try again in 1 minute."
+    })
+  }
 });
+
+//TODO rest of the endpoints
 
 module.exports = {
   octofarmGlobalLimits,
