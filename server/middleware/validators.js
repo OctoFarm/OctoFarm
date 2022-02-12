@@ -42,6 +42,7 @@ function getExtendedValidator() {
   nodeInputValidator.extend("printer_id", async ({ value, args }) => {
     return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
   });
+  //TODO this needs a custom message passing back out, can remove the logger then.
   nodeInputValidator.extend("settings_appearance", async ({ value, args }) => {
     const { color, colorTransparent, defaultLanguage, name, showFahrenheitAlso } = value;
     const colorValid = typeof color === "string" && color === "default"; //The client will always send default for adding a printer

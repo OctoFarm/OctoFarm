@@ -19,6 +19,7 @@ const { TaskManager } = require("./services/task-manager.service");
 const exceptionHandler = require("./exceptions/exception.handler");
 const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
+const { fetchSuperSecretKey } = require("./app-env");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -71,7 +72,7 @@ function setupExpressServer() {
   app.use(express.urlencoded({ extended: false }));
   app.use(
     session({
-      secret: "supersecret",
+      secret: fetchSuperSecretKey(),
       resave: false,
       saveUninitialized: true
     })
