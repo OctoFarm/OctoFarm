@@ -1,4 +1,4 @@
-name: Semgrep
+name: Semgrep-Analysis
 on:
   pull_request: {}
   push:
