@@ -1,9 +1,10 @@
 const nodeInputValidator = require("node-input-validator");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
-const { databaseNamesList } = require("../constants/database.constants")
+const { databaseNamesList } = require("../constants/database.constants");
 const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
+const path = require("path");
 const logger = new Logger("OctoFarm-Validation");
 
 // REFACTOR should be a utility -_-
@@ -73,6 +74,10 @@ function getExtendedValidator() {
   nodeInputValidator.extend("database_name", async ({ value, args }) => {
     return databaseNamesList.includes(value);
   });
+  nodeInputValidator.extend("system_path", async ({ value, args }) => {
+    return value !== path.basename(value);
+  });
+
   return nodeInputValidator;
 }
 
