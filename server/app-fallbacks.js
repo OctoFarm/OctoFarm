@@ -9,6 +9,7 @@ const path = require("path");
 const Logger = require("./handlers/logger.js");
 const exceptionHandler = require("./exceptions/exception.handler");
 const logger = new Logger("OctoFarm-Fallback-Server");
+const { fetchSuperSecretKey } = require("./app-env");
 const routePath = "./routes";
 const opts = { cwd: __dirname };
 
@@ -26,7 +27,7 @@ function setupFallbackExpressServer() {
   app.use(express.urlencoded({ extended: false }));
   app.use(
     session({
-      secret: "supersecret",
+      secret: fetchSuperSecretKey(),
       resave: true,
       saveUninitialized: true
     })
