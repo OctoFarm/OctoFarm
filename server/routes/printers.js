@@ -92,9 +92,9 @@ router.post(
   }
 );
 
-router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
+router.post("/update", ensureAuthenticated, ensureAdministrator,  validateBodyMiddleware(P_VALID.UPDATE_PRINTERS), (req, res) => {
   // Grab the API body
-  const printers = req.body;
+  const printers = req.body.infoList;
   // Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
   const p = getPrinterManagerCache().bulkUpdateBasicPrinterInformation(printers);

@@ -52,7 +52,7 @@ function getExtendedValidator() {
     const nameValid = typeof name === "string" && name.length < 50; // Can be blank, must be less than 50 characters
     const showFahrenheitAlsoValid = typeof showFahrenheitAlso === "boolean";
 
-    logger.debug(`
+    logger.info(`
       Color is Valid: ${colorValid},
       Colour Transparent is Valid: ${colorTransparentValid},
       Default Language is Valid: ${defaultLanguageValid},
@@ -85,8 +85,6 @@ async function validateInput(data, rules) {
   const v = new localNIV.Validator(data, rules);
 
   const matched = await v.check();
-
-  console.log(matched)
 
   if (!matched) {
     throw new ValidationException(v.errors);
