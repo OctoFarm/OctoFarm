@@ -279,6 +279,7 @@ function setupEnvConfig(skipDotEnv = false) {
   envUtils.ensureBackgroundImageExists(__dirname);
   ensurePageTitle();
   ensureLogLevelSet();
+  ensureSuperSecretKeySet();
 }
 
 /**
@@ -363,6 +364,28 @@ function fetchClientVersion() {
   return clientPackageJson.version;
 }
 
+function fetchSuperSecretKey() {
+  return process.env[AppConstants.SUPER_SECRET_KEY];
+}
+
+function ensureSuperSecretKeySet() {
+  const newlyGeneratedKey = AppConstants.defaultSuperSecretKey;
+
+  if (!process.env[AppConstants.SUPER_SECRET_KEY]) {
+    logger.info(
+      `~ ${AppConstants.SUPER_SECRET_KEY} environment variable is not set. Setting new randomly generated Key!: ${AppConstants.SUPER_SECRET_KEY}=${newlyGeneratedKey}.`
+    );
+    envUtils.writeVariableToEnvFile(
+      path.resolve(dotEnvPath),
+      AppConstants.SUPER_SECRET_KEY,
+      newlyGeneratedKey
+    );
+    process.env[AppConstants.SUPER_SECRET_KEY] = newlyGeneratedKey.toString();
+  } else {
+    logger.info(`✓ ${AppConstants.SUPER_SECRET_KEY} environment variable set!`);
+  }
+}
+
 module.exports = {
   isEnvProd,
   setupEnvConfig,
@@ -370,5 +393,6 @@ module.exports = {
   fetchMongoDBConnectionString,
   fetchOctoFarmPort,
   getViewsPath,
-  fetchClientVersion
+  fetchClientVersion,
+  fetchSuperSecretKey
 };

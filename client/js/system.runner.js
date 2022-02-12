@@ -5,7 +5,6 @@ import {
   localStorageKeys,
   returnSaveBtn,
   serverActionsElements,
-  serverDatabaseKeys,
   userActionElements
 } from "./pages/system/server.options";
 import {
@@ -31,6 +30,7 @@ import {
 } from "./pages/system/server.actions";
 import {serverBootBoxOptions} from "./pages/system/utils/bootbox.options";
 import {removeLocalStorage} from "./services/local-storage.service";
+import { serverDatabaseKeys } from "../../server/constants/database.constants"
 
 // Setup Page
 for (const key in serverDatabaseKeys) {

@@ -85,9 +85,9 @@ class LoggerService {
               metaData = JSON.stringify(metaData);
             }
           }
-          let message = `${date} | ${level} | ${route} \n MESSAGE: ${info.message} `;
+          let message = `${date} | ${level} | ${route} \n ${level} MESSAGE: ${info.message} `;
           message = metaData
-              ? message + `\n DATA: ${metaData}`
+              ? message + `: ${metaData} `
               : message;
           return message;
         })

@@ -3,6 +3,19 @@ import {ApplicationError} from "../exceptions/application-error.handler";
 import {HTTPError} from "../exceptions/octofarm-api.exceptions";
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
 
+//TODO move out to utility file
+const prettyPrintStatusError = (errorString) => {
+  const { name, errors } = errorString;
+
+  let prettyString = `<br>###${name}###<br>`;
+
+  for (let key in errors ){
+    prettyString += `<br>#${key.toLocaleUpperCase()}#<br> ${errors[key].message} <br>`
+  }
+
+  return prettyString
+}
+
 // axios request interceptor
 axios.interceptors.request.use(
   function (config) {
@@ -32,7 +45,7 @@ axios.interceptors.response.use(
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST, {message: `${HTTPError.BAD_REQUEST.message}: ${error.response.statusText}`});
+        throw new ApplicationError(HTTPError.BAD_REQUEST, {message: `${HTTPError.BAD_REQUEST.message}: ${prettyPrintStatusError(error.response.data)}`});
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
       case 403:

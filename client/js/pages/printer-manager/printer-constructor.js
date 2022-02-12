@@ -173,7 +173,7 @@ export class PrintersManagement {
         0
       );
       try {
-        const printersToRemove = await OctoFarmClient.post("printers/remove", deletedPrinters);
+        const printersToRemove = await OctoFarmClient.post("printers/remove", { idList: deletedPrinters });
         const { printersRemoved } = printersToRemove;
         deletingAlert.close();
         printersRemoved.forEach((printer) => {
