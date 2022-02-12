@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const path = require("path")
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 // User Modal
 const Logger = require("../handlers/logger.js");
@@ -29,9 +30,14 @@ router.delete("/delete/:id", ensureAuthenticated, ensureAdministrator, async (re
 });
 router.post("/test", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
-  const opts = req.body;
+  const { scriptLocation, message } = req.body;
+
+  const scriptValid = scriptLocation !== path.basename(scriptLocation);
+  console.log(path.basename(scriptLocation))
+  console.log(scriptValid)
+
   //Send Dashboard to Runner..
-  let testFire = await Script.test(opts.scriptLocation, opts.message);
+  let testFire = await Script.test(scriptLocation, message);
   //Return printers added...
   res.send({ testFire: testFire, status: 200 });
 });

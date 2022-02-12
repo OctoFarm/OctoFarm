@@ -1,5 +1,6 @@
 module.exports = {
-  DATABASE_NAME: {
-    databaseName: ["required", "database_name"]
+  SCRIPT_TEST: {
+    scriptLocation: ["required", "database_name"],
+    message: ["required", ""]
   }
 };
