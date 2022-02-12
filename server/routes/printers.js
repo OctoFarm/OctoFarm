@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
+const { printerActionLimits } = require("../middleware/rate-limiting");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -15,7 +16,7 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
-const { validateBodyMiddleware } = require("../handlers/validators");
+const { validateBodyMiddleware } = require("../middleware/validators");
 const P_VALID = require("../constants/printer-validation.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
@@ -100,16 +101,22 @@ router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });
-router.post("/remove", ensureAuthenticated, ensureAdministrator, validateBodyMiddleware(P_VALID.DELETE_PRINTERS), async (req, res) => {
-  // Grab the API body
-  console.log(req.body)
-  const printers = req.body.idList;
-  // Send Dashboard to Runner..
-  logger.info("Delete printers request: ", printers);
-  const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
-  // Return printers added...
-  res.send({ printersRemoved: p, status: 200 });
-});
+router.post(
+  "/remove",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(P_VALID.DELETE_PRINTERS),
+  async (req, res) => {
+    // Grab the API body
+    console.log(req.body);
+    const printers = req.body.idList;
+    // Send Dashboard to Runner..
+    logger.info("Delete printers request: ", printers);
+    const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
+    // Return printers added...
+    res.send({ printersRemoved: p, status: 200 });
+  }
+);
 
 // Register Handle for Saving printers
 router.post("/removefile", ensureAuthenticated, async (req, res) => {
