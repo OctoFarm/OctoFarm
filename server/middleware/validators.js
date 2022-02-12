@@ -1,10 +1,12 @@
 const nodeInputValidator = require("node-input-validator");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
+const { databaseNamesList } = require("../constants/database.constants")
 const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Validation");
 
+// REFACTOR should be a utility -_-
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
     let isMinLength = true;
@@ -32,29 +34,27 @@ function validateMongoURL(mongoURL) {
     isValid: hasMongoPrefix
   };
 }
-
+//REFACTOR this needs splitting up for each section of the app
 function getExtendedValidator() {
-  nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
+  nodeInputValidator.extend("wss_url", ({ value, args }) => {
     const url = new URL(value).href;
     return url.includes("ws://") || url.includes("wss://");
-  });
-  nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
-    const url = new URL(value).href;
-    return url.includes("http://") || url.includes("https://");
   });
   nodeInputValidator.extend("printer_id", async ({ value, args }) => {
     return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
   });
+  //TODO this needs a custom message passing back out, can remove the logger then.
   nodeInputValidator.extend("settings_appearance", async ({ value, args }) => {
     const { color, colorTransparent, defaultLanguage, name, showFahrenheitAlso } = value;
-    const colorValid = !!color && typeof color === "string" && color === "default"; //The client will always send default for adding a printer
+    const colorValid = typeof color === "string" && color === "default"; //The client will always send default for adding a printer
     const colorTransparentValid =
       typeof colorTransparent === "boolean" && colorTransparent === false;
-    const defaultLanguageValid = !!defaultLanguage && typeof defaultLanguage === "string";
-    const nameValid = !!name && typeof name === "string" && (name.length === 0 || name.length < 50); // Can be blank, must be less than 50 characters
+    const defaultLanguageValid =
+      typeof defaultLanguage === "string" && defaultLanguage === "_default";
+    const nameValid = typeof name === "string" && name.length < 50; // Can be blank, must be less than 50 characters
     const showFahrenheitAlsoValid = typeof showFahrenheitAlso === "boolean";
 
-    logger.debug(`
+    logger.info(`
       Color is Valid: ${colorValid},
       Colour Transparent is Valid: ${colorTransparentValid},
       Default Language is Valid: ${defaultLanguageValid},
@@ -70,17 +70,8 @@ function getExtendedValidator() {
       showFahrenheitAlsoValid
     ].includes(false);
   });
-  nodeInputValidator.extend("camera_url", async ({ value, args }) => {
-    console.log("VALIDATE CAM");
-    console.log(value, args);
-  });
-  nodeInputValidator.extend("apikey", async ({ value, args }) => {
-    console.log("VALIDATE API");
-    console.log(value, args);
-  });
-  nodeInputValidator.extend("group", async ({ value, args }) => {
-    console.log("VALIDATE GROUP");
-    console.log(value, args);
+  nodeInputValidator.extend("database_name", async ({ value, args }) => {
+    return databaseNamesList.includes(value);
   });
   return nodeInputValidator;
 }
@@ -108,22 +99,44 @@ function validateBodyMiddleware(rules) {
   return function (req, res, next) {
     validateInput(req.body, rules)
       .then((res) => {
-        console.log(res);
-        logger.debug("Validate Body Middelware: ", res);
+        logger.debug("Validated Body Middleware");
         return next();
       })
       .catch((e) => {
-        const errorMessage = "Invalid body input! Error:" + e.message;
-        logger.error(errorMessage);
+        const errorMessage =
+          "Invalid body input detected in " +
+          req.protocol +
+          "://" +
+          req.get("host") +
+          req.originalUrl;
+        logger.error(errorMessage, e);
         res.statusCode = 400;
-        res.statusMessage = errorMessage;
-        return res.send({ error: errorMessage });
+        res.statusMessage = e;
+        return res.send(e);
       });
   };
 }
 
-async function validateParamsMiddleware() {
-  // return validateInput(req.params, rules);
+function validateParamsMiddleware(rules) {
+  return function (req, res, next) {
+    validateInput(req.params, rules)
+      .then(() => {
+        logger.debug("Validated Params Middleware");
+        return next();
+      })
+      .catch((e) => {
+        const errorMessage =
+          "Invalid body input detected in " +
+          req.protocol +
+          "://" +
+          req.get("host") +
+          req.originalUrl;
+        logger.error(errorMessage, e);
+        res.statusCode = 400;
+        res.statusMessage = e;
+        return res.send(e);
+      });
+  };
 }
 
 module.exports = {

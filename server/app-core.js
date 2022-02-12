@@ -3,6 +3,7 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
+const { octofarmGlobalLimits, printerActionLimits } = require("./middleware/rate-limiting");
 const morganMiddleware = require("./middleware/morgan");
 const passport = require("passport");
 const swaggerJsdoc = require("swagger-jsdoc");
@@ -18,6 +19,7 @@ const { TaskManager } = require("./services/task-manager.service");
 const exceptionHandler = require("./exceptions/exception.handler");
 const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
+const { fetchSuperSecretKey } = require("./app-env");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -29,6 +31,8 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
  */
 function setupExpressServer() {
   let app = express();
+
+  app.use(octofarmGlobalLimits);
 
   require("./middleware/passport.js")(passport);
 
@@ -68,7 +72,7 @@ function setupExpressServer() {
   app.use(express.urlencoded({ extended: false }));
   app.use(
     session({
-      secret: "supersecret",
+      secret: fetchSuperSecretKey(),
       resave: false,
       saveUninitialized: true
     })
@@ -114,7 +118,7 @@ function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/amialive", require("./routes/SSE-amIAlive", { page: "route" }));
   app.use("/users", require("./routes/users", { page: "route" }));
-  app.use("/printers", require("./routes/printers", { page: "route" }));
+  app.use("/printers", printerActionLimits, require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
   app.use("/filament", require("./routes/filament", { page: "route" }));
   app.use("/history", require("./routes/history", { page: "route" }));

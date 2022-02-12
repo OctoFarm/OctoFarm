@@ -2,7 +2,7 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function randomString(len) {
+function randomString(len = 32) {
   const buf = [],
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
     charlen = chars.length;

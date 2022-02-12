@@ -1,9 +1,12 @@
+const { randomString } = require("../utils/random.util")
+
 const MONGO_KEY = "MONGO";
 const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
 const NON_NPM_MODE_KEY = "NON_NPM_MODE";
 const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
 const LOG_LEVEL = "LOG_LEVEL";
 const NODE_ENV_KEY = "NODE_ENV";
+const SUPER_SECRET_KEY = "SUPER_SECRET_KEY";
 
 const VERSION_KEY = "npm_package_version";
 
@@ -17,6 +20,7 @@ const knownLogLevels = ["info", "debug", "silly"];
 const defaultLogLevel = "info";
 const currentReleaseBranch = "master";
 const releaseBranches = ["master", "development"];
+const defaultSuperSecretKey = randomString(20);
 
 // Make sure the client is up to date with this
 const jsonStringify = false;
@@ -64,6 +68,10 @@ class AppConstants {
     return defaultLogLevel;
   }
 
+  static get defaultSuperSecretKey(){
+    return defaultSuperSecretKey;
+  }
+
   static get VERSION_KEY() {
     return VERSION_KEY;
   }
@@ -90,6 +98,10 @@ class AppConstants {
 
   static get LOG_LEVEL() {
     return LOG_LEVEL;
+  }
+
+  static get SUPER_SECRET_KEY() {
+    return SUPER_SECRET_KEY;
   }
 }
 

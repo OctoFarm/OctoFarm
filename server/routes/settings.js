@@ -28,6 +28,8 @@ const {
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
+const S_VALID = require("../constants/validate-settings.constants");
+const { validateParamsMiddleware } = require("../middleware/validators");
 
 module.exports = router;
 
@@ -104,11 +106,12 @@ router.post(
 );
 
 router.get(
-  "/server/delete/database/:name",
+  "/server/delete/database/:databaseName",
   ensureAuthenticated,
   ensureAdministrator,
+  validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.name;
+    const databaseName = req.params.databaseName;
     await getPrinterManagerCache().killAllConnections();
     if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
@@ -142,11 +145,12 @@ router.get(
   }
 );
 router.get(
-  "/server/get/database/:name",
+  "/server/get/database/:databaseName",
   ensureAuthenticated,
   ensureAdministrator,
+  validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.name;
+    const databaseName = req.params.databaseName;
     logger.info("Client requests export of " + databaseName);
     let returnedObjects = [];
     if (databaseName === "FilamentDB") {

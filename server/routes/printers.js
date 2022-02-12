@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
+const { printerActionLimits } = require("../middleware/rate-limiting");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -15,8 +16,8 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { returnPrinterHealthChecks } = require("../store/printer-health-checks.store");
 const { getPluginList, getPluginNoticesList } = require("../store/octoprint-plugin-list.store");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
-const { validateBodyMiddleware } = require("../handlers/validators");
-const P_VALID = require("../constants/printer-validation.constants");
+const { validateBodyMiddleware } = require("../middleware/validators");
+const P_VALID = require("../constants/validate-printers.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 
@@ -91,24 +92,37 @@ router.post(
   }
 );
 
-router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
-  // Grab the API body
-  const printers = req.body;
-  // Send Dashboard to Runner..
-  logger.info("Update printers request: ", printers);
-  const p = getPrinterManagerCache().bulkUpdateBasicPrinterInformation(printers);
-  // Return printers added...
-  res.send({ printersAdded: p, status: 200 });
-});
-router.post("/remove", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  // Grab the API body
-  const printers = req.body;
-  // Send Dashboard to Runner..
-  logger.info("Delete printers request: ", printers);
-  const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
-  // Return printers added...
-  res.send({ printersRemoved: p, status: 200 });
-});
+router.post(
+  "/update",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(P_VALID.UPDATE_PRINTERS),
+  (req, res) => {
+    // Grab the API body
+    const printers = req.body.infoList;
+    // Send Dashboard to Runner..
+    logger.info("Update printers request: ", printers);
+    const p = getPrinterManagerCache().bulkUpdateBasicPrinterInformation(printers);
+    // Return printers added...
+    res.send({ printersAdded: p, status: 200 });
+  }
+);
+router.post(
+  "/remove",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
+  async (req, res) => {
+    // Grab the API body
+    console.log(req.body);
+    const printers = req.body.idList;
+    // Send Dashboard to Runner..
+    logger.info("Delete printers request: ", printers);
+    const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
+    // Return printers added...
+    res.send({ printersRemoved: p, status: 200 });
+  }
+);
 
 // Register Handle for Saving printers
 router.post("/removefile", ensureAuthenticated, async (req, res) => {
@@ -276,10 +290,15 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   logger.info("Action wake host: ", data);
   await Script.wol(data);
 });
-router.post("/updateSortIndex", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const data = req.body;
-  logger.info("Update printer sort indexes: ", data);
-  res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
+router.post(
+  "/updateSortIndex",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
+  async (req, res) => {
+    const data = req.body.idList;
+    logger.info("Update printer sort indexes: ", data);
+    res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
 });
 router.get("/connectionLogs/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let id = req.params.id;
