@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 // User Modal
 const Logger = require("../handlers/logger.js");
@@ -7,6 +8,8 @@ const logger = new Logger("OctoFarm-API");
 const Alerts = require("../models/Alerts.js");
 
 const script = require("../services/local-scripts.service.js");
+const { validateBodyMiddleware } = require("../middleware/validators");
+const S_VALID = require("../constants/validate-script.constants");
 const Script = script.ScriptRunner;
 router.get("/get", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
@@ -27,14 +30,21 @@ router.delete("/delete/:id", ensureAuthenticated, ensureAdministrator, async (re
     });
   //Return printers added...
 });
-router.post("/test", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  //Grab the API body
-  const opts = req.body;
-  //Send Dashboard to Runner..
-  let testFire = await Script.test(opts.scriptLocation, opts.message);
-  //Return printers added...
-  res.send({ testFire: testFire, status: 200 });
-});
+
+router.post(
+  "/test",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(S_VALID.SCRIPT_TEST),
+  async (req, res) => {
+    //Grab the API body
+    const { scriptLocation, message } = req.body;
+    //Send Dashboard to Runner..
+    let testFire = await Script.test(scriptLocation, message);
+    //Return printers added...
+    res.send({ testFire: testFire, status: 200 });
+  }
+);
 router.post("/save", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   const opts = req.body;

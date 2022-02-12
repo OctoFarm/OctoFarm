@@ -1,5 +1,5 @@
 module.exports = {
   DATABASE_NAME: {
-    databaseName: ["required", "database_name"]
+    databaseName: ["required", "string", "database_name"]
   }
 };
