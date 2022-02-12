@@ -208,8 +208,7 @@ export class PrintersManagement {
   }
 
   static async savePrinter(event) {
-    try {
-      // Gather the printer data...
+    // Gather the printer data...
       let newId = event.id.split("-");
       newId = newId[1];
 
@@ -234,7 +233,7 @@ export class PrintersManagement {
         printCheck > -1 ||
         printerAPIKEY.value === "" ||
         printerName.value === "" ||
-        printerCamURL.value === ""
+        printerCamURL.value === "" || printerName.value.length > 50
       ) {
         if (printerURL.value === "") {
           errors.push({
@@ -246,6 +245,12 @@ export class PrintersManagement {
           errors.push({
             type: "warning",
             msg: "Please input your printers API Key"
+          });
+        }
+        if (printerName.value.length > 50){
+          errors.push({
+            type: "warning",
+            msg: "Printer names must be less than 50 characters"
           });
         }
         if (printCheck > -1) {
@@ -272,6 +277,7 @@ export class PrintersManagement {
           printerName.value
         ).build();
         const printersToAdd = await OctoFarmClient.post("printers/add", printer);
+        console.log(printersToAdd)
         const { printersAdded } = printersToAdd;
         printersAdded.forEach((printer) => {
           UI.createAlert(
@@ -291,15 +297,7 @@ export class PrintersManagement {
           table.classList.add("d-none");
         }
       }
-    } catch (e) {
-      console.error(e);
-      UI.createAlert(
-        "error",
-        "Something went wrong saving your printer, please check the logs",
-        3000,
-        "clicked"
-      );
-    }
+
   }
 
   build() {
