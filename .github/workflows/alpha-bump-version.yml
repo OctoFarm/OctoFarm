@@ -9,6 +9,8 @@ on:
       - "client/package.json"
       - "server/package-lock.json"
       - "client/package-lock.json"
+      - "client/dist"
+      - "server/views/assets/dist"
 
 jobs:
   bump-versions-pre-release:
@@ -106,3 +108,5 @@ jobs:
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>
+          ## This action should only ever commit these two files!
+          file_pattern: server/package*.json client/package*.json
