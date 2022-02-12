@@ -15,7 +15,7 @@ export function setupSortablePrintersTable() {
         listID.push(ca[1]);
       });
       try {
-        OctoFarmClient.post("printers/updateSortIndex", listID);
+        OctoFarmClient.post("printers/updateSortIndex", { idList: listID });
       } catch (e) {
         console.error(e);
         UI.createAlert(

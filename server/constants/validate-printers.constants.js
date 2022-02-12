@@ -9,7 +9,7 @@ module.exports = {
     apikey: ["required", "string", "minLength:32", "maxLength:32"],
     group: ["string", "minLength:0", "maxLength:50"]
   },
-  DELETE_PRINTERS: {
+  PRINTER_ID_LIST: {
     idList: ["required", "array"],
     "idList.*": ["required", "string"]
   },
