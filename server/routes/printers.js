@@ -75,15 +75,21 @@ const ConnectionMonitorService = require("../services/connection-monitor.service
  *       400:
  *       500:
  */
-router.post("/add", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  // Grab the API body
-  const printers = req.body;
-  // Send Dashboard to Runner..
-  logger.info("Update printers request: ", printers);
-  const p = await getPrinterManagerCache().addPrinter(printers);
-  // Return printers added...
-  res.send({ printersAdded: [p], status: 200 });
-});
+router.post(
+  "/add",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateBodyMiddleware(P_VALID.NEW_PRINTER),
+  async (req, res) => {
+    // Grab the API body
+    const printers = req.body;
+    // Send Dashboard to Runner..
+    logger.info("Update printers request: ", printers);
+    const p = await getPrinterManagerCache().addPrinter(printers);
+    //Return printers added...
+    res.send({ printersAdded: [p], status: 200 });
+  }
+);
 
 router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   // Grab the API body
