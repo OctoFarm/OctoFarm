@@ -1,0 +1,119 @@
+<div
+  id="actionsBar"
+  class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 stuck mb-3 d-none d-md-block d-lg-block d-xl-block"
+>
+  <div class="card text-white bg-dark mx-0 my-0">
+    <div class="row px-1" id="actionsBarBody">
+
+      <div class="col-8">
+        <button
+                title="Connect multiple Printers at once."
+                id="bulkConnectBtn"
+                type="button"
+                class="btn btn-success"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-link"></i> Connect
+        </button>
+        <button
+                title="Diconnect multiple Printers at once."
+                id="bulkDisconnectBtn"
+                type="button"
+                class="btn btn-danger"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-unlink"></i> Disconnect
+        </button>
+        <button
+                title="Power On/Off multiple Printers at once."
+                id="bulkPowerBtn"
+                type="button"
+                class="btn btn-outline-danger"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-power-off"></i> Power
+        </button>
+
+        <button
+                title="Send heating commands to multiple printers at once."
+                id="bulkPreHeat"
+                type="button"
+                class="btn btn-warning text-dark"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-temperature-high"></i> Pre-Heat
+        </button>
+        <button
+                title="Control multiple printers at once."
+                id="bulkControl"
+                type="button"
+                class="btn btn-info"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-gamepad"></i> Control
+        </button>
+        <button
+                title="Send gcode commands to multiple printers at once."
+                id="bulkGcodeCommands"
+                type="button"
+                class="btn btn-success"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-code"></i> Gcode
+        </button>
+        <button
+                id="multiPrintCommand"
+                type="button"
+                class="btn btn-warning text-dark"
+                data-toggle="modal"
+                data-target="#printerSelectModal"
+        >
+          <i class="fas fa-print"></i> Multi-Print
+        </button>
+      </div>
+      <div class="col-2">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="sortStates">Sort: </label>
+          </div>
+          <select class="custom-select" id="sortStates">
+            <option href="#" value="index">Index</option>
+            <option href="#" value="percent">Percent</option>
+            <option id="timeOption" href="#" value="time">Time</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-2">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="filterStates">Filter: </label>
+          </div>
+          <select class="custom-select" id="filterStates">
+            <% for(let i = 0; i < printGroups.length; i++){ %>
+              <option href="#" value="<%= printGroups[i] %>"><%= printGroups[i] %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+</div>
