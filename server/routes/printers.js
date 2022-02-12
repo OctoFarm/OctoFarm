@@ -100,9 +100,10 @@ router.post("/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });
-router.post("/remove", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+router.post("/remove", ensureAuthenticated, ensureAdministrator, validateBodyMiddleware(P_VALID.DELETE_PRINTERS), async (req, res) => {
   // Grab the API body
-  const printers = req.body;
+  console.log(req.body)
+  const printers = req.body.idList;
   // Send Dashboard to Runner..
   logger.info("Delete printers request: ", printers);
   const p = await getPrinterManagerCache().bulkDeletePrinters(printers);

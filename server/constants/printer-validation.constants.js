@@ -8,5 +8,9 @@ module.exports = {
     camURL: ["required", "string", "url"],
     apikey: ["required", "string", "minLength:32", "maxLength:32"],
     group: ["string", "minLength:0", "maxLength:50"]
+  },
+  DELETE_PRINTERS: {
+    idList: ["required", "array"],
+    "idList.*": ["required", "string"]
   }
 };
