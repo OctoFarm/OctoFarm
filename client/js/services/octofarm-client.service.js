@@ -28,12 +28,11 @@ axios.interceptors.response.use(
 
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-
     switch (error?.response?.status) {
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST);
+        throw new ApplicationError(HTTPError.BAD_REQUEST, {message: `${HTTPError.BAD_REQUEST.message}: ${error.response.statusText}`});
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
       case 403:
@@ -41,15 +40,15 @@ axios.interceptors.response.use(
       case 404:
         throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
       case 500:
-        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
+        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR, {message: `${HTTPError.INTERNAL_SERVER_ERROR.message}: ${error.response.statusText}`});
       case 502:
         throw new ApplicationError(HTTPError.BAD_GATEWAY);
       case 503:
-        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE);
+        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE, {message: `${HTTPError.SERVICE_UNAVAILABLE.message}: ${error.response.statusText}`});
       case 504:
         throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
       default:
-        throw new ApplicationError(HTTPError.UNKNOWN);
+        throw new ApplicationError(HTTPError.UNKNOWN, {message: `${HTTPError.UNKNOWN.message}: ${error?.response?.statusText}`});
     }
   }
 );

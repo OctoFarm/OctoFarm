@@ -3,7 +3,7 @@ const { ValidationException } = require("../exceptions/runtime.exceptions");
 const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger("OctoFarm-Validation");
 
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
@@ -45,6 +45,43 @@ function getExtendedValidator() {
   nodeInputValidator.extend("printer_id", async ({ value, args }) => {
     return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
   });
+  nodeInputValidator.extend("settings_appearance", async ({ value, args }) => {
+    const { color, colorTransparent, defaultLanguage, name, showFahrenheitAlso } = value;
+    const colorValid = !!color && typeof color === "string" && color === "default"; //The client will always send default for adding a printer
+    const colorTransparentValid =
+      typeof colorTransparent === "boolean" && colorTransparent === false;
+    const defaultLanguageValid = !!defaultLanguage && typeof defaultLanguage === "string";
+    const nameValid = !!name && typeof name === "string" && (name.length === 0 || name.length < 50); // Can be blank, must be less than 50 characters
+    const showFahrenheitAlsoValid = typeof showFahrenheitAlso === "boolean";
+
+    logger.debug(`
+      Color is Valid: ${colorValid},
+      Colour Transparent is Valid: ${colorTransparentValid},
+      Default Language is Valid: ${defaultLanguageValid},
+      Name is Valid: ${nameValid},
+      Show Fahrenheit Is Valid: ${showFahrenheitAlsoValid}
+    `);
+
+    return ![
+      colorValid,
+      colorTransparentValid,
+      defaultLanguageValid,
+      nameValid,
+      showFahrenheitAlsoValid
+    ].includes(false);
+  });
+  nodeInputValidator.extend("camera_url", async ({ value, args }) => {
+    console.log("VALIDATE CAM");
+    console.log(value, args);
+  });
+  nodeInputValidator.extend("apikey", async ({ value, args }) => {
+    console.log("VALIDATE API");
+    console.log(value, args);
+  });
+  nodeInputValidator.extend("group", async ({ value, args }) => {
+    console.log("VALIDATE GROUP");
+    console.log(value, args);
+  });
   return nodeInputValidator;
 }
 
@@ -64,22 +101,23 @@ async function validateInput(data, rules) {
 
 /**
  * Handle API input validation
- * @param req
  * @param rules
- * @param res
  * @returns {function(*, *, *): *}
  */
 function validateBodyMiddleware(rules) {
   return function (req, res, next) {
     validateInput(req.body, rules)
       .then((res) => {
+        console.log(res);
         logger.debug("Validate Body Middelware: ", res);
         return next();
       })
       .catch((e) => {
-        logger.error("Invalid body input!", e.message);
-        res.statusMessage = "Invalid body input! Error:" + e.message;
-        return res.sendStatus(400);
+        const errorMessage = "Invalid body input! Error:" + e.message;
+        logger.error(errorMessage);
+        res.statusCode = 400;
+        res.statusMessage = errorMessage;
+        return res.send({ error: errorMessage });
       });
   };
 }

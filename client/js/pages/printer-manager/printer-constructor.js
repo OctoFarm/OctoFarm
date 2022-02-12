@@ -208,8 +208,7 @@ export class PrintersManagement {
   }
 
   static async savePrinter(event) {
-    try {
-      // Gather the printer data...
+    // Gather the printer data...
       let newId = event.id.split("-");
       newId = newId[1];
 
@@ -298,15 +297,7 @@ export class PrintersManagement {
           table.classList.add("d-none");
         }
       }
-    } catch (e) {
-      console.error(JSON.stringify(e));
-      UI.createAlert(
-        "error",
-        "Something went wrong saving your printer, please check the logs: " + e,
-        3000,
-        "clicked"
-      );
-    }
+
   }
 
   build() {

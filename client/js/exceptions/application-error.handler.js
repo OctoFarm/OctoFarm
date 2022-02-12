@@ -1,6 +1,7 @@
 export class ApplicationError extends Error {
   static hasErrorNotificationBeenTriggered = false;
   constructor(options, overrides) {
+
     super();
     Object.assign(options, overrides);
 
