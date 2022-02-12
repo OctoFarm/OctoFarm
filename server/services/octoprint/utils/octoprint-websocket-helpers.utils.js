@@ -8,7 +8,6 @@ const { mapStateToCategory } = require("../../printers/utils/printer-state.utils
 const Logger = require("../../../handlers/logger");
 const logger = new Logger("OctoFarm-State");
 
-//TODO Add delete of timer into printer delete
 const tempTimers = {};
 
 const captureLogData = (id, data) => {
