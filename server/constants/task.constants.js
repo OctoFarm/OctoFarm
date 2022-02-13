@@ -73,6 +73,13 @@ class TASK_PRESETS {
     milliseconds: THIRTY_SECONDS
   };
 
+  static PERIODIC_IMMEDIATE_200_MS = {
+    ...this.PERIODIC,
+    runImmediately: true,
+    logFirstCompletion: true,
+    milliseconds: 200
+  };
+
   static PERIODIC_DAY = {
     ...this.PERIODIC,
     logFirstCompletion: true,

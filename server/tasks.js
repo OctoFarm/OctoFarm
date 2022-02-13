@@ -22,6 +22,10 @@ const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
 };
 
+const START_PRINTER_ADD_QUEUE = async () => {
+  getPrinterManagerCache().handlePrinterAddQueue();
+};
+
 // const INIT_FILE_UPLOAD_QUEUE = async () => {
 //   getFileUploadQueueCache().actionQueueState();
 // };
@@ -222,7 +226,8 @@ class OctoFarmTasks {
     TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
     TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
-    TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS)
+    TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
+    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_200_MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

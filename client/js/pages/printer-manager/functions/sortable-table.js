@@ -1,5 +1,6 @@
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import Sortable from "../../../vendor/sortable";
+import UI from "../../../utils/ui"
 
 export function setupSortablePrintersTable() {
   // Setup drag and drop re-ordering listeners
@@ -15,7 +16,7 @@ export function setupSortablePrintersTable() {
         listID.push(ca[1]);
       });
       try {
-        OctoFarmClient.post("printers/updateSortIndex", { idList: listID });
+        await OctoFarmClient.post("printers/updateSortIndex", {idList: listID});
       } catch (e) {
         console.error(e);
         UI.createAlert(

@@ -125,7 +125,7 @@ export class PrintersManagement {
         // Grab uploaded file contents into an object
         const importPrinters = JSON.parse(theBytes);
         // Loop over import only importing printers with correct fields.
-        for (let index = 0; index < importPrinters.length; index++) {
+        for (let newPrinter of importPrinters) {
           const printer = {
             printerURL: "Key not found",
             cameraURL: "Key not found",
@@ -133,20 +133,20 @@ export class PrintersManagement {
             group: "Key not found",
             apikey: "Key not found"
           };
-          if (typeof importPrinters[index].name !== "undefined") {
-            printer.name = importPrinters[index].name;
+          if (typeof newPrinter.name !== "undefined") {
+            printer.name = newPrinter.name;
           }
-          if (typeof importPrinters[index].printerURL !== "undefined") {
-            printer.printerURL = importPrinters[index].printerURL;
+          if (typeof newPrinter.printerURL !== "undefined") {
+            printer.printerURL = newPrinter.printerURL;
           }
-          if (typeof importPrinters[index].cameraURL !== "undefined") {
-            printer.camURL = importPrinters[index].cameraURL;
+          if (typeof newPrinter.cameraURL !== "undefined") {
+            printer.camURL = newPrinter.cameraURL;
           }
-          if (typeof importPrinters[index].group !== "undefined") {
-            printer.group = importPrinters[index].group;
+          if (typeof newPrinter.group !== "undefined") {
+            printer.group = newPrinter.group;
           }
-          if (typeof importPrinters[index].apikey !== "undefined") {
-            printer.apikey = importPrinters[index].apikey;
+          if (typeof newPrinter.apikey !== "undefined") {
+            printer.apikey = newPrinter.apikey;
           }
           PrintersManagement.addPrinter(printer);
         }
@@ -166,12 +166,12 @@ export class PrintersManagement {
   }
 
   static async deletePrinter(deletedPrinters) {
-    if (deletedPrinters.length > 0) {
-      const deletingAlert = UI.createAlert(
+    const deletingAlert = UI.createAlert(
         "warning",
         `Deleting ${[...deletedPrinters]} from the farm...`,
         0
-      );
+    );
+    if (deletedPrinters.length > 0) {
       try {
         const printersToRemove = await OctoFarmClient.post("printers/remove", { idList: deletedPrinters });
         const { printersRemoved } = printersToRemove;

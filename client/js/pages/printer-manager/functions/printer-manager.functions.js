@@ -306,12 +306,11 @@ export async function saveAllOnAddPrinterTable() {
   UI.createAlert(
     "warning",
     "Starting to save all your instances... this may take some time...",
-    onScreenButtons.length * 1500
+    onScreenButtons.length * 50
   );
   for (const btn of onScreenButtons) {
     btn.disabled = false;
     btn.click();
-    await UI.delay(1500);
   }
   UI.createAlert("success", "Successfully saved all your instances", 4000);
   saveAllBtn.disabled = false;

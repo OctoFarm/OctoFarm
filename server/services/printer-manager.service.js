@@ -16,6 +16,7 @@ const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket
 const logger = new Logger("OctoFarm-PrinterControlManagerService");
 
 class PrinterManagerService {
+  #addPrintersQueue = [];
   #printerGroupList = [];
   #printerControlList = [];
 
@@ -26,7 +27,7 @@ class PrinterManagerService {
     for (let p of pList) {
       await patchPrinterValues(p);
     }
-    this.batchCreatePrinters(pList);
+    await this.batchCreatePrinters(pList);
     return true;
   }
 
@@ -41,13 +42,24 @@ class PrinterManagerService {
 
   async addPrinter(printer) {
     await patchPrinterValues(printer);
+    this.#addPrintersQueue.push(printer);
 
-    await getPrinterStoreCache().addPrinter(new OctoPrintPrinter(printer));
     return {
       printerURL: printer.printerURL
     };
   }
+
+  handlePrinterAddQueue() {
+    if (this.#addPrintersQueue.length > 0) {
+      if (!!this.#addPrintersQueue[0]) {
+        getPrinterStoreCache().addPrinter(new OctoPrintPrinter(this.#addPrintersQueue[0]));
+        this.#addPrintersQueue.shift();
+      }
+    }
+  }
+
   // REFACTOR, this is a massive CPU smash, slow it down...
+  // Redundant after adding the printer add queue. May as well remove it and just push straight into the queue.
   async batchCreatePrinters(printerList) {
     // Async function to send mail to a list of users.
     const createNewPrinterBatches = async (printer) => {

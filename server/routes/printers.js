@@ -84,6 +84,7 @@ router.post(
   async (req, res) => {
     // Grab the API body
     const printers = req.body;
+
     // Send Dashboard to Runner..
     logger.info("Update printers request: ", printers);
     const p = await getPrinterManagerCache().addPrinter(printers);
@@ -297,6 +298,7 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const data = req.body.idList;
+    console.log(data.length);
     logger.info("Update printer sort indexes: ", data);
     res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
   }

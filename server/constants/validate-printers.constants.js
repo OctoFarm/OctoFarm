@@ -12,21 +12,11 @@ module.exports = {
     group: ["string", "minLength:0", "maxLength:50"]
   },
   PRINTER_ID_LIST: {
-    idList: [
-      "required",
-      "array",
-      "minLength:0",
-      `maxLength: ${getPrinterStoreCache().getPrinterCount()}`
-    ],
+    idList: ["required", "array", "minLength:0", "maxLength:1000"],
     "idList.*": ["required", "string", "mongoose_object_id"]
   },
   UPDATE_PRINTERS: {
-    infoList: [
-      "required",
-      "array",
-      "minLength:0",
-      `maxLength: ${getPrinterStoreCache().getPrinterCount()}`
-    ],
+    infoList: ["required", "array", "minLength:0", "maxLength:1000"],
     "infoList.*._id": ["required", "mongoose_object_id"],
     "infoList.*.apikey": ["required", "string", "minLength:32", "maxLength:32"],
     "infoList.*.camURL": ["string", "url"],
