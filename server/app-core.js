@@ -152,7 +152,7 @@ function serveOctoFarmRoutes(app) {
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Starting OctoFarm server tasks...");
-    for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS.length) {
+    for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS) {
       TaskManager.registerJobOrTask(task);
     }
     await optionalInfluxDatabaseSetup();

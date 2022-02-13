@@ -25,7 +25,7 @@ router.delete(
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
     //Grab the API body
-    let id = req.params.id;
+    let id = req.paramString("id");
     await Alerts.deleteOne({ _id: id })
       .then((response) => {
         res.send({ alerts: "success", status: 200 });
@@ -45,7 +45,8 @@ router.post(
   validateBodyMiddleware(S_VALID.SCRIPT_TEST),
   async (req, res) => {
     //Grab the API body
-    const { scriptLocation, message } = req.body;
+    const scriptLocation = req.bodyString("scriptLocation");
+    const message = req.bodyString("message");
     //Send Dashboard to Runner..
     let testFire = await Script.test(scriptLocation, message);
     //Return printers added...
