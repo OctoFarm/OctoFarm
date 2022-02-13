@@ -103,7 +103,10 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/get", ensureAuthenticated, async (req, res) => {
-  const { page, limit, sort } = req.query;
+  const page = req.queryString("page");
+  const limit = req.queryString("limit");
+  const sort = req.queryString("sort");
+
   let paginationOptions = {};
 
   paginationOptions.page = page;
@@ -112,19 +115,17 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
 
   paginationOptions.sort = sortOptions[sort];
 
-  const {
-    firstDate,
-    lastDate,
-    fileFilter,
-    pathFilter,
-    spoolManuFilter,
-    spoolMatFilter,
-    fileSearch,
-    spoolSearch,
-    printerNameFilter,
-    printerGroupFilter,
-    printerSearch
-  } = req.query;
+  const firstDate = req.queryString("firstDate");
+  const lastDate = req.queryString("lastDate");
+  const fileFilter = req.queryString("fileFilter");
+  const pathFilter = req.queryString("pathFilter");
+  const spoolManuFilter = req.queryString("spoolManuFilter");
+  const spoolMatFilter = req.queryString("spoolMatFilter");
+  const fileSearch = req.queryString("fileSearch");
+  const spoolSearch = req.queryString("spoolSearch");
+  const printerNameFilter = req.queryString("printerNameFilter");
+  const printerGroupFilter = req.queryString("printerGroupFilter");
+  const printerSearch = req.queryString("printerSearch");
 
   const findOptions = {
     "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
