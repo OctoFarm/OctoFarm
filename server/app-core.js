@@ -20,6 +20,7 @@ const exceptionHandler = require("./exceptions/exception.handler");
 const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
+const { sanitizeString } = require("./utils/sanitize-utils");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -133,7 +134,7 @@ function serveOctoFarmRoutes(app) {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
   }
   app.get("*", function (req, res) {
-    const originalURL = req.originalUrl.toString();
+    const originalURL = sanitizeString(req.originalUrl);
     if (originalURL.endsWith(".min.js")) {
       res.status(404);
       res.send("Resource not found " + originalURL);
