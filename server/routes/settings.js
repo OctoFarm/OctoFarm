@@ -43,7 +43,12 @@ const Storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: Storage });
+const upload = multer({
+  storage: Storage,
+  limits: {
+    fileSize: 8000000 // Sensitive: 10MB is more than the recommended limit of 8MB
+  }
+});
 
 router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const serverLogs = await Logs.grabLogs();
@@ -112,7 +117,7 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.databaseName;
+    const databaseName = req.paramString("databaseName");
     await getPrinterManagerCache().killAllConnections();
     if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
@@ -151,7 +156,7 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.databaseName;
+    const databaseName = req.paramString("databaseName");
     logger.info("Client requests export of " + databaseName);
     let returnedObjects = [];
     if (databaseName === "FilamentDB") {
@@ -184,7 +189,7 @@ router.post(
       statusTypeForUser: "error",
       message: ""
     };
-    let force = req?.body;
+    let force = req.bodyBool;
     if (
       !force ||
       typeof force?.forcePull !== "boolean" ||
@@ -237,7 +242,7 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
       res.send({ msg: "Settings Saved" });
     })
     .catch((e) => {
-      res.send({ msg: "Settings Not Saved" });
+      res.send({ msg: "Settings Not Saved: " + e });
     });
 });
 router.post(
