@@ -56,8 +56,14 @@ function updatePrinterInfo(printer) {
   const printerSortIndex = document.getElementById(`printerSortIndex-${printer._id}`);
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
+  let printerName = JSON.parse(JSON.stringify(printer?.printerName))
+
+  if(!printerName){
+    printerName = "<i class=\"fa-solid fa-spinner fa-spin\"></i>"
+  }
+
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
+  UI.doesElementNeedUpdating(printerName, printName, "innerHTML");
   UI.doesElementNeedUpdating(`${printer.printerURL} <br> ${printer.webSocketURL}`, printerURL, "innerHTML");
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
