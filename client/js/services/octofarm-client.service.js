@@ -86,8 +86,8 @@ export default class OctoFarmClient {
 
   static validatePath(pathname) {
     if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
+      const newURL = new URL(path, window.location.origin);
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, {message: ClientErrors.FAILED_VALIDATION_PATH + " " + newURL});
     }
   }
 

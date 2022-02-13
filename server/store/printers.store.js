@@ -1094,8 +1094,10 @@ class PrinterStore {
     );
 
     farmPrintersAssigned.forEach((printer) => {
-      printer.selectedFilament.forEach((spool) => {
+      printer.selectedFilament = printer.selectedFilament.map((spool) => {
+        logger.debug("Resetting spool to null", spool);
         spool = null;
+        logger.debug("Spool reset", spool);
       });
       PrinterService.findOneAndUpdate(printer._id, {
         selectedFilament: printer.selectedFilament

@@ -710,7 +710,7 @@ class PrinterSettingsService {
 
     const alertsTable = document.getElementById("printerAltersTableBody");
     alertsTable.innerHTML = "";
-    printerScripts.map(async (s) => {
+    printerScripts.forEach(async (s) => {
       alertsTable.insertAdjacentHTML(
         "beforeend",
         `
