@@ -15,6 +15,7 @@ on:
   push:
     branches: [ master, development, canary ]
   pull_request:
+    types: [opened, synchronize, reopened]
     # The branches below must be a subset of the branches above
     branches: [ master]
   schedule:

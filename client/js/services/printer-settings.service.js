@@ -145,7 +145,7 @@ class PrinterSettingsService {
         printerNameElement.value = newPrinterName;
         UI.createAlert("success", "Successfully generated new printer name! " + newPrinterName + "<br> Don't forget to save!", "clicked", 3000)
       }else{
-        UI.createAlert("warning", "Failed to generate printer name! Please check the logs..." + newPrinterName, "clicked", 3000)
+        UI.createAlert("warning", "Failed to generate printer name! Please check the logs..." + newPrinterName, 3000, "clicked")
       }
 
       e.target.innerHTML = "<i class=\"fas fa-sync\"></i>"
