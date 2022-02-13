@@ -553,7 +553,7 @@ async function renderSystemCharts() {
 }
 
 async function updateLiveSystemInformation() {
-  const options = {
+  const initialChartOptions = {
     noData: {
       text: "No data to display yet!"
     }
@@ -577,7 +577,7 @@ async function updateLiveSystemInformation() {
       systemInformation.memoryLoadHistory[systemInformation.memoryLoadHistory.length - 1].y
     ]);
   } else {
-    await historicUsageGraph.updateOptions(options);
+    await historicUsageGraph.updateOptions(initialChartOptions);
   }
 
   if (systemInformation.cpuLoadHistory.length > 0) {
@@ -585,7 +585,7 @@ async function updateLiveSystemInformation() {
       systemInformation.cpuLoadHistory[systemInformation.cpuLoadHistory.length - 1].y
     ]);
   } else {
-    await historicUsageGraph.updateOptions(options);
+    await historicUsageGraph.updateOptions(initialChartOptions);
   }
 
   if (systemInformation.memoryLoadHistory.length > 5) {
@@ -601,17 +601,20 @@ async function updateLiveSystemInformation() {
     ];
     await historicUsageGraph.updateSeries(dataSeriesForCharts);
   } else {
-    await historicUsageGraph.updateOptions(options);
+    await historicUsageGraph.updateOptions(initialChartOptions);
   }
 }
 
 async function startUpdateInfoRunner() {
   await updateLiveSystemInformation();
-  setInterval(await updateLiveSystemInformation, 5000);
+  setInterval(async () => {
+    await updateLiveSystemInformation
+  }, 5000);
 }
 
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
+    await updateLiveSystemInformation
     const taskManagerState = await OctoFarmClient.get("system/tasks");
 
     for (let task in taskManagerState) {
@@ -652,6 +655,19 @@ function startUpdateTasksRunner() {
   }, 1500);
 }
 
+function displayUserErrors(errors){
+  errors.forEach((error) => {
+    userActionElements.userCreateMessage.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="alert alert-warning text-dark" role="alert">
+          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
+        </div>
+        `
+    );
+  });
+}
+
 async function createNewUser() {
   userActionElements.userCreateMessage.innerHTML = "";
   const newUser = {
@@ -661,21 +677,12 @@ async function createNewUser() {
     password: userActionElements.createPassword.value,
     password2: userActionElements.createPassword2.value
   };
-  const createNewUser = await OctoFarmClient.createNewUser(newUser);
+  const newCreatedUser = await OctoFarmClient.createNewUser(newUser);
 
-  if (createNewUser.errors.length > 0) {
-    createNewUser.errors.forEach((error) => {
-      userActionElements.userCreateMessage.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div class="alert alert-warning text-dark" role="alert">
-          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
-        </div>
-        `
-      );
-    });
+  if (newCreatedUser.errors.length > 0) {
+    displayUserErrors(newCreatedUser.errors);
   } else {
-    const createdUser = createNewUser.createdNewUser;
+    const createdUser = newCreatedUser.createdNewUser;
     userActionElements.userTableContent.insertAdjacentHTML(
       "beforeend",
       ` 
@@ -750,16 +757,7 @@ async function editUser(id) {
   };
   const editedUser = await OctoFarmClient.editUser(id, newUserInfo);
   if (editedUser.errors.length > 0) {
-    editedUser.errors.forEach((error) => {
-      userActionElements.userCreateMessage.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div class="alert alert-warning text-dark" role="alert">
-          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
-        </div>
-        `
-      );
-    });
+    displayUserErrors(editedUser.errors)
   } else {
     UI.createAlert("success", "Successfully updated your user!", 3000, "clicked");
     userActionElements.editName.value = "";

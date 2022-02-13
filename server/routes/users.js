@@ -84,7 +84,11 @@ router.get("/register", async (req, res) => {
 
 // Register Handle
 router.post("/register", async (req, res) => {
-  const { name, username, password, password2 } = req.body;
+  const name = req.bodyString("name");
+  const username = req.bodyString("username");
+  const password = req.bodyString("password");
+  const password2 = req.bodyString("password2");
+
   const errors = [];
 
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -211,7 +215,11 @@ router.patch(
   ensureAdministrator,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    const newUserInformation = req.body;
+    const newUserInformation = {
+      name: req.bodyString("name"),
+      username: req.bodyString("username"),
+      group: req.bodyString("group")
+    };
     const id = req.paramString("id");
 
     if ("password" in newUserInformation) {

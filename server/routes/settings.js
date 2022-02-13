@@ -31,6 +31,7 @@ const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
+const { sanitizeString } = require("../utils/sanitize-utils");
 
 module.exports = router;
 
@@ -357,13 +358,18 @@ router.get(
   }
 );
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
-  const newObj = req.body;
-  let script = await GcodeDB.findById(newObj.id);
-  script.gcode = newObj.gcode;
-  script.name = newObj.name;
-  script.description = newObj.description;
-  script.printerIds = newObj.printerIds;
-  script.buttonColour = newObj.buttonColour;
+  let script = await GcodeDB.findById(req.bodyString("id"));
+  script.gcode = req.bodyString("gcode");
+  script.name = req.bodyString("name");
+  script.description = req.bodyString("description");
+  const printerIDList = [];
+  if (Array.isArray(req.body.printerIds)) {
+    req.body.printerIds.forEach((id) => {
+      printerIDList.push(sanitizeString(id));
+    });
+  }
+  script.printerIds = printerIDList;
+  script.buttonColour = req.bodyString("buttonColour");
   script.save();
   res.send(script);
 });
