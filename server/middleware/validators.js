@@ -41,7 +41,7 @@ function getExtendedValidator() {
     const url = new URL(value).href;
     return url.includes("ws://") || url.includes("wss://");
   });
-  nodeInputValidator.extend("printer_id", async ({ value, args }) => {
+  nodeInputValidator.extend("mongoose_object_id", async ({ value, args }) => {
     return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
   });
   //TODO this needs a custom message passing back out, can remove the logger then.

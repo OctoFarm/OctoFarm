@@ -30,6 +30,7 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
+const M_VALID = require("../constants/validate-mongo.constants");
 
 module.exports = router;
 
@@ -335,16 +336,21 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   });
 });
 
-router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
-  const scriptId = req.params.id;
-  GcodeDB.findByIdAndDelete(scriptId, function (err) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.send(scriptId);
-    }
-  });
-});
+router.get(
+  "/customGcode/delete/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const scriptId = req.params.id;
+    GcodeDB.findByIdAndDelete(scriptId, function (err) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send(scriptId);
+      }
+    });
+  }
+);
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
   const newObj = req.body;
   let script = await GcodeDB.findById(newObj.id);
@@ -369,14 +375,19 @@ router.post("/customGcode", ensureAuthenticated, async (req, res) => {
 router.get("/customGcode", ensureAuthenticated, async (req, res) => {
   res.send(await GcodeDB.find());
 });
-router.get("/customGcode/:id", ensureAuthenticated, async (req, res) => {
-  const printerId = req.params.id;
-  const all = await GcodeDB.find();
-  let returnCode = [];
-  all.forEach((script) => {
-    if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
-      returnCode.push(script);
-    }
-  });
-  res.send(returnCode);
-});
+router.get(
+  "/customGcode/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerId = req.params.id;
+    const all = await GcodeDB.find();
+    let returnCode = [];
+    all.forEach((script) => {
+      if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
+        returnCode.push(script);
+      }
+    });
+    res.send(returnCode);
+  }
+);

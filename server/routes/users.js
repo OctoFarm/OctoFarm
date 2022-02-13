@@ -17,6 +17,8 @@ const {
   resetPassword,
   editUser
 } = require("../services/user-service");
+const { validateParamsMiddleware } = require("../middleware/validators");
+const M_VALID = require("../constants/validate-mongo.constants");
 
 // Login Page
 router.get("/login", async (req, res) => {
@@ -187,22 +189,34 @@ router.get("/logout", (req, res) => {
 });
 
 // Get user list
-router.get("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const user = await User.findById(req.params.id);
-  res.send(user);
-});
+router.get(
+  "/users/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const user = await User.findById(req.params.id);
+    res.send(user);
+  }
+);
 
 // Update user
-router.patch("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const newUserInformation = req.body;
-  const id = req.params.id;
-  if ("password" in newUserInformation) {
-    res.send(await resetPassword(id, newUserInformation));
+router.patch(
+  "/users/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const newUserInformation = req.body;
+    const id = req.params.id;
+    if ("password" in newUserInformation) {
+      res.send(await resetPassword(id, newUserInformation));
+    }
+    if ("username" in newUserInformation) {
+      res.send(await editUser(id, newUserInformation));
+    }
   }
-  if ("username" in newUserInformation) {
-    res.send(await editUser(id, newUserInformation));
-  }
-});
+);
 
 // New user
 router.post("/users", ensureAuthenticated, ensureAdministrator, async (req, res) => {
@@ -211,9 +225,15 @@ router.post("/users", ensureAuthenticated, ensureAdministrator, async (req, res)
 });
 
 // Delete User
-router.delete("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const id = req.params.id;
-  res.send(await deleteUser(id));
-});
+router.delete(
+  "/users/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const id = req.params.id;
+    res.send(await deleteUser(id));
+  }
+);
 
 module.exports = router;

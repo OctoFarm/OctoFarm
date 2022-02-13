@@ -12,6 +12,8 @@ const { getHistoryCache } = require("../cache/history.cache");
 const { sortOptions } = require("../constants/history-sort.constants");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { validateParamsMiddleware } = require("../middleware/validators");
+const { M_VALID } = require("../constants/validate-mongo.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
@@ -235,14 +237,19 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     res.send(send);
   }
 });
-router.get("/statistics/:id", ensureAuthenticated, async function (req, res) {
-  const printerID = req.params.id;
-  let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
-  if (!stats) {
-    stats = await generatePrinterStatistics(printerID);
-    getPrinterStoreCache().updatePrinterStatistics(printerID, stats);
+router.get(
+  "/statistics/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async function (req, res) {
+    const printerID = req.params.id;
+    let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
+    if (!stats) {
+      stats = await generatePrinterStatistics(printerID);
+      getPrinterStoreCache().updatePrinterStatistics(printerID, stats);
+    }
+    res.send(stats);
   }
-  res.send(stats);
-});
+);
 
 module.exports = router;
