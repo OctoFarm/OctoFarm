@@ -18,6 +18,7 @@ import {
 } from "../templates/health-checks-table-row.templates";
 import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
 import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates"
+import PrinterTerminalManagerService from "../../../services/printer-terminal-manager.service";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
@@ -55,11 +56,12 @@ export function workerEventFunction(data) {
         } else if (currentOpenModal.innerHTML.includes("Control")) {
           PrinterControlManagerService.init("", data.printersInformation, data.printerControlList);
         } else if (currentOpenModal.innerHTML.includes("Terminal")) {
+          PrinterTerminalManagerService.init("", data.printersInformation, data.printerControlList);
         }
       }
 
       if (UI.checkIfSpecificModalShown("printerSettingsModal")) {
-        updatePrinterSettingsModal(data.printersInformation);
+        updatePrinterSettingsModal(data.printersInformation).then();
       }
     }
   } else {
@@ -77,7 +79,7 @@ export async function scanNetworkForDevices(e) {
   UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
   try {
     const scannedPrinters = await OctoFarmClient.get("printers/scanNetwork");
-    for (let index = 0; index < scannedPrinters.length; index++) {
+    for (const scannedPrinter of scannedPrinters) {
       const printer = {
         printerURL: "",
         cameraURL: "",
@@ -86,11 +88,11 @@ export async function scanNetworkForDevices(e) {
         apikey: ""
       };
 
-      if (typeof scannedPrinters[index].name !== "undefined") {
-        printer.name = scannedPrinters[index].name;
+      if (typeof scannedPrinter.name !== "undefined") {
+        printer.name = scannedPrinter.name;
       }
-      if (typeof scannedPrinters[index].url !== "undefined") {
-        printer.printerURL = scannedPrinters[index].url;
+      if (typeof scannedPrinter.url !== "undefined") {
+        printer.printerURL = scannedPrinter.url;
       }
       PrintersManagement.addPrinter(printer);
     }
@@ -100,8 +102,8 @@ export async function scanNetworkForDevices(e) {
       3000,
       "Clicked"
     );
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     UI.createAlert(
       "error",
       "There we're issues scanning your network for devices... please check the logs",
@@ -113,16 +115,16 @@ export async function scanNetworkForDevices(e) {
 }
 
 export async function reSyncAPI(force = false, id = null) {
-  let reSyncAPIBtn = document.getElementById("reSyncAPI");
+  const reSyncAPIBtn = document.getElementById("reSyncAPI");
 
   reSyncAPIBtn.disabled = true;
-  let alert = UI.createAlert(
+  const alert = UI.createAlert(
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Scanning APIs...";
   try {
-    const post = await OctoFarmClient.post("printers/reSyncAPI", {
+    await OctoFarmClient.post("printers/reSyncAPI", {
       id: id,
       force: force
     });
@@ -136,16 +138,16 @@ export async function reSyncAPI(force = false, id = null) {
   reSyncAPIBtn.disabled = false;
 }
 export async function reSyncWebsockets() {
-  let reSyncSocketsBtn = document.getElementById("reSyncSockets");
+  const reSyncSocketsBtn = document.getElementById("reSyncSockets");
 
   reSyncSocketsBtn.disabled = true;
-  let alert = UI.createAlert(
+  const alert = UI.createAlert(
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   reSyncSocketsBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Syncing Sockets...";
   try {
-    const post = await OctoFarmClient.post("printers/reSyncSockets", {
+    await OctoFarmClient.post("printers/reSyncSockets", {
       id: null
     });
   } catch (e) {
@@ -160,10 +162,10 @@ export async function reSyncWebsockets() {
 
 export async function bulkEditPrinters() {
   let editedPrinters = [];
-  let inputBoxes = document.querySelectorAll("*[id^=editPrinterCard-]");
-  for (let i = 0; i < inputBoxes.length; i++) {
-    if (inputBoxes[i]) {
-      let printerID = inputBoxes[i].id;
+  const inputBoxes = document.querySelectorAll("*[id^=editPrinterCard-]");
+  for (const boxes of inputBoxes) {
+    if (boxes) {
+      let printerID = boxes.id;
       printerID = printerID.split("-");
       printerID = printerID[1];
 
@@ -240,15 +242,15 @@ export async function bulkDeletePrinters() {
 
 export async function exportPrintersToJson() {
   try {
-    let printers = await OctoFarmClient.listPrinters();
+    const printers = await OctoFarmClient.listPrinters();
     const printersExport = [];
-    for (let r = 0; r < printers.length; r++) {
+    for (const currentPrinter of  printers) {
       const printer = {
-        name: printers[r].printerName,
-        group: printers[r].group,
-        printerURL: printers[r].printerURL,
-        cameraURL: printers[r].camURL,
-        apikey: printers[r].apikey
+        name: currentPrinter.printerName,
+        group: currentPrinter.group,
+        printerURL: currentPrinter.printerURL,
+        cameraURL: currentPrinter.camURL,
+        apikey: currentPrinter.apikey
       };
       printersExport.push(printer);
     }
@@ -285,7 +287,7 @@ export function addBlankPrinterToTable() {
 }
 
 export function deleteAllOnAddPrinterTable() {
-  let onScreenButtons = document.querySelectorAll("*[id^=delButton-]");
+  const onScreenButtons = document.querySelectorAll("*[id^=delButton-]");
   for (const btn of onScreenButtons) {
     btn.click();
   }
@@ -295,8 +297,8 @@ export async function saveAllOnAddPrinterTable() {
   const saveAllBtn = document.getElementById("saveAllBtn");
   saveAllBtn.disabled = true;
   deleteAllBtn.disabled = true;
-  let onScreenButtons = document.querySelectorAll("*[id^=saveButton-]");
-  let onScreenDelete = document.querySelectorAll("*[id^=delButton-]");
+  const onScreenButtons = document.querySelectorAll("*[id^=saveButton-]");
+  const onScreenDelete = document.querySelectorAll("*[id^=delButton-]");
   for (const btn of onScreenButtons) {
     btn.disabled = true;
   }
@@ -340,7 +342,9 @@ export async function loadPrinterHealthChecks(id = undefined) {
 export async function loadFarmOverviewInformation() {
   const farmOverviewInformation = document.getElementById("farmOverviewInformation");
   farmOverviewInformation.innerHTML =
-    "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td><i class=\"fas fa-sync fa-spin\"></i> Generating records, please wait...</td><td></td><td></td><td></td><td></td><td></td></tr>";
+    "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>" +
+      "<i class=\"fas fa-sync fa-spin\"></i> Generating records, please wait..." +
+      "</td><td></td><td></td><td></td><td></td><td></td></tr>";
 
   const farmOverview = await OctoFarmClient.getFarmOverview();
   farmOverviewInformation.innerHTML = "";
@@ -392,13 +396,12 @@ export async function loadConnectionOverViewInformation() {
   const today = new Date();
   document.getElementById("lastUpdateConnectionOverview").innerHTML = today.toLocaleTimeString()
 
-   const totalsArray = []; 
-   printerConnectionStats.forEach((url, index) => { 
+   const totalsArray = [];
+   printerConnectionStats.forEach((url, index) => {
      const currentPrinter = url;
      const toCalc = [];
      currentPrinter.connections.forEach(con => {
        const log = con.log;
-       const url = con.url;
        const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
        const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0)
        const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections
@@ -416,8 +419,12 @@ export async function loadConnectionOverViewInformation() {
 
     printerConnectionStats.forEach((url, index) => {
     const currentPrinter = url;
-    const totalSuccessPercent = totalsArray[index].reduce( function(a, b){ return a + b["successPercentage"] }, 0)
-    const totalFailedPercent = totalsArray[index].reduce( function(a, b){ return a + b["failedPercent"] }, 0)
+    const totalSuccessPercent = totalsArray[index].reduce( function(a, b){
+      return a + b["successPercentage"]
+    }, 0)
+    const totalFailedPercent = totalsArray[index].reduce( function(a, b){
+      return a + b["failedPercent"]
+    }, 0)
     const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length
     const actualFailedPercent = totalFailedPercent / totalsArray[index].length
     let averageTotalCountLength = 0;
@@ -425,28 +432,39 @@ export async function loadConnectionOverViewInformation() {
            averageTotalCountLength = averageTotalCountLength + 1;
            return a + b["totalResponse"]
          }, 0)
-    const totalAPIFailed = totalsArray[index].reduce( function(a, b){ return a + b["apiFailures"] }, 0)
-    const averageTotalCalc = (averageTotalCount / averageTotalCount) || 0;
-      const totalPingPongFails = totalsArray[index].reduce( function(a, b){ return a + b["totalPingPong"] }, 0)
+    const totalAPIFailed = totalsArray[index].reduce( function(a, b){
+      return a + b["apiFailures"]
+    }, 0)
+    const averageTotalCalc = (averageTotalCount / averageTotalCountLength) || 0;
+      const totalPingPongFails = totalsArray[index].reduce( function(a, b){
+        return a + b["totalPingPong"]
+      }, 0)
 
-      const collapseableRow = collapsableRow(index, currentPrinter.printerURL, averageTotalCalc, actualSuccessPercent,actualFailedPercent, totalsArray, totalAPIFailed, totalPingPongFails)
+      const collapseableRow = collapsableRow(index,
+          currentPrinter.printerURL,
+          averageTotalCalc,
+          actualSuccessPercent,
+          actualFailedPercent,
+          totalsArray,
+          totalAPIFailed,
+          totalPingPongFails)
 
       connectionOverViewTableBody.insertAdjacentHTML("beforeend", collapseableRow);
 
       currentPrinter.connections.forEach(con => {
-      let url = con.url
-            const log = con.log
-            if(url.includes("http")){
-          if(url.includes("https")){
-                url = url.replace("https://"+currentPrinter.printerURL, "")
+      let currentURL = con.url
+      const log = con.log
+      if(currentURL.includes("http")){
+          if(currentURL.includes("https")){
+            currentURL = currentURL.replace("https://"+currentPrinter.printerURL, "")
                   }else{
-                 url = url.replace("http://"+currentPrinter.printerURL, "")
+            currentURL = currentURL.replace("http://"+currentPrinter.printerURL, "")
                    }
-       }else if(url.includes("ws")){
-          if(url.includes("wss")){
-                 url = url.replace("wss://"+currentPrinter.printerURL, "")
+       }else if(currentURL.includes("ws")){
+          if(currentURL.includes("wss")){
+            currentURL = currentURL.replace("wss://"+currentPrinter.printerURL, "")
                    }else{
-                 url = url.replace("ws://"+currentPrinter.printerURL, "")
+            currentURL = currentURL.replace("ws://"+currentPrinter.printerURL, "")
                    }
        }
 
@@ -455,7 +473,7 @@ export async function loadConnectionOverViewInformation() {
       const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
       const successPercent = (log.totalRequestsSuccess * 100) / totalConnections;
       const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections;
-      const connectionInnerElement = collapsableContent(index, url, averageCalculation, successPercent, failedPercent, log);
+      const connectionInnerElement = collapsableContent(index, currentURL, averageCalculation, successPercent, failedPercent, log);
 
       connectionOverViewTableBody.insertAdjacentHTML("beforeend", connectionInnerElement)
 

@@ -25,6 +25,8 @@ let historicUsageGraph;
 let cpuUsageDonut;
 let memoryUsageDonut;
 
+const LOADING_DATA = "Loading Data..."
+
 const options = {
   series: [],
   chart: {
@@ -53,7 +55,7 @@ const options = {
     mode: "dark"
   },
   noData: {
-    text: "Loading Data..."
+    text: LOADING_DATA
   },
   stroke: {
     curve: "smooth"
@@ -139,7 +141,7 @@ const cpuOptions = {
     mode: "dark"
   },
   noData: {
-    text: "Loading Data..."
+    text: LOADING_DATA
   },
   series: [],
   labels: ["CPU (%)"]
@@ -165,7 +167,7 @@ const memoryOptions = {
     mode: "dark"
   },
   noData: {
-    text: "Loading Data..."
+    text: LOADING_DATA
   },
   series: [],
   labels: ["Memory (%)"]
@@ -222,7 +224,7 @@ async function setupOPFilamentManagerPluginSettings() {
 }
 
 async function generateLogDumpFile() {
-  let logDumpResponse = await OctoFarmClient.generateLogDump();
+  const logDumpResponse = await OctoFarmClient.generateLogDump();
 
   if (!logDumpResponse?.status || !logDumpResponse?.msg || !logDumpResponse?.zipDumpPath) {
     UI.createAlert(
@@ -277,12 +279,12 @@ async function exportDatabases(database) {
 }
 
 async function restartOctoFarmServer() {
-  let systemRestartBtn = document.getElementById("restartOctoFarmBtn");
+  const systemRestartBtn = document.getElementById("restartOctoFarmBtn");
   // Make sure the system button is disabled whilst the restart is happening.
   if (systemRestartBtn) {
     systemRestartBtn.disabled = true;
   }
-  let restart = await OctoFarmClient.restartServer();
+  const restart = await OctoFarmClient.restartServer();
   if (restart) {
     UI.createAlert(
       "success",
@@ -293,7 +295,10 @@ async function restartOctoFarmServer() {
   } else {
     UI.createAlert(
       "error",
-      "Service restart failed... Please check: <a rel=”noopener” href='https://docs.octofarm.net/installation/setup-service.html'> OctoFarm Service Setup </a> for more information ",
+      "Service restart failed... " +
+        "Please check: " +
+        "<a type=”noopener” href='https://docs.octofarm.net/installation/setup-service.html'> " +
+        "OctoFarm Service Setup </a> for more information ",
       5000,
       "clicked"
     );
@@ -385,13 +390,13 @@ async function updateServerSettings() {
 }
 
 async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
-  let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
+  const updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
   // Make sure the update OctoFarm button is disabled after keypress
   if (updateOctoFarmBtn) {
     updateOctoFarmBtn.disabled = true;
     UI.addLoaderToElementsInnerHTML(updateOctoFarmBtn);
   }
-  let updateData = {
+  const updateData = {
     forcePull: false,
     doWeInstallPackages: false
   };
@@ -402,7 +407,7 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     updateData.doWeInstallPackages = true;
   }
 
-  let updateOctoFarm = await OctoFarmClient.post("settings/server/update/octofarm", updateData);
+  const updateOctoFarm = await OctoFarmClient.post("settings/server/update/octofarm", updateData);
 
   // Local changes are detected, question whether we overwrite or cancel..
   if (
@@ -443,13 +448,13 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
 }
 
 async function checkForOctoFarmUpdates() {
-  let forceCheckForUpdatesBtn = document.getElementById("checkUpdatesForOctoFarmBtn");
+  const forceCheckForUpdatesBtn = document.getElementById("checkUpdatesForOctoFarmBtn");
   // Make sure check button is disbaled after key press
   if (forceCheckForUpdatesBtn) {
     forceCheckForUpdatesBtn.disabled = true;
   }
 
-  let updateCheck = await OctoFarmClient.get("settings/server/update/octofarm");
+  const updateCheck = await OctoFarmClient.get("settings/server/update/octofarm");
 
   if (updateCheck?.air_gapped) {
     UI.createAlert(
@@ -479,7 +484,7 @@ async function checkForOctoFarmUpdates() {
 }
 
 async function grabOctoFarmLogList() {
-  let logList = await OctoFarmClient.get(OctoFarmClient.logsRoute);
+  const logList = await OctoFarmClient.get(OctoFarmClient.logsRoute);
   const logTable = document.getElementById("serverLogs");
   logList.forEach((logs) => {
     logTable.insertAdjacentHTML(
@@ -510,10 +515,10 @@ async function grabOctoFarmLogList() {
         await OctoFarmClient.deleteLogFile(logs.name);
         const logLine = document.getElementById(`log-${logs.name}`)
         logLine.remove();
-        UI.createAlert("success", "Successfully deleted " + logs.name + "!", 3000, "clicked")
+        UI.createAlert("success", `Successfully deleted ${logs.name}!`, 3000, "clicked")
       }catch(e){
         event.target.disabled = false;
-        UI.createAlert("error", "Failed to delete " + logs.name + "!", 3000, "clicked")
+        UI.createAlert("error", `Failed to delete ${logs.name}!`, 3000, "clicked")
       }
     });
   });
@@ -562,7 +567,7 @@ async function updateLiveSystemInformation() {
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
-  if(!systemInformation) return;
+  if(!systemInformation) {return}
 
   if (systemInformation?.uptime && !!procUptimeElem) {
     procUptimeElem.innerHTML = Calc.generateTime(systemInformation.uptime);
@@ -617,7 +622,7 @@ function startUpdateTasksRunner() {
     await updateLiveSystemInformation();
     const taskManagerState = await OctoFarmClient.get("system/tasks");
 
-    for (let task in taskManagerState) {
+    for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
 
       UI.doesElementNeedUpdating(
@@ -694,7 +699,10 @@ async function createNewUser() {
                         <td>
                             <button id="resetPasswordBtn-${
                               createdUser._id
-                            }" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>
+                            }" type="button" 
+                            class="btn btn-warning text-dark btn-sm" 
+                            data-toggle="modal" 
+                            data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>
                             <button id="editUserBtn-${
                               createdUser._id
                             }" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userEditModal"><i class="fas fa-user-edit"></i> Edit</button>
@@ -742,7 +750,7 @@ async function createNewUser() {
 }
 
 async function fillInEditInformation(id) {
-  let editInformation = await OctoFarmClient.getUser(id);
+  const editInformation = await OctoFarmClient.getUser(id);
   userActionElements.editName.value = editInformation.name;
   userActionElements.editUserName.value = editInformation.username;
   userActionElements.editGroup.value = editInformation.group;
@@ -802,7 +810,7 @@ async function resetUserPassword(id) {
     password: userActionElements.resetPassword.value,
     password2: userActionElements.resetPassword2.value
   };
-  let resetPassword = await OctoFarmClient.resetUserPassword(id, newPassword);
+  const resetPassword = await OctoFarmClient.resetUserPassword(id, newPassword);
   if (resetPassword.errors.length > 0) {
     resetPassword.errors.forEach((error) => {
       userActionElements.userResetMessage.insertAdjacentHTML(
