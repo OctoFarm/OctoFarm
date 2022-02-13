@@ -17,9 +17,8 @@ const M_VALID = require("../constants/validate-mongo.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
-  const latest = req.body;
-  const { note } = latest;
-  const { filamentId } = latest;
+  const note = req.bodyString("note");
+  const filamentId = req.bodyString("filamentId");
   const history = await History.findOne({ _id: latest.id });
   if (history.printHistory.notes != note) {
     history.printHistory.notes = note;
@@ -96,8 +95,8 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
 //Register Handle for Saving printers
 router.post("/delete", ensureAuthenticated, async (req, res) => {
   //Check required fields
-  const deleteHistory = req.body;
-  await History.findOneAndDelete({ _id: deleteHistory.id }).then(() => {
+  const deleteHistory = req.bodyString("id");
+  await History.findOneAndDelete({ _id: deleteHistory }).then(() => {
     getHistoryCache().initCache();
   });
   res.send("success");
@@ -198,13 +197,13 @@ router.get("/statisticsData", ensureAuthenticated, async (req, res) => {
   res.send({ history: stats });
 });
 router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
-  const latest = req.body;
+  const latest = req.bodyString("id");
 
   // Find history and matching printer ID
-  const historyEntity = await History.findOne({ _id: latest.id });
+  const historyEntity = await History.findOne({ _id: latest });
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
-    return o.settingsAppearance.name == historyEntity.printHistory.printerName;
+    return o.settingsAppearance.name === historyEntity.printHistory.printerName;
   });
   if (printer > -1) {
     historyEntity.printHistory.costSettings = printers[printer].costSettings;

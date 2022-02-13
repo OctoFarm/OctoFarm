@@ -64,7 +64,7 @@ router.delete(
   }
 );
 router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const fileName = req.params.name;
+  const fileName = req.paramString("name");
   try {
     Logs.deleteLogByName(fileName);
     res.sendStatus(201);
@@ -75,7 +75,7 @@ router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, as
 });
 
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
-  const download = req.params.name;
+  const download = req.paramString("name");
   const file = `${getLogsPath()}/${download}`;
   console.log(file);
   res.download(file, download); // Set disposition and send it.
@@ -222,11 +222,11 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
   const currentUserList = await fetchUsers();
 
   // Patch to fill in user settings if it doesn't exist
-  for (let i = 0; i < currentUserList.length; i++) {
-    if (!currentUserList[i].clientSettings) {
-      currentUserList[i].clientSettings = new ClientSettingsDB();
-      currentUserList[i].clientSettings.save();
-      currentUserList[i].save();
+  for (let user of currentUserList) {
+    if (!user.clientSettings) {
+      user.clientSettings = new ClientSettingsDB();
+      user.clientSettings.save();
+      user.save();
     }
   }
 
@@ -341,7 +341,7 @@ router.get(
   ensureAuthenticated,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    const scriptId = req.params.id;
+    const scriptId = req.paramString("id");
     GcodeDB.findByIdAndDelete(scriptId, function (err) {
       if (err) {
         res.send(err);
@@ -380,7 +380,7 @@ router.get(
   ensureAuthenticated,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    const printerId = req.params.id;
+    const printerId = req.paramString("id");
     const all = await GcodeDB.find();
     let returnCode = [];
     all.forEach((script) => {
