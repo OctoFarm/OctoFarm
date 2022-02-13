@@ -949,7 +949,11 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data).then((r) => console.log(r));
+    PrinterService.findOneAndPush(index, "fileList.files", data)
+      .then()
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );
@@ -975,7 +979,11 @@ class PrinterStore {
       display
     };
     printer.fileList.folderList.push(newFolder);
-    PrinterService.findOneAndPush(i, "fileList.folders", newFolder);
+    PrinterService.findOneAndPush(i, "fileList.folders", newFolder)
+      .then()
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
 
     return printer;
   }
@@ -1063,7 +1071,11 @@ class PrinterStore {
       }
       PrinterService.findOneAndUpdate(printerID, {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
-      }).then();
+      })
+        .then()
+        .catch((e) => {
+          logger.error("Issue updating spool list", e);
+        });
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
@@ -1087,7 +1099,11 @@ class PrinterStore {
       });
       PrinterService.findOneAndUpdate(printer._id, {
         selectedFilament: printer.selectedFilament
-      }).then();
+      })
+        .then()
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
     });
   }
 

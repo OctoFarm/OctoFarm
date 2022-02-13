@@ -771,7 +771,7 @@ class OctoPrintPrinter {
       );
     }
 
-    if(this.#reconnectTimeout !== false) return; //Reconnection is planned..
+    if (this.#reconnectTimeout !== false) return; //Reconnection is planned..
 
     this.#reconnectTimeout = setTimeout(() => {
       this.#reconnectTimeout = false;
@@ -1714,83 +1714,6 @@ class OctoPrintPrinter {
   deleteFromDataBase() {
     return this.#db.delete();
   }
-
-  // async fileInformationScanAndCheck(file) {
-  //   const cleanFileName = file.display.replace(".gcode", "");
-  //   if (this.#fileInformationTimeout[cleanFileName].timer > 15000) {
-  //     logger.debug("Deleting timeout", cleanFileName);
-  //     clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-  //     this.#fileInformationTimeout[cleanFileName] = undefined;
-  //     logger.debug("Deleted timeout", cleanFileName);
-  //   } else {
-  //     // Try to update file information...
-  //     const fileInformation = await this.acquireOctoPrintFileData(file.fullPath);
-  //
-  //     if (!!fileInformation) {
-  //       // We have fileInformation returned, check for some update meta data
-  //       if (fileInformation?.time === null || fileInformation?.time === "No Time Estimate") {
-  //         // File information is not generated, plz try again!
-  //         this.#fileInformationTimeout[cleanFileName].timer =
-  //           this.#fileInformationTimeout[cleanFileName].timer + 5000;
-  //         logger.info(
-  //           "Triggering octoprint file scan",
-  //           this.#fileInformationTimeout[cleanFileName].timer
-  //         );
-  //         clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-  //         this.#fileInformationTimeout[cleanFileName].timeout = false;
-  //         this.triggerFileInformationScan(file);
-  //       } else {
-  //         // File information is grabbed, sort and update the file information
-  //         const fileIndex = findIndex(this.fileList.fileList, function (o) {
-  //           return o.display === fileInformation.display;
-  //         });
-  //
-  //         this.fileList.fileList[fileIndex] = FileClean.generateSingle(
-  //           fileInformation,
-  //           this.selectedFilament,
-  //           this.costSettings
-  //         );
-  //
-  //         logger.debug("Deleting timeout", cleanFileName);
-  //         clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-  //         this.#fileInformationTimeout[cleanFileName] = undefined;
-  //         logger.debug("Deleted timeout", cleanFileName);
-  //       }
-  //     } else {
-  //       // Call failed, clear and delete the timeout...
-  //       logger.warning("Call failed due to network issue, deleting timeout...", cleanFileName);
-  //       clearTimeout(this.#fileInformationTimeout[cleanFileName].timeout);
-  //       this.#fileInformationTimeout[cleanFileName] = undefined;
-  //       logger.debug("Deleted timeout", cleanFileName);
-  //     }
-  //   }
-  // }
-
-  // triggerFileInformationScan(file) {
-  //   const cleanFileName = file.display.replace(".gcode", "");
-  //   // No timer exists, create one. If exists, update existing.
-  //   if (!this?.#fileInformationTimeout[cleanFileName]) {
-  //     logger.warning("Triggering initial scan", cleanFileName);
-  //     this.#fileInformationTimeout[cleanFileName] = {
-  //       timer: 0,
-  //       timeout: setTimeout(async () => {
-  //         await this.fileInformationScanAndCheck(file);
-  //       }, 5000)
-  //     };
-  //   } else {
-  //     logger.warning(
-  //       "Timeout or file information not met, trigging another scan...",
-  //       cleanFileName
-  //     );
-  //     if (this.#fileInformationTimeout[cleanFileName].timeout === false) {
-  //       this.#fileInformationTimeout[cleanFileName].timeout = setTimeout(async () => {
-  //         await this.fileInformationScanAndCheck(file);
-  //       }, 5000);
-  //     } else {
-  //       return "Scan already planned, ignoring extra scan";
-  //     }
-  //   }
-  // }
 
   updatePrinterStatistics(statistics) {
     this.#printerStatistics = statistics;
