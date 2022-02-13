@@ -40,8 +40,11 @@ router.post(
     failureFlash: true
   }),
   async function (req, res, next) {
-    console.log("AUTH");
-    console.log(req.user);
+    const prevSession = req.session;
+    req.session.regenerate((err) => {
+      Object.assign(req.session, prevSession);
+    });
+
     if (!req.body.remember_me) {
       return next();
     }
@@ -49,6 +52,7 @@ router.post(
       if (err) {
         return next(err);
       }
+
       res.cookie("remember_me", token, {
         path: "/",
         httpOnly: true,
@@ -116,8 +120,8 @@ router.post("/register", async (req, res) => {
     });
   } else {
     // Validation Passed
-    User.findOne({ username }).then((user) => {
-      if (user) {
+    User.findOne({ username }).then((currentUser) => {
+      if (currentUser) {
         // User exists
         errors.push({ msg: "Username is already registered" });
         res.render("register", {
@@ -134,9 +138,9 @@ router.post("/register", async (req, res) => {
         });
       } else {
         // Check if first user that's created.
-        User.find({}).then(async (user) => {
+        User.find({}).then(async (userList) => {
           let userGroup = "";
-          if (user.length < 1) {
+          if (userList.length < 1) {
             userGroup = "Administrator";
           } else {
             userGroup = "User";
@@ -169,7 +173,7 @@ router.post("/register", async (req, res) => {
                   req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
-                .catch((err) => console.log(err))
+                .catch((theError) => console.error(theError))
                 .finally(async () => {
                   await fetchUsers(true);
                 });
@@ -195,7 +199,7 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.paramString("id"));
     res.send(user);
   }
 );
@@ -208,7 +212,8 @@ router.patch(
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
     const newUserInformation = req.body;
-    const id = req.params.id;
+    const id = req.paramString("id");
+
     if ("password" in newUserInformation) {
       res.send(await resetPassword(id, newUserInformation));
     }
@@ -231,7 +236,7 @@ router.delete(
   ensureAdministrator,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    const id = req.params.id;
+    const id = req.paramString("id");
     res.send(await deleteUser(id));
   }
 );

@@ -242,7 +242,7 @@ router.get(
   ensureAuthenticated,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async function (req, res) {
-    const printerID = req.params.id;
+    const printerID = req.paramString("id");
     let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
     if (!stats) {
       stats = await generatePrinterStatistics(printerID);

@@ -33,7 +33,7 @@ function setupExpressServer() {
   let app = express();
 
   app.use(octofarmGlobalLimits);
-
+  app.use(require("sanitize").middleware);
   require("./middleware/passport.js")(passport);
 
   //Morgan middleware
@@ -100,14 +100,14 @@ async function ensureSystemSettingsInitiated() {
 
   await ServerSettingsDB.find({}).catch((e) => {
     if (e.message.includes("command find requires authentication")) {
-      throw "Database authentication failed.";
+      throw new Error("Database authentication failed.");
     } else {
-      throw "Database connection failed.";
+      throw new Error("Database connection failed.");
     }
   });
 
   // Setup Settings as connection is established
-  return await SettingsClean.initialise();
+  return SettingsClean.initialise();
 }
 
 /**
@@ -152,9 +152,8 @@ function serveOctoFarmRoutes(app) {
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Starting OctoFarm server tasks...");
-
-    for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
-      TaskManager.registerJobOrTask(OctoFarmTasks.RECURRING_BOOT_TASKS[i]);
+    for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS.length) {
+      TaskManager.registerJobOrTask(task);
     }
     await optionalInfluxDatabaseSetup();
   }
