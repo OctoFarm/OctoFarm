@@ -70,7 +70,7 @@ function setupExpressServer() {
 
   app.use("/images", express.static("../images"));
   app.use(cookieParser());
-  app.use(express.urlencoded({ extended: false, limit: "4mb" }));
+  app.use(express.urlencoded({ extended: false, limit: "2mb" }));
   app.use(
     session({
       secret: fetchSuperSecretKey(),
