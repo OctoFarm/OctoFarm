@@ -2,7 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
-const { printerActionLimits } = require("../middleware/rate-limiting");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");

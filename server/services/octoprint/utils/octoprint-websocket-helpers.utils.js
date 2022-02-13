@@ -56,6 +56,11 @@ const captureTemperatureData = (id, data) => {
   }
 };
 
+const deleteTemperatureData = async (id) => {
+  delete tempTimers[id];
+  await TempHistoryDB.deleteMany({ printer_id: id });
+};
+
 const coolDownEvent = (id, temps) => {
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
@@ -214,5 +219,6 @@ module.exports = {
   setWebsocketAlive,
   captureResendsData,
   capturePrinterProgress,
-  captureCurrentZ
+  captureCurrentZ,
+  deleteTemperatureData
 };

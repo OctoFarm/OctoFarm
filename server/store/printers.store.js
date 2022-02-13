@@ -918,11 +918,6 @@ class PrinterStore {
     return await printer.acquireOctoPrintFileData(fullPath, true);
   }
 
-  triggerOctoPrintFileScan(id, file) {
-    const printer = this.#findMePrinter(id);
-    return printer.triggerFileInformationScan(file);
-  }
-
   addNewFile(file) {
     const { index, files } = file;
     const printer = this.#findMePrinter(index);
@@ -954,17 +949,10 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data).then(r => console.log(r));
+    PrinterService.findOneAndPush(index, "fileList.files", data).then((r) => console.log(r));
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );
-    // IMPROVE Utilise the websocket event to trigger updating a file's information
-    // OctoFarm shouldn't be repeatedly calling the API for information after a file has uploaded.
-    // We can use the websocket event trigger to update OctoFarms records. - TESTING seeing if I can use IMPROVE
-
-
-    // Trigger file update check service
-    this.triggerOctoPrintFileScan(index, data);
 
     return printer;
   }
@@ -1119,6 +1107,28 @@ class PrinterStore {
   updatePrinterStatistics(id, statistics) {
     const printer = this.#findMePrinter(id);
     printer.updatePrinterStatistics(statistics);
+  }
+
+  updateFileInformation(id, data) {
+    const printer = this.#findMePrinter(id);
+
+    const { name, result } = data;
+
+    const fileIndex = findIndex(printer.fileList.fileList, function (o) {
+      return o.name === name;
+    });
+
+    if (!!fileIndex) {
+      logger.warning("Updating file information with generated OctoPrint data", data);
+      const { estimatedPrintTime, filament } = result;
+
+      printer.fileList.fileList[fileIndex].estimatedPrintTime = {
+        ...estimatedPrintTime,
+        ...filament
+      };
+    } else {
+      logger.error("Couldn't find file index to update!", name);
+    }
   }
 
   getPrinterStatistics(id) {

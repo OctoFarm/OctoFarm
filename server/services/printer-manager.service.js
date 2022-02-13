@@ -11,6 +11,7 @@ const Filament = require("../models/Filament");
 const Printers = require("../models/Printer");
 const { FileClean } = require("./file-cleaner.service");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
+const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket-helpers.utils");
 
 const logger = new Logger("OctoFarm-PrinterControlManagerService");
 
@@ -135,19 +136,21 @@ class PrinterManagerService {
       const id = deleteList[d];
       const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
-      // FIXME Make sure printers are cleaned up on deletion...
-      // Printer Control List, Printer Filament Selects, Printer Temp Trackers...
-
       removedPrinterList.push({
         printerURL: printer.printerURL,
         printerId: printer._id
       });
+      await deleteTemperatureData(printer._id);
     }
     // Regenerate groups list
     this.updateGroupList();
-
+    // Regenerate control list
+    await this.generatePrintersControlDropList();
     // Regenerate sort indexs
     await this.updatePrinterSortIndexes();
+    // Generate statistics cache
+    await this.generatePrintersStatisticsCache();
+
     return removedPrinterList;
   }
 
@@ -299,6 +302,8 @@ class PrinterManagerService {
     for (let i = 0; i < printerList.length; i++) {
       const printer = printerList[i];
       await printer.acquireOctoPrintUpdatesData(true);
+      await printer.acquireOctoPrintPluginsListData(true
+      );
     }
   }
 

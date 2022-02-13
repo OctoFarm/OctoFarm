@@ -239,6 +239,8 @@ const captureHome = (id, data) => {
     });
 };
 const captureMetadataAnalysisFinished = (id, data) => {
+  getPrinterStoreCache().updateFileInformation(id, data);
+
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadatafinished", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata finished script", res);
@@ -259,6 +261,7 @@ const captureMetadataAnalysisStarted = (id, data) => {
     });
 };
 const captureMetadataStatisticsUpdated = (id, data) => {
+  getPrinterStoreCache().updateFileInformation(id, data);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadataupdated", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata updated script", res);
@@ -447,7 +450,7 @@ const captureUserLoggedIn = (id, data) => {
 const captureZChange = (id, data) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "zchange", undefined)
     .then((res) => {
-      logger.info("Successfully checked zchange script", res);
+      logger.debug("Successfully checked zchange script", res);
       return res;
     })
     .catch((e) => {
