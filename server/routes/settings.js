@@ -308,7 +308,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     let shouldDisableInflux = false;
     let returnMsg = "";
     let influx = sentOnline.influxExport;
-    if (sentOnline.influxExport.active) {
+    if (influx.active) {
       if (influx.host.length === 0) {
         shouldDisableInflux = true;
         returnMsg += "Issue: No host information! <br>";
