@@ -98,6 +98,9 @@ class PrinterSettingsService {
   }
 
   static setupConnectionTab(currentPrinter) {
+    document.getElementById("generateNameButtonWrapper").innerHTML = `
+      <button class="btn btn-info btn-block" id="generatePrinterName"><i class="fas fa-sync"></i></button>
+    `;
     document.getElementById("psDefaultPortDrop").innerHTML = `
       <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
       `;
@@ -107,6 +110,8 @@ class PrinterSettingsService {
     document.getElementById("psDefaultProfileDrop").innerHTML = `
       <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
       `;
+
+
     const userDropDown = document.getElementById("psOctoPrintUser");
     userDropDown.innerHTML = "";
     userDropDown.disabled = false;
@@ -124,8 +129,29 @@ class PrinterSettingsService {
       userDropDown.value = 0;
     }
 
-    document.getElementById("psPrinterName").placeholder = currentPrinter.printerName;
+    const printerNameElement = document.getElementById("psPrinterName");
+    printerNameElement.placeholder = currentPrinter.printerName;
     document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
+
+
+
+    const generatePrinterName = document.getElementById("generatePrinterName");
+    generatePrinterName.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.target.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i>"
+      e.target.disabled = true;
+      const newPrinterName = await OctoFarmClient.getPrinterName();
+      if(!!newPrinterName){
+        printerNameElement.value = newPrinterName;
+        UI.createAlert("success", "Successfully generated new printer name! " + newPrinterName + "<br> Don't forget to save!", "clicked", 3000)
+      }else{
+        UI.createAlert("warning", "Failed to generate printer name! Please check the logs..." + newPrinterName, "clicked", 3000)
+      }
+
+      e.target.innerHTML = "<i class=\"fas fa-sync\"></i>"
+      e.target.disabled = false;
+    })
+
     // Convert websocket url into a url object
     const webSocketURL = new URL(currentPrinter.webSocketURL);
     // Grab out the protocol and select it on the select box.

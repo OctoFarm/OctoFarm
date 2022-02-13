@@ -20,6 +20,7 @@ const P_VALID = require("../constants/validate-printers.constants");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
+const { generateRandomName } = require("../services/printer-name-generator.service");
 
 /**
  * @swagger
@@ -436,5 +437,9 @@ router.patch(
     res.send(await getPrinterStoreCache().enablePrinter(id));
   }
 );
+
+router.get("/generate_printer_name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  res.send(generateRandomName());
+});
 
 module.exports = router;
