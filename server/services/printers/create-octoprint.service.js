@@ -1,6 +1,6 @@
 const {
   systemChecks,
-  tempTriggers,
+  tempTriggersDefaults,
   ALLOWED_SYSTEM_CHECKS
 } = require("./constants/printer-defaults.constants");
 const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.constants");
@@ -79,7 +79,7 @@ class OctoPrintPrinter {
   currentActive = 0;
   currentOffline = 0;
   selectedFilament = [];
-  tempTriggers = tempTriggers();
+  tempTriggers = tempTriggersDefaults();
   feedRate = 100;
   flowRate = 100;
   stepRate = 10;
@@ -95,11 +95,6 @@ class OctoPrintPrinter {
   currentConnection = undefined;
   connectionOptions = undefined;
   terminal = [];
-  otherSettings = PrinterClean.sortOtherSettings(
-    this.tempTriggers,
-    this.settingsWebcam,
-    this.settingsServer
-  );
 
   //Updated by API / database
   octoPi = undefined;
@@ -158,6 +153,11 @@ class OctoPrintPrinter {
   webSocketState = undefined;
   order = undefined;
   gcodeScripts = undefined;
+  otherSettings = PrinterClean.sortOtherSettings(
+    this.tempTriggers,
+    this.settingsWebcam,
+    this.settingsServer
+  );
 
   constructor(printer) {
     if (
@@ -526,7 +526,7 @@ class OctoPrintPrinter {
         };
         this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
         this.reconnectAPI();
-        return "Successfully enabled printer...";
+        return "Failed due to timeout!";
       } else if (testingTheWaters === 503 || testingTheWaters === 502) {
         const unavailable = {
           hostState: "Unavailable!",
@@ -534,7 +534,7 @@ class OctoPrintPrinter {
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
         this.reconnectAPI();
-        return "Successfully enabled printer...";
+        return "Failed because of octoprint server error!";
       } else if (testingTheWaters === 404) {
         const unavailable = {
           hostState: "Not Found!",
@@ -542,7 +542,7 @@ class OctoPrintPrinter {
             "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Successfully enabled printer...";
+        return "Failed because octoprint is unavailable";
       } else if (testingTheWaters === 403) {
         const unavailable = {
           hostState: "Forbidden!",
@@ -550,7 +550,7 @@ class OctoPrintPrinter {
             "Could not establish authentication... please check your API key and try again!"
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Successfully enabled printer...";
+        return "Failed because octoprint forbid OctoFarm!";
       } else {
         const unavailable = {
           hostState: "Hard Fail!",
@@ -558,7 +558,7 @@ class OctoPrintPrinter {
             "Something is seriously wrong... please check all settings! will not attempt reconnect..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Successfully enabled printer...";
+        return "Failed due to unknown causes";
       }
     }
     this.setHostState(PRINTER_STATES().HOST_ONLINE);
@@ -577,7 +577,7 @@ class OctoPrintPrinter {
           "Global api key detected... please use application / user generated key! Please correct to reconnect..."
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
-      return "Successfully enabled printer...";
+      return "Failed due to Global API key detection triggering!";
     }
 
     if (apiCheckFail[1]) {
@@ -587,7 +587,7 @@ class OctoPrintPrinter {
           "Failed to collect user information! Please check all settings and correct to reconnect..."
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
-      return "Successfully enabled printer...";
+      return "Failed because of inability to collect user information!";
     }
 
     const initialApiCheckValues = initialApiCheck.map((check) => {
@@ -597,7 +597,7 @@ class OctoPrintPrinter {
     if (initialApiCheckValues.includes(true)) {
       this.setPrinterState(PRINTER_STATES().SHUTDOWN);
       this.reconnectAPI();
-      return "Successfully enabled printer...";
+      return "Failed due to possible network issues...";
     }
 
     // Grab required api data, fail to shutdown... should not continue without this data...
@@ -612,7 +612,7 @@ class OctoPrintPrinter {
       };
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
       this.reconnectAPI();
-      return "Successfully enabled printer...";
+      return "Failed due to missing required values!";
     }
 
     // Get a session key
@@ -700,7 +700,7 @@ class OctoPrintPrinter {
   }
 
   async testTheApiWaters() {
-    return await this.acquireOctoPrintVersionData();
+    return this.acquireOctoPrintVersionData();
   }
 
   async setupClient() {
@@ -805,14 +805,14 @@ class OctoPrintPrinter {
   async initialApiCheckSequence() {
     logger.info(this.printerURL + ": Gathering Initial API Data");
     this.#apiPrinterTickerWrap("Gathering Initial API Data", "Info");
-    return await Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
+    return Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
   }
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
   async #requiredApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering required API data. Forced Scan: " + force);
     this.#apiPrinterTickerWrap("Gathering required API data.", "Info", " Forced Scan: " + force);
-    return await Promise.allSettled([
+    return Promise.allSettled([
       this.acquireOctoPrintSettingsData(force),
       this.acquireOctoPrintSystemData(force),
       this.acquireOctoPrintProfileData(force),
@@ -823,7 +823,7 @@ class OctoPrintPrinter {
     logger.info(this.printerURL + ": Gathering optional API data. Forced Scan: " + force);
     this.#apiPrinterTickerWrap("Gathering optional API data.", "Info", " Forced Scan: " + force);
 
-    return await Promise.allSettled([
+    return Promise.allSettled([
       this.acquireOctoPrintSystemInfoData(force),
       this.acquireOctoPrintUpdatesData(force),
       this.acquireOctoPrintFilesData(force),
@@ -918,8 +918,7 @@ class OctoPrintPrinter {
           return true;
         } else {
           //If the userList isn't empty then we need to parse out the users and search for octofarm user.
-          for (let u = 0; u < userList.length; u++) {
-            const currentUser = userList[u];
+          for (let currentUser of userList) {
             if (!!currentUser.admin) {
               this.userList.push(currentUser.name);
               // Look for OctoFarm user and skip the rest, if not use the first admin we find
@@ -1682,7 +1681,7 @@ class OctoPrintPrinter {
   }
 
   async resetSocketConnection() {
-    return await this.enablePrinter()
+    return this.enablePrinter()
       .then((res) => {
         logger.warning(res);
       })

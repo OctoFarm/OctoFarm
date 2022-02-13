@@ -154,16 +154,10 @@ const captureError = (id, data) => {
   HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
     .then((res) => {
       logger.info("Successfully captured error", res);
-      setTimeout(async function () {
+      setTimeout(function () {
         // Register cancelled print...
-
-        // await Runner.updateFilament();
-
-        setTimeout(async function () {
-          // await Runner.reSyncFile(
-          //   farmPrinters[that.index]._id,
-          //   farmPrinters[that.index].job.file.path
-          // );
+        setTimeout(function () {
+          console.log("Don't be empty ");
         }, 5000);
       }, 10000);
     })
@@ -309,23 +303,10 @@ const captureFinishedPrint = (id, data, success) => {
   HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success)
     .then((res) => {
       logger.info("Successfully captured print!", res);
-
-      setTimeout(async function () {
-        // Register cancelled print...
-
-        // await Runner.updateFilament();
-        // TODO Decide how we're going to update filament after a printer has been captured
-        // This is specifically the filament cache which isn't very fleshed out at the moment.
-        // Exactly the same for the failed event.
-
-        setTimeout(async function () {
-          // TODO Decide to manually update files after print job, or utilise OctoPrints Event system.
-          // I feel the event structure should be best avoided in future as it makes supporting multiple
-          // Exactly the same for the failed event.
-          // await Runner.reSyncFile(
-          //   farmPrinters[that.index]._id,
-          //   farmPrinters[that.index].job.file.path
-          // );
+      setTimeout(function () {
+        //TODO check to see if file meta analysis is fired after successful print, would accomplish this!
+        setTimeout(function () {
+          console.log("DONT BE EMPTY");
         }, 5000);
       }, 10000);
     })

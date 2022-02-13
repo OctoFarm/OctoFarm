@@ -23,10 +23,10 @@ class PrinterManagerService {
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
-    for (let p = 0; p < pList.length; p++) {
-      await patchPrinterValues(pList[p]);
+    for (let p of pList) {
+      await patchPrinterValues(p);
     }
-    await this.batchCreatePrinters(pList);
+    this.batchCreatePrinters(pList);
     return true;
   }
 
@@ -47,22 +47,22 @@ class PrinterManagerService {
       printerURL: printer.printerURL
     };
   }
-
+  // REFACTOR, this is a massive CPU smash, slow it down...
   async batchCreatePrinters(printerList) {
     // Async function to send mail to a list of users.
     const createNewPrinterBatches = async (printer) => {
       const printerLength = printer.length;
 
-      for (let i = 0; i < printerLength; i += 10) {
-        const requests = printer.slice(i, i + 10).map((printer) => {
+      for (let i = 0; i < printerLength; i += 5) {
+        const requests = printer.slice(i, i + 5).map((printerCreate) => {
           // The batch size is 100. We are processing in a set of 100 users.
-          return this.addPrinter(printer);
+          return this.addPrinter(printerCreate);
         });
 
         // requests will have 100 or less pending promises.
         // Promise.all will wait till all the promises got resolves and then take the next 100.
         logger.debug(`Running printer batch ${i + 1}`);
-        await Promise.all(requests).catch((e) =>
+        await Promise.allSettled(requests).catch((e) =>
           logger.error(`Error in creating new printer batch: ${i} - ${e}`)
         ); // Catch the error.
       }
@@ -74,8 +74,7 @@ class PrinterManagerService {
   updateStateCounters() {
     const printerList = getPrinterStoreCache().listPrinters();
     logger.debug(printerList.length + " printers updating state counters...");
-    for (let i = 0; i < printerList.length; i++) {
-      const printer = printerList[i];
+    for (let printer of printerList) {
       if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
         switch (printer.printerState.colour.category) {
           case CATEGORIES.ACTIVE:
@@ -95,10 +94,8 @@ class PrinterManagerService {
             break;
           case CATEGORIES.ERROR:
             this.updateStateCounterCategory(CATEGORIES.OFFLINE, printer);
-            //this.updateStateCounterCategory(CATEGORIES.ERROR, printer);
             break;
           case CATEGORIES.DISABLED:
-            //this.updateStateCounterCategory(CATEGORIES.DISABLED, printer);
             break;
           default:
             logger.debug("Don't know category", printer.printerState.colour.category);
@@ -132,8 +129,7 @@ class PrinterManagerService {
   async bulkDeletePrinters(deleteList) {
     const removedPrinterList = [];
 
-    for (let d = 0; d < deleteList.length; d++) {
-      const id = deleteList[d];
+    for (let id of deleteList) {
       const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
       removedPrinterList.push({
@@ -205,7 +201,7 @@ class PrinterManagerService {
     if (id === null) {
       //No id, full scan requested..
       const printerList = getPrinterStoreCache().listPrinters();
-      return await this.batchReSyncWebsockets(printerList, 50);
+      return this.batchReSyncWebsockets(printerList, 50);
     } else {
       const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reConnectWebsocket();
@@ -216,20 +212,20 @@ class PrinterManagerService {
     if (id === null) {
       //No id, full scan requested..
       const printerList = getPrinterStoreCache().listPrinters();
-      return await this.batchReScanAPI(printerList, 10, force);
+      return this.batchReScanAPI(force, printerList, 10);
     } else {
       const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reScanAPI(force);
     }
   }
-  async batchReScanAPI(printerList = [], batchSize = 10, force) {
-    const createNewPrinterBatches = async (printer, force) => {
+  async batchReScanAPI(force, printerList = [], batchSize = 10) {
+    const createNewPrinterBatches = async (printer) => {
       const printerLength = printer.length;
 
       for (let i = 0; i < printerLength; i += batchSize) {
-        const requests = printer.slice(i, i + batchSize).map((printer) => {
+        const requests = printer.slice(i, i + batchSize).map((scanPrinter) => {
           // The batch size is 100. We are processing in a set of 100 users.
-          return printer.reScanAPI(force);
+          return scanPrinter.reScanAPI(force);
         });
 
         // requests will have 100 or less pending promises.
@@ -241,16 +237,16 @@ class PrinterManagerService {
       }
     };
 
-    await createNewPrinterBatches(printerList, force);
+    await createNewPrinterBatches(printerList);
   }
   async batchReSyncWebsockets(printerList = [], batchSize = 10) {
     const createNewPrinterBatches = async (printer) => {
       const printerLength = printer.length;
 
       for (let i = 0; i < printerLength; i += batchSize) {
-        const requests = printer.slice(i, i + batchSize).map((printer) => {
+        const requests = printer.slice(i, i + batchSize).map((syncPrinter) => {
           // The batch size is 100. We are processing in a set of 100 users.
-          return printer.reConnectWebsocket();
+          return syncPrinter.reConnectWebsocket();
         });
 
         // requests will have 100 or less pending promises.
@@ -283,10 +279,10 @@ class PrinterManagerService {
         }
       } else if (farmPrinters[i].selectedFilament != null) {
         const newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id);
-        const printer = await Printers.findById(farmPrinters[i]._id);
+        const otherPrinter = await Printers.findById(farmPrinters[i]._id);
         farmPrinters[i].selectedFilament = newInfo;
-        printer.selectedFilament = newInfo;
-        printer.save();
+        otherPrinter.selectedFilament = newInfo;
+        otherPrinter.save();
         const currentFilament = await Runner.compileSelectedFilament(
           farmPrinters[i].selectedFilament,
           i
@@ -299,11 +295,9 @@ class PrinterManagerService {
   async checkForOctoPrintUpdates() {
     const printerList = getPrinterStoreCache().listPrinters();
     logger.debug(printerList.length + " checking for any octoprint updates");
-    for (let i = 0; i < printerList.length; i++) {
-      const printer = printerList[i];
+    for (let printer of printerList) {
       await printer.acquireOctoPrintUpdatesData(true);
-      await printer.acquireOctoPrintPluginsListData(true
-      );
+      await printer.acquireOctoPrintPluginsListData(true);
     }
   }
 
@@ -336,8 +330,7 @@ class PrinterManagerService {
   async generatePrintersStatisticsCache() {
     const pList = getPrinterStoreCache().listPrinters();
     if (pList?.length > 0) {
-      for (let i = 0; i < pList.length; i++) {
-        const printer = pList[i];
+      for (let printer of pList) {
         const printerStatistics = await generatePrinterStatistics(printer._id);
         getPrinterStoreCache().updatePrinterStatistics(printer._id, printerStatistics);
       }

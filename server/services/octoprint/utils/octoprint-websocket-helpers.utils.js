@@ -100,15 +100,12 @@ const capturePrinterState = (id, data) => {
     let returnState = "";
     let returnStateDescription = "";
 
-    if (text === "Offline") {
+    if (text === "Offline" || text.includes("Closed")) {
       returnState = "Disconnected";
       returnStateDescription = "Your printer isn't connected to OctoPrint";
     } else if (text.includes("Error") || text.includes("error")) {
       returnState = "Error!";
       returnStateDescription = text;
-    } else if (text.includes("Closed")) {
-      returnState = "Disconnected";
-      returnStateDescription = "Your printer isn't connected to OctoPrint";
     } else {
       returnState = text;
       returnStateDescription = "Current status from OctoPrint";

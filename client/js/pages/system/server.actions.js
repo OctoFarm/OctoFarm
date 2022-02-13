@@ -608,13 +608,13 @@ async function updateLiveSystemInformation() {
 async function startUpdateInfoRunner() {
   await updateLiveSystemInformation();
   setInterval(async () => {
-    await updateLiveSystemInformation
+    await updateLiveSystemInformation();
   }, 5000);
 }
 
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
-    await updateLiveSystemInformation
+    await updateLiveSystemInformation();
     const taskManagerState = await OctoFarmClient.get("system/tasks");
 
     for (let task in taskManagerState) {

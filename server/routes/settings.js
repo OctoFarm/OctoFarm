@@ -223,8 +223,8 @@ router.post(
     }
   }
 );
-router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  await checkReleaseAndLogUpdate();
+router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, (req, res) => {
+  checkReleaseAndLogUpdate();
   const softwareUpdateNotification = getUpdateNotificationIfAny();
   res.send(softwareUpdateNotification);
 });
