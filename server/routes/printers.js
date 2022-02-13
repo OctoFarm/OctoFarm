@@ -86,7 +86,7 @@ router.post(
     const printers = req.body;
 
     // Send Dashboard to Runner..
-    logger.info("Update printers request: ", printers);
+    logger.info("Add printers request: ", printers);
     const p = await getPrinterManagerCache().addPrinter(printers);
     //Return printers added...
     res.send({ printersAdded: [p], status: 200 });
@@ -172,7 +172,7 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
 router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Check required fields
   const settings = req.body;
-  logger.info("Update printers request: ", settings);
+  logger.info("Update printers settings request: ", settings);
   try {
     const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
     console.log(updateSets);
@@ -186,7 +186,7 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
 router.get("/groups", ensureAuthenticated, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
-  for (let printer of printers) {
+  for (const printer of printers) {
     groups.push({
       _id: printer._id,
       group: printer.group
@@ -298,7 +298,7 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const data = req.body.idList;
-    console.log(data.length);
+    console.log(data);
     logger.info("Update printer sort indexes: ", data);
     res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
   }
@@ -309,9 +309,9 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    let id = req.paramString("id");
+    const id = req.paramString("id");
     logger.info("Grabbing connection logs for: ", id);
-    let connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
+    const connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
 
     res.send(connectionLogs);
   }
@@ -358,19 +358,19 @@ router.get(
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const { searchForDevicesOnNetwork } = require("../services/octoprint-auto-discovery.service.js");
 
-  let devices = await searchForDevicesOnNetwork();
+  const devices = await searchForDevicesOnNetwork();
 
   res.json(devices);
 });
 
 router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
+  const uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
   res.json(uniqueFolderPaths);
 });
 
 router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
   //DISCOVER Where's this gone!?
-  let uniqueFolderPaths = getPrinterStoreCache().listUniqueFiles();
+  const uniqueFolderPaths = getPrinterStoreCache().listUniqueFiles();
   res.json(uniqueFolderPaths);
 });
 
@@ -380,7 +380,7 @@ router.get(
   validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const idList = req.paramString("idList");
-    let uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
+    const uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
     res.json(uniqueFolderPaths);
   }
 );
@@ -393,7 +393,7 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
   const returnArray = [];
   const printers = getPrinterStoreCache().listPrintersInformation();
 
-  for (let printer of printers) {
+  for (const printer of printers) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printer._id);
 
     if (!stats) {
