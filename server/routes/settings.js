@@ -32,6 +32,7 @@ const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { sanitizeString } = require("../utils/sanitize-utils");
+const { databaseNamesList } = require("../constants/database.constants");
 
 module.exports = router;
 
@@ -150,7 +151,7 @@ router.get(
       await ProfilesDB.deleteMany({});
       logger.info("Successfully deleted Filament database.... Restarting server...");
       await SystemCommands.rebootOctoFarm();
-    } else {
+    } else if (databaseNamesList.includes(databaseName)) {
       await eval(databaseName).deleteMany({});
       res.send({
         message: `Successfully deleted ${databaseName}, server will restart...`
