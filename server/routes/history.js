@@ -13,7 +13,7 @@ const { sortOptions } = require("../constants/history-sort.constants");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { validateParamsMiddleware } = require("../middleware/validators");
-const { M_VALID } = require("../constants/validate-mongo.constants");
+const M_VALID = require("../constants/validate-mongo.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
