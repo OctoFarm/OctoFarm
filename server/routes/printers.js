@@ -115,7 +115,7 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     // Grab the API body
-    const printers = req.body.idList;
+    const printers = req.bodyOneOf("idList");
     // Send Dashboard to Runner..
     logger.info("Delete printers request: ", printers);
     const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
@@ -143,7 +143,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const file = req.body;
   logger.info("File Re-sync request for: ", file);
-  let ret = null;
+  let ret;
   if (typeof file.fullPath !== "undefined") {
     ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
   } else {
@@ -290,6 +290,7 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Action wake host: ", data);
   await Script.wol(data);
+  res.sendStatus(201);
 });
 router.post(
   "/updateSortIndex",
