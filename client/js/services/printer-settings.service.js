@@ -10,6 +10,7 @@ let printerOnline;
 let currentPrinter;
 let pageElements;
 let currentPrintersInformation;
+const NO_PREFERENCE = "<option value=\"0\">No Preference</option>"
 
 // Close modal event listeners...
 $("#connectionModal").on("hidden.bs.modal", function (e) {
@@ -88,7 +89,7 @@ class PrinterSettingsService {
     currentPrintersInformation = printersInformation;
     // Printer ID we need to initialise the page.
     const printersIndex = _.findIndex(printersInformation, function (o) {
-      return o._id == printerID;
+      return o._id === printerID;
     });
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
@@ -102,13 +103,19 @@ class PrinterSettingsService {
       <button class="btn btn-info btn-block" id="generatePrinterName"><i class="fas fa-sync"></i></button>
     `;
     document.getElementById("psDefaultPortDrop").innerHTML = `
-      <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
+      <div class="input-group mb-1"> <div class="input-group-prepend"> 
+      <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> 
+      </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
       `;
     document.getElementById("psDefaultBaudDrop").innerHTML = `
-      <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultBaudrate">Preferred Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultBaudrate"></select></div>
+      <div class="input-group mb-1"> <div class="input-group-prepend">
+       <label class="input-group-text bg-secondary text-light" for="psDefaultBaudrate">Preferred Baudrate:</label> 
+       </div> <select class="custom-select bg-secondary text-light" id="psDefaultBaudrate"></select></div>
       `;
     document.getElementById("psDefaultProfileDrop").innerHTML = `
-      <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
+      <div class="input-group mb-1"> <div class="input-group-prepend">
+       <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> 
+       </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
       `;
 
 
@@ -143,9 +150,15 @@ class PrinterSettingsService {
       const newPrinterName = await OctoFarmClient.getPrinterName();
       if(!!newPrinterName){
         printerNameElement.value = newPrinterName;
-        UI.createAlert("success", "Successfully generated new printer name! " + newPrinterName + "<br> Don't forget to save!", "clicked", 3000)
+        UI.createAlert("success",
+            `Successfully generated new printer name! ${ newPrinterName }<br> Don't forget to save!`,
+            "clicked",
+            3000)
       }else{
-        UI.createAlert("warning", "Failed to generate printer name! Please check the logs..." + newPrinterName, 3000, "clicked")
+        UI.createAlert("warning",
+            `Failed to generate printer name! Please check the logs... ${newPrinterName}`,
+            3000,
+            "clicked")
       }
 
       e.target.innerHTML = "<i class=\"fas fa-sync\"></i>"
@@ -182,10 +195,10 @@ class PrinterSettingsService {
       if (!!currentPrinter.connectionOptions.baudratePreference) {
         baudrateDropdown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+          NO_PREFERENCE
         );
       }
-      let portAvailable = this.checkPortIsAvailable(
+      const portAvailable = this.checkPortIsAvailable(
         currentPrinter.connectionOptions.ports,
         currentPrinter.connectionOptions.portPreference
       );
@@ -207,7 +220,7 @@ class PrinterSettingsService {
       if (currentPrinter.connectionOptions.portPreference === null) {
         serialPortDropDown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+            NO_PREFERENCE
         );
       }
       currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
@@ -219,7 +232,7 @@ class PrinterSettingsService {
       if (currentPrinter.connectionOptions.printerProfilePreference === null) {
         profileDropDown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+            NO_PREFERENCE
         );
       }
       if (!!currentPrinter.connectionOptions.baudratePreference) {
@@ -239,7 +252,9 @@ class PrinterSettingsService {
       }
     } else {
       pageElements.mainPage.offlineMessage.innerHTML =
-        "<div class=\"alert alert-danger\" role=\"alert\">NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</div>";
+        "<div class=\"alert alert-danger\" role=\"alert\">" +
+          "NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... " +
+          "Please turn on your OctoPrint instance to re-enabled these.</div>";
       baudrateDropdown.disabled = true;
       serialPortDropDown.disabled = true;
       profileDropDown.disabled = true;
@@ -326,14 +341,17 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">Profile Name: </span>
             </div>
-            <input id="psProfileName" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.name}" aria-label="Username" aria-describedby="basic-addon1">
+            <input id="psProfileName" type="text" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.name}" aria-label="Username" aria-describedby="basic-addon1">
           </div>
           </p>
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Printer Model: </span>
                 </div>
-                <input id="psPrinterModel" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.model}" aria-label="Username" aria-describedby="basic-addon1">
+                <input id="psPrinterModel" type="text" class="form-control" 
+                placeholder="${currentPrinter.currentProfile.model}" aria-label="Username" 
+                aria-describedby="basic-addon1">
               </div>
           </p>
           <h5 class="mb-1"><u>Axis</u></h5>
@@ -347,7 +365,9 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">E:</span>
             </div>
-            <input id="psPrinterEAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.e.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+            <input id="psPrinterEAxis" type="number" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.axes.e.speed}" aria-label="Username" 
+            aria-describedby="basic-addon1" step="1" min="0">
             <div class="input-group-append">
               <span class="input-group-text">mm/min</span>
             </div>
@@ -362,7 +382,8 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">X:</span>
             </div>
-            <input id="psPrinterXAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.x.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+            <input id="psPrinterXAxis" type="number" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.axes.x.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
             <div class="input-group-append">
               <span class="input-group-text">mm/min</span>
             </div>
@@ -377,7 +398,8 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">Y:</span>
             </div>
-            <input id="psPrinterYAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.y.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+            <input id="psPrinterYAxis" type="number" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.axes.y.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
             <div class="input-group-append">
               <span class="input-group-text">mm/min</span>
             </div>
@@ -392,7 +414,8 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">Z:</span>
             </div>
-            <input id="psPrinterZAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.z.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+            <input id="psPrinterZAxis" type="number" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.axes.z.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
             <div class="input-group-append">
               <span class="input-group-text">mm/min</span>
             </div>
@@ -410,13 +433,17 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">Extruder Count:</span>
             </div>
-            <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            <input id="psExtruderCount" type="number" class="form-control" 
+            placeholder="${currentPrinter?.currentProfile?.extruder?.count}" aria-label="Username" 
+            aria-describedby="basic-addon1" step="1" min="1">
           </div>
            <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text">Nozzle Size:</span>
             </div>
-            <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
+            <input id="psNozzleDiameter" type="number" class="form-control" 
+            placeholder="${currentPrinter?.currentProfile?.extruder?.nozzleDiameter}" 
+            aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
           </div>
           </div>
           <div class="col-12 col-lg-4">
@@ -447,7 +474,8 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">D:</span>
             </div>
-            <input id="psVolumeDepth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.depth}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            <input id="psVolumeDepth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.depth}" 
+            aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             <div class="input-group-append">
               <span class="input-group-text">mm</span>
             </div>
@@ -456,7 +484,8 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">H:</span>
             </div>
-            <input id="psVolumeHeight" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.height}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            <input id="psVolumeHeight" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.height}" 
+            aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             <div class="input-group-append">
               <span class="input-group-text">mm</span>
             </div>
@@ -465,7 +494,9 @@ class PrinterSettingsService {
             <div class="input-group-prepend">
               <span class="input-group-text">W:</span>
             </div>
-            <input id="psVolumeWidth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.width}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            <input id="psVolumeWidth" type="number" class="form-control" 
+            placeholder="${currentPrinter.currentProfile.volume.width}" 
+            aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             <div class="input-group-append">
               <span class="input-group-text">mm</span>
             </div>
@@ -519,7 +550,9 @@ class PrinterSettingsService {
 
     // disable OctoPrint specific elements when offline
     let disabledElement = "disabled";
-    if (printerOnline) disabledElement = "";
+    if (printerOnline) {
+      disabledElement = ""
+    }
 
     document.getElementById("psPowerCommands").innerHTML = `
       <h5><u>OctoPrint Specific Power Commands</u></h5>
@@ -591,7 +624,9 @@ class PrinterSettingsService {
         <h5><u>Custom Power Commands</u></h5>
         <p class="mb-0">Custom power commands is designed to work with all available plugins, and also custom API endpoints.</p>
         <p class="mb-0">If your endpoint requires url params, and not an object then please leave the command boxes empty.</p>
-        <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at <a rel=”noopener” href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">OctoFarm Documentation</a></p>
+        <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at 
+        <a type=”noopener” href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">
+        OctoFarm Documentation</a></p>
         <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
         <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
         
@@ -659,13 +694,13 @@ class PrinterSettingsService {
       </form>
       `;
     document.getElementById("psWolEnable").checked = wolEnable;
-    if (serverRestart != "N/A") {
+    if (serverRestart !== "N/A") {
       document.getElementById("psServerRestart").placeholder = serverRestart;
     }
-    if (systemRestart != "N/A") {
+    if (systemRestart !== "N/A") {
       document.getElementById("psSystemRestart").placeholder = systemRestart;
     }
-    if (systemShutdown != "N/A") {
+    if (systemShutdown !== "N/A") {
       document.getElementById("psSystemShutdown").placeholder = systemShutdown;
     }
     if (currentPrinter.powerSettings && !_.isEmpty(currentPrinter.powerSettings)) {
@@ -688,7 +723,7 @@ class PrinterSettingsService {
   }
 
   static async setupAlertsTab() {
-    let scripts = await OctoFarmClient.get("scripts/get");
+    const scripts = await OctoFarmClient.get("scripts/get");
     const printerScripts = [];
     scripts.alerts.forEach((script) => {
       if (script.printer === currentPrinter._id || script.printer.length === 0) {
@@ -810,7 +845,8 @@ class PrinterSettingsService {
             <div class="form-group">
             <label for="psSettingsBeforePrinterDisconnected">Before Printer Disconnected</label>
             <textarea class="form-control bg-dark text-white" id="psSettingsBeforePrinterDisconnected" rows="2" placeholder="${beforePrinterDisconnected}"></textarea>
-             <small> Anything you put here will only be executed when closing the connection actively. If the connection to the printer is suddenly lost nothing will be sent.</small>
+             <small> Anything you put here will only be executed when closing the connection 
+             actively. If the connection to the printer is suddenly lost nothing will be sent.</small>
             </div>
             <div class="form-group">
             <label for="psSettingsBeforeToolChange">Before Tool Change</label>
@@ -892,7 +928,7 @@ class PrinterSettingsService {
     document.getElementById("savePrinterSettingsBtn").addEventListener("click", async (event) => {
       UI.addLoaderToElementsInnerHTML(event.target);
       const printerSettingsValues = this.getPageValues(currentPrinter);
-      let updatedSettings = await OctoFarmClient.post(
+      const updatedSettings = await OctoFarmClient.post(
         "printers/updateSettings",
         printerSettingsValues
       );
@@ -950,7 +986,7 @@ class PrinterSettingsService {
   }
 
   static getPageValues() {
-    let newPrinterSettingsValues = {
+    const newPrinterSettingsValues = {
       printer: {
         printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
         printerURL: UI.getValueOrPlaceHolder(document.getElementById("psPrinterURL")),
@@ -1127,7 +1163,9 @@ class PrinterSettingsService {
 
   static checkPortIsAvailable(portList, portPreference) {
     // If port preference is null, then we have no preference from OctoPrint so no need to check if available
-    if (portPreference === null) return true;
+    if (portPreference === null) {
+      return true
+    }
     return !!portList.includes(portPreference);
   }
 

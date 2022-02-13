@@ -6,7 +6,7 @@ const TempHistory = require("../models/TempHistory.js");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
-  tempTriggers,
+  tempTriggersDefaults,
   webCamSettings,
   systemCommands
 } = require("./printers/constants/printer-defaults.constants");
@@ -157,7 +157,7 @@ class PrinterCleanerService {
 
   static sortOtherSettings(temp, webcam, system) {
     const otherSettings = {
-      temperatureTriggers: tempTriggers(),
+      temperatureTriggers: tempTriggersDefaults(),
       webCamSettings: webCamSettings(),
       system: systemCommands()
     };

@@ -81,6 +81,7 @@ function setupExpressServer() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(passport.authenticate("remember-me")); // Remember Me!
+
   app.use(flash());
   app.use((req, res, next) => {
     res.locals.success_msg = req.flash("success_msg");
