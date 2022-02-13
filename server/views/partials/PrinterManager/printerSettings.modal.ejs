@@ -20,7 +20,10 @@
                     class="fas fa-pen"></i> Gcode Scripts <i class="fas fa-spinner fa-spin"></i></a>
         <a class="list-group-item list-group-item-action notyet" id="printer-settings-btn"
            data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i
-                    class="fas fa-cog"></i>Other Settings <i class="fas fa-spinner fa-spin"></i></a>
+                    class="fas fa-cog"></i> Camera Settings <i class="fas fa-spinner fa-spin"></i></a>
+        <a class="list-group-item list-group-item-action notyet" id="printer-trigger-btn"
+           data-toggle="list" href="#printer-trigger" role="tab" aria-controls="messages"><i
+                    class="fas fa-cog"></i> Trigger Settings <i class="fas fa-spinner fa-spin"></i></a>
     </div>
     <span id="printerSettingsFooter">
 
@@ -260,16 +263,23 @@
         </div>
         <div class="tab-pane fade" id="printer-settings" role="tabpanel"
              aria-labelledby="system-settings-list">
-            <h5>Printer Settings</h5>
+            <h5>Camera Settings</h5>
             <hr>
             <div class="row">
-                <div class="col-12 col-md-4" id="printerManagerSettings">
+                <div class="col-12 col-md-12" id="printerManagerSettings">
                     <h6><u>Camera Settings</u></h6>
                     <div id="cameraRotation">
 
                     </div>
                 </div>
-                <div class="col-12 col-md-4" id="printerManagerSettings">
+            </div>
+        </div>
+        <div class="tab-pane fade" id="printer-trigger" role="tabpanel"
+             aria-labelledby="system-settings-list">
+            <h5>Trigger Settings</h5>
+            <hr>
+            <div class="row">
+                <div class="col-12 col-md-12" id="printerManagerSettings">
                     <h6><u>Temperature Triggers</u></h6>
                     <div id="tempTriggers">
 

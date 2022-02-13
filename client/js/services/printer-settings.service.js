@@ -62,9 +62,12 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
       // Setup Gcode Script Tab
       PrinterSettingsService.setupGcodeTab(currentPrinter);
       PrinterSettingsService.enablePanel(pageElements.menu.printerGcodeBtn);
-      // Setup Other Settings Tab
-      PrinterSettingsService.setupOtherSettingsTab(currentPrinter);
-      PrinterSettingsService.enablePanel(pageElements.menu.printerOtherSettings);
+      // Setup Camera Settings Tab
+      PrinterSettingsService.setupCameraTab(currentPrinter);
+      PrinterSettingsService.enablePanel(pageElements.menu.printerCameraSettingsBtn);
+      // Setup Triggers Tab
+      PrinterSettingsService.setupTriggersTab(currentPrinter);
+      PrinterSettingsService.enablePanel(pageElements.menu.printerTriggerSettingsBtn);
     }
     // Setup Refresh Settings Button
     await PrinterSettingsService.setupRefreshButton(currentPrinter);
@@ -797,7 +800,7 @@ class PrinterSettingsService {
       `;
   }
 
-  static setupOtherSettingsTab(currentPrinter) {
+  static setupCameraTab(currentPrinter) {
     document.getElementById("cameraRotation").innerHTML = `
       <form class="was-validated">
       <div class="custom-control custom-checkbox mb-3">
@@ -839,7 +842,8 @@ class PrinterSettingsService {
       currentPrinter.otherSettings.webCamSettings.rotate90;
     document.getElementById("camFlipH").checked = currentPrinter.otherSettings.webCamSettings.flipH;
     document.getElementById("camFlipV").checked = currentPrinter.otherSettings.webCamSettings.flipV;
-
+  }
+  static setupTriggersTab(currentPrinter) {
     document.getElementById("tempTriggers").innerHTML = `
          <div class="form-group">
             <label for="headtingVariation">Heating Variation</label>
@@ -1143,7 +1147,8 @@ class PrinterSettingsService {
           printerAlertsBtn: document.getElementById("printer-alerts-btn"),
           printerGcodeBtn: document.getElementById("printer-gcode-btn"),
           printerSettingsBtn: document.getElementById("printer-settings-btn"),
-          printerOtherSettings: document.getElementById("printer-settings-btn"),
+          printerCameraSettingsBtn: document.getElementById("printer-settings-btn"),
+          printerTriggerSettingsBtn: document.getElementById("printer-trigger-btn"),
           printerMenuFooter: document.getElementById("printerSettingsFooter")
         }
       };
@@ -1214,7 +1219,8 @@ class PrinterSettingsService {
     if (!printerOnline) {
       pageElements.menu.printerProfileBtn.disabled = true;
       pageElements.menu.printerGcodeBtn.disabled = true;
-      pageElements.menu.printerOtherSettings.disabled = true;
+      pageElements.menu.printerCameraSettingsBtn.disabled = true;
+      pageElements.menu.printerTriggerSettingsBtn.disabled = true;
 
       if (!pageElements.menu.printerProfileBtn.classList.contains("notyet")) {
         pageElements.menu.printerProfileBtn.classList.add("notyet");
@@ -1222,14 +1228,18 @@ class PrinterSettingsService {
       if (!pageElements.menu.printerGcodeBtn.classList.contains("notyet")) {
         pageElements.menu.printerGcodeBtn.classList.add("notyet");
       }
-      if (!pageElements.menu.printerOtherSettings.classList.contains("notyet")) {
-        pageElements.menu.printerOtherSettings.classList.add("notyet");
+      if (!pageElements.menu.printerCameraSettingsBtn.classList.contains("notyet")) {
+        pageElements.menu.printerCameraSettingsBtn.classList.add("notyet");
+      }
+      if (!pageElements.menu.printerTriggerSettingsBtn.classList.contains("notyet")) {
+        pageElements.menu.printerTriggerSettingsBtn.classList.add("notyet");
       }
     } else {
       pageElements.mainPage.offlineMessage.innerHTML = "";
       pageElements.menu.printerProfileBtn.disabled = false;
       pageElements.menu.printerGcodeBtn.disabled = false;
-      pageElements.menu.printerOtherSettings.disabled = false;
+      pageElements.menu.printerCameraSettingsBtn.disabled = false;
+      pageElements.menu.printerTriggerSettingsBtn.disabled = false;
 
       if (pageElements.menu.printerProfileBtn.classList.contains("notyet")) {
         pageElements.menu.printerProfileBtn.classList.remove("notyet");
@@ -1237,8 +1247,11 @@ class PrinterSettingsService {
       if (pageElements.menu.printerGcodeBtn.classList.contains("notyet")) {
         pageElements.menu.printerGcodeBtn.classList.remove("notyet");
       }
-      if (pageElements.menu.printerOtherSettings.classList.contains("notyet")) {
-        pageElements.menu.printerOtherSettings.classList.remove("notyet");
+      if (pageElements.menu.printerCameraSettingsBtn.classList.contains("notyet")) {
+        pageElements.menu.printerCameraSettingsBtn.classList.remove("notyet");
+      }
+      if (pageElements.menu.printerTriggerSettingsBtn.classList.contains("notyet")) {
+        pageElements.menu.printerTriggerSettingsBtn.classList.remove("notyet");
       }
     }
   }
