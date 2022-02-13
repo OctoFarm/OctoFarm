@@ -7,6 +7,10 @@ const Logger = require("../handlers/logger");
 const path = require("path");
 const logger = new Logger("OctoFarm-Validation");
 
+const errorMessage = (req) => {
+  return `Invalid body input detected in ${req.protocol}://${req.get("host")}${req.originalUrl}`;
+};
+
 // REFACTOR should be a utility -_-
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
@@ -42,7 +46,7 @@ function getExtendedValidator() {
     return url.includes("ws://") || url.includes("wss://");
   });
   nodeInputValidator.extend("mongoose_object_id", async ({ value, args }) => {
-    return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
+    return mongoose.Types.ObjectId.isValid(value) || typeof value !== "undefined";
   });
   //FIX this needs a custom message passing back out, can remove the logger then.
   nodeInputValidator.extend("settings_appearance", async ({ value, args }) => {
@@ -108,18 +112,16 @@ function validateBodyMiddleware(rules) {
         return next();
       })
       .catch((e) => {
-        const errorMessage =
-          "Invalid body input detected in " +
-          req.protocol +
-          "://" +
-          req.get("host") +
-          req.originalUrl;
-        logger.error(errorMessage, e);
-        res.statusCode = 400;
-        res.statusMessage = e;
-        return res.send(e);
+        dealWithError(e, req, res);
       });
   };
+}
+
+function dealWithError(e, req, res) {
+  logger.error(errorMessage(req), e);
+  res.statusCode = 400;
+  res.statusMessage = e;
+  return res.send(e);
 }
 
 function validateParamsMiddleware(rules) {
@@ -130,16 +132,7 @@ function validateParamsMiddleware(rules) {
         return next();
       })
       .catch((e) => {
-        const errorMessage =
-          "Invalid params input detected in " +
-          req.protocol +
-          "://" +
-          req.get("host") +
-          req.originalUrl;
-        logger.error(errorMessage, e);
-        res.statusCode = 400;
-        res.statusMessage = e;
-        return res.send(e);
+        dealWithError(e, req, res);
       });
   };
 }

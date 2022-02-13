@@ -297,8 +297,7 @@ router.post(
   ensureAdministrator,
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-    const data = req.body.idList;
-    console.log(data);
+    const data = req.bodyOneOf("idList");
     logger.info("Update printer sort indexes: ", data);
     res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
   }

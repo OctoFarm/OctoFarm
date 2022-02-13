@@ -1,6 +1,10 @@
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
-const MIN_LENGTH_0 = "minLength: 0";
+const MIN_LENGTH_0 = "minLength:0";
+const MAX_PRINTER_ARRAY = `maxLength:${getPrinterStoreCache().getPrinterCount() + 100}`; //Leave some headroom incase printers are been added when action occurs
+const API_MAX_LENGTH = "maxLength:32";
+const API_MIN_LENGTH = "minLength:32";
+const STRING_MAX_LENGTH = "maxLength:50";
 
 module.exports = {
   PRINTER_ID: {
@@ -10,19 +14,19 @@ module.exports = {
     settingsAppearance: "settings_appearance",
     printerURL: ["required", "string", "url"],
     camURL: ["string", "url"],
-    apikey: ["required", "string", "minLength:32", "maxLength:32"],
-    group: ["string", MIN_LENGTH_0, "maxLength:50"]
+    apikey: ["required", "string", API_MIN_LENGTH, API_MAX_LENGTH],
+    group: ["string", MIN_LENGTH_0, STRING_MAX_LENGTH]
   },
   PRINTER_ID_LIST: {
     idList: ["required", "array", MIN_LENGTH_0], //INVESTIGATE why max length doesn't work here!?
     "idList.*": ["required", "string", "mongoose_object_id"]
   },
   UPDATE_PRINTERS: {
-    infoList: ["required", "array", "minLength:0", "maxLength:1000"],
+    infoList: ["required", "array", MIN_LENGTH_0, MAX_PRINTER_ARRAY],
     "infoList.*._id": ["required", "mongoose_object_id"],
-    "infoList.*.apikey": ["required", "string", "minLength:32", "maxLength:32"],
+    "infoList.*.apikey": ["required", "string", API_MIN_LENGTH, API_MAX_LENGTH],
     "infoList.*.camURL": ["string", "url"],
-    "infoList.*.group": ["string", MIN_LENGTH_0, "maxLength:50"],
+    "infoList.*.group": ["string", MIN_LENGTH_0, MAX_PRINTER_ARRAY],
     "infoList.*.printerURL": ["required", "string", "url"],
     "infoList.*.settingsAppearance": "settings_appearance"
   }
