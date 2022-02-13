@@ -43,36 +43,36 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     UI.clearSelect("ps");
 
     // Setup Connection Tab
-    PrinterSettingsService.setupConnectionTab(currentPrinter);
+    PrinterSettingsService.setupConnectionTab();
     PrinterSettingsService.enablePanel(pageElements.menu.printerConnectionBtn);
 
     // Setup Cost Tab
-    PrinterSettingsService.setupCostTab(currentPrinter);
+    PrinterSettingsService.setupCostTab();
     PrinterSettingsService.enablePanel(pageElements.menu.printerCostBtn);
     // Setup Power Tab
-    PrinterSettingsService.setupPowerTab(currentPrinter);
+    PrinterSettingsService.setupPowerTab();
     PrinterSettingsService.enablePanel(pageElements.menu.printerPowerBtn);
     // Setup Alerts Tab
-    await PrinterSettingsService.setupAlertsTab(currentPrinter);
+    await PrinterSettingsService.setupAlertsTab();
     PrinterSettingsService.enablePanel(pageElements.menu.printerAlertsBtn);
     if (printerOnline) {
       // Setup Profile Tab
-      PrinterSettingsService.setupProfileTab(currentPrinter);
+      PrinterSettingsService.setupProfileTab();
       PrinterSettingsService.enablePanel(pageElements.menu.printerProfileBtn);
       // Setup Gcode Script Tab
-      PrinterSettingsService.setupGcodeTab(currentPrinter);
+      PrinterSettingsService.setupGcodeTab();
       PrinterSettingsService.enablePanel(pageElements.menu.printerGcodeBtn);
       // Setup Camera Settings Tab
-      PrinterSettingsService.setupCameraTab(currentPrinter);
+      PrinterSettingsService.setupCameraTab();
       PrinterSettingsService.enablePanel(pageElements.menu.printerCameraSettingsBtn);
       // Setup Triggers Tab
-      PrinterSettingsService.setupTriggersTab(currentPrinter);
+      PrinterSettingsService.setupTriggersTab();
       PrinterSettingsService.enablePanel(pageElements.menu.printerTriggerSettingsBtn);
     }
     // Setup Refresh Settings Button
-    await PrinterSettingsService.setupRefreshButton(currentPrinter);
+    await PrinterSettingsService.setupRefreshButton();
     // Setup Save Settings button
-    await PrinterSettingsService.setupSaveButton(currentPrinter);
+    await PrinterSettingsService.setupSaveButton();
 
     UI.addSelectListeners("ps");
 
@@ -97,7 +97,7 @@ class PrinterSettingsService {
     }
   }
 
-  static setupConnectionTab(currentPrinter) {
+  static setupConnectionTab() {
     document.getElementById("generateNameButtonWrapper").innerHTML = `
       <button class="btn btn-info btn-block" id="generatePrinterName"><i class="fas fa-sync"></i></button>
     `;
@@ -246,7 +246,7 @@ class PrinterSettingsService {
     }
   }
 
-  static setupCostTab(currentPrinter) {
+  static setupCostTab() {
     document.getElementById("psPrinterCost").innerHTML = `
           <div class="col-6">
                  <h5>Operating Costs</h5>
@@ -318,7 +318,7 @@ class PrinterSettingsService {
       `;
   }
 
-  static setupProfileTab(currentPrinter) {
+  static setupProfileTab() {
     document.getElementById("psPrinterProfiles").innerHTML = `
           <div class="col-12 col-lg-4">
           <h5 class="mb-1"><u>Printer</u></h5>
@@ -485,24 +485,18 @@ class PrinterSettingsService {
       currentPrinter.currentProfile.heatedChamber;
   }
 
-  static setupPowerTab(currentPrinter) {
+  static setupPowerTab() {
     let serverRestart = "N/A";
     let systemRestart = "N/A";
     let systemShutdown = "N/A";
     if (printerOnline && !!currentPrinter.otherSettings) {
-      if (currentPrinter.otherSettings.system.commands.serverRestartCommand === "") {
-        serverRestart = "N/A";
-      } else {
+      if (currentPrinter.otherSettings.system.commands.serverRestartCommand !== "") {
         serverRestart = currentPrinter.otherSettings.system.commands.serverRestartCommand;
       }
-      if (currentPrinter.otherSettings.system.commands.systemRestartCommand === "") {
-        systemRestart = "N/A";
-      } else {
+      if (currentPrinter.otherSettings.system.commands.systemRestartCommand !== "") {
         systemRestart = currentPrinter.otherSettings.system.commands.systemRestartCommand;
       }
-      if (currentPrinter.otherSettings.system.commands.systemShutdownCommand === "") {
-        systemShutdown = "N/A";
-      } else {
+      if (currentPrinter.otherSettings.system.commands.systemShutdownCommand !== "") {
         systemShutdown = currentPrinter.otherSettings.system.commands.systemShutdownCommand;
       }
     }
@@ -693,7 +687,7 @@ class PrinterSettingsService {
     }
   }
 
-  static async setupAlertsTab(currentPrinter) {
+  static async setupAlertsTab() {
     let scripts = await OctoFarmClient.get("scripts/get");
     const printerScripts = [];
     scripts.alerts.forEach((script) => {
@@ -740,7 +734,7 @@ class PrinterSettingsService {
     });
   }
 
-  static setupGcodeTab(currentPrinter) {
+  static setupGcodeTab() {
     let afterPrintCancelled = "";
     if (typeof currentPrinter.gcodeScripts.afterPrintCancelled !== "undefined") {
       afterPrintCancelled = currentPrinter.gcodeScripts.afterPrintCancelled;
@@ -826,7 +820,7 @@ class PrinterSettingsService {
       `;
   }
 
-  static setupCameraTab(currentPrinter) {
+  static setupCameraTab() {
     document.getElementById("cameraRotation").innerHTML = `
       <form class="was-validated">
       <div class="custom-control custom-checkbox mb-3">
@@ -869,7 +863,7 @@ class PrinterSettingsService {
     document.getElementById("camFlipH").checked = currentPrinter.otherSettings.webCamSettings.flipH;
     document.getElementById("camFlipV").checked = currentPrinter.otherSettings.webCamSettings.flipV;
   }
-  static setupTriggersTab(currentPrinter) {
+  static setupTriggersTab() {
     document.getElementById("tempTriggers").innerHTML = `
          <div class="form-group">
             <label for="headtingVariation">Heating Variation</label>
@@ -888,7 +882,7 @@ class PrinterSettingsService {
       `;
   }
 
-  static async setupSaveButton(currentPrinter) {
+  static async setupSaveButton() {
 
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
@@ -912,7 +906,7 @@ class PrinterSettingsService {
     });
   }
 
-  static async setupRefreshButton(currentPrinter) {
+  static async setupRefreshButton() {
     pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
@@ -955,7 +949,7 @@ class PrinterSettingsService {
     return serverResponseMessage;
   }
 
-  static getPageValues(currentPrinter) {
+  static getPageValues() {
     let newPrinterSettingsValues = {
       printer: {
         printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
@@ -1181,7 +1175,7 @@ class PrinterSettingsService {
     }
   }
 
-  static updateStateElements(currentPrinter) {
+  static updateStateElements() {
     if (isNaN(currentPrinterIndex)) {
       // Disable the entire page as this is a major failure!
       Object.values(pageElements.menu).map((e) => {

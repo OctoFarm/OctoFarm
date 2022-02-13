@@ -93,16 +93,16 @@ export default class OctoFarmClient {
 
   static async getPrinter(id) {
     if (!id) {
-      throw "Cant fetch printer without defined 'id' input";
+      throw new Error("Cant fetch printer without defined 'id' input");
     }
     const body = {
       i: id
     };
-    return await this.post(`${this.printerRoute}/printerInfo/`, body);
+    return this.post(`${this.printerRoute}/printerInfo/`, body);
   }
 
   static async getPrinterName(){
-    return await this.get(this.generatePrinterNameRoute)
+    return this.get(this.generatePrinterNameRoute)
   }
 
   static async listPrinters(disabled = false) {

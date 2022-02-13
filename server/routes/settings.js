@@ -35,6 +35,7 @@ const { sanitizeString } = require("../utils/sanitize-utils");
 
 module.exports = router;
 
+//REFACTOR needs to be in middleware folder, 3 functions below.
 const Storage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, getImagesPath());
@@ -50,6 +51,14 @@ const upload = multer({
     fileSize: 8000000 // Sensitive: 10MB is more than the recommended limit of 8MB
   }
 });
+
+const fileSizeLimitErrorHandler = (err, req, res, next) => {
+  if (err) {
+    res.send(413);
+  } else {
+    next();
+  }
+};
 
 router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const serverLogs = await Logs.grabLogs();
@@ -251,6 +260,7 @@ router.post(
   ensureAuthenticated,
   ensureAdministrator,
   upload.single("myFile"),
+  fileSizeLimitErrorHandler,
   (req, res) => {
     const file = req.file;
     if (!file) {

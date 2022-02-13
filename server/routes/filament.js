@@ -56,7 +56,7 @@ router.get("/get/filament", ensureAuthenticated, (req, res) => {
   res.send({ Spool: spools });
 });
 router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
-  const selected = await FilamentClean.getDropDown();
+  const selected = FilamentClean.getDropDown();
   res.send({ status: 200, selected });
 });
 router.post("/assign", ensureAuthenticated, async (req, res) => {
@@ -143,13 +143,13 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     newFilament.save().then(async (e) => {
       logger.info("New Spool saved successfully: ", newFilament);
       await FilamentManagerPlugin.filamentManagerReSync();
-      await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
       res.send({ res: "success", spools: newFilament, filamentManager });
     });
   }
 });
 router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await SettingsClean.returnSystemSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
 
   let searchId = req.bodyString("id");
@@ -292,7 +292,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
 });
 
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await SettingsClean.returnSystemSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
   const newProfile = req.body;
   const error = [];
@@ -358,7 +358,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   }
 });
 router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await SettingsClean.returnSystemSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
   let searchId = req.bodyString("id");
   const newContent = req.body.profile;
@@ -465,7 +465,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     logger.info("Deleting from database: ", searchId);
     const rel = await Profiles.deleteOne({ _id: profiles[findID]._id }).exec();
     logger.info("Profile deleted successfully");
-    await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     rel.status = 200;
     res.send({ profiles });
   } else {
@@ -473,7 +473,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     const rel = await Profiles.deleteOne({ _id: searchId }).exec();
     rel.status = 200;
     logger.info("Profile deleted successfully");
-    await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     Profiles.find({}).then((profiles) => {
       res.send({ profiles });
     });
