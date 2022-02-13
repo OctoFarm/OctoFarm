@@ -9,7 +9,7 @@ class Script {
     logger.info("Script: ", scriptLocation);
     logger.info("Message: ", message);
     try {
-      const { stdout, stderr } = await exec(`${scriptLocation} ${message}`);
+      const { stdout, stderr } = await exec(Script.escapeShellArg(`${scriptLocation} ${message}`));
       if (!!stdout) logger.info("stdout:", stdout);
       if (!!stderr) logger.error("stderr:", stderr);
 
@@ -36,6 +36,10 @@ class Script {
         logger.info("Successfully fired wake packet: ", mac, opts);
       }
     });
+  }
+
+  static escapeShellArg (arg) {
+    return `'${arg.replace(/'/g, `'\\''`)}'`;
   }
 }
 
