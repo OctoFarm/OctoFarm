@@ -9,7 +9,7 @@ const prettyPrintStatusError = (errorString) => {
 
   let prettyString = `<br>###${name}###<br>`;
 
-  for (let key in errors ){
+  for (const key in errors ){
     prettyString += `<br>#${key.toLocaleUpperCase()}#<br> ${errors[key].message} <br>`
   }
 
@@ -37,7 +37,9 @@ axios.interceptors.response.use(
   },
   function (error) {
     //Guard clause - Server offline then these commands will always error...
-    if(window.serverOffline) return { data: false }
+    if(window.serverOffline) {
+      return { data: false }
+    }
 
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
@@ -74,6 +76,7 @@ export default class OctoFarmClient {
   static disablePrinterRoute = this.printerRoute + "/disable/";
   static enablePrinterRoute = this.printerRoute + "/enable/";
   static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
+  static printerStepChange = this.printerRoute + "/stepChange";
   static serverSettingsRoute = "/settings/server";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
@@ -87,7 +90,9 @@ export default class OctoFarmClient {
   static validatePath(pathname) {
     if (!pathname) {
       const newURL = new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, {message: ClientErrors.FAILED_VALIDATION_PATH + " " + newURL});
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, {
+        message: `${ClientErrors.FAILED_VALIDATION_PATH} ${newURL}`
+      });
     }
   }
 
@@ -154,6 +159,13 @@ export default class OctoFarmClient {
     return this.get(`${this.serverSettingsRoute}/get`);
   }
 
+  static async setPrinterSteps(id, newSteps) {
+    return this.post("printers/stepChange", {
+      printer: id,
+      newSteps
+    });
+  }
+
   static async getUser(id) {
     return this.get(`${this.userRoute}/${id}`);
   }
@@ -190,7 +202,7 @@ export default class OctoFarmClient {
   static async getCustomGcode(id) {
     let url = "settings/customGcode";
     if (id) {
-      url = url + "/" + id;
+      url = `${url}/${id}`;
     }
     return this.get(url);
   }

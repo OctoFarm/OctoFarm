@@ -10,7 +10,7 @@ export function customGcodeScriptTemplate(scripts, scriptLines) {
         id="script_name_${scripts._id}"
         placeholder="${scripts.name}"
         disabled
-      ></input>
+      />
     </td>
     <td>
       <input
@@ -19,7 +19,7 @@ export function customGcodeScriptTemplate(scripts, scriptLines) {
         id="script_desc_${scripts._id}"
         placeholder="${scripts.description}"
         disabled
-      ></input>
+      />
     </td>
     <td>
       <textarea
