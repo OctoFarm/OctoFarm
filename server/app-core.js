@@ -133,9 +133,10 @@ function serveOctoFarmRoutes(app) {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
   }
   app.get("*", function (req, res) {
-    if (req.originalUrl.endsWith(".min.js")) {
+    const originalURL = req.originalUrl.toString();
+    if (originalURL.endsWith(".min.js")) {
       res.status(404);
-      res.send("Resource not found " + req.originalUrl);
+      res.send("Resource not found " + originalURL);
       return;
     }
     res.redirect("/");
