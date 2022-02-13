@@ -1282,7 +1282,7 @@ setInterval(async () => {
       await OctoFarmClient.post("printers/newFiles", file);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
-      if (fileCounts && fileCounts.innerHTML === 1) {
+      if (fileCounts && fileCounts.innerHTML === "1") {
         fileCounts.innerHTML = ` ${0}`;
       }
     }
