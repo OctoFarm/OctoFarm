@@ -93,7 +93,7 @@ function corsWarningCheck(printer) {
   }
 }
 
-function reconnectingIn(printer) {
+function setupReconnectingIn(printer) {
   const { reconnectingIn, _id } = printer;
   const printerReScanButton = document.getElementById("printerAPIScanning-" + _id);
   const printerReScanIcon = document.getElementById("apiReScanIcon-" + _id);
@@ -229,7 +229,7 @@ function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
     updatePrinterInfo(printer);
-    reconnectingIn(printer);
+    setupReconnectingIn(printer);
     reconnectingWebsocketIn(printer);
     updatePrinterState(printer);
     checkQuickConnectState(printer);
@@ -350,11 +350,11 @@ export function createOrUpdatePrinterTableRow(printers) {
                 "warning",
                 `${isDisabled ? "Enabling" : "Disabling"} your printer... please wait!`
               );
-              let patch = null;
+
               if (isDisabled) {
-                patch = await OctoFarmClient.enablePrinter(printer._id);
+                await OctoFarmClient.enablePrinter(printer._id);
               } else {
-                patch = await OctoFarmClient.disablePrinter(printer._id);
+                await OctoFarmClient.disablePrinter(printer._id);
               }
 
               alert.close();
