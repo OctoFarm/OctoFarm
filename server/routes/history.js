@@ -12,12 +12,13 @@ const { getHistoryCache } = require("../cache/history.cache");
 const { sortOptions } = require("../constants/history-sort.constants");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { validateParamsMiddleware } = require("../middleware/validators");
+const M_VALID = require("../constants/validate-mongo.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
-  const latest = req.body;
-  const { note } = latest;
-  const { filamentId } = latest;
+  const note = req.bodyString("note");
+  const filamentId = req.bodyString("filamentId");
   const history = await History.findOne({ _id: latest.id });
   if (history.printHistory.notes != note) {
     history.printHistory.notes = note;
@@ -94,15 +95,18 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
 //Register Handle for Saving printers
 router.post("/delete", ensureAuthenticated, async (req, res) => {
   //Check required fields
-  const deleteHistory = req.body;
-  await History.findOneAndDelete({ _id: deleteHistory.id }).then(() => {
+  const deleteHistory = req.bodyString("id");
+  await History.findOneAndDelete({ _id: deleteHistory }).then(() => {
     getHistoryCache().initCache();
   });
   res.send("success");
 });
 
 router.get("/get", ensureAuthenticated, async (req, res) => {
-  const { page, limit, sort } = req.query;
+  const page = req.queryString("page");
+  const limit = req.queryString("limit");
+  const sort = req.queryString("sort");
+
   let paginationOptions = {};
 
   paginationOptions.page = page;
@@ -111,19 +115,17 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
 
   paginationOptions.sort = sortOptions[sort];
 
-  const {
-    firstDate,
-    lastDate,
-    fileFilter,
-    pathFilter,
-    spoolManuFilter,
-    spoolMatFilter,
-    fileSearch,
-    spoolSearch,
-    printerNameFilter,
-    printerGroupFilter,
-    printerSearch
-  } = req.query;
+  const firstDate = req.queryString("firstDate");
+  const lastDate = req.queryString("lastDate");
+  const fileFilter = req.queryString("fileFilter");
+  const pathFilter = req.queryString("pathFilter");
+  const spoolManuFilter = req.queryString("spoolManuFilter");
+  const spoolMatFilter = req.queryString("spoolMatFilter");
+  const fileSearch = req.queryString("fileSearch");
+  const spoolSearch = req.queryString("spoolSearch");
+  const printerNameFilter = req.queryString("printerNameFilter");
+  const printerGroupFilter = req.queryString("printerGroupFilter");
+  const printerSearch = req.queryString("printerSearch");
 
   const findOptions = {
     "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
@@ -196,13 +198,13 @@ router.get("/statisticsData", ensureAuthenticated, async (req, res) => {
   res.send({ history: stats });
 });
 router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
-  const latest = req.body;
+  const latest = req.bodyString("id");
 
   // Find history and matching printer ID
-  const historyEntity = await History.findOne({ _id: latest.id });
+  const historyEntity = await History.findOne({ _id: latest });
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
-    return o.settingsAppearance.name == historyEntity.printHistory.printerName;
+    return o.settingsAppearance.name === historyEntity.printHistory.printerName;
   });
   if (printer > -1) {
     historyEntity.printHistory.costSettings = printers[printer].costSettings;
@@ -235,14 +237,19 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     res.send(send);
   }
 });
-router.get("/statistics/:id", ensureAuthenticated, async function (req, res) {
-  const printerID = req.params.id;
-  let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
-  if (!stats) {
-    stats = await generatePrinterStatistics(printerID);
-    getPrinterStoreCache().updatePrinterStatistics(printerID, stats);
+router.get(
+  "/statistics/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async function (req, res) {
+    const printerID = req.paramString("id");
+    let stats = getPrinterStoreCache().getPrinterStatistics(printerID);
+    if (!stats) {
+      stats = await generatePrinterStatistics(printerID);
+      getPrinterStoreCache().updatePrinterStatistics(printerID, stats);
+    }
+    res.send(stats);
   }
-  res.send(stats);
-});
+);
 
 module.exports = router;

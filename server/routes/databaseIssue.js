@@ -42,8 +42,7 @@ router.get("/", (req, res) =>
 );
 
 router.post("/test-connection", async (req, res) => {
-  const body = req.body;
-  const connectionURL = body.connectionURL;
+  const connectionURL = req.bodyString("connectionURL");
 
   if (!connectionURL || !validateMongoURL(connectionURL)) {
     res.statusCode = 400;
@@ -80,7 +79,7 @@ router.post("/test-connection", async (req, res) => {
     });
   }
 
-  return await ServerSettingsDB.find({})
+  return ServerSettingsDB.find({})
     .then((r) => {
       return res.send({
         connectionURL,
@@ -115,8 +114,8 @@ router.post("/save-connection-env", async (req, res) => {
     });
   }
 
-  const body = req.body;
-  const connectionURL = body.connectionURL;
+  const connectionURL = req.bodyString("connectionURL");
+  // REFACTOR This needs to use the middleware
   if (!connectionURL || !validateMongoURL(connectionURL)) {
     res.statusCode = 400;
     return res.send({

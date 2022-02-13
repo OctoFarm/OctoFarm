@@ -59,7 +59,7 @@ const systemChecks = () => {
     }
   );
 };
-const tempTriggers = () => {
+const tempTriggersDefaults = () => {
   return Object.assign(
     {},
     {
@@ -110,7 +110,7 @@ const systemCommands = () => {
 
 module.exports = {
   systemChecks,
-  tempTriggers,
+  tempTriggersDefaults,
   systemCommands,
   webCamSettings,
 

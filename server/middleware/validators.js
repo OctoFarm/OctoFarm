@@ -41,10 +41,10 @@ function getExtendedValidator() {
     const url = new URL(value).href;
     return url.includes("ws://") || url.includes("wss://");
   });
-  nodeInputValidator.extend("printer_id", async ({ value, args }) => {
+  nodeInputValidator.extend("mongoose_object_id", async ({ value, args }) => {
     return mongoose.Types.ObjectId.isValid(value) || typeof value === "undefined";
   });
-  //TODO this needs a custom message passing back out, can remove the logger then.
+  //FIX this needs a custom message passing back out, can remove the logger then.
   nodeInputValidator.extend("settings_appearance", async ({ value, args }) => {
     const { color, colorTransparent, defaultLanguage, name, showFahrenheitAlso } = value;
     const colorValid = typeof color === "string" && color === "default"; //The client will always send default for adding a printer
@@ -103,7 +103,7 @@ async function validateInput(data, rules) {
 function validateBodyMiddleware(rules) {
   return function (req, res, next) {
     validateInput(req.body, rules)
-      .then((res) => {
+      .then(() => {
         logger.debug("Validated Body Middleware");
         return next();
       })
@@ -131,7 +131,7 @@ function validateParamsMiddleware(rules) {
       })
       .catch((e) => {
         const errorMessage =
-          "Invalid body input detected in " +
+          "Invalid params input detected in " +
           req.protocol +
           "://" +
           req.get("host") +

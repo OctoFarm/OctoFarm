@@ -30,9 +30,12 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
+const M_VALID = require("../constants/validate-mongo.constants");
+const { sanitizeString } = require("../utils/sanitize-utils");
 
 module.exports = router;
 
+//REFACTOR needs to be in middleware folder, 3 functions below.
 const Storage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, getImagesPath());
@@ -42,7 +45,20 @@ const Storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: Storage });
+const upload = multer({
+  storage: Storage,
+  limits: {
+    fileSize: 8000000 // Sensitive: 10MB is more than the recommended limit of 8MB
+  }
+});
+
+const fileSizeLimitErrorHandler = (err, req, res, next) => {
+  if (err) {
+    res.send(413);
+  } else {
+    next();
+  }
+};
 
 router.get("/server/logs", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const serverLogs = await Logs.grabLogs();
@@ -63,7 +79,7 @@ router.delete(
   }
 );
 router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const fileName = req.params.name;
+  const fileName = req.paramString("name");
   try {
     Logs.deleteLogByName(fileName);
     res.sendStatus(201);
@@ -74,7 +90,7 @@ router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, as
 });
 
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
-  const download = req.params.name;
+  const download = req.paramString("name");
   const file = `${getLogsPath()}/${download}`;
   console.log(file);
   res.download(file, download); // Set disposition and send it.
@@ -111,7 +127,7 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.databaseName;
+    const databaseName = req.paramString("databaseName");
     await getPrinterManagerCache().killAllConnections();
     if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
@@ -150,7 +166,7 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
-    const databaseName = req.params.databaseName;
+    const databaseName = req.paramString("databaseName");
     logger.info("Client requests export of " + databaseName);
     let returnedObjects = [];
     if (databaseName === "FilamentDB") {
@@ -183,7 +199,7 @@ router.post(
       statusTypeForUser: "error",
       message: ""
     };
-    let force = req?.body;
+    let force = req.bodyBool;
     if (
       !force ||
       typeof force?.forcePull !== "boolean" ||
@@ -207,8 +223,8 @@ router.post(
     }
   }
 );
-router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  await checkReleaseAndLogUpdate();
+router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, (req, res) => {
+  checkReleaseAndLogUpdate();
   const softwareUpdateNotification = getUpdateNotificationIfAny();
   res.send(softwareUpdateNotification);
 });
@@ -221,11 +237,11 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
   const currentUserList = await fetchUsers();
 
   // Patch to fill in user settings if it doesn't exist
-  for (let i = 0; i < currentUserList.length; i++) {
-    if (!currentUserList[i].clientSettings) {
-      currentUserList[i].clientSettings = new ClientSettingsDB();
-      currentUserList[i].clientSettings.save();
-      currentUserList[i].save();
+  for (let user of currentUserList) {
+    if (!user.clientSettings) {
+      user.clientSettings = new ClientSettingsDB();
+      user.clientSettings.save();
+      user.save();
     }
   }
 
@@ -236,7 +252,7 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
       res.send({ msg: "Settings Saved" });
     })
     .catch((e) => {
-      res.send({ msg: "Settings Not Saved" });
+      res.send({ msg: "Settings Not Saved: " + e });
     });
 });
 router.post(
@@ -244,6 +260,7 @@ router.post(
   ensureAuthenticated,
   ensureAdministrator,
   upload.single("myFile"),
+  fileSizeLimitErrorHandler,
   (req, res) => {
     const file = req.file;
     if (!file) {
@@ -271,13 +288,13 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const historyChanges = isEqual(actualOnline.history, sentOnline.history);
     const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
-    checked[0].onlinePolling = req.body.onlinePolling;
-    checked[0].server = req.body.server;
-    checked[0].timeout = req.body.timeout;
-    checked[0].filament = req.body.filament;
-    checked[0].history = req.body.history;
-    checked[0].influxExport = req.body.influxExport;
-    checked[0].monitoringViews = req.body.monitoringViews;
+    checked[0].onlinePolling = sentOnline.onlinePolling;
+    checked[0].server = sentOnline.server;
+    checked[0].timeout = sentOnline.timeout;
+    checked[0].filament = sentOnline.filament;
+    checked[0].history = sentOnline.history;
+    checked[0].influxExport = sentOnline.influxExport;
+    checked[0].monitoringViews = sentOnline.monitoringViews;
 
     if (
       [
@@ -301,8 +318,8 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
-    let influx = req.body.influxExport;
-    if (req.body.influxExport.active) {
+    let influx = sentOnline.influxExport;
+    if (influx.active) {
       if (influx.host.length === 0) {
         shouldDisableInflux = true;
         returnMsg += "Issue: No host information! <br>";
@@ -335,24 +352,34 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   });
 });
 
-router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
-  const scriptId = req.params.id;
-  GcodeDB.findByIdAndDelete(scriptId, function (err) {
-    if (err) {
-      res.send(err);
-    } else {
-      res.send(scriptId);
-    }
-  });
-});
+router.get(
+  "/customGcode/delete/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const scriptId = req.paramString("id");
+    GcodeDB.findByIdAndDelete(scriptId, function (err) {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send(scriptId);
+      }
+    });
+  }
+);
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
-  const newObj = req.body;
-  let script = await GcodeDB.findById(newObj.id);
-  script.gcode = newObj.gcode;
-  script.name = newObj.name;
-  script.description = newObj.description;
-  script.printerIds = newObj.printerIds;
-  script.buttonColour = newObj.buttonColour;
+  let script = await GcodeDB.findById(req.bodyString("id"));
+  script.gcode = req.bodyString("gcode");
+  script.name = req.bodyString("name");
+  script.description = req.bodyString("description");
+  const printerIDList = [];
+  if (Array.isArray(req.body.printerIds)) {
+    req.body.printerIds.forEach((id) => {
+      printerIDList.push(sanitizeString(id));
+    });
+  }
+  script.printerIds = printerIDList;
+  script.buttonColour = req.bodyString("buttonColour");
   script.save();
   res.send(script);
 });
@@ -369,14 +396,19 @@ router.post("/customGcode", ensureAuthenticated, async (req, res) => {
 router.get("/customGcode", ensureAuthenticated, async (req, res) => {
   res.send(await GcodeDB.find());
 });
-router.get("/customGcode/:id", ensureAuthenticated, async (req, res) => {
-  const printerId = req.params.id;
-  const all = await GcodeDB.find();
-  let returnCode = [];
-  all.forEach((script) => {
-    if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
-      returnCode.push(script);
-    }
-  });
-  res.send(returnCode);
-});
+router.get(
+  "/customGcode/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerId = req.paramString("id");
+    const all = await GcodeDB.find();
+    let returnCode = [];
+    all.forEach((script) => {
+      if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
+        returnCode.push(script);
+      }
+    });
+    res.send(returnCode);
+  }
+);

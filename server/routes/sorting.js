@@ -10,12 +10,12 @@ const {
 } = require("../services/current-operations-order.service");
 
 router.get("/updateFilter/:filter", ensureAuthenticated, async (req, res) => {
-  updateFilter(req.params.filter);
+  updateFilter(req.paramString("filter"));
   res.sendStatus(200);
 });
 
 router.get("/updateSorting/:sorting", ensureAuthenticated, async (req, res) => {
-  updateSorting(req.params.sorting);
+  updateSorting(req.paramString("sorting"));
   res.sendStatus(200);
 });
 

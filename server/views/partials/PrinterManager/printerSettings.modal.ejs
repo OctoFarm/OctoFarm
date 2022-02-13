@@ -20,7 +20,10 @@
                     class="fas fa-pen"></i> Gcode Scripts <i class="fas fa-spinner fa-spin"></i></a>
         <a class="list-group-item list-group-item-action notyet" id="printer-settings-btn"
            data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i
-                    class="fas fa-cog"></i>Other Settings <i class="fas fa-spinner fa-spin"></i></a>
+                    class="fas fa-cog"></i> Camera Settings <i class="fas fa-spinner fa-spin"></i></a>
+        <a class="list-group-item list-group-item-action notyet" id="printer-trigger-btn"
+           data-toggle="list" href="#printer-trigger" role="tab" aria-controls="messages"><i
+                    class="fas fa-cog"></i> Trigger Settings <i class="fas fa-spinner fa-spin"></i></a>
     </div>
     <span id="printerSettingsFooter">
 
@@ -62,11 +65,16 @@
                     <div class="row pb-1">
                         <div class="col-12 col-md-6">
                             <label for="psPrinterName">Printer Name:</label>
-                            <input id="psPrinterName" type="text" class="form-control"
-                                   placeholder="OctoPrint User">
-                            <small class="form-text text-muted">Your current Printer Name.
-                                Saving this will update OctoPrints Settings => Appearance Name
-                                if available.</small>
+                            <div class="input-group">
+                                <input id="psPrinterName" type="text" class="form-control"
+                                       placeholder="OctoPrint User">
+                                <div id="generateNameButtonWrapper" class="input-group-append">
+
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Your current Printer Name. Use the generate button or update manually to create a new one</small>
+
+                            <small>Note: <code>This is not saved back to OctoPrint!</code></small>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="psOctoPrintUser">OctoPrint User:</label>
@@ -260,16 +268,23 @@
         </div>
         <div class="tab-pane fade" id="printer-settings" role="tabpanel"
              aria-labelledby="system-settings-list">
-            <h5>Printer Settings</h5>
+            <h5>Camera Settings</h5>
             <hr>
             <div class="row">
-                <div class="col-12 col-md-4" id="printerManagerSettings">
+                <div class="col-12 col-md-12" id="printerManagerSettings">
                     <h6><u>Camera Settings</u></h6>
                     <div id="cameraRotation">
 
                     </div>
                 </div>
-                <div class="col-12 col-md-4" id="printerManagerSettings">
+            </div>
+        </div>
+        <div class="tab-pane fade" id="printer-trigger" role="tabpanel"
+             aria-labelledby="system-settings-list">
+            <h5>Trigger Settings</h5>
+            <hr>
+            <div class="row">
+                <div class="col-12 col-md-12" id="printerManagerSettings">
                     <h6><u>Temperature Triggers</u></h6>
                     <div id="tempTriggers">
 

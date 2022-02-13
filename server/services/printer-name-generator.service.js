@@ -137,8 +137,8 @@ const maxRecepticle = recepticleList.length;
 const maxFood = foodList.length;
 
 const generateRandomName = () => {
-  const recepitalName = recepticleList[randomNumberBetween(0, maxRecepticle)];
-  const foodName = foodList[randomNumberBetween(0, maxFood)];
+  const recepitalName = recepticleList[randomNumberBetween(0, maxRecepticle - 1)];
+  const foodName = foodList[randomNumberBetween(0, maxFood - 1)];
   return `${recepitalName} of ${foodName}`;
 };
 

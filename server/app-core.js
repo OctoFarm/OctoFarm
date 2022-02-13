@@ -20,6 +20,7 @@ const exceptionHandler = require("./exceptions/exception.handler");
 const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
+const { sanitizeString } = require("./utils/sanitize-utils");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -33,7 +34,7 @@ function setupExpressServer() {
   let app = express();
 
   app.use(octofarmGlobalLimits);
-
+  app.use(require("sanitize").middleware);
   require("./middleware/passport.js")(passport);
 
   //Morgan middleware
@@ -69,7 +70,7 @@ function setupExpressServer() {
 
   app.use("/images", express.static("../images"));
   app.use(cookieParser());
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: false, limit: "2mb" }));
   app.use(
     session({
       secret: fetchSuperSecretKey(),
@@ -100,14 +101,14 @@ async function ensureSystemSettingsInitiated() {
 
   await ServerSettingsDB.find({}).catch((e) => {
     if (e.message.includes("command find requires authentication")) {
-      throw "Database authentication failed.";
+      throw new Error("Database authentication failed.");
     } else {
-      throw "Database connection failed.";
+      throw new Error("Database connection failed.");
     }
   });
 
   // Setup Settings as connection is established
-  return await SettingsClean.initialise();
+  return SettingsClean.initialise();
 }
 
 /**
@@ -133,9 +134,10 @@ function serveOctoFarmRoutes(app) {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
   }
   app.get("*", function (req, res) {
-    if (req.originalUrl.endsWith(".min.js")) {
+    const originalURL = sanitizeString(req.originalUrl);
+    if (originalURL.endsWith(".min.js")) {
       res.status(404);
-      res.send("Resource not found " + req.originalUrl);
+      res.send("Resource not found " + originalURL);
       return;
     }
     res.redirect("/");
@@ -152,9 +154,8 @@ function serveOctoFarmRoutes(app) {
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Starting OctoFarm server tasks...");
-
-    for (let i = 0; i < OctoFarmTasks.RECURRING_BOOT_TASKS.length; i++) {
-      TaskManager.registerJobOrTask(OctoFarmTasks.RECURRING_BOOT_TASKS[i]);
+    for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS) {
+      TaskManager.registerJobOrTask(task);
     }
     await optionalInfluxDatabaseSetup();
   }

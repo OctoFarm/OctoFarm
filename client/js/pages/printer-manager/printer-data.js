@@ -56,8 +56,14 @@ function updatePrinterInfo(printer) {
   const printerSortIndex = document.getElementById(`printerSortIndex-${printer._id}`);
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
+  let printerName = JSON.parse(JSON.stringify(printer?.printerName))
+
+  if(!printerName){
+    printerName = "<i class=\"fa-solid fa-spinner fa-spin\"></i>"
+  }
+
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
-  UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
+  UI.doesElementNeedUpdating(printerName, printName, "innerHTML");
   UI.doesElementNeedUpdating(`${printer.printerURL} <br> ${printer.webSocketURL}`, printerURL, "innerHTML");
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
@@ -87,7 +93,7 @@ function corsWarningCheck(printer) {
   }
 }
 
-function reconnectingIn(printer) {
+function setupReconnectingIn(printer) {
   const { reconnectingIn, _id } = printer;
   const printerReScanButton = document.getElementById("printerAPIScanning-" + _id);
   const printerReScanIcon = document.getElementById("apiReScanIcon-" + _id);
@@ -184,7 +190,7 @@ function checkIfMultiUserIssueFlagged(printer) {
 }
 
 function checkForApiErrors(printer) {
-  if (!printer.printerState.colour.category === "Offline") {
+  if (printer.printerState.colour.category !== "Offline") {
     const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
     if (apiErrorTag && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
@@ -223,7 +229,7 @@ function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
     updatePrinterInfo(printer);
-    reconnectingIn(printer);
+    setupReconnectingIn(printer);
     reconnectingWebsocketIn(printer);
     updatePrinterState(printer);
     checkQuickConnectState(printer);
@@ -344,11 +350,11 @@ export function createOrUpdatePrinterTableRow(printers) {
                 "warning",
                 `${isDisabled ? "Enabling" : "Disabling"} your printer... please wait!`
               );
-              let patch = null;
+
               if (isDisabled) {
-                patch = await OctoFarmClient.enablePrinter(printer._id);
+                await OctoFarmClient.enablePrinter(printer._id);
               } else {
-                patch = await OctoFarmClient.disablePrinter(printer._id);
+                await OctoFarmClient.disablePrinter(printer._id);
               }
 
               alert.close();

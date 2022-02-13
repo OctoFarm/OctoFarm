@@ -3,7 +3,7 @@ import {ApplicationError} from "../exceptions/application-error.handler";
 import {HTTPError} from "../exceptions/octofarm-api.exceptions";
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
 
-//TODO move out to utility file
+//REFACTOR move out to utility file
 const prettyPrintStatusError = (errorString) => {
   const { name, errors } = errorString;
 
@@ -73,6 +73,7 @@ export default class OctoFarmClient {
   static printerRoute = "/printers";
   static disablePrinterRoute = this.printerRoute + "/disable/";
   static enablePrinterRoute = this.printerRoute + "/enable/";
+  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
   static serverSettingsRoute = "/settings/server";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
@@ -85,19 +86,23 @@ export default class OctoFarmClient {
 
   static validatePath(pathname) {
     if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
+      const newURL = new URL(path, window.location.origin);
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, {message: ClientErrors.FAILED_VALIDATION_PATH + " " + newURL});
     }
   }
 
   static async getPrinter(id) {
     if (!id) {
-      throw "Cant fetch printer without defined 'id' input";
+      throw new Error("Cant fetch printer without defined 'id' input");
     }
     const body = {
       i: id
     };
-    return await this.post(`${this.printerRoute}/printerInfo/`, body);
+    return this.post(`${this.printerRoute}/printerInfo/`, body);
+  }
+
+  static async getPrinterName(){
+    return this.get(this.generatePrinterNameRoute)
   }
 
   static async listPrinters(disabled = false) {

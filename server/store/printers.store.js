@@ -253,9 +253,9 @@ class PrinterStore {
     const socketsNeedTerminating = [];
 
     // Cycle through the printers and update their state...
-    for (let i = 0; i < newPrintersInformation.length; i++) {
-      const oldPrinter = this.#findMePrinter(newPrintersInformation[i]._id);
-      const newPrinterInfo = newPrintersInformation[i];
+    for (let printer of newPrintersInformation) {
+      const oldPrinter = this.#findMePrinter(printer._id);
+      const newPrinterInfo = printer;
 
       //Check for a printer name change...
       if (
@@ -515,7 +515,7 @@ class PrinterStore {
       !!estimatedLifeSpan ||
       !!maintenanceCosts
     ) {
-      const costSettings = {
+      const costSettingsNew = {
         ...(!!powerConsumption
           ? { powerConsumption }
           : { powerConsumption: originalPrinter.costSettings.powerConsumption }),
@@ -532,7 +532,7 @@ class PrinterStore {
           ? { maintenanceCosts }
           : { maintenanceCosts: originalPrinter.costSettings.maintenanceCosts })
       };
-      this.updatePrinterDatabase(index, { costSettings });
+      this.updatePrinterDatabase(index, { costSettingsNew });
     }
 
     const { name, model, volume, heatedBed, heatedChamber, axes, extruder } = profile;
@@ -835,12 +835,12 @@ class PrinterStore {
 
     const filePathsArray = [""];
 
-    for (let f = 0; f < printers.length; f++) {
-      const folderList = printers[f]?.fileList?.folderList;
+    for (let printer of printers) {
+      const folderList = printer?.fileList?.folderList;
       if (folderList) {
-        for (let p = 0; p < folderList.length; p++) {
-          if (!filePathsArray.includes(folderList[p].name)) {
-            filePathsArray.push(folderList[p].name);
+        for (let folder of folderList) {
+          if (!filePathsArray.includes(folder.name)) {
+            filePathsArray.push(folder.name);
           }
         }
       }
@@ -855,9 +855,9 @@ class PrinterStore {
       const currentPrinter = this.#findMePrinter(id);
       const fileList = currentPrinter?.fileList?.fileList;
       if (fileList) {
-        for (let p = 0; p < fileList.length; p++) {
+        for (let file of fileList) {
           const index = findIndex(uniqueFilesListFromAllPrinters, function (o) {
-            return o.name == fileList[p].name;
+            return o.name === file.name;
           });
           if (index === -1) {
             uniqueFilesListFromAllPrinters.push(fileList[p]);
@@ -867,11 +867,10 @@ class PrinterStore {
     });
     const filesThatExistOnAllPrinters = [];
     // Check if that file exists on all of the printers...
-    for (let f = 0; f < uniqueFilesListFromAllPrinters.length; f++) {
-      const fileToCheck = uniqueFilesListFromAllPrinters[f];
+    for (let fileToCheck of uniqueFilesListFromAllPrinters) {
       const fileChecks = [];
-      for (let p = 0; p < ids.length; p++) {
-        const currentPrinter = this.#findMePrinter(ids[p]);
+      for (let id of ids) {
+        const currentPrinter = this.#findMePrinter(id);
         const fileList = currentPrinter?.fileList?.fileList;
         if (!!fileList) {
           fileChecks.push(fileList.some((el) => el.name === fileToCheck.name));
@@ -890,7 +889,7 @@ class PrinterStore {
 
   async generatePrinterConnectionLogs(id) {
     const printer = this.#findMePrinter(id);
-    return await PrinterClean.generateConnectionLogs(printer);
+    return PrinterClean.generateConnectionLogs(printer);
   }
 
   disablePrinter(id) {
@@ -900,27 +899,22 @@ class PrinterStore {
 
   async enablePrinter(id) {
     const printer = this.#findMePrinter(id);
-    return await printer.enablePrinter();
+    return printer.enablePrinter();
   }
 
   async getNewSessionKey(id) {
     const printer = this.#findMePrinter(id);
-    return await printer.getSessionkey();
+    return printer.getSessionkey();
   }
 
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
-    return await printer.acquireOctoPrintFilesData(true, true);
+    return printer.acquireOctoPrintFilesData(true, true);
   }
 
   async resyncFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
-    return await printer.acquireOctoPrintFileData(fullPath, true);
-  }
-
-  triggerOctoPrintFileScan(id, file) {
-    const printer = this.#findMePrinter(id);
-    return printer.triggerFileInformationScan(file);
+    return printer.acquireOctoPrintFileData(fullPath, true);
   }
 
   addNewFile(file) {
@@ -954,17 +948,14 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data).then(r => console.log(r));
+    PrinterService.findOneAndPush(index, "fileList.files", data)
+      .then()
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
     printer.fileList.fileList.push(
       FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
     );
-    // IMPROVE Utilise the websocket event to trigger updating a file's information
-    // OctoFarm shouldn't be repeatedly calling the API for information after a file has uploaded.
-    // We can use the websocket event trigger to update OctoFarms records. - TESTING seeing if I can use IMPROVE
-
-
-    // Trigger file update check service
-    this.triggerOctoPrintFileScan(index, data);
 
     return printer;
   }
@@ -987,7 +978,11 @@ class PrinterStore {
       display
     };
     printer.fileList.folderList.push(newFolder);
-    PrinterService.findOneAndPush(i, "fileList.folders", newFolder);
+    PrinterService.findOneAndPush(i, "fileList.folders", newFolder)
+      .then()
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
 
     return printer;
   }
@@ -1017,7 +1012,6 @@ class PrinterStore {
     const file = findIndex(printer.fileList.fileList, function (o) {
       return o.name === filename;
     });
-    // farmPrinters[i].fileList.files[file].path = newPath;
     printer.fileList.fileList[file].path = newPath;
     printer.fileList.fileList[file].fullPath = fullPath;
     return printer;
@@ -1039,8 +1033,8 @@ class PrinterStore {
         printer.fileList.fileList.splice(index, 1);
       }
     });
-    printer.fileList.folderList.forEach((folder, index) => {
-      if (folder.path === fullPath) {
+    printer.fileList.folderList.forEach((newFolder, index) => {
+      if (newFolder.path === fullPath) {
         printer.fileList.folderList.splice(index, 1);
       }
     });
@@ -1059,8 +1053,7 @@ class PrinterStore {
     }
 
     // Asign new printer id's;
-    for (let i = 0; i < printerIDs.length; i++) {
-      const id = printerIDs[i];
+    for (let id of printerIDs) {
       const tool = id.tool;
       const split = id.printer.split("-");
       const printerID = split[0];
@@ -1075,7 +1068,11 @@ class PrinterStore {
       }
       PrinterService.findOneAndUpdate(printerID, {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
-      }).then();
+      })
+        .then()
+        .catch((e) => {
+          logger.error("Issue updating spool list", e);
+        });
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
@@ -1095,11 +1092,17 @@ class PrinterStore {
 
     farmPrintersAssigned.forEach((printer) => {
       printer.selectedFilament.forEach((spool) => {
+        logger.debug("Resetting spool to null", spool);
         spool = null;
+        logger.debug("Spool reset", spool);
       });
       PrinterService.findOneAndUpdate(printer._id, {
         selectedFilament: printer.selectedFilament
-      }).then();
+      })
+        .then()
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
     });
   }
 
@@ -1119,6 +1122,28 @@ class PrinterStore {
   updatePrinterStatistics(id, statistics) {
     const printer = this.#findMePrinter(id);
     printer.updatePrinterStatistics(statistics);
+  }
+
+  updateFileInformation(id, data) {
+    const printer = this.#findMePrinter(id);
+
+    const { name, result } = data;
+
+    const fileIndex = findIndex(printer.fileList.fileList, function (o) {
+      return o.name === name;
+    });
+
+    if (!!fileIndex) {
+      logger.warning("Updating file information with generated OctoPrint data", data);
+      const { estimatedPrintTime, filament } = result;
+
+      printer.fileList.fileList[fileIndex].estimatedPrintTime = {
+        ...estimatedPrintTime,
+        ...filament
+      };
+    } else {
+      logger.error("Couldn't find file index to update!", name);
+    }
   }
 
   getPrinterStatistics(id) {

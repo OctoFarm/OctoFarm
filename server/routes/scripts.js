@@ -8,8 +8,9 @@ const logger = new Logger("OctoFarm-API");
 const Alerts = require("../models/Alerts.js");
 
 const script = require("../services/local-scripts.service.js");
-const { validateBodyMiddleware } = require("../middleware/validators");
+const { validateBodyMiddleware, validateParamsMiddleware } = require("../middleware/validators");
 const S_VALID = require("../constants/validate-script.constants");
+const M_VALID = require("../constants/validate-mongo.constants");
 const Script = script.ScriptRunner;
 router.get("/get", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
@@ -17,19 +18,25 @@ router.get("/get", ensureAuthenticated, ensureAdministrator, async (req, res) =>
   //Return printers added...
   res.send({ alerts: alerts, status: 200 });
 });
-router.delete("/delete/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  //Grab the API body
-  let id = req.params.id;
-  await Alerts.deleteOne({ _id: id })
-    .then((response) => {
-      res.send({ alerts: "success", status: 200 });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.send({ alerts: "error", status: 500 });
-    });
-  //Return printers added...
-});
+router.delete(
+  "/delete/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    //Grab the API body
+    let id = req.paramString("id");
+    await Alerts.deleteOne({ _id: id })
+      .then((response) => {
+        res.send({ alerts: "success", status: 200 });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.send({ alerts: "error", status: 500 });
+      });
+    //Return printers added...
+  }
+);
 
 router.post(
   "/test",
@@ -38,7 +45,8 @@ router.post(
   validateBodyMiddleware(S_VALID.SCRIPT_TEST),
   async (req, res) => {
     //Grab the API body
-    const { scriptLocation, message } = req.body;
+    const scriptLocation = req.bodyString("scriptLocation");
+    const message = req.bodyString("message");
     //Send Dashboard to Runner..
     let testFire = await Script.test(scriptLocation, message);
     //Return printers added...

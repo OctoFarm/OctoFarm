@@ -56,6 +56,11 @@ const captureTemperatureData = (id, data) => {
   }
 };
 
+const deleteTemperatureData = async (id) => {
+  delete tempTimers[id];
+  await TempHistoryDB.deleteMany({ printer_id: id });
+};
+
 const coolDownEvent = (id, temps) => {
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
@@ -95,15 +100,12 @@ const capturePrinterState = (id, data) => {
     let returnState = "";
     let returnStateDescription = "";
 
-    if (text === "Offline") {
+    if (text === "Offline" || text.includes("Closed")) {
       returnState = "Disconnected";
       returnStateDescription = "Your printer isn't connected to OctoPrint";
     } else if (text.includes("Error") || text.includes("error")) {
       returnState = "Error!";
       returnStateDescription = text;
-    } else if (text.includes("Closed")) {
-      returnState = "Disconnected";
-      returnStateDescription = "Your printer isn't connected to OctoPrint";
     } else {
       returnState = text;
       returnStateDescription = "Current status from OctoPrint";
@@ -214,5 +216,6 @@ module.exports = {
   setWebsocketAlive,
   captureResendsData,
   capturePrinterProgress,
-  captureCurrentZ
+  captureCurrentZ,
+  deleteTemperatureData
 };
