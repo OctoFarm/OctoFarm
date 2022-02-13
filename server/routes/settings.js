@@ -153,12 +153,14 @@ router.get(
       await SystemCommands.rebootOctoFarm();
     } else if (databaseNamesList.includes(databaseName)) {
       await eval(databaseName).deleteMany({});
-      res.send({
-        message: `Successfully deleted ${databaseName}, server will restart...`
-      });
-      logger.info(databaseName + " successfully deleted.... Restarting server...");
-      await SystemCommands.rebootOctoFarm();
+    } else {
+      logger.error("Unknown DB Name", databaseName);
     }
+    res.send({
+      message: `Successfully deleted ${databaseName}, server will restart...`
+    });
+    logger.info(databaseName + " successfully deleted.... Restarting server...");
+    await SystemCommands.rebootOctoFarm();
   }
 );
 router.get(
@@ -173,7 +175,7 @@ router.get(
     if (databaseName === "FilamentDB") {
       returnedObjects.push(await ProfilesDB.find({}));
       returnedObjects.push(await SpoolsDB.find({}));
-    } else {
+    } else if (databaseNamesList.includes(databaseName)) {
       returnedObjects.push(await eval(databaseName).find({}));
     }
     logger.info("Returning to client database object: " + databaseName);
