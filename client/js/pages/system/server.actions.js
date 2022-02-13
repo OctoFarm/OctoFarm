@@ -293,7 +293,7 @@ async function restartOctoFarmServer() {
   } else {
     UI.createAlert(
       "error",
-      "Service restart failed... Please check: <a href='https://docs.octofarm.net/installation/setup-service.html'> OctoFarm Service Setup </a> for more information ",
+      "Service restart failed... Please check: <a rel=”noopener” href='https://docs.octofarm.net/installation/setup-service.html'> OctoFarm Service Setup </a> for more information ",
       5000,
       "clicked"
     );

@@ -57,6 +57,7 @@
                          <i class="fas fa-code-branch"></i> Current Client Version: <a
                                  title="OctoFarm current version, will take you to github releases page"
                                  class="text-light"
+                                 rel=”noopener”
                                  href="<%= npmURL %>"
                                  target="_blank"><br><%= clientVersion %></a>
                      </div>
@@ -64,6 +65,7 @@
                          <i class="fas fa-code-branch"></i> Current Server Version: <a
                                  title="OctoFarm current version, will take you to github releases page"
                                  class="text-light"
+                                 rel=”noopener”
                                  href="<%= releasesURL + serviceInformation?.update?.current_version %>"
                                  target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
                      </div>
@@ -72,12 +74,14 @@
                              <i class="fas fa-code-branch"></i> Latest Server Version: <a
                                      title="OctoFarm latest version, will take you to github releases page"
                                      class="text-light"
+                                     rel=”noopener”
                                      href="<%= releasesURL + serviceInformation?.update?.current_version %>"
                                      target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
                          <% }else{ %>
                              <i class="fas fa-code-branch"></i> Latest Version:
                              <a title="OctoFarm latest version, will take you to github releases page"
                                 class="text-light"
+                                rel=”noopener”
                                 href="<%= serviceInformation?.update?.latestReleaseKnown.html_url; %>"
                                 target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown.name; %>
                                  <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
@@ -88,12 +92,14 @@
                          <i class="fas fa-code-branch"></i> GitHub Branch: <a
                                  title="OctoFarm current version, will take you to github releases page"
                                  class="text-light"
+                                 rel=”noopener”
                                  target="_blank"><br><%= currentGitBranch.current; %></a>
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> Node Environment: <a
                                  title="OctoFarm current version, will take you to github releases page"
                                  class="text-light"
+                                 rel=”noopener”
                                  target="_blank"><br><%= systemEnvironment; %></a>
                      </div>
                  </div>

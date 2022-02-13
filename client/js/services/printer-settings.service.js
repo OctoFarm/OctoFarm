@@ -568,7 +568,7 @@ class PrinterSettingsService {
         <h5><u>Custom Power Commands</u></h5>
         <p class="mb-0">Custom power commands is designed to work with all available plugins, and also custom API endpoints.</p>
         <p class="mb-0">If your endpoint requires url params, and not an object then please leave the command boxes empty.</p>
-        <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at <a href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">OctoFarm Documentation</a></p>
+        <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at <a rel=”noopener” href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">OctoFarm Documentation</a></p>
         <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
         <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
         
