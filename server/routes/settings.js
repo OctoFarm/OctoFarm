@@ -277,13 +277,13 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const historyChanges = isEqual(actualOnline.history, sentOnline.history);
     const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
-    checked[0].onlinePolling = req.body.onlinePolling;
-    checked[0].server = req.body.server;
-    checked[0].timeout = req.body.timeout;
-    checked[0].filament = req.body.filament;
-    checked[0].history = req.body.history;
-    checked[0].influxExport = req.body.influxExport;
-    checked[0].monitoringViews = req.body.monitoringViews;
+    checked[0].onlinePolling = sentOnline.onlinePolling;
+    checked[0].server = sentOnline.server;
+    checked[0].timeout = sentOnline.timeout;
+    checked[0].filament = sentOnline.filament;
+    checked[0].history = sentOnline.history;
+    checked[0].influxExport = sentOnline.influxExport;
+    checked[0].monitoringViews = sentOnline.monitoringViews;
 
     if (
       [
@@ -307,8 +307,8 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
-    let influx = req.body.influxExport;
-    if (req.body.influxExport.active) {
+    let influx = sentOnline.influxExport;
+    if (sentOnline.influxExport.active) {
       if (influx.host.length === 0) {
         shouldDisableInflux = true;
         returnMsg += "Issue: No host information! <br>";
