@@ -1137,7 +1137,7 @@ class PrinterStore {
       logger.warning("Updating file information with generated OctoPrint data", data);
       const { estimatedPrintTime, filament } = result;
 
-      printer.fileList.fileList[fileIndex].estimatedPrintTime = {
+      printer.fileList.fileList[fileIndex] = {
         ...estimatedPrintTime,
         ...filament
       };

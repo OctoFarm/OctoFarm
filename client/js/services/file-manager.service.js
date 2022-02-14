@@ -12,7 +12,8 @@ import {
   updateBulkActionsProgress,
   updateTableRow
 } from "../pages/printer-manager/functions/bulk-actions-progress.functions";
-import {allowedFileTypes} from "../constants/file-types.constants"
+import {allowedFileTypes} from "../constants/file-types.constants";
+import {getFileRowID} from "../pages/file-manager/upload-queue.templates"
 
 const fileUploads = new Queue();
 
@@ -22,41 +23,61 @@ const buttonSuccess = "btn btn-success mb-0";
 const buttonFailed = "btn btn-danger mb-0";
 const defaultReSync = "<i class=\"fas fa-sync\"></i> Re-Sync";
 const isValid = "is-valid";
-const isInValid = "is-invalid"
+const isInValid = "is-invalid";
+
+const QUEUE_PAUSED = false;
 
 const flashReturn = (element) => {
   element.className = buttonSuccess;
   element.innerHTML = defaultReSync;
 };
 
+const handleUploadFromQueue = async (current, index) => {
+  if (!current.active) {
+    fileUploads.activate(index);
+    const currentDate = new Date();
+    let file = await current.upload(current);
+    file = JSON.parse(file);
+    file.index = current.index;
+    file.uploadDate = currentDate.getTime() / 1000;
+    fileUploads.remove();
+    await OctoFarmClient.post("printers/newFiles", file);
+    await FileManagerSortingService.loadSort(current.index);
+    const uploadsRemaining = document.getElementById("uploadsRemaining");
+    if (uploadsRemaining) {
+      uploadsRemaining.innerHTML = `${fileUploads.size()}`;
+    }
+    const fileCounts = document.getElementById(`fileCounts-${current.index}`);
+    if (fileCounts && fileCounts.innerHTML === "1") {
+      fileCounts.innerHTML = "0";
+    }
+    if (uploadsRemaining && uploadsRemaining.innerHTML === "1") {
+      uploadsRemaining.innerHTML = "0";
+    }
+  }
+}
+
 setInterval(async () => {
+  let uploadQueueSize = parseFloat(document.getElementById("queueUploadLimitInput").value)
+  if(isNaN(uploadQueueSize)){
+    uploadQueueSize = 1;
+  }
+
   //Auto refresh of files
 
   // If there are files in the queue, plow through until uploaded... currently single file at a time.
-  if (fileUploads.size() > 0) {
-    const current = fileUploads.first();
-    if (!current.active) {
-      fileUploads.activate(0);
-      const currentDate = new Date();
-      let file = await current.upload(current);
-      file = JSON.parse(file);
-      file.index = current.index;
-      file.uploadDate = currentDate.getTime() / 1000;
-      fileUploads.remove();
-      await OctoFarmClient.post("printers/newFiles", file);
-      await FileManagerSortingService.loadSort(current.index);
-      const uploadsRemaining = document.getElementById("uploadsRemaining");
-      if (uploadsRemaining) {
-        uploadsRemaining.innerHTML = `${fileUploads.size()}`;
+  if (fileUploads.size() > 0 && !QUEUE_PAUSED) {
+    for (let ind = 1; ind <= uploadQueueSize; ind++){
+      const queueItem = fileUploads.n(ind - 1);
+      console.log(ind)
+      console.log(queueItem)
+      if(!!queueItem){
+        await handleUploadFromQueue(queueItem, ind -1)
       }
-      const fileCounts = document.getElementById(`fileCounts-${current.index}`);
-      if (fileCounts && fileCounts.innerHTML === "1") {
-        fileCounts.innerHTML = "0";
-      }
-      if (uploadsRemaining && uploadsRemaining.innerHTML === "1") {
-        uploadsRemaining.innerHTML = "0";
-      }
+
     }
+
+
   }
   const allUploads = fileUploads.all();
   allUploads.forEach((uploads) => {
@@ -79,7 +100,7 @@ export default class FileManagerService {
       const spinner = document.getElementById("fileUploadCountSpinner");
       if (spinner) {
         if (spinner.classList.contains("fa-spin")) {
-          
+
         } else {
           spinner.className = "fas fa-spinner fa-spin";
         }
@@ -105,7 +126,7 @@ export default class FileManagerService {
     }
   }
 
-  static createUpload(index, fileName, loaded, total) {
+  static createUpload(index, fileName, loaded, total, printerName) {
     const uploadSize = fileUploads.size();
     const uploadsSpinnerIcon = document.getElementById("uploadsSpinnerIcon");
     const uploadsRemaining = document.getElementById("uploadsRemaining");
@@ -157,6 +178,24 @@ export default class FileManagerService {
         progress.className = loadingBarSuccess;
       }
     }
+    const theFile = {
+      printer: printerName,
+      name: fileName,
+    }
+    const queueProgressBar = document.getElementById(`queueProgressBar-${getFileRowID(theFile)}`);
+    if (!!queueProgressBar) {
+      queueProgressBar.className = loadingBarWarning;
+      let percentLoad = (loaded / total) * 100;
+      if (isNaN(percentLoad)) {
+        percentLoad = 0;
+      }
+      queueProgressBar.innerHTML = `${Math.floor(percentLoad)}%`;
+      queueProgressBar.style.width = `${percentLoad}%`;
+      if (percentLoad === 100) {
+        queueProgressBar.className = loadingBarSuccess;
+      }
+    }
+
 
     const viewProgressBarWrapper = document.getElementById("filesViewProgressWrapper-" + index);
     if (viewProgressBarWrapper) {
@@ -217,17 +256,17 @@ export default class FileManagerService {
       xhr.open("POST", url);
       xhr.upload.onprogress = function (e) {
         if (e.lengthComputable) {
-          FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+          FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total, printerInfo.printerName);
         }
       };
 
       // xhr.setRequestHeader("Content-Type", "multipart/form-data");
       xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
       xhr.onloadstart = function (e) {
-        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total, printerInfo.printerName);
       };
       xhr.onloadend = async function (e) {
-        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total);
+        FileManagerService.createUpload(printerInfo._id, file.name, e.loaded, e.total, printerInfo.printerName);
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
           UI.createAlert(

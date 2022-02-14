@@ -107,9 +107,9 @@ class Manager {
       );
       //Setup for first printer
       const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
-      listItem.addEventListener("click", (e) => {
+      listItem.addEventListener("click", async (e) => {
         if (!e.target.id.includes("tool")) {
-          Manager.changePrinter(e, printer._id);
+          await Manager.changePrinter(e, printer._id);
         }
       });
 
@@ -137,7 +137,7 @@ class Manager {
     await Manager.drawPrinterList();
   }
 
-  static changePrinter(e, target) {
+  static async changePrinter(e, target) {
     if (!e.target.id.includes("filamentDrop")) {
       const fileList = document.getElementById("fileBody");
       if (!!fileList) {
@@ -159,7 +159,7 @@ class Manager {
       panel.classList.remove("bg-secondary");
       const firstElement = document.getElementById("currentPrinter");
       firstElement.innerHTML = `<i class="fas fa-print"></i> ${printerName}`;
-      Manager.updatePrinterList(target);
+      await Manager.updatePrinterList(target);
     }
   }
 
@@ -179,7 +179,7 @@ class Manager {
             <button
                     id="createFolderBtn"
                     type="button"
-                    class="btn btn-warning float-left mr-1 mb-0 bg-colour-3"
+                    class="btn btn-warning float-left mr-1 mb-0 text-dark"
                     data-toggle="collapse"
                     href="#createFolder"
                     role="button"
@@ -190,6 +190,12 @@ class Manager {
             </button>
             <button id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
               <i class="fas fa-sync"></i> Re-Sync
+            </button>
+            <button id="fileReSync" type="button" class="btn btn-outline-danger mb-0 float-right" disabled>
+              <i class="fa-solid fa-trash-can"></i> Delete All
+            </button>
+            <button id="fileReSync" type="button" class="btn btn-warning text-dark mb-0  mr-1 float-right" disabled>
+              <i class="fa-solid fa-broom"></i> House Keeping
             </button>
           </div>
         </div>
