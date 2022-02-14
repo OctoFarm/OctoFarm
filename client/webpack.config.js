@@ -36,7 +36,7 @@ webpackEntries["bootstrap"] = "bootstrap/dist/js/bootstrap.bundle";
 
 module.exports = (env, options) => {
   const isProd = options.mode === "production";
-  let chosenBuildDir = isProd ? buildDirProd : buildDirDev;
+  const chosenBuildDir = isProd ? buildDirProd : buildDirDev;
   const fullDir = path.resolve(__dirname, chosenBuildDir);
   return {
     entry: webpackEntries,
@@ -111,10 +111,10 @@ module.exports = (env, options) => {
         function (stats, callback) {
           const newlyCreatedAssets = stats.compilation.assets;
           const unlinked = [];
-          const dirContents = fs.readdirSync(path.resolve(chosenBuildDir), {
+          const localDirContents = fs.readdirSync(path.resolve(chosenBuildDir), {
             withFileTypes: true
           });
-          dirContents.forEach((file) => {
+          localDirContents.forEach((file) => {
             if (!newlyCreatedAssets[file.name] && file.isFile() && !isProd) {
               fs.unlinkSync(path.resolve(chosenBuildDir + file.name));
               unlinked.push(file.name);
