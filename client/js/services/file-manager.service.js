@@ -7,17 +7,27 @@ import FileManagerSortingService from "./file-manager-sorting.service.js";
 import PrinterSelectionService from "./printer-selection.service.js";
 import OctoFarmClient from "./octofarm-client.service";
 import {
-    generateTableRows,
-    showBulkActionsModal,
-    updateBulkActionsProgress,
-    updateTableRow
+  generateTableRows,
+  showBulkActionsModal,
+  updateBulkActionsProgress,
+  updateTableRow
 } from "../pages/printer-manager/functions/bulk-actions-progress.functions";
 import {allowedFileTypes} from "../constants/file-types.constants"
 
 const fileUploads = new Queue();
 
-const fileSortInit = false;
-const sortableFileList = null;
+const loadingBarWarning = "progress-bar progress-bar-striped bg-warning";
+const loadingBarSuccess = "progress-bar progress-bar-striped bg-success";
+const buttonSuccess = "btn btn-success mb-0";
+const buttonFailed = "btn btn-danger mb-0";
+const defaultReSync = "<i class=\"fas fa-sync\"></i> Re-Sync";
+const isValid = "is-valid";
+const isInValid = "is-invalid"
+
+const flashReturn = (element) => {
+  element.className = buttonSuccess;
+  element.innerHTML = defaultReSync;
+};
 
 setInterval(async () => {
   //Auto refresh of files
@@ -51,7 +61,7 @@ setInterval(async () => {
   const allUploads = fileUploads.all();
   allUploads.forEach((uploads) => {
     const currentCount = allUploads.reduce(function (n, up) {
-      return n + (up.index == uploads.index);
+      return n + (up.index === uploads.index);
     }, 0);
     const fileCounts = document.getElementById(`fileCounts-${uploads.index}`);
 
@@ -69,8 +79,9 @@ export default class FileManagerService {
       const spinner = document.getElementById("fileUploadCountSpinner");
       if (spinner) {
         if (spinner.classList.contains("fa-spin")) {
+          
         } else {
-          spinner.classList = "fas fa-spinner fa-spin";
+          spinner.className = "fas fa-spinner fa-spin";
         }
       }
       const uploadsSpinnerIcon = document.getElementById("uploadsSpinnerIcon");
@@ -104,7 +115,7 @@ export default class FileManagerService {
 
     if (uploadsSpinnerIcon) {
       uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner fa-spin'></i>";
-      let percentLoad = (loaded / total) * 100;
+      const percentLoad = (loaded / total) * 100;
       if (isNaN(percentLoad)) {
         uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner'></i>";
       }
@@ -116,13 +127,13 @@ export default class FileManagerService {
         upCount.innerHTML = "File Queue: 0";
         const spinner = document.getElementById("fileUploadCountSpinner");
         if (spinner.classList.contains("fa-spin")) {
-          spinner.classList = "fas fa-spinner";
+          spinner.className = "fas fa-spinner";
         }
       }
     }
     const uploadCurrentProgress = document.getElementById("uploadCurrentProgress");
     if (uploadCurrentProgress) {
-      uploadCurrentProgress.classList = "progress-bar progress-bar-striped bg-warning";
+      uploadCurrentProgress.className = loadingBarWarning;
       let percentLoad = (loaded / total) * 100;
       if (isNaN(percentLoad)) {
         percentLoad = 0;
@@ -130,12 +141,12 @@ export default class FileManagerService {
       uploadCurrentProgress.innerHTML = `${Math.floor(percentLoad)}%`;
       uploadCurrentProgress.style.width = `${percentLoad}%`;
       if (percentLoad === 100) {
-        uploadCurrentProgress.classList = "progress-bar progress-bar-striped bg-success";
+        uploadCurrentProgress.className = loadingBarSuccess;
       }
     }
     const progress = document.getElementById(`fileProgress-${index}`);
     if (progress) {
-      progress.classList = "progress-bar progress-bar-striped bg-warning";
+      progress.className = loadingBarWarning;
       let percentLoad = (loaded / total) * 100;
       if (isNaN(percentLoad)) {
         percentLoad = 0;
@@ -143,7 +154,7 @@ export default class FileManagerService {
       progress.innerHTML = `${Math.floor(percentLoad)}%`;
       progress.style.width = `${percentLoad}%`;
       if (percentLoad === 100) {
-        progress.classList = "progress-bar progress-bar-striped bg-success";
+        progress.className = loadingBarSuccess;
       }
     }
 
@@ -153,7 +164,7 @@ export default class FileManagerService {
         viewProgressBarWrapper.classList.remove("d-none");
       }
       const viewProgressBar = document.getElementById("filesViewProgressBar-" + index);
-      viewProgressBar.classList = "progress-bar progress-bar-striped bg-warning";
+      viewProgressBar.className = loadingBarWarning;
       let percentLoad = (loaded / total) * 100;
       if (isNaN(percentLoad)) {
         percentLoad = 0;
@@ -292,20 +303,14 @@ export default class FileManagerService {
     const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id
     });
-    const flashReturn = function () {
-      e.target.classList = "btn btn-success mb-0";
-      e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
-    };
-    if (how) {
-      e.target.classList = "btn btn-success mb-0";
-      e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
-      setTimeout(flashReturn, 500);
-    } else {
-      e.target.classList = "btn btn-success mb-0";
-      e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
-      setTimeout(flashReturn, 500);
-    }
 
+    if (how) {
+      e.target.className = buttonSuccess;
+    } else {
+      e.target.className = buttonFailed;
+    }
+    e.target.innerHTML = defaultReSync;
+    setTimeout(flashReturn, 500);
     printer.fileList = how;
     await FileManagerSortingService.loadSort(printer._id);
   }
@@ -803,10 +808,10 @@ export default class FileManagerService {
     async function chooseOrCreateFolder() {
       const multiFolderInput = document.getElementById("multi-UploadFolderSelect");
       const multiNewFolderNew = document.getElementById("multi-UploadNewFolderNew");
-      multiNewFolderNew.classList.remove("is-invalid");
-      multiNewFolderNew.classList.remove("is-valid");
-      multiFolderInput.classList.remove("is-invalid");
-      multiFolderInput.classList.remove("is-valid");
+      multiNewFolderNew.classList.remove(isInValid);
+      multiNewFolderNew.classList.remove(isValid);
+      multiFolderInput.classList.remove(isInValid);
+      multiFolderInput.classList.remove(isValid);
       multiNewFolderNew.value = "";
       multiFolderInput.innerHTML = "";
       const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
@@ -833,8 +838,8 @@ export default class FileManagerService {
         "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
       document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
         selectedFolder = document.getElementById("multiNewFolder").value;
-        let newFolder = document.getElementById("multiNewFolderNew").value;
-        let printers = await OctoFarmClient.listPrinters();
+        const newFolder = document.getElementById("multiNewFolderNew").value;
+        const printers = await OctoFarmClient.listPrinters();
         selectedPrinters.forEach((printer, index) => {
           if (printer) {
             const i = _.findIndex(printers, function (o) {
@@ -882,13 +887,13 @@ export default class FileManagerService {
 
         // validate the path
         if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
-          multiFolderInput.classList.add("is-invalid");
-          multiNewFolderNew.classList.add("is-invalid");
+          multiFolderInput.classList.add(isInValid);
+          multiNewFolderNew.classList.add(isInValid);
         } else {
-          multiNewFolderNew.classList.remove("is-invalid");
-          multiNewFolderNew.classList.add("is-valid");
-          multiFolderInput.classList.remove("is-invalid");
-          multiFolderInput.classList.add("is-valid");
+          multiNewFolderNew.classList.remove(isInValid);
+          multiNewFolderNew.classList.add(isValid);
+          multiFolderInput.classList.remove(isInValid);
+          multiFolderInput.classList.add(isValid);
           await checkIfPathExistsOnOctoPrint();
 
           await selectFilesToupload();
@@ -897,8 +902,8 @@ export default class FileManagerService {
     }
 
     async function checkIfPathExistsOnOctoPrint() {
-      for (let i = 0; i < selectedPrinters.length; i++) {
-        const currentPrinter = selectedPrinters[i].printerInfo;
+      for (const printer of selectedPrinters) {
+        const currentPrinter = printer.printerInfo;
         const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
         if (doesFolderExist === 200) {
           document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
@@ -1046,7 +1051,7 @@ export default class FileManagerService {
 
 export class FileActions {
   static async search(id) {
-    let printer = await OctoFarmClient.getPrinter(id);
+    const printer = await OctoFarmClient.getPrinter(id);
 
     const fileList = document.getElementById(`fileList-${id}`);
     let input = document.getElementById("searchFiles").value.toUpperCase();
@@ -1202,26 +1207,21 @@ export class FileActions {
 
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
-    const btnName = null;
     refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Syncing...";
     const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id,
       fullPath
     });
     if (how) {
+      refreshBtn.className = buttonSuccess;
       await FileManagerSortingService.loadSort(printer._id);
-    }
-    refreshBtn.innerHTML = "<i class=\"fas fa-sync\"></i> Re-Sync";
-    const flashReturn = function () {
-      refreshBtn.classList = "btn btn-dark";
-    };
-    if (how) {
-      refreshBtn.classList = "btn btn-sm btn-success";
-      setTimeout(flashReturn, 500);
     } else {
-      refreshBtn.classList = "btn btn-sm btn-danger";
-      setTimeout(flashReturn, 500);
+      refreshBtn.className = buttonFailed;
     }
+    refreshBtn.innerHTML = defaultReSync;
+    setTimeout(() => {
+      flashReturn(refreshBtn)
+    }, 500);
   }
 
   static moveFile(printer, fullPath) {

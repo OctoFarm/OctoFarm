@@ -19,7 +19,7 @@ export default class Queue {
     return this.data.length;
   }
   all() {
-    let res = [];
+    const res = [];
     this.data.forEach((d, index) => {
       res.push(this.data[index]);
     });
