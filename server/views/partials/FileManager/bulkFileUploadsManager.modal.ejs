@@ -7,15 +7,15 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Upload Limit</span>
                 </div>
-                <input type="number" step="1" min="1" max="5" class="form-control" placeholder="1" aria-label="Recipient's username" id="queueUploadLimitInput">
+                <input type="number" step="1" min="1" max="10" class="form-control" placeholder="1" aria-label="Recipient's username" id="queueUploadLimitInput">
                 <small class="form-text text-muted">
-                    Changing this will change how many uploads are actioned at 1 time. Min: <code>1</code>, Max: <code>5</code>.
+                    Changing this will change how many uploads are actioned at 1 time. Min: <code>1</code>, Max: <code>10</code>.
                 </small>
             </div>
 
 
-            <button title="Remove all items from queue" type="button" class="btn btn-outline-danger float-right ml-1" id="clearQueueBtn"><i class="fa-solid fa-xmark" disabled></i> Cancel Queue</button>
-            <button title="Pause/Resume the queue" type="button" class="btn btn-outline-warning float-right" id="stopQueueBtn" disabled><i class="fa-solid fa-pause"></i> Pause Queue</button>
+            <button title="Remove all items from queue" type="button" class="btn btn-outline-danger float-right ml-1 d-none" id="clearQueueBtn"><i class="fa-solid fa-xmark" disabled></i> Cancel Queue</button>
+            <button title="Pause/Resume the queue" type="button" class="btn btn-outline-warning float-right d-none" id="stopQueueBtn" disabled><i class="fa-solid fa-pause"></i> Pause Queue</button>
         </div>
     </div>
     <div class="row">

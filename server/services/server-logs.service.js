@@ -21,7 +21,7 @@ class Logs {
       const logFilePath = join(logFolder, folder);
       const stats = statSync(logFilePath);
       const logFile = {
-        name: folderContents[i],
+        name: folder,
         path: logFilePath,
         size: stats?.size,
         modified: stats?.mtime,
