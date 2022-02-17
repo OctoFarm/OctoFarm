@@ -8,8 +8,8 @@ export class DashUpdate {
   static insertIterable(elementId, data) {
     const element = document.getElementById(elementId);
     element.innerHTML = "";
-    for (let d = 0; d < data.length; d++) {
-      element.insertAdjacentHTML("beforeend", data[d]);
+    for (const dat of data) {
+      element.insertAdjacentHTML("beforeend", dat);
     }
   }
 
