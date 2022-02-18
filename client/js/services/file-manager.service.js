@@ -60,8 +60,8 @@ const handleUploadFromQueue = async (current, index) => {
 }
 
 setInterval(async () => {
-  let uploadQueueSize = parseFloat(document.getElementById("queueUploadLimitInput").value)
-  if(isNaN(uploadQueueSize)){
+  let uploadQueueSize = parseFloat(document.getElementById("queueUploadLimitInput"))
+  if(!!uploadQueueSize && isNaN(uploadQueueSize.value)){
     uploadQueueSize = 1;
   }
 
@@ -238,7 +238,7 @@ export default class FileManagerService {
       formData.append("file", file.file);
       formData.append("path", path);
       if (file.print) {
-        formData.append("print", true);
+        formData.append("print", "true");
       }
       const url = `${printerInfo.printerURL}/api/files/local`;
       const xhr = new XMLHttpRequest();

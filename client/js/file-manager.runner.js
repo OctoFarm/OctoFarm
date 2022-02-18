@@ -6,6 +6,12 @@ import {createFilamentSelector} from "./services/filament-manager-plugin.service
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 import {allowedFileTypes} from "./constants/file-types.constants"
 
+
+import {createClientSSEWorker} from "./services/client-worker.service";
+import {eventsSSEHandler, eventsURL} from "./pages/file-manager/file-manager-sse.handler";
+
+createClientSSEWorker(eventsURL, eventsSSEHandler);
+
 let lastId = null;
 
 //Setup global listeners...

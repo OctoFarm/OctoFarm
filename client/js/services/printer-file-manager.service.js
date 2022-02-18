@@ -5,7 +5,7 @@ import FileManagerService from "./file-manager.service.js";
 import {returnDropDown} from "./filament-manager-plugin.service";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./client-modal.service";
+import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {allowedFileTypes} from "../constants/file-types.constants";
 
 let currentIndex = 0;

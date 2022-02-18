@@ -4,7 +4,7 @@ import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
 import {createFilamentSelector} from "./filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./client-modal.service";
+import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 
 let currentIndex = 0;
 
