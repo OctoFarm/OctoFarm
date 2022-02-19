@@ -17,7 +17,8 @@ const addClientConnection = (req, res) => {
   res.writeHead(200, headers);
 
   // Add a new client that just connected
-  // Store the id and the whole response object
+  // Store the id and the whole response object with a clone of the user information
+  // Limitations it doesn't update user information, don't think it's needed
   const id = Date.now();
   const client = {
     id,
@@ -25,7 +26,7 @@ const addClientConnection = (req, res) => {
     user: Object.assign({}, req.user)
   };
   clientList.push(client);
-  console.log(req.user);
+
   logger.info(
     `${client?.user?.name ? client.user.name : UNKNOWN_USER} has connected to the endpoint.`
   );
@@ -52,6 +53,7 @@ const removeClient = (id) => {
 
 // TODO map, add to system as a callable endpoint so admins can see users connected...
 const listClients = (req, res) => {
+  console.log(clients);
   return res.json(clients);
 };
 /**
@@ -75,23 +77,21 @@ const notifySubscribers = (id, type, message) => {
   }
 };
 
-setInterval(() => {
-  console.log("SENDING CLIENT MESSAGE");
-
-  if (count === 0) {
-    notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
-      key: "fileDate",
-      value: "I Was updated from SSE!"
-    });
-    count = 1;
-  } else {
-    notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
-      key: "fileDate",
-      value: "I was changed from SSE!"
-    });
-    count = 0;
-  }
-}, 5000);
+// setInterval(() => {
+//   if (count === 0) {
+//     notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
+//       key: "fileDate",
+//       value: "I Was updated from SSE!"
+//     });
+//     count = 1;
+//   } else {
+//     notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
+//       key: "fileDate",
+//       value: "I was changed from SSE!"
+//     });
+//     count = 0;
+//   }
+// }, 5000);
 
 module.exports = {
   addClientConnection,

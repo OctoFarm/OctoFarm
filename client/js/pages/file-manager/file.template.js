@@ -15,9 +15,7 @@ export const getFolderTemplate = (folder, id) => {
                   <center><i class="fas fa-folder fa-2x"></i></center>
                 </div>
                 <div class="col-lg-11">
-                  <small class="float-right"
-                    >WHAT IS THIS</small
-                  >
+                  <small class="float-right"></small>
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1 float-left">
                       ${folder.display.replace(/_/g, " ")}

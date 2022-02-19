@@ -1,4 +1,5 @@
 import {asyncParse, debounce} from "./utils/sse.utils";
+import {MESSAGE_TYPES} from "../../server/constants/sse.constants"
 
 
 const reloadWindow = async function () {
@@ -117,21 +118,21 @@ function triggerCountDownTimer(seconds){
 }
 
 function setupEventSource() {
-  evtSource = new EventSource("/amialive");
+  evtSource = new EventSource("/events");
   evtSource.onmessage = async function (e) {
-    if (e?.data !== null) {
-      window.serverOffline = false;
-      await asyncParse(e.data);
-      const lostServerConnectionModal = document.getElementById("lostServerConnection");
-      if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
-        // If user has login enabled then we need to refresh the session...
-        if(!!e.data.loginRequired){
-          await reloadWindow()
-        }else{
-          await closeModal();
-        }
+    const { type, message } = await asyncParse(e.data);
+    if(type === MESSAGE_TYPES.AM_I_ALIVE){
+        window.serverOffline = false;
+        const lostServerConnectionModal = document.getElementById("lostServerConnection");
+        if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
+          // If user has login enabled then we need to refresh the session...
+          if(!!message?.loginRequired){
+            await reloadWindow();
+          }else{
+            await closeModal();
+          }
 
-      }
+        }
     }
   };
   evtSource.onopen = function (e) {

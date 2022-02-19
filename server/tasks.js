@@ -16,8 +16,20 @@ const {
 const { FileClean } = require("./services/file-cleaner.service");
 const { sortCurrentOperations } = require("./services/printer-statistics.service");
 const { initFarmInformation } = require("./services/farm-information.service");
+const { notifySubscribers } = require("./services/server-side-events.service");
+const { MESSAGE_TYPES } = require("./constants/sse.constants");
+
 const Logger = require("./handlers/logger");
+const { SettingsClean } = require("./services/settings-cleaner.service");
 const logger = new Logger("OctoFarm-TaskManager");
+
+const I_AM_ALIVE = () => {
+  notifySubscribers("iAmAlive", MESSAGE_TYPES.AM_I_ALIVE, {
+    ok: true,
+    loginRequired: SettingsClean.isLogonRequired()
+  });
+};
+
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
 };
@@ -25,10 +37,6 @@ const INITIALISE_PRINTERS = async () => {
 const START_PRINTER_ADD_QUEUE = async () => {
   getPrinterManagerCache().handlePrinterAddQueue();
 };
-
-// const INIT_FILE_UPLOAD_QUEUE = async () => {
-//   getFileUploadQueueCache().actionQueueState();
-// };
 
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
@@ -227,7 +235,8 @@ class OctoFarmTasks {
     TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_200_MS)
+    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_500_MS),
+    TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_500_MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

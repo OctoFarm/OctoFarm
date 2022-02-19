@@ -26,6 +26,11 @@ class Manager {
   static async drawPrinterList() {
     let printers = await OctoFarmClient.listPrinters();
     const printerList = document.getElementById("printerList");
+
+    if(!printerList){
+      return;
+    }
+
     printerList.innerHTML = "";
     //Get online printers...
     const onlinePrinterList = [];

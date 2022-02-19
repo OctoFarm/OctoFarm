@@ -118,7 +118,6 @@ async function ensureSystemSettingsInitiated() {
  */
 function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/amialive", require("./routes/SSE-amIAlive", { page: "route" }));
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", printerActionLimits, require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));

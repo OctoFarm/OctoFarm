@@ -1144,9 +1144,7 @@ export class FileActions {
             UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
             await OctoFarmClient.post("printers/moveFile", opts);
             await FileManagerSortingService.loadSort(printer._id);
-            setTimeout(function () {
-              UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
-            }, 3000);
+            UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
           }
         }
       }
