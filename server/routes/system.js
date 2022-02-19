@@ -7,7 +7,7 @@ const { SystemRunner } = require("../services/system-information.service.js");
 
 const isDocker = require("is-docker");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const { ensureCurrentUserAndGroup } = require("../middleware/users");
 const { AppConstants } = require("../constants/app.constants");
 const { getDefaultDashboardSettings } = require("../constants/settings.constants");
@@ -21,6 +21,7 @@ const { returnPatreonData } = require("../services/patreon.service");
 const { TaskManager } = require("../services/task-manager.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
+const { listActiveClients } = require("../services/server-side-events.service");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -83,10 +84,11 @@ router.get("/info", ensureAuthenticated, (req, res) => {
   res.send(systemInformation);
 });
 
-router.get("/tasks", ensureAuthenticated, async (req, res) => {
+router.get("/tasks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const taskManagerState = TaskManager.getTaskState();
 
   res.send(taskManagerState);
 });
 
+router.get("/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
 module.exports = router;

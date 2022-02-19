@@ -1126,24 +1126,7 @@ class PrinterStore {
 
   updateFileInformation(id, data) {
     const printer = this.#findMePrinter(id);
-
-    const { name, result } = data;
-
-    const fileIndex = findIndex(printer.fileList.fileList, function (o) {
-      return o.name === name;
-    });
-
-    if (!!fileIndex) {
-      logger.warning("Updating file information with generated OctoPrint data", data);
-      const { estimatedPrintTime, filament } = result;
-
-      printer.fileList.fileList[fileIndex] = {
-        ...estimatedPrintTime,
-        ...filament
-      };
-    } else {
-      logger.error("Couldn't find file index to update!", name);
-    }
+    printer.updateFileInformation(data);
   }
 
   getPrinterStatistics(id) {

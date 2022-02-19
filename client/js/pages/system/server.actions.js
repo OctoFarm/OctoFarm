@@ -20,6 +20,7 @@ import {
 } from "./server.options";
 import {serverBootBoxOptions} from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";
+import {activeUserListRowTemplate} from "./system.templates";
 
 let historicUsageGraph;
 let cpuUsageDonut;
@@ -526,23 +527,41 @@ async function grabOctoFarmLogList() {
 
 async function clearOldLogs(){
   try {
-    const deletedLogs = await OctoFarmClient.clearOldLogs();
-    if(deletedLogs.length === 0){
-      UI.createAlert("warning", "No logs older than 1 day to delete!", 3000, "clicked")
-    }else{
-      let message = "";
 
-      deletedLogs.forEach(log => {
-        message += `${log}<br>`
-        const logLine = document.getElementById(`log-${log}`)
-        if(!!logLine){
-          logLine.remove();
+    bootbox.confirm({
+      message: "Logs older than 5 days will be removed, Are you sure?",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success"
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger"
         }
-      })
+      },
+      callback: async function (result) {
+        if(!!result){
+          const deletedLogs = await OctoFarmClient.clearOldLogs();
+          if(deletedLogs.length === 0){
+            UI.createAlert("warning", "No logs older than 5 day to delete!", 3000, "clicked")
+          }else{
+            let message = "";
 
-      UI.createAlert("success", "Successfully cleaned house! <br>" + message, 3000, "clicked")
-    }
+            deletedLogs.forEach(log => {
+              message += `${log}<br>`
+              const logLine = document.getElementById(`log-${log}`)
+              if(!!logLine){
+                logLine.remove();
+              }
+            })
 
+            UI.createAlert("success", "Successfully cleaned house! <br>" + message, 3000, "clicked")
+          }
+        }
+
+      }
+    });
   }catch (e) {
     UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked")
   }
@@ -557,6 +576,22 @@ async function renderSystemCharts() {
   await memoryUsageDonut.render();
 }
 
+async function updateCurrentActiveUsers() {
+  const activeUserList = await OctoFarmClient.get("system/activeUsers");
+  const activeUserListContainer = document.getElementById("activeUserListContainer");
+  const activeUserCount = document.getElementById("activeUserCount");
+  if(!!activeUserCount){
+    activeUserCount.innerHTML = activeUserList.length;
+  }
+
+  if(!!activeUserListContainer){
+    activeUserListContainer.innerHTML = "";
+    activeUserList.forEach(user => {
+      activeUserListContainer.insertAdjacentHTML("beforeend", activeUserListRowTemplate(user))
+    })
+  }
+}
+
 async function updateLiveSystemInformation() {
   const initialChartOptions = {
     noData: {
@@ -567,7 +602,9 @@ async function updateLiveSystemInformation() {
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
-  if(!systemInformation) {return}
+  if(!systemInformation) {
+    return;
+  }
 
   if (systemInformation?.uptime && !!procUptimeElem) {
     procUptimeElem.innerHTML = Calc.generateTime(systemInformation.uptime);
@@ -612,14 +649,16 @@ async function updateLiveSystemInformation() {
 
 async function startUpdateInfoRunner() {
   await updateLiveSystemInformation();
+  await updateCurrentActiveUsers();
   setInterval(async () => {
     await updateLiveSystemInformation();
+    await updateCurrentActiveUsers();
   }, 5000);
 }
 
+// REFACTOR utilise the events server for this...
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
-    await updateLiveSystemInformation();
     const taskManagerState = await OctoFarmClient.get("system/tasks");
 
     for (const task in taskManagerState) {

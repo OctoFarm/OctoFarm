@@ -51,10 +51,15 @@ const removeClient = (id) => {
   clientList = clientList.filter((client) => client.id !== id);
 };
 
-// TODO map, add to system as a callable endpoint so admins can see users connected...
-const listClients = (req, res) => {
-  console.log(clients);
-  return res.json(clients);
+const listActiveClients = (req, res) => {
+  const curretnActiveClientList = clientList.map((client) => {
+    return {
+      connectionDate: client.id,
+      userName: client?.user?.name ? client.user.name : UNKNOWN_USER,
+      group: client.user.group
+    };
+  });
+  return res.json(curretnActiveClientList);
 };
 /**
  *
@@ -96,5 +101,5 @@ const notifySubscribers = (id, type, message) => {
 module.exports = {
   addClientConnection,
   notifySubscribers,
-  listClients
+  listActiveClients
 };

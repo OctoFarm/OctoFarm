@@ -6,7 +6,7 @@ export default class Calculate {
     const random = Math.random().toString(36).substr(2, 5);
     return random;
   }
-
+  // Ah david and him been "Explicit" da fuck is this
   static perc(amount, rounding = 2) {
     return `${amount?.toFixed(rounding) || 0}%`;
   }
@@ -22,13 +22,13 @@ export default class Calculate {
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
       string = "No Time Estimate";
     } else {
-      const days = Math.floor(seconds / (3600 * 24));
+      let days = Math.floor(seconds / (3600 * 24));
 
       seconds -= days * 3600 * 24;
-      const hrs = Math.floor(seconds / 3600);
+      let hrs = Math.floor(seconds / 3600);
 
       seconds -= hrs * 3600;
-      const mnts = Math.floor(seconds / 60);
+      let mnts = Math.floor(seconds / 60);
 
       seconds -= mnts * 60;
       seconds = Math.floor(seconds);
@@ -94,10 +94,36 @@ export default class Calculate {
       "Nov",
       "Dec"
     ];
+
+    let hrs = date.getHours();
+
+    let mnts = date.getMinutes();
+
+    let seconds = date.getSeconds();
+
+    if(mnts < 10){
+      mnts = `0${mnts}`
+    }
+
+    if(hrs < 10){
+      hrs = `0${hrs}`
+    }
+
+    if(seconds < 10){
+      seconds = `0${seconds}`
+    }
+
     return `${days[date.getDay()]} ${
       months[date.getMonth()]
-    } ${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    } ${date.getFullYear()} - ${hrs}:${mnts}:${seconds}`;
   }
+
+  static timeSince(date) {
+    const currentDate = Date.now();
+
+    return Calculate.generateTime(currentDate / 1000 - date / 1000);
+  }
+
   static generateCost(cost) {
     if (cost) {
       return cost.toFixed(2);

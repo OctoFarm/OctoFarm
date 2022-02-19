@@ -7,6 +7,8 @@ const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
 const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
+const { notifySubscribers } = require("../../server-side-events.service");
+const { MESSAGE_TYPES } = require("../../../constants/sse.constants");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -235,6 +237,20 @@ const captureHome = (id, data) => {
 const captureMetadataAnalysisFinished = (id, data) => {
   getPrinterStoreCache().updateFileInformation(id, data);
 
+  const { name, result } = data;
+
+  const { estimatedPrintTime, filament } = result;
+
+  notifySubscribers(name, MESSAGE_TYPES.FILE_UPDATE, {
+    key: "fileTime",
+    value: estimatedPrintTime
+  });
+
+  notifySubscribers(name, MESSAGE_TYPES.FILE_UPDATE, {
+    key: "fileTool",
+    value: filament
+  });
+
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadatafinished", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata finished script", res);
@@ -256,6 +272,7 @@ const captureMetadataAnalysisStarted = (id, data) => {
 };
 const captureMetadataStatisticsUpdated = (id, data) => {
   getPrinterStoreCache().updateFileInformation(id, data);
+
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadataupdated", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata updated script", res);

@@ -1714,6 +1714,39 @@ class OctoPrintPrinter {
     return this.#db.delete();
   }
 
+  updateFileInformation(data) {
+    const { name, result } = data;
+
+    const fileIndex = findIndex(this.fileList.fileList, function (o) {
+      return o.name === name;
+    });
+
+    if (!!fileIndex) {
+      logger.warning("Updating file information with generated OctoPrint data", data);
+      const { estimatedPrintTime, filament } = result;
+
+      this.fileList.fileList[fileIndex] = {
+        ...estimatedPrintTime,
+        ...filament
+      };
+
+      this.fileList = FileClean.generate(
+        {
+          files: this.fileList.files,
+          filecount: this.fileList.files.length,
+          folders: this.fileList.folders,
+          folderCount: this.fileList.folders.length
+        },
+        this.selectedFilament,
+        this.costSettings
+      );
+
+      this.#db.updatePrinterDatabase(id, { fileList: this.fileList });
+    } else {
+      logger.error("Couldn't find file index to update!", name);
+    }
+  }
+
   updatePrinterStatistics(statistics) {
     this.#printerStatistics = statistics;
   }

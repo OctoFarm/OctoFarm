@@ -60,8 +60,8 @@ const handleUploadFromQueue = async (current, index) => {
 }
 
 setInterval(async () => {
-  let uploadQueueSize = parseFloat(document.getElementById("queueUploadLimitInput"))
-  if(!!uploadQueueSize && isNaN(uploadQueueSize.value)){
+  let uploadQueueSize = document.getElementById("queueUploadLimitInput")
+  if(!!uploadQueueSize && isNaN(parseFloat(uploadQueueSize.value))){
     uploadQueueSize = 1;
   }
 
@@ -71,8 +71,6 @@ setInterval(async () => {
   if (fileUploads.size() > 0 && !QUEUE_PAUSED) {
     for (let ind = 1; ind <= uploadQueueSize; ind++){
       const queueItem = fileUploads.n(ind - 1);
-      console.log(ind)
-      console.log(queueItem)
       if(!!queueItem){
         await handleUploadFromQueue(queueItem, ind -1)
       }

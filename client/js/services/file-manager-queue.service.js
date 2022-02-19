@@ -31,7 +31,7 @@ export default class Queue {
     return this.data.length;
   }
   all() {
-    // REFACTOR bit weird, why not just pull this.data :/
+    // REFACTOR bit weird, why not just pull this.data :/ ahh my learning exploits scripty kiddie copy pastey!
     const res = [];
     this.data.forEach((d, index) => {
       res.push(this.data[index]);
