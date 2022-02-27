@@ -170,10 +170,6 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
   of Gina and everyone who helps out with that.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
-- [James Mackay (NotExpectedYet)](https://github.com/NotExpectedYet) - The spirit and creator of OctoFarm!
-- [David Zwart (davidzwa)](https://github.com/davidzwa) - Big help for the massive push from him to get V2 underway.
-  Brought a lot of knowledge to the table that I was lacking.
-- The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.
