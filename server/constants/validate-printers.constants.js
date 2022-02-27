@@ -8,7 +8,7 @@ const STRING_MAX_LENGTH = "maxLength:50";
 
 module.exports = {
   PRINTER_ID: {
-    i: ["string", "mongoose_object_id"]
+    id: ["string", "mongoose_object_id"]
   },
   NEW_PRINTER: {
     settingsAppearance: "settings_appearance",
@@ -29,5 +29,9 @@ module.exports = {
     "infoList.*.group": ["string", MIN_LENGTH_0, MAX_PRINTER_ARRAY],
     "infoList.*.printerURL": ["required", "string", "url"],
     "infoList.*.settingsAppearance": "settings_appearance"
+  },
+  FILE_SYNC: {
+    id: ["required", "string", "mongoose_object_id"],
+    filePath: ["string", "path"]
   }
 };

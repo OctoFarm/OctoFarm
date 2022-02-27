@@ -139,18 +139,57 @@ router.post("/removefolder", ensureAuthenticated, async (req, res) => {
   getPrinterStoreCache().deleteFolder(folder.index, folder.fullPath);
   res.send(true);
 });
-router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
-  // Check required fields
-  const file = req.body;
-  logger.info("File Re-sync request for: ", file);
-  let ret;
-  if (typeof file.fullPath !== "undefined") {
-    ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
-  } else {
-    ret = await getPrinterStoreCache().resyncFilesList(file.i);
+router.post(
+  "/resyncFile",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.FILE_SYNC),
+  async (req, res) => {
+    // Check required fields
+    const file = req.body;
+    let ret;
+    if (!file.fullPath) {
+      logger.info("Printer single file resync request", {
+        printer_id: file.i,
+        file_path: file.fullPath
+      });
+      ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
+    } else {
+      logger.info("Full printer files resync request", {
+        printer_id: file.i
+      });
+      ret = await getPrinterStoreCache().resyncFilesList(file.i);
+    }
+    res.send(ret);
   }
-  res.send(ret);
-});
+);
+router.post(
+  "/nukeFiles",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.FILE_SYNC),
+  async (req, res) => {
+    // Check required fields
+    const { i } = req.body;
+    logger.info("Nuke all files and folders requested!", i);
+
+    res.send({});
+  }
+);
+router.post(
+  "/houseCleanFiles",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.PRINTER_ID),
+  async (req, res) => {
+    // Check required fields
+    const { i, days } = req.body;
+    logger.info("File house clean requested!", {
+      printerID: i,
+      days
+    });
+    await getPrinterStoreCache().houseCleanFiles(i, days);
+
+    res.send({});
+  }
+);
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;

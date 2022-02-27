@@ -25,9 +25,8 @@ class PrinterManagerService {
     const pList = await PrinterService.list();
     logger.debug("Initialising " + pList.length + " printers");
     for (let p of pList) {
-      await patchPrinterValues(p);
+      await this.addPrinter(p);
     }
-    await this.batchCreatePrinters(pList);
     return true;
   }
 
@@ -50,6 +49,7 @@ class PrinterManagerService {
   }
 
   handlePrinterAddQueue() {
+    console.log(this.#addPrintersQueue);
     if (this.#addPrintersQueue.length > 0) {
       if (!!this.#addPrintersQueue[0]) {
         getPrinterStoreCache().addPrinter(new OctoPrintPrinter(this.#addPrintersQueue[0]));
@@ -58,30 +58,30 @@ class PrinterManagerService {
     }
   }
 
-  // REFACTOR, this is a massive CPU smash, slow it down...
-  // Redundant after adding the printer add queue. May as well remove it and just push straight into the queue.
-  async batchCreatePrinters(printerList) {
-    // Async function to send mail to a list of users.
-    const createNewPrinterBatches = async (printer) => {
-      const printerLength = printer.length;
-
-      for (let i = 0; i < printerLength; i += 5) {
-        const requests = printer.slice(i, i + 5).map((printerCreate) => {
-          // The batch size is 100. We are processing in a set of 100 users.
-          return this.addPrinter(printerCreate);
-        });
-
-        // requests will have 100 or less pending promises.
-        // Promise.all will wait till all the promises got resolves and then take the next 100.
-        logger.debug(`Running printer batch ${i + 1}`);
-        await Promise.allSettled(requests).catch((e) =>
-          logger.error(`Error in creating new printer batch: ${i} - ${e}`)
-        ); // Catch the error.
-      }
-    };
-
-    await createNewPrinterBatches(printerList);
-  }
+  // // REFACTOR, this is a massive CPU smash, slow it down...
+  // // Redundant after adding the printer add queue. May as well remove it and just push straight into the queue.
+  // async batchCreatePrinters(printerList) {
+  //   // Async function to send mail to a list of users.
+  //   const createNewPrinterBatches = async (printer) => {
+  //     const printerLength = printer.length;
+  //
+  //     for (let i = 0; i < printerLength; i += 5) {
+  //       const requests = printer.slice(i, i + 5).map((printerCreate) => {
+  //         // The batch size is 100. We are processing in a set of 100 users.
+  //         return this.addPrinter(printerCreate);
+  //       });
+  //
+  //       // requests will have 100 or less pending promises.
+  //       // Promise.all will wait till all the promises got resolves and then take the next 100.
+  //       logger.debug(`Running printer batch ${i + 1}`);
+  //       await Promise.allSettled(requests).catch((e) =>
+  //         logger.error(`Error in creating new printer batch: ${i} - ${e}`)
+  //       ); // Catch the error.
+  //     }
+  //   };
+  //
+  //   await createNewPrinterBatches(printerList);
+  // }
 
   updateStateCounters() {
     const printerList = getPrinterStoreCache().listPrinters();

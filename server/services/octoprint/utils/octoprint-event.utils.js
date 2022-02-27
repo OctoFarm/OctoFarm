@@ -234,8 +234,8 @@ const captureHome = (id, data) => {
       logger.error("Failed to check homed script", e);
     });
 };
-const captureMetadataAnalysisFinished = (id, data) => {
-  getPrinterStoreCache().updateFileInformation(id, data);
+const captureMetadataAnalysisFinished = async (id, data) => {
+  await getPrinterStoreCache().updateFileInformation(id, data);
 
   const { name, result } = data;
 

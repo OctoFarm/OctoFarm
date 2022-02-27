@@ -917,6 +917,11 @@ class PrinterStore {
     return printer.acquireOctoPrintFileData(fullPath, true);
   }
 
+  async houseCleanFiles(id, days) {
+    const printer = this.#findMePrinter(id);
+    return printer.houseCleanFiles(days);
+  }
+
   addNewFile(file) {
     const { index, files } = file;
     const printer = this.#findMePrinter(index);
@@ -1003,7 +1008,9 @@ class PrinterStore {
     });
     printer.fileList.folderList[folderIndex].name = folderName;
     printer.fileList.folderList[folderIndex].path = newFullPath;
-
+    printer.updatePrinterData({
+      fileList: printer.fileList
+    });
     return printer;
   }
 
@@ -1014,6 +1021,9 @@ class PrinterStore {
     });
     printer.fileList.fileList[file].path = newPath;
     printer.fileList.fileList[file].fullPath = fullPath;
+    printer.updatePrinterData({
+      fileList: printer.fileList
+    });
     return printer;
   }
 
@@ -1023,6 +1033,9 @@ class PrinterStore {
       return o.fullPath === fullPath;
     });
     printer.fileList.fileList.splice(index, 1);
+    printer.updatePrinterData({
+      fileList: printer.fileList
+    });
     return printer;
   }
 
@@ -1042,6 +1055,9 @@ class PrinterStore {
       return o.name === fullPath;
     });
     printer.fileList.folderList.splice(folder, 1);
+    printer.updatePrinterData({
+      fileList: printer.fileList
+    });
     return printer;
   }
 
@@ -1124,9 +1140,9 @@ class PrinterStore {
     printer.updatePrinterStatistics(statistics);
   }
 
-  updateFileInformation(id, data) {
+  async updateFileInformation(id, data) {
     const printer = this.#findMePrinter(id);
-    printer.updateFileInformation(data);
+    await printer.updateFileInformation(data);
   }
 
   getPrinterStatistics(id) {

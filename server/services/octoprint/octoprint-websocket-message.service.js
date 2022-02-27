@@ -94,7 +94,7 @@ class OctoprintWebsocketMessageService {
     return type;
   };
 
-  static handleMessage(printerID, message) {
+  static async handleMessage(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
 
     const { header, data } = OP_EM.parseOctoPrintWebsocketMessage(message);
@@ -113,7 +113,7 @@ class OctoprintWebsocketMessageService {
         OP_EM.handleHistoryData(printerID, data);
         break;
       case OP_WS_MSG.event:
-        OP_EM.handleEventData(printerID, data);
+        await OP_EM.handleEventData(printerID, data);
         break;
       case OP_WS_MSG.plugin:
         OP_EM.handlePluginData(printerID, data);
@@ -165,7 +165,7 @@ class OctoprintWebsocketMessageService {
     getPrinterStoreCache().updatePrinterState(printerID, currentState);
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
-  static handleEventData(printerID, data) {
+  static async handleEventData(printerID, data) {
     const { type, payload } = data.event;
     const debugMessage = `Detected ${type} event`;
     logger.debug(debugMessage, payload);
@@ -221,7 +221,7 @@ class OctoprintWebsocketMessageService {
         captureHome(printerID, payload);
         break;
       case EVENT_TYPES.MetadataAnalysisFinished:
-        captureMetadataAnalysisFinished(printerID, payload);
+        await captureMetadataAnalysisFinished(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.MetadataAnalysisStarted:

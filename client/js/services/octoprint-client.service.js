@@ -190,8 +190,10 @@ export default class OctoPrintClient {
   static async file(printer, fullPath, action, notify = true) {
     const url = "files/local/" + fullPath;
     let post = null;
+    let pastTense = action;
 
     if (action === "load") {
+      pastTense = "loaded"
       const opt = {
         command: "select",
         print: false
@@ -201,6 +203,7 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateBedOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "print") {
+      pastTense = "printed"
       const opt = {
         command: "select",
         print: true
@@ -210,24 +213,31 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateBedOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "delete") {
+      pastTense = "deleted"
       post = await OctoPrintClient.delete(printer, url);
     }
-    console.log(post?.status);
-    console.log(notify);
-    if (post?.status === 204 || post?.status === 200) {
-      if (action === "delete") {
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");
-        }
-      } else {
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: ${action} actioned`, 3000, "clicked");
-        }
+
+    if(notify){
+      if (post?.status === 204 || post?.status === 200) {
+        UI.createAlert("success", `${printer.printerName}/${fullPath}: Successfully ${pastTense}`, 3000, "clicked");
+        return;
       }
-    } else {
-      if (notify) {
-        UI.createAlert("error", `${printer.printerName}: ${action} failed`, 3000, "clicked");
+      if (post?.status === 404){
+          UI.createAlert("warning", `${printer.printerName}/${fullPath}: Could not be found, maybe you need to ReSync?`, 3000, "clicked");
+          return;
       }
+      if (post?.status > 500 && post?.status < 600){
+        UI.createAlert("error", `${printer.printerName}/${fullPath}: OctoPrint reported a server error! Please check it's logs.`, 3000, "clicked");
+        return;
+      }
+      if (post?.status === 409) {
+        UI.createAlert("warning", `
+        ${printer.printerName}/${fullPath}: OctoPrint reported a conflict... 
+        The file is in use for a printer or something else that is preventing
+        `, 3000, "clicked");
+        return;
+      }
+      UI.createAlert("error", "'Ello 'ello 'ello, what's going on 'ere then!? <br> This shouldn't be seen, please log a bug report!", 0, "Clicked")
     }
   }
 

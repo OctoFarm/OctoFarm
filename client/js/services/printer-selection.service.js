@@ -245,7 +245,7 @@ export default class PrinterSelectionService {
   }
 
   static async create(element, editable, action, callback) {
-    let saveEditsBtn = document.getElementById("saveEditsBtn");
+    const saveEditsBtn = document.getElementById("saveEditsBtn");
     if (saveEditsBtn) {
       saveEditsBtn.remove();
     }
@@ -255,7 +255,7 @@ export default class PrinterSelectionService {
     //Setup elements
     element.innerHTML = "";
     element.innerHTML = printersTable;
-    let messageBox = document.getElementById("selectMessageBox");
+    const messageBox = document.getElementById("selectMessageBox");
     messageBox.innerHTML = "";
     let override = false;
     if (action === "Printer Deletion") {

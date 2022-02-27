@@ -35,7 +35,7 @@ class Logs {
   /**
    * Deletes a log file by name
    * @param name
-   * @returns {void}
+   * @returns Boolean
    */
   static deleteLogByName(name = undefined) {
     if (!name) {

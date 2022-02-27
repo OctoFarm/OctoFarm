@@ -349,6 +349,39 @@ export default class FileManagerService {
     await FileManagerSortingService.loadSort(printer._id);
   }
 
+  static async deleteAllFiles(e, printer) {
+    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
+    const how = await OctoFarmClient.post("printers/nukeFiles", {
+      i: printer._id
+    });
+
+    if (how) {
+      e.target.className = buttonSuccess;
+    } else {
+      e.target.className = buttonFailed;
+    }
+    e.target.innerHTML = defaultReSync;
+    setTimeout(() => {
+      e.target.className = buttonSuccess;
+      e.target.innerHTML = "<i class=\"fa-solid fa-trash-can\"></i> Delete All";
+    }, 500);
+    printer.fileList = how;
+    await FileManagerSortingService.loadSort(printer._id);
+  }
+
+  static async fileHouseKeeping(e, printer, days) {
+    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
+    const houseCleanFiles = await OctoFarmClient.post("printers/houseCleanFiles", {
+      i: printer._id,
+      days
+    });
+    setTimeout(() => {
+      e.target.innerHTML = "<i class=\"fa-solid fa-broom\"></i> House Keeping"
+    }, 500);
+    printer.fileList = houseCleanFiles;
+    await FileManagerSortingService.loadSort(printer._id);
+  }
+
   static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
     if (typeof target !== "undefined" && target.type === "button") {

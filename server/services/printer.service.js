@@ -10,7 +10,9 @@ const logger = new Logger("OctoFarm-Server");
  * @throws {Error} If the printer is not correctly provided.
  */
 const create = async (printer) => {
-  if (!printer) throw new Error("Missing printer");
+  if (!printer) {
+    throw new Error("Missing printer");
+  }
 
   return printerModel.create(printer);
 };
@@ -38,9 +40,11 @@ const findOneAndPush = (id, pushKey, obj) => {
     .findOneAndUpdate({ _id: id }, { $push: { [pushKey]: obj } }, { new: true })
     .then((res) => {
       logger.debug("Successfully updated printer database! Key Push: " + pushKey, obj);
+      return res;
     })
     .catch((e) => {
       logger.error("Failed to update printer database!! Key Push: " + pushKey, e);
+      return e;
     });
 };
 

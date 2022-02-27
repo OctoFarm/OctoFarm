@@ -1,5 +1,6 @@
 import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./utils/calc.js";
+import UI from "./utils/ui"
 import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
 import {createFilamentSelector} from "./services/filament-manager-plugin.service";
@@ -199,13 +200,13 @@ class Manager {
             >
               <i class="fas fa-folder-plus"></i> Create Folder
             </button>
-            <button id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
+            <button title="Re-Sync OctoPrints file list back to OctoFarm" id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
               <i class="fas fa-sync"></i> Re-Sync
             </button>
-            <button id="fileReSync" type="button" class="btn btn-outline-danger mb-0 float-right" disabled>
+            <button title="Delete all file from OctoPrint" id="fileDeleteAll" type="button" class="btn btn-outline-danger mb-0 float-right">
               <i class="fa-solid fa-trash-can"></i> Delete All
             </button>
-            <button id="fileReSync" type="button" class="btn btn-warning text-dark mb-0  mr-1 float-right" disabled>
+            <button title="Run house keeping on file list" id="fileHouseKeeping" type="button" class="btn btn-warning text-dark mb-0 mr-1 float-right">
               <i class="fa-solid fa-broom"></i> House Keeping
             </button>
           </div>
@@ -218,7 +219,7 @@ class Manager {
         `<div id="fileList-${id}" class="list-group" data-jplist-group="files"></div>`
       );
 
-    let printer = await OctoFarmClient.getPrinter(id);
+    const printer = await OctoFarmClient.getPrinter(id);
 
     await FileManagerSortingService.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
@@ -231,6 +232,8 @@ class Manager {
         uploadFiles: document.getElementById("fileUploadBtn"),
         uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
         syncFiles: document.getElementById("fileReSync"),
+        fileDeleteAll: document.getElementById("fileDeleteAll"),
+        fileHouseKeeping: document.getElementById("fileHouseKeeping"),
         back: document.getElementById("fileBackBtn"),
         createFolderBtn: document.getElementById("createFolderBtn")
       }
@@ -266,6 +269,24 @@ class Manager {
     });
     fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
       await FileManagerService.reSyncFiles(e, printer);
+    });
+    fileButtons.fileManager.fileDeleteAll.addEventListener("click", async (e) => {
+      await FileManagerService.deleteAllFiles(e, printer);
+    });
+    fileButtons.fileManager.fileHouseKeeping.addEventListener("click", async (e) => {
+      bootbox.prompt({
+        title: "Clean all files older than 'X' days...",
+        message: "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
+        inputType: "number",
+        callback: async function (result) {
+          if(!!result && result > 0){
+            await FileManagerService.fileHouseKeeping(e, printer, result);
+          }else{
+            UI.createAlert("error", "You must input an amount of days for files to be cleaned, use the 'Delete All' function to nuke everything...", 3000, "Clicked")
+          }
+        }
+      });
+
     });
   }
 }

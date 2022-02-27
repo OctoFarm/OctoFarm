@@ -32,6 +32,8 @@ const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const _ = require("lodash");
 const PrinterService = require("../printer.service");
+const { join } = require("path");
+const { statSync } = require("fs");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -362,7 +364,7 @@ class OctoPrintPrinter {
     if (!!printerFirmware) {
       this.printerFirmware = printerFirmware;
     }
-
+    console.log(fileList);
     if (!!fileList) {
       this.fileList = FileClean.generate(
         {
@@ -1706,7 +1708,10 @@ class OctoPrintPrinter {
 
   killAllConnections() {
     this.killApiTimeout();
-    if (!this?.#ws) return false;
+    if (!this?.#ws) {
+      return false;
+    }
+
     return this.#ws.killAllConnectionsAndListeners();
   }
 
@@ -1714,10 +1719,14 @@ class OctoPrintPrinter {
     return this.#db.delete();
   }
 
-  updateFileInformation(data) {
+  async updateFileInformation(data) {
+    console.log(data);
+
     const { name, result } = data;
 
-    const fileIndex = findIndex(this.fileList.fileList, function (o) {
+    const databaseRecord = await this.#db.get();
+    console.log(databaseRecord.fileList);
+    const fileIndex = findIndex(databaseRecord.fileList.files, function (o) {
       return o.name === name;
     });
 
@@ -1725,23 +1734,14 @@ class OctoPrintPrinter {
       logger.warning("Updating file information with generated OctoPrint data", data);
       const { estimatedPrintTime, filament } = result;
 
-      this.fileList.fileList[fileIndex] = {
+      databaseRecord.fileList.files[fileIndex] = {
         ...estimatedPrintTime,
         ...filament
       };
 
-      this.fileList = FileClean.generate(
-        {
-          files: this.fileList.files,
-          filecount: this.fileList.files.length,
-          folders: this.fileList.folders,
-          folderCount: this.fileList.folders.length
-        },
-        this.selectedFilament,
-        this.costSettings
-      );
+      this.#db.update(this._id, { fileList: databaseRecord.fileList });
 
-      this.#db.updatePrinterDatabase(id, { fileList: this.fileList });
+      this.cleanPrintersInformation(databaseRecord);
     } else {
       logger.error("Couldn't find file index to update!", name);
     }
@@ -1761,7 +1761,7 @@ class OctoPrintPrinter {
     }
   }
 
-  cleanPrintersInformation() {
+  cleanPrintersInformation(databaseRecord) {
     this.otherSettings = PrinterClean.sortOtherSettings(
       this.tempTriggers,
       this.settingsWebcam,
@@ -1778,6 +1778,36 @@ class OctoPrintPrinter {
     this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
 
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+
+    if (!!databaseRecord) {
+      this.fileList = FileClean.generate(
+        {
+          files: databaseRecord.fileList.files,
+          filecount: databaseRecord.fileList.files.length,
+          folders: databaseRecord.fileList.folders,
+          folderCount: databaseRecord.fileList.folders.length
+        },
+        this.selectedFilament,
+        this.costSettings
+      );
+      console.log(fileList);
+    }
+  }
+
+  async houseCleanFiles(days) {
+    // get todays date
+    const now = new Date();
+    // get past date
+    const past = now.setDate(now.getDate() - days);
+    for (const folder of folderContents) {
+      const logFilePath = join(logFolder, folder);
+      const stats = statSync(logFilePath);
+      const endTime = new Date(stats.birthtime).getTime() + 3600000;
+      if (yesterday > endTime) {
+        Logs.deleteLogByName(logFilePath);
+        deletedFiles.push(logFilePath);
+      }
+    }
   }
 }
 

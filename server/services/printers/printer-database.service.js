@@ -12,6 +12,19 @@ class PrinterDatabaseService {
     this.#id = id;
   }
 
+  get = () => {
+    return printerModel
+      .findById(this.#id)
+      .then((res) => {
+        logger.debug("Successfully grabbed printer from database");
+        return res;
+      })
+      .catch((err) => {
+        return err;
+        logger.error(err);
+      });
+  };
+
   update = (update) => {
     return printerModel
       .findOneAndUpdate({ _id: this.#id }, update, this.#options)
