@@ -30,8 +30,6 @@ const { FileClean } = require("../file-cleaner.service");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
-const _ = require("lodash");
-const PrinterService = require("../printer.service");
 const { join } = require("path");
 const { statSync } = require("fs");
 
@@ -192,10 +190,8 @@ class OctoPrintPrinter {
     if (!!printer?._id) {
       this.#updatePrinterRecordsFromDatabase(printer);
     }
-
+    this.setAllPrinterStates(PRINTER_STATES().SETTING_UP);
     this.#updatePrinterSettingsFromDatabase();
-
-    this.startOctoPrintService();
   }
 
   #updatePrinterRecordsFromDatabase(printer) {
@@ -364,7 +360,6 @@ class OctoPrintPrinter {
     if (!!printerFirmware) {
       this.printerFirmware = printerFirmware;
     }
-    console.log(fileList);
     if (!!fileList) {
       this.fileList = FileClean.generate(
         {
@@ -496,22 +491,7 @@ class OctoPrintPrinter {
     this.#db.update(record);
   }
 
-  startOctoPrintService() {
-    if (!this?.disabled) {
-      this.enablePrinter()
-        .then((res) => {
-          logger.warning(res);
-        })
-        .catch((e) => {
-          logger.error("Failed starting service", e);
-        });
-    } else {
-      this.disablePrinter();
-    }
-  }
-
   async enablePrinter() {
-    this.setAllPrinterStates(PRINTER_STATES().SETTING_UP);
     // Setup initial client stuff, database, api
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
@@ -527,7 +507,6 @@ class OctoPrintPrinter {
           hostDescription: "Printer timed out, will attempt reconnection..."
         };
         this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
-        this.reconnectAPI();
         return "Failed due to timeout!";
       } else if (testingTheWaters === 503 || testingTheWaters === 502) {
         const unavailable = {
@@ -535,7 +514,6 @@ class OctoPrintPrinter {
           hostDescription: "Printer is unavailable, will attempt reconnection..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        this.reconnectAPI();
         return "Failed because of octoprint server error!";
       } else if (testingTheWaters === 404) {
         const unavailable = {
@@ -598,7 +576,6 @@ class OctoPrintPrinter {
     // User list fail... reconnect same as others, probably network at this stage.
     if (initialApiCheckValues.includes(true)) {
       this.setPrinterState(PRINTER_STATES().SHUTDOWN);
-      this.reconnectAPI();
       return "Failed due to possible network issues...";
     }
 
@@ -613,7 +590,6 @@ class OctoPrintPrinter {
         stateDescription: "Required API Checks have failed... attempting reconnect..."
       };
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
-      this.reconnectAPI();
       return "Failed due to missing required values!";
     }
 
@@ -753,54 +729,6 @@ class OctoPrintPrinter {
     }
 
     return true;
-  }
-
-  reconnectAPI() {
-    this.reconnectingIn = Date.now() + this.#apiRetry;
-    this.#retryNumber = this.#retryNumber + 1;
-    logger.info(
-      this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
-    );
-    if (this.#retryNumber < 1) {
-      PrinterTicker.addIssue(
-        new Date(),
-        this.printerURL,
-        `Setting up reconnect in ${this.#apiRetry}ms retry #${
-          this.#retryNumber
-        }. Subsequent logs will be silenced...`,
-        "Active",
-        this._id
-      );
-    }
-
-    if (this.#reconnectTimeout !== false) return; //Reconnection is planned..
-
-    this.#reconnectTimeout = setTimeout(() => {
-      this.#reconnectTimeout = false;
-      this.reconnectingIn = 0;
-      if (this.#retryNumber > 0) {
-        const modifier = this.timeout.apiRetry * 0.1;
-        this.#apiRetry = this.#apiRetry + modifier;
-        logger.debug(this.printerURL + ": API modifier " + modifier);
-      } else if (this.#retryNumber === 0) {
-        logger.info(this.printerURL + ": Attempting to reconnect to printer!");
-        PrinterTicker.addIssue(
-          new Date(),
-          this.printerURL,
-          "Attempting to reconnect to printer! Any subsequent logs will be silenced...",
-          "Active",
-          this._id
-        );
-      }
-      this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
-      this.enablePrinter()
-        .then((res) => {
-          logger.warning(res);
-        })
-        .catch((e) => {
-          logger.error("Failed starting service", e);
-        });
-    }, this.#apiRetry);
   }
 
   // Base minimum viable requirements for websocket connection
@@ -1790,11 +1718,10 @@ class OctoPrintPrinter {
         this.selectedFilament,
         this.costSettings
       );
-      console.log(fileList);
     }
   }
 
-  async houseCleanFiles(days) {
+  async houseKeepFiles(days) {
     // get todays date
     const now = new Date();
     // get past date

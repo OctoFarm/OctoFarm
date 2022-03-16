@@ -177,7 +177,6 @@ export class PrintersManagement {
         const { printersRemoved } = printersToRemove;
         deletingAlert.close();
         printersRemoved.forEach((printer) => {
-          console.log(printer);
           UI.createAlert(
             "success",
             `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
@@ -277,12 +276,11 @@ export class PrintersManagement {
           printerName.value
         ).build();
         const printersToAdd = await OctoFarmClient.post("printers/add", printer);
-        console.log(printersToAdd)
         const { printersAdded } = printersToAdd;
-        printersAdded.forEach((printer) => {
+        printersAdded.forEach((p) => {
           UI.createAlert(
             "success",
-            `Printer: ${printer.printerURL} has successfully been added to the farm...`,
+            `Printer: ${p.printerURL} has successfully been added to the farm...`,
             500,
             "Clicked"
           );

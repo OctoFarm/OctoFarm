@@ -35,7 +35,7 @@ const INITIALISE_PRINTERS = async () => {
 };
 
 const START_PRINTER_ADD_QUEUE = async () => {
-  getPrinterManagerCache().handlePrinterAddQueue();
+  await getPrinterManagerCache().handlePrinterAddQueue();
 };
 
 const INITIALIST_PRINTERS_STORE = async () => {
@@ -196,6 +196,10 @@ const GENERATE_PRINTER_SPECIFIC_STATISTICS = async () => {
   await getPrinterManagerCache().generatePrintersStatisticsCache();
 };
 
+const OFFLINE_INSTANCE_CHECK = async () => {
+  await getPrinterManagerCache().offlineInstanceCheck();
+};
+
 /**
  * @param task
  * @param preset
@@ -235,8 +239,9 @@ class OctoFarmTasks {
     TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_500_MS),
-    TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_500_MS)
+    // TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_1000_MS),
+    TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
+    // TaskStart(OFFLINE_INSTANCE_CHECK, TaskPresets.PERIODIC_IMMEDIATE_5000_MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

@@ -2,7 +2,7 @@ const Logger = require("../handlers/logger.js");
 
 const PrinterService = require("./printer.service");
 const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
-const { CATEGORIES } = require("./printers/constants/printer-state.constants");
+const { CATEGORIES, PRINTER_STATES} = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
 const { isEmpty } = require("lodash");
@@ -12,22 +12,48 @@ const Printers = require("../models/Printer");
 const { FileClean } = require("./file-cleaner.service");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket-helpers.utils");
+const { SettingsClean } = require("./settings-cleaner.service");
 
 const logger = new Logger("OctoFarm-PrinterControlManagerService");
 
 class PrinterManagerService {
-  #addPrintersQueue = [];
+  #enablePrintersQueue = [];
   #printerGroupList = [];
   #printerControlList = [];
+  #offlineAPIRetry = null;
+
+  loadPrinterTimeoutSettingss() {
+    const { timeout } = SettingsClean.returnSystemSettings();
+    this.#offlineAPIRetry = timeout.apiRetry;
+  }
 
   async initialisePrinters() {
+    this.loadPrinterTimeoutSettingss();
     // Grab printers from database
     const pList = await PrinterService.list();
-    logger.debug("Initialising " + pList.length + " printers");
+    logger.info("Initialising " + pList.length + " printers");
+    //Parse out enabled printers and disable any disabled printers straight away...
     for (let p of pList) {
-      await this.addPrinter(p);
+      await patchPrinterValues(p);
+      const printer = new OctoPrintPrinter(p);
+      if (!printer?.disabled) {
+        getPrinterStoreCache().addPrinter(printer);
+        this.#enablePrintersQueue.push(printer);
+      } else {
+        getPrinterStoreCache().addPrinter(printer);
+        printer.disablePrinter()
+      }
     }
-    return true;
+  }
+
+  async addPrinter(printer) {
+    await patchPrinterValues(printer);
+    getPrinterStoreCache().addPrinter(printer);
+    this.#enablePrintersQueue.push(printer);
+
+    return {
+      printerURL: printer.printerURL
+    };
   }
 
   killAllConnections() {
@@ -39,54 +65,93 @@ class PrinterManagerService {
       });
   }
 
-  async addPrinter(printer) {
-    await patchPrinterValues(printer);
-    this.#addPrintersQueue.push(printer);
+  async offlineInstanceCheck() {
+    const printersList = getPrinterStoreCache().listPrinters();
 
-    return {
-      printerURL: printer.printerURL
-    };
+    for (const printer of printersList) {
+      const disabled = printer?.disabled;
+      const category = printer?.printerState?.colour?.category;
+      if (!disabled && category === "Offline") {
+        //Do the connection check...
+      }
+    }
+
+    // this.reconnectingIn = Date.now() + this.#apiRetry;
+    //   this.#retryNumber = this.#retryNumber + 1;
+    //   logger.info(
+    //     this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
+    //   );
+    //   if (this.#retryNumber < 1) {
+    //     PrinterTicker.addIssue(
+    //       new Date(),
+    //       this.printerURL,
+    //       `Setting up reconnect in ${this.#apiRetry}ms retry #${
+    //         this.#retryNumber
+    //       }. Subsequent logs will be silenced...`,
+    //       "Active",
+    //       this._id
+    //     );
+    //   }
+    //
+    //   if (this.#reconnectTimeout !== false) return; //Reconnection is planned..
+    //
+    //   this.#reconnectTimeout = setTimeout(() => {
+    //     this.#reconnectTimeout = false;
+    //     this.reconnectingIn = 0;
+    //     if (this.#retryNumber > 0) {
+    //       const modifier = this.timeout.apiRetry * 0.1;
+    //       this.#apiRetry = this.#apiRetry + modifier;
+    //       logger.debug(this.printerURL + ": API modifier " + modifier);
+    //     } else if (this.#retryNumber === 0) {
+    //       logger.info(this.printerURL + ": Attempting to reconnect to printer!");
+    //       PrinterTicker.addIssue(
+    //         new Date(),
+    //         this.printerURL,
+    //         "Attempting to reconnect to printer! Any subsequent logs will be silenced...",
+    //         "Active",
+    //         this._id
+    //       );
+    //     }
+    //     this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
+    //     this.enablePrinter()
+    //       .then((res) => {
+    //         logger.warning(res);
+    //       })
+    //       .catch((e) => {
+    //         logger.error("Failed starting service", e);
+    //       });
+    //   }, this.#apiRetry);
   }
 
-  handlePrinterAddQueue() {
-    console.log(this.#addPrintersQueue);
-    if (this.#addPrintersQueue.length > 0) {
-      if (!!this.#addPrintersQueue[0]) {
-        getPrinterStoreCache().addPrinter(new OctoPrintPrinter(this.#addPrintersQueue[0]));
-        this.#addPrintersQueue.shift();
-      }
+  async addPrinterFromQueue(index) {
+    if (!!this.#enablePrintersQueue[index]) {
+      const printerAdded = await this.#enablePrintersQueue[index].enablePrinter();
+      this.#enablePrintersQueue.splice(index, 1);
+      return printerAdded;
     }
   }
 
-  // // REFACTOR, this is a massive CPU smash, slow it down...
-  // // Redundant after adding the printer add queue. May as well remove it and just push straight into the queue.
-  // async batchCreatePrinters(printerList) {
-  //   // Async function to send mail to a list of users.
-  //   const createNewPrinterBatches = async (printer) => {
-  //     const printerLength = printer.length;
-  //
-  //     for (let i = 0; i < printerLength; i += 5) {
-  //       const requests = printer.slice(i, i + 5).map((printerCreate) => {
-  //         // The batch size is 100. We are processing in a set of 100 users.
-  //         return this.addPrinter(printerCreate);
-  //       });
-  //
-  //       // requests will have 100 or less pending promises.
-  //       // Promise.all will wait till all the promises got resolves and then take the next 100.
-  //       logger.debug(`Running printer batch ${i + 1}`);
-  //       await Promise.allSettled(requests).catch((e) =>
-  //         logger.error(`Error in creating new printer batch: ${i} - ${e}`)
-  //       ); // Catch the error.
-  //     }
-  //   };
-  //
-  //   await createNewPrinterBatches(printerList);
-  // }
+  handlePrinterAddQueue() {
+    if (this.#enablePrintersQueue.length > 0) {
+      return Promise.all([
+        this.addPrinterFromQueue(0),
+        this.addPrinterFromQueue(1),
+        this.addPrinterFromQueue(2),
+        this.addPrinterFromQueue(3),
+        this.addPrinterFromQueue(4),
+        this.addPrinterFromQueue(5),
+        this.addPrinterFromQueue(6),
+        this.addPrinterFromQueue(7),
+        this.addPrinterFromQueue(8),
+        this.addPrinterFromQueue(9)
+      ]);
+    }
+  }
 
   updateStateCounters() {
     const printerList = getPrinterStoreCache().listPrinters();
     logger.debug(printerList.length + " printers updating state counters...");
-    for (let printer of printerList) {
+    for (const printer of printerList) {
       if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
         switch (printer.printerState.colour.category) {
           case CATEGORIES.ACTIVE:
@@ -230,6 +295,7 @@ class PrinterManagerService {
       return printer.reScanAPI(force);
     }
   }
+
   async batchReScanAPI(force, printerList = [], batchSize = 10) {
     const createNewPrinterBatches = async (printer) => {
       const printerLength = printer.length;
@@ -251,6 +317,7 @@ class PrinterManagerService {
 
     await createNewPrinterBatches(printerList);
   }
+
   async batchReSyncWebsockets(printerList = [], batchSize = 10) {
     const createNewPrinterBatches = async (printer) => {
       const printerLength = printer.length;
