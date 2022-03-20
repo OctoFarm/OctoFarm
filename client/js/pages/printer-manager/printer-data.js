@@ -266,7 +266,10 @@ function checkIfMultiUserIssueFlagged(printer) {
 }
 
 function checkForApiErrors(printer) {
-  if (printer.printerState.colour.category !== "Offline") {
+  if (
+    printer.printerState.colour.category !== "Offline" &&
+    printer.printerState.colour.category !== "Searching"
+  ) {
     const apiErrorTag = document.getElementById(
       `scanningIssues-${printer._id}`
     );
