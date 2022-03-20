@@ -19,6 +19,8 @@ function shutdownServer(app) {
   return Promise.allSettled([
     killMongoDBConnection(),
     getPrinterManagerCache().killAllConnections(),
+    getPrinterManagerCache().clearPrinterEnableTimeout(),
+    getPrinterManagerCache().clearOfflineTimeout(),
     TaskManager.stopSchedulerTasks(),
     app.close()
   ]);

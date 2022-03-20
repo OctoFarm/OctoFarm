@@ -40,7 +40,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
-        logger.error("Failed to fetch", e);
+        logger.debug("Failed to fetch", e);
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -73,7 +73,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
-      logger.error("Failed fetch timeout!", e);
+      logger.debug("Failed fetch timeout!", e);
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
@@ -117,7 +117,7 @@ class OctoprintApiService {
     try {
       return await this.get(item);
     } catch (e) {
-      logger.error("Error with get request", e);
+      logger.debug("Error with get request", e);
       switch (e.code) {
         case "ECONNREFUSED":
           ConnectionMonitorService.updateOrAddResponse(
@@ -151,9 +151,9 @@ class OctoprintApiService {
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
           if (cutOffIn <= 0) {
-            logger.error(`${this.printerURL} | Cutoff reached! marking offline!`);
+            logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
           } else {
-            logger.error(
+            logger.debug(
               `${this.printerURL} | Current Timeout: ${
                 this.#currentTimeout
               } | Cut off in ${cutOffIn}`
@@ -165,7 +165,7 @@ class OctoprintApiService {
             REQUEST_KEYS.RETRY_REQUESTED
           );
           if (cutOffIn <= 0) {
-            logger.error(
+            logger.debug(
               `${this.printerURL} | Timeout Exceeded: ${item} | Timeout: ${this.#currentTimeout}`
             );
             // Reset the timeout after failed...
@@ -174,10 +174,10 @@ class OctoprintApiService {
           }
           // Make sure to use the settings for api retry.
           this.#currentTimeout = this.#currentTimeout + 5000;
-          logger.error(this.printerURL + " | Initial timeout failed increasing...", {
+          logger.debug(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });
-          return await this.getRetry(item);
+          return this.getRetry(item);
       }
     }
   }

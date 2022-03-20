@@ -2,7 +2,7 @@ const Logger = require("../handlers/logger.js");
 
 const PrinterService = require("./printer.service");
 const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
-const { CATEGORIES, PRINTER_STATES} = require("./printers/constants/printer-state.constants");
+const { CATEGORIES, PRINTER_STATES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
 const { isEmpty } = require("lodash");
@@ -21,6 +21,10 @@ class PrinterManagerService {
   #printerGroupList = [];
   #printerControlList = [];
   #offlineAPIRetry = null;
+  #printerEnableTimeout = null;
+  #printerOfflineTimeout;
+  #printerEnableTimer = 5000;
+  #printerOfflineTimer = 10000;
 
   loadPrinterTimeoutSettingss() {
     const { timeout } = SettingsClean.returnSystemSettings();
@@ -38,11 +42,23 @@ class PrinterManagerService {
       const printer = new OctoPrintPrinter(p);
       if (!printer?.disabled) {
         getPrinterStoreCache().addPrinter(printer);
-        this.#enablePrintersQueue.push(printer);
+        this.#enablePrintersQueue.push(printer._id);
       } else {
         getPrinterStoreCache().addPrinter(printer);
-        printer.disablePrinter()
       }
+    }
+  }
+
+  async enablePrinters(enableList) {
+    for (let id of enableList) {
+      this.#enablePrintersQueue.push(id);
+    }
+  }
+
+  async disablePrinters(disableList) {
+    for (let id of disableList) {
+      const printer = getPrinterStoreCache().getPrinter(id);
+      printer.disablePrinter();
     }
   }
 
@@ -63,89 +79,95 @@ class PrinterManagerService {
       .forEach((printer) => {
         printer.killAllConnections();
       });
+    return "Killed Current Connections";
   }
 
-  async offlineInstanceCheck() {
-    const printersList = getPrinterStoreCache().listPrinters();
+  clearOfflineTimeout() {
+    clearTimeout(this.#printerOfflineTimeout);
+    return "Killed Printer Offline Timeout";
+  }
 
-    for (const printer of printersList) {
-      const disabled = printer?.disabled;
-      const category = printer?.printerState?.colour?.category;
-      if (!disabled && category === "Offline") {
-        //Do the connection check...
+  async startOfflineCheckQueue() {
+    this.#printerOfflineTimeout = setTimeout(async () => {
+      await this.offlineInstanceCheck();
+    }, this.#printerOfflineTimer);
+  }
+
+  async offlineInstanceCheck(batchSize = 10) {
+    const offlinePrinterChecking = async () => {
+      const printersList = getPrinterStoreCache().listPrinters();
+      const offlinePrinterList = [];
+
+      for (const printer of printersList) {
+        const disabled = printer?.disabled;
+        const category = printer?.printerState?.colour?.category;
+        if (!disabled && category === "Offline") {
+          offlinePrinterList.push(printer);
+        }
       }
-    }
 
-    // this.reconnectingIn = Date.now() + this.#apiRetry;
-    //   this.#retryNumber = this.#retryNumber + 1;
-    //   logger.info(
-    //     this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
-    //   );
-    //   if (this.#retryNumber < 1) {
-    //     PrinterTicker.addIssue(
-    //       new Date(),
-    //       this.printerURL,
-    //       `Setting up reconnect in ${this.#apiRetry}ms retry #${
-    //         this.#retryNumber
-    //       }. Subsequent logs will be silenced...`,
-    //       "Active",
-    //       this._id
-    //     );
-    //   }
-    //
-    //   if (this.#reconnectTimeout !== false) return; //Reconnection is planned..
-    //
-    //   this.#reconnectTimeout = setTimeout(() => {
-    //     this.#reconnectTimeout = false;
-    //     this.reconnectingIn = 0;
-    //     if (this.#retryNumber > 0) {
-    //       const modifier = this.timeout.apiRetry * 0.1;
-    //       this.#apiRetry = this.#apiRetry + modifier;
-    //       logger.debug(this.printerURL + ": API modifier " + modifier);
-    //     } else if (this.#retryNumber === 0) {
-    //       logger.info(this.printerURL + ": Attempting to reconnect to printer!");
-    //       PrinterTicker.addIssue(
-    //         new Date(),
-    //         this.printerURL,
-    //         "Attempting to reconnect to printer! Any subsequent logs will be silenced...",
-    //         "Active",
-    //         this._id
-    //       );
-    //     }
-    //     this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
-    //     this.enablePrinter()
-    //       .then((res) => {
-    //         logger.warning(res);
-    //       })
-    //       .catch((e) => {
-    //         logger.error("Failed starting service", e);
-    //       });
-    //   }, this.#apiRetry);
+      const queueLength = offlinePrinterList.length;
+      for (let i = 0; i < queueLength; i += batchSize) {
+        const requests = offlinePrinterList.slice(i, i + batchSize).map((printer) => {
+          // The batch size is 100. We are processing in a set of 100 users.
+          const reconnectingState = printer.returnReconnectingState();
+          if (reconnectingState === false) {
+            return printer.reconnectAPI();
+          }
+        });
+
+        // requests will have 100 or less pending promises.
+        // Promise.all will wait till all the promises got resolves and then take the next 100.
+        logger.info(`Offline printer check batch ${i + 1}`);
+        await Promise.all(requests).catch((e) =>
+          logger.error(`Error in batch offline printers! ${i} - ${e}`)
+        ); // Catch the error.
+      }
+    };
+
+    await offlinePrinterChecking();
+    await this.startOfflineCheckQueue();
   }
 
-  async addPrinterFromQueue(index) {
-    if (!!this.#enablePrintersQueue[index]) {
-      const printerAdded = await this.#enablePrintersQueue[index].enablePrinter();
-      this.#enablePrintersQueue.splice(index, 1);
-      return printerAdded;
+  async enablePrinterFromQueue(id) {
+    if (!!id) {
+      const printer = getPrinterStoreCache().getPrinter(id);
+      return printer.enablePrinter();
     }
   }
 
-  handlePrinterAddQueue() {
-    if (this.#enablePrintersQueue.length > 0) {
-      return Promise.all([
-        this.addPrinterFromQueue(0),
-        this.addPrinterFromQueue(1),
-        this.addPrinterFromQueue(2),
-        this.addPrinterFromQueue(3),
-        this.addPrinterFromQueue(4),
-        this.addPrinterFromQueue(5),
-        this.addPrinterFromQueue(6),
-        this.addPrinterFromQueue(7),
-        this.addPrinterFromQueue(8),
-        this.addPrinterFromQueue(9)
-      ]);
-    }
+  clearPrinterEnableTimeout() {
+    clearTimeout(this.#printerEnableTimeout);
+    return "Killed Printer Enable Timeout";
+  }
+
+  async startPrinterEnableQueue() {
+    this.#printerEnableTimeout = setTimeout(async () => {
+      await this.handlePrinterEnableQueue();
+    }, this.#printerEnableTimer);
+  }
+
+  async handlePrinterEnableQueue(batchSize = 10) {
+    const enablePrinterQueueBatch = async () => {
+      const queueLength = this.#enablePrintersQueue.length;
+
+      for (let i = 0; i < queueLength; i += batchSize) {
+        const requests = this.#enablePrintersQueue.slice(i, i + batchSize).map((id) => {
+          // The batch size is 100. We are processing in a set of 100 users.
+          return this.enablePrinterFromQueue(id);
+        });
+
+        // requests will have 100 or less pending promises.
+        // Promise.all will wait till all the promises got resolves and then take the next 100.
+        logger.info(`Running printer enable batch ${i + 1}`);
+        await Promise.all(requests).catch((e) =>
+          logger.error(`Error in batch enable printers! ${i} - ${e}`)
+        ); // Catch the error.
+      }
+    };
+
+    await enablePrinterQueueBatch();
+    await this.startPrinterEnableQueue();
   }
 
   updateStateCounters() {

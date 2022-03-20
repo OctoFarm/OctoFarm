@@ -27,7 +27,7 @@ const mapStateToCategory = (state) => {
     return { name: "danger", hex: "#2e0905", category: "Offline" };
   }
   if (state === "Searching...") {
-    return { name: "warning text-dark", hex: "#2e0905", category: "Offline" };
+    return { name: "warning text-dark", hex: "#2e0905", category: "Searching" };
   }
   if (state === "Disconnected") {
     return { name: "danger", hex: "#2e0905", category: "Disconnected" };

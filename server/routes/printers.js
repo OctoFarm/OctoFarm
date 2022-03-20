@@ -457,24 +457,24 @@ router.get("/connectionOverview", ensureAuthenticated, ensureAdministrator, (req
 });
 
 router.patch(
-  "/disable/:id",
+  "/disable/:idList",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(M_VALID.MONGO_ID),
+  validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
   (req, res) => {
-    const id = req.paramString("id");
-    res.send(getPrinterStoreCache().disablePrinter(id));
+    const idList = req.paramString("idList");
+    res.send(getPrinterManagerCache().disablePrinters(idList));
   }
 );
 
 router.patch(
-  "/enable/:id",
+  "/enable/:idList",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(M_VALID.MONGO_ID),
+  validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-    const id = req.paramString("id");
-    res.send(await getPrinterStoreCache().enablePrinter(id));
+    const idList = req.paramString("idList");
+    res.send(await getPrinterManagerCache().enablePrinters(idList));
   }
 );
 
