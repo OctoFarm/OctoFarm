@@ -24,7 +24,7 @@ class PrinterManagerService {
   #printerEnableTimeout = null;
   #printerOfflineTimeout;
   #printerEnableTimer = 5000;
-  #printerOfflineTimer = 10000;
+  #printerOfflineTimer = 30000;
 
   loadPrinterTimeoutSettingss() {
     const { timeout } = SettingsClean.returnSystemSettings();
