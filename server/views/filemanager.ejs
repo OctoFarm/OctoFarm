@@ -1,35 +1,11 @@
 <% let base = './partials' %>
 <% let modal = base + '/octofarm-modal.ejs' %>
 
-<% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
-    <% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0 || currentOperationsCount.complete > 0) { %>
+<% if(true || typeof printerCount != 'undefined' && printerCount > 0 ) { %>
+    <% if(true || typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0 || currentOperationsCount.complete > 0) { %>
 
         <div class="row">
-            <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
-                <div class="card text-white bg-dark h-100">
-                    <div class="card-header dashHeader p-0">
-                        <button
-                                type="button"
-                                class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                                href="#"
-                                aria-expanded="false"
-                                disabled
-                        >
-                            <i class="fas fa-chart-bar"></i> File Manager Statistics
-                        </button>
-
-
-                    </div>
-                    <div class="card-body pt-2 pb-0">
-                        <%- include('./partials/FileManager/fileManagerStatistics.ejs') %>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
+            <div id="file-manager-managment" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
                 <div class="card text-white bg-dark h-100">
                     <div class="card-header dashHeader p-0">
                         <button
@@ -57,25 +33,24 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-lg-2">
+                            <div class="col-lg-3 col-xl-2">
                                 <div class="row">
                                     <div class="col-12 p-0">
-                                        <h5 class="float-left mb-0"> Current Uploads </h5>
-                                        <span title="File uploads remaining" class="float-right badge badge-success m-1"><i class="fa-solid fa-file-code"></i> <span id="uploadsRemaining">0</span></span>
-                                        <span title="Printers in queue" class="float-right badge badge-success m-1"><i class="fa-solid fa-print"></i> <span id="printersRemaining">0</span></span>
-
+                                        <h5 class="float-left mb-1"> Current Uploads </h5>
+                                        <span title="File uploads remaining" class="badge badge-success m-1 float-right"><i class="fa-solid fa-file-code"></i> <span id="uploadsRemaining">0</span></span>
+                                        <span title="Printers in queue" class="badge badge-success m-1 float-right"><i class="fa-solid fa-print"></i> <span id="printersRemaining">0</span></span>
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="row">
-                                    <div class="col-12">
-                                        <small>Current Printer: <span id="uploadsPrinterName"></span></small><br>
+                                    <div class="col-12 text-truncate">
+                                      <small>Current Printer: <span id="uploadsPrinterName"></span></small><br>
                                         <small>Current File: <span id="uploadsFileName"></span></small><br>
                                     </div>
 
                                 </div>
                             </div>
-                            <div class="col-lg-4">
+                            <div class="col-lg-3 col-xl-4">
                                 <h5>Manage</h5>
                                 <hr>
                                 <div class="row">
@@ -108,10 +83,19 @@
                                         >
                                             <i class="fas fa-code"></i> Gcode Scripts
                                         </button>
+                                        <button
+                                                type="button"
+                                                class="tag btn btn-secondary mt-1"
+                                                href="#"
+                                                aria-expanded="false"
+                                                data-toggle="modal" data-target="#fileManagerStatisticsModal"
+                                        >
+                                            <i class="fas fa-chart-bar"></i> Statistics
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-6 col-xl-6">
                                 <h5>File Actions</h5>
                                 <hr>
                                 <div id="fileManagerManagement">
@@ -241,7 +225,13 @@
             </div>
         </div>
     <% } %>
-
+    <%- include(modal, {
+    modal:{
+    id:"fileManagerStatistics", title:"File Manager Statistics"
+    },
+    bodyFile:'./FileManager/fileManagerStatistics.modal.ejs'
+    })
+    %>
     <%- include(modal, {
     modal:{
     id:"printerCustomGcodeScripts", title:"Custom Gcode Scripts"

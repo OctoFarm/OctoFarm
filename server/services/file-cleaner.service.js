@@ -39,7 +39,7 @@ class FileCleanerService {
         devices.push(device);
       }
       if (!!printer.fileList) {
-        for (let i = 0; i < printer.fileList.fileList.length; i++) {
+        for (let i = 0; i < printer.fileList?.fileList?.length; i++) {
           const file = printer.fileList.fileList[i];
 
           if (!isNaN(file.fileSize)) {
