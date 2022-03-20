@@ -24,7 +24,6 @@ class PrinterManagerService {
   #printerEnableTimeout = null;
   #printerOfflineTimeout;
   #printerEnableTimer = 5000;
-  #printerOfflineTimer = 30000;
 
   loadPrinterTimeoutSettingss() {
     const { timeout } = SettingsClean.returnSystemSettings();
@@ -87,46 +86,18 @@ class PrinterManagerService {
     return "Killed Printer Offline Timeout";
   }
 
-  async startOfflineCheckQueue() {
-    this.#printerOfflineTimeout = setTimeout(async () => {
-      await this.offlineInstanceCheck();
-    }, this.#printerOfflineTimer);
-  }
+  async websocketKeepAlive() {}
 
-  async offlineInstanceCheck(batchSize = 10) {
-    const offlinePrinterChecking = async () => {
-      const printersList = getPrinterStoreCache().listPrinters();
-      const offlinePrinterList = [];
+  async offlineInstanceCheck() {
+    const printersList = getPrinterStoreCache().listPrinters();
 
-      for (const printer of printersList) {
-        const disabled = printer?.disabled;
-        const category = printer?.printerState?.colour?.category;
-        if (!disabled && category === "Offline") {
-          offlinePrinterList.push(printer);
-        }
+    for (const printer of printersList) {
+      const disabled = printer?.disabled;
+      const category = printer?.printerState?.colour?.category;
+      if (!disabled && category === "Offline") {
+        printer.reconnectAPI();
       }
-
-      const queueLength = offlinePrinterList.length;
-      for (let i = 0; i < queueLength; i += batchSize) {
-        const requests = offlinePrinterList.slice(i, i + batchSize).map((printer) => {
-          // The batch size is 100. We are processing in a set of 100 users.
-          const reconnectingState = printer.returnReconnectingState();
-          if (reconnectingState === false) {
-            return printer.reconnectAPI();
-          }
-        });
-
-        // requests will have 100 or less pending promises.
-        // Promise.all will wait till all the promises got resolves and then take the next 100.
-        logger.info(`Offline printer check batch ${i + 1}`);
-        await Promise.all(requests).catch((e) =>
-          logger.error(`Error in batch offline printers! ${i} - ${e}`)
-        ); // Catch the error.
-      }
-    };
-
-    await offlinePrinterChecking();
-    await this.startOfflineCheckQueue();
+    }
   }
 
   async enablePrinterFromQueue(id) {

@@ -83,27 +83,17 @@ class WebSocketClient {
       this.id
     );
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
-    this.#instance.on("ping", () => {
-      logger.debug("PING RECEIVED");
-    });
-    // HACK Completely re-write the PING/PONG checking.
-    // I believe something maybe bubbling or not calling in sequence here.
+
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);
       clearTimeout(this.#heartbeatPing);
 
-      this.#heartbeatPing = setTimeout(() => {
-        getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
-        logger.debug(this.url + ": Pinging client");
-        this.#instance.ping();
-        this.pongTimer = Date.now();
-      }, this.#pingPongTimer);
       logger.debug(this.url + " ping timout set", this.#pingPongTimer);
 
       this.#heartbeatTerminate = setTimeout(() => {
-        logger.error(this.url + ": Didn't receive a pong from client, reconnecting!");
+        logger.http(this.url + ": Didn't receive a pong from client, reconnecting!");
         PrinterTicker.addIssue(
           new Date(),
           this.url,
@@ -118,8 +108,8 @@ class WebSocketClient {
         );
         this.terminate();
         // consider a minute without response a dead connection! Should cover WiFi devices better.
-      }, this.#pingPongTimer + 2000);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 2000);
+      }, this.#pingPongTimer + 1000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 1000);
     });
 
     this.#instance.on("unexpected-response", (err) => {
@@ -377,7 +367,6 @@ class WebSocketClient {
       REQUEST_KEYS.RETRY_REQUESTED
     );
     clearTimeout(this.#heartbeatTerminate);
-    clearTimeout(this.#heartbeatPing);
     clearTimeout(this.reconnectTimeout);
     this.#instance.removeAllListeners();
     this.reconnectTimeout = setTimeout(async () => {
@@ -416,6 +405,13 @@ class WebSocketClient {
       this.#retryNumber = this.#retryNumber + 1;
       clearTimeout(this.reconnectTimeout);
     }, this.autoReconnectInterval);
+  }
+
+  ping() {
+    getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
+    logger.debug(this.url + ": Pinging client");
+    this.pongTimer = Date.now();
+    this.#instance.ping();
   }
 
   close() {

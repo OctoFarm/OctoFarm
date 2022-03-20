@@ -684,10 +684,13 @@ class OctoPrintPrinter {
   async setupClient() {
     this.disabled = false;
     if (this.#retryNumber === 0) {
-      logger.info(this.printerURL + ": Running setup sequence.");
-      this.#apiPrinterTickerWrap("Starting printer setup sequence", "Info");
-    } else {
-      logger.info(this.printerURL + ": Re-running setup sequence");
+      logger.info(
+        this.printerURL + ": Running setup sequence... subsequent logs will be silenced!"
+      );
+      this.#apiPrinterTickerWrap(
+        "Starting printer setup sequence... subsequent logs will be silenced!",
+        "Info"
+      );
     }
 
     // If printer ID doesn't exist, we need to create the database record
@@ -1742,6 +1745,10 @@ class OctoPrintPrinter {
     if (!!this?.#ws) {
       this.#ws.sendThrottle(seconds);
     }
+  }
+
+  ping() {
+    this.#ws.ping();
   }
 
   cleanPrintersInformation(databaseRecord) {
