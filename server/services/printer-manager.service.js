@@ -24,6 +24,7 @@ class PrinterManagerService {
   #printerEnableTimeout = null;
   #printerOfflineTimeout;
   #printerEnableTimer = 5000;
+  #offlinePrinterCheckList = [];
 
   loadPrinterTimeoutSettingss() {
     const { timeout } = SettingsClean.returnSystemSettings();
@@ -86,7 +87,22 @@ class PrinterManagerService {
     return "Killed Printer Offline Timeout";
   }
 
-  async websocketKeepAlive() {}
+  websocketKeepAlive() {
+    const printersList = getPrinterStoreCache().listPrinters();
+
+    for (const printer of printersList) {
+      const disabled = printer?.disabled;
+      const category = printer?.printerState?.colour?.category;
+      if (
+        !disabled &&
+        category !== "Offline" &&
+        category !== "Searching" &&
+        category !== "Setting Up"
+      ) {
+        printer.ping();
+      }
+    }
+  }
 
   async offlineInstanceCheck() {
     const printersList = getPrinterStoreCache().listPrinters();
@@ -95,7 +111,7 @@ class PrinterManagerService {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
       if (!disabled && category === "Offline") {
-        printer.reconnectAPI();
+        this.#offlinePrinterCheckList.push(printer._id);
       }
     }
   }

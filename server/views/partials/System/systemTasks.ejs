@@ -14,16 +14,19 @@
             <tbody>
             <% for(task in taskManagerState) { %>
                 <% const currentTask = taskManagerState[task]  %>
-                    <% let taskName = task.replace(/_/g, " ") %>
-                    <% taskName = taskName.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ')%>
-                <tr>
-                    <th scope="row"><%= taskName %></th>
-                    <td><%= (currentTask.options.periodic) ? helpers.generateMilisecondsTime(currentTask.options.milliseconds) : 'No Interval' %></td>
-                    <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
-                    <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
-                    <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
-                    <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "On Demand / One Time Task" %></td>
-                </tr>
+                <% let taskName = task.replace(/_/g, " ") %>
+                <% taskName = taskName.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ')%>
+                <% if(currentTask.options.periodic){ %>
+                    <tr>
+                        <th scope="row"><%= taskName %></th>
+                        <td><%= (currentTask.options.periodic) ? helpers.generateMilisecondsTime(currentTask.options.milliseconds) : 'No Interval' %></td>
+                        <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Started" %></td>
+                        <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
+                        <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
+                        <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "First Not Completed" %></td>
+                    </tr>
+                <% } %>
+
             <%     } %>
             </tbody>
         </table>

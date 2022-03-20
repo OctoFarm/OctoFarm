@@ -4,29 +4,29 @@ import Calc from "../../utils/calc";
 import FileOperations from "../../utils/file";
 import {
   setupOctoPrintForFilamentManager,
-  setupOctoPrintForTimelapses
+  setupOctoPrintForTimelapses,
 } from "../../services/octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
-  setupFilamentManagerSyncBtn
+  setupFilamentManagerSyncBtn,
 } from "../../services/filament-manager-plugin.service";
 import {
   filamentManagerPluginActionElements,
   returnSaveBtn,
   settingsElements,
-  userActionElements
+  userActionElements,
 } from "./server.options";
-import {serverBootBoxOptions} from "./utils/bootbox.options";
+import { serverBootBoxOptions } from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";
-import {activeUserListRowTemplate} from "./system.templates";
+import { activeUserListRowTemplate } from "./system.templates";
 
 let historicUsageGraph;
 let cpuUsageDonut;
 let memoryUsageDonut;
 
-const LOADING_DATA = "Loading Data..."
+const LOADING_DATA = "Loading Data...";
 
 const options = {
   series: [],
@@ -39,40 +39,40 @@ const options = {
       enabled: true,
       easing: "linear",
       dynamicAnimation: {
-        speed: 1000
-      }
+        speed: 1000,
+      },
     },
     toolbar: {
-      show: false
+      show: false,
     },
     zoom: {
-      enabled: false
-    }
+      enabled: false,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   theme: {
-    mode: "dark"
+    mode: "dark",
   },
   noData: {
-    text: LOADING_DATA
+    text: LOADING_DATA,
   },
   stroke: {
-    curve: "smooth"
+    curve: "smooth",
   },
   title: {
     text: "System CPU and Memory Usage History",
-    align: "center"
+    align: "center",
   },
   markers: {
-    size: 0
+    size: 0,
   },
   xaxis: {
-    type: "datetime"
+    type: "datetime",
   },
   yaxis: {
-    max: 100
+    max: 100,
   },
   legend: {
     show: true,
@@ -95,7 +95,7 @@ const options = {
     offsetY: 0,
     labels: {
       colors: undefined,
-      useSeriesColors: false
+      useSeriesColors: false,
     },
     markers: {
       width: 12,
@@ -107,19 +107,19 @@ const options = {
       customHTML: undefined,
       onClick: undefined,
       offsetX: 0,
-      offsetY: 0
+      offsetY: 0,
     },
     itemMargin: {
       horizontal: 5,
-      vertical: 0
+      vertical: 0,
     },
     onItemClick: {
-      toggleDataSeries: true
+      toggleDataSeries: true,
     },
     onItemHover: {
-      highlightDataSeries: true
-    }
-  }
+      highlightDataSeries: true,
+    },
+  },
 };
 const cpuOptions = {
   chart: {
@@ -130,22 +130,22 @@ const cpuOptions = {
       enabled: true,
       easing: "linear",
       dynamicAnimation: {
-        speed: 1000
-      }
-    }
+        speed: 1000,
+      },
+    },
   },
   title: {
     text: "Current System CPU Usage (%)",
-    align: "center"
+    align: "center",
   },
   theme: {
-    mode: "dark"
+    mode: "dark",
   },
   noData: {
-    text: LOADING_DATA
+    text: LOADING_DATA,
   },
   series: [],
-  labels: ["CPU (%)"]
+  labels: ["CPU (%)"],
 };
 const memoryOptions = {
   chart: {
@@ -156,22 +156,22 @@ const memoryOptions = {
       enabled: true,
       easing: "linear",
       dynamicAnimation: {
-        speed: 1000
-      }
-    }
+        speed: 1000,
+      },
+    },
   },
   title: {
     text: "Current System Memory Usage (%)",
-    align: "center"
+    align: "center",
   },
   theme: {
-    mode: "dark"
+    mode: "dark",
   },
   noData: {
-    text: LOADING_DATA
+    text: LOADING_DATA,
   },
   series: [],
-  labels: ["Memory (%)"]
+  labels: ["Memory (%)"],
 };
 
 async function setupOPTimelapseSettings() {
@@ -180,7 +180,8 @@ async function setupOPTimelapseSettings() {
     "warning",
     `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
   );
-  const { successfulPrinters, failedPrinters } = await setupOctoPrintForTimelapses(printers);
+  const { successfulPrinters, failedPrinters } =
+    await setupOctoPrintForTimelapses(printers);
   alert.close();
   bootbox.alert(successfulPrinters + failedPrinters);
 }
@@ -196,24 +197,32 @@ async function setupOPFilamentManagerPluginSettings() {
     uri: filamentManagerPluginActionElements.postgresURI.value,
     name: filamentManagerPluginActionElements.databaseName.value,
     user: filamentManagerPluginActionElements.username.value,
-    password: filamentManagerPluginActionElements.password.value
+    password: filamentManagerPluginActionElements.password.value,
   };
 
   if (!settings.uri.includes("postgresql://")) {
-    UI.createAlert("warning", "Your postgres URI isn't configured correctly!", 3000, "clicked");
+    UI.createAlert(
+      "warning",
+      "Your postgres URI isn't configured correctly!",
+      3000,
+      "clicked"
+    );
     alert.close();
     return;
   }
   if (!settings.uri || !settings.name || !settings.user || !settings.password) {
-    UI.createAlert("warning", "You are missing some required fields!", 3000, "clicked");
+    UI.createAlert(
+      "warning",
+      "You are missing some required fields!",
+      3000,
+      "clicked"
+    );
     alert.close();
     return;
   }
 
-  const { successfulPrinters, failedPrinters } = await setupOctoPrintForFilamentManager(
-    printers,
-    settings
-  );
+  const { successfulPrinters, failedPrinters } =
+    await setupOctoPrintForFilamentManager(printers, settings);
 
   filamentManagerPluginActionElements.postgresURI.value = "";
   filamentManagerPluginActionElements.databaseName.value = "";
@@ -227,7 +236,11 @@ async function setupOPFilamentManagerPluginSettings() {
 async function generateLogDumpFile() {
   const logDumpResponse = await OctoFarmClient.generateLogDump();
 
-  if (!logDumpResponse?.status || !logDumpResponse?.msg || !logDumpResponse?.zipDumpPath) {
+  if (
+    !logDumpResponse?.status ||
+    !logDumpResponse?.msg ||
+    !logDumpResponse?.zipDumpPath
+  ) {
     UI.createAlert(
       "error",
       "There was an issue with the servers response, please check your logs",
@@ -252,9 +265,7 @@ async function generateLogDumpFile() {
       setTimeout(() => {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
-      window.open(
-        `${OctoFarmClient.logsRoute}/${logDumpResponse.zipDumpPath}`
-      );
+      window.open(`${OctoFarmClient.logsRoute}/${logDumpResponse.zipDumpPath}`);
     });
   }
 }
@@ -264,18 +275,30 @@ async function nukeDatabases(database) {
   if (!database) {
     databaseNuke = await OctoFarmClient.get("settings/server/delete/database");
   } else {
-    databaseNuke = await OctoFarmClient.get("settings/server/delete/database/" + database);
+    databaseNuke = await OctoFarmClient.get(
+      "settings/server/delete/database/" + database
+    );
   }
   UI.createAlert("success", databaseNuke.message, 3000);
 }
 
 async function exportDatabases(database) {
-  const databaseExport = await OctoFarmClient.get("settings/server/get/database/" + database);
+  const databaseExport = await OctoFarmClient.get(
+    "settings/server/get/database/" + database
+  );
 
   if (databaseExport?.databases[0].length !== 0) {
-    FileOperations.download(database + ".json", JSON.stringify(databaseExport.databases));
+    FileOperations.download(
+      database + ".json",
+      JSON.stringify(databaseExport.databases)
+    );
   } else {
-    UI.createAlert("warning", "Database is empty, will not export...", 3000, "clicked");
+    UI.createAlert(
+      "warning",
+      "Database is empty, will not export...",
+      3000,
+      "clicked"
+    );
   }
 }
 
@@ -324,40 +347,40 @@ async function checkFilamentManagerPluginState() {
 async function updateServerSettings() {
   const opts = {
     onlinePolling: {
-      seconds: settingsElements.onlinePolling.seconds.value
+      seconds: settingsElements.onlinePolling.seconds.value,
     },
     server: {
       // Deprecated Port
       port: parseInt(settingsElements.server.port.value),
       loginRequired: settingsElements.server.loginRequired.checked,
-      registration: settingsElements.server.registration.checked
+      registration: settingsElements.server.registration.checked,
     },
     timeout: {
       webSocketRetry: settingsElements.timeout.webSocketRetry.value * 1000,
       apiTimeout: settingsElements.timeout.apiTimeout.value * 1000,
       apiRetryCutoff: settingsElements.timeout.apiRetryCutoff.value * 1000,
-      apiRetry: settingsElements.timeout.apiRetry.value * 1000
+      apiRetry: settingsElements.timeout.apiRetry.value * 1000,
     },
     filament: {
       filamentCheck: settingsElements.filament.filamentCheck.checked,
       hideEmpty: settingsElements.filament.hideEmpty.checked,
       downDateFailed: settingsElements.filament.downDateFailed.checked,
-      downDateSuccess: settingsElements.filament.downDateSuccess.checked
+      downDateSuccess: settingsElements.filament.downDateSuccess.checked,
     },
     history: {
       snapshot: {
         onComplete: settingsElements.history.snapshot.onComplete.checked,
-        onFailure: settingsElements.history.snapshot.onComplete.checked
+        onFailure: settingsElements.history.snapshot.onComplete.checked,
       },
       thumbnails: {
         onComplete: settingsElements.history.thumbnails.onComplete.checked,
-        onFailure: settingsElements.history.thumbnails.onComplete.checked
+        onFailure: settingsElements.history.thumbnails.onComplete.checked,
       },
       timelapse: {
         onComplete: settingsElements.history.timelapse.onComplete.checked,
         onFailure: settingsElements.history.timelapse.onComplete.checked,
-        deleteAfter: settingsElements.history.timelapse.onComplete.checked
-      }
+        deleteAfter: settingsElements.history.timelapse.onComplete.checked,
+      },
     },
     influxExport: {
       active: settingsElements.influxExport.active.checked,
@@ -368,18 +391,21 @@ async function updateServerSettings() {
       password: settingsElements.influxExport.password.value,
       retentionPolicy: {
         duration: settingsElements.influxExport.retentionPolicy.duration.value,
-        replication: settingsElements.influxExport.retentionPolicy.replication.value,
-        defaultRet: settingsElements.influxExport.retentionPolicy.defaultRet.checked
-      }
+        replication:
+          settingsElements.influxExport.retentionPolicy.replication.value,
+        defaultRet:
+          settingsElements.influxExport.retentionPolicy.defaultRet.checked,
+      },
     },
     monitoringViews: {
       panel: settingsElements.monitoringViews.panel.checked,
       list: settingsElements.monitoringViews.list.checked,
       camera: settingsElements.monitoringViews.camera.checked,
       group: settingsElements.monitoringViews.group.checked,
-      currentOperations: settingsElements.monitoringViews.currentOperations.checked,
-      combined: settingsElements.monitoringViews.combined.checked
-    }
+      currentOperations:
+        settingsElements.monitoringViews.currentOperations.checked,
+      combined: settingsElements.monitoringViews.combined.checked,
+    },
   };
 
   OctoFarmClient.post("settings/server/update", opts).then((res) => {
@@ -399,7 +425,7 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
   }
   const updateData = {
     forcePull: false,
-    doWeInstallPackages: false
+    doWeInstallPackages: false,
   };
   if (doWeForcePull) {
     updateData.forcePull = true;
@@ -408,14 +434,22 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     updateData.doWeInstallPackages = true;
   }
 
-  const updateOctoFarm = await OctoFarmClient.post("settings/server/update/octofarm", updateData);
+  const updateOctoFarm = await OctoFarmClient.post(
+    "settings/server/update/octofarm",
+    updateData
+  );
 
   // Local changes are detected, question whether we overwrite or cancel..
   if (
-    updateOctoFarm.message.includes("The update is failing due to local changes been detected.")
+    updateOctoFarm.message.includes(
+      "The update is failing due to local changes been detected."
+    )
   ) {
     bootbox.confirm(
-      serverBootBoxOptions.OF_UPDATE_LOCAL_CHANGES(updateOctoFarmBtn, updateOctoFarm.message)
+      serverBootBoxOptions.OF_UPDATE_LOCAL_CHANGES(
+        updateOctoFarmBtn,
+        updateOctoFarm.message
+      )
     );
     return;
   }
@@ -449,13 +483,17 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
 }
 
 async function checkForOctoFarmUpdates() {
-  const forceCheckForUpdatesBtn = document.getElementById("checkUpdatesForOctoFarmBtn");
+  const forceCheckForUpdatesBtn = document.getElementById(
+    "checkUpdatesForOctoFarmBtn"
+  );
   // Make sure check button is disbaled after key press
   if (forceCheckForUpdatesBtn) {
     forceCheckForUpdatesBtn.disabled = true;
   }
 
-  const updateCheck = await OctoFarmClient.get("settings/server/update/octofarm");
+  const updateCheck = await OctoFarmClient.get(
+    "settings/server/update/octofarm"
+  );
 
   if (updateCheck?.air_gapped) {
     UI.createAlert(
@@ -474,7 +512,12 @@ async function checkForOctoFarmUpdates() {
       "Clicked"
     );
   } else {
-    UI.createAlert("warning", "Sorry there are no new updates available!", 5000, "Clicked");
+    UI.createAlert(
+      "warning",
+      "Sorry there are no new updates available!",
+      5000,
+      "Clicked"
+    );
   }
 
   setTimeout(() => {
@@ -501,108 +544,144 @@ async function grabOctoFarmLogList() {
                   logs.name
                 }-download" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button>
                 <button id="${
-                    logs.name
+                  logs.name
                 }-delete" type="button" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `
     );
-    document.getElementById(logs.name+"-download").addEventListener("click",  (event) => {
-      window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
-    });
-    document.getElementById(logs.name+"-delete").addEventListener("click", async (event) => {
-      event.target.disabled = true;
-      try{
-        await OctoFarmClient.deleteLogFile(logs.name);
-        const logLine = document.getElementById(`log-${logs.name}`)
-        logLine.remove();
-        UI.createAlert("success", `Successfully deleted ${logs.name}!`, 3000, "clicked")
-      }catch(e){
-        event.target.disabled = false;
-        UI.createAlert("error", `Failed to delete ${logs.name}!`, 3000, "clicked")
-      }
-    });
+    document
+      .getElementById(logs.name + "-download")
+      .addEventListener("click", (event) => {
+        window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
+      });
+    document
+      .getElementById(logs.name + "-delete")
+      .addEventListener("click", async (event) => {
+        event.target.disabled = true;
+        try {
+          await OctoFarmClient.deleteLogFile(logs.name);
+          const logLine = document.getElementById(`log-${logs.name}`);
+          logLine.remove();
+          UI.createAlert(
+            "success",
+            `Successfully deleted ${logs.name}!`,
+            3000,
+            "clicked"
+          );
+        } catch (e) {
+          event.target.disabled = false;
+          UI.createAlert(
+            "error",
+            `Failed to delete ${logs.name}!`,
+            3000,
+            "clicked"
+          );
+        }
+      });
   });
 }
 
-async function clearOldLogs(){
+async function clearOldLogs() {
   try {
-
     bootbox.confirm({
       message: "Logs older than 5 days will be removed, Are you sure?",
       buttons: {
         confirm: {
           label: "Yes",
-          className: "btn-success"
+          className: "btn-success",
         },
         cancel: {
           label: "No",
-          className: "btn-danger"
-        }
+          className: "btn-danger",
+        },
       },
       callback: async function (result) {
-        if(!!result){
+        if (!!result) {
           const deletedLogs = await OctoFarmClient.clearOldLogs();
-          if(deletedLogs.length === 0){
-            UI.createAlert("warning", "No logs older than 5 day to delete!", 3000, "clicked")
-          }else{
+          if (deletedLogs.length === 0) {
+            UI.createAlert(
+              "warning",
+              "No logs older than 5 day to delete!",
+              3000,
+              "clicked"
+            );
+          } else {
             let message = "";
 
-            deletedLogs.forEach(log => {
-              message += `${log}<br>`
-              const logLine = document.getElementById(`log-${log}`)
-              if(!!logLine){
+            deletedLogs.forEach((log) => {
+              message += `${log}<br>`;
+              const logLine = document.getElementById(`log-${log}`);
+              if (!!logLine) {
                 logLine.remove();
               }
-            })
+            });
 
-            UI.createAlert("success", "Successfully cleaned house! <br>" + message, 3000, "clicked")
+            UI.createAlert(
+              "success",
+              "Successfully cleaned house! <br>" + message,
+              3000,
+              "clicked"
+            );
           }
         }
-
-      }
+      },
     });
-  }catch (e) {
-    UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked")
+  } catch (e) {
+    UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked");
   }
 }
 
 async function renderSystemCharts() {
-  historicUsageGraph = new ApexCharts(document.querySelector("#historicUsageGraph"), options);
+  historicUsageGraph = new ApexCharts(
+    document.querySelector("#historicUsageGraph"),
+    options
+  );
   await historicUsageGraph.render();
-  cpuUsageDonut = new ApexCharts(document.querySelector("#cpuUsageDonut"), cpuOptions);
+  cpuUsageDonut = new ApexCharts(
+    document.querySelector("#cpuUsageDonut"),
+    cpuOptions
+  );
   await cpuUsageDonut.render();
-  memoryUsageDonut = new ApexCharts(document.querySelector("#memoryUsageDonut"), memoryOptions);
+  memoryUsageDonut = new ApexCharts(
+    document.querySelector("#memoryUsageDonut"),
+    memoryOptions
+  );
   await memoryUsageDonut.render();
 }
 
 async function updateCurrentActiveUsers() {
   const activeUserList = await OctoFarmClient.get("system/activeUsers");
-  const activeUserListContainer = document.getElementById("activeUserListContainer");
+  const activeUserListContainer = document.getElementById(
+    "activeUserListContainer"
+  );
   const activeUserCount = document.getElementById("activeUserCount");
-  if(!!activeUserCount){
+  if (!!activeUserCount) {
     activeUserCount.innerHTML = activeUserList.length;
   }
 
-  if(!!activeUserListContainer){
+  if (!!activeUserListContainer) {
     activeUserListContainer.innerHTML = "";
-    activeUserList.forEach(user => {
-      activeUserListContainer.insertAdjacentHTML("beforeend", activeUserListRowTemplate(user))
-    })
+    activeUserList.forEach((user) => {
+      activeUserListContainer.insertAdjacentHTML(
+        "beforeend",
+        activeUserListRowTemplate(user)
+      );
+    });
   }
 }
 
 async function updateLiveSystemInformation() {
   const initialChartOptions = {
     noData: {
-      text: "No data to display yet!"
-    }
+      text: "No data to display yet!",
+    },
   };
   const systemInformation = await OctoFarmClient.get("system/info");
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
-  if(!systemInformation) {
+  if (!systemInformation) {
     return;
   }
 
@@ -616,7 +695,9 @@ async function updateLiveSystemInformation() {
 
   if (systemInformation.memoryLoadHistory.length > 0) {
     await memoryUsageDonut.updateSeries([
-      systemInformation.memoryLoadHistory[systemInformation.memoryLoadHistory.length - 1].y
+      systemInformation.memoryLoadHistory[
+        systemInformation.memoryLoadHistory.length - 1
+      ].y,
     ]);
   } else {
     await historicUsageGraph.updateOptions(initialChartOptions);
@@ -624,7 +705,9 @@ async function updateLiveSystemInformation() {
 
   if (systemInformation.cpuLoadHistory.length > 0) {
     await cpuUsageDonut.updateSeries([
-      systemInformation.cpuLoadHistory[systemInformation.cpuLoadHistory.length - 1].y
+      systemInformation.cpuLoadHistory[
+        systemInformation.cpuLoadHistory.length - 1
+      ].y,
     ]);
   } else {
     await historicUsageGraph.updateOptions(initialChartOptions);
@@ -634,12 +717,12 @@ async function updateLiveSystemInformation() {
     const dataSeriesForCharts = [
       {
         name: "Memory",
-        data: systemInformation.memoryLoadHistory
+        data: systemInformation.memoryLoadHistory,
       },
       {
         name: "CPU",
-        data: systemInformation.cpuLoadHistory
-      }
+        data: systemInformation.cpuLoadHistory,
+      },
     ];
     await historicUsageGraph.updateSeries(dataSeriesForCharts);
   } else {
@@ -663,47 +746,53 @@ function startUpdateTasksRunner() {
 
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
+      const { options } = theTask;
+      const { periodic } = options;
 
-      UI.doesElementNeedUpdating(
-        theTask.firstCompletion
-          ? new Date(theTask.firstCompletion).toLocaleString().replace(",", ": ")
-          : "Not Finished",
-        document.getElementById("firstExecution-" + task),
-        "innerHTML"
-      );
+      if (periodic) {
+        UI.doesElementNeedUpdating(
+          theTask.firstCompletion
+            ? new Date(theTask.firstCompletion)
+                .toLocaleString()
+                .replace(",", ": ")
+            : "Not Started",
+          document.getElementById("firstExecution-" + task),
+          "innerHTML"
+        );
 
-      UI.doesElementNeedUpdating(
-        theTask.lastExecuted
-          ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
-          : "Not Finished",
-        document.getElementById("lastExecution-" + task),
-        "innerHTML"
-      );
+        UI.doesElementNeedUpdating(
+          theTask.lastExecuted
+            ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
+            : "Not Finished",
+          document.getElementById("lastExecution-" + task),
+          "innerHTML"
+        );
 
-      UI.doesElementNeedUpdating(
-        theTask.duration
-          ? UI.generateMilisecondsTime(theTask.duration)
-          : "<i class=\"fas fa-sync fa-spin\"></i>",
-        document.getElementById("duration-" + task),
-        "innerHTML"
-      );
+        UI.doesElementNeedUpdating(
+          theTask.duration
+            ? UI.generateMilisecondsTime(theTask.duration)
+            : '<i class="fas fa-sync fa-spin"></i>',
+          document.getElementById("duration-" + task),
+          "innerHTML"
+        );
 
-      UI.doesElementNeedUpdating(
-        theTask.nextRun
-          ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
-          : "On Demand / One Time Task",
-        document.getElementById("next-" + task),
-        "innerHTML"
-      );
+        UI.doesElementNeedUpdating(
+          theTask.nextRun
+            ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
+            : "First Not Completed",
+          document.getElementById("next-" + task),
+          "innerHTML"
+        );
+      }
     }
   }, 1500);
 }
 
-function displayUserErrors(errors){
+function displayUserErrors(errors) {
   errors.forEach((error) => {
     userActionElements.userCreateMessage.insertAdjacentHTML(
-        "beforeend",
-        `
+      "beforeend",
+      `
         <div class="alert alert-warning text-dark" role="alert">
           <i class="fas fa-exclamation-triangle"></i> ${error.msg}
         </div>
@@ -719,7 +808,7 @@ async function createNewUser() {
     username: userActionElements.createUserName.value,
     group: userActionElements.createGroup.value,
     password: userActionElements.createPassword.value,
-    password2: userActionElements.createPassword2.value
+    password2: userActionElements.createPassword2.value,
   };
   const newCreatedUser = await OctoFarmClient.createNewUser(newUser);
 
@@ -734,7 +823,9 @@ async function createNewUser() {
                         <th scope="row">${createdUser.name}</th>
                         <td>${createdUser.username}</td>
                         <td>${createdUser.group}</td>
-                        <td>${new Date(createdUser.date).toLocaleDateString()}</td>
+                        <td>${new Date(
+                          createdUser.date
+                        ).toLocaleDateString()}</td>
                         <td>
                             <button id="resetPasswordBtn-${
                               createdUser._id
@@ -758,9 +849,11 @@ async function createNewUser() {
     userActionElements.createPassword.value = "";
     userActionElements.createPassword2.value = "";
     $("#userCreateModal").modal("hide");
-    document.getElementById(`deleteUserBtn-${createdUser._id}`).addEventListener("click", (e) => {
-      deleteUser(createdUser._id);
-    });
+    document
+      .getElementById(`deleteUserBtn-${createdUser._id}`)
+      .addEventListener("click", (e) => {
+        deleteUser(createdUser._id);
+      });
     document
       .getElementById(`resetPasswordBtn-${createdUser._id}`)
       .addEventListener("click", (e) => {
@@ -784,7 +877,12 @@ async function createNewUser() {
           await editUser(createdUser._id);
         });
       });
-    UI.createAlert("success", "Successfully created your user!", 3000, "clicked");
+    UI.createAlert(
+      "success",
+      "Successfully created your user!",
+      3000,
+      "clicked"
+    );
   }
 }
 
@@ -800,13 +898,18 @@ async function editUser(id) {
   const newUserInfo = {
     name: userActionElements.editName.value,
     username: userActionElements.editUserName.value,
-    group: userActionElements.editGroup.value
+    group: userActionElements.editGroup.value,
   };
   const editedUser = await OctoFarmClient.editUser(id, newUserInfo);
   if (editedUser.errors.length > 0) {
-    displayUserErrors(editedUser.errors)
+    displayUserErrors(editedUser.errors);
   } else {
-    UI.createAlert("success", "Successfully updated your user!", 3000, "clicked");
+    UI.createAlert(
+      "success",
+      "Successfully updated your user!",
+      3000,
+      "clicked"
+    );
     userActionElements.editName.value = "";
     userActionElements.editUserName.value = "";
     userActionElements.editGroup.value = "User";
@@ -820,12 +923,12 @@ function deleteUser(id) {
     buttons: {
       confirm: {
         label: "Yes",
-        className: "btn-success"
+        className: "btn-success",
       },
       cancel: {
         label: "No",
-        className: "btn-danger"
-      }
+        className: "btn-danger",
+      },
     },
     callback: async function (result) {
       if (result) {
@@ -835,11 +938,18 @@ function deleteUser(id) {
             UI.createAlert("error", error.msg, 3000, "clicked");
           });
         } else {
-          document.getElementById(`userRow-${deletedUser.userDeleted._id}`).remove();
-          UI.createAlert("success", "Successfully deleted your user!", 3000, "clicked");
+          document
+            .getElementById(`userRow-${deletedUser.userDeleted._id}`)
+            .remove();
+          UI.createAlert(
+            "success",
+            "Successfully deleted your user!",
+            3000,
+            "clicked"
+          );
         }
       }
-    }
+    },
   });
 }
 
@@ -847,7 +957,7 @@ async function resetUserPassword(id) {
   userActionElements.userResetMessage.innerHTML = "";
   const newPassword = {
     password: userActionElements.resetPassword.value,
-    password2: userActionElements.resetPassword2.value
+    password2: userActionElements.resetPassword2.value,
   };
   const resetPassword = await OctoFarmClient.resetUserPassword(id, newPassword);
   if (resetPassword.errors.length > 0) {
@@ -862,7 +972,12 @@ async function resetUserPassword(id) {
       );
     });
   } else {
-    UI.createAlert("success", "Successfully reset your users password!", 3000, "clicked");
+    UI.createAlert(
+      "success",
+      "Successfully reset your users password!",
+      3000,
+      "clicked"
+    );
     userActionElements.resetPassword.value = "";
     userActionElements.resetPassword2.value = "";
     $("#usersResetPasswordModal").modal("hide");
@@ -889,5 +1004,5 @@ export {
   resetUserPassword,
   fillInEditInformation,
   setupOPFilamentManagerPluginSettings,
-  clearOldLogs
+  clearOldLogs,
 };

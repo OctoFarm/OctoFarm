@@ -1630,10 +1630,11 @@ class OctoPrintPrinter {
   reconnectAPI() {
     this.reconnectingIn = Date.now() + this.#apiRetry;
     this.#retryNumber = this.#retryNumber + 1;
-    logger.info(
-      this.printerURL + ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
-    );
     if (this.#retryNumber < 1) {
+      logger.info(
+        this.printerURL +
+          ` | Setting up reconnect in ${this.#apiRetry}ms retry #${this.#retryNumber}`
+      );
       PrinterTicker.addIssue(
         new Date(),
         this.printerURL,
@@ -1748,7 +1749,9 @@ class OctoPrintPrinter {
   }
 
   ping() {
-    this.#ws.ping();
+    if (!!this?.#ws) {
+      this.#ws.ping();
+    }
   }
 
   cleanPrintersInformation(databaseRecord) {

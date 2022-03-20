@@ -134,7 +134,9 @@ const START_OFFLINE_INSTANCE_CHECK = async () => {
   await getPrinterManagerCache().offlineInstanceCheck();
 };
 
-const PING_PONG_CHECK = async () => {};
+const PING_PONG_CHECK = async () => {
+  await getPrinterManagerCache().websocketKeepAlive();
+};
 
 /**
  * @param task
@@ -177,7 +179,8 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.RUNONCE),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
-    TaskStart(START_OFFLINE_INSTANCE_CHECK, TaskPresets.PERIODIC_30000MS)
+    TaskStart(START_OFFLINE_INSTANCE_CHECK, TaskPresets.PERIODIC_30000MS),
+    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_60000MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
