@@ -38,6 +38,10 @@ const START_PRINTER_ADD_QUEUE = async () => {
   await getPrinterManagerCache().startPrinterEnableQueue();
 };
 
+const START_PRINTER_OFFLINE_QUEUE = async () => {
+  await getPrinterManagerCache().startPrinterOfflineQueue();
+};
+
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
 };
@@ -123,15 +127,11 @@ const UPDATE_OCTOPRINT_PLUGINS_LIST = async () => {
 };
 
 const CHECK_FOR_OCTOPRINT_UPDATES = async () => {
-  await getPrinterManagerCache().checkForOctoPrintUpdates();
+  //await getPrinterManagerCache().checkForOctoPrintUpdates();
 };
 
 const GENERATE_PRINTER_SPECIFIC_STATISTICS = async () => {
   await getPrinterManagerCache().generatePrintersStatisticsCache();
-};
-
-const START_OFFLINE_INSTANCE_CHECK = async () => {
-  await getPrinterManagerCache().offlineInstanceCheck();
 };
 
 const PING_PONG_CHECK = async () => {
@@ -179,7 +179,7 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.RUNONCE),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
-    TaskStart(START_OFFLINE_INSTANCE_CHECK, TaskPresets.PERIODIC_30000MS),
+    TaskStart(START_PRINTER_OFFLINE_QUEUE, TaskPresets.PERIODIC_30000MS),
     TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_60000MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];

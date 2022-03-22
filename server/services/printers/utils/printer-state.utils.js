@@ -26,9 +26,6 @@ const mapStateToCategory = (state) => {
   if (state === "Re-Sync") {
     return { name: "danger", hex: "#2e0905", category: "Offline" };
   }
-  if (state === "Searching...") {
-    return { name: "warning text-dark", hex: "#2e0905", category: "Searching" };
-  }
   if (state === "Disconnected") {
     return { name: "danger", hex: "#2e0905", category: "Disconnected" };
   }
@@ -46,6 +43,12 @@ const mapStateToCategory = (state) => {
   }
   if (state === "Offline after error") {
     return { name: "danger", hex: "#2e0905", category: "Error!" };
+  }
+  if (state === "Setting Up") {
+    return { name: "info text-dark", hex: "#2e0905", category: "Searching" };
+  }
+  if (state === "Searching...") {
+    return { name: "info text-dark", hex: "#2e0905", category: "Searching" };
   }
   if (state === "Disabled") {
     return { name: "dark", hex: "#2e0905", category: "Disabled" };

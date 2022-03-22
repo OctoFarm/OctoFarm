@@ -14,16 +14,19 @@ const { generatePrinterStatistics } = require("../services/printer-statistics.se
 const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket-helpers.utils");
 const { SettingsClean } = require("./settings-cleaner.service");
 
+const hostStatesList = ["Session Fail!"]
+
 const logger = new Logger("OctoFarm-PrinterControlManagerService");
 
 class PrinterManagerService {
-  #enablePrintersQueue = [];
   #printerGroupList = [];
   #printerControlList = [];
   #offlineAPIRetry = null;
   #printerEnableTimeout = null;
-  #printerOfflineTimeout;
+  #printerOfflineTimeout = null;
+  #printerOfflineTimer = 30000;
   #printerEnableTimer = 5000;
+  #enablePrintersQueue = [];
   #offlinePrinterCheckList = [];
 
   loadPrinterTimeoutSettingss() {
@@ -40,11 +43,11 @@ class PrinterManagerService {
     for (let p of pList) {
       await patchPrinterValues(p);
       const printer = new OctoPrintPrinter(p);
+      getPrinterStoreCache().addPrinter(printer);
       if (!printer?.disabled) {
-        getPrinterStoreCache().addPrinter(printer);
         this.#enablePrintersQueue.push(printer._id);
       } else {
-        getPrinterStoreCache().addPrinter(printer);
+        printer.disablePrinter();
       }
     }
   }
@@ -62,58 +65,73 @@ class PrinterManagerService {
     }
   }
 
-  async addPrinter(printer) {
-    await patchPrinterValues(printer);
-    getPrinterStoreCache().addPrinter(printer);
-    this.#enablePrintersQueue.push(printer);
+  async addPrinter(printerValues) {
+    await patchPrinterValues(printerValues);
+    const newPrinter = new OctoPrintPrinter(printerValues);
+    getPrinterStoreCache().addPrinter(newPrinter);
+    this.#enablePrintersQueue.push(newPrinter._id);
 
     return {
       printerURL: printer.printerURL
     };
   }
 
-  killAllConnections() {
-    logger.debug("Killing all printer connections...");
-    getPrinterStoreCache()
-      .listPrinters()
-      .forEach((printer) => {
-        printer.killAllConnections();
-      });
-    return "Killed Current Connections";
-  }
 
-  clearOfflineTimeout() {
-    clearTimeout(this.#printerOfflineTimeout);
-    return "Killed Printer Offline Timeout";
-  }
 
-  websocketKeepAlive() {
+
+  offlineInstanceCheck() {
     const printersList = getPrinterStoreCache().listPrinters();
 
     for (const printer of printersList) {
       const disabled = printer?.disabled;
-      const category = printer?.printerState?.colour?.category;
-      if (
-        !disabled &&
-        category !== "Offline" &&
-        category !== "Searching" &&
-        category !== "Setting Up"
-      ) {
-        printer.ping();
+
+      const category = printer?.hostState?.colour?.category;
+      const fullyScanned = printer.onboarding.fullyScanned;
+      const reconnectionPlanned = printer.reconnectionPlanned;
+
+      if (!disabled && category === "Offline" && !fullyScanned && !reconnectionPlanned) {
+        if (!this.#offlinePrinterCheckList.includes(printer._id)){
+          this.#offlinePrinterCheckList.push(printer._id);
+        }
       }
     }
   }
 
-  async offlineInstanceCheck() {
-    const printersList = getPrinterStoreCache().listPrinters();
+  async startPrinterOfflineQueue() {
+    this.#printerEnableTimeout = setTimeout(async () => {
+      this.offlineInstanceCheck();
+      await this.handlePrinterOfflineCheckQueue();
+    }, this.#printerOfflineTimer);
+  }
 
-    for (const printer of printersList) {
-      const disabled = printer?.disabled;
-      const category = printer?.printerState?.colour?.category;
-      if (!disabled && category === "Offline") {
-        this.#offlinePrinterCheckList.push(printer._id);
-      }
+  async offlineCheckPrinterFromQueue(id){
+    if (!!id) {
+      const printer = getPrinterStoreCache().getPrinter(id);
+      return printer.reconnectAPI();
     }
+  }
+
+  async handlePrinterOfflineCheckQueue(batchSize = 10) {
+    const offlinePrinterCheckBatchQueue = async () => {
+      const queueLength = this.#offlinePrinterCheckList.length;
+      console.log(queueLength)
+      for (let i = 0; i < queueLength; i += batchSize) {
+        const requests = this.#offlinePrinterCheckList.slice(i, i + batchSize).map((id) => {
+          // The batch size is 100. We are processing in a set of 100 users.
+          return this.offlineCheckPrinterFromQueue(id);
+        });
+
+        // requests will have 100 or less pending promises.
+        // Promise.all will wait till all the promises got resolves and then take the next 100.
+        logger.info(`Running printer enable batch ${i + 1}`);
+        await Promise.all(requests).catch((e) =>
+            logger.error(`Error in batch enable printers! ${i} - ${e}`)
+        ); // Catch the error.
+      }
+    };
+
+    await offlinePrinterCheckBatchQueue();
+    await this.startPrinterOfflineQueue();
   }
 
   async enablePrinterFromQueue(id) {
@@ -123,9 +141,10 @@ class PrinterManagerService {
     }
   }
 
-  clearPrinterEnableTimeout() {
+  clearPrinterQueuesTimeout() {
     clearTimeout(this.#printerEnableTimeout);
-    return "Killed Printer Enable Timeout";
+    clearTimeout(this.#printerOfflineTimeout);
+    return "Killed Printer Onboard Queues";
   }
 
   async startPrinterEnableQueue() {
@@ -155,6 +174,23 @@ class PrinterManagerService {
 
     await enablePrinterQueueBatch();
     await this.startPrinterEnableQueue();
+  }
+
+  websocketKeepAlive() {
+    const printersList = getPrinterStoreCache().listPrinters();
+
+    for (const printer of printersList) {
+      const disabled = printer?.disabled;
+      const category = printer?.printerState?.colour?.category;
+      if (
+          !disabled &&
+          category !== "Offline" &&
+          category !== "Searching" &&
+          category !== "Setting Up"
+      ) {
+        printer.ping();
+      }
+    }
   }
 
   updateStateCounters() {
@@ -423,6 +459,21 @@ class PrinterManagerService {
         getPrinterStoreCache().updatePrinterStatistics(printer._id, printerStatistics);
       }
     }
+  }
+
+  killAllConnections() {
+    logger.debug("Killing all printer connections...");
+    getPrinterStoreCache()
+        .listPrinters()
+        .forEach((printer) => {
+          printer.killAllConnections();
+        });
+    return "Killed Current Connections";
+  }
+
+  clearOfflineTimeout() {
+    clearTimeout(this.#printerOfflineTimeout);
+    return "Killed Printer Offline Timeout";
   }
 }
 

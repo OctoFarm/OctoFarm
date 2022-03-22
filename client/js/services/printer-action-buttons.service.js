@@ -107,9 +107,9 @@ function groupInit(printers) {
       `;
       }
       if (
-        printer.currentConnection != null &&
-        printer.currentConnection.port != null &&
-        printer.printerState.colour.category != "Offline"
+        printer.currentConnection !== null &&
+        printer.currentConnection.port !== null &&
+        printer.printerState.colour.category !== "Offline" && printer.printerState.colour.category !== "Searching"
       ) {
         printerQuickConnected(cleanGroup);
       } else {
@@ -293,15 +293,7 @@ function init(printer, element) {
     ${returnActionBtnTemplate(printer._id, printer.printerURL)}
   `;
   PrinterPowerService.applyBtn(printer);
-  if (
-    printer.currentConnection != null &&
-    printer.currentConnection.port != null &&
-    printer.printerState.colour.category != "Offline"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
-  }
+  checkQuickConnectState(printer);
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     printer.printerState.colour.category === "Offline";
 
@@ -441,7 +433,7 @@ function checkQuickConnectState(printer) {
   const isDisabledOrOffline =
     printer.printerState.colour.category === "Offline" ||
     printer.printerState.colour.category === "Disabled" ||
-    printer.printerState.colour.category === "Searching";
+    printer.printerState.colour.category === "Searching...";
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     isDisabledOrOffline;
 
