@@ -42,6 +42,7 @@ class OctoPrintPrinter {
   #retryNumber = 0;
   multiUserIssue = undefined;
   restartRequired = false;
+  enabling = false;
   coolDownEvent = undefined;
   versionNotSupported = false;
   versionNotChecked = false;
@@ -499,6 +500,7 @@ class OctoPrintPrinter {
 
   async enablePrinter() {
     // Setup initial client stuff, database, api
+    this.enabling = true;
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
     const testingTheWaters = await this.testTheApiWaters();
@@ -513,6 +515,7 @@ class OctoPrintPrinter {
           hostDescription: "Printer timed out, will attempt reconnection..."
         };
         this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
+        this.reconnectAPI();
         return "Failed due to timeout!";
       } else if (testingTheWaters === 503 || testingTheWaters === 502) {
         const unavailable = {
@@ -520,6 +523,7 @@ class OctoPrintPrinter {
           hostDescription: "Printer is unavailable, will attempt reconnection..."
         };
         this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        this.reconnectAPI();
         return "Failed because of octoprint server error!";
       } else if (testingTheWaters === 404) {
         const unavailable = {
@@ -628,6 +632,22 @@ class OctoPrintPrinter {
     return session;
   }
 
+  setupDatabase() {
+    if (!this?.#db) {
+      logger.debug(this.printerURL + ": Creating printer database link");
+      this.#db = new PrinterDatabaseService(this._id);
+      this.#db.update({
+        disabled: this.disabled,
+        sortIndex: this.sortIndex,
+        group: this.group,
+        apikey: this.apikey,
+        printerURL: this.printerURL,
+        webSocketURL: this.webSocketURL,
+        settingsAppearance: this.settingsAppearance
+      });
+    }
+  }
+
   async #setupWebsocket() {
     if (!this?.#ws) {
       logger.debug(
@@ -669,6 +689,7 @@ class OctoPrintPrinter {
         })
         .catch((e) => logger.error("Failed saving enable state for printer", e));
     }
+    this.setupDatabase();
     this.setAllPrinterStates(PRINTER_STATES().DISABLED);
     this.killAllConnections();
     logger.debug(this.printerURL + ": client set as disabled...");
@@ -726,19 +747,7 @@ class OctoPrintPrinter {
     }
 
     // Create database client
-    if (!this?.#db) {
-      logger.debug(this.printerURL + ": Creating printer database link");
-      this.#db = new PrinterDatabaseService(this._id);
-      this.#db.update({
-        disabled: this.disabled,
-        sortIndex: this.sortIndex,
-        group: this.group,
-        apikey: this.apikey,
-        printerURL: this.printerURL,
-        webSocketURL: this.webSocketURL,
-        settingsAppearance: this.settingsAppearance
-      });
-    }
+    this.setupDatabase();
 
     return true;
   }
@@ -1609,8 +1618,6 @@ class OctoPrintPrinter {
   }
 
   reconnectAPI() {
-    this.reconnectingIn = Date.now() + this.#apiRetry;
-    this.#retryNumber = this.#retryNumber + 1;
     if (this.#retryNumber < 1) {
       logger.info(
         this.printerURL +
@@ -1627,10 +1634,14 @@ class OctoPrintPrinter {
       );
     }
 
-    if (this.reconnectionPlanned) return; //Reconnection is planned..
-
+    if (this.reconnectionPlanned) {
+      return;
+    }
+    this.#retryNumber = this.#retryNumber + 1;
+    this.reconnectingIn = Date.now() + this.#apiRetry;
     this.reconnectionPlanned = true;
-    console.log("RECONAPI", this.reconnectionPlanned);
+    this.setHostState(PRINTER_STATES().SEARCHING);
+    // if (this.#reconnect) return; //Reconnection is planned..
     this.#reconnectTimeout = setTimeout(() => {
       this.reconnectingIn = 0;
 
@@ -1648,7 +1659,6 @@ class OctoPrintPrinter {
           this._id
         );
       }
-      this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
       return this.enablePrinter()
         .then((res) => {
           return logger.warning(res);
@@ -1660,7 +1670,6 @@ class OctoPrintPrinter {
           clearTimeout(this.#reconnectTimeout);
           this.#reconnectTimeout = false;
           this.reconnectionPlanned = false;
-          console.log("RECONAPI DONE", this.reconnectionPlanned);
         });
     }, this.#apiRetry);
   }
@@ -1689,6 +1698,7 @@ class OctoPrintPrinter {
   }
 
   deleteFromDataBase() {
+    this.#apiPrinterTickerWrap("Removing printer from database", "Warning");
     return this.#db.delete();
   }
 

@@ -115,10 +115,10 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     // Grab the API body
-    const printers = req.bodyOneOf("idList");
+    const idList = req.body.idList;
     // Send Dashboard to Runner..
-    logger.info("Delete printers request: ", printers);
-    const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
+    logger.info("Delete printers request: ", idList);
+    const p = await getPrinterManagerCache().bulkDeletePrinters(idList);
     // Return printers added...
     res.send({ printersRemoved: p, status: 200 });
   }
@@ -243,8 +243,9 @@ router.post(
     const id = req.body.i;
     let returnedPrinterInformation;
     if (!id) {
-      const disabled = req.query.disabled === "true";
-      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(false, disabled);
+      const onlyDisabled = req.query.disabled === "true";
+      const showFullList = req.query.fullList === "true";
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(showFullList, onlyDisabled);
     } else {
       returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
     }
@@ -337,7 +338,7 @@ router.post(
   ensureAdministrator,
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-    const data = req.bodyOneOf("idList");
+    const data = req.body.idList;
     logger.info("Update printer sort indexes: ", data);
     res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
   }

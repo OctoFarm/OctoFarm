@@ -110,11 +110,15 @@ export default class OctoFarmClient {
     return this.get(this.generatePrinterNameRoute)
   }
 
-  static async listPrinters(disabled = false) {
+  static async listPrinters(disabled = false, showFullList = false) {
     let path = `${this.printerRoute}/printerInfo`
 
     if(disabled){
       path += "?disabled=true"
+    }
+
+    if(showFullList){
+      path += "?fullList=true"
     }
 
     return this.post(path);
