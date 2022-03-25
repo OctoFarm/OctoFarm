@@ -200,7 +200,7 @@ export async function bulkDisablePrinters() {
   updateBulkActionsProgress(0, printersToControl.length);
   generateTableRows(printersToControl);
   for (let p = 0; p < printersToControl.length; p++) {
-    await OctoFarmClient.disablePrinter(printersToControl[p]._id);
+    await OctoFarmClient.disablePrinter([printersToControl[p]._id]);
     const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
     const disableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
     printerCard.classList = "printerDisabled";
@@ -219,7 +219,7 @@ export async function bulkEnablePrinters(disabled) {
     updateBulkActionsProgress(0, printersToControl.length);
     generateTableRows(printersToControl);
     for (let p = 0; p < printersToControl.length; p++) {
-      await OctoFarmClient.enablePrinter(printersToControl[p]._id);
+      await OctoFarmClient.enablePrinter([printersToControl[p]._id]);
       const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
       const enableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
       enableButton.classList = "btn btn-outline-success btn-sm";

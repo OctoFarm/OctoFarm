@@ -457,25 +457,25 @@ router.get("/connectionOverview", ensureAuthenticated, ensureAdministrator, (req
   res.send(printerConnectionStats);
 });
 
-router.patch(
-  "/disable/:idList",
+router.post(
+  "/disable",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   (req, res) => {
-    const idList = req.paramString("idList");
+    const idList = req.body.idList;
     res.send(getPrinterManagerCache().disablePrinters(idList));
   }
 );
 
-router.patch(
-  "/enable/:idList",
+router.post(
+  "/enable",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-    const idList = req.paramString("idList");
-    res.send(await getPrinterManagerCache().enablePrinters(idList));
+      const idList = req.body.idList;
+      res.send(await getPrinterManagerCache().enablePrinters(idList));
   }
 );
 

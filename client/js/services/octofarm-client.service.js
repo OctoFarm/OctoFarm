@@ -124,12 +124,18 @@ export default class OctoFarmClient {
     return this.post(path);
   }
 
-  static async disablePrinter(id) {
-    return this.patch(`${this.disablePrinterRoute}${id}`);
+  static async disablePrinter(idList) {
+    const body = {
+      idList
+    }
+    return this.post(`${this.disablePrinterRoute}`, body);
   }
 
-  static async enablePrinter(id) {
-    return this.patch(`${this.enablePrinterRoute}${id}`);
+  static async enablePrinter(idList) {
+    const body = {
+      idList
+    }
+    return this.post(`${this.enablePrinterRoute}`, body);
   }
 
   static async refreshPrinterSettings(id) {

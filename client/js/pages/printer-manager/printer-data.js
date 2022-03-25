@@ -460,9 +460,9 @@ export function createOrUpdatePrinterTableRow(printers) {
                 );
 
                 if (isDisabled) {
-                  await OctoFarmClient.enablePrinter(printer._id);
+                  await OctoFarmClient.enablePrinter([printer._id]);
                 } else {
-                  await OctoFarmClient.disablePrinter(printer._id);
+                  await OctoFarmClient.disablePrinter([printer._id]);
                 }
 
                 alert.close();

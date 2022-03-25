@@ -756,7 +756,7 @@ class OctoPrintPrinter {
   async initialApiCheckSequence() {
     logger.info(this.printerURL + ": Gathering Initial API Data");
     this.#apiPrinterTickerWrap("Gathering Initial API Data", "Info");
-    return Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
+    return Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList(true)]);
   }
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
@@ -839,7 +839,10 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintUsersList(force = true) {
-    if (!force || this.onboarding.userApi) return true;
+    if (!force || this.onboarding.userApi) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
+      return true;
+    }
 
     this.#apiPrinterTickerWrap("Acquiring User List", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
@@ -1005,7 +1008,10 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSystemData(force = false) {
-    if (!force || this.onboarding.systemApi) return true;
+    if (!force || this.onboarding.systemApi) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
+      return true;
+    }
 
     this.#apiPrinterTickerWrap("Acquiring system data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
@@ -1041,7 +1047,10 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
-    if (!force || this.onboarding.profileApi) return true;
+    if (!force || this.onboarding.profileApi) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
+      return true;
+    }
 
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
@@ -1079,7 +1088,10 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintStateData(force = false) {
-    if (!force || this.onboarding.stateApi) return false;
+    if (!force || this.onboarding.stateApi) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success", true);
+      return false;
+    }
 
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
@@ -1130,10 +1142,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSettingsData(force = false) {
+    if (!force || this.onboarding.settingsApi) {
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
+      return true;
+    }
+
     this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
-
-    if (!force || this.onboarding.settingsApi) return true;
 
     let settingsCheck = await this.#api.getSettings(true).catch((e) => {
       logger.http("Failed Aquire settings data", e);
