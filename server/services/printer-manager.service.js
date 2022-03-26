@@ -49,6 +49,8 @@ class PrinterManagerService {
 
   async enablePrinters(enableList) {
     for (let id of enableList) {
+      const printer = getPrinterStoreCache().getPrinter(id);
+      printer.enabling = false;
       this.#enablePrintersQueue.push(id);
     }
   }
