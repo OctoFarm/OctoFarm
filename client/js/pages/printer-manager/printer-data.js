@@ -401,19 +401,11 @@ export function createOrUpdatePrinterTableRow(printers) {
           bootbox.dialog({
             title: "Rescan All API endpoints",
             message:
-              '<p class="alert alert-warning text-dark" role="alert">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>' +
-              '<p class="alert alert-danger text-dark" role="alert">Force ReScan: Will rescan all endpoints regardless of existing data.</p>',
+              "<p class=\"alert alert-danger text-dark\" role=\"alert\">ReScan: Will rescan all endpoints regardless of existing data.</p>",
             size: "large",
             buttons: {
-              normal: {
-                label: "ReScan",
-                className: "btn-warning text-dark",
-                callback: async function () {
-                  await reSyncAPI(false, printer._id);
-                },
-              },
               force: {
-                label: "Force ReScan",
+                label: "ReScan",
                 className: "btn-danger text-dark",
                 callback: async function () {
                   await reSyncAPI(true, printer._id);

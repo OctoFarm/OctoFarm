@@ -453,18 +453,14 @@ function checkQuickConnectState(printer) {
 
   if (
     (printer.printerState.colour.category !== "Offline" &&
-      printer.printerState.colour.category === "Disconnected") ||
-    printer.printerState.colour.category === "Error!" ||
-      printer.printerState.colour.category !== "Disabled" ||
-      printer.printerState.colour.category !== "Searching..."
+    printer.printerState.colour.category === "Disconnected") ||
+    printer.printerState.colour.category === "Error!"
   ) {
     printerQuickDisconnected(printer._id);
   } else if (
     printer.printerState.colour.category !== "Offline" &&
     printer.printerState.colour.category !== "Disconnected" &&
-    printer.printerState.colour.category !== "Error!" &&
-      printer.printerState.colour.category !== "Disabled" &&
-      printer.printerState.colour.category !== "Searching..."
+    printer.printerState.colour.category !== "Error!"
   ) {
     printerQuickConnected(printer._id);
   } else {

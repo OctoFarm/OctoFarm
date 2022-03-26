@@ -209,6 +209,7 @@ class OctoPrintPrinter {
       currentActive,
       currentOffline,
       currentUser,
+      userList,
       selectedFilament,
       octoPrintVersion,
       octoPi,
@@ -249,6 +250,9 @@ class OctoPrintPrinter {
     }
     if (!!currentUser) {
       this.currentUser = currentUser;
+    }
+    if (!!userList) {
+      this.userList = userList;
     }
     if (!!dateAdded) {
       this.dateAdded = dateAdded;
@@ -501,7 +505,7 @@ class OctoPrintPrinter {
   async enablePrinter() {
     // Setup initial client stuff, database, api
     this.enabling = true;
-    if(this.disabled){
+    if (this.disabled) {
       this.#db.update({ disabled: false });
     }
 
@@ -760,7 +764,7 @@ class OctoPrintPrinter {
   async initialApiCheckSequence() {
     logger.info(this.printerURL + ": Gathering Initial API Data");
     this.#apiPrinterTickerWrap("Gathering Initial API Data", "Info");
-    return Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList(true)]);
+    return Promise.allSettled([this.globalAPIKeyCheck(), this.acquireOctoPrintUsersList()]);
   }
 
   // Only run this when we've confirmed we can at least get a session key + api responses from OctoPrint
@@ -862,58 +866,51 @@ class OctoPrintPrinter {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
-      // Always forced... may change in future
-      if (force) {
-        if (isEmpty(userList)) {
-          //If user list is empty then we can assume that an admin user is only one available.
-          //Only relevant for OctoPrint < 1.4.2.
-          this.currentUser = "admin";
-          this.userList.push(this.currentUser);
-          this.#db.update({ currentUser: this.currentUser });
-          this.#apiPrinterTickerWrap(
-            "Acquired a single admin user!",
-            "Complete",
-            "Current User: " + this.currentUser
-          );
-          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
-          return true;
-        } else {
-          //If the userList isn't empty then we need to parse out the users and search for octofarm user.
-          for (let currentUser of userList) {
-            if (!!currentUser.admin) {
-              this.userList.push(currentUser.name);
-              // Look for OctoFarm user and skip the rest, if not use the first admin we find
-              if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
-                this.currentUser = currentUser.name;
-                this.#db.update({ currentUser: this.currentUser });
-                // Continue to collect the rest of the users...
-                continue;
-              }
-              // If no octofarm user then collect the rest for user choice in ui.
-              if (!this?.currentUser) {
-                // We should not override the database value to allow users to update it.
-                this.currentUser = currentUser.name;
-                this.#db.update({ currentUser: this.currentUser });
-              }
-            }
-          }
-          this.#apiPrinterTickerWrap(
-            "Successfully acquired " + userList.length + " users...",
-            "Complete",
-            "Current User: " + this.currentUser
-          );
-          this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
-        }
-      } else {
+      if (isEmpty(userList)) {
+        //If user list is empty then we can assume that an admin user is only one available.
+        //Only relevant for OctoPrint < 1.4.2.
+        this.currentUser = "admin";
+        this.userList.push(this.currentUser);
         this.#apiPrinterTickerWrap(
-          "User list acquired previously... skipping!",
+          "Acquired a single admin user!",
           "Complete",
           "Current User: " + this.currentUser
         );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success");
+        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
+        return true;
+      } else {
+        //If the userList isn't empty then we need to parse out the users and search for octofarm user.
+        for (let currentUser of userList) {
+          if (!!currentUser.admin) {
+            this.userList.push(currentUser.name);
+            // Look for OctoFarm user and skip the rest, if not use the first admin we find
+            if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
+              this.currentUser = currentUser.name;
+              this.#db.update({ currentUser: this.currentUser });
+              // Continue to collect the rest of the users...
+              continue;
+            }
+            // If no octofarm user then collect the rest for user choice in ui.
+            if (!this?.currentUser) {
+              // We should not override the database value to allow users to update it.
+              this.currentUser = currentUser.name;
+            }
+          }
+        }
       }
+
+      this.#apiPrinterTickerWrap(
+        "Successfully acquired " + userList.length + " users...",
+        "Complete",
+        "Current User: " + this.currentUser
+      );
+      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       this.onboarding.userApi = true;
-      this.#db.update({ onboarding: this.onboarding });
+      this.#db.update({
+        currentUser: this.currentUser,
+        userList: this.userList,
+        onoarding: this.onboarding
+      });
       return true;
     } else {
       this.#apiPrinterTickerWrap(

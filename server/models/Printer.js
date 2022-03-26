@@ -73,6 +73,10 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  userList: {
+    type: Array,
+    required: false
+  },
   dateAdded: {
     type: Number,
     required: false
