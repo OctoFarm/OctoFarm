@@ -1,6 +1,5 @@
 import UI from "../utils/ui";
 import OctoFarmClient from "./octofarm-client.service";
-import {updatePrinterSettingsModal} from "./printer-settings.service";
 
 export default class PrinterEditService {
     static pageElements;
