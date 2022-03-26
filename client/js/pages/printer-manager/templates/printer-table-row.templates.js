@@ -266,7 +266,7 @@ export function returnDisabledPrinterTableRow(printer) {
 
         </td>
         <td class="align-middle" id="printerManageBtns-${printer._id}">
-            ${returnPrinterManageDropDown(printer._id)}
+            ${returnPrinterManageDropDown(printer._id, printer.disabled)}
         </td>
 
         <td class="align-middle" id="printerAlertsBtns-${printer._id}">
