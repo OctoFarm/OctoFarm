@@ -73,8 +73,8 @@ axios.interceptors.response.use(
 export default class OctoFarmClient {
   static base = "/api";
   static printerRoute = "/printers";
-  static disablePrinterRoute = this.printerRoute + "/disable/";
-  static enablePrinterRoute = this.printerRoute + "/enable/";
+  static disablePrinterRoute = this.printerRoute + "/disable";
+  static enablePrinterRoute = this.printerRoute + "/enable";
   static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
   static printerStepChange = this.printerRoute + "/stepChange";
   static serverSettingsRoute = "/settings/server";

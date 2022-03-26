@@ -501,6 +501,10 @@ class OctoPrintPrinter {
   async enablePrinter() {
     // Setup initial client stuff, database, api
     this.enabling = true;
+    if(this.disabled){
+      this.#db.update({ disabled: false });
+    }
+
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
     const testingTheWaters = await this.testTheApiWaters();
