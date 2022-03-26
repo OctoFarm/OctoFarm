@@ -95,7 +95,7 @@ function returnPrinterManageDropDown(id, disabled){
                  type="button"
                  class="btn btn-primary dropdown-item"
                  data-toggle="modal"
-                 data-target="#printerSettingsModal"
+                 data-target="#printerEditModal"
                 >
                 <i class="fa-solid fa-pen-to-square"></i> Edit
             </button>

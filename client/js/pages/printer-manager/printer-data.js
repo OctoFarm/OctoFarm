@@ -10,6 +10,7 @@ import { setupUpdateOctoPrintClientBtn } from "../../services/octoprint/octoprin
 import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "../../services/printer-logs.service.js";
+import PrinterEditService from "../../services/printer-edit.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../../services/printer-settings.service";
 import {
@@ -372,6 +373,13 @@ export function createOrUpdatePrinterTableRow(printers) {
       // Setup listeners
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
+
+      document
+          .getElementById(`printerEdit-${printer._id}`)
+          .addEventListener("click", async (e) => {
+            const printersInfo = await OctoFarmClient.listPrinters(false, true);
+            await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id);
+          });
 
       document
         .getElementById(`printerSettings-${printer._id}`)

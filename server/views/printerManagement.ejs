@@ -97,10 +97,17 @@ bodyFile:'./PrinterManager/farmOverview.modal.ejs'
 })
 %>
 <%- include(modal, {
-modal:{
-id:"connectionsOverview", title: "Connections Overview"
-},
-bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+    modal:{
+    id:"connectionsOverview", title: "Connections Overview"
+    },
+    bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+})
+%>
+<%- include(modal, {
+    modal:{
+    id:"printerEdit", title:"Printer Edit: "
+    },
+    bodyFile:'./PrinterManager/printerEdit.modal.ejs'
 })
 %>
 <%- include(modal, {
