@@ -61,7 +61,8 @@ const returnAlerts = (id) => {
 
 function returnPrinterManageDropDown(id, disabled){
     let printerDisabledButton = null;
-    if(disabled){
+    // let disabled = "disabled=true"
+    if(!disabled){
         printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${id}"
@@ -90,7 +91,7 @@ function returnPrinterManageDropDown(id, disabled){
           <div class="dropdown-menu">
           <h6 class="dropdown-header">Connection</h6>
           <button  title="Change your Printer Settings"
-                 id="printerSettings-${id}"
+                 id="printerEdit-${id}"
                  type="button"
                  class="btn btn-primary dropdown-item"
                  data-toggle="modal"

@@ -6,7 +6,7 @@ import { groupBy, mapValues } from "lodash";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
-      <div class="btn-group">
+      <div id="printerManageDropDown-${id}" class="btn-group">
          <button  
            title="Quickly connect/disconnect your printer"
            id="printerQuickConnect-${id}"
@@ -25,22 +25,22 @@ function returnActionBtnTemplate(id, webURL) {
         </button>
         <div class="dropdown-menu">
             <h6 class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
-            <a  
+            <button  
              title="Runs a pre-configured gcode sequence so you can detect which printer this is."
              id="printerFindMe-${id}"
              type="button"
              class="dropdown-item d-none"
           >
               <i class="fas fa-search"></i> Find Printer!
-          </a> 
-          <a  
+          </button> 
+          <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerPreHeat-${id}"
              type="button"
          class="dropdown-item d-none"
           >
             <i class="fas fa-fire"></i> Pre-Heat
-          </a> 
+          </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
           <a title="Open OctoPrint"
                id="printerWeb-${id}"
@@ -48,22 +48,22 @@ function returnActionBtnTemplate(id, webURL) {
                class="dropdown-item"
                target="_blank"
                href="${webURL}" role="button"><i class="fas fa-globe-europe"></i> OctoPrint Web</a>
-            <a  
+            <button
                title="Terminate and reconnect OctoPrints Socket connection."
                id="printerSyncButton-${id}"
                type="button"
                class="dropdown-item"
             >
                 <i class="fas fa-sync"></i> Re-Connect Socket
-            </a> 
+            </button> 
           <h6 id="printerPowerDivider" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer Power</h6>
-          <a id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Power On Printer</a>
-          <a id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Power Off Printer</a>
+          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
           <h6 id="octoPrintPowerDivider" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint Power</h6>
-          <a id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-redo"></i> Restart OctoPrint</a>
-          <a id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-sync-alt"></i> Reboot Host</a>
-          <a id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Wake Host</a>
-          <a id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Shutdown Host</a>
+          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
+          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
+          <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Wake Host</button>
+          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
 
         </div>
       </div>
@@ -292,13 +292,8 @@ function init(printer, element) {
   document.getElementById(element).innerHTML = `
     ${returnActionBtnTemplate(printer._id, printer.printerURL)}
   `;
-  PrinterPowerService.applyBtn(printer);
+  // PrinterPowerService.applyBtn(printer);
   checkQuickConnectState(printer);
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
-    printer.printerState.colour.category === "Offline";
-
-  document.getElementById("printerWeb-" + printer._id).href =
-    printer.printerURL;
 
   addEventListeners(printer);
 }
@@ -434,10 +429,11 @@ function checkQuickConnectState(printer) {
     printer.printerState.colour.category === "Offline" ||
     printer.printerState.colour.category === "Disabled" ||
     printer.printerState.colour.category === "Searching...";
+
+  document.getElementById("printerSyncButton-"+printer._id).disabled = isDisabledOrOffline;
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     isDisabledOrOffline;
-
-  document.getElementById("printerSyncButton-" + printer._id).disabled =
+  document.getElementById("printerManageDropDown-" + printer._id).disabled =
     isDisabledOrOffline;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
@@ -458,13 +454,17 @@ function checkQuickConnectState(printer) {
   if (
     (printer.printerState.colour.category !== "Offline" &&
       printer.printerState.colour.category === "Disconnected") ||
-    printer.printerState.colour.category === "Error!"
+    printer.printerState.colour.category === "Error!" ||
+      printer.printerState.colour.category !== "Disabled" ||
+      printer.printerState.colour.category !== "Searching..."
   ) {
     printerQuickDisconnected(printer._id);
   } else if (
     printer.printerState.colour.category !== "Offline" &&
     printer.printerState.colour.category !== "Disconnected" &&
-    !printer.printerState.colour.category !== "Error!"
+    printer.printerState.colour.category !== "Error!" &&
+      printer.printerState.colour.category !== "Disabled" &&
+      printer.printerState.colour.category !== "Searching..."
   ) {
     printerQuickConnected(printer._id);
   } else {

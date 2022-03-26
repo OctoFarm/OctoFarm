@@ -45,10 +45,10 @@ const mapStateToCategory = (state) => {
     return { name: "danger", hex: "#2e0905", category: "Error!" };
   }
   if (state === "Setting Up") {
-    return { name: "info text-dark", hex: "#2e0905", category: "Searching" };
+    return { name: "info text-dark", hex: "#2e0905", category: "Searching..." };
   }
   if (state === "Searching...") {
-    return { name: "info text-dark", hex: "#2e0905", category: "Searching" };
+    return { name: "info text-dark", hex: "#2e0905", category: "Searching..." };
   }
   if (state === "Disabled") {
     return { name: "dark", hex: "#2e0905", category: "Disabled" };
