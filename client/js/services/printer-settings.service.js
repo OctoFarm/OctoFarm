@@ -933,6 +933,9 @@ class PrinterSettingsService {
 
   static getPageValues() {
     const newPrinterSettingsValues = {
+      printer: {
+        index: currentPrinter._id,
+      },
       connection: {
         preferredPort: UI.getValueOrPlaceHolder(document.getElementById("psDefaultSerialPort")),
         preferredBaud: UI.getValueOrPlaceHolder(document.getElementById("psDefaultBaudrate")),

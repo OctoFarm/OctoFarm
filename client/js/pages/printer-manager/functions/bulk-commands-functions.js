@@ -1094,7 +1094,10 @@ export async function bulkOctoPrintPluginAction(action) {
             const disabledPluginList = await OctoFarmClient.get(
               "printers/disabledPluginList/" + id
             );
-            pluginList = createPluginList(disabledPluginList)
+            const cleanDisabledList = createPluginList(disabledPluginList)
+            cleanDisabledList.forEach(plugin => {
+              pluginList.push(plugin)
+            })
           } catch (e) {
             console.error("Couldn't grab disabled plugin list... ignoring.", e);
           }
@@ -1104,8 +1107,10 @@ export async function bulkOctoPrintPluginAction(action) {
             const enabledPluginList = await OctoFarmClient.get(
               "printers/enabledPluginList/" + id
             );
-            pluginList = createPluginList(enabledPluginList)
-
+            const cleanEnabledList = createPluginList(enabledPluginList)
+            cleanEnabledList.forEach(plugin => {
+              pluginList.push(plugin)
+            })
           } catch (e) {
             console.error("Couldn't grab enabled plugin list... ignoring.", e);
           }
@@ -1115,7 +1120,10 @@ export async function bulkOctoPrintPluginAction(action) {
             const allInstalledPlugins = await OctoFarmClient.get(
               "printers/allPluginsList/" + id
             );
-            pluginList = createPluginList(allInstalledPlugins)
+            const cleanAllPluginList = createPluginList(allInstalledPlugins)
+            cleanAllPluginList.forEach(plugin => {
+              pluginList.push(plugin)
+            })
           } catch (e) {
             console.error("Couldn't grab installed plugin list... ignoring.", e);
           }
@@ -1134,9 +1142,12 @@ export async function bulkOctoPrintPluginAction(action) {
     });
 
     //Install Promt
-    bootbox.prompt({
-      size: "large",
-      title: `<form class="form-inline float-right">
+    if(pluginList.length === 0){
+      UI.createAlert("info", `You don't have any plugins to ${action}`, "clicked", 4000)
+    }else{
+      bootbox.prompt({
+        size: "large",
+        title: `<form class="form-inline float-right">
                   <div class="form-group text-wrap">
                     <label for="searchPlugins text-wrap">
                       Please choose the plugin you'd like to ${action}.. or: &nbsp;
@@ -1144,36 +1155,38 @@ export async function bulkOctoPrintPluginAction(action) {
                     <input width="75%" id="searchPlugins" type="text" placeholder="Search for your plugin name here..." class="search-control search-control-underlined">
                   </div>
                 </form>`,
-      inputType: "checkbox",
-      multiple: true,
-      inputOptions: pluginList,
-      scrollable: true,
-      onShow: function (e) {
-        setupPluginSearch();
-      },
-      callback: async function (result) {
-        if (result) {
-          const pluginAmount = result.length * printersForPluginAction.length;
-          let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
-          if (action === "install") {
-            cleanAction = `${cleanAction}ing`;
+        inputType: "checkbox",
+        multiple: true,
+        inputOptions: pluginList,
+        scrollable: true,
+        onShow: function (e) {
+          setupPluginSearch();
+        },
+        callback: async function (result) {
+          if (result) {
+            const pluginAmount = result.length * printersForPluginAction.length;
+            let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
+            if (action === "install") {
+              cleanAction = `${cleanAction}ing`;
+            }
+            showBulkActionsModal();
+            updateBulkActionsProgress(0, pluginAmount);
+            generateTableRows(printersForPluginAction);
+            for (let p = 0; p < printersForPluginAction.length; p++) {
+              const response = await octoPrintPluginInstallAction(
+                  printersForPluginAction[p],
+                  result,
+                  cleanAction
+              );
+              updateTableRow(printersForPluginAction[p]._id, response.status, response.message);
+              updateBulkActionsProgress(p, pluginAmount);
+            }
+            updateBulkActionsProgress(printersForPluginAction.length, pluginAmount);
           }
-          showBulkActionsModal();
-          updateBulkActionsProgress(0, pluginAmount);
-          generateTableRows(printersForPluginAction);
-          for (let p = 0; p < printersForPluginAction.length; p++) {
-            const response = await octoPrintPluginInstallAction(
-              printersForPluginAction[p],
-              result,
-              cleanAction
-            );
-            updateTableRow(printersForPluginAction[p]._id, response.status, response.message);
-            updateBulkActionsProgress(p, pluginAmount);
-          }
-          updateBulkActionsProgress(printersForPluginAction.length, pluginAmount);
         }
-      }
-    });
+      });
+    }
+
   } catch (e) {
     console.error(e);
     UI.createAlert(
@@ -1185,7 +1198,7 @@ export async function bulkOctoPrintPluginAction(action) {
   }
 }
 
-async function createPluginList(plugins){
+function createPluginList(plugins){
   const pluginList = [];
   plugins.forEach((plugin) => {
     pluginList.push({

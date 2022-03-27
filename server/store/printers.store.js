@@ -483,28 +483,8 @@ class PrinterStore {
       gcode,
       other
     } = settings;
-    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+    const { index } = printer;
     const originalPrinter = this.#findMePrinter(index);
-
-    if (!!currentUser && currentUser !== originalPrinter.currentUser && currentUser !== 0) {
-      this.updatePrinterDatabase(index, {
-        currentUser: currentUser
-      });
-    }
-
-    // Deal with OctoFarm connection information updates
-    const octoFarmConnectionSettings = {
-      _id: index,
-      settingsAppearance: {
-        name: printerName
-      },
-      printerURL: printerURL,
-      camURL: cameraURL,
-      apikey: apikey
-    };
-
-    // Update OctoFarms data
-    this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
 
     const { preferredPort, preferredBaud, preferredProfile } = connection;
     // Connection is always sent so can just update.

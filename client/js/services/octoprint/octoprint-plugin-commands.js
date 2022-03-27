@@ -136,13 +136,13 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
       let postData = {};
       if (action === "install") {
         postData = {
-          command: action,
+          command: action.toLowerCase(),
           dependency_links: false,
           url: pluginList[r]
         };
       } else {
         postData = {
-          command: action,
+          command: action.toLowerCase(),
           plugin: pluginList[r]
         };
       }

@@ -1,4 +1,4 @@
-const returnAlerts = (id) => {
+const returnAlerts = (id, printerURL) => {
   return `
     <button title="No OctoPrint updates available!" id="octoprintUpdate-${id}"
             class='tag btn btn-outline-info btn-sm d-none' ><i class="fab fa-raspberry-pi"></i></button>
@@ -37,13 +37,14 @@ const returnAlerts = (id) => {
     >
         <i class="fas fa-users"></i>
     </button>
-    <button title="CORS is not enable on OctoPrint!"
+    <a title="CORS is not enable on OctoPrint!"
             type="button"
             class="tag btn btn-outline-info btn-sm d-none"
             id="corsIssue-${id}" 
+            href="printerURL"
     >
         <i class="fas fa-crosshairs"></i>
-    </button>
+    </a>
     <button  title="Offline Rescan planned"
                  id="printerAPIScanning-${id}"
                  type="button"
@@ -210,7 +211,7 @@ export function returnPrinterTableRow(printer) {
         </td>
 
         <td class="align-middle" id="printerAlertsBtns-${printer._id}">
-            ${returnAlerts(printer._id)}
+            ${returnAlerts(printer._id, printer.printerURL)}
         </td>
 
     </tr>
@@ -272,7 +273,7 @@ export function returnDisabledPrinterTableRow(printer) {
         </td>
 
         <td class="align-middle" id="printerAlertsBtns-${printer._id}">
-               ${returnAlerts(printer._id)}
+               ${returnAlerts(printer._id, printer.printerURL)}
         </td>
 
     </tr>
