@@ -6,7 +6,10 @@ import {
   checkQuickConnectState,
   init as actionButtonInit,
 } from "../../services/printer-action-buttons.service";
-import { setupUpdateOctoPrintClientBtn } from "../../services/octoprint/octoprint-client-commands";
+import {
+  sendPowerCommandToOctoPrint,
+  setupUpdateOctoPrintClientBtn
+} from "../../services/octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "../../services/printer-logs.service.js";
@@ -495,6 +498,31 @@ export function createOrUpdatePrinterTableRow(printers) {
             const printersInfo = await OctoFarmClient.listPrinters(false, true);
             await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id, true);
           });
+
+      document
+          .getElementById("restartRequired-" + printer._id)
+          .addEventListener("click", async (e) => {
+            bootbox.confirm({
+              message: "This will restart your OctoPrint instance, are you sure?",
+              buttons: {
+                confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+                },
+                cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+                }
+              },
+              callback: async function (result) {
+                if(result){
+                  document.getElementById("restartRequired-"+printer._id).disabled = true;
+                  await sendPowerCommandToOctoPrint(printer, "restart");
+                }
+              }
+            });
+          });
     }
+
   });
 }

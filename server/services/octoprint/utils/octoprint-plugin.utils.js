@@ -123,6 +123,10 @@ const captureResultsData = (id, data) => {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       restartRequired: true
     });
+  } else {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      restartRequired: false
+    });
   }
   const message = `Action: ${action} has ${
     result ? "successfully completed" : "failed to complete"
