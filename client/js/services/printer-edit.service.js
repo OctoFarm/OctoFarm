@@ -4,8 +4,11 @@ import OctoFarmClient from "./octofarm-client.service";
 export default class PrinterEditService {
     static pageElements;
     static currentPrinter;
-    static loadPrinterEditInformation(printersInformation, printerID){
+    static loadPrinterEditInformation(printersInformation, printerID, highlightMultiUser = false){
         PrinterEditService.setCurrentPrinter(printersInformation, printerID)
+        if(highlightMultiUser){
+            PrinterEditService.highlightMultiUser();
+        }
         if(!!PrinterEditService.currentPrinter){
             PrinterEditService.grabPageElements();
             PrinterEditService.enablePrinterEditSaveButton(printerID);
@@ -15,7 +18,12 @@ export default class PrinterEditService {
         }
 
     }
-
+    static highlightMultiUser(){
+        document.getElementById("psOctoPrintUser").classList.add("highlight-glow")
+    }
+    static normaliseMultiUser(){
+        document.getElementById("psOctoPrintUser").classList.remove("highlight-glow")
+    }
     static setCurrentPrinter(printersInformation, printerID) {
         const printersIndex = _.findIndex(printersInformation, function (o) {
             return o._id === printerID;
@@ -96,9 +104,16 @@ export default class PrinterEditService {
             UI.addLoaderToElementsInnerHTML(event.target);
             const printerSettingsValues = PrinterEditService.getPageValues();
             const updatedSettings = await OctoFarmClient.post(
-                "printers/updateSettings",
+                "printers/editPrinter",
                 { printer: printerSettingsValues }
             );
+            if(updatedSettings.status.status !== 200){
+                UI.createAlert("error", "Failed to save " + PrinterEditService.currentPrinter.printerName + " settings!", 5000, "clicked");
+                UI.removeLoaderFromElementInnerHTML(event.target);
+                PrinterEditService.normaliseMultiUser();
+                return;
+            }
+            PrinterEditService.normaliseMultiUser();
             UI.createAlert("info", "Successfully saved " + PrinterEditService.currentPrinter.printerName + " settings!", 5000, "clicked");
             UI.removeLoaderFromElementInnerHTML(event.target);
         });

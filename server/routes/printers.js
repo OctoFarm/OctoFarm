@@ -208,13 +208,24 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   getPrinterStoreCache().updateFeedRate(step.printer, step.newSteps);
   res.send("success");
 });
+router.post("/editPrinter", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  // Check required fields
+  const settings = req.body;
+  logger.info("Update printers settings request: ", settings);
+  try {
+    const editPrinter = await getPrinterStoreCache().editPrinterConnectionSettings(settings);
+    res.send({ status: editPrinter });
+  } catch (e) {
+    logger.error("Couldn't update settings...", e.message);
+    res.send({ status: 500 });
+  }
+});
 router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Check required fields
   const settings = req.body;
   logger.info("Update printers settings request: ", settings);
   try {
     const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
-    console.log(updateSets);
     res.send({ status: updateSets });
   } catch (e) {
     logger.error("Couldn't update settings...", e.message);
@@ -245,7 +256,10 @@ router.post(
     if (!id) {
       const onlyDisabled = req.query.disabled === "true";
       const showFullList = req.query.fullList === "true";
-      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(showFullList, onlyDisabled);
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(
+        showFullList,
+        onlyDisabled
+      );
     } else {
       returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
     }
@@ -474,8 +488,8 @@ router.post(
   ensureAdministrator,
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-      const idList = req.body.idList;
-      res.send(await getPrinterManagerCache().enablePrinters(idList));
+    const idList = req.body.idList;
+    res.send(await getPrinterManagerCache().enablePrinters(idList));
   }
 );
 

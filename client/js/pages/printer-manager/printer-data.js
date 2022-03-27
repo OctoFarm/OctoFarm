@@ -488,6 +488,13 @@ export function createOrUpdatePrinterTableRow(printers) {
         .addEventListener("click", async (e) => {
           await loadPrinterHealthChecks(printer._id);
         });
+
+      document
+          .getElementById("multiUserIssue-" + printer._id)
+          .addEventListener("click", async (e) => {
+            const printersInfo = await OctoFarmClient.listPrinters(false, true);
+            await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id, true);
+          });
     }
   });
 }

@@ -432,6 +432,37 @@ class PrinterStore {
       });
     }
   }
+  async editPrinterConnectionSettings(settings) {
+    const { printer } = settings;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+
+    const originalPrinter = this.#findMePrinter(index);
+
+    if (!!currentUser && currentUser !== originalPrinter.currentUser && currentUser !== 0) {
+      this.updatePrinterDatabase(index, {
+        currentUser: currentUser
+      });
+      this.resetConnectionInformation([index]);
+    }
+
+    // Deal with OctoFarm connection information updates
+    const octoFarmConnectionSettings = {
+      _id: index,
+      settingsAppearance: {
+        name: printerName
+      },
+      printerURL: printerURL,
+      camURL: cameraURL,
+      apikey: apikey
+    };
+
+    // Update OctoFarms data
+    this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
+
+    return { status: 200 };
+
+    // Refresh OctoPrint Updates
+  }
 
   async updatePrinterSettings(settings) {
     const newOctoPrintSettings = {};

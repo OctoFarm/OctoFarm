@@ -31,6 +31,8 @@ const returnAlerts = (id) => {
     <button title="Multiple user issue detected! Please open settings and choose one..."
             type="button"
             class="tag btn btn-outline-primary btn-sm d-none"
+            data-toggle="modal"
+            data-target="#printerEditModal"
             id="multiUserIssue-${id}"
     >
         <i class="fas fa-users"></i>
