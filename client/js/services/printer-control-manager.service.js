@@ -8,13 +8,11 @@ import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 
 let currentIndex = 0;
 
-let controlDropDown = false;
-
 let currentPrinter = null;
 
 let filamentManager = false;
 
-$("#connectionModal").on("hidden.bs.modal", function (e) {
+$("#connectionModal").on("hidden.bs.modal", function () {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
   }
@@ -31,7 +29,7 @@ export default class PrinterControlManagerService {
 
         currentIndex = index;
         const id = _.findIndex(printers, function (o) {
-          return o._id == index;
+          return o._id === index;
         });
         currentPrinter = printers[id];
 
@@ -48,7 +46,7 @@ export default class PrinterControlManagerService {
         PrinterControlManagerService.applyListeners(elements, printers);
       } else {
         const id = _.findIndex(printers, function (o) {
-          return o._id == currentIndex;
+          return o._id === currentIndex;
         });
         currentPrinter = printers[id];
         const elements = await PrinterControlManagerService.grabPage();
@@ -66,7 +64,7 @@ export default class PrinterControlManagerService {
     }
   }
 
-  static async loadPrinter(printer, printerControlList) {
+  static async loadPrinter(printer) {
     //Load Connection Panel
 
     try {
@@ -123,21 +121,21 @@ export default class PrinterControlManagerService {
         printer.printerState.state === "Error!"
       ) {
         printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
+          "<button id=\"pmConnect\" class=\"btn btn-success inline text-center\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
           "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
           printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
+          "\" class=\"btn-group ml-1\"></div>";
         document.getElementById("pmSerialPort").disabled = false;
         document.getElementById("pmBaudrate").disabled = false;
         document.getElementById("pmProfile").disabled = false;
       } else {
         printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
+          "<button id=\"pmConnect\" class=\"btn btn-danger text-center inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
           "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
           printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
+          "\" class=\"btn-group ml-1\"></div>";
         document.getElementById("pmSerialPort").disabled = true;
         document.getElementById("pmBaudrate").disabled = true;
         document.getElementById("pmProfile").disabled = true;
@@ -160,10 +158,8 @@ export default class PrinterControlManagerService {
         }
       }
 
-      let clientSettings = await OctoFarmClient.getClientSettings();
       let serverSettings = await OctoFarmClient.getServerSettings();
       filamentManager = serverSettings.filamentManager;
-      let controlSettings = clientSettings.controlSettings;
 
       let thumbnailClass = "d-none";
       if (!!printer?.currentJob?.thumbnail) {
@@ -183,7 +179,7 @@ export default class PrinterControlManagerService {
                     <h5>Camera</h5><hr>
                     <div class="row">
                        <div class="col-12">
-                          <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
+                          <img alt="printer camera" style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
                         </div>
                     </div>
                   </span>
@@ -291,48 +287,46 @@ export default class PrinterControlManagerService {
                     <h5>Control</h5><hr>    
                     <div class="row">
                         <div class="col-3"></div>
-                        <div class="col-3">
-                            <center><button id="pcYpos" type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcYpos" type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button>
                         </div>
                         <div class="col-3"></div>
-                        <div class="col-3">
-                            <center><button id="pcZpos"type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcZpos" type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-3">
-                            <center><button id="pcXneg" type="button" class="btn btn-light"><i class="fas fa-arrow-left"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcXneg" type="button" class="btn btn-light"><i class="fas fa-arrow-left"></i></button>
                         </div>
-                        <div class="col-3">
-                            <center><button id="pcXYhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcXYhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button>
                         </div>
-                        <div class="col-3">
-                            <center><button id="pcXpos" type="button" class="btn btn-light"><i class="fas fa-arrow-right"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcXpos" type="button" class="btn btn-light"><i class="fas fa-arrow-right"></i></button>
                         </div>
-                        <div class="col-3">
-                            <center><button id="pcZhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcZhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-3"></div>
-                        <div class="col-3">
-                            <center><button id="pcYneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcYneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button>
                         </div>
                         <div class="col-3"></div>
-                        <div class="col-3">
-                            <center><button id="pcZneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button></center>
+                        <div class="col-3 text-center">
+                            <button id="pcZneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12">
-                            <center>
+                        <div class="col-12 text-center">
                                 <div id="pcAxisSteps" class="btn-group" role="group">
                                     <button id="pcAxisSteps01" type="button" class="btn btn-light" value="01">0.1</button>
                                     <button id="pcAxisSteps1" type="button" class="btn btn-light" value="1">1</button>
                                     <button id="pcAxisSteps10" type="button" class="btn btn-light" value="10">10</button>
                                     <button id="pcAxisSteps100" type="button" class="btn btn-light" value="100">100</button>
                                 </div>
-                            </center>
                         </div>
                     </div>
                   </div>
@@ -362,15 +356,15 @@ export default class PrinterControlManagerService {
                 <div class="col-md-4 col-lg-4 text-center">
                   <h5>Motors / Fans</h5><hr>
                   <div class="row">
-                    <div class="col-12">
-                        <center><button id="pcMotorTog" class="btn btn-light" type="submit">Motors Off</button></center>
+                    <div class="col-12 text-center">
+                        <button id="pcMotorTog" class="btn btn-light" type="submit">Motors Off</button>
                     </div>
                 </div>
                   <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 text-center">
                     <label for="pcFlow">Fan Percent: <span id="pcFanPercent">100%</span></label>
                     <input type="range" class="octoRange custom-range" min="0" max="100" step="1" id="pcFanPercent" value="100">
-                        <center><button id="pcFanOn" class="btn btn-light" type="submit">Set Fans</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
+                     <button id="pcFanOn" class="btn btn-light" type="submit">Set Fans</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
                     </div>
                 </div>
                </div>
