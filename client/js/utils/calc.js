@@ -1,11 +1,6 @@
 // Calculation Functions
 // REFACTOR this can be shared between server and client
 export default class Calculate {
-  // Generate a random string
-  static randomString() {
-    const random = Math.random().toString(36).substr(2, 5);
-    return random;
-  }
   // Ah david and him been "Explicit" da fuck is this
   static perc(amount, rounding = 2) {
     return `${amount?.toFixed(rounding) || 0}%`;
@@ -18,7 +13,7 @@ export default class Calculate {
 
   // Convert miliseconds to Days, Hours, Minutes
   static generateTime(seconds) {
-    let string = "";
+    let string;
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
       string = "No Time Estimate";
     } else {
@@ -64,11 +59,10 @@ export default class Calculate {
   }
 
   static bytes(a, b) {
-    let string = "";
     if (a === undefined || isNaN(a) || a === null) {
-      return (string = "No File Estimate");
+      return "No File Estimate";
     }
-    if (a == 0) return "0 Bytes";
+    if (a === 0) return "0 Bytes";
     const c = 1024;
     const d = b || 2;
     const e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
