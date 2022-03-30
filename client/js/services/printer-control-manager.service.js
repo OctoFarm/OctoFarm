@@ -41,17 +41,17 @@ export default class PrinterControlManagerService {
         const elements = PrinterControlManagerService.grabPage();
         elements.printerControls["step" + currentPrinter.stepRate].className =
           "btn btn-dark active";
-        PrinterControlManagerService.applyState(currentPrinter, elements);
-        PrinterControlManagerService.applyTemps(currentPrinter, elements);
+        await PrinterControlManagerService.applyState(currentPrinter, elements);
+        await PrinterControlManagerService.applyTemps(currentPrinter, elements);
         PrinterControlManagerService.applyListeners(elements, printers);
       } else {
         const id = _.findIndex(printers, function (o) {
           return o._id === currentIndex;
         });
         currentPrinter = printers[id];
-        const elements = await PrinterControlManagerService.grabPage();
-        PrinterControlManagerService.applyState(currentPrinter, elements);
-        PrinterControlManagerService.applyTemps(currentPrinter, elements);
+        const elements = PrinterControlManagerService.grabPage();
+        await PrinterControlManagerService.applyState(currentPrinter, elements);
+        await PrinterControlManagerService.applyTemps(currentPrinter, elements);
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     } catch (e) {
@@ -169,9 +169,6 @@ export default class PrinterControlManagerService {
       //Load tools
 
       document.getElementById("printerControls").innerHTML = `
-
-
-
             <div class="row">
                 <!-- Camera -->
                 <div class="col-md-4 col-lg-3 text-center">
@@ -372,7 +369,7 @@ export default class PrinterControlManagerService {
             </div>
             `;
 
-      let camURL = "";
+      let camURL;
       if (typeof printer.camURL !== "undefined" && printer.camURL.includes("http")) {
         camURL = printer.camURL;
       } else {
@@ -427,20 +424,18 @@ export default class PrinterControlManagerService {
               document.getElementById("pmOtherTemps").insertAdjacentHTML(
                 "beforeend",
                 `
-                           <div class="col">
-                          <center>
+                           <div class="col text-center">
                               <h5>Bed</h5>
-                          </center>
                           <hr>
-                          <div class="md-form input-group mb-3">
-                              <div title="Actual Bed temperature" class="input-group-prepend">
-                                  <span id="bedActual" class="input-group-text">0°C</span>
-                              </div>
-                              <input title="Set your target Bed temperature" id="bedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                              <div class="input-group-append">
-                                  <button class="btn btn-md btn-light m-0 p-1" type="button" id="bedSet">Set</button>
-                              </div>
-                          </div>
+                            <div class="md-form input-group mb-3">
+                                <div title="Actual Bed temperature" class="input-group-prepend">
+                                    <span id="bedActual" class="input-group-text">0°C</span>
+                                </div>
+                                <input title="Set your target Bed temperature" id="bedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-md btn-light m-0 p-1" type="button" id="bedSet">Set</button>
+                                </div>
+                            </div>
                             </div>
                          `
               );
@@ -450,10 +445,8 @@ export default class PrinterControlManagerService {
               document.getElementById("pmOtherTemps").insertAdjacentHTML(
                 "beforeend",
                 `
-                         <div class="col">
-                          <center>
+                         <div class="col text-center">
                               <h5>Chamber</h5>
-                          </center>
                           <hr>
                           <div class="md-form input-group mb-3">
                               <div title="Actual Bed temperature" class="input-group-prepend">
@@ -487,52 +480,47 @@ export default class PrinterControlManagerService {
     }
   }
 
-  static applyListeners(elements, printers) {
+  static applyListeners(elements) {
     const rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach((slider) => {
       slider.addEventListener("input", (e) => {
         e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
       });
     });
-    if (currentPrinter.state != "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
+    if (currentPrinter.state !== "Disconnected") {
+      elements.connectPage.connectButton.addEventListener("click", async () => {
         elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    } else {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
+       await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
       });
     }
 
     //Control Listeners... There's a lot!
-    elements.printerControls.xPlus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "x");
+    elements.printerControls.xPlus.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "jog", "x");
     });
-    elements.printerControls.xMinus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "x", "-");
+    elements.printerControls.xMinus.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "jog", "x", "-");
     });
-    elements.printerControls.yPlus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "y");
+    elements.printerControls.yPlus.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "jog", "y");
     });
-    elements.printerControls.yMinus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "y", "-");
+    elements.printerControls.yMinus.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "jog", "y", "-");
     });
-    elements.printerControls.xyHome.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "home", ["x", "y"]);
+    elements.printerControls.xyHome.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "home", ["x", "y"]);
     });
-    elements.printerControls.zPlus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "z");
+    elements.printerControls.zPlus.addEventListener("click", async (e) => {
+      await  OctoPrintClient.move(e, currentPrinter, "jog", "z");
     });
-    elements.printerControls.zMinus.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "jog", "z", "-");
+    elements.printerControls.zMinus.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "jog", "z", "-");
     });
-    elements.printerControls.zHome.addEventListener("click", (e) => {
-      OctoPrintClient.move(e, currentPrinter, "home", ["z"]);
+    elements.printerControls.zHome.addEventListener("click", async (e) => {
+      await OctoPrintClient.move(e, currentPrinter, "home", ["z"]);
     });
-    elements.printerControls.step01.addEventListener("click", (e) => {
-      OctoFarmClient.post("printers/stepChange", {
+    elements.printerControls.step01.addEventListener("click", async () => {
+      await  OctoFarmClient.post("printers/stepChange", {
         printer: currentPrinter._id,
         newSteps: "01"
       });
@@ -541,8 +529,8 @@ export default class PrinterControlManagerService {
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
     });
-    elements.printerControls.step1.addEventListener("click", (e) => {
-      OctoFarmClient.post("printers/stepChange", {
+    elements.printerControls.step1.addEventListener("click", async () => {
+      await OctoFarmClient.post("printers/stepChange", {
         printer: currentPrinter._id,
         newSteps: "1"
       });
@@ -551,8 +539,8 @@ export default class PrinterControlManagerService {
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
     });
-    elements.printerControls.step10.addEventListener("click", (e) => {
-      OctoFarmClient.post("printers/stepChange", {
+    elements.printerControls.step10.addEventListener("click", async () => {
+      await OctoFarmClient.post("printers/stepChange", {
         printer: currentPrinter._id,
         newSteps: "10"
       });
@@ -561,8 +549,8 @@ export default class PrinterControlManagerService {
       elements.printerControls.step01.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
     });
-    elements.printerControls.step100.addEventListener("click", (e) => {
-      OctoFarmClient.post("printers/stepChange", {
+    elements.printerControls.step100.addEventListener("click", async () => {
+      await OctoFarmClient.post("printers/stepChange", {
         printer: currentPrinter._id,
         newSteps: "100"
       });
@@ -577,7 +565,7 @@ export default class PrinterControlManagerService {
       for (let t = 0; t < keys.length; t++) {
         if (keys[t].includes("extruder")) {
           for (let i = 0; i < currentPrinter.currentProfile[keys[t]].count; i++) {
-            const toolSet = async function (e) {
+            const toolSet = async function () {
               const flashReturn = function () {
                 document.getElementById("tool" + i + "Set").className =
                   "btn btn-md btn-light m-0 p-1";
@@ -594,7 +582,8 @@ export default class PrinterControlManagerService {
                 }
               };
               const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
-              if (post.status === 204) {
+              const { status } = post;
+              if (status === 204) {
                 document.getElementById("tool" + i + "Set").className =
                   "btn btn-md btn-success m-0 p-1";
                 setTimeout(flashReturn, 500);
@@ -604,7 +593,7 @@ export default class PrinterControlManagerService {
                 setTimeout(flashReturn, 500);
               }
             };
-            document.getElementById("tool" + i + "Target").addEventListener("change", async (e) => {
+            document.getElementById("tool" + i + "Target").addEventListener("change", async () => {
               if (document.getElementById("tool" + i + "Target").value <= 0) {
                 document.getElementById("tool" + i + "Target").value = "0";
               }
@@ -613,16 +602,16 @@ export default class PrinterControlManagerService {
               .getElementById("tool" + i + "Target")
               .addEventListener("keypress", async (e) => {
                 if (e.key === "Enter") {
-                  toolSet(e);
+                  await toolSet(e);
                 }
               });
             document.getElementById("tool" + i + "Set").addEventListener("click", async (e) => {
-              toolSet(e);
+             await toolSet(e);
             });
           }
         } else if (keys[t].includes("heatedBed")) {
           if (currentPrinter.currentProfile[keys[t]]) {
-            const bedSet = async function (e) {
+            const bedSet = async function () {
               const flashReturn = function () {
                 elements.temperatures.bed[2].classList = "btn btn-md btn-light m-0 p-1";
               };
@@ -637,18 +626,16 @@ export default class PrinterControlManagerService {
                 target: parseInt(value)
               };
               const post = await OctoPrintClient.post(currentPrinter, "printer/bed", opt);
-              if (post.status === 204) {
+              if (post?.status === 204) {
                 elements.temperatures.bed[2].className = "btn btn-md btn-success m-0 p-1";
-                elements.temperatures.bed[2].value = "";
-                setTimeout(flashReturn, 500);
               } else {
-                elements.temperatures.bed[2].className = "btn btn-md btn-success m-0 p-1";
-                elements.temperatures.bed[2].value = "";
-                setTimeout(flashReturn, 500);
+                elements.temperatures.bed[2].className = "btn btn-md btn-danger m-0 p-1";
               }
+              elements.temperatures.bed[2].value = "";
+              setTimeout(flashReturn, 500);
             };
             if (elements.temperatures.bed[1]) {
-              elements.temperatures.bed[1].addEventListener("change", async (e) => {
+              elements.temperatures.bed[1].addEventListener("change", async () => {
                 if (elements.temperatures.bed[1].value <= 0) {
                   elements.temperatures.bed[1].value = "";
                 }
@@ -660,7 +647,7 @@ export default class PrinterControlManagerService {
                 if (node) {
                   node.addEventListener("keypress", async (e) => {
                     if (e.key === "Enter") {
-                      bedSet(e);
+                      await bedSet(e);
                     }
                   });
                 }
@@ -668,7 +655,7 @@ export default class PrinterControlManagerService {
               if (node.id.includes("Set")) {
                 if (node) {
                   node.addEventListener("click", async (e) => {
-                    bedSet(e);
+                    await bedSet(e);
                   });
                 }
               }
@@ -676,7 +663,7 @@ export default class PrinterControlManagerService {
           }
         } else if (keys[t].includes("heatedChamber")) {
           if (currentPrinter.currentProfile[keys[t]]) {
-            const chamberSet = async function (e) {
+            const chamberSet = async function () {
               const flashReturn = function () {
                 elements.temperatures.chamber[2].classList = "btn btn-md btn-light m-0 p-1";
               };
@@ -691,16 +678,16 @@ export default class PrinterControlManagerService {
                 target: parseInt(value)
               };
               const post = await OctoPrintClient.post(currentPrinter, "printer/chamber", opt);
-              if (post.status === 204) {
+              const {status} = post;
+              if (status === 204) {
                 elements.temperatures.chamber[2].className = "btn btn-md btn-success m-0 p-1";
-                setTimeout(flashReturn, 500);
               } else {
-                elements.temperatures.chamber[2].className = "btn btn-md btn-success m-0 p-1";
-                setTimeout(flashReturn, 500);
+                elements.temperatures.chamber[2].className = "btn btn-md btn-danger m-0 p-1";
               }
+              setTimeout(flashReturn, 500);
             };
             if (elements.temperatures.chamber[1]) {
-              elements.temperatures.chamber[1].addEventListener("change", async (e) => {
+              elements.temperatures.chamber[1].addEventListener("change", async () => {
                 if (elements.temperatures.chamber[1].value <= 0) {
                   elements.temperatures.chamber[1].value = "";
                 }
@@ -712,7 +699,7 @@ export default class PrinterControlManagerService {
                 if (node) {
                   node.addEventListener("keypress", async (e) => {
                     if (e.key === "Enter") {
-                      chamberSet(e);
+                      await chamberSet(e);
                     }
                   });
                 }
@@ -720,7 +707,7 @@ export default class PrinterControlManagerService {
               if (node.id.includes("Set")) {
                 if (node) {
                   node.addEventListener("click", async (e) => {
-                    chamberSet(e);
+                    await chamberSet(e);
                   });
                 }
               }
@@ -736,7 +723,7 @@ export default class PrinterControlManagerService {
       };
       let value = elements.printerControls.feedRateValue.innerHTML;
       value = value.replace("%", "");
-      OctoFarmClient.post("printers/feedChange", {
+      await OctoFarmClient.post("printers/feedChange", {
         printer: currentPrinter._id,
         newSteps: value
       });
@@ -745,7 +732,7 @@ export default class PrinterControlManagerService {
         factor: parseInt(value)
       };
       const post = await OctoPrintClient.post(currentPrinter, "printer/printhead", opt);
-      if (post.status === 204) {
+      if (post?.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
@@ -759,7 +746,7 @@ export default class PrinterControlManagerService {
       };
       let value = elements.printerControls.flowRateValue.innerHTML;
       value = value.replace("%", "");
-      OctoFarmClient.post("printers/flowChange", {
+      await OctoFarmClient.post("printers/flowChange", {
         printer: currentPrinter._id,
         newSteps: value
       });
@@ -768,7 +755,7 @@ export default class PrinterControlManagerService {
         factor: parseInt(value)
       };
       const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
-      if (post.status === 204) {
+      if (post?.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
@@ -784,7 +771,7 @@ export default class PrinterControlManagerService {
         commands: ["M18"]
       };
       const post = await OctoPrintClient.post(currentPrinter, "printer/command", opt);
-      if (post.status === 204) {
+      if (post?.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
@@ -797,7 +784,7 @@ export default class PrinterControlManagerService {
       fanspeed = fanspeed.replace("%", "");
       fanspeed /= 100;
       fanspeed = 255 * fanspeed;
-      fanspeed = Math.floor(fanspeed);
+      fanspeed = Math.floor(Number.parseFloat(fanspeed));
 
       const flashReturn = function () {
         e.target.classList = "btn btn-light";
@@ -806,7 +793,7 @@ export default class PrinterControlManagerService {
         commands: [`M106 S${fanspeed}`]
       };
       const post = await OctoPrintClient.post(currentPrinter, "printer/command", opt);
-      if (post.status === 204) {
+      if (post?.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
@@ -822,7 +809,7 @@ export default class PrinterControlManagerService {
         commands: ["M107"]
       };
       const post = await OctoPrintClient.post(currentPrinter, "printer/command", opt);
-      if (post.status === 204) {
+      if (post?.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
@@ -835,7 +822,7 @@ export default class PrinterControlManagerService {
         e.target.classList = "btn btn-light";
       };
       if (
-        elements.printerControls.extruder.value != undefined &&
+        typeof elements.printerControls.extruder.value !== "undefined" &&
         elements.printerControls.extruder.value !== ""
       ) {
         const select = OctoPrintClient.selectTool(currentPrinter, "tool0");
@@ -846,7 +833,7 @@ export default class PrinterControlManagerService {
             amount: parseInt(value)
           };
           const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
-          if (post.status === 204) {
+          if (post?.status === 204) {
             e.target.classList = "btn btn-success";
             setTimeout(flashReturn, 500);
           } else {
@@ -868,7 +855,7 @@ export default class PrinterControlManagerService {
         e.target.classList = "btn btn-light";
       };
       if (
-        elements.printerControls.extruder.value != undefined &&
+        typeof elements.printerControls.extruder.value !== "undefined" &&
         elements.printerControls.extruder.value !== ""
       ) {
         const select = OctoPrintClient.selectTool(currentPrinter, "tool0");
@@ -880,7 +867,7 @@ export default class PrinterControlManagerService {
             amount: parseInt(value)
           };
           const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
-          if (post.status === 204) {
+          if (post?.status === 204) {
             e.target.classList = "btn btn-success";
             setTimeout(flashReturn, 500);
           } else {
@@ -903,32 +890,32 @@ export default class PrinterControlManagerService {
         command: "start"
       };
 
-      OctoPrintClient.jobAction(currentPrinter, opts, e);
+      await OctoPrintClient.jobAction(currentPrinter, opts, e);
     });
-    elements.printerControls.printPause.addEventListener("click", (e) => {
+    elements.printerControls.printPause.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "pause",
         action: "pause"
       };
-      OctoPrintClient.jobAction(currentPrinter, opts, e);
+      await OctoPrintClient.jobAction(currentPrinter, opts, e);
     });
-    elements.printerControls.printRestart.addEventListener("click", (e) => {
+    elements.printerControls.printRestart.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "restart"
       };
-      OctoPrintClient.jobAction(currentPrinter, opts, e);
+      await OctoPrintClient.jobAction(currentPrinter, opts, e);
     });
-    elements.printerControls.printResume.addEventListener("click", (e) => {
+    elements.printerControls.printResume.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "pause",
         action: "resume"
       };
-      OctoPrintClient.jobAction(currentPrinter, opts, e);
+      await OctoPrintClient.jobAction(currentPrinter, opts, e);
     });
-    elements.printerControls.printStop.addEventListener("click", (e) => {
+    elements.printerControls.printStop.addEventListener("click", async (e) => {
       bootbox.confirm({
         message: `${currentPrinter.printerName}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
@@ -939,13 +926,13 @@ export default class PrinterControlManagerService {
             label: "<i class=\"fa fa-check\"></i> Confirm"
           }
         },
-        callback(result) {
+        async callback(result) {
           if (result) {
             e.target.disabled = true;
             const opts = {
               command: "cancel"
             };
-            OctoPrintClient.jobAction(currentPrinter, opts, e);
+            await OctoPrintClient.jobAction(currentPrinter, opts, e);
           }
         }
       });
@@ -953,7 +940,7 @@ export default class PrinterControlManagerService {
   }
 
   static grabPage() {
-    const printerManager = {
+    return {
       mainPage: {
         title: document.getElementById("printerSelection"),
         status: document.getElementById("pmStatus")
@@ -1026,22 +1013,20 @@ export default class PrinterControlManagerService {
       },
       filamentDrops: document.querySelectorAll("[id$=FilamentManagerFolderSelect]")
     };
-
-    return printerManager;
   }
 
   static async applyState(printer, elements) {
     //Garbage collection for terminal
     elements.mainPage.status.innerHTML = printer.printerState.state;
     elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
-    let dateComplete = null;
+    let dateComplete;
     const camField = document.getElementById("fileThumbnail");
     if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
       if (
         camField.innerHTML !==
-        `<center><img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}"></center>`
+        `<img alt="Gcode Thumbnail" width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
       ) {
-        camField.innerHTML = `<center><img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}"></center>`;
+        camField.innerHTML = `<img alt="Gcode Thumbnail" width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`;
       }
     } else {
       if (camField.innerHTML !== "") {
@@ -1118,8 +1103,7 @@ export default class PrinterControlManagerService {
 
     if (typeof printer.currentJob === "undefined") {
       elements.jobStatus.fileName.setAttribute("title", "No File Selected");
-      const fileName = "No File Selected";
-      elements.jobStatus.fileName.innerHTML = fileName;
+      elements.jobStatus.fileName.innerHTML = "No File Selected";
     } else {
       elements.jobStatus.fileName.setAttribute("title", printer.currentJob.filePath);
       let fileName = printer.currentJob.fileDisplay;
@@ -1127,7 +1111,7 @@ export default class PrinterControlManagerService {
         fileName = fileName.substring(0, 49) + "...";
       }
 
-      elements.jobStatus.fileName.innerHTML = printer.currentJob.fileDisplay;
+      elements.jobStatus.fileName.innerHTML = fileName;
       let usageDisplay = "";
       let filamentCost = "";
       if (printer.currentJob.expectedTotals !== null) {
@@ -1169,13 +1153,11 @@ export default class PrinterControlManagerService {
 
       elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
 
-      const printCost = printer.currentJob.expectedPrinterCosts;
-
-      elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
+      elements.jobStatus.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts;
     }
 
     if (printer.printerState.colour.category === "Active") {
-      PrinterControlManagerService.controls(true, true);
+      await PrinterControlManagerService.controls(true, true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
       elements.printerControls.printPause.disabled = false;
@@ -1190,7 +1172,7 @@ export default class PrinterControlManagerService {
       printer.printerState.colour.category === "Idle" ||
       printer.printerState.colour.category === "Complete"
     ) {
-      PrinterControlManagerService.controls(false);
+      await PrinterControlManagerService.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
       elements.connectPage.connectButton.classList = "btn btn-danger inline";
@@ -1211,7 +1193,7 @@ export default class PrinterControlManagerService {
         elements.printerControls.printResume.style.display = "none";
       } else {
         if (printer.printerState.state === "Paused") {
-          PrinterControlManagerService.controls(false);
+          await PrinterControlManagerService.controls(false);
           elements.printerControls.printStart.disabled = true;
           elements.printerControls.printStart.style.display = "none";
           elements.printerControls.printPause.disabled = true;
@@ -1248,7 +1230,7 @@ export default class PrinterControlManagerService {
       elements.connectPage.connectButton.innerHTML = "Connect";
       elements.connectPage.connectButton.classList = "btn btn-success inline";
       elements.connectPage.connectButton.disabled = false;
-      PrinterControlManagerService.controls(true);
+      await PrinterControlManagerService.controls(true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
       elements.printerControls.printPause.disabled = true;
@@ -1302,7 +1284,7 @@ export default class PrinterControlManagerService {
   }
 
   static async controls(enable, printing) {
-    let elements = await PrinterControlManagerService.grabPage();
+    let elements = PrinterControlManagerService.grabPage();
     const { filamentDrops } = elements;
     elements = elements.printerControls;
     let spool = true;

@@ -20,8 +20,8 @@ class PrinterDatabaseService {
         return res;
       })
       .catch((err) => {
-        return err;
         logger.error(err);
+        return err;
       });
   };
 
@@ -39,7 +39,7 @@ class PrinterDatabaseService {
   delete = () => {
     return printerModel
       .findOneAndDelete({ _id: this.#id })
-      .then((res) => {
+      .then(() => {
         logger.warning("Successfully deleted printer from database", this.#id);
       })
       .catch((err) => {
