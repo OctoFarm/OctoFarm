@@ -847,7 +847,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintUsersList(force = true) {
-    if (!force || this.onboarding.userApi) {
+    if (this.onboarding.userApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       return true;
     }
@@ -1009,7 +1009,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSystemData(force = false) {
-    if (!force || this.onboarding.systemApi) {
+    if (this.onboarding.systemApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
       return true;
     }
@@ -1048,7 +1048,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
-    if (!force || this.onboarding.profileApi) {
+    if (!force && this.onboarding.profileApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
       return true;
     }
@@ -1075,7 +1075,6 @@ class OctoPrintPrinter {
 
       this.onboarding.profileApi = true;
       this.#db.update({ onboarding: this.onboarding });
-
       return true;
     } else {
       this.#apiPrinterTickerWrap(
@@ -1089,7 +1088,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintStateData(force = false) {
-    if (!force || this.onboarding.stateApi) {
+    if (!force && this.onboarding.stateApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success", true);
       return false;
     }
@@ -1129,7 +1128,6 @@ class OctoPrintPrinter {
 
       this.onboarding.stateApi = true;
       this.#db.update({ onboarding: this.onboarding });
-
       return true;
     } else {
       this.#apiPrinterTickerWrap(
@@ -1143,7 +1141,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSettingsData(force = false) {
-    if (!force || this.onboarding.settingsApi) {
+    if (!force && this.onboarding.settingsApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       return true;
     }
@@ -1177,8 +1175,8 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+        this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
       }
-      this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
       }
@@ -1651,7 +1649,7 @@ class OctoPrintPrinter {
     }
 
     if (this.#reconnectTimeout !== false) {
-      console.log("IGNORING RECONNECTION");
+      logger.warning("Ignoring reconnection attempt!");
       return;
     }
     this.#retryNumber = this.#retryNumber + 1;
@@ -1659,7 +1657,6 @@ class OctoPrintPrinter {
     // if (this.#reconnect) return; //Reconnection is planned..
     this.#reconnectTimeout = setTimeout(() => {
       this.reconnectingIn = 0;
-      console.log(this.#retryNumber);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
@@ -1711,7 +1708,7 @@ class OctoPrintPrinter {
   }
 
   deleteFromDataBase() {
-    this.#apiPrinterTickerWrap("Removing printer from database", "Warning");
+    this.#apiPrinterTickerWrap("Removing printer from database", "Active");
     return this.#db.delete();
   }
 
