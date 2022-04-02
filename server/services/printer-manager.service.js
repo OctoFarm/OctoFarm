@@ -63,13 +63,17 @@ class PrinterManagerService {
   }
 
   async addPrinter(printerValues) {
+    //create printer database record...
+    if (!printerValues?._id) {
+      printerValues = await PrinterService.create(printerValues);
+    }
     await patchPrinterValues(printerValues);
     const newPrinter = new OctoPrintPrinter(printerValues);
     getPrinterStoreCache().addPrinter(newPrinter);
     this.#enablePrintersQueue.push(newPrinter._id);
 
     return {
-      printerURL: printer.printerURL
+      printerURL: newPrinter.printerURL
     };
   }
 
@@ -79,9 +83,12 @@ class PrinterManagerService {
       const printer = getPrinterStoreCache().getPrinter(currentID);
       if (!printer.enabling) {
         await printer?.enablePrinter();
-        const idIndex = this.#enablePrintersQueue.findIndex(currentID);
-        this.#enablePrintersQueue.splice(idIndex, 1);
+        return;
       }
+
+      const idIndex = this.#enablePrintersQueue.findIndex((index) => currentID === index);
+
+      this.#enablePrintersQueue.splice(idIndex, 1);
     }
   }
 
@@ -414,7 +421,6 @@ class PrinterManagerService {
       });
     return "Killed Current Connections";
   }
-
 }
 
 module.exports = PrinterManagerService;

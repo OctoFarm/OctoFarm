@@ -57,8 +57,6 @@ class OctoPrintPrinter {
   timeout = undefined;
   #reconnectTimeout = false;
   reconnectingIn = 0;
-  reconnectionPlanned = false;
-  websocketReconnectingIn = 0;
   //Required
   sortIndex = undefined;
   category = undefined;
@@ -514,6 +512,8 @@ class OctoPrintPrinter {
     const testingTheWaters = await this.testTheApiWaters();
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
+
+    this.reconnectionPlanned = false;
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
       if (testingTheWaters === 408) {
@@ -1650,17 +1650,16 @@ class OctoPrintPrinter {
       );
     }
 
-    if (this.reconnectionPlanned) {
+    if (this.#reconnectTimeout !== false) {
+      console.log("IGNORING RECONNECTION");
       return;
     }
     this.#retryNumber = this.#retryNumber + 1;
     this.reconnectingIn = Date.now() + this.#apiRetry;
-    this.reconnectionPlanned = true;
-    this.setHostState(PRINTER_STATES().SEARCHING);
     // if (this.#reconnect) return; //Reconnection is planned..
     this.#reconnectTimeout = setTimeout(() => {
       this.reconnectingIn = 0;
-
+      console.log(this.#retryNumber);
       if (this.#retryNumber > 0) {
         const modifier = this.timeout.apiRetry * 0.1;
         this.#apiRetry = this.#apiRetry + modifier;
@@ -1675,17 +1674,15 @@ class OctoPrintPrinter {
           this._id
         );
       }
+      clearTimeout(this.#reconnectTimeout);
+      this.#reconnectTimeout = false;
+      this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
       return this.enablePrinter()
         .then((res) => {
           return logger.warning(res);
         })
         .catch((e) => {
           return logger.error("Failed starting service", e);
-        })
-        .finally(() => {
-          clearTimeout(this.#reconnectTimeout);
-          this.#reconnectTimeout = false;
-          this.reconnectionPlanned = false;
         });
     }, this.#apiRetry);
   }

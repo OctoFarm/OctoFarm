@@ -9,7 +9,7 @@ const logger = new Logger("OctoFarm-Server");
  * @param {Object} printer object to create.
  * @throws {Error} If the printer is not correctly provided.
  */
-const create = async (printer) => {
+const create = (printer) => {
   if (!printer) {
     throw new Error("Missing printer");
   }
