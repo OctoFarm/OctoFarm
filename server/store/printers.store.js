@@ -103,6 +103,11 @@ class PrinterStore {
     this.#removeFromStore(id);
   }
 
+  updateHostState(id, data) {
+    const printer = this.#findMePrinter(id);
+    printer.setHostState(data);
+  }
+
   updatePrinterState(id, data) {
     const printer = this.#findMePrinter(id);
     printer.setPrinterState(data);

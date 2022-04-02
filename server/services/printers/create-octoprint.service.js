@@ -633,7 +633,7 @@ class OctoPrintPrinter {
         stateDescription:
           "Failed to acquire session key, please check your API key and try again..."
       };
-      this.setHostState(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
+      this.setAllPrinterStates(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
       return false;
     }
 
@@ -1649,7 +1649,7 @@ class OctoPrintPrinter {
     }
 
     if (this.#reconnectTimeout !== false) {
-      logger.warning("Ignoring reconnection attempt!");
+      logger.warning("Ignoring Setup reconnection attempt!");
       return;
     }
     this.#retryNumber = this.#retryNumber + 1;
