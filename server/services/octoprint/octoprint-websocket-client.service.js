@@ -83,6 +83,12 @@ class WebSocketClient {
     );
     this.#instance = new WebSocket(this.url, undefined, defaultWebsocketOptions);
 
+    getPrinterStoreCache().updateHostState(this.id, {
+      hostState: "Online",
+      hostStateColour: mapStateToCategory("Online"),
+      hostDescription: "OctoPrint API is Online"
+    });
+
     this.#instance.on("pong", () => {
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");
@@ -392,7 +398,7 @@ class WebSocketClient {
         webSocket: "info",
         webSocketDescription: "Searching for a printer connection!"
       });
-      console.log("Websocket Retry", this.#retryNumber);
+
       if (this.#retryNumber > 0) {
         const modifier = this.systemSettings.timeout.webSocketRetry * 0.1;
         this.autoReconnectInterval = this.autoReconnectInterval + modifier;
