@@ -534,6 +534,8 @@ export default class FileManagerService {
 
   static updatePrinterFilesList(printer, recursive) {
     const { fileList } = printer;
+    const fileElem = getFileListElement(printer._id);
+    fileElem.innerHTML = "";
     // Update page elements
     const currentFolder = FileManagerService.updatePrinterMetrics(
       printer._id,
