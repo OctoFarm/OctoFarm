@@ -26,7 +26,6 @@ const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
 const { handleMessage } = require("../octoprint/octoprint-websocket-message.service");
 const { PrinterTicker } = require("../printer-connection-log.service");
-const { FileClean } = require("../file-cleaner.service");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
@@ -370,16 +369,17 @@ class OctoPrintPrinter {
       this.printerFirmware = printerFirmware;
     }
     if (!!fileList) {
-      this.fileList = FileClean.generate(
-        {
-          files: fileList.files,
-          filecount: fileList.files.length,
-          folders: fileList.folders,
-          folderCount: fileList.folders.length
-        },
-        this.selectedFilament,
-        this.costSettings
-      );
+      this.fileList = fileList;
+      // this.fileList = FileClean.generate(
+      //   {
+      //     files: fileList.files,
+      //     filecount: fileList.files.length,
+      //     folders: fileList.folders,
+      //     folderCount: fileList.folders.length
+      //   },
+      //   this.selectedFilament,
+      //   this.costSettings
+      // );
     }
 
     if (!!profiles && !!current) {
@@ -1454,11 +1454,6 @@ class OctoPrintPrinter {
           return o.display === fileInformation.display;
         });
 
-        this.fileList.fileList[fileIndex] = FileClean.generateSingle(
-          fileInformation,
-          this.selectedFilament,
-          this.costSettings
-        );
         return this.fileList.fileList[fileIndex];
       } else {
         return {
@@ -1521,32 +1516,17 @@ class OctoPrintPrinter {
             folderCount: printerLocations.length
           }
         });
-
-        this.fileList = FileClean.generate(
-          {
-            files: printerFiles,
-            filecount: printerFiles.length,
-            folders: printerLocations,
-            folderCount: printerLocations.length
-          },
-          this.selectedFilament,
-          this.costSettings
-        );
         this.#apiPrinterTickerWrap("Acquired file list data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "success", true);
         if (!returnObject) {
           return true;
         } else {
-          return FileClean.generate(
-            {
-              files: printerFiles,
-              filecount: printerFiles.length,
-              folders: printerLocations,
-              folderCount: printerLocations.length
-            },
-            this.selectedFilament,
-            this.costSettings
-          );
+          return {
+                files: printerFiles,
+                filecount: printerFiles.length,
+                folders: printerLocations,
+                folderCount: printerLocations.length
+          }
         }
       } else {
         this.#apiPrinterTickerWrap(
@@ -1713,12 +1693,10 @@ class OctoPrintPrinter {
   }
 
   async updateFileInformation(data) {
-    console.log(data);
-
     const { name, result } = data;
 
     const databaseRecord = await this.#db.get();
-    console.log(databaseRecord.fileList);
+
     const fileIndex = findIndex(databaseRecord.fileList.files, function (o) {
       return o.name === name;
     });
@@ -1734,7 +1712,7 @@ class OctoPrintPrinter {
 
       this.#db.update(this._id, { fileList: databaseRecord.fileList });
 
-      this.cleanPrintersInformation(databaseRecord);
+      this.cleanPrintersInformation();
     } else {
       logger.error("Couldn't find file index to update!", name);
     }
@@ -1760,7 +1738,7 @@ class OctoPrintPrinter {
     }
   }
 
-  cleanPrintersInformation(databaseRecord) {
+  cleanPrintersInformation() {
     this.otherSettings = PrinterClean.sortOtherSettings(
       this.tempTriggers,
       this.settingsWebcam,
@@ -1777,19 +1755,6 @@ class OctoPrintPrinter {
     this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
 
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
-
-    if (!!databaseRecord) {
-      this.fileList = FileClean.generate(
-        {
-          files: databaseRecord.fileList.files,
-          filecount: databaseRecord.fileList.files.length,
-          folders: databaseRecord.fileList.folders,
-          folderCount: databaseRecord.fileList.folders.length
-        },
-        this.selectedFilament,
-        this.costSettings
-      );
-    }
   }
 
   async houseKeepFiles(days) {

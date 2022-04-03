@@ -51,7 +51,7 @@ class PrinterStore {
   }
 
   listPrintersInformation(disabled = false, onlyDisabled = false) {
-    const returnList = [];
+    let returnList = [];
 
     if (onlyDisabled) {
       this.#printersList.forEach((printer) => {
@@ -70,6 +70,12 @@ class PrinterStore {
         }
       });
     }
+
+    //CLEAN FILES
+    returnList = returnList.map(printer => {
+      printer.fileList = FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+      return printer
+    })
 
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }
@@ -195,8 +201,9 @@ class PrinterStore {
   }
 
   getPrinterInformation(id) {
-    const printer = this.#findMePrinter(id);
-    return JSON.parse(JSON.stringify(printer));
+    let printer = this.#findMePrinter(id);
+    printer.fileList = FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+    return Object.assign({}, printer);
   }
 
   getPrinter(id) {
@@ -925,12 +932,19 @@ class PrinterStore {
 
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
-    return printer.acquireOctoPrintFilesData(true, true);
+
+    printer.fileList = printer.acquireOctoPrintFilesData(true, true);
+    return printer;
   }
 
   async resyncFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
-    return printer.acquireOctoPrintFileData(fullPath, true);
+    const fileInformation = printer.acquireOctoPrintFileData(fullPath, true);
+    return FileClean.generateSingle(
+        fileInformation,
+        this.selectedFilament,
+        this.costSettings
+    );
   }
 
   async houseCleanFiles(id, days) {

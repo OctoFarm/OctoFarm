@@ -29,7 +29,10 @@ class FileCleanerService {
     const folderCount = [];
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
     for (let p = 0; p < farmPrinters.length; p++) {
-      const printer = farmPrinters[p];
+      let printer = farmPrinters[p];
+
+      printer.fileList = FileCleanerService.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+
       if (!!printer.storage) {
         const device = {
           ip: printer.printerURL,
