@@ -31,8 +31,11 @@ class FileCleanerService {
     for (let p = 0; p < farmPrinters.length; p++) {
       let printer = farmPrinters[p];
       let fileList = JSON.parse(JSON.stringify(printer.fileList));
-      fileList = FileCleanerService.generate(fileList, printer.selectedFilament, printer.costSettings);
-
+      fileList = FileCleanerService.generate(
+        fileList,
+        printer.selectedFilament,
+        printer.costSettings
+      );
 
       if (!!printer.storage) {
         const device = {
@@ -249,6 +252,18 @@ class FileCleanerService {
     const totalCost = costArray.reduce((a, b) => a + b, 0);
     strings.unshift(totalCost.toFixed(2));
     return strings;
+  }
+
+  static listFilesOlderThanX(fileList, days) {
+    const today = new Date();
+    today.setDate(today.getDate() - days);
+    const deleteList = [];
+    for (const file of fileList) {
+      if (new Date(file.date * 1000) < today) {
+        deleteList.push(file.fullPath);
+      }
+    }
+    return deleteList;
   }
 }
 

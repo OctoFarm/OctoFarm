@@ -32,6 +32,14 @@ module.exports = {
   },
   FILE_SYNC: {
     id: ["required", "string", "mongoose_object_id"],
-    filePath: ["string", "path"]
+    filePath: ["string"]
+  },
+  HOUSE_KEEPING: {
+    id: ["required", "string", "mongoose_object_id"],
+    days: ["required"]
+  },
+  BULK_FILE_DELETE: {
+    id: ["required", "string", "mongoose_object_id"],
+    "pathList.*": ["required", "string"]
   }
 };

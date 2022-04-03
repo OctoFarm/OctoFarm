@@ -147,17 +147,17 @@ router.post(
     // Check required fields
     const file = req.body;
     let ret;
-    if (!file.fullPath) {
+    if (!!file?.fullPath) {
       logger.info("Printer single file resync request", {
-        printer_id: file.i,
+        printer_id: file.id,
         file_path: file.fullPath
       });
-      ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
+      ret = await getPrinterStoreCache().resyncFile(file.id, file.fullPath);
     } else {
       logger.info("Full printer files resync request", {
-        printer_id: file.i
+        printer_id: file.id
       });
-      ret = await getPrinterStoreCache().resyncFilesList(file.i);
+      ret = await getPrinterStoreCache().resyncFilesList(file.id);
     }
     res.send(ret);
   }
@@ -175,19 +175,35 @@ router.post(
   }
 );
 router.post(
+    "/getHouseCleanList",
+    ensureAuthenticated,
+    validateBodyMiddleware(P_VALID.HOUSE_KEEPING),
+    async (req, res) => {
+        // Check required fields
+        const { id, days } = req.body;
+        logger.info("File house clean requested!", {
+            printerID: id,
+            days
+        });
+        const fileList = getPrinterStoreCache().getHouseCleanFileList(id, days);
+
+        res.send(fileList);
+    }
+);
+router.post(
   "/houseCleanFiles",
   ensureAuthenticated,
-  validateBodyMiddleware(P_VALID.PRINTER_ID),
+  validateBodyMiddleware(P_VALID.BULK_FILE_DELETE),
   async (req, res) => {
     // Check required fields
-    const { i, days } = req.body;
+    const { id, pathList } = req.body;
     logger.info("File house clean requested!", {
-      printerID: i,
-      days
+      printerID: id,
+      pathList
     });
-    await getPrinterStoreCache().houseCleanFiles(i, days);
-
-    res.send({});
+    const deletedList = await getPrinterStoreCache().houseCleanFiles(id, pathList);
+    console.log(deletedList)
+    res.send(deletedList);
   }
 );
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {

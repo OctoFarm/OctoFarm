@@ -294,9 +294,9 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 62vh;
-  height: 62vh;
-  max-height: 62vh;
+  min-height: 66vh;
+  height: 66vh;
+  max-height: 66vh;
 }
 .fileBody p {
   margin-bottom: 0px !important;
@@ -540,6 +540,11 @@ label {
   opacity: 0;
   position: absolute;
   z-index: -1;
+}
+
+.modal-body {
+  max-height: 55vh;
+  overflow-y: scroll;
 }
 
 .sortableList {

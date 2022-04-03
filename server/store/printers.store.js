@@ -933,24 +933,31 @@ class PrinterStore {
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
 
-    printer.fileList = printer.acquireOctoPrintFilesData(true, true);
+    printer.fileList = await printer.acquireOctoPrintFilesData(true, true);
     const newPrinter = JSON.parse(JSON.stringify(printer))
     return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
   }
 
   async resyncFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
-    const fileInformation = printer.acquireOctoPrintFileData(fullPath, true);
+    const fileInformation = await printer.acquireOctoPrintFileData(fullPath, true);
+    const newFile = JSON.parse(JSON.stringify(fileInformation))
+
     return FileClean.generateSingle(
-        fileInformation,
+        newFile,
         printer.selectedFilament,
         printer.costSettings
     );
   }
 
-  async houseCleanFiles(id, days) {
+  getHouseCleanFileList(id, days) {
     const printer = this.#findMePrinter(id);
-    return printer.houseCleanFiles(days);
+    return FileClean.listFilesOlderThanX(printer.fileList.fileList, days);
+  }
+
+  async houseCleanFiles(id, pathList) {
+    const printer = this.#findMePrinter(id);
+    return printer.houseKeepFiles(pathList);
   }
 
   addNewFile(file) {
@@ -1061,6 +1068,7 @@ class PrinterStore {
   deleteFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
     const index = findIndex(printer.fileList.fileList, function (o) {
+
       return o.fullPath === fullPath;
     });
     printer.fileList.fileList.splice(index, 1);

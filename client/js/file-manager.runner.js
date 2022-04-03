@@ -279,10 +279,8 @@ class Manager {
         message: "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
         inputType: "number",
         callback: async function (result) {
-          if(!!result && result > 0){
+          if(!!result){
             await FileManagerService.fileHouseKeeping(e, printer, result);
-          }else{
-            UI.createAlert("error", "You must input an amount of days for files to be cleaned, use the 'Delete All' function to nuke everything...", 3000, "Clicked")
           }
         }
       });

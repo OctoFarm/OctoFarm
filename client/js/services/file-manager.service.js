@@ -67,13 +67,13 @@ const handleUploadFromQueue = async (current, index) => {
 };
 
 setInterval(async () => {
-  let uploadQueueSize = document.getElementById("queueUploadLimitInput");
-  if (!!uploadQueueSize && isNaN(parseFloat(uploadQueueSize.value))) {
-    uploadQueueSize = 1;
+  const uploadQueueElement = document.getElementById("queueUploadLimitInput");
+  let uploadQueueSize = 1
+  if (!uploadQueueElement || !isNaN(parseInt(uploadQueueElement.value))) {
+    uploadQueueSize = parseInt(uploadQueueElement.value);
   }
 
   //Auto refresh of files
-
   // If there are files in the queue, plow through until uploaded... currently single file at a time.
   if (fileUploads.size() > 0 && !QUEUE_PAUSED) {
     for (let ind = 1; ind <= uploadQueueSize; ind++) {
@@ -364,7 +364,7 @@ export default class FileManagerService {
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
     const how = await OctoFarmClient.post("printers/resyncFile", {
-      i: printer._id,
+      id: printer._id,
     });
 
     if (how) {
@@ -399,19 +399,81 @@ export default class FileManagerService {
   }
 
   static async fileHouseKeeping(e, printer, days) {
-    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
     const houseCleanFiles = await OctoFarmClient.post(
-      "printers/houseCleanFiles",
+      "printers/getHouseCleanList",
       {
-        i: printer._id,
+        id: printer._id,
         days,
       }
     );
-    setTimeout(() => {
-      e.target.innerHTML = "<i class=\"fa-solid fa-broom\"></i> House Keeping";
-    }, 500);
-    printer.fileList = houseCleanFiles;
-    await FileManagerSortingService.loadSort(printer._id);
+    const prettyList = [];
+
+    let buttons = {}
+
+    if(houseCleanFiles.length === 0){
+      prettyList.push(`<div class="alert alert-danger" role="alert">No Files to Clean...</div>`)
+      buttons = {
+        cancel: {
+          label: 'OK',
+          className: 'btn-secondary'
+        },
+        confirm: {
+          label: 'OK',
+          className: 'btn-secondary d-none'
+        }
+      }
+    }else{
+      for(const file of houseCleanFiles) {
+        prettyList.push(`<div class="alert alert-danger" role="alert"><i class="fas fa-file-code fa-2x"></i> ${file}</div>`)
+      }
+      buttons = {
+        confirm: {
+          label: 'Yes',
+          className: 'btn-success'
+        },
+        cancel: {
+          label: 'No',
+          className: 'btn-danger'
+        }
+      }
+    }
+
+
+    bootbox.confirm({
+      title: "Please confirm you want to delete the following files!",
+      message: prettyList,
+      buttons: buttons,
+      callback: async function (result) {
+        if(!!result){
+          e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
+          const deletedList = await OctoFarmClient.post(
+              "printers/houseCleanFiles",
+              {
+                id: printer._id,
+                pathList: houseCleanFiles
+              }
+          );
+          console.log(deletedList)
+          const prettyDelete = [];
+
+          for(const file of deletedList){
+            prettyDelete.push(`${file} <br>`)
+          }
+
+          UI.createAlert("success", "Deleted the following files: <br>" + prettyDelete, 5000, "clicked")
+
+          setTimeout(async () => {
+            e.target.innerHTML = "<i class=\"fa-solid fa-broom\"></i> House Keeping";
+            await FileManagerSortingService.loadSort(printer._id);
+          }, 500);
+
+        }
+      }
+    });
+
+
+
+
   }
 
   static async openFolder(folder, target, printer) {
@@ -517,7 +579,7 @@ export default class FileManagerService {
     if (printerFileCount) {
       printerFileCount.innerHTML = `<i class="fas fa-file"></i> ${fileList.length} <i class="fas fa-folder"></i> ${folderList.length}`;
     }
-    const fileCardCount = document.getElementById("fileManagerFileCount-" + id);
+    const fileCardCount = document.getElementById("fileManagerfileCount-" + id);
     if (fileCardCount) {
       fileCardCount.innerHTML = `Files: ${fileList.length}`;
     }
@@ -1092,14 +1154,36 @@ export class FileActions {
   }
 
   static async selectFile(printer, filePath) {
-    await OctoPrintClient.file(printer, filePath, "load", true);
+    const {status} = await OctoPrintClient.file(printer, filePath, "load");
+    if (status === 404) {
+      UI.createAlert(
+          "error",
+          "We could not find the location, does it exist?",
+          3000,
+          "clicked"
+      );
+    } else if (status === 409) {
+      UI.createAlert(
+          "warning",
+          "There was a conflict, file is in use...",
+          3000,
+          "clicked"
+      );
+    } else {
+      UI.createAlert(
+          "success",
+          "Successfully deleted your file...",
+          3000,
+          "clicked"
+      );
+    }
   }
 
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
     refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Syncing...";
     const how = await OctoFarmClient.post("printers/resyncFile", {
-      i: printer._id,
+      id: printer._id,
       fullPath,
     });
     if (how) {
@@ -1153,7 +1237,7 @@ export class FileActions {
             );
           } else if (status === 409) {
             UI.createAlert(
-              "error",
+              "warning",
               "There was a conflict, file already exists or is in use...",
               3000,
               "clicked"
@@ -1199,13 +1283,35 @@ export class FileActions {
       },
       async callback(result) {
         if (result) {
-          await OctoPrintClient.file(printer, fullPath, "delete");
-          const opt = {
-            i: printer._id,
-            fullPath,
-          };
-          await OctoFarmClient.post("printers/removefile", opt);
-          document.getElementById(`file-${fullPath}`).remove();
+          const {status} = await OctoPrintClient.file(printer, fullPath, "delete");
+          if (status === 404) {
+            UI.createAlert(
+                "error",
+                "We could not find the location, does it exist?",
+                3000,
+                "clicked"
+            );
+          } else if (status === 409) {
+            UI.createAlert(
+                "warning",
+                "There was a conflict, file is in use...",
+                3000,
+                "clicked"
+            );
+          } else {
+            const opt = {
+              i: printer._id,
+              fullPath,
+            };
+            await OctoFarmClient.post("printers/removefile", opt);
+            document.getElementById(`file-${fullPath}`).remove();
+            UI.createAlert(
+                "success",
+                "Successfully deleted your file...",
+                3000,
+                "clicked"
+            );
+          }
         }
       },
     });

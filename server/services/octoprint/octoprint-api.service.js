@@ -10,7 +10,7 @@ const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monit
 const { promiseTimeout } = require("../../utils/promise.utils");
 
 async function fetchApi(url, method, apikey, bodyData = undefined) {
-  return await fetch(url, {
+  return fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +23,7 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
 async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = undefined) {
   const startTime = ConnectionMonitorService.startTimer();
   if (!fetchTimeout || method !== "GET") {
-    return await fetchApi(url, method, apikey, bodyData)
+    return fetchApi(url, method, apikey, bodyData)
       .then((res) => {
         const endTime = ConnectionMonitorService.stopTimer();
         ConnectionMonitorService.updateOrAddResponse(
@@ -132,7 +132,7 @@ class OctoprintApiService {
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 502;
+          throw 461;
         case "EHOSTUNREACH":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
@@ -191,13 +191,28 @@ class OctoprintApiService {
    */
   async post(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return await fetchApiTimeout(
+    return fetchApiTimeout(
       url,
       "POST",
       this.apikey,
       timeout ? this.#currentTimeout : false,
       data
-    );
+    ).catch((e) => {
+      return e;
+    });
+  }
+
+  /**
+   * Delete request onto OctoPrint API
+   * @param route
+   * @param timeout
+   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
+   */
+  async delete(route, timeout = true) {
+    const url = new URL(route, this.printerURL).href;
+    return fetchApiTimeout(url, "DELETE", this.apikey, timeout ? this.#currentTimeout : false).catch(e => {
+      return e;
+    });
   }
 
   /**
@@ -208,7 +223,9 @@ class OctoprintApiService {
    */
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return await fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false);
+    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false).catch(e => {
+      return e;
+    });
   }
 
   /**

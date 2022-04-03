@@ -3,6 +3,7 @@ module.exports = {
     GET: "get",
     POST: "post",
     PATCH: "patch",
+    DELETE: "delete",
     WEBSOCKET: "websocket",
     PING_PONG: "ping_pong"
   },

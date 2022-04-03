@@ -382,10 +382,8 @@ class OctoPrintPrinter {
         fileList: fileList?.files ? fileList.files : fileList.fileList,
         fileCount: fileList?.files ? fileList.files.length : fileList.fileList.length,
         folderList: fileList?.folders ? fileList.folders : fileList.folderList,
-        folderCount: fileList?.folders ? fileList.folders.length : fileList.folderList.length,
-
-      }
-
+        folderCount: fileList?.folders ? fileList.folders.length : fileList.folderList.length
+      };
     }
 
     if (!!profiles && !!current) {
@@ -876,7 +874,7 @@ class OctoPrintPrinter {
         //If user list is empty then we can assume that an admin user is only one available.
         //Only relevant for OctoPrint < 1.4.2.
         this.currentUser = "admin";
-        if(!this.userList.includes(this.currentUser)){
+        if (!this.userList.includes(this.currentUser)) {
           this.userList.push(this.currentUser);
         }
         this.#apiPrinterTickerWrap(
@@ -890,7 +888,7 @@ class OctoPrintPrinter {
         //If the userList isn't empty then we need to parse out the users and search for octofarm user.
         for (let currentUser of userList) {
           if (!!currentUser.admin) {
-            if(!this.userList.includes(this.currentUser)){
+            if (!this.userList.includes(this.currentUser)) {
               this.userList.push(currentUser.name);
             }
             // Look for OctoFarm user and skip the rest, if not use the first admin we find
@@ -1406,7 +1404,6 @@ class OctoPrintPrinter {
 
     if (globalStatusCode === 200) {
       const fileEntry = await filesCheck.json();
-
       let timeStat = null;
       let filament = [];
       if (typeof fileEntry.gcodeAnalysis !== "undefined") {
@@ -1445,42 +1442,31 @@ class OctoPrintPrinter {
         failed = fileEntry.prints.failure;
         last = fileEntry.prints.last.success;
       }
-      if (generate) {
-        const fileInformation = {
-          path,
-          fullPath: fileEntry.path,
-          display: fileEntry.display,
-          length: filament,
-          name: fileEntry.name,
-          size: fileEntry.size,
-          time: timeStat,
-          date: fileEntry.date,
-          thumbnail,
-          success: success,
-          failed: failed,
-          last: last
-        };
-        const fileIndex = findIndex(this.fileList.fileList, function (o) {
-          return o.display === fileInformation.display;
-        });
 
-        return this.fileList.fileList[fileIndex];
-      } else {
-        return {
-          path,
-          fullPath: fileEntry.path,
-          display: fileEntry.display,
-          length: filament,
-          name: fileEntry.name,
-          size: fileEntry.size,
-          time: timeStat,
-          date: fileEntry.date,
-          thumbnail,
-          success: success,
-          failed: failed,
-          last: last
-        };
-      }
+      const fileInformation = {
+        path,
+        fullPath: fileEntry.path,
+        display: fileEntry.display,
+        length: filament,
+        name: fileEntry.name,
+        size: fileEntry.size,
+        time: timeStat,
+        date: fileEntry.date,
+        thumbnail,
+        success: success,
+        failed: failed,
+        last: last
+      };
+
+      const fileIndex = findIndex(this.fileList.fileList, function (o) {
+        return o.display === fileInformation.display;
+      });
+
+      this.fileList.fileList[fileIndex] = fileInformation;
+
+      this.#db.update({ fileList: this.fileList });
+
+      return fileInformation;
     } else {
       return false;
     }
@@ -1508,11 +1494,11 @@ class OctoPrintPrinter {
         const { printerFiles, printerLocations } = acquirePrinterFilesAndFolderData(files);
 
         this.fileList = {
-              fileList: printerFiles,
-              filecount: printerFiles.length,
-              folderList: printerLocations,
-              folderCount: printerLocations.length
-        }
+          fileList: printerFiles,
+          filecount: printerFiles.length,
+          folderList: printerLocations,
+          folderCount: printerLocations.length
+        };
 
         this.#db.update({
           storage: this.storage,
@@ -1530,11 +1516,11 @@ class OctoPrintPrinter {
           return true;
         } else {
           return {
-                fileList: printerFiles,
-                filecount: printerFiles.length,
-                folderList: printerLocations,
-                folderCount: printerLocations.length
-          }
+            fileList: printerFiles,
+            filecount: printerFiles.length,
+            folderList: printerLocations,
+            folderCount: printerLocations.length
+          };
         }
       } else {
         this.#apiPrinterTickerWrap(
@@ -1711,6 +1697,7 @@ class OctoPrintPrinter {
 
     if (!!fileIndex) {
       logger.debug("Updating file information with generated OctoPrint data", data);
+      console.log(result);
       const { estimatedPrintTime, filament } = result;
 
       databaseRecord.fileList.files[fileIndex] = {
@@ -1765,20 +1752,27 @@ class OctoPrintPrinter {
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
   }
 
-  async houseKeepFiles(days) {
-    // get todays date
-    const now = new Date();
-    // get past date
-    const past = now.setDate(now.getDate() - days);
-    for (const folder of folderContents) {
-      const logFilePath = join(logFolder, folder);
-      const stats = statSync(logFilePath);
-      const endTime = new Date(stats.birthtime).getTime() + 3600000;
-      if (yesterday > endTime) {
-        Logs.deleteLogByName(logFilePath);
-        deletedFiles.push(logFilePath);
+  async houseKeepFiles(pathList) {
+    const deletedList = [];
+    for (const path of pathList) {
+      const index = findIndex(this.fileList.fileList, function (o) {
+        return o.fullPath === path;
+      });
+      if (typeof index !== "undefined") {
+        const pathDeleted = await this.#api.deleteFile(path).catch((e) => {
+          logger.http("Error deleting file!", e);
+          return false;
+        });
+        const globalStatusCode = checkApiStatusResponse(pathDeleted);
+
+        if (globalStatusCode === 204) {
+          this.fileList.fileList.splice(index, 1);
+          deletedList.push(path);
+        }
       }
     }
+    this.#db.update({ fileList: this.fileList })
+    return deletedList;
   }
 }
 
