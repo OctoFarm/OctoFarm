@@ -11,7 +11,7 @@ module.exports = function (passport) {
     new RememberMeStrategy(async function (token, done) {
       await UserTokenService.popRememberMeTokenWithDone(token, function (uid) {
         if (!uid) {
-          return done(null, !!uid);
+          return done(null, uid);
         }
         User.findById(uid, (err, user) => {
           if (err) {
@@ -36,7 +36,6 @@ module.exports = function (passport) {
           // Match password
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) throw err;
-
             if (isMatch) {
               return done(null, user);
             }
