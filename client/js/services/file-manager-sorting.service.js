@@ -1,41 +1,50 @@
-import FileManagerService from "./file-manager.service.js";
 import OctoFarmClient from "./octofarm-client.service";
+import {
+  updatePrinterFilesList
+} from "../pages/file-manager/file.actions"
 
 export default class FileManagerSortingService {
   static saveSort(meta, reverse) {
     localStorage.setItem("fileSort", JSON.stringify({ meta, reverse }));
   }
 
-  static async loadSort(id, recursive) {
-    const updatedPrinter = await OctoFarmClient.getPrinter(id);
+  static async loadSort(id, recursive, printer) {
+    let updatedPrinter = null
+    if(!!printer){
+      updatedPrinter = printer;
+    }else{
+      updatedPrinter = await OctoFarmClient.getPrinter(id);
+    }
+    console.log(updatedPrinter)
     const fileSortStorage = JSON.parse(localStorage.getItem("fileSort"));
     if (fileSortStorage !== null) {
       const reverse = fileSortStorage.reverse;
       if (fileSortStorage.meta === "file") {
         if (typeof recursive !== "undefined") {
-          this.sortFileName(updatedPrinter, reverse, recursive);
+          FileManagerSortingService.sortFileName(updatedPrinter, reverse, recursive);
         } else {
-          this.sortFileName(updatedPrinter, reverse);
+          FileManagerSortingService.sortFileName(updatedPrinter, reverse);
         }
       }
+      console.log(fileSortStorage.meta)
       if (fileSortStorage.meta === "date") {
         if (typeof recursive !== "undefined") {
-          this.sortUploadDate(updatedPrinter, reverse, recursive);
+          FileManagerSortingService.sortUploadDate(updatedPrinter, reverse, recursive);
         } else {
-          this.sortUploadDate(updatedPrinter, reverse);
+          FileManagerSortingService.sortUploadDate(updatedPrinter, reverse);
         }
       }
       if (fileSortStorage.meta === "time") {
         if (typeof recursive !== "undefined") {
-          this.sortPrintTime(updatedPrinter, reverse, recursive);
+          FileManagerSortingService.sortPrintTime(updatedPrinter, reverse, recursive);
         } else {
-          this.sortPrintTime(updatedPrinter, reverse);
+          FileManagerSortingService.sortPrintTime(updatedPrinter, reverse);
         }
       }
     } else {
       this.sortUploadDate(updatedPrinter, true);
     }
-    this.setListeners(updatedPrinter);
+    FileManagerSortingService.setListeners(updatedPrinter);
   }
 
   static setListeners(printer) {
@@ -47,32 +56,33 @@ export default class FileManagerSortingService {
     const dateDown = document.getElementById("sortDateDown");
     if (fileNameUp) {
       fileNameUp.addEventListener("click", (e) => {
-        this.sortFileName(printer, true);
+        console.log("SORTING")
+        FileManagerSortingService.sortFileName(printer, true);
       });
     }
     if (fileNameDown) {
       fileNameDown.addEventListener("click", (e) => {
-        this.sortFileName(printer);
+        FileManagerSortingService.sortFileName(printer);
       });
     }
     if (printTimeUp) {
       printTimeUp.addEventListener("click", (e) => {
-        this.sortPrintTime(printer, true);
+        FileManagerSortingService.sortPrintTime(printer, true);
       });
     }
     if (printTimeDown) {
       printTimeDown.addEventListener("click", (e) => {
-        this.sortPrintTime(printer);
+        FileManagerSortingService.sortPrintTime(printer);
       });
     }
     if (dateUp) {
       dateUp.addEventListener("click", (e) => {
-        this.sortUploadDate(printer);
+        FileManagerSortingService.sortUploadDate(printer);
       });
     }
     if (dateDown) {
       dateDown.addEventListener("click", (e) => {
-        this.sortUploadDate(printer, true);
+        FileManagerSortingService.sortUploadDate(printer, true);
       });
     }
   }
@@ -100,7 +110,7 @@ export default class FileManagerSortingService {
           '<i class="fas fa-sort-alpha-down"></i> File Name';
         this.saveSort("file", false);
       }
-      FileManagerService.updatePrinterFilesList(printer, recursive);
+      updatePrinterFilesList(printer, recursive);
     }
   }
 
@@ -128,7 +138,7 @@ export default class FileManagerSortingService {
           '<i class="fas fa-sort-numeric-up"></i> Upload Date';
         this.saveSort("date", false);
       }
-      FileManagerService.updatePrinterFilesList(printer, recursive);
+      updatePrinterFilesList(printer, recursive);
     }
   }
 
@@ -156,7 +166,7 @@ export default class FileManagerSortingService {
           '<i class="fas fa-sort-numeric-down"></i> Print Time';
         this.saveSort("time", true);
       }
-      FileManagerService.updatePrinterFilesList(printer, recursive);
+      updatePrinterFilesList(printer, recursive);
     }
   }
 }
