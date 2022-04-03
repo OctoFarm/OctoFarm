@@ -52,14 +52,14 @@ const removeClient = (id) => {
 };
 
 const listActiveClients = (req, res) => {
-  const currentActiveClientList = clientList.map((client) => {
+  const curretnActiveClientList = clientList.map((client) => {
     return {
       connectionDate: client.id,
       userName: client?.user?.name ? client.user.name : UNKNOWN_USER,
       group: client.user.group
     };
   });
-  return res.json(currentActiveClientList);
+  return res.json(curretnActiveClientList);
 };
 /**
  *

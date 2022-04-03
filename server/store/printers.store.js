@@ -992,8 +992,8 @@ class PrinterStore {
     printer.fileList.fileList.push(
       data
     );
-    const returnPrinter = JSON.parse(JSON.stringify(printer))
-    return Object.assign(returnPrinter, {fileList: FileClean.generate(returnPrinter.fileList, returnPrinter.selectedFilament, returnPrinter.costSettings)});
+
+    return printer;
   }
 
   addNewFolder(folder) {
