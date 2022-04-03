@@ -95,7 +95,16 @@ class OctoPrintPrinter {
   currentConnection = undefined;
   connectionOptions = undefined;
   terminal = [];
-
+  fileList = {
+    fileList: [],
+    filecount: 0,
+    folderList: [],
+    folderCount: 0
+  };
+  storage = {
+    free: 0,
+    total: 0
+  };
   //Updated by API / database
   octoPi = undefined;
   costSettings = {
@@ -126,7 +135,6 @@ class OctoPrintPrinter {
   klipperFirmwareVersion = undefined;
   printerFirmware = undefined;
   octoPrintVersion = undefined;
-  storage = undefined;
   current = undefined;
   options = undefined;
   profiles = undefined;
@@ -368,18 +376,16 @@ class OctoPrintPrinter {
     if (!!printerFirmware) {
       this.printerFirmware = printerFirmware;
     }
+
     if (!!fileList) {
-      this.fileList = fileList;
-      // this.fileList = FileClean.generate(
-      //   {
-      //     files: fileList.files,
-      //     filecount: fileList.files.length,
-      //     folders: fileList.folders,
-      //     folderCount: fileList.folders.length
-      //   },
-      //   this.selectedFilament,
-      //   this.costSettings
-      // );
+      this.fileList = {
+        fileList: fileList?.files ? fileList.files : fileList.fileList,
+        fileCount: fileList?.files ? fileList.files.length : fileList.fileList.length,
+        folderList: fileList?.folders ? fileList.folders : fileList.folderList,
+        folderCount: fileList?.folders ? fileList.folders.length : fileList.folderList.length,
+
+      }
+
     }
 
     if (!!profiles && !!current) {
@@ -870,7 +876,9 @@ class OctoPrintPrinter {
         //If user list is empty then we can assume that an admin user is only one available.
         //Only relevant for OctoPrint < 1.4.2.
         this.currentUser = "admin";
-        this.userList.push(this.currentUser);
+        if(!this.userList.includes(this.currentUser)){
+          this.userList.push(this.currentUser);
+        }
         this.#apiPrinterTickerWrap(
           "Acquired a single admin user!",
           "Complete",
@@ -882,7 +890,9 @@ class OctoPrintPrinter {
         //If the userList isn't empty then we need to parse out the users and search for octofarm user.
         for (let currentUser of userList) {
           if (!!currentUser.admin) {
-            this.userList.push(currentUser.name);
+            if(!this.userList.includes(this.currentUser)){
+              this.userList.push(currentUser.name);
+            }
             // Look for OctoFarm user and skip the rest, if not use the first admin we find
             if (currentUser.name === "octofarm" || currentUser.name === "OctoFarm") {
               this.currentUser = currentUser.name;
@@ -1479,18 +1489,8 @@ class OctoPrintPrinter {
   async acquireOctoPrintFilesData(force = false, returnObject = false) {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
-    if (!this?.fileList || !this?.storage || force) {
-      this.fileList = {
-        files: [],
-        filecount: 0,
-        folders: [],
-        folderCount: 0
-      };
-      this.storage = {
-        free: 0,
-        total: 0
-      };
 
+    if (this?.fileList.fileList.length === 0 || force) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
         logger.http("Failed Aquire files data", e);
         return false;
@@ -1507,24 +1507,32 @@ class OctoPrintPrinter {
         };
         const { printerFiles, printerLocations } = acquirePrinterFilesAndFolderData(files);
 
+        this.fileList = {
+              fileList: printerFiles,
+              filecount: printerFiles.length,
+              folderList: printerLocations,
+              folderCount: printerLocations.length
+        }
+
         this.#db.update({
           storage: this.storage,
           fileList: {
-            files: printerFiles,
+            fileList: printerFiles,
             filecount: printerFiles.length,
-            folders: printerLocations,
+            folderList: printerLocations,
             folderCount: printerLocations.length
           }
         });
+
         this.#apiPrinterTickerWrap("Acquired file list data!", "Complete");
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "success", true);
         if (!returnObject) {
           return true;
         } else {
           return {
-                files: printerFiles,
+                fileList: printerFiles,
                 filecount: printerFiles.length,
-                folders: printerLocations,
+                folderList: printerLocations,
                 folderCount: printerLocations.length
           }
         }

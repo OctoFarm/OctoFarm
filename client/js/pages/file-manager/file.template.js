@@ -1,3 +1,5 @@
+import Calc from "../../utils/calc";
+
 export const getFolderTemplate = (folder, id) => {
   return `
     <a
@@ -128,27 +130,27 @@ export const getFileTemplate = (file, printerURL, id) => {
                 >
                 <button
             title="Re-Sync File"
-            id="${printer._id}*fileActionUpdate*${file.fullPath}"
+            id="${id}*fileActionUpdate*${file.fullPath}"
             role="button"
           class="btn btn-dark"
                 >
                 <i class="fas fa-sync"></i> Re-Sync
                 </button>
                 <button           title="Start printing file"
-            id="${printer._id}*fileActionStart*${
+            id="${id}*fileActionStart*${
     file.fullPath
   }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${
-                printer._id
+                id
               }*fileActionSelect*${
     file.fullPath
   }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
             </button>
             <button          title="Move file" id="${
-              printer._id
+              id
             }*fileActionMove*${
     file.fullPath
   }" type="button" class="btn btn-warning">

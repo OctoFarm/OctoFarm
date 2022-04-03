@@ -56,16 +56,16 @@ class PrinterStore {
     if (onlyDisabled) {
       this.#printersList.forEach((printer) => {
         if (printer?.disabled) {
-          returnList.push(Object.assign({}, printer));
+          returnList.push(JSON.parse(JSON.stringify(printer)));
         }
       });
     } else {
       this.#printersList.forEach((printer) => {
         if (disabled) {
-          returnList.push(Object.assign({}, printer));
+          returnList.push(JSON.parse(JSON.stringify(printer)));
         } else {
           if (!printer.disabled) {
-            returnList.push(Object.assign({}, printer));
+            returnList.push(JSON.parse(JSON.stringify(printer)));
           }
         }
       });
@@ -73,8 +73,7 @@ class PrinterStore {
 
     //CLEAN FILES
     returnList = returnList.map(printer => {
-      printer.fileList = FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
-      return printer
+      return Object.assign(printer, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
     })
 
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
@@ -142,7 +141,8 @@ class PrinterStore {
 
   getFileList(id) {
     const printer = this.#findMePrinter(id);
-    return printer.fileList;
+    const newPrinter = JSON.parse(JSON.stringify(printer))
+    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
   }
 
   getCurrentZ(id) {
@@ -201,9 +201,9 @@ class PrinterStore {
   }
 
   getPrinterInformation(id) {
-    let printer = this.#findMePrinter(id);
-    printer.fileList = FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
-    return Object.assign({}, printer);
+    const printer = this.#findMePrinter(id);
+    const newPrinter = JSON.parse(JSON.stringify(printer))
+    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
   }
 
   getPrinter(id) {
@@ -934,7 +934,8 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
 
     printer.fileList = printer.acquireOctoPrintFilesData(true, true);
-    return printer;
+    const newPrinter = JSON.parse(JSON.stringify(printer))
+    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
   }
 
   async resyncFile(id, fullPath) {
@@ -942,8 +943,8 @@ class PrinterStore {
     const fileInformation = printer.acquireOctoPrintFileData(fullPath, true);
     return FileClean.generateSingle(
         fileInformation,
-        this.selectedFilament,
-        this.costSettings
+        printer.selectedFilament,
+        printer.costSettings
     );
   }
 
@@ -989,7 +990,7 @@ class PrinterStore {
         logger.error("Issue updating file list", e);
       });
     printer.fileList.fileList.push(
-      FileClean.generateSingle(data, printer.selectedFilament, printer.costSettings)
+      data
     );
 
     return printer;

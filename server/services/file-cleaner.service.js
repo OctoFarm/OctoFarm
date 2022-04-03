@@ -30,8 +30,9 @@ class FileCleanerService {
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
     for (let p = 0; p < farmPrinters.length; p++) {
       let printer = farmPrinters[p];
+      let fileList = JSON.parse(JSON.stringify(printer.fileList));
+      fileList = FileCleanerService.generate(fileList, printer.selectedFilament, printer.costSettings);
 
-      printer.fileList = FileCleanerService.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
 
       if (!!printer.storage) {
         const device = {
@@ -41,9 +42,9 @@ class FileCleanerService {
         };
         devices.push(device);
       }
-      if (!!printer.fileList) {
-        for (let i = 0; i < printer.fileList?.fileList?.length; i++) {
-          const file = printer.fileList.fileList[i];
+      if (!!fileList) {
+        for (let i = 0; i < fileList?.fileList?.length; i++) {
+          const file = fileList.fileList[i];
 
           if (!isNaN(file.fileSize)) {
             fileSizes.push(file.fileSize);
@@ -99,8 +100,8 @@ class FileCleanerService {
 
     const printCost = costSettings;
     const sortedFileList = [];
-    if (!!fileList?.files) {
-      for (let file of fileList.files) {
+    if (!!fileList?.fileList) {
+      for (let file of fileList.fileList) {
         const sortedFile = {
           path: file.path,
           fullPath: file.fullPath,
@@ -125,9 +126,9 @@ class FileCleanerService {
     }
     return {
       fileList: sortedFileList,
-      filecount: fileList.fileCount || 0,
-      folderList: fileList.folders || [],
-      folderCount: fileList.folderCount || 0
+      filecount: sortedFileList.length || 0,
+      folderList: fileList?.folderList || [],
+      folderCount: fileList?.folderList.length || 0
     };
   }
 

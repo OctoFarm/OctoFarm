@@ -18,8 +18,8 @@ let lastId = null;
 //Setup global listeners...
 const multiUploadBtn = document.getElementById("multUploadBtn");
 if (multiUploadBtn) {
-  multiUploadBtn.addEventListener("click", (e) => {
-    FileManagerService.multiUpload();
+  multiUploadBtn.addEventListener("click", async () => {
+    await FileManagerService.multiUpload();
   });
 }
 
@@ -36,7 +36,7 @@ class Manager {
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
-      if (printer.printerState.colour.category !== "Offline") {
+      if (printer.printerState.colour.category !== "Offline" && !printer.disabled && printer.printerState.colour.category !== "Searching...") {
         onlinePrinterList.push(printer);
       }
     });
@@ -220,7 +220,7 @@ class Manager {
       );
 
     const printer = await OctoFarmClient.getPrinter(id);
-
+    console.log("GET", printer)
     await FileManagerSortingService.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
       "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";

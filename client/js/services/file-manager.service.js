@@ -534,7 +534,6 @@ export default class FileManagerService {
 
   static updatePrinterFilesList(printer, recursive) {
     const { fileList } = printer;
-
     // Update page elements
     const currentFolder = FileManagerService.updatePrinterMetrics(
       printer._id,
@@ -579,8 +578,7 @@ export default class FileManagerService {
     const fileElem = getFileListElement(id);
     if (fileElem) {
       // Filter out files out of current folder scope
-
-      const currentFileList = fileList.fileList.filter((f) => {
+      const currentFileList = fileList.filter((f) => {
         return typeof recursive !== "undefined" || f.path === currentFolder;
       });
       // Show empty or filled list
