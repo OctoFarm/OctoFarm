@@ -72,9 +72,15 @@ class PrinterStore {
     }
 
     //CLEAN FILES
-    returnList = returnList.map(printer => {
-      return Object.assign(printer, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
-    })
+    returnList = returnList.map((printer) => {
+      return Object.assign(printer, {
+        fileList: FileClean.generate(
+          printer.fileList,
+          printer.selectedFilament,
+          printer.costSettings
+        )
+      });
+    });
 
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }
@@ -141,8 +147,10 @@ class PrinterStore {
 
   getFileList(id) {
     const printer = this.#findMePrinter(id);
-    const newPrinter = JSON.parse(JSON.stringify(printer))
-    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
+    const newPrinter = JSON.parse(JSON.stringify(printer));
+    return Object.assign(newPrinter, {
+      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+    });
   }
 
   getCurrentZ(id) {
@@ -202,8 +210,10 @@ class PrinterStore {
 
   getPrinterInformation(id) {
     const printer = this.#findMePrinter(id);
-    const newPrinter = JSON.parse(JSON.stringify(printer))
-    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
+    const newPrinter = JSON.parse(JSON.stringify(printer));
+    return Object.assign(newPrinter, {
+      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+    });
   }
 
   getPrinter(id) {
@@ -934,20 +944,18 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
 
     printer.fileList = await printer.acquireOctoPrintFilesData(true, true);
-    const newPrinter = JSON.parse(JSON.stringify(printer))
-    return Object.assign(newPrinter, {fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)});
+    const newPrinter = JSON.parse(JSON.stringify(printer));
+    return Object.assign(newPrinter, {
+      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+    });
   }
 
   async resyncFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
     const fileInformation = await printer.acquireOctoPrintFileData(fullPath, true);
-    const newFile = JSON.parse(JSON.stringify(fileInformation))
+    const newFile = JSON.parse(JSON.stringify(fileInformation));
 
-    return FileClean.generateSingle(
-        newFile,
-        printer.selectedFilament,
-        printer.costSettings
-    );
+    return FileClean.generateSingle(newFile, printer.selectedFilament, printer.costSettings);
   }
 
   getHouseCleanFileList(id, days) {
@@ -958,6 +966,11 @@ class PrinterStore {
   async houseCleanFiles(id, pathList) {
     const printer = this.#findMePrinter(id);
     return printer.houseKeepFiles(pathList);
+  }
+
+  async deleteAllFilesAndFolders(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.deleteAllFilesAndFolders();
   }
 
   addNewFile(file) {
@@ -996,9 +1009,7 @@ class PrinterStore {
       .catch((e) => {
         logger.error("Issue updating file list", e);
       });
-    printer.fileList.fileList.push(
-      data
-    );
+    printer.fileList.fileList.push(data);
 
     return printer;
   }
@@ -1021,7 +1032,7 @@ class PrinterStore {
       display
     };
     printer.fileList.folderList.push(newFolder);
-    PrinterService.findOneAndPush(i, "fileList.folders", newFolder)
+    PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
       .then()
       .catch((e) => {
         logger.error("Issue updating file list", e);
@@ -1068,7 +1079,6 @@ class PrinterStore {
   deleteFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
     const index = findIndex(printer.fileList.fileList, function (o) {
-
       return o.fullPath === fullPath;
     });
     printer.fileList.fileList.splice(index, 1);

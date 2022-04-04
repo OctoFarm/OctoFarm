@@ -5,7 +5,7 @@ const { OctoprintApiService } = require("./octoprint-api.service");
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
-const apiFile = (path) => apiBase + "/files/local/" + path;
+const apiFile = (path) => apiBase + "/files/local/" + encodeURIComponent(path);
 const apiFiles = (recursive = true) => apiBase + "/files?recursive=" + recursive;
 const apiConnection = apiBase + "/connection";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
@@ -87,6 +87,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async deleteFile(path) {
+    console.log("PATH ", apiFile(path));
     return this.deletePrinter(apiFile(path));
   }
 

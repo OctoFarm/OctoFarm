@@ -1690,8 +1690,8 @@ class OctoPrintPrinter {
     const { name, result } = data;
 
     const databaseRecord = await this.#db.get();
-
-    const fileIndex = findIndex(databaseRecord.fileList.files, function (o) {
+    console.log(name);
+    const fileIndex = findIndex(databaseRecord.fileList.fileList, function (o) {
       return o.name === name;
     });
 
@@ -1706,8 +1706,6 @@ class OctoPrintPrinter {
       };
 
       this.#db.update(this._id, { fileList: databaseRecord.fileList });
-
-      this.cleanPrintersInformation();
     } else {
       logger.error("Couldn't find file index to update!", name);
     }
@@ -1752,6 +1750,53 @@ class OctoPrintPrinter {
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
   }
 
+  async deleteAllFilesAndFolders() {
+    //Clear out all files...
+    const deletedList = [];
+
+    for (const path of this.fileList.fileList) {
+      const index = findIndex(this.fileList.fileList, function (o) {
+        return o.fullPath === path;
+      });
+      if (typeof index !== "undefined") {
+        console.log(path.fullPath);
+        const pathDeleted = await this.#api.deleteFile(path.fullPath).catch((e) => {
+          logger.http("Error deleting file!", e);
+          return false;
+        });
+        const globalStatusCode = checkApiStatusResponse(pathDeleted);
+
+        if (globalStatusCode === 204) {
+          this.fileList.fileList.splice(index, 1);
+          deletedList.push(path);
+        }
+      }
+    }
+
+    for (const path of this.fileList.folderList) {
+      const index = findIndex(this.fileList.folderList, function (o) {
+        return o.path === path;
+      });
+      if (typeof index !== "undefined") {
+        console.log(`${path.path}/${path.name}`);
+        const pathDeleted = await this.#api.deleteFile(`${path.name}`).catch((e) => {
+          logger.http("Error deleting folder!", e);
+          return false;
+        });
+        const globalStatusCode = checkApiStatusResponse(pathDeleted);
+        console.log(globalStatusCode);
+        if (globalStatusCode === 204) {
+          this.fileList.folderList.splice(index, 1);
+          deletedList.push(path);
+        }
+      }
+    }
+    this.fileList.filecount = 0;
+    this.fileList.folderCount = 0;
+    this.#db.update({ fileList: this.fileList });
+    return deletedList;
+  }
+
   async houseKeepFiles(pathList) {
     const deletedList = [];
     for (const path of pathList) {
@@ -1771,7 +1816,10 @@ class OctoPrintPrinter {
         }
       }
     }
-    this.#db.update({ fileList: this.fileList })
+    this.fileList.filecount = this.fileList.fileList.length;
+    this.fileList.folderCount = this.fileList.folderList.length;
+
+    this.#db.update({ fileList: this.fileList });
     return deletedList;
   }
 }

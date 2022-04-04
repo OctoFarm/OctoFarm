@@ -31,6 +31,7 @@ const loadingBarSuccess = "progress-bar progress-bar-striped bg-success";
 const buttonSuccess = "btn btn-success mb-0";
 const buttonFailed = "btn btn-danger mb-0";
 const defaultReSync = "<i class=\"fas fa-sync\"></i> Re-Sync";
+const defaultDeleteAll = "<i class=\"fa-solid fa-trash-can\"></i> Delete All";
 const isValid = "is-valid";
 const isInValid = "is-invalid";
 
@@ -363,6 +364,7 @@ export default class FileManagerService {
 
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
+    e.target.disabled = true;
     const how = await OctoFarmClient.post("printers/resyncFile", {
       id: printer._id,
     });
@@ -373,29 +375,41 @@ export default class FileManagerService {
       e.target.className = buttonFailed;
     }
     e.target.innerHTML = defaultReSync;
-    setTimeout(flashReturn, 500);
-    printer.fileList = how;
+    setTimeout( () => {
+      flashReturn(e.target)
+      e.target.disabled = false;
+    }, 1000);
+    e.target.disabled = false;
     await FileManagerSortingService.loadSort(printer._id);
   }
 
   static async deleteAllFiles(e, printer) {
-    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
-    const how = await OctoFarmClient.post("printers/nukeFiles", {
-      i: printer._id,
-    });
 
-    if (how) {
-      e.target.className = buttonSuccess;
-    } else {
-      e.target.className = buttonFailed;
-    }
-    e.target.innerHTML = defaultReSync;
-    setTimeout(() => {
-      e.target.className = buttonSuccess;
-      e.target.innerHTML = "<i class=\"fa-solid fa-trash-can\"></i> Delete All";
-    }, 500);
-    printer.fileList = how;
-    await FileManagerSortingService.loadSort(printer._id);
+    bootbox.confirm({
+      title: "Delete everything!",
+      message: "This will delete all files and folders on your OctoPrint instance... Are you sure?",
+      callback: async function (result) {
+        if(!!result) {
+          e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
+          e.target.disabled = true;
+          const how = await OctoFarmClient.post("printers/nukeFiles", {
+            id: printer._id
+          });
+
+          if (how) {
+            e.target.className = buttonSuccess + " float-right";
+          } else {
+            e.target.className = buttonFailed + " float-right";
+          }
+          setTimeout(() => {
+            e.target.className = "btn btn-outline-danger mb-0 float-right";
+            e.target.innerHTML = defaultDeleteAll;
+            e.target.disabled = false;
+          }, 1000);
+          await FileManagerSortingService.loadSort(printer._id);
+        }
+      }
+    });
   }
 
   static async fileHouseKeeping(e, printer, days) {

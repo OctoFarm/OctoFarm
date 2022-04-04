@@ -165,30 +165,30 @@ router.post(
 router.post(
   "/nukeFiles",
   ensureAuthenticated,
-  validateBodyMiddleware(P_VALID.FILE_SYNC),
+  validateBodyMiddleware(P_VALID.PRINTER_ID),
   async (req, res) => {
     // Check required fields
-    const { i } = req.body;
-    logger.info("Nuke all files and folders requested!", i);
-
-    res.send({});
+    const { id } = req.body;
+    logger.info("Nuke all files and folders requested!", id);
+    const deletedList = await getPrinterStoreCache().deleteAllFilesAndFolders(id);
+    res.send(deletedList);
   }
 );
 router.post(
-    "/getHouseCleanList",
-    ensureAuthenticated,
-    validateBodyMiddleware(P_VALID.HOUSE_KEEPING),
-    async (req, res) => {
-        // Check required fields
-        const { id, days } = req.body;
-        logger.info("File house clean requested!", {
-            printerID: id,
-            days
-        });
-        const fileList = getPrinterStoreCache().getHouseCleanFileList(id, days);
+  "/getHouseCleanList",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.HOUSE_KEEPING),
+  async (req, res) => {
+    // Check required fields
+    const { id, days } = req.body;
+    logger.info("File house clean requested!", {
+      printerID: id,
+      days
+    });
+    const fileList = getPrinterStoreCache().getHouseCleanFileList(id, days);
 
-        res.send(fileList);
-    }
+    res.send(fileList);
+  }
 );
 router.post(
   "/houseCleanFiles",
@@ -202,7 +202,6 @@ router.post(
       pathList
     });
     const deletedList = await getPrinterStoreCache().houseCleanFiles(id, pathList);
-    console.log(deletedList)
     res.send(deletedList);
   }
 );
