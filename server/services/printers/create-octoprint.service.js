@@ -1183,7 +1183,11 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
+        if (this.settingsAppearance.name === "") {
+          this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
+        } else {
+          this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+        }
       }
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
