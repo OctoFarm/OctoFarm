@@ -1,9 +1,10 @@
 import {getFileQueueRow, getFileRowID} from "../pages/file-manager/upload-queue.templates"
 
-const FILE_QUEUE_TABLE_BODY = document.getElementById("uploadQueueTableBody");
+let FILE_QUEUE_TABLE_BODY;
 
 export default class Queue {
   constructor() {
+    FILE_QUEUE_TABLE_BODY = document.getElementById("uploadQueueTableBody");
     this.data = [];
   }
   add(record) {
@@ -47,7 +48,10 @@ export default class Queue {
       currentFolder: record.currentFolder,
     }
     file.index = getFileRowID(file)
-    FILE_QUEUE_TABLE_BODY.insertAdjacentHTML("beforeend", getFileQueueRow(file))
+    if(!!FILE_QUEUE_TABLE_BODY){
+      FILE_QUEUE_TABLE_BODY.insertAdjacentHTML("beforeend", getFileQueueRow(file))
+    }
+
   }
   removeFromFileQueue(record){
     const file = {
