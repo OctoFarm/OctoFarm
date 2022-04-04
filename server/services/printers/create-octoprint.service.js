@@ -1695,7 +1695,7 @@ class OctoPrintPrinter {
       return o.name === name;
     });
 
-    if (!!fileIndex) {
+    if (false) {
       logger.debug("Updating file information with generated OctoPrint data", data);
       console.log(result);
       const { estimatedPrintTime, filament } = result;
@@ -1759,7 +1759,6 @@ class OctoPrintPrinter {
         return o.fullPath === path;
       });
       if (typeof index !== "undefined") {
-        console.log(path.fullPath);
         const pathDeleted = await this.#api.deleteFile(path.fullPath).catch((e) => {
           logger.http("Error deleting file!", e);
           return false;
@@ -1778,13 +1777,11 @@ class OctoPrintPrinter {
         return o.path === path;
       });
       if (typeof index !== "undefined") {
-        console.log(`${path.path}/${path.name}`);
         const pathDeleted = await this.#api.deleteFile(`${path.name}`).catch((e) => {
           logger.http("Error deleting folder!", e);
           return false;
         });
         const globalStatusCode = checkApiStatusResponse(pathDeleted);
-        console.log(globalStatusCode);
         if (globalStatusCode === 204) {
           this.fileList.folderList.splice(index, 1);
           deletedList.push(path);
