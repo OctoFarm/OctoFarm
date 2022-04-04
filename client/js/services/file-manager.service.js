@@ -69,7 +69,7 @@ const handleUploadFromQueue = async (current, index) => {
 setInterval(async () => {
   const uploadQueueElement = document.getElementById("queueUploadLimitInput");
   let uploadQueueSize = 1
-  if (!uploadQueueElement || !isNaN(parseInt(uploadQueueElement.value))) {
+  if (!!uploadQueueElement && !isNaN(parseInt(uploadQueueElement.value))) {
     uploadQueueSize = parseInt(uploadQueueElement.value);
   }
 
@@ -411,15 +411,15 @@ export default class FileManagerService {
     let buttons = {}
 
     if(houseCleanFiles.length === 0){
-      prettyList.push(`<div class="alert alert-danger" role="alert">No Files to Clean...</div>`)
+      prettyList.push("<div class=\"alert alert-danger\" role=\"alert\">No Files to Clean...</div>")
       buttons = {
         cancel: {
-          label: 'OK',
-          className: 'btn-secondary'
+          label: "OK",
+          className: "btn-secondary"
         },
         confirm: {
-          label: 'OK',
-          className: 'btn-secondary d-none'
+          label: "OK",
+          className: "btn-secondary d-none"
         }
       }
     }else{
@@ -428,12 +428,12 @@ export default class FileManagerService {
       }
       buttons = {
         confirm: {
-          label: 'Yes',
-          className: 'btn-success'
+          label: "Yes",
+          className: "btn-success"
         },
         cancel: {
-          label: 'No',
-          className: 'btn-danger'
+          label: "No",
+          className: "btn-danger"
         }
       }
     }

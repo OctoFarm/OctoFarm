@@ -1,6 +1,5 @@
 import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./utils/calc.js";
-import UI from "./utils/ui"
 import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
 import {createFilamentSelector} from "./services/filament-manager-plugin.service";
@@ -220,7 +219,6 @@ class Manager {
       );
 
     const printer = await OctoFarmClient.getPrinter(id);
-    console.log("GET", printer)
     await FileManagerSortingService.loadSort(printer._id);
     document.getElementById("backBtn").innerHTML =
       "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";
