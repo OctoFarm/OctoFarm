@@ -1783,11 +1783,13 @@ class OctoPrintPrinter {
       const globalStatusCode = checkApiStatusResponse(pathDeleted);
       if (globalStatusCode === 204) {
         const fileIndex = findIndex(this.fileList.fileList, function (o) {
-          return o.fullPath === path;
+          return o.fullPath === path.fullPath;
         });
         this.fileList.fileList.splice(fileIndex, 1);
         deletedFiles.push(path.fullPath);
-        logger.info("Deleted: ", path.fullPath)
+        logger.info("Deleted: ", path.fullPath);
+      } else {
+        logger.error("Failed to delete file...", path.fullPath);
       }
     }
 
@@ -1801,11 +1803,14 @@ class OctoPrintPrinter {
 
       if (globalStatusCode === 204) {
         const folderIndex = findIndex(this.fileList.folderList, function (o) {
-          return o.name === path;
+          return o.name === path.name;
         });
-        this.fileList.fileList.splice(folderIndex, 1);
+
+        this.fileList.folderList.splice(folderIndex, 1);
         deletedFolders.push(path.name);
-        logger.info("Deleted Folder: ", path.name)
+        logger.info("Deleted Folder: ", path.name);
+      } else {
+        logger.error("Failed to delete folder...", path.name);
       }
     }
 
@@ -1814,7 +1819,7 @@ class OctoPrintPrinter {
     this.#db.update({ fileList: this.fileList });
     logger.info("Deleted files... ", deletedFiles);
     logger.info("Deleted folders... ", deletedFolders);
-    return deletedFiles;
+    return { deletedFiles, deletedFolders };
   }
 
   async houseKeepFiles(pathList) {
@@ -1831,7 +1836,10 @@ class OctoPrintPrinter {
         const fileIndex = findIndex(this.fileList.fileList, function (o) {
           return o.fullPath === path;
         });
+        console.log(fileIndex);
         this.fileList.fileList.splice(fileIndex, 1);
+      } else {
+        logger.error("Failed to delete file...", path);
       }
     }
 

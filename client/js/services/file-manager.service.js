@@ -392,16 +392,32 @@ export default class FileManagerService {
         if(!!result) {
           e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
           e.target.disabled = true;
-          await OctoFarmClient.post("printers/nukeFiles", {
+          const deletedList = await OctoFarmClient.post("printers/nukeFiles", {
             id: printer._id
           });
+          console.log(deletedList)
+          const prettyFolderList = [];
+          const prettyFilesList = [];
+          deletedList.deletedFiles.forEach(file => {
+            prettyFilesList.push(`${file}<br>`)
+          })
+          deletedList.deletedFolders.forEach(folder => {
+            prettyFolderList.push(`${folder}<br>`)
+          })
 
-          setTimeout(() => {
+
+          setTimeout(async () => {
             e.target.className = "btn btn-outline-danger mb-0 float-right";
             e.target.innerHTML = defaultDeleteAll;
             e.target.disabled = false;
+            if(deletedList.deletedFiles.length > 0){
+              UI.createAlert("success", "Successfully deleted files: <br>" + prettyFilesList, 5000, "Clicked");
+            }
+            if(deletedList.deletedFolders.length > 0){
+              UI.createAlert("success", "Successfully deleted folders: <br>" + prettyFolderList, 5000, "Clicked")
+            }
+            await FileManagerSortingService.loadSort(printer._id);
           }, 1000);
-          await FileManagerSortingService.loadSort(printer._id);
         }
       }
     });
@@ -462,7 +478,6 @@ export default class FileManagerService {
                 pathList: houseCleanFiles
               }
           );
-          console.log(deletedList)
           const prettyDelete = [];
 
           for(const file of deletedList){
