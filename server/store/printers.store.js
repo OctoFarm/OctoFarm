@@ -956,7 +956,6 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     const fileInformation = await printer.acquireOctoPrintFileData(fullPath, true);
     const newFile = JSON.parse(JSON.stringify(fileInformation));
-
     return FileClean.generateSingle(newFile, printer.selectedFilament, printer.costSettings);
   }
 

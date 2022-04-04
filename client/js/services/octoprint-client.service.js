@@ -197,7 +197,7 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
-      return OctoPrintClient.post(printer, url, opt);
+      return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -206,9 +206,9 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
-      return OctoPrintClient.post(printer, url, opt);
+      return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "delete") {
-      return OctoPrintClient.delete(printer, url);
+      return OctoPrintClient.delete(printer, encodeURIComponent(url));
     }
   }
 

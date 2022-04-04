@@ -138,21 +138,21 @@ export const getFileTemplate = (file, printerURL, id) => {
                 </button>
                 <button           title="Start printing file"
             id="${id}*fileActionStart*${
-      encodeURIComponent(file.fullPath)
+      file.fullPath
   }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${
                 id
               }*fileActionSelect*${
-      encodeURIComponent(file.fullPath)
+      file.fullPath
   }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
             </button>
             <button          title="Move file" id="${
               id
             }*fileActionMove*${
-      encodeURIComponent(file.fullPath)
+      file.fullPath
   }" type="button" class="btn btn-warning">
       <i class="fas fa-people-carry"></i> Move
           </button>
@@ -162,7 +162,7 @@ export const getFileTemplate = (file, printerURL, id) => {
     <i class="fas fa-download"></i> Download
         </button>
         <button title="Delete file" id="${printerURL}*fileActionDelete*${
-      encodeURIComponent(file.fullPath)
+      file.fullPath
   }" type="button" class="btn btn-danger">
   <i class="fas fa-trash-alt"></i> Delete
       </button>

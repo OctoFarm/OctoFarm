@@ -137,7 +137,7 @@ class FileCleanerService {
 
   static generateSingle(file, selectedFilament, costSettings) {
     if (!file) {
-      logger.error("Printer File Cleaner failed: farmPrinter:fileList not defined.");
+      logger.error("Printer File Cleaner failed: file not defined.");
       return;
     }
 

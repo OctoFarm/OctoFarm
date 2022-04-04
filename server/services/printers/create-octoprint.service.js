@@ -841,6 +841,7 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Passive login was successful!", "Complete");
       return this.sessionKey;
     } else {
+      logger.http("Passive login failed...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Passive login failed...",
         "Offline",
@@ -921,6 +922,7 @@ class OctoPrintPrinter {
       });
       return true;
     } else {
+      logger.http("Failed to acquire user list...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Failed to acquire user list...",
         "Offline",
@@ -971,6 +973,7 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Successfully found printer on the high sea!", "Complete");
       return true;
     } else {
+      logger.http("Failed to acquire version data...", globalStatusCode);
       if (this.#retryNumber === 0) {
         this.#apiPrinterTickerWrap(
           "Failed to find printer on the high sea! marking offline...",
@@ -1006,6 +1009,7 @@ class OctoPrintPrinter {
         this.#db.update({
           octoPi: this.octoPi
         });
+        logger.http("Failed to acquire raspberry pi data...", globalStatusCode);
         this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline");
         return globalStatusCode;
       }
@@ -1045,6 +1049,7 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
+      logger.http("Failed to acquire system data...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Failed to acquire system data",
         "Offline",
@@ -1085,6 +1090,7 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
+      logger.http("Failed to acquire profile data...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Failed to acquire profile data",
         "Offline",
@@ -1138,6 +1144,7 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
+      logger.http("Failed to acquire state data...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Failed to acquire state data",
         "Offline",
@@ -1217,6 +1224,7 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
+      logger.http("Failed to acquire settings data...", globalStatusCode);
       this.#apiPrinterTickerWrap(
         "Failed to acquire settings data",
         "Offline",
@@ -1253,6 +1261,7 @@ class OctoPrintPrinter {
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
         return true;
       } else {
+        logger.http("Failed to acquire system info data...", globalStatusCode);
         this.#apiPrinterTickerWrap(
           "Failed to acquire system information plugin data",
           "Offline",
@@ -1306,6 +1315,7 @@ class OctoPrintPrinter {
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
         return true;
       } else {
+        logger.http("Failed to acquire plugin data...", globalStatusCode);
         this.#apiPrinterTickerWrap(
           "Failed to acquire plugin lists data",
           "Offline",
@@ -1380,6 +1390,7 @@ class OctoPrintPrinter {
 
         return true;
       } else {
+        logger.http("Failed to acquire octoprint updates data...", globalStatusCode);
         this.#apiPrinterTickerWrap(
           "Failed to acquire OctoPrint updates data",
           "Offline",
@@ -1403,7 +1414,6 @@ class OctoPrintPrinter {
       logger.http("Failed Aquire file data", e);
       return false;
     });
-
     const globalStatusCode = checkApiStatusResponse(filesCheck);
 
     if (globalStatusCode === 200) {
@@ -1472,6 +1482,7 @@ class OctoPrintPrinter {
 
       return fileInformation;
     } else {
+      logger.http("File could not be re-synced", globalStatusCode);
       return false;
     }
   }
@@ -1527,6 +1538,7 @@ class OctoPrintPrinter {
           };
         }
       } else {
+        logger.http("Failed to acquire file list data...", globalStatusCode);
         this.#apiPrinterTickerWrap(
           "Failed to acquire file list data",
           "Offline",
@@ -1691,28 +1703,28 @@ class OctoPrintPrinter {
   }
 
   async updateFileInformation(data) {
-    const { name, result } = data;
-
-    const databaseRecord = await this.#db.get();
-    console.log(name);
-    const fileIndex = findIndex(databaseRecord.fileList.fileList, function (o) {
-      return o.name === name;
-    });
-
-    if (false) {
-      logger.debug("Updating file information with generated OctoPrint data", data);
-      console.log(result);
-      const { estimatedPrintTime, filament } = result;
-
-      databaseRecord.fileList.files[fileIndex] = {
-        ...estimatedPrintTime,
-        ...filament
-      };
-
-      this.#db.update(this._id, { fileList: databaseRecord.fileList });
-    } else {
-      logger.error("Couldn't find file index to update!", name);
-    }
+    // const { name, result } = data;
+    //
+    // const databaseRecord = await this.#db.get();
+    // console.log(name);
+    // const fileIndex = findIndex(databaseRecord.fileList.fileList, function (o) {
+    //   return o.name === name;
+    // });
+    //
+    // if (false) {
+    //   logger.debug("Updating file information with generated OctoPrint data", data);
+    //   console.log(result);
+    //   const { estimatedPrintTime, filament } = result;
+    //
+    //   databaseRecord.fileList.files[fileIndex] = {
+    //     ...estimatedPrintTime,
+    //     ...filament
+    //   };
+    //
+    //   this.#db.update(this._id, { fileList: databaseRecord.fileList });
+    // } else {
+    //   logger.error("Couldn't find file index to update!", name);
+    // }
   }
 
   updatePrinterStatistics(statistics) {
@@ -1756,67 +1768,73 @@ class OctoPrintPrinter {
 
   async deleteAllFilesAndFolders() {
     //Clear out all files...
-    const deletedList = [];
+    const deletedFiles = [];
+    const deletedFolders = [];
 
-    for (const path of this.fileList.fileList) {
-      const index = findIndex(this.fileList.fileList, function (o) {
-        return o.fullPath === path;
+    const fileList = JSON.parse(JSON.stringify(this.fileList.fileList));
+    const folderList = JSON.parse(JSON.stringify(this.fileList.folderList));
+
+    for (const path of fileList) {
+      logger.warning("Deleting File: ", path.fullPath);
+      const pathDeleted = await this.#api.deleteFile(path.fullPath).catch((e) => {
+        logger.http("Error deleting file!", e);
+        return false;
       });
-      if (typeof index !== "undefined") {
-        const pathDeleted = await this.#api.deleteFile(path.fullPath).catch((e) => {
-          logger.http("Error deleting file!", e);
-          return false;
+      const globalStatusCode = checkApiStatusResponse(pathDeleted);
+      if (globalStatusCode === 204) {
+        const fileIndex = findIndex(this.fileList.fileList, function (o) {
+          return o.fullPath === path;
         });
-        const globalStatusCode = checkApiStatusResponse(pathDeleted);
-
-        if (globalStatusCode === 204) {
-          this.fileList.fileList.splice(index, 1);
-          deletedList.push(path);
-        }
+        this.fileList.fileList.splice(fileIndex, 1);
+        deletedFiles.push(path.fullPath);
+        logger.info("Deleted: ", path.fullPath)
       }
     }
 
-    for (const path of this.fileList.folderList) {
-      const index = findIndex(this.fileList.folderList, function (o) {
-        return o.path === path;
+    for (const path of folderList) {
+      logger.warning("Deleting Folder: ", path.name);
+      const pathDeleted = await this.#api.deleteFile(`${path.name}`).catch((e) => {
+        logger.http("Error deleting folder!", e);
+        return false;
       });
-      if (typeof index !== "undefined") {
-        const pathDeleted = await this.#api.deleteFile(`${path.name}`).catch((e) => {
-          logger.http("Error deleting folder!", e);
-          return false;
+      const globalStatusCode = checkApiStatusResponse(pathDeleted);
+
+      if (globalStatusCode === 204) {
+        const folderIndex = findIndex(this.fileList.folderList, function (o) {
+          return o.name === path;
         });
-        const globalStatusCode = checkApiStatusResponse(pathDeleted);
-        if (globalStatusCode === 204) {
-          this.fileList.folderList.splice(index, 1);
-          deletedList.push(path);
-        }
+        this.fileList.fileList.splice(folderIndex, 1);
+        deletedFolders.push(path.name);
+        logger.info("Deleted Folder: ", path.name)
       }
     }
+
     this.fileList.filecount = 0;
     this.fileList.folderCount = 0;
     this.#db.update({ fileList: this.fileList });
-    return deletedList;
+    logger.info("Deleted files... ", deletedFiles);
+    logger.info("Deleted folders... ", deletedFolders);
+    return deletedFiles;
   }
 
   async houseKeepFiles(pathList) {
     const deletedList = [];
     for (const path of pathList) {
-      const index = findIndex(this.fileList.fileList, function (o) {
-        return o.fullPath === path;
+      const pathDeleted = await this.#api.deleteFile(path).catch((e) => {
+        logger.http("Error deleting file!", e);
+        return false;
       });
-      if (typeof index !== "undefined") {
-        const pathDeleted = await this.#api.deleteFile(path).catch((e) => {
-          logger.http("Error deleting file!", e);
-          return false;
-        });
-        const globalStatusCode = checkApiStatusResponse(pathDeleted);
+      const globalStatusCode = checkApiStatusResponse(pathDeleted);
 
-        if (globalStatusCode === 204) {
-          this.fileList.fileList.splice(index, 1);
-          deletedList.push(path);
-        }
+      if (globalStatusCode === 204) {
+        deletedList.push(path);
+        const fileIndex = findIndex(this.fileList.fileList, function (o) {
+          return o.fullPath === path;
+        });
+        this.fileList.fileList.splice(fileIndex, 1);
       }
     }
+
     this.fileList.filecount = this.fileList.fileList.length;
     this.fileList.folderCount = this.fileList.folderList.length;
 

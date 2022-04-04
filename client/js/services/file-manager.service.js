@@ -392,15 +392,10 @@ export default class FileManagerService {
         if(!!result) {
           e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
           e.target.disabled = true;
-          const how = await OctoFarmClient.post("printers/nukeFiles", {
+          await OctoFarmClient.post("printers/nukeFiles", {
             id: printer._id
           });
 
-          if (how) {
-            e.target.className = buttonSuccess + " float-right";
-          } else {
-            e.target.className = buttonFailed + " float-right";
-          }
           setTimeout(() => {
             e.target.className = "btn btn-outline-danger mb-0 float-right";
             e.target.innerHTML = defaultDeleteAll;
@@ -1186,7 +1181,7 @@ export class FileActions {
     } else {
       UI.createAlert(
           "success",
-          "Successfully deleted your file...",
+          "Successfully selected your file...",
           3000,
           "clicked"
       );
@@ -1264,12 +1259,6 @@ export class FileActions {
               fileName: json.name,
               newFullPath: json.path,
             };
-            UI.createAlert(
-              "warning",
-              "Moving file... please wait.",
-              3000,
-              "clicked"
-            );
             await OctoFarmClient.post("printers/moveFile", opts);
             await FileManagerSortingService.loadSort(printer._id);
             UI.createAlert(
