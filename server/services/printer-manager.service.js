@@ -188,7 +188,9 @@ class PrinterManagerService {
     const { updateGroupListing, changesList, socketsNeedTerminating } =
       getPrinterStoreCache().updatePrintersBasicInformation(newPrintersInformation);
 
-    if (updateGroupListing) this.updateGroupList();
+    if (updateGroupListing) {
+      this.updateGroupList();
+    }
 
     if (socketsNeedTerminating.length > 0) {
       getPrinterStoreCache().resetPrintersSocketConnections(socketsNeedTerminating);

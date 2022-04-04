@@ -433,6 +433,8 @@ class PrinterStore {
           });
         }
       }
+
+      oldPrinter.cleanPrintersInformation();
     }
 
     if (socketsNeedTerminating.length > 0) {
