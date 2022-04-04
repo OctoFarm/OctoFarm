@@ -40,7 +40,7 @@ const addClientConnection = (req, res) => {
   });
 
   req.on("error", (e) => {
-    logger.error(
+    logger.warning(
       `${client?.user?.name ? client.user.name : UNKNOWN_USER} has disconnected from the endpoint.`
     );
     removeClient(id);
@@ -52,14 +52,14 @@ const removeClient = (id) => {
 };
 
 const listActiveClients = (req, res) => {
-  const curretnActiveClientList = clientList.map((client) => {
+  const currentActiveClientList = clientList.map((client) => {
     return {
       connectionDate: client.id,
       userName: client?.user?.name ? client.user.name : UNKNOWN_USER,
       group: client.user.group
     };
   });
-  return res.json(curretnActiveClientList);
+  return res.json(currentActiveClientList);
 };
 /**
  *
