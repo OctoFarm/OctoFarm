@@ -9,6 +9,8 @@ import {allowedFileTypes} from "./constants/file-types.constants"
 
 import {createClientSSEWorker} from "./services/client-worker.service";
 import {eventsSSEHandler, eventsURL} from "./pages/file-manager/file-manager-sse.handler";
+import {printer} from "prettier/doc";
+import {printerIsOnline} from "./utils/octofarm.utils";
 
 createClientSSEWorker(eventsURL, eventsSSEHandler);
 
@@ -26,16 +28,26 @@ class Manager {
   static async drawPrinterList() {
     let printers = await OctoFarmClient.listPrinters();
     const printerList = document.getElementById("printerList");
+    printerList.innerHTML = "";
 
-    if(!printerList){
+    const onlinePrinters = printers.every( printer => {
+      return printerIsOnline(printer);
+    })
+
+    if(!printerList || onlinePrinters){
+      printerList.innerHTML = `
+      <div class="alert alert-dark text-center" role="alert">
+        No printers are online... Please refresh when they are!
+      </div>
+      `
       return;
     }
 
-    printerList.innerHTML = "";
+
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
-      if (printer.printerState.colour.category !== "Offline" && !printer.disabled && printer.printerState.colour.category !== "Searching...") {
+      if (printer.printerState.colour.category !== "Offline" || !printer.disabled && printer.printerState.colour.category !== "Searching...") {
         onlinePrinterList.push(printer);
       }
     });

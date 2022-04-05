@@ -1,8 +1,7 @@
 <% let base = './partials' %>
 <% let modal = base + '/octofarm-modal.ejs' %>
 
-<% if(true || typeof printerCount != 'undefined' && printerCount > 0 ) { %>
-    <% if(true || typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0 || currentOperationsCount.complete > 0) { %>
+<% if(typeof printerCount !== 'undefined' && printerCount > 0 ) { %>
 
         <div class="row">
             <div id="file-manager-managment" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
@@ -213,18 +212,7 @@
                 </div>
             </div>
         </div>
-    <% }else{ %>
-        <div class="row mt-5">
-            <div class="col-md-6 m-auto">
-                <div class="card card-body text-center">
-                    <p>
-                        To use file manager you need at least 1 idle or active printer in your farm... Please turn your
-                        printer on and connect.
-                    </p>
-                </div>
-            </div>
-        </div>
-    <% } %>
+
     <%- include(modal, {
     modal:{
     id:"fileManagerStatistics", title:"File Manager Statistics"
