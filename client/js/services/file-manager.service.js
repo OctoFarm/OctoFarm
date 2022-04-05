@@ -463,16 +463,13 @@ export default class FileManagerService {
       }
     }
 
-    const bootBoxElement = document.getElementsByClassName("modal-body");
-    bootBoxElement.classList.add("modal-overflow");
-
     bootbox.confirm({
       title: "Please confirm you want to delete the following files!",
       message: prettyList,
       buttons: buttons,
+      scrollable: true,
       callback: async function (result) {
         if(!!result){
-          bootBoxElement.classList.remove("modal-overflow");
           e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
           const deletedList = await OctoFarmClient.post(
               "printers/houseCleanFiles",
