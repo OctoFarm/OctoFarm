@@ -9,7 +9,6 @@ import {allowedFileTypes} from "./constants/file-types.constants"
 
 import {createClientSSEWorker} from "./services/client-worker.service";
 import {eventsSSEHandler, eventsURL} from "./pages/file-manager/file-manager-sse.handler";
-import {printer} from "prettier/doc";
 import {printerIsOnline} from "./utils/octofarm.utils";
 
 createClientSSEWorker(eventsURL, eventsSSEHandler);
@@ -34,7 +33,7 @@ class Manager {
       return printerIsOnline(printer);
     })
 
-    if(!printerList || onlinePrinters){
+    if(!printerList || !onlinePrinters){
       printerList.innerHTML = `
       <div class="alert alert-dark text-center" role="alert">
         No printers are online... Please refresh when they are!
