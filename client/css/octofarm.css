@@ -542,7 +542,7 @@ label {
   z-index: -1;
 }
 
-.modal-body {
+.modal-overflow {
   max-height: 80vh;
   overflow-y: scroll;
 }
