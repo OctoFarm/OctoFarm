@@ -796,7 +796,7 @@ async function updateState(printer, clientSettings, view, index) {
       elements.stop.disabled = false;
     }
 
-    if (printer.printerState.state === "Pausing") {
+    if (printer.printerState.state === "Pausing" || printer.printerState.state === "Cancelling") {
       if (elements.start) {
         elements.start.classList.remove("hidden");
       }
@@ -1082,7 +1082,7 @@ async function updateGroupState(printers, clientSettings, view) {
           (obj) => obj.printerState.state === "Paused"
         ).length;
         const pausingPrinters = groupedPrinters[key].filter(
-          (obj) => obj.printerState.state === "Pausing"
+          (obj) => obj.printerState.state === "Pausing" || obj.printerState.state === "Cancelling"
         ).length;
         const filesSelected = groupedPrinters[key].filter(
           (obj) => obj?.currentJob?.fileName !== "No File Selected"

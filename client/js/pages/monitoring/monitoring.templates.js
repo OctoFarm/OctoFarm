@@ -4,13 +4,15 @@ import {
   checkCameraState,
   imageOrCamera,
   checkGroupColumns,
-  isHidden,
+  isHidden, printerIsAvailableToView,
 } from "../../utils/octofarm.utils";
 import { getPrinterNameBadge } from "../../templates/printer.templates"
 
 export function drawListView(printer, clientSettings) {
+  if(!printerIsAvailableToView(printer)){
+    return;
+  }
   const hidden = isHidden(printer, clientSettings);
-  const name = printer.printerName;
   let toolList = "";
   let environment = "";
   if (!!printer?.currentProfile) {
@@ -179,9 +181,10 @@ export function drawListView(printer, clientSettings) {
 }
 
 export function drawPanelView(printer, clientSettings) {
+  if(!printerIsAvailableToView(printer)){
+    return;
+  }
   const hidden = isHidden(printer, clientSettings);
-  const name = printer.printerName;
-  const printerRows = checkPrinterRows(clientSettings);
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
@@ -374,11 +377,13 @@ export function drawPanelView(printer, clientSettings) {
 }
 
 export function drawCameraView(printer, clientSettings) {
+  if(!printerIsAvailableToView(printer)){
+    return;
+  }
   let hidden = isHidden(printer, clientSettings);
   if (printer.camURL === "") {
     hidden = "hidden";
   }
-  const name = printer.printerName;
 
   const printerRows = checkPrinterRows(clientSettings);
 
@@ -575,8 +580,11 @@ export function drawCameraView(printer, clientSettings) {
 }
 
 export function drawCombinedView(printer, clientSettings) {
+  if(!printerIsAvailableToView(printer)){
+    return;
+  }
   const hidden = isHidden(printer, clientSettings);
-  const name = printer.printerName;
+
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
@@ -919,8 +927,11 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
   });
 }
 
-export function drawGroupViewPrinters(printer, clientSettings) {
-  printer.forEach((printer) => {
+export function drawGroupViewPrinters(printers, clientSettings) {
+  printers.forEach((printer) => {
+    if(!printerIsAvailableToView(printer)){
+      return;
+    }
     if (printer.group !== "") {
       const cleanGroup = encodeURIComponent(printer.group);
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
