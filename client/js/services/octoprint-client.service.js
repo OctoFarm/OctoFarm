@@ -262,9 +262,13 @@ export default class OctoPrintClient {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
     let printerCheck = false;
-    if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
-      printerCheck = printer.selectedFilament.every(function (e) {
-        return e !== null;
+    if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
+      if(printer.selectedFilament.length === 0){
+        printerCheck = true;
+      }
+      printerCheck = printer.selectedFilament.some(function (e) {
+        console.log(e)
+        return e === null
       });
     }
 
@@ -290,13 +294,12 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            // Make sure feed/flow are set before starting print...
-            return await OctoPrintClient.post(printer, "job", opts);
+            return OctoPrintClient.post(printer, "job", opts);
           }
         }
       });
     } else {
-      return await OctoPrintClient.post(printer, "job", opts);
+      return OctoPrintClient.post(printer, "job", opts);
     }
     if (element) {
       element.target.disabled = false;

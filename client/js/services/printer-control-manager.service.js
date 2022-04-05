@@ -5,6 +5,8 @@ import UI from "../utils/ui.js";
 import {createFilamentSelector} from "./filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
+import {fileActionStatusResponse} from "../pages/file-manager/file-manager.helpers";
+import {printActionStatusResponse} from "./octoprint/octoprint.helpers-commands";
 
 let currentIndex = 0;
 
@@ -890,7 +892,8 @@ export default class PrinterControlManagerService {
         command: "start"
       };
 
-      await OctoPrintClient.jobAction(currentPrinter, opts, e);
+     const { status } = await OctoPrintClient.jobAction(currentPrinter, opts, e);
+     printActionStatusResponse(status, "print")
     });
     elements.printerControls.printPause.addEventListener("click", async (e) => {
       e.target.disabled = true;
@@ -898,14 +901,16 @@ export default class PrinterControlManagerService {
         command: "pause",
         action: "pause"
       };
-      await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      const { status } = await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      printActionStatusResponse(status, "pause")
     });
     elements.printerControls.printRestart.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "restart"
       };
-      await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      const { status } = await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      printActionStatusResponse(status, "restart")
     });
     elements.printerControls.printResume.addEventListener("click", async (e) => {
       e.target.disabled = true;
@@ -913,7 +918,8 @@ export default class PrinterControlManagerService {
         command: "pause",
         action: "resume"
       };
-      await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      const { status } = await OctoPrintClient.jobAction(currentPrinter, opts, e);
+      printActionStatusResponse(status, "resume")
     });
     elements.printerControls.printStop.addEventListener("click", async (e) => {
       bootbox.confirm({
@@ -932,7 +938,8 @@ export default class PrinterControlManagerService {
             const opts = {
               command: "cancel"
             };
-            await OctoPrintClient.jobAction(currentPrinter, opts, e);
+            const { status } = await OctoPrintClient.jobAction(currentPrinter, opts, e);
+            printActionStatusResponse(status, "cancel")
           }
         }
       });
