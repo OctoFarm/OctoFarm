@@ -172,6 +172,11 @@ export function printerIsAvailableToView(printer){
     const { disabled } = printer;
 
     const {printerState: {colour: {category}}} = printer;
-    console.log(!(disabled || category === "Searching..."))
+
     return !(disabled || category === "Searching...");
+}
+export function printerIsDisconnectedOrError(printer){
+    const {printerState: {colour: {category}}} = printer;
+
+    return (category !== "Offline" && category === "Disconnected" || category === "Error!")
 }

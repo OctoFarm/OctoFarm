@@ -3,6 +3,7 @@ import UI from "../utils/ui";
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
+import {printerIsDisconnectedOrError, printerIsOnline} from "../utils/octofarm.utils";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -420,16 +421,10 @@ function addEventListeners(printer) {
 }
 
 function checkQuickConnectState(printer) {
-  const isDisabledOrOffline =
-    printer.printerState.colour.category === "Offline" ||
-    printer.printerState.colour.category === "Disabled" ||
-    printer.printerState.colour.category === "Searching...";
-
-  document.getElementById("printerSyncButton-"+printer._id).disabled = isDisabledOrOffline;
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
-    isDisabledOrOffline;
-  document.getElementById("printerManageDropDown-" + printer._id).disabled =
-    isDisabledOrOffline;
+  const isOnline = printerIsOnline(printer);
+  document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
+  document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
+  document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||
@@ -446,21 +441,17 @@ function checkQuickConnectState(printer) {
     ).disabled = true;
   }
 
-  if (
-    (printer.printerState.colour.category !== "Offline" &&
-    printer.printerState.colour.category === "Disconnected") ||
-    printer.printerState.colour.category === "Error!"
-  ) {
+  if(!isOnline){
     printerQuickDisconnected(printer._id);
-  } else if (
-    printer.printerState.colour.category !== "Offline" &&
-    printer.printerState.colour.category !== "Disconnected" &&
-    printer.printerState.colour.category !== "Error!"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
+    return;
   }
+
+  if(printerIsDisconnectedOrError(printer)) {
+    printerQuickDisconnected(printer._id);
+    return;
+  }
+
+  printerQuickConnected(printer._id);
 }
 
 function checkGroupQuickConnectState(printers) {
