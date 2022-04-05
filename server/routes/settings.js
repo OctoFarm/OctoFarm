@@ -202,7 +202,7 @@ router.post(
       statusTypeForUser: "error",
       message: ""
     };
-    const force = req.bodyBool;
+    const force = req.body;
     if (
       !force ||
       typeof force?.forcePull !== "boolean" ||
