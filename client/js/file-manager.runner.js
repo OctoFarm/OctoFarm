@@ -153,7 +153,6 @@ class Manager {
       const fileList = document.getElementById("fileBody");
       if (!!fileList) {
         fileList.innerHTML = "";
-        fileList.scrollTop = 0;
       }
 
       //Set old one deselected
@@ -219,7 +218,7 @@ class Manager {
       );
 
     const printer = await OctoFarmClient.getPrinter(id);
-    await FileManagerSortingService.loadSort(printer._id);
+    await FileManagerSortingService.loadSort(id);
     document.getElementById("backBtn").innerHTML =
       "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";
     const fileButtons = {

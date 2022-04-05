@@ -395,7 +395,7 @@ export default class FileManagerService {
           const deletedList = await OctoFarmClient.post("printers/nukeFiles", {
             id: printer._id
           });
-          console.log(deletedList)
+
           const prettyFolderList = [];
           const prettyFilesList = [];
           deletedList.deletedFiles.forEach(file => {

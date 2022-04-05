@@ -294,9 +294,9 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 66vh;
-  height: 66vh;
-  max-height: 66vh;
+  min-height: 60vh;
+  height: 60vh;
+  max-height: 60vh;
 }
 .fileBody p {
   margin-bottom: 0px !important;
@@ -543,7 +543,7 @@ label {
 }
 
 .modal-body {
-  max-height: 55vh;
+  max-height: 80vh;
   overflow-y: scroll;
 }
 
