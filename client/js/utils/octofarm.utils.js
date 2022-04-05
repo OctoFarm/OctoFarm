@@ -172,6 +172,6 @@ export function printerIsAvailableToView(printer){
     const { disabled } = printer;
 
     const {printerState: {colour: {category}}} = printer;
-
-    return (!disabled || category !== "Searching...");
+    console.log(!(disabled || category === "Searching..."))
+    return !(disabled || category === "Searching...");
 }

@@ -26,6 +26,7 @@ import PrinterTerminalManagerService from "../../services/printer-terminal-manag
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
+import {printerIsAvailableToView} from "../../utils/octofarm.utils";
 
 let elems = [];
 let groupElems = [];
@@ -1307,7 +1308,7 @@ export async function initMonitoring(printers, clientSettings, view) {
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
-        if (!printers[p].disabled) {
+        if (printerIsAvailableToView(printers[p])) {
           let printerPanel = document.getElementById("panel-" + printers[p]._id);
           if (!printerPanel) {
             if (view === "panel") {

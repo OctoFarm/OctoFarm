@@ -4,14 +4,11 @@ import {
   checkCameraState,
   imageOrCamera,
   checkGroupColumns,
-  isHidden, printerIsAvailableToView,
+  isHidden
 } from "../../utils/octofarm.utils";
 import { getPrinterNameBadge } from "../../templates/printer.templates"
 
 export function drawListView(printer, clientSettings) {
-  if(!printerIsAvailableToView(printer)){
-    return;
-  }
   const hidden = isHidden(printer, clientSettings);
   let toolList = "";
   let environment = "";
@@ -181,9 +178,6 @@ export function drawListView(printer, clientSettings) {
 }
 
 export function drawPanelView(printer, clientSettings) {
-  if(!printerIsAvailableToView(printer)){
-    return;
-  }
   const hidden = isHidden(printer, clientSettings);
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
@@ -377,9 +371,6 @@ export function drawPanelView(printer, clientSettings) {
 }
 
 export function drawCameraView(printer, clientSettings) {
-  if(!printerIsAvailableToView(printer)){
-    return;
-  }
   let hidden = isHidden(printer, clientSettings);
   if (printer.camURL === "") {
     hidden = "hidden";
@@ -580,9 +571,6 @@ export function drawCameraView(printer, clientSettings) {
 }
 
 export function drawCombinedView(printer, clientSettings) {
-  if(!printerIsAvailableToView(printer)){
-    return;
-  }
   const hidden = isHidden(printer, clientSettings);
 
   let cameraElement = imageOrCamera(printer);
@@ -929,9 +917,6 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
 
 export function drawGroupViewPrinters(printers, clientSettings) {
   printers.forEach((printer) => {
-    if(!printerIsAvailableToView(printer)){
-      return;
-    }
     if (printer.group !== "") {
       const cleanGroup = encodeURIComponent(printer.group);
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);

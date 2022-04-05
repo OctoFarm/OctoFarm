@@ -6,7 +6,7 @@ import { groupBy, mapValues } from "lodash";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
-      <div id="printerManageDropDown-${id}" class="btn-group">
+      <div id="printerManageDropDown-${id}" class="btn-group dropright">
          <button  
            title="Quickly connect/disconnect your printer"
            id="printerQuickConnect-${id}"
@@ -17,29 +17,33 @@ function returnActionBtnTemplate(id, webURL) {
         </button>
         <button title="Toggle your printers power"
               id="printerPowerToggle-${id}"
-              class="btn btn-outline-danger btn-sm d-none" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+              class="btn btn-outline-danger btn-sm" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
           <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
         </button>
         <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-            <h6 class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
+            <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
+             <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+            <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
             <button  
              title="Runs a pre-configured gcode sequence so you can detect which printer this is."
              id="printerFindMe-${id}"
              type="button"
              class="dropdown-item d-none"
+              disabled
           >
-              <i class="fas fa-search"></i> Find Printer!
+              <i class="fas fa-search text-info"></i> Find Printer!
           </button> 
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerPreHeat-${id}"
              type="button"
-         class="dropdown-item d-none"
+             class="dropdown-item d-none"
+              disabled
           >
-            <i class="fas fa-fire"></i> Pre-Heat
+            <i class="fas fa-fire text-warning"></i> Pre-Heat
           </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
           <a title="Open OctoPrint"
@@ -47,33 +51,24 @@ function returnActionBtnTemplate(id, webURL) {
                type="button"
                class="dropdown-item"
                target="_blank"
-               href="${webURL}" role="button"><i class="fas fa-globe-europe"></i> OctoPrint Web</a>
+               href="${webURL}" role="button"><i class="fas fa-globe-europe text-info"></i> OctoPrint Web</a>
             <button
                title="Terminate and reconnect OctoPrints Socket connection."
                id="printerSyncButton-${id}"
                type="button"
                class="dropdown-item"
             >
-                <i class="fas fa-sync"></i> Re-Connect Socket
+                <i class="fas fa-sync text-warning"></i> Re-Connect Socket
             </button> 
-          <h6 id="printerPowerDivider" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer Power</h6>
-          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Power On Printer</button>
-          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
-          <h6 id="octoPrintPowerDivider" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint Power</h6>
-          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
-          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
-          <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Wake Host</button>
-          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
+          <h6 id="octoPrintPowerDivider" class="dropdown-header"><i class="fab fa-octopus-deploy" disabled></i> OctoPrint</h6>
+          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
+          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
+          <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
+          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
 
         </div>
       </div>
   `;
-}
-
-export function printerWebBtn(id, webURL) {
-  return `
-
-    `;
 }
 
 function printerQuickConnected(id) {
