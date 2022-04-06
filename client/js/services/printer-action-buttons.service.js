@@ -74,14 +74,14 @@ function returnActionBtnTemplate(id, webURL) {
 
 function printerQuickConnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
   connectBtn.title = "Press to connect your printer!";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
   connectBtn.title = "Press to connect your printer!";
@@ -136,8 +136,7 @@ function addGroupEventListeners(printers) {
                 .getElementById("printerQuickConnect-" + currentGroupEncoded)
                 .classList.contains("btn-danger")
             ) {
-              for (let p = 0; p < groupedPrinters[key].length; p++) {
-                const printer = groupedPrinters[key][p];
+              for (const printer of groupedPrinters[key]) {
                 let data = {};
                 if (typeof printer.connectionOptions !== "undefined") {
                   data = {
@@ -152,8 +151,8 @@ function addGroupEventListeners(printers) {
                 } else {
                   UI.createAlert(
                     "warning",
-                    `${printer.printerName} has no preferences saved, defaulting to AUTO...`,
-                    8000,
+                    `${printer.printerName} has no preferences saved, defaulting to AUTO... OctoFarm has saved these connection preferences as default for you...`,
+                    10000,
                     "Clicked"
                   );
                   data.command = "connect";
@@ -206,8 +205,7 @@ function addGroupEventListeners(printers) {
                 },
                 callback: async function (result) {
                   if (result) {
-                    for (let p = 0; p < groupedPrinters[key].length; p++) {
-                      const printer = groupedPrinters[key][p];
+                    for (const printer of groupedPrinters[key]) {
                       let data = {
                         command: "disconnect",
                       };
@@ -252,8 +250,7 @@ function addGroupEventListeners(printers) {
           .getElementById(`printerSyncButton-${currentGroupEncoded}`)
           .addEventListener("click", async (e) => {
             e.target.disabled = true;
-            for (let p = 0; p < groupedPrinters[key].length; p++) {
-              const printer = groupedPrinters[key][p];
+            for (const printer of groupedPrinters[key]) {
               const data = {
                 id: printer._id,
               };
