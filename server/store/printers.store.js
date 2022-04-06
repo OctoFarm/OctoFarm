@@ -1005,12 +1005,14 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.files", data)
-      .then()
+    PrinterService.findOneAndPush(index, "fileList.fileList", data)
+      .then(() => {
+        printer.fileList.fileList.push(data);
+      })
       .catch((e) => {
         logger.error("Issue updating file list", e);
       });
-    printer.fileList.fileList.push(data);
+
 
     return printer;
   }
@@ -1032,9 +1034,11 @@ class PrinterStore {
       path,
       display
     };
-    printer.fileList.folderList.push(newFolder);
+
     PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
-      .then()
+      .then(() => {
+        printer.fileList.folderList.push(newFolder);
+      })
       .catch((e) => {
         logger.error("Issue updating file list", e);
       });

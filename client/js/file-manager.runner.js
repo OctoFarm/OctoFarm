@@ -6,12 +6,8 @@ import {createFilamentSelector} from "./services/filament-manager-plugin.service
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 import {allowedFileTypes} from "./constants/file-types.constants"
 
-
-import {createClientSSEWorker} from "./services/client-worker.service";
-import {eventsSSEHandler, eventsURL} from "./pages/file-manager/file-manager-sse.handler";
 import {printerIsOnline} from "./utils/octofarm.utils";
 
-createClientSSEWorker(eventsURL, eventsSSEHandler);
 
 let lastId = null;
 
@@ -29,7 +25,7 @@ class Manager {
     const printerList = document.getElementById("printerList");
     printerList.innerHTML = "";
 
-    const onlinePrinters = printers.every( printer => {
+    const onlinePrinters = printers.some(printer => {
       return printerIsOnline(printer);
     })
 
@@ -42,11 +38,10 @@ class Manager {
       return;
     }
 
-
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
-      if (printer.printerState.colour.category !== "Offline" || !printer.disabled && printer.printerState.colour.category !== "Searching...") {
+      if (printerIsOnline(printer)) {
         onlinePrinterList.push(printer);
       }
     });
@@ -69,7 +64,8 @@ class Manager {
       }
 
       let extruderList = "";
-      for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+
+      for (let i = 0; i < printer?.currentProfile?.extruder?.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
       }
 

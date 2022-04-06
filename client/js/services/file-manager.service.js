@@ -1212,6 +1212,8 @@ export class FileActions {
     });
     if (how) {
       refreshBtn.className = buttonSuccess;
+      const fileElem = getFileListElement(printer._id);
+      fileElem.innerHTML = "";
       await FileManagerSortingService.loadSort(printer._id);
     } else {
       refreshBtn.className = buttonFailed;

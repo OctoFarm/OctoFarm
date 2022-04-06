@@ -22,6 +22,7 @@ const {
   checkHighestSupportedOctoPrint,
   checkLowestSupportedOctoPrint
 } = require("../../utils/compatibility.utils");
+const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
 const { handleMessage } = require("../octoprint/octoprint-websocket-message.service");
@@ -29,8 +30,8 @@ const { PrinterTicker } = require("../printer-connection-log.service");
 const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
-const { join } = require("path");
-const { statSync } = require("fs");
+const { FileClean } = require("../file-cleaner.service");
+const { MESSAGE_TYPES } = require("../../constants/sse.constants")
 
 const logger = new Logger("OctoFarm-State");
 
@@ -380,7 +381,7 @@ class OctoPrintPrinter {
     if (!!fileList) {
       this.fileList = {
         fileList: fileList?.files ? fileList.files : fileList.fileList,
-        fileCount: fileList?.files ? fileList.files.length : fileList.fileList.length,
+        filecount: fileList?.files ? fileList.files.length : fileList.fileList.length,
         folderList: fileList?.folders ? fileList.folders : fileList.folderList,
         folderCount: fileList?.folders ? fileList.folders.length : fileList.folderList.length
       };
@@ -1473,7 +1474,7 @@ class OctoPrintPrinter {
       };
 
       const fileIndex = findIndex(this.fileList.fileList, function (o) {
-        return o.display === fileInformation.display;
+        return o.fullPath === fileInformation.fullPath;
       });
 
       this.fileList.fileList[fileIndex] = fileInformation;
@@ -1703,28 +1704,40 @@ class OctoPrintPrinter {
   }
 
   async updateFileInformation(data) {
-    // const { name, result } = data;
-    //
-    // const databaseRecord = await this.#db.get();
-    // console.log(name);
-    // const fileIndex = findIndex(databaseRecord.fileList.fileList, function (o) {
-    //   return o.name === name;
-    // });
-    //
-    // if (false) {
-    //   logger.debug("Updating file information with generated OctoPrint data", data);
-    //   console.log(result);
-    //   const { estimatedPrintTime, filament } = result;
-    //
-    //   databaseRecord.fileList.files[fileIndex] = {
-    //     ...estimatedPrintTime,
-    //     ...filament
-    //   };
-    //
-    //   this.#db.update(this._id, { fileList: databaseRecord.fileList });
-    // } else {
-    //   logger.error("Couldn't find file index to update!", name);
-    // }
+    const { result, path: fullPath } = data;
+    const fileIndex = findIndex(this.fileList.fileList, function (o) {
+      return o.fullPath === fullPath;
+    });
+
+    if (typeof fileIndex !== "undefined") {
+      logger.debug("Updating file information with generated OctoPrint data", data);
+      const { estimatedPrintTime, filament } = result;
+
+      const toolInfo = [];
+
+      if (!!estimatedPrintTime) {
+        this.fileList.fileList[fileIndex].time = estimatedPrintTime;
+      }
+      if (!!filament) {
+        Object.keys(filament).forEach(function (item, i) {
+          toolInfo[i] = filament[item].length;
+        });
+        this.fileList.fileList[fileIndex].length = toolInfo;
+      }
+
+      this.#db.update({ fileList: this.fileList });
+
+      notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
+        key: "fileInformationUpdated",
+        value: FileClean.generateSingle(
+          JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
+          this.selectedFilament,
+          this.costSettings
+        )
+      });
+    } else {
+      logger.error("updateFileInformation: Couldn't find file index to update!", fullPath);
+    }
   }
 
   updatePrinterStatistics(statistics) {
@@ -1836,7 +1849,6 @@ class OctoPrintPrinter {
         const fileIndex = findIndex(this.fileList.fileList, function (o) {
           return o.fullPath === path;
         });
-        console.log(fileIndex);
         this.fileList.fileList.splice(fileIndex, 1);
       } else {
         logger.error("Failed to delete file...", path);

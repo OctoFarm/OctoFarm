@@ -63,7 +63,6 @@ export const getFileTemplate = (file, printerURL, id) => {
   } else if (file.last === false) {
     bgColour = "bg-dark-failed";
   }
-  fileDate = `${dateString} ${timeString}`;
   return `
     <div
       id="file-${file.fullPath}"
@@ -110,10 +109,10 @@ export const getFileTemplate = (file, printerURL, id) => {
                   file.fullPath
                 }" class="date d-none"> ${
     file.uploadDate
-  }</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
-                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
+  }</span><span id="fileDate-${file.fullPath}"> ${dateString} ${timeString}</span><br>
+                <span class="size" id="fileSize-${
                   file.fullPath
-                }"> ${Calc.bytes(file.fileSize)}</span> <br>
+                }">${Calc.bytes(file.fileSize)}</span> <br>
             <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
               file.fullPath
             }"> ${toolInfo} </span>

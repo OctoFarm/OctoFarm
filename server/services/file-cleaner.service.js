@@ -122,7 +122,10 @@ class FileCleanerService {
           filamentLength: file.length,
           printCost: getPrintCostNumeric(file.time, printCost)
         };
-        sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+        sortedFile.toolUnits = FileCleanerService.getUnits(
+          selectedFilament,
+          sortedFile.filamentLength
+        );
         sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
         sortedFileList.push(sortedFile);
       }
@@ -158,8 +161,12 @@ class FileCleanerService {
       filamentLength: file.length,
       printCost: getPrintCostNumeric(file.time, costSettings)
     };
-    sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+    sortedFile.toolUnits = FileCleanerService.getUnits(
+        selectedFilament,
+        sortedFile.filamentLength
+    );
     sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
+
     return sortedFile;
   }
 

@@ -7,8 +7,9 @@ const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
 const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
-const { notifySubscribers } = require("../../server-side-events.service");
 const { MESSAGE_TYPES } = require("../../../constants/sse.constants");
+const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
+const { FileClean } = require("../../file-cleaner.service");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -62,14 +63,9 @@ const captureClientClosed = (id, data) => {
   if (!networkIpAddresses) networkIpAddresses = [];
   const { remoteAddress } = data;
 
-  let detectedAddress = "Socket was closed for: ";
-  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
-    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
-  } else if (!!remoteAddress) {
-    detectedAddress += parseOutIPAddress(remoteAddress);
-  } else {
-    detectedAddress += "Unknown IP";
-  }
+  const detectedAddress =
+    "Socket was closed for: " + matchRemoteAddressToOctoFarm(networkIpAddresses, remoteAddress);
+
   logger.warning(detectedAddress);
   tickerWrapper(id, "Info", detectedAddress);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "clientclosed", undefined)
@@ -87,14 +83,9 @@ const captureClientOpened = (id, data) => {
 
   const { remoteAddress } = data;
 
-  let detectedAddress = "Socket Opened for: ";
-  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
-    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
-  } else if (!!remoteAddress) {
-    detectedAddress += parseOutIPAddress(remoteAddress);
-  } else {
-    detectedAddress += "Unknown IP";
-  }
+  const detectedAddress =
+    "Socket Opened for: " + matchRemoteAddressToOctoFarm(networkIpAddresses, remoteAddress);
+
   logger.warning(detectedAddress);
   tickerWrapper(id, "Info", detectedAddress);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "clientopened", undefined)
@@ -114,6 +105,7 @@ const captureConnected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check connected script", e);
+      return e;
     });
 };
 const captureDisconnecting = (id, data) => {
@@ -124,6 +116,7 @@ const captureDisconnecting = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check disconnecting script", e);
+      return e;
     });
 };
 const captureDisconnected = (id, data) => {
@@ -134,6 +127,7 @@ const captureDisconnected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check disconnected script", e);
+      return e;
     });
 };
 const captureDwelling = (id, data) => {
@@ -144,6 +138,7 @@ const captureDwelling = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check dwelling script", e);
+      return e;
     });
 };
 const captureError = (id, data) => {
@@ -156,15 +151,10 @@ const captureError = (id, data) => {
   HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
     .then((res) => {
       logger.info("Successfully captured error", res);
-      setTimeout(function () {
-        // Register cancelled print...
-        setTimeout(function () {
-          console.log("Don't be empty ");
-        }, 5000);
-      }, 10000);
     })
     .catch((e) => {
       logger.error("Failed to capture error", e);
+      return e;
     });
 };
 const captureFileAdded = (id, data) => {
@@ -175,6 +165,7 @@ const captureFileAdded = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check file added script", e);
+      return e;
     });
 };
 const captureFileDeselected = (id, data) => {
@@ -185,6 +176,7 @@ const captureFileDeselected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check file deselected script", e);
+      return e;
     });
 };
 const captureFileRemoved = (id, data) => {
@@ -195,6 +187,7 @@ const captureFileRemoved = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check fil eremoved script", e);
+      return e;
     });
 };
 const captureFirmwareData = (id, data) => {
@@ -212,6 +205,7 @@ const captureFolderAdded = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check folder added script", e);
+      return e;
     });
 };
 const captureFolderRemoved = (id, data) => {
@@ -222,6 +216,7 @@ const captureFolderRemoved = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check folder removed script", e);
+      return e;
     });
 };
 const captureHome = (id, data) => {
@@ -232,24 +227,13 @@ const captureHome = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check homed script", e);
+      return e;
     });
 };
+
+//WTF Why is this returning a promise!?
 const captureMetadataAnalysisFinished = async (id, data) => {
   await getPrinterStoreCache().updateFileInformation(id, data);
-
-  const { name, result } = data;
-
-  const { estimatedPrintTime, filament } = result;
-
-  notifySubscribers(name, MESSAGE_TYPES.FILE_UPDATE, {
-    key: "fileTime",
-    value: estimatedPrintTime
-  });
-
-  notifySubscribers(name, MESSAGE_TYPES.FILE_UPDATE, {
-    key: "fileTool",
-    value: filament
-  });
 
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadatafinished", undefined)
     .then((res) => {
@@ -271,7 +255,8 @@ const captureMetadataAnalysisStarted = (id, data) => {
     });
 };
 const captureMetadataStatisticsUpdated = (id, data) => {
-  getPrinterStoreCache().updateFileInformation(id, data);
+  console.log("META DATA UPDATED", data)
+  //getPrinterStoreCache().updateFileInformation(id, data);
 
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadataupdated", undefined)
     .then((res) => {
