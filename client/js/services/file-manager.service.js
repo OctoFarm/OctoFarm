@@ -47,12 +47,23 @@ const handleUploadFromQueue = async (current, index) => {
     fileUploads.activate(index);
     const currentDate = new Date();
     let file = await current.upload(current);
+
     file = JSON.parse(file);
     file.index = current.index;
     file.uploadDate = currentDate.getTime() / 1000;
     fileUploads.remove();
     await OctoFarmClient.post("printers/newFiles", file);
-    await FileManagerSortingService.loadSort(current.index);
+
+    const currentFolder = document.getElementById("currentFolder").innerHTML;
+    const fileFolder = "local/"+file.files.local.path;
+
+    const currentPrinter = document.getElementById("currentPrinter").innerHTML;
+    const filePrinter = current.printerInfo.printerName;
+
+    if(fileFolder.includes(currentFolder) && currentPrinter.includes(filePrinter)){
+      await FileManagerSortingService.loadSort(current.index);
+    }
+
     const uploadsRemaining = document.getElementById("uploadsRemaining");
     if (uploadsRemaining) {
       uploadsRemaining.innerHTML = `${fileUploads.size()}`;
@@ -621,7 +632,10 @@ export default class FileManagerService {
   static updatePrinterFilesList(printer, recursive) {
     const { fileList } = printer;
     const fileElem = getFileListElement(printer._id);
-    fileElem.innerHTML = "";
+    if(fileElem){
+      fileElem.innerHTML = "";
+    }
+
     // Update page elements
     const currentFolder = FileManagerService.updatePrinterMetrics(
       printer._id,
