@@ -127,7 +127,6 @@ function checkIfPrinterHasEvents(printer){
   }
   UI.removeDisplayNoneFromElement(eventsAlerts);
   removeAlertsLog({ id: "printerEvents-" + printer._id });
-
 }
 
 function corsWarningCheck(printer) {

@@ -301,25 +301,59 @@ const capturePrintCancelling = (id, data) => {
       logger.error("Failed to check cancelling script", e);
     });
 };
+const capturePrintFailed = (id, data) => {
+  const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+    data,
+    getPrinterStoreCache().getPrinter(id)
+  );
+  HistoryCollection.capturePrint(
+    payloadData,
+    printer,
+    job,
+    files,
+    resendStats,
+    false
+  )
+    .then((res) => {
+      logger.info("Successfully captured failed print!", res);
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res._id)
+        .then((resScript) => {
+          logger.info("Successfully checked failed script", resScript);
+        })
+        .catch((e) => {
+          logger.error("Failed to check cancelled script", e);
+        });
+    })
+    .catch((e) => {
+      logger.error("Failed to capture print!", e);
+    });
+};
 const captureFinishedPrint = (id, data, success) => {
   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success)
+  const { _id } = HistoryCollection.capturePrint(
+    payloadData,
+    printer,
+    job,
+    files,
+    resendStats,
+    success
+  )
     .then((res) => {
       logger.info("Successfully captured print!", res);
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", res._id)
+        .then((resScript) => {
+          logger.info("Successfully print finished script", resScript);
+          return res;
+        })
+        .catch((e) => {
+          logger.error("Failed to check print finished script", e);
+        });
     })
     .catch((e) => {
       logger.error("Failed to capture print!", e);
-    });
-  ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "connected", undefined)
-    .then((res) => {
-      logger.info("Successfully checked connected script", res);
-      return res;
-    })
-    .catch((e) => {
-      logger.error("Failed to check connected script", e);
     });
 };
 const capturePrintPaused = (id) => {
@@ -463,6 +497,7 @@ module.exports = {
   capturePrintCancelled,
   capturePrintCancelling,
   captureFinishedPrint,
+  capturePrintFailed,
   capturePrintPaused,
   capturePrintStarted,
   capturePrinterStateChanged,

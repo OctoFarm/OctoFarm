@@ -49,7 +49,8 @@ const {
   captureUpload,
   captureUserLoggedIn,
   captureUserLoggedOut,
-  captureZChange
+  captureZChange,
+  capturePrintFailed
 } = require("./utils/octoprint-event.utils");
 const {
   captureKlipperPluginData,
@@ -248,8 +249,7 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintFailed:
-        // TODO Create a print failed event function
-        // capturePrint(printerID, payload, false);
+        capturePrintFailed(printerID, payload, false);
         break;
 
       case EVENT_TYPES.PrintPaused:
