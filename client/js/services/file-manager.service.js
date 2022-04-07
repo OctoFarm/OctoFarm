@@ -1173,7 +1173,7 @@ export class FileActions {
     };
     await OctoPrintClient.file(printer, filePath, "load", false);
     const ret = await OctoPrintClient.jobAction(printer, opts);
-    if (ret?.status === 200 || ret?.status === 201) {
+    if (ret?.status === 200 || ret?.status === 201 || ret?.status === 204) {
       UI.createAlert(
         "success",
         `${printer.printerName}: Successfully started printing ${filePath}`
