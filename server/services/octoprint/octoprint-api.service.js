@@ -53,6 +53,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
           REQUEST_KEYS.LAST_RESPONSE,
           ConnectionMonitorService.calculateTimer(startTime, endTime)
         );
+        return e;
       });
   }
 
@@ -86,7 +87,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         REQUEST_KEYS.LAST_RESPONSE,
         ConnectionMonitorService.calculateTimer(startTime, endTime)
       );
-      throw e;
+      return e;
     });
 }
 
@@ -115,9 +116,11 @@ class OctoprintApiService {
    */
   async getRetry(item) {
     try {
-      return await this.get(item);
+      return await this.get(item).catch(e => {
+        return e;
+      });
     } catch (e) {
-      logger.debug("Error with get request", e);
+      logger.http("Error with get request", e);
       switch (e.code) {
         case "ECONNREFUSED":
           ConnectionMonitorService.updateOrAddResponse(
@@ -125,28 +128,28 @@ class OctoprintApiService {
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 502;
+          return 502;
         case "ECONNRESET":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 461;
+          return 461;
         case "EHOSTUNREACH":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 404;
+          return 404;
         case "ENOTFOUND":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 404;
+          return 404;
         default:
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
@@ -170,14 +173,16 @@ class OctoprintApiService {
             );
             // Reset the timeout after failed...
             this.#currentTimeout = JSON.parse(JSON.stringify(this.timeout.apiTimeout));
-            throw 408;
+            return 408;
           }
           // Make sure to use the settings for api retry.
           this.#currentTimeout = this.#currentTimeout + 5000;
           logger.debug(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });
-          return this.getRetry(item);
+          return this.getRetry(item).catch(e => {
+            return e;
+          });
       }
     }
   }
@@ -210,7 +215,12 @@ class OctoprintApiService {
    */
   async delete(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "DELETE", this.apikey, timeout ? this.#currentTimeout : false).catch(e => {
+    return fetchApiTimeout(
+      url,
+      "DELETE",
+      this.apikey,
+      timeout ? this.#currentTimeout : false
+    ).catch((e) => {
       return e;
     });
   }
@@ -223,9 +233,11 @@ class OctoprintApiService {
    */
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false).catch(e => {
-      return e;
-    });
+    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false).catch(
+      (e) => {
+        return e;
+      }
+    );
   }
 
   /**
@@ -237,7 +249,7 @@ class OctoprintApiService {
    */
   patch(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data);
+    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data).catch(e => {return e;});
   }
 
   // /**

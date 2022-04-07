@@ -800,7 +800,7 @@ class OctoPrintPrinter {
     // Compare entered API key to settings API Key...
     this.#apiPrinterTickerWrap("Checking API key doesn't match global API key...", "Active");
     const globalAPIKeyCheck = await this.#api.getSettings(true).catch((e) => {
-      logger.http("Failed global API Key check", e);
+      logger.http("Failed to check global api key", e);
       return false;
     });
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
@@ -822,6 +822,7 @@ class OctoPrintPrinter {
       }
     } else {
       // Hard failure as can't setup websocket
+      logger.error("API key is global... cannot connect...")
       this.#apiPrinterTickerWrap("API key is global API key", "Offline");
       return false;
     }
