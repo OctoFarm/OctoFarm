@@ -118,7 +118,6 @@ async function ensureSystemSettingsInitiated() {
  */
 function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/amialive", require("./routes/SSE-amIAlive", { page: "route" }));
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", printerActionLimits, require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
@@ -128,9 +127,11 @@ function serveOctoFarmRoutes(app) {
   app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
   app.use("/system", require("./routes/system", { page: "route" }));
   app.use("/client", require("./routes/sorting", { page: "route" }));
-  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
-  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
-  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
+  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
+  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK - This may as well be an API call
+  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
+  app.use("/events", require("./routes/events.sse.js", { page: "route" }));
+
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
   }

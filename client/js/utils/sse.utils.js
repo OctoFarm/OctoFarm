@@ -1,7 +1,7 @@
 import {parse} from "flatted";
 
 export const asyncParse = async function (str) {
-  try {
+  try{
     return parse(str);
   } catch (e) {
     return false;

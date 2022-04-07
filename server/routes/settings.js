@@ -32,6 +32,7 @@ const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { sanitizeString } = require("../utils/sanitize-utils");
+const { databaseNamesList } = require("../constants/database.constants");
 
 module.exports = router;
 
@@ -70,7 +71,7 @@ router.delete(
   ensureAdministrator,
   async (req, res) => {
     try {
-      const deletedLogs = Logs.clearLogsOlderThan(1);
+      const deletedLogs = Logs.clearLogsOlderThan(5);
       res.send(deletedLogs);
     } catch (e) {
       logger.error("Failed to clear logs!", e);
@@ -103,7 +104,7 @@ router.post(
     // Will use in a future update to configure the dump.
     // let settings = req.body;
     // Generate the log package
-    let zipDumpResponse = {
+    const zipDumpResponse = {
       status: "error",
       msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
       zipDumpPath: ""
@@ -150,14 +151,16 @@ router.get(
       await ProfilesDB.deleteMany({});
       logger.info("Successfully deleted Filament database.... Restarting server...");
       await SystemCommands.rebootOctoFarm();
-    } else {
+    } else if (databaseNamesList.includes(databaseName)) {
       await eval(databaseName).deleteMany({});
-      res.send({
-        message: "Successfully deleted " + databaseName + ", server will restart..."
-      });
-      logger.info(databaseName + " successfully deleted.... Restarting server...");
-      await SystemCommands.rebootOctoFarm();
+    } else {
+      logger.error("Unknown DB Name", databaseName);
     }
+    res.send({
+      message: `Successfully deleted ${databaseName}, server will restart...`
+    });
+    logger.info(databaseName + " successfully deleted.... Restarting server...");
+    await SystemCommands.rebootOctoFarm();
   }
 );
 router.get(
@@ -168,11 +171,11 @@ router.get(
   async (req, res) => {
     const databaseName = req.paramString("databaseName");
     logger.info("Client requests export of " + databaseName);
-    let returnedObjects = [];
+    const returnedObjects = [];
     if (databaseName === "FilamentDB") {
       returnedObjects.push(await ProfilesDB.find({}));
       returnedObjects.push(await SpoolsDB.find({}));
-    } else {
+    } else if (databaseNamesList.includes(databaseName)) {
       returnedObjects.push(await eval(databaseName).find({}));
     }
     logger.info("Returning to client database object: " + databaseName);
@@ -199,7 +202,7 @@ router.post(
       statusTypeForUser: "error",
       message: ""
     };
-    let force = req.bodyBool;
+    const force = req.body;
     if (
       !force ||
       typeof force?.forcePull !== "boolean" ||
@@ -237,7 +240,7 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
   const currentUserList = await fetchUsers();
 
   // Patch to fill in user settings if it doesn't exist
-  for (let user of currentUserList) {
+  for (const user of currentUserList) {
     if (!user.clientSettings) {
       user.clientSettings = new ClientSettingsDB();
       user.clientSettings.save();
@@ -318,7 +321,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
-    let influx = sentOnline.influxExport;
+    const influx = sentOnline.influxExport;
     if (influx.active) {
       if (influx.host.length === 0) {
         shouldDisableInflux = true;
@@ -368,7 +371,7 @@ router.get(
   }
 );
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
-  let script = await GcodeDB.findById(req.bodyString("id"));
+  const script = await GcodeDB.findById(req.bodyString("id"));
   script.gcode = req.bodyString("gcode");
   script.name = req.bodyString("name");
   script.description = req.bodyString("description");
@@ -385,7 +388,7 @@ router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
 });
 
 router.post("/customGcode", ensureAuthenticated, async (req, res) => {
-  let newScript = req.body;
+  const newScript = req.body;
   const saveScript = new GcodeDB(newScript);
   saveScript
     .save()
@@ -403,7 +406,7 @@ router.get(
   async (req, res) => {
     const printerId = req.paramString("id");
     const all = await GcodeDB.find();
-    let returnCode = [];
+    const returnCode = [];
     all.forEach((script) => {
       if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
         returnCode.push(script);

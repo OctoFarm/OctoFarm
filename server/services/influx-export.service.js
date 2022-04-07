@@ -10,15 +10,12 @@ const logger = new Logger("OctoFarm-Server");
 let db = null;
 
 async function optionalInfluxDatabaseSetup() {
-  let serverSettings = await SettingsClean.returnSystemSettings();
-  if (typeof clientSettings === "undefined") {
+  let serverSettings = SettingsClean.returnSystemSettings();
+  if (!serverSettings) {
     await SettingsClean.start();
-    serverSettings = await SettingsClean.returnSystemSettings();
+    serverSettings = SettingsClean.returnSystemSettings();
   }
-  if (
-    typeof serverSettings.influxExport !== "undefined" &&
-    serverSettings.influxExport.active
-  ) {
+  if (serverSettings?.influxExport?.active) {
     let options = {
       username: serverSettings.influxExport.username,
       password: serverSettings.influxExport.password,
@@ -37,9 +34,7 @@ async function optionalInfluxDatabaseSetup() {
 async function checkDatabase(options) {
   const names = await db.getDatabaseNames();
   if (!names.includes(options.database)) {
-    logger.info(
-      "Cannot find database... creating new database: " + options.database
-    );
+    logger.info("Cannot find database... creating new database: " + options.database);
     await db.createDatabase(options.database);
     return "database created...: " + options.database;
   } else {
@@ -57,15 +52,15 @@ function writePoints(tags, measurement, dataPoints) {
         fields: dataPoints
       }
     ]).catch((err) => {
+      logger.error("Influx Tags", tags);
+      logger.error("Influx Measurement", measurement);
+      logger.error("Influx Datapoints", dataPoints);
       logger.error(`Error saving data to InfluxDB! ${err.stack}`);
     });
-  } else {
-    logger.error(`InfluxDB is null... ignoring until setup...`);
   }
 }
 
 module.exports = {
   optionalInfluxDatabaseSetup,
-  checkDatabase,
   writePoints
 };

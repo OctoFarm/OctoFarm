@@ -3,9 +3,9 @@ import UI from "../utils/ui";
 
 const customGcodeScripts = document.getElementById("customGcodeBtn");
 customGcodeScripts.addEventListener("click", async (e) => {
-  let customScripts = await OctoFarmClient.get("settings/customGcode");
+  const customScripts = await OctoFarmClient.get("settings/customGcode");
   //Draw Scripts
-  let scriptTable = document.getElementById("gcodeScriptTable");
+  const scriptTable = document.getElementById("gcodeScriptTable");
   scriptTable.innerHTML = "";
   customScripts.forEach((scripts) => {
     drawScriptTable(scripts);
@@ -15,30 +15,28 @@ const createNewScriptBtn = document.getElementById("createNewScriptBtn");
 
 async function newGcodeScript(newScript) {
   const keys = Object.keys(newScript);
-  let errors = [];
+  const errors = [];
   for (const key of keys) {
-    if (newScript["name"] === "") {
-      errors.push(key);
-    } else if (newScript["gcode"] === "") {
-      errors.push(key);
-    } else if (newScript["printerIds"].length === 0) {
+    if (newScript["name"] === "" || newScript["gcode"] === "" || newScript["printerIds"].length === 0) {
       errors.push(key);
     }
   }
 
   if (errors.length !== 0) {
-    if (errors.includes("printerIds"))
+    if (errors.includes("printerIds")) {
       UI.createAlert("error", "You need to select some printers!", 3000, "Clicked");
-    if (errors.includes("gcode") || errors.includes("name"))
+    }
+    if (errors.includes("gcode") || errors.includes("name")) {
       UI.createAlert(
         "error",
         "You need to fill in at least a name and some gcode ",
         3000,
         "Clicked"
       );
+    }
     return false;
   } else {
-    let lines = newScript.gcode.match(/[^\r\n]+/g);
+    const lines = newScript.gcode.match(/[^\r\n]+/g);
     newScript.gcode = lines.map(function (name) {
       if (!name.includes("=")) {
         return name.toLocaleUpperCase();
@@ -47,29 +45,18 @@ async function newGcodeScript(newScript) {
       }
     });
     if (newScript.id) {
-      let post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
+      const post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
       console.log(post);
-      // if (post.status === 200) {
-      //   post = await post.json();
-      // } else {
-      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
-      // }
     } else {
-      let post = await OctoFarmClient.post("settings/customGcode", newScript);
+      const post = await OctoFarmClient.post("settings/customGcode", newScript);
       console.log(post);
-      // if (post.status === 200) {
-      //   post = await post.json();
-      //   drawScriptTable(post);
-      // } else {
-      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
-      // }
     }
   }
   return true;
 }
 
 createNewScriptBtn.addEventListener("click", async (e) => {
-  let newScript = {
+  const newScript = {
     name: document.getElementById("gcodeScriptName").value,
     description: document.getElementById("gcodeScriptDescription").value,
     gcode: document.getElementById("gcodeScriptScript").value,
@@ -87,7 +74,7 @@ createNewScriptBtn.addEventListener("click", async (e) => {
 });
 
 async function drawScriptTable(scripts) {
-  let scriptTable = document.getElementById("gcodeScriptTable");
+  const scriptTable = document.getElementById("gcodeScriptTable");
   const printerList = await OctoFarmClient.listPrinters();
   const printerSelect = [];
   printerList.forEach((printer) => {
@@ -104,8 +91,8 @@ async function drawScriptTable(scripts) {
     `
              <tr id="scriptRow-${scripts._id}" >
                 <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
-                <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
-                <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled></input></td>
+                <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled/></td>
+                <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled/></td>
                 <td>            
                   <select class="custom-select" id="script_btn_colour_${scripts._id}" size="1" disabled>
                     <option value="success">Green</option>
@@ -145,13 +132,13 @@ async function drawScriptTable(scripts) {
   }
 
   if (!scripts?.printerIds || scripts.printerIds.length === 0) {
-    for (let i = 0; i < scriptPrinters.options.length; i++) {
-      scriptPrinters.options[i].selected = true;
+    for (const scriptOptions of scriptPrinters.options) {
+      scriptOptions.selected = true;
     }
   } else {
-    for (let i = 0; i < scriptPrinters.options.length; i++) {
-      if (scripts.printerIds.includes(scriptPrinters.options[i].value)) {
-        scriptPrinters.options[i].selected = true;
+    for (const scriptOptions of scriptPrinters.options) {
+      if (scripts.printerIds.includes(scriptOptions.value)) {
+        scriptOptions.selected = true;
       }
     }
   }
@@ -165,7 +152,7 @@ async function drawScriptTable(scripts) {
   const saveButton = document.getElementById(`saveScript-${scripts._id}`);
 
   document.getElementById("deleteScript-" + scripts._id).addEventListener("click", async (e) => {
-    let delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
+    const delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
     if (delt.status === 200) {
       UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked");
       document.getElementById("scriptRow-" + scripts._id).remove();
@@ -189,7 +176,7 @@ async function drawScriptTable(scripts) {
     saveButton.classList.toggle("d-none");
   });
   saveButton.addEventListener("click", async (e) => {
-    let newScript = {
+    const newScript = {
       id: scriptID.innerHTML,
       name: scriptName.value,
       description: scriptDesc.value,
@@ -198,7 +185,7 @@ async function drawScriptTable(scripts) {
       printerIds: Array.from(scriptPrinters.selectedOptions).map((v) => v.value)
     };
 
-    let save = await newGcodeScript(newScript);
+    const save = await newGcodeScript(newScript);
     if (save) {
       UI.setElementPlaceholderFromValue([scriptName, scriptDesc, scriptLines]);
       UI.disableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);

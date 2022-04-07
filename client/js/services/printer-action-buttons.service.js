@@ -2,11 +2,12 @@ import PrinterPowerService from "./printer-power-service.js";
 import UI from "../utils/ui";
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
-import {groupBy, mapValues} from "lodash";
+import { groupBy, mapValues } from "lodash";
+import {printerIsDisconnectedOrError, printerIsOnline} from "../utils/octofarm.utils";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
-      <div class="btn-group">
+      <div id="printerManageDropDown-${id}" class="btn-group dropright">
          <button  
            title="Quickly connect/disconnect your printer"
            id="printerQuickConnect-${id}"
@@ -17,63 +18,58 @@ function returnActionBtnTemplate(id, webURL) {
         </button>
         <button title="Toggle your printers power"
               id="printerPowerToggle-${id}"
-              class="btn btn-outline-danger btn-sm d-none" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+              class="btn btn-outline-danger btn-sm" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
           <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
         </button>
         <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-            <h6 class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
-            <a  
+            <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
+             <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+            <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
+            <button  
              title="Runs a pre-configured gcode sequence so you can detect which printer this is."
              id="printerFindMe-${id}"
              type="button"
              class="dropdown-item d-none"
+              disabled
           >
-              <i class="fas fa-search"></i> Find Printer!
-          </a> 
-          <a  
+              <i class="fas fa-search text-info"></i> Find Printer!
+          </button> 
+          <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerPreHeat-${id}"
              type="button"
-         class="dropdown-item d-none"
+             class="dropdown-item d-none"
+              disabled
           >
-            <i class="fas fa-fire"></i> Pre-Heat
-          </a> 
+            <i class="fas fa-fire text-warning"></i> Pre-Heat
+          </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
           <a title="Open OctoPrint"
                id="printerWeb-${id}"
                type="button"
                class="dropdown-item"
                target="_blank"
-               href="${webURL}" role="button"><i class="fas fa-globe-europe"></i> OctoPrint Web</a>
-            <a  
+               href="${webURL}" role="button"><i class="fas fa-globe-europe text-info"></i> OctoPrint Web</a>
+            <button
                title="Terminate and reconnect OctoPrints Socket connection."
                id="printerSyncButton-${id}"
                type="button"
                class="dropdown-item"
             >
-                <i class="fas fa-sync"></i> Re-Connect Socket
-            </a> 
-          <h6 id="printerPowerDivider" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer Power</h6>
-          <a id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Power On Printer</a>
-          <a id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Power Off Printer</a>
-          <h6 id="octoPrintPowerDivider" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint Power</h6>
-          <a id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-redo"></i> Restart OctoPrint</a>
-          <a id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-sync-alt"></i> Reboot Host</a>
-          <a id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Wake Host</a>
-          <a id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Shutdown Host</a>
+                <i class="fas fa-sync text-warning"></i> Re-Connect Socket
+            </button> 
+          <h6 id="octoPrintPowerDivider" class="dropdown-header"><i class="fab fa-octopus-deploy" disabled></i> OctoPrint</h6>
+          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
+          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
+          <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
+          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
 
         </div>
       </div>
   `;
-}
-
-export function printerWebBtn(id, webURL) {
-  return `
-
-    `;
 }
 
 function printerQuickConnected(id) {
@@ -95,17 +91,21 @@ function groupInit(printers) {
   printers.forEach((printer) => {
     if (printer.group !== "") {
       const cleanGroup = encodeURIComponent(printer.group);
-      const groupContainer = document.getElementById(`printerActionBtns-${cleanGroup}`);
-      const skipElement = document.getElementById(`printerQuickConnect-${cleanGroup}`);
+      const groupContainer = document.getElementById(
+        `printerActionBtns-${cleanGroup}`
+      );
+      const skipElement = document.getElementById(
+        `printerQuickConnect-${cleanGroup}`
+      );
       if (!skipElement) {
         groupContainer.innerHTML = `
         ${returnActionBtnTemplate(`${cleanGroup}`)}
       `;
       }
       if (
-        printer.currentConnection != null &&
-        printer.currentConnection.port != null &&
-        printer.printerState.colour.category != "Offline"
+        printer.currentConnection !== null &&
+        printer.currentConnection.port !== null &&
+        printer.printerState.colour.category !== "Offline" && printer.printerState.colour.category !== "Searching"
       ) {
         printerQuickConnected(cleanGroup);
       } else {
@@ -136,21 +136,23 @@ function addGroupEventListeners(printers) {
                 .getElementById("printerQuickConnect-" + currentGroupEncoded)
                 .classList.contains("btn-danger")
             ) {
-              for (let p = 0; p < groupedPrinters[key].length; p++) {
-                const printer = groupedPrinters[key][p];
+              for (const printer of groupedPrinters[key]) {
                 let data = {};
                 if (typeof printer.connectionOptions !== "undefined") {
                   data = {
                     command: "connect",
                     port: printer.connectionOptions.portPreference,
-                    baudrate: parseInt(printer.connectionOptions.baudratePreference),
-                    printerProfile: printer.connectionOptions.printerProfilePreference
+                    baudrate: parseInt(
+                      printer.connectionOptions.baudratePreference
+                    ),
+                    printerProfile:
+                      printer.connectionOptions.printerProfilePreference,
                   };
                 } else {
                   UI.createAlert(
                     "warning",
-                    `${printer.printerName} has no preferences saved, defaulting to AUTO...`,
-                    8000,
+                    `${printer.printerName} has no preferences saved, defaulting to AUTO... OctoFarm has saved these connection preferences as default for you...`,
+                    10000,
                     "Clicked"
                   );
                   data.command = "connect";
@@ -158,7 +160,11 @@ function addGroupEventListeners(printers) {
                   data.baudrate = 0;
                   data.printerProfile = "_default";
                 }
-                let post = await OctoPrintClient.post(printer, "connection", data);
+                let post = await OctoPrintClient.post(
+                  printer,
+                  "connection",
+                  data
+                );
                 if (typeof post !== "undefined") {
                   if (post.status === 204) {
                     UI.createAlert(
@@ -190,21 +196,24 @@ function addGroupEventListeners(printers) {
                 buttons: {
                   confirm: {
                     label: "Yes",
-                    className: "btn-success"
+                    className: "btn-success",
                   },
                   cancel: {
                     label: "No",
-                    className: "btn-danger"
-                  }
+                    className: "btn-danger",
+                  },
                 },
                 callback: async function (result) {
                   if (result) {
-                    for (let p = 0; p < groupedPrinters[key].length; p++) {
-                      const printer = groupedPrinters[key][p];
+                    for (const printer of groupedPrinters[key]) {
                       let data = {
-                        command: "disconnect"
+                        command: "disconnect",
                       };
-                      let post = await OctoPrintClient.post(printer, "connection", data);
+                      let post = await OctoPrintClient.post(
+                        printer,
+                        "connection",
+                        data
+                      );
                       if (typeof post !== "undefined") {
                         if (post.status === 204) {
                           UI.createAlert(
@@ -231,7 +240,7 @@ function addGroupEventListeners(printers) {
                       }
                     }
                   }
-                }
+                },
               });
             }
           });
@@ -241,12 +250,14 @@ function addGroupEventListeners(printers) {
           .getElementById(`printerSyncButton-${currentGroupEncoded}`)
           .addEventListener("click", async (e) => {
             e.target.disabled = true;
-            for (let p = 0; p < groupedPrinters[key].length; p++) {
-              const printer = groupedPrinters[key][p];
+            for (const printer of groupedPrinters[key]) {
               const data = {
-                id: printer._id
+                id: printer._id,
               };
-              let post = await OctoFarmClient.post("printers/reSyncSockets", data);
+              let post = await OctoFarmClient.post(
+                "printers/reSyncSockets",
+                data
+              );
               if (post.msg.status !== "error") {
                 UI.createAlert(
                   "success",
@@ -255,7 +266,12 @@ function addGroupEventListeners(printers) {
                   "clicked"
                 );
               } else {
-                UI.createAlert("error", printer.printerName + ": " + post.msg.msg, 3000, "clicked");
+                UI.createAlert(
+                  "error",
+                  printer.printerName + ": " + post.msg.msg,
+                  3000,
+                  "clicked"
+                );
               }
             }
             e.target.disabled = false;
@@ -269,20 +285,8 @@ function init(printer, element) {
   document.getElementById(element).innerHTML = `
     ${returnActionBtnTemplate(printer._id, printer.printerURL)}
   `;
-  PrinterPowerService.applyBtn(printer);
-  if (
-    printer.currentConnection != null &&
-    printer.currentConnection.port != null &&
-    printer.printerState.colour.category != "Offline"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
-  }
-  document.getElementById("printerQuickConnect-" + printer._id).disabled =
-    printer.printerState.colour.category === "Offline";
-
-  document.getElementById("printerWeb-" + printer._id).href = printer.printerURL;
+  // PrinterPowerService.applyBtn(printer);
+  checkQuickConnectState(printer);
 
   addEventListeners(printer);
 }
@@ -304,7 +308,7 @@ function addEventListeners(printer) {
             command: "connect",
             port: printer.connectionOptions.portPreference,
             baudrate: parseInt(printer.connectionOptions.baudratePreference),
-            printerProfile: printer.connectionOptions.printerProfilePreference
+            printerProfile: printer.connectionOptions.printerProfilePreference,
           };
         } else {
           UI.createAlert(
@@ -349,19 +353,23 @@ function addEventListeners(printer) {
           buttons: {
             confirm: {
               label: "Yes",
-              className: "btn-success"
+              className: "btn-success",
             },
             cancel: {
               label: "No",
-              className: "btn-danger"
-            }
+              className: "btn-danger",
+            },
           },
           callback: async function (result) {
             if (result) {
               let data = {
-                command: "disconnect"
+                command: "disconnect",
               };
-              let post = await OctoPrintClient.post(printer, "connection", data);
+              let post = await OctoPrintClient.post(
+                printer,
+                "connection",
+                data
+              );
               if (typeof post !== "undefined") {
                 if (post.status === 204) {
                   UI.createAlert(
@@ -387,7 +395,7 @@ function addEventListeners(printer) {
                 );
               }
             }
-          }
+          },
         });
       }
     });
@@ -397,7 +405,7 @@ function addEventListeners(printer) {
     .addEventListener("click", async (e) => {
       e.target.disabled = true;
       const data = {
-        id: printer._id
+        id: printer._id,
       };
       let post = await OctoFarmClient.post("printers/reSyncSockets", data);
       if (post.status !== "error") {
@@ -410,39 +418,37 @@ function addEventListeners(printer) {
 }
 
 function checkQuickConnectState(printer) {
-  const isDisabledOrOffline =
-    printer.printerState.colour.category === "Offline" ||
-    printer.printerState.colour.category === "Disabled";
-  document.getElementById("printerQuickConnect-" + printer._id).disabled = isDisabledOrOffline;
-
-  document.getElementById("printerSyncButton-" + printer._id).disabled = isDisabledOrOffline;
+  const isOnline = printerIsOnline(printer);
+  document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
+  document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
+  document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||
       printer.connectionOptions.baudratePreference === null ||
       printer.connectionOptions.printerProfilePreference === null
     ) {
-      document.getElementById("printerQuickConnect-" + printer._id).disabled = true;
+      document.getElementById(
+        "printerQuickConnect-" + printer._id
+      ).disabled = true;
     }
   } else {
-    document.getElementById("printerQuickConnect-" + printer._id).disabled = true;
+    document.getElementById(
+      "printerQuickConnect-" + printer._id
+    ).disabled = true;
   }
 
-  if (
-    (printer.printerState.colour.category !== "Offline" &&
-      printer.printerState.colour.category === "Disconnected") ||
-    printer.printerState.colour.category === "Error!"
-  ) {
+  if(!isOnline){
     printerQuickDisconnected(printer._id);
-  } else if (
-    printer.printerState.colour.category !== "Offline" &&
-    printer.printerState.colour.category !== "Disconnected" &&
-    !printer.printerState.colour.category !== "Error!"
-  ) {
-    printerQuickConnected(printer._id);
-  } else {
-    printerQuickDisconnected(printer._id);
+    return;
   }
+
+  if(printerIsDisconnectedOrError(printer)) {
+    printerQuickDisconnected(printer._id);
+    return;
+  }
+
+  printerQuickConnected(printer._id);
 }
 
 function checkGroupQuickConnectState(printers) {
@@ -455,7 +461,9 @@ function checkGroupQuickConnectState(printers) {
           (obj) => obj.printerState.colour.category === "Offline"
         ).length;
         if (offlinePrinters > 0) {
-          document.getElementById("printerQuickConnect-" + currentGroupEncoded).disabled = true;
+          document.getElementById(
+            "printerQuickConnect-" + currentGroupEncoded
+          ).disabled = true;
         }
         const noConnectionOptions = groupedPrinters[key].filter(
           (obj) =>
@@ -464,7 +472,9 @@ function checkGroupQuickConnectState(printers) {
             obj?.connectionOptions?.printerProfilePreference === null
         ).length;
         if (noConnectionOptions > 0) {
-          document.getElementById("printerQuickConnect-" + currentGroupEncoded).disabled = true;
+          document.getElementById(
+            "printerQuickConnect-" + currentGroupEncoded
+          ).disabled = true;
         }
         const disconnectedOrError = groupedPrinters[key].filter(
           (obj) =>
@@ -496,5 +506,5 @@ export {
   printerQuickConnected,
   printerQuickDisconnected,
   checkQuickConnectState,
-  checkGroupQuickConnectState
+  checkGroupQuickConnectState,
 };

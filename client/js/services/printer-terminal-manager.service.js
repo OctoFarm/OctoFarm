@@ -3,7 +3,7 @@ import OctoFarmClient from "./octofarm-client.service";
 import UI from "../utils/ui.js";
 import {returnDropDown} from "./filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./client-modal.service";
+import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 
 let currentIndex = 0;
 

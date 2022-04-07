@@ -74,6 +74,27 @@ export function workerEventFunction(data) {
   }
 }
 
+export async function loadPrintersRegisteredEvents(id){
+  const printerEvents = await OctoFarmClient.get("printers/events/"+id)
+  const printerEventsContent = document.getElementById("printerEventsList");
+
+  printerEventsContent.innerHTML = "";
+
+  printerEvents.forEach((event) => {
+    printerEventsContent.insertAdjacentHTML("beforeend", `
+      <div class="card text-white bg-info mb-3">
+        <div class="card-header"><i class="${event.icon}"></i> ${event.name}</div>
+        <div class="card-body">
+          <p class="card-text">${event.description}</p>
+          <small class="card-text">Fires: ${event.amount}</small><br>
+          <small class="card-text">Related Setting: ${event.relatedSettings}</small>
+        </div>
+      </div>
+    `)
+  })
+
+}
+
 export async function scanNetworkForDevices(e) {
   e.target.disabled = true;
   UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);

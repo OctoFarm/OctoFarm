@@ -33,7 +33,7 @@
     "@babel/plugin-transform-runtime": "^7.13.9",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.14.1",
-    "apexcharts": "^3.24.0",
+    "apexcharts": "^3.23.1",
     "axios": "^0.21.1",
     "babel-jest": "^26.6.3",
     "before-build-webpack": "^0.2.11",

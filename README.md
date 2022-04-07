@@ -1,14 +1,13 @@
-[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/octofarm/octofarm?style=for-the-badge&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
-![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=for-the-badge)
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/octofarm/octofarm/latest/total?style=for-the-badge)
-[![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/network)
-
-[![GitHub license](https://img.shields.io/github/license/octofarm/octofarm?style=for-the-badge)](https://github.com/NotExpectedYet/octofarm/blob/master/LICENSE.txt)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/octofarm/octofarm/ci?style=for-the-badge)
-![GitHub issues](https://img.shields.io/github/issues/octofarm/octofarm?color=green&style=for-the-badge)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://GitHub.com/octofarm/octofarm/graphs/commit-activity)
-[![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=for-the-badge)](https://hub.docker.com/r/octofarm/octofarm)
+[comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/octofarm/octofarm?style=appveyor&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
+![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/octofarm/octofarm/latest/total?style=appveyor)
+[![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/network)
+[![GitHub license](https://img.shields.io/github/license/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/octofarm/blob/master/LICENSE.txt)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/octofarm/octofarm/ci?style=appveyor)
+![GitHub issues](https://img.shields.io/github/issues/octofarm/octofarm?color=green&style=appveyor)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=appveyor)](https://GitHub.com/octofarm/octofarm/graphs/commit-activity)
+[![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=appveyor)](https://hub.docker.com/r/octofarm/octofarm)
 
 # OctoFarm [![Latest Release](https://img.shields.io/github/release/octofarm/octofarm)](https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date)
 <div align="center">
@@ -17,9 +16,9 @@
   </a>
 
   <p align="center">
-    OctoFarm is an easy to setup and install web server and client for unifying multiple instances of Octoprint. <br/>You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
+    OctoFarm is an easy to setup and install web server and client for creating a single pane of glass for all of your OctoPrint instances. <br/>You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
     <br />
-    <a href="https://github.com/NotExpectedYet/OctoFarm/wiki"><strong>Explore the docs »</strong></a>
+    <a href="https://docs.octofarm.net"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarm Bug</a>
@@ -30,7 +29,6 @@
 
 ## Table of Contents
 - [About the Project](#about-the-project)
-- [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [License](#license)
 - [Contact](#contact)
@@ -43,89 +41,53 @@ it will scan and keep you up to date on the status of your printers.
 
 ![OctoFarm Dashboard][DashboardScreenshot]
 
-## Prerequisites
-
-In order to have OctoFarm running using a local installation of NodeJS and MongoDB as database, please be aware of the following minimum version requirements:
-- [MongoDB](https://www.mongodb.com/) - v3.6+ (Latest test: V4.4)
-- [NodeJS](https://nodejs.org/) - v14.0.0 (Latest tested: v14.16.1)
-- [NPM](https://www.npmjs.com/) - v6.10.0+ (Latest tested: v7.17.0)
-- [OctoPrint](https://octoprint.org) - v1.4.2+ (Tested with: 1.4.2, 1.5.3, 1.6.1, 1.7.1)
-
-### OS / Platform for OctoFarm
-Confirmed working on:
-- Windows 10/11 (direct or with chocolatey)
-> Find the chocolatey package here: https://community.chocolatey.org/packages/octofarm 
-> This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2  
-- Linux (Ubuntu, Debian)
-- FarmPi (Raspberry Pi 3A+ or newer)
-> Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
-
-Should also work on but not tested:
-- MacOS
-- _Anything else NodeJS 14+ will run on._
-
-Avoid the following, known to be tough to get working: 
-- Raspberry Pi OS - go for the **FarmPi Ubuntu** image instead (https://github.com/mkevenaar/FarmPi/releases/latest)!
-
-_Note_: Raspberry Pi's OS must be the 64-bit version to work. Both the docker containers as well as direct install is hard to get working. The docker containers seem to fail on wrong architecture and direct install fails on a 64 bits MongoDB requirement. 
-
-### Important note OctoPrint 1.4.1+
-
-<span style="color:red">Do not use the **Global API Key!**</span><br/>
-<span style="color:lime">Generate an **Application** or **User API Key!**</span><br/>
-
-OctoPrint WebSocket connection **will fail** when providing the **Global API** Key and **OctoFarm will therefore not accept this type of OctoPrint key**. You must generate an **Application Key** or **User API key** from your OctoPrint account. Your logged in user requires the groups **Admin** and **Operator** (or simply all permissions), or we cannot guarantee a 100% succesful OctoFarm experience.
-
-### Preparing OctoPrint User API Key / Application Key
-
-Follow all these steps **on the specific OctoPrint website**:
-- User Name -> User Settings
-- Copy the **User API Key** (or alternatively **Application Key** in System Settings, **but never the Global API Key!**)
-- Enable the Allow Cross Origin Resource Sharing (CORS) setting
-- Restart OctoPrint
-- Repeat for all OctoPrints that will be added to the Farm
-
 ## Getting Started
+Before installing it is best to read the getting started documents here:
+[Getting Started](https://docs.octofarm.net/getting-started/)
+
+### Production Installation.
 Please choose the direct NodeJS installation or the Docker image.
 1) Installing OctoFarm - read the following: [OctoFarm.net installation instructions](https://octofarm.net/installation) 
-2) Docker image(s) [docker or docker-compose usage instructions](./docs/USING_DOCKER.md)
+2) Docker image(s) [docker or docker-compose usage instructions](https://docs.octofarm.net/installation/install-docker)
 3) Installation for Development (Node 14+, Nodemon)
 
-### Development Installation for the server.
-_This is for devs or testers only! It is not practical to use `nodemon` for normal usage as `nodemon` does not add a service like `pm2` (option 1) or `docker` (option 1 and 2). Please, if you are a normal user, check out [OctoFarm.net installation instructions](https://octofarm.net/installation) instead!_
-
+### Development Installation
 1. Clone the OctoFarm
 
 ```sh
 git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```
 
-2. Install NPM packages
+2. Install package dependencies
 
 ```sh
-npm server-install
+npm run setup-dev
 ```
 
-3. Start the server
+3. Create an `.env` file in the OctoFarm folder's root directory. e.g. `OctoFarm/.env`.
+Paste in the contents below.
+```dotenv
+NODE_ENV=development
+MONGO=mongodb://127.0.0.1:27017/octofarm
+OCTOFARM_PORT=4000
+```
+
+4. Build the latest client
+```sh
+npm run build-client
+```
+
+5. (Optional): Watch for client changes
+```sh
+npm run dev-client
+```
+
+7. Start the server
 
 ```sh
 npm run server-dev
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
-
-### Development Installation for the client.
-_If your making changes to the client then you will need to build this manually._
-
-1. Install NPM packages
-
-```sh
-npm client-install
-```
-
-2. Start the client development file watcher
-```sh
-npm run client-dev
-```
 
 ## License
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.

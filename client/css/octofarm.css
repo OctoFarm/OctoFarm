@@ -59,6 +59,11 @@ textarea{
   font-family: monospace;
 }
 
+.highlight-glow {
+  border-color: #FF0000;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 0, 0, 0.6);
+}
+
 
 .restricScreenSize {
   margin: 0 auto;
@@ -255,10 +260,7 @@ a.notyet {
 /* CUSTOM CLASSES */
 /* Dashboard */
 [class*="col-"] {
-  padding-top: 4px;
-  padding-right: 4px;
-  padding-left: 4px;
-  padding-bottom: 4px;
+  padding: 4px;
 }
 .card {
   margin: 5px;
@@ -292,9 +294,9 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 65vh;
-  height: 65vh;
-  max-height: 65vh;
+  min-height: 60vh;
+  height: 60vh;
+  max-height: 60vh;
 }
 .fileBody p {
   margin-bottom: 0px !important;
@@ -540,6 +542,17 @@ label {
   z-index: -1;
 }
 
+.modal-dialog {
+  margin-bottom: 0 !important;
+}
+
+.modal-body {
+  min-height: 80vh;
+  height: 80vh;
+  max-height: 80vh;
+  overflow-y: scroll;
+}
+
 .sortableList {
   cursor: move;
 }
@@ -567,7 +580,7 @@ label {
   .sticky-table {
     min-width:100px;
     position: sticky;
-    top: 40px;
+    top: 0px;
     z-index: 1000;
   }
 
@@ -580,7 +593,7 @@ label {
   .sticky-table {
     min-width:100px;
     position: sticky;
-    top: 40px;
+    top: 0;
     z-index: 1000;
   }
 }

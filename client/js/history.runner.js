@@ -1206,7 +1206,7 @@ class History {
       upDate = `${upDate.toLocaleDateString()} ${upDate.toLocaleTimeString()}`;
       uploadDate.value = upDate;
       path.value = current.file.path;
-      size.value = Calc.bytes(current.file.size);
+      size.value = Calc.bytes(current.file.size).replace("<i class=\"fas fa-hdd\"></i> ", "");
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];

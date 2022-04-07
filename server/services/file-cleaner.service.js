@@ -29,7 +29,14 @@ class FileCleanerService {
     const folderCount = [];
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
     for (let p = 0; p < farmPrinters.length; p++) {
-      const printer = farmPrinters[p];
+      let printer = farmPrinters[p];
+      let fileList = JSON.parse(JSON.stringify(printer.fileList));
+      fileList = FileCleanerService.generate(
+        fileList,
+        printer.selectedFilament,
+        printer.costSettings
+      );
+
       if (!!printer.storage) {
         const device = {
           ip: printer.printerURL,
@@ -38,9 +45,9 @@ class FileCleanerService {
         };
         devices.push(device);
       }
-      if (!!printer.fileList) {
-        for (let i = 0; i < printer.fileList.fileList.length; i++) {
-          const file = printer.fileList.fileList[i];
+      if (!!fileList) {
+        for (let i = 0; i < fileList?.fileList?.length; i++) {
+          const file = fileList.fileList[i];
 
           if (!isNaN(file.fileSize)) {
             fileSizes.push(file.fileSize);
@@ -96,8 +103,8 @@ class FileCleanerService {
 
     const printCost = costSettings;
     const sortedFileList = [];
-    if (!!fileList?.files) {
-      for (let file of fileList.files) {
+    if (!!fileList?.fileList) {
+      for (let file of fileList.fileList) {
         const sortedFile = {
           path: file.path,
           fullPath: file.fullPath,
@@ -115,22 +122,25 @@ class FileCleanerService {
           filamentLength: file.length,
           printCost: getPrintCostNumeric(file.time, printCost)
         };
-        sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+        sortedFile.toolUnits = FileCleanerService.getUnits(
+          selectedFilament,
+          sortedFile.filamentLength
+        );
         sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
         sortedFileList.push(sortedFile);
       }
     }
     return {
       fileList: sortedFileList,
-      filecount: fileList.fileCount || 0,
-      folderList: fileList.folders || [],
-      folderCount: fileList.folderCount || 0
+      filecount: sortedFileList.length || 0,
+      folderList: fileList?.folderList || [],
+      folderCount: fileList?.folderList.length || 0
     };
   }
 
   static generateSingle(file, selectedFilament, costSettings) {
     if (!file) {
-      logger.error("Printer File Cleaner failed: farmPrinter:fileList not defined.");
+      logger.error("Printer File Cleaner failed: file not defined.");
       return;
     }
 
@@ -151,8 +161,12 @@ class FileCleanerService {
       filamentLength: file.length,
       printCost: getPrintCostNumeric(file.time, costSettings)
     };
-    sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, file.length);
+    sortedFile.toolUnits = FileCleanerService.getUnits(
+        selectedFilament,
+        sortedFile.filamentLength
+    );
     sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
+
     return sortedFile;
   }
 
@@ -245,6 +259,18 @@ class FileCleanerService {
     const totalCost = costArray.reduce((a, b) => a + b, 0);
     strings.unshift(totalCost.toFixed(2));
     return strings;
+  }
+
+  static listFilesOlderThanX(fileList, days) {
+    const today = new Date();
+    today.setDate(today.getDate() - days);
+    const deleteList = [];
+    for (const file of fileList) {
+      if (new Date(file.date * 1000) < today) {
+        deleteList.push(file.fullPath);
+      }
+    }
+    return deleteList;
   }
 }
 

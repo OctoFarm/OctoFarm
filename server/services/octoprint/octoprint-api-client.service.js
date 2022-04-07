@@ -5,7 +5,7 @@ const { OctoprintApiService } = require("./octoprint-api.service");
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
-const apiFile = (path) => apiBase + "/files/local/" + path;
+const apiFile = (path) => apiBase + "/files/local/" + encodeURI(path);
 const apiFiles = (recursive = true) => apiBase + "/files?recursive=" + recursive;
 const apiConnection = apiBase + "/connection";
 const apiPrinterProfiles = apiBase + "/printerprofiles";
@@ -41,23 +41,39 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async postPrinter(route, data, timeout = false) {
-    return await super.post(route, data, timeout);
+    return super.post(route, data, timeout).catch((e) => {
+      return e;
+    });
+  }
+
+  async deletePrinter(route, timeout = false) {
+    return super.delete(route, timeout).catch((e) => {
+      return e;
+    });
   }
 
   async getWithOptionalRetry(route, retry = false) {
     if (retry) {
-      return await this.getRetry(route);
+      return this.getRetry(route).catch((e) => {
+        return e;
+      });
     } else {
-      return await this.get(route);
+      return this.get(route).catch((e) => {
+        return e;
+      });
     }
   }
 
   async getSettings(retry = false) {
-    return await this.getWithOptionalRetry(apiSettingsPart, retry);
+    return this.getWithOptionalRetry(apiSettingsPart, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getVersion(retry = false) {
-    return await this.getWithOptionalRetry(apiVersion, retry);
+    return this.getWithOptionalRetry(apiVersion, retry).catch((e) => {
+      return e;
+    });
   }
 
   /**
@@ -68,7 +84,9 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFiles(recursive = false, retry = false) {
-    return await this.getWithOptionalRetry(apiFiles(recursive), retry);
+    return this.getWithOptionalRetry(apiFiles(recursive), retry).catch((e) => {
+      return e;
+    });
   }
 
   /**
@@ -79,15 +97,27 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFile(path, retry = false) {
-    return await this.getWithOptionalRetry(apiFile(path), retry);
+    return this.getWithOptionalRetry(apiFile(path), retry).catch((e) => {
+      return e;
+    });
+  }
+
+  async deleteFile(path) {
+    return this.deletePrinter(apiFile(path)).catch((e) => {
+      return e;
+    });
   }
 
   async getConnection(retry = false) {
-    return await this.getWithOptionalRetry(apiConnection, retry);
+    return this.getWithOptionalRetry(apiConnection, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getPrinterProfiles(retry = false) {
-    return await this.getWithOptionalRetry(apiPrinterProfiles, retry);
+    return this.getWithOptionalRetry(apiPrinterProfiles, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getPluginManager(retry = false, octoPrintVersion = undefined) {
@@ -95,27 +125,39 @@ class OctoprintApiClientService extends OctoprintApiService {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
-    return await this.getWithOptionalRetry(route, retry);
+    return this.getWithOptionalRetry(route, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getSystemInfo(retry = false) {
-    return await this.getWithOptionalRetry(apiSystemInfo, retry);
+    return this.getWithOptionalRetry(apiSystemInfo, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getSystemCommands(retry = false) {
-    return await this.getWithOptionalRetry(apiSystemCommands, retry);
+    return this.getWithOptionalRetry(apiSystemCommands, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getSoftwareUpdateCheck(force, retry = false) {
-    return await this.getWithOptionalRetry(apiSoftwareUpdateCheck(force), retry);
+    return this.getWithOptionalRetry(apiSoftwareUpdateCheck(force), retry).catch((e) => {
+      return e;
+    });
   }
 
   async getUsers(retry = false) {
-    return await this.getWithOptionalRetry(apiUsers, retry);
+    return this.getWithOptionalRetry(apiUsers, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getPluginPiSupport(retry = false) {
-    return await this.getWithOptionalRetry(apiPluginPiSupport, retry);
+    return this.getWithOptionalRetry(apiPluginPiSupport, retry).catch((e) => {
+      return e;
+    });
   }
 
   async getPluginFilamentManagerFilament(filamentID) {
@@ -126,30 +168,33 @@ class OctoprintApiClientService extends OctoprintApiService {
       throw OPClientErrors.filamentIDNotANumber;
     }
     const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
-    return await this.getWithOptionalRetry(getURL, false);
+    return this.getWithOptionalRetry(getURL, false).catch((e) => {
+      return e;
+    });
   }
 
   async login(passive = true) {
-    return await this.postPrinter(apiLogin(passive), {}, false);
+    return this.postPrinter(apiLogin(passive), {}, false).catch((e) => {
+      return e;
+    });
   }
 
   async getTimelapses(unrendered = true) {
-    return await this.getWithOptionalRetry(apiTimelapse(unrendered), true);
+    return this.getWithOptionalRetry(apiTimelapse(unrendered), true).catch((e) => {
+      return e;
+    });
   }
 
   async patchProfile(data, profileID) {
-    try {
-      const toPatch = await this.patch(apiProfiles + profileID, data);
-      console.log(toPatch);
-      return toPatch;
-    } catch (e) {
-      console.log(e);
+    return this.patch(apiProfiles + profileID, data).catch((e) => {
       return e;
-    }
+    });
   }
 
   async postSettings(data) {
-    return await this.post(apiSettings, data);
+    return this.post(apiSettings, data).catch((e) => {
+      return e;
+    });
   }
 }
 

@@ -36,30 +36,30 @@ const workerURL = "/printersInfo/get/";
 const multiPrinterSelectModal = document.getElementById("multiPrintersSection");
 
 // Bulk OctoPrint Command Listeners
-let bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
+const bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
 bulkPluginUpdateButton.addEventListener("click", async () => {
   await bulkOctoPrintPluginUpdate();
 });
 
-let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
+const bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   await bulkOctoPrintClientUpdate();
 });
 
-let bulkDisablePrintersButton = document.getElementById("disablePrintersBtn");
+const bulkDisablePrintersButton = document.getElementById("disablePrintersBtn");
 bulkDisablePrintersButton.addEventListener("click", async (e) => {
     await PrinterSelectionService.create(multiPrinterSelectModal, false, "Disable Printers", function () {
         bulkDisablePrinters();
     });
 });
-let bulkEnablePrintersButton = document.getElementById("enablePrintersBtn");
+const bulkEnablePrintersButton = document.getElementById("enablePrintersBtn");
 bulkEnablePrintersButton.addEventListener("click", async (e) => {
     await PrinterSelectionService.create(multiPrinterSelectModal, false, "Enable Printers", function () {
         bulkEnablePrinters(true);
     });
 });
 
-let scanNetworkBtn = document.getElementById("scanNetworkBtn");
+const scanNetworkBtn = document.getElementById("scanNetworkBtn");
 scanNetworkBtn.addEventListener("click", async (e) => {
   await scanNetworkForDevices(e);
 });
@@ -109,19 +109,11 @@ reSyncAPIBtn.addEventListener("click", async (e) => {
   bootbox.dialog({
     title: "Rescan All API endpoints",
     message:
-      "<p class=\"alert alert-warning text-dark\" role=\"alert\">ReScan: Will rescan all endpoints, ignoring any that data already exists for.</p>" +
-      "<p class=\"alert alert-danger text-dark\" role=\"alert\">Force ReScan: Will rescan all endpoints regardless of existing data.</p>",
+      "<p class=\"alert alert-danger text-dark\" role=\"alert\">ReScan: Will rescan all endpoints regardless of existing data.</p>",
     size: "large",
     buttons: {
-      normal: {
-        label: "ReScan",
-        className: "btn-warning text-dark",
-        callback: async function () {
-          await reSyncAPI();
-        }
-      },
       force: {
-        label: "Force ReScan",
+        label: "ReScan",
         className: "btn-danger text-dark",
         callback: async function () {
           await reSyncAPI(true);

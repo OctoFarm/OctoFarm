@@ -1,6 +1,8 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
 
+const defaultWOLSubnetMask = "255.255.255.0";
+
 const addOctoPrintLogWrapper = (id, message, state) => {
   PrinterTicker.addOctoPrintLog(
     getPrinterStoreCache().getPrinter(id),
@@ -53,17 +55,17 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   if (currentSettings === null) {
     if (plugins["psucontrol"]) {
       return {
-        powerOnCommand: '{"command":"turnPSUOn"}',
-        powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerOffCommand: '{"command":"turnPSUOff"}',
+        powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+        powerOnURL: "[PrinterURL]/api/plugin/control",
+        powerOffCommand: "{\"command\":\"turnPSUOff\"}",
         powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerToggleCommand: '{"command":"togglePSU"}',
+        powerToggleCommand: "{\"command\":\"togglePSU\"}",
         powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerStatusCommand: '{"command":"getPSUState"}',
+        powerStatusCommand: "{\"command\":\"getPSUState\"}",
         powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
         wol: {
           enabled: false,
-          ip: "255.255.255.0",
+          ip: defaultWOLSubnetMask,
           packets: "3",
           port: "9",
           interval: "100",
@@ -82,7 +84,7 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
         powerStatusURL: "",
         wol: {
           enabled: false,
-          ip: "255.255.255.0",
+          ip: defaultWOLSubnetMask,
           packets: "3",
           port: "9",
           interval: "100",
@@ -122,6 +124,10 @@ const captureResultsData = (id, data) => {
   if (needs_restart) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       restartRequired: true
+    });
+  } else {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      restartRequired: false
     });
   }
   const message = `Action: ${action} has ${

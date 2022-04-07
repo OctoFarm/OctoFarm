@@ -99,9 +99,6 @@ class PrinterSettingsService {
   }
 
   static setupConnectionTab() {
-    document.getElementById("generateNameButtonWrapper").innerHTML = `
-      <button class="btn btn-info btn-block" id="generatePrinterName"><i class="fas fa-sync"></i></button>
-    `;
     document.getElementById("psDefaultPortDrop").innerHTML = `
       <div class="input-group mb-1"> <div class="input-group-prepend"> 
       <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> 
@@ -119,58 +116,7 @@ class PrinterSettingsService {
       `;
 
 
-    const userDropDown = document.getElementById("psOctoPrintUser");
-    userDropDown.innerHTML = "";
-    userDropDown.disabled = false;
 
-    if (!!currentPrinter?.userList && currentPrinter.userList.length !== 0) {
-      userDropDown.innerHTML = "";
-      currentPrinter.userList.forEach((user) => {
-        userDropDown.insertAdjacentHTML("beforeend", `<option value="${user}">${user}</option>`);
-      });
-      userDropDown.value = currentPrinter.currentUser;
-    } else {
-      console.log("EH")
-      userDropDown.disabled = true;
-      userDropDown.insertAdjacentHTML("beforeend", "<option value='0'>No users available</option>");
-      userDropDown.value = 0;
-    }
-
-    const printerNameElement = document.getElementById("psPrinterName");
-    printerNameElement.placeholder = currentPrinter.printerName;
-    document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
-
-
-
-    const generatePrinterName = document.getElementById("generatePrinterName");
-    generatePrinterName.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.target.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i>"
-      e.target.disabled = true;
-      const newPrinterName = await OctoFarmClient.getPrinterName();
-      if(!!newPrinterName){
-        printerNameElement.value = newPrinterName;
-        UI.createAlert("success",
-            `Successfully generated new printer name! ${ newPrinterName }<br> Don't forget to save!`,
-            "clicked",
-            3000)
-      }else{
-        UI.createAlert("warning",
-            `Failed to generate printer name! Please check the logs... ${newPrinterName}`,
-            3000,
-            "clicked")
-      }
-
-      e.target.innerHTML = "<i class=\"fas fa-sync\"></i>"
-      e.target.disabled = false;
-    })
-
-    // Convert websocket url into a url object
-    const webSocketURL = new URL(currentPrinter.webSocketURL);
-    // Grab out the protocol and select it on the select box.
-    document.getElementById("psWebSocketProtocol").value = webSocketURL.protocol + "//";
-    document.getElementById("psCamURL").placeholder = currentPrinter.camURL;
-    document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
 
     const baudrateDropdown = document.getElementById("psDefaultBaudrate");
 
@@ -988,13 +934,7 @@ class PrinterSettingsService {
   static getPageValues() {
     const newPrinterSettingsValues = {
       printer: {
-        printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
-        printerURL: UI.getValueOrPlaceHolder(document.getElementById("psPrinterURL")),
-        webSocketProtocol: UI.getValueOrPlaceHolder(document.getElementById("psWebSocketProtocol")),
         index: currentPrinter._id,
-        cameraURL: UI.getValueOrPlaceHolder(document.getElementById("psCamURL")),
-        apikey: UI.getValueOrPlaceHolder(document.getElementById("psAPIKEY")),
-        currentUser: UI.getValueOrPlaceHolder(document.getElementById("psOctoPrintUser"))
       },
       connection: {
         preferredPort: UI.getValueOrPlaceHolder(document.getElementById("psDefaultSerialPort")),

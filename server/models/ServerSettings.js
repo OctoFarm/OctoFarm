@@ -9,11 +9,6 @@ const ServerSettingsSchema = new mongoose.Schema({
     }
   },
   server: {
-    port: {
-      type: Number,
-      default: 4000,
-      required: true
-    },
     loginRequired: {
       type: Boolean,
       default: true,
@@ -26,21 +21,25 @@ const ServerSettingsSchema = new mongoose.Schema({
     }
   },
   timeout: {
+    // Connection Timeout
     apiTimeout: {
       type: Number,
-      default: 1000,
+      default: 2000,
       required: true
     },
+    // Cut off timeout... don't try to connect for more than 10 seconds...
     apiRetryCutoff: {
       type: Number,
-      default: 10000,
+      default: 5000,
       required: true
     },
+    // When to retry the connections, this is a base for the
     apiRetry: {
       type: Number,
       default: 30000,
       required: true
     },
+    // When to try reconnecting the websocket...
     webSocketRetry: {
       type: Number,
       default: 5000,

@@ -26,6 +26,40 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
+  // Onboarding flags:
+  onboarding: {
+    fullyScanned: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    // Required Flags
+    userApi: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    settingsApi: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    systemApi: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    profileApi: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    stateApi: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  },
   // Auto-generated below
   settingsAppearance: {
     type: Object,
@@ -37,6 +71,10 @@ const PrinterSchema = new mongoose.Schema({
   },
   currentUser: {
     type: String,
+    required: false
+  },
+  userList: {
+    type: Array,
     required: false
   },
   dateAdded: {

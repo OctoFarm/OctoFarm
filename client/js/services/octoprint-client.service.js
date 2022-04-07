@@ -69,7 +69,7 @@ export default class OctoPrintClient {
     });
   }
 
-  static delete(printer, item) {
+  static async delete(printer, item) {
     this.validatePrinter(printer);
     const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
@@ -189,8 +189,6 @@ export default class OctoPrintClient {
 
   static async file(printer, fullPath, action, notify = true) {
     const url = "files/local/" + fullPath;
-    let post = null;
-
     if (action === "load") {
       const opt = {
         command: "select",
@@ -199,7 +197,7 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
-      post = await OctoPrintClient.post(printer, url, opt);
+      return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -208,26 +206,9 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
-      post = await OctoPrintClient.post(printer, url, opt);
+      return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "delete") {
-      post = await OctoPrintClient.delete(printer, url);
-    }
-    console.log(post?.status);
-    console.log(notify);
-    if (post?.status === 204 || post?.status === 200) {
-      if (action === "delete") {
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");
-        }
-      } else {
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: ${action} actioned`, 3000, "clicked");
-        }
-      }
-    } else {
-      if (notify) {
-        UI.createAlert("error", `${printer.printerName}: ${action} failed`, 3000, "clicked");
-      }
+      return OctoPrintClient.delete(printer, encodeURIComponent(url));
     }
   }
 
@@ -281,9 +262,13 @@ export default class OctoPrintClient {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
     let printerCheck = false;
-    if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
-      printerCheck = printer.selectedFilament.every(function (e) {
-        return e !== null;
+    if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
+      if(printer.selectedFilament.length === 0){
+        printerCheck = true;
+      }
+      printerCheck = printer.selectedFilament.some(function (e) {
+        console.log(e)
+        return e === null
       });
     }
 
@@ -309,13 +294,12 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            // Make sure feed/flow are set before starting print...
-            return await OctoPrintClient.post(printer, "job", opts);
+            return OctoPrintClient.post(printer, "job", opts);
           }
         }
       });
     } else {
-      return await OctoPrintClient.post(printer, "job", opts);
+      return OctoPrintClient.post(printer, "job", opts);
     }
     if (element) {
       element.target.disabled = false;

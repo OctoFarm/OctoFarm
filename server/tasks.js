@@ -16,19 +16,27 @@ const {
 const { FileClean } = require("./services/file-cleaner.service");
 const { sortCurrentOperations } = require("./services/printer-statistics.service");
 const { initFarmInformation } = require("./services/farm-information.service");
+const { notifySubscribers } = require("./services/server-side-events.service");
+const { MESSAGE_TYPES } = require("./constants/sse.constants");
+
 const Logger = require("./handlers/logger");
+const { SettingsClean } = require("./services/settings-cleaner.service");
 const logger = new Logger("OctoFarm-TaskManager");
+
+const I_AM_ALIVE = () => {
+  notifySubscribers("iAmAlive", MESSAGE_TYPES.AM_I_ALIVE, {
+    ok: true,
+    loginRequired: SettingsClean.isLogonRequired()
+  });
+};
+
 const INITIALISE_PRINTERS = async () => {
   await getPrinterManagerCache().initialisePrinters();
 };
 
 const START_PRINTER_ADD_QUEUE = async () => {
-  getPrinterManagerCache().handlePrinterAddQueue();
+  await getPrinterManagerCache().startPrinterEnableQueue();
 };
-
-// const INIT_FILE_UPLOAD_QUEUE = async () => {
-//   getFileUploadQueueCache().actionQueueState();
-// };
 
 const INITIALIST_PRINTERS_STORE = async () => {
   await getPrinterStoreCache();
@@ -87,67 +95,6 @@ const RUN_PRINTER_HEALTH_CHECKS = async () => {
   await updatePrinterHealthChecks(true);
 };
 
-const SSE_TASK = () => {
-  //     const currentOperationsService = await PrinterClean.returnCurrentOperations();
-  //     let printersInformation = await PrinterClean.listPrintersInformation();
-  //     printersInformation = await filterMe(printersInformation);
-  //     printersInformation = await sortMe(printersInformation);
-  //     const printerControlList = await PrinterClean.returnPrinterControlList();
-  //
-  //     if (!!serverSettings.influxExport?.active) {
-  //       if (influxCounter >= 2000) {
-  //         sendToInflux(printersInformation);
-  //         influxCounter = 0;
-  //       } else {
-  //         influxCounter = influxCounter + 500;
-  //       }
-  //       // eslint-disable-next-line no-use-before-define
-  //     }
-  //     const infoDrop = {
-  //       printersInformation: printersInformation,
-  //       currentOperationsService: currentOperationsService,
-  //       printerControlList: printerControlList,
-  //       clientSettings: clientSettings
-  //     };
-  //     clientInformation = await stringify(infoDrop);
-  //     clients.forEach((c, index) => {
-  //       c.res.write("data: " + clientInformation + "\n\n");
-  //     });
-};
-
-const SSE_DASHBOARD = () => {
-  // if (interval === false) {
-  //   interval = setInterval(async function () {
-  //     let clientsSettingsCache = await SettingsClean.returnClientSettings();
-  //     if (!clientsSettingsCache) {
-  //       await SettingsClean.start();
-  //       clientsSettingsCache = await SettingsClean.returnClientSettings();
-  //     }
-  //
-  //     let dashboardSettings = clientsSettingsCache.dashboard;
-  //     if (!dashboardSettings) {
-  //       dashboardSettings = getDefaultDashboardSettings();
-  //     }
-  //
-  //     const currentOperationsService = await PrinterClean.returnCurrentOperations();
-  //     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-  //     const printerInformation = await PrinterClean.listPrintersInformation();
-  //     const infoDrop = {
-  //       printerInformation,
-  //       currentOperationsService,
-  //       dashStatistics,
-  //       dashboardSettings
-  //     };
-  //
-  //     clientInformation = await stringify(infoDrop);
-  //     for (clientId in clients) {
-  //       clients[clientId].write("retry:" + 10000 + "\n");
-  //       clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
-  //     }
-  //   }, 5000);
-  // }
-};
-
 const GENERATE_FILE_STATISTICS = async () => {
   const pList = getPrinterStoreCache().listPrintersInformation();
   const stats = FileClean.statistics(pList);
@@ -160,11 +107,6 @@ const STATE_TRACK_COUNTERS = async () => {
 
 const GRAB_LATEST_PATREON_DATA = async () => {
   await grabLatestPatreonData();
-};
-
-const DATABASE_MIGRATIONS_TASK = async () => {
-  const migrations = require("./migrations");
-  console.log(migrations);
 };
 
 const GENERATE_PRINTER_CONTROL_LIST = async () => {
@@ -181,11 +123,15 @@ const UPDATE_OCTOPRINT_PLUGINS_LIST = async () => {
 };
 
 const CHECK_FOR_OCTOPRINT_UPDATES = async () => {
-  await getPrinterManagerCache().checkForOctoPrintUpdates();
+  //await getPrinterManagerCache().checkForOctoPrintUpdates();
 };
 
 const GENERATE_PRINTER_SPECIFIC_STATISTICS = async () => {
   await getPrinterManagerCache().generatePrintersStatisticsCache();
+};
+
+const PING_PONG_CHECK = async () => {
+  await getPrinterManagerCache().websocketKeepAlive();
 };
 
 /**
@@ -227,7 +173,9 @@ class OctoFarmTasks {
     TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.RUNONCE),
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.PERIODIC_IMMEDIATE_200_MS)
+    TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.RUNONCE),
+    TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
+    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_60000MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

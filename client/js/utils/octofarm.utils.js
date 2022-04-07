@@ -154,3 +154,29 @@ export function checkCameraState(printer) {
         return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
     }
 }
+
+/**
+ *
+ * @param printer
+ * @returns {boolean}
+ */
+export function printerIsOnline(printer) {
+    const { disabled } = printer;
+
+    const {printerState: {colour: {category}}} = printer;
+
+    return !(disabled || category === "Offline" || category === "Searching...");
+}
+
+export function printerIsAvailableToView(printer){
+    const { disabled } = printer;
+
+    const {printerState: {colour: {category}}} = printer;
+
+    return !(disabled || category === "Searching...");
+}
+export function printerIsDisconnectedOrError(printer){
+    const {printerState: {colour: {category}}} = printer;
+
+    return (category !== "Offline" && category === "Disconnected" || category === "Error!")
+}

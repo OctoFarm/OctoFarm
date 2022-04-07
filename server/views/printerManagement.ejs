@@ -63,13 +63,13 @@
     { title:"Sort Index" ,style:"min-width:100px;" },
     { title:"Name" ,style:"", wrap:" text-wrap" },
     { title:"Printer URL" ,style:"", wrap:" text-wrap" },
-    { title:"Host State" ,style:"min-width:50px;" },
+    { title:"OctoPrint API" ,style:"min-width:50px;" },
     { title:"Printer State" ,style:"min-width:50px;" },
-    { title:"WebSocket" ,style:"min-width:150px;" },
+    { title:"OctoPrint WebSocket" ,style:"min-width:50px;" },
     { title:"Group" ,style:"min-width:10px;" },
-    { title:"Quick Actions" ,style:"width:50px;" },
-    { title:"Manage" ,style:"min-width:200px;" },
-    { title:"Alerts" ,style:"min-width:150px;" },
+    { title:"Quick Actions" ,style:"width:150px;" },
+    { title:"Manage" ,style:"min-width:100px;" },
+    { title:"Alerts" ,style:"min-width:200px;" },
     ]
     }
     })
@@ -97,10 +97,17 @@ bodyFile:'./PrinterManager/farmOverview.modal.ejs'
 })
 %>
 <%- include(modal, {
-modal:{
-id:"connectionsOverview", title: "Connections Overview"
-},
-bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+    modal:{
+    id:"connectionsOverview", title: "Connections Overview"
+    },
+    bodyFile:'./PrinterManager/connectionOverview.modal.ejs'
+})
+%>
+<%- include(modal, {
+    modal:{
+    id:"printerEdit", title:"Printer Edit: "
+    },
+    bodyFile:'./PrinterManager/printerEdit.modal.ejs'
 })
 %>
 <%- include(modal, {
@@ -122,6 +129,14 @@ modal:{
 id:"healthChecks", title: "Printers Health Checks"
 },
 bodyFile:'./PrinterManager/healthChecks.modal.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"printerEvents", title: "Current Registered Printer Events", size: "small"
+
+},
+bodyFile:'./PrinterManager/printerEvents.modal.ejs'
 })
 %>
 

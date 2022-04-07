@@ -1,6 +1,8 @@
 import OctoFarmClient from "./octofarm-client.service";
 import UI from "../utils/ui.js";
 
+const showFullList = ["Edit Printers", "Printer Deletion"]
+
 const editMessage = `
 <div class="alert alert-info" role="alert">
 Update any of the printer values below and press action when you've made your changes.
@@ -245,7 +247,7 @@ export default class PrinterSelectionService {
   }
 
   static async create(element, editable, action, callback) {
-    let saveEditsBtn = document.getElementById("saveEditsBtn");
+    const saveEditsBtn = document.getElementById("saveEditsBtn");
     if (saveEditsBtn) {
       saveEditsBtn.remove();
     }
@@ -255,7 +257,7 @@ export default class PrinterSelectionService {
     //Setup elements
     element.innerHTML = "";
     element.innerHTML = printersTable;
-    let messageBox = document.getElementById("selectMessageBox");
+    const messageBox = document.getElementById("selectMessageBox");
     messageBox.innerHTML = "";
     let override = false;
     if (action === "Printer Deletion") {
@@ -289,12 +291,17 @@ export default class PrinterSelectionService {
     const printerList = [];
 
     let disabled = false;
+    let fullPrinterList = false;
 
     if(action === "Enable Printers"){
       disabled = true
     }
 
-    const printers = await OctoFarmClient.listPrinters(disabled);
+    if(showFullList.includes(action)){
+      fullPrinterList = true
+    }
+
+    const printers = await OctoFarmClient.listPrinters(disabled, fullPrinterList);
 
     printers.forEach((printer) => {
       if (

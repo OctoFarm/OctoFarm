@@ -88,9 +88,9 @@ const PRINTER_STATES = (customStates = {}) => {
     },
     SETTING_UP: {
       state: OF_C_STATE.SETTING_UP,
-      stateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+      stateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
       hostState: OF_C_STATE.SETTING_UP,
-      hostStateColour: mapStateToCategory(OF_C_STATE.OFFLINE),
+      hostStateColour: mapStateToCategory(OF_C_STATE.SEARCHING),
       webSocket: OF_COLOURS.DANGER,
       stateDescription: OF_C_DESC.SETTING_UP,
       hostDescription: OF_C_DESC.SETTING_UP,

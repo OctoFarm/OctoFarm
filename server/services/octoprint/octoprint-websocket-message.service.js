@@ -49,7 +49,8 @@ const {
   captureUpload,
   captureUserLoggedIn,
   captureUserLoggedOut,
-  captureZChange
+  captureZChange,
+  capturePrintFailed
 } = require("./utils/octoprint-event.utils");
 const {
   captureKlipperPluginData,
@@ -94,7 +95,7 @@ class OctoprintWebsocketMessageService {
     return type;
   };
 
-  static handleMessage(printerID, message) {
+  static async handleMessage(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
 
     const { header, data } = OP_EM.parseOctoPrintWebsocketMessage(message);
@@ -113,7 +114,7 @@ class OctoprintWebsocketMessageService {
         OP_EM.handleHistoryData(printerID, data);
         break;
       case OP_WS_MSG.event:
-        OP_EM.handleEventData(printerID, data);
+        await OP_EM.handleEventData(printerID, data);
         break;
       case OP_WS_MSG.plugin:
         OP_EM.handlePluginData(printerID, data);
@@ -165,7 +166,7 @@ class OctoprintWebsocketMessageService {
     getPrinterStoreCache().updatePrinterState(printerID, currentState);
     // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
-  static handleEventData(printerID, data) {
+  static async handleEventData(printerID, data) {
     const { type, payload } = data.event;
     const debugMessage = `Detected ${type} event`;
     logger.debug(debugMessage, payload);
@@ -221,7 +222,7 @@ class OctoprintWebsocketMessageService {
         captureHome(printerID, payload);
         break;
       case EVENT_TYPES.MetadataAnalysisFinished:
-        captureMetadataAnalysisFinished(printerID, payload);
+        await captureMetadataAnalysisFinished(printerID, payload);
         // Trigger resyncs
         break;
       case EVENT_TYPES.MetadataAnalysisStarted:
@@ -248,8 +249,7 @@ class OctoprintWebsocketMessageService {
         break;
 
       case EVENT_TYPES.PrintFailed:
-        // TODO Create a print failed event function
-        // capturePrint(printerID, payload, false);
+        capturePrintFailed(printerID, payload, false);
         break;
 
       case EVENT_TYPES.PrintPaused:
@@ -296,6 +296,7 @@ class OctoprintWebsocketMessageService {
     //logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {
+    console.log("PRINTER PLUGIN DATA", message)
     const OP_EM = OctoprintWebsocketMessageService;
     const { header, data } = OP_EM.parseOctoPrintPluginMessage(message);
 
@@ -306,8 +307,8 @@ class OctoprintWebsocketMessageService {
         capturePluginManagerData(printerID, type, data);
         break;
       case OP_WS_PLUGIN_KEYS.klipper:
-        //console.log(type);
-        //captureKlipperPluginData(printerID, data);
+        console.log(type);
+        captureKlipperPluginData(printerID, data);
         break;
     }
   }

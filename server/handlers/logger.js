@@ -1,5 +1,5 @@
 const winston = require("winston");
-const { AppConstants } = require("../constants/app.constants")
+const { AppConstants } = require("../constants/app.constants");
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -22,19 +22,19 @@ const COLOUR_MAP = {
   warn: COLOURS.ORANGE,
   debug: COLOURS.ORANGE,
   error: COLOURS.RED,
-  http : COLOURS.PURPLE,
+  http: COLOURS.PURPLE,
   silly: COLOURS.CYAN
 };
 
 const LEVELS = {
-    error: 0,
-    warn: 1,
-    http: 2,
-    info: 3,
-    verbose: 4,
-    debug: 5,
-    silly: 6
-}
+  error: 0,
+  warn: 1,
+  http: 2,
+  info: 3,
+  verbose: 4,
+  debug: 5,
+  silly: 6
+};
 
 dateFormat = () => {
   return dtFormat.format(new Date());
@@ -65,7 +65,7 @@ class LoggerService {
         let message = `${COLOUR_MAP[info.level]}${date} ${COLOURS.WHITE}| ${
           COLOUR_MAP[info.level]
         }${level} ${COLOURS.WHITE}| ${COLOUR_MAP[info.level]}${route} ${COLOURS.WHITE} \n ${
-            COLOUR_MAP[info.level]
+          COLOUR_MAP[info.level]
         }${level} MESSAGE: ${COLOURS.WHITE}${info.message} `;
         message = metaData ? message + `| ${COLOURS.WHITE}${metaData}` : message;
         return message;
@@ -73,24 +73,22 @@ class LoggerService {
     );
 
     let prettyPrintMyLogs = winston.format.combine(
-        winston.format.printf((info) => {
-          const level = info.level.toUpperCase();
-          const date = dateFormat();
-          let metaData = undefined;
-          if (!!info?.meta) {
-            if (typeof info.meta === "string" || typeof info.meta === "number") {
-              metaData = info.meta;
-            } else {
-              metaData = Object.assign({}, info.meta);
-              metaData = JSON.stringify(metaData);
-            }
+      winston.format.printf((info) => {
+        const level = info.level.toUpperCase();
+        const date = dateFormat();
+        let metaData = undefined;
+        if (!!info?.meta) {
+          if (typeof info.meta === "string" || typeof info.meta === "number") {
+            metaData = info.meta;
+          } else {
+            metaData = Object.assign({}, info.meta);
+            metaData = JSON.stringify(metaData);
           }
-          let message = `${date} | ${level} | ${route} \n ${level} MESSAGE: ${info.message} `;
-          message = metaData
-              ? message + `: ${metaData} `
-              : message;
-          return message;
-        })
+        }
+        let message = `${date} | ${level} | ${route} \n ${level} MESSAGE: ${info.message} `;
+        message = metaData ? message + `: ${metaData} ` : message;
+        return message;
+      })
     );
 
     this.logger = winston.createLogger({
@@ -98,7 +96,7 @@ class LoggerService {
       transports: [
         new winston.transports.Console({
           level: logFilterLevel,
-          format: alignColorsAndTime,
+          format: alignColorsAndTime
         }),
         ...(enableFileLogs
           ? [
@@ -111,7 +109,7 @@ class LoggerService {
               })
             ]
           : [])
-      ],
+      ]
     });
   }
 
@@ -127,11 +125,10 @@ class LoggerService {
     });
   }
 
-  http(message, meta){
-      console.log(message)
-      this.logger.log("http", message, {
-          meta
-      })
+  http(message, meta) {
+    this.logger.log("http", message, {
+      meta
+    });
   }
 
   debug(message, meta) {

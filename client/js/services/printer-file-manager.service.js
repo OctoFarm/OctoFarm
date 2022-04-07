@@ -5,13 +5,13 @@ import FileManagerService from "./file-manager.service.js";
 import {returnDropDown} from "./filament-manager-plugin.service";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./client-modal.service";
+import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {allowedFileTypes} from "../constants/file-types.constants";
 
 let currentIndex = 0;
 let currentPrinter = null;
 
-$("#connectionModal").on("hidden.bs.modal", function (e) {
+$("#connectionModal").on("hidden.bs.modal", function () {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
   }
@@ -23,7 +23,7 @@ export default class PrinterFileManagerService {
     if (index !== "") {
       currentIndex = index;
       const id = _.findIndex(printers, function (o) {
-        return o._id == index;
+        return o._id === index;
       });
       currentPrinter = printers[id];
 
@@ -36,15 +36,15 @@ export default class PrinterFileManagerService {
       const filamentDropDown = await returnDropDown();
       await PrinterFileManagerService.loadPrinter(currentPrinter);
       const elements = PrinterFileManagerService.grabPage();
-      PrinterFileManagerService.applyState(currentPrinter, elements);
+      await PrinterFileManagerService.applyState(currentPrinter, elements);
       PrinterFileManagerService.applyListeners(elements, printers, filamentDropDown);
     } else {
       const id = _.findIndex(printers, function (o) {
-        return o._id == currentIndex;
+        return o._id === currentIndex;
       });
       currentPrinter = printers[id];
-      const elements = await PrinterFileManagerService.grabPage();
-      PrinterFileManagerService.applyState(currentPrinter, elements);
+      const elements = PrinterFileManagerService.grabPage();
+      await PrinterFileManagerService.applyState(currentPrinter, elements);
       document.getElementById("printerManagerModal").style.overflow = "auto";
     }
     return true;
@@ -106,21 +106,21 @@ export default class PrinterFileManagerService {
         printer.printerState.state === "Error!"
       ) {
         printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
+          "<button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
           "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
           printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
+          "\" class=\"btn-group ml-1\"></div>";
         document.getElementById("pmSerialPort").disabled = false;
         document.getElementById("pmBaudrate").disabled = false;
         document.getElementById("pmProfile").disabled = false;
       } else {
         printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
+          "<button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
           printer.printerURL +
           "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
           printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
+          "\" class=\"btn-group ml-1\"></div>";
         document.getElementById("pmSerialPort").disabled = true;
         document.getElementById("pmBaudrate").disabled = true;
         document.getElementById("pmProfile").disabled = true;
@@ -164,7 +164,7 @@ export default class PrinterFileManagerService {
               </div>
               <div class="col-lg-10">
                 <div class="progress">
-                  <div id="fileProgress-${printer._id}" class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                  <div id="fileProgress-${printer._id}" class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                     0%
                   </div>
                 </div>
@@ -222,9 +222,9 @@ export default class PrinterFileManagerService {
 
           </div>
             `;
-      FileManagerSortingService.loadSort(printer._id);
+      await FileManagerSortingService.loadSort(printer._id);
 
-      CustomGenerator.generateButtons(printer);
+      await CustomGenerator.generateButtons(printer);
     } catch (e) {
       UI.createAlert(
         "error",
@@ -244,19 +244,13 @@ export default class PrinterFileManagerService {
         e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
       });
     });
-    if (currentPrinter.state != "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    } else {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    }
 
-    elements.fileManager.uploadFiles.addEventListener("change", function () {
+    elements.connectPage.connectButton.addEventListener("click", async () => {
+      elements.connectPage.connectButton.disabled = true;
+      await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
+    });
+
+    elements.fileManager.uploadFiles.addEventListener("change", async () => {
       UI.createAlert(
         "warning",
         "Your files for Printer: " +
@@ -265,27 +259,27 @@ export default class PrinterFileManagerService {
         3000,
         "Clicked"
       );
-      FileManagerService.handleFiles(this.files, currentPrinter);
+      await FileManagerService.handleFiles(this?.files, currentPrinter);
     });
-    elements.fileManager.createFolderBtn.addEventListener("click", (e) => {
-      FileManagerService.createFolder(currentPrinter);
+    elements.fileManager.createFolderBtn.addEventListener("click", async () => {
+      await FileManagerService.createFolder(currentPrinter);
     });
-    elements.fileManager.fileSearch.addEventListener("keyup", (e) => {
-      FileManagerService.search(currentPrinter._id);
+    elements.fileManager.fileSearch.addEventListener("keyup", async () => {
+      await FileManagerService.search(currentPrinter._id);
     });
-    elements.fileManager.uploadPrintFile.addEventListener("change", function () {
-      FileManagerService.handleFiles(this.files, currentPrinter, "print");
+    elements.fileManager.uploadPrintFile.addEventListener("change", async () => {
+      await FileManagerService.handleFiles(this?.files, currentPrinter, "print");
     });
-    elements.fileManager.back.addEventListener("click", (e) => {
-      FileManagerService.openFolder(undefined, undefined, currentPrinter);
+    elements.fileManager.back.addEventListener("click", async () => {
+     await FileManagerService.openFolder(undefined, undefined, currentPrinter);
     });
-    elements.fileManager.syncFiles.addEventListener("click", (e) => {
-      FileManagerService.reSyncFiles(e, currentPrinter);
+    elements.fileManager.syncFiles.addEventListener("click", async (e) => {
+     await FileManagerService.reSyncFiles(e, currentPrinter);
     });
   }
 
   static grabPage() {
-    const printerManager = {
+    return {
       mainPage: {
         title: document.getElementById("printerSelection"),
         status: document.getElementById("pmStatus")
@@ -315,8 +309,6 @@ export default class PrinterFileManagerService {
         createFolderBtn: document.getElementById("createFolderBtn")
       }
     };
-
-    return printerManager;
   }
 
   static async applyState(printer, elements) {
@@ -326,11 +318,11 @@ export default class PrinterFileManagerService {
     }
 
     if (typeof printer.storage !== "undefined") {
-      elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+      elements.fileManager.printerStorage.innerHTML = `${Calc.bytes(
         printer.storage.free
       )} / ${Calc.bytes(printer.storage.total)}`;
     } else {
-      elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+      elements.fileManager.printerStorage.innerHTML = `${Calc.bytes(
         0
       )} / ${Calc.bytes(0)}`;
     }

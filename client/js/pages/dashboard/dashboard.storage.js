@@ -1,14 +1,13 @@
-const storageKey = "dashboardConfiguration";
+import {getLocalStorage, saveLocalStorage} from "../../services/local-storage.service"
+import {LOCAL_STORAGE_CONSTANTS} from "../../constants/local-storage.constants"
 
-//REFACTOR Use the local storage service here...
 export class DashboardStorage {
   /**
    * Fetch the tile configuration from LocalStorage without guarantee
    * @returns {any}
    */
   static fetchConfig() {
-    const dashData = localStorage.getItem(storageKey);
-    return JSON.parse(dashData);
+    return getLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG)
   }
 
   /**
@@ -16,7 +15,7 @@ export class DashboardStorage {
    * @param config
    */
   static saveConfig(config) {
-    localStorage.setItem(storageKey, JSON.stringify(config));
+    saveLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG, config)
   }
 
   /**
@@ -34,6 +33,6 @@ export class DashboardStorage {
         id: node.id
       });
     });
-    localStorage.setItem(storageKey, JSON.stringify(gridStackConfig));
+    DashboardStorage.saveConfig(gridStackConfig)
   }
 }

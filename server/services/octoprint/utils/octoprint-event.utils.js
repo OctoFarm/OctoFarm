@@ -7,6 +7,7 @@ const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
 const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
+const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -60,14 +61,9 @@ const captureClientClosed = (id, data) => {
   if (!networkIpAddresses) networkIpAddresses = [];
   const { remoteAddress } = data;
 
-  let detectedAddress = "Socket was closed for: ";
-  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
-    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
-  } else if (!!remoteAddress) {
-    detectedAddress += parseOutIPAddress(remoteAddress);
-  } else {
-    detectedAddress += "Unknown IP";
-  }
+  const detectedAddress =
+    "Socket was closed for: " + matchRemoteAddressToOctoFarm(networkIpAddresses, remoteAddress);
+
   logger.warning(detectedAddress);
   tickerWrapper(id, "Info", detectedAddress);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "clientclosed", undefined)
@@ -85,14 +81,9 @@ const captureClientOpened = (id, data) => {
 
   const { remoteAddress } = data;
 
-  let detectedAddress = "Socket Opened for: ";
-  if (networkIpAddresses.includes(parseOutIPAddress(remoteAddress))) {
-    detectedAddress += process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY];
-  } else if (!!remoteAddress) {
-    detectedAddress += parseOutIPAddress(remoteAddress);
-  } else {
-    detectedAddress += "Unknown IP";
-  }
+  const detectedAddress =
+    "Socket Opened for: " + matchRemoteAddressToOctoFarm(networkIpAddresses, remoteAddress);
+
   logger.warning(detectedAddress);
   tickerWrapper(id, "Info", detectedAddress);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "clientopened", undefined)
@@ -112,6 +103,7 @@ const captureConnected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check connected script", e);
+      return e;
     });
 };
 const captureDisconnecting = (id, data) => {
@@ -122,6 +114,7 @@ const captureDisconnecting = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check disconnecting script", e);
+      return e;
     });
 };
 const captureDisconnected = (id, data) => {
@@ -132,6 +125,7 @@ const captureDisconnected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check disconnected script", e);
+      return e;
     });
 };
 const captureDwelling = (id, data) => {
@@ -142,6 +136,7 @@ const captureDwelling = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check dwelling script", e);
+      return e;
     });
 };
 const captureError = (id, data) => {
@@ -154,15 +149,10 @@ const captureError = (id, data) => {
   HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
     .then((res) => {
       logger.info("Successfully captured error", res);
-      setTimeout(function () {
-        // Register cancelled print...
-        setTimeout(function () {
-          console.log("Don't be empty ");
-        }, 5000);
-      }, 10000);
     })
     .catch((e) => {
       logger.error("Failed to capture error", e);
+      return e;
     });
 };
 const captureFileAdded = (id, data) => {
@@ -173,6 +163,7 @@ const captureFileAdded = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check file added script", e);
+      return e;
     });
 };
 const captureFileDeselected = (id, data) => {
@@ -183,6 +174,7 @@ const captureFileDeselected = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check file deselected script", e);
+      return e;
     });
 };
 const captureFileRemoved = (id, data) => {
@@ -193,6 +185,7 @@ const captureFileRemoved = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check fil eremoved script", e);
+      return e;
     });
 };
 const captureFirmwareData = (id, data) => {
@@ -210,6 +203,7 @@ const captureFolderAdded = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check folder added script", e);
+      return e;
     });
 };
 const captureFolderRemoved = (id, data) => {
@@ -220,6 +214,7 @@ const captureFolderRemoved = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check folder removed script", e);
+      return e;
     });
 };
 const captureHome = (id, data) => {
@@ -230,10 +225,13 @@ const captureHome = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to check homed script", e);
+      return e;
     });
 };
-const captureMetadataAnalysisFinished = (id, data) => {
-  getPrinterStoreCache().updateFileInformation(id, data);
+
+//WTF Why is this returning a promise!?
+const captureMetadataAnalysisFinished = async (id, data) => {
+  await getPrinterStoreCache().updateFileInformation(id, data);
 
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadatafinished", undefined)
     .then((res) => {
@@ -255,7 +253,15 @@ const captureMetadataAnalysisStarted = (id, data) => {
     });
 };
 const captureMetadataStatisticsUpdated = (id, data) => {
-  getPrinterStoreCache().updateFileInformation(id, data);
+  getPrinterStoreCache()
+    .resyncFile(id, data.path)
+    .then((res) => {
+      logger.warning("Automatically updated file information!", res);
+      return res;
+    })
+    .catch((e) => {
+      logger.error("Failed to automatically update file information", e);
+    });
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadataupdated", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata updated script", res);
@@ -295,31 +301,59 @@ const capturePrintCancelling = (id, data) => {
       logger.error("Failed to check cancelling script", e);
     });
 };
+const capturePrintFailed = (id, data) => {
+  const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+    data,
+    getPrinterStoreCache().getPrinter(id)
+  );
+  HistoryCollection.capturePrint(
+    payloadData,
+    printer,
+    job,
+    files,
+    resendStats,
+    false
+  )
+    .then((res) => {
+      logger.info("Successfully captured failed print!", res);
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res._id)
+        .then((resScript) => {
+          logger.info("Successfully checked failed script", resScript);
+        })
+        .catch((e) => {
+          logger.error("Failed to check cancelled script", e);
+        });
+    })
+    .catch((e) => {
+      logger.error("Failed to capture print!", e);
+    });
+};
 const captureFinishedPrint = (id, data, success) => {
   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success)
+  const { _id } = HistoryCollection.capturePrint(
+    payloadData,
+    printer,
+    job,
+    files,
+    resendStats,
+    success
+  )
     .then((res) => {
       logger.info("Successfully captured print!", res);
-      setTimeout(function () {
-        //TODO check to see if file meta analysis is fired after successful print, would accomplish this!
-        setTimeout(function () {
-          console.log("DONT BE EMPTY");
-        }, 5000);
-      }, 10000);
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", res._id)
+        .then((resScript) => {
+          logger.info("Successfully print finished script", resScript);
+          return res;
+        })
+        .catch((e) => {
+          logger.error("Failed to check print finished script", e);
+        });
     })
     .catch((e) => {
       logger.error("Failed to capture print!", e);
-    });
-  ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "connected", undefined)
-    .then((res) => {
-      logger.info("Successfully checked connected script", res);
-      return res;
-    })
-    .catch((e) => {
-      logger.error("Failed to check connected script", e);
     });
 };
 const capturePrintPaused = (id) => {
@@ -373,6 +407,7 @@ const captureTransferStarted = (id, data) => {
     });
 };
 const captureUpdatedFiles = (id, data) => {
+  console.log("Updated file", data);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "fileupdate", undefined)
     .then((res) => {
       logger.info("Successfully checked file update script", res);
@@ -462,6 +497,7 @@ module.exports = {
   capturePrintCancelled,
   capturePrintCancelling,
   captureFinishedPrint,
+  capturePrintFailed,
   capturePrintPaused,
   capturePrintStarted,
   capturePrinterStateChanged,

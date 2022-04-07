@@ -83,23 +83,24 @@ export default class FileManagerSortingService {
       printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [
         function (o) {
           return o.display;
-        }
+        },
       ]);
       printer.fileList.folderList = _.sortBy(printer.fileList.folderList, [
         function (o) {
           return o.name;
-        }
+        },
       ]);
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-alpha-up\"></i> File Name";
+        sortHeader.innerHTML = '<i class="fas fa-sort-alpha-up"></i> File Name';
         this.saveSort("file", true);
       } else {
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-alpha-down\"></i> File Name";
+        sortHeader.innerHTML =
+          '<i class="fas fa-sort-alpha-down"></i> File Name';
         this.saveSort("file", false);
       }
-      FileManagerService.drawFiles(printer, true);
+      FileManagerService.updatePrinterFilesList(printer, recursive);
     }
   }
 
@@ -109,23 +110,25 @@ export default class FileManagerSortingService {
       printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [
         function (o) {
           return o.uploadDate;
-        }
+        },
       ]);
       printer.fileList.folderList = _.sortBy(printer.fileList.folderList, [
         function (o) {
           return o.name;
-        }
+        },
       ]);
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Upload Date";
+        sortHeader.innerHTML =
+          '<i class="fas fa-sort-numeric-down"></i> Upload Date';
         this.saveSort("date", true);
       } else {
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Upload Date";
+        sortHeader.innerHTML =
+          '<i class="fas fa-sort-numeric-up"></i> Upload Date';
         this.saveSort("date", false);
       }
-      FileManagerService.drawFiles(printer, recursive);
+      FileManagerService.updatePrinterFilesList(printer, recursive);
     }
   }
 
@@ -135,23 +138,25 @@ export default class FileManagerSortingService {
       printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [
         function (o) {
           return o.expectedPrintTime;
-        }
+        },
       ]);
       printer.fileList.folderList = _.sortBy(printer.fileList.folderList, [
         function (o) {
           return o.name;
-        }
+        },
       ]);
       if (reverse) {
         printer.fileList.fileList = printer.fileList.fileList.reverse();
         printer.fileList.folderList = printer.fileList.folderList.reverse();
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Print Time";
+        sortHeader.innerHTML =
+          '<i class="fas fa-sort-numeric-up"></i> Print Time';
         this.saveSort("time", false);
       } else {
-        sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Print Time";
+        sortHeader.innerHTML =
+          '<i class="fas fa-sort-numeric-down"></i> Print Time';
         this.saveSort("time", true);
       }
-      FileManagerService.drawFiles(printer, recursive);
+      FileManagerService.updatePrinterFilesList(printer, recursive);
     }
   }
 }

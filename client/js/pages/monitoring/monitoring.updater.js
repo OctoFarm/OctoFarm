@@ -25,6 +25,8 @@ import {
 import PrinterTerminalManagerService from "../../services/printer-terminal-manager.service";
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
+import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
+import {printerIsAvailableToView} from "../../utils/octofarm.utils";
 
 let elems = [];
 let groupElems = [];
@@ -87,13 +89,14 @@ function addListeners(printer) {
   //Play button listeners
   let playBtn = document.getElementById("play-" + printer._id);
   if (playBtn) {
-    playBtn.addEventListener("click", (e) => {
+    playBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "start"
       };
       const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
+      const { status } = await OctoPrintClient.jobAction(print, opts, e);
+      printActionStatusResponse(status, "print")
     });
   }
   let cancelBtn = document.getElementById("cancel-" + printer._id);
@@ -111,13 +114,14 @@ function addListeners(printer) {
             label: "<i class=\"fa fa-check\"></i> Confirm"
           }
         },
-        callback(result) {
+        async callback(result) {
           if (result) {
             e.target.disabled = true;
             const opts = {
               command: "cancel"
             };
-            OctoPrintClient.jobAction(print, opts, e);
+            const { status } = await OctoPrintClient.jobAction(print, opts, e);
+            printActionStatusResponse(status, "cancel")
           }
         }
       });
@@ -125,37 +129,40 @@ function addListeners(printer) {
   }
   let restartBtn = document.getElementById("restart-" + printer._id);
   if (restartBtn) {
-    restartBtn.addEventListener("click", (e) => {
+    restartBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "restart"
       };
       const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
+      const { status } = await OctoPrintClient.jobAction(print, opts, e);
+      printActionStatusResponse(status, "restart")
     });
   }
   let pauseBtn = document.getElementById("pause-" + printer._id);
   if (pauseBtn) {
-    pauseBtn.addEventListener("click", (e) => {
+    pauseBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "pause",
         action: "pause"
       };
       const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
+      const { status } = await OctoPrintClient.jobAction(print, opts, e);
+      printActionStatusResponse(status, "pause")
     });
   }
   let resumeBtn = document.getElementById("resume-" + printer._id);
   if (resumeBtn) {
-    resumeBtn.addEventListener("click", (e) => {
+    resumeBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
         command: "pause",
         action: "resume"
       };
       const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
+      const { status } = await OctoPrintClient.jobAction(print, opts, e);
+      printActionStatusResponse(status, "resume")
     });
   }
   let cameraContain = document.getElementById("cameraContain-" + printer._id);
@@ -346,7 +353,7 @@ function addGroupListeners(printers) {
       //Play button listeners
       let playBtn = document.getElementById("play-" + currentGroupEncoded);
       if (playBtn) {
-        playBtn.addEventListener("click", (e) => {
+        playBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
           for (let p = 0; p < groupedPrinters[key].length; p++) {
             const printer = groupedPrinters[key][p];
@@ -354,7 +361,8 @@ function addGroupListeners(printers) {
               command: "start"
             };
             const print = returnPrinterInfo(printer._id);
-            OctoPrintClient.jobAction(print, opts, e);
+            const { status } = await OctoPrintClient.jobAction(print, opts, e);
+            printActionStatusResponse(status, "print")
           }
         });
       }
@@ -371,7 +379,7 @@ function addGroupListeners(printers) {
                 label: "<i class=\"fa fa-check\"></i> Confirm"
               }
             },
-            callback(result) {
+            async callback(result) {
               if (result) {
                 e.target.disabled = true;
                 for (let p = 0; p < groupedPrinters[key].length; p++) {
@@ -380,7 +388,8 @@ function addGroupListeners(printers) {
                   const opts = {
                     command: "cancel"
                   };
-                  OctoPrintClient.jobAction(print, opts, e);
+                  const { status } = await OctoPrintClient.jobAction(print, opts, e);
+                  printActionStatusResponse(status, "cancel")
                 }
               }
             }
@@ -389,7 +398,7 @@ function addGroupListeners(printers) {
       }
       let restartBtn = document.getElementById("restart-" + currentGroupEncoded);
       if (restartBtn) {
-        restartBtn.addEventListener("click", (e) => {
+        restartBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
           for (let p = 0; p < groupedPrinters[key].length; p++) {
             const printer = groupedPrinters[key][p];
@@ -397,13 +406,14 @@ function addGroupListeners(printers) {
               command: "restart"
             };
             const print = returnPrinterInfo(printer._id);
-            OctoPrintClient.jobAction(print, opts, e);
+            const { status } = await OctoPrintClient.jobAction(print, opts, e);
+            printActionStatusResponse(status, "restart")
           }
         });
       }
       let pauseBtn = document.getElementById("pause-" + currentGroupEncoded);
       if (pauseBtn) {
-        pauseBtn.addEventListener("click", (e) => {
+        pauseBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
           for (let p = 0; p < groupedPrinters[key].length; p++) {
             const printer = groupedPrinters[key][p];
@@ -412,13 +422,14 @@ function addGroupListeners(printers) {
               action: "pause"
             };
             const print = returnPrinterInfo(printer._id);
-            OctoPrintClient.jobAction(print, opts, e);
+            const { status } = await OctoPrintClient.jobAction(print, opts, e);
+            printActionStatusResponse(status, "pause")
           }
         });
       }
       let resumeBtn = document.getElementById("resume-" + currentGroupEncoded);
       if (resumeBtn) {
-        resumeBtn.addEventListener("click", (e) => {
+        resumeBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
           for (let p = 0; p < groupedPrinters[key].length; p++) {
             const printer = groupedPrinters[key][p];
@@ -427,7 +438,8 @@ function addGroupListeners(printers) {
               action: "resume"
             };
             const print = returnPrinterInfo(printer._id);
-            OctoPrintClient.jobAction(print, opts, e);
+            const { status } = await OctoPrintClient.jobAction(print, opts, e);
+            printActionStatusResponse(status, "resume")
           }
         });
       }
@@ -785,7 +797,7 @@ async function updateState(printer, clientSettings, view, index) {
       elements.stop.disabled = false;
     }
 
-    if (printer.printerState.state === "Pausing") {
+    if (printer.printerState.state === "Pausing" || printer.printerState.state === "Cancelling") {
       if (elements.start) {
         elements.start.classList.remove("hidden");
       }
@@ -1071,7 +1083,7 @@ async function updateGroupState(printers, clientSettings, view) {
           (obj) => obj.printerState.state === "Paused"
         ).length;
         const pausingPrinters = groupedPrinters[key].filter(
-          (obj) => obj.printerState.state === "Pausing"
+          (obj) => obj.printerState.state === "Pausing" || obj.printerState.state === "Cancelling"
         ).length;
         const filesSelected = groupedPrinters[key].filter(
           (obj) => obj?.currentJob?.fileName !== "No File Selected"
@@ -1296,7 +1308,7 @@ export async function initMonitoring(printers, clientSettings, view) {
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
-        if (!printers[p].disabled) {
+        if (printerIsAvailableToView(printers[p])) {
           let printerPanel = document.getElementById("panel-" + printers[p]._id);
           if (!printerPanel) {
             if (view === "panel") {

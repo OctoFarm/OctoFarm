@@ -12,6 +12,19 @@ class PrinterDatabaseService {
     this.#id = id;
   }
 
+  get = () => {
+    return printerModel
+      .findById(this.#id)
+      .then((res) => {
+        logger.debug("Successfully grabbed printer from database");
+        return res;
+      })
+      .catch((err) => {
+        logger.error(err);
+        return err;
+      });
+  };
+
   update = (update) => {
     return printerModel
       .findOneAndUpdate({ _id: this.#id }, update, this.#options)
@@ -26,7 +39,7 @@ class PrinterDatabaseService {
   delete = () => {
     return printerModel
       .findOneAndDelete({ _id: this.#id })
-      .then((res) => {
+      .then(() => {
         logger.warning("Successfully deleted printer from database", this.#id);
       })
       .catch((err) => {

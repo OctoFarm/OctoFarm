@@ -1,4 +1,6 @@
 import {asyncParse, debounce} from "./utils/sse.utils";
+import {MESSAGE_TYPES} from "../../server/constants/sse.constants"
+import {updateLiveFileInformation} from "./pages/file-manager/file-manager-sse.handler";
 
 
 const reloadWindow = async function () {
@@ -81,7 +83,7 @@ let reconnectFrequencySeconds = 3;
 let evtSource;
 let countDownInterval = false;
 let triggerTimeout = false;
-let countDownSeconds = 0;
+let countDownSeconds = 5;
 let reloadListenerAdded = false;
 
 const reconnectFunc = debounce(
@@ -117,25 +119,29 @@ function triggerCountDownTimer(seconds){
 }
 
 function setupEventSource() {
-  evtSource = new EventSource("/amialive");
+  evtSource = new EventSource("/events");
   evtSource.onmessage = async function (e) {
-    if (e?.data !== null) {
-      window.serverOffline = false;
-      await asyncParse(e.data);
-      const lostServerConnectionModal = document.getElementById("lostServerConnection");
-      if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
-        // If user has login enabled then we need to refresh the session...
-        if(!!e.data.loginRequired){
-          await reloadWindow()
-        }else{
-          await closeModal();
-        }
+    const { type, message, id } = await asyncParse(e.data);
+    if(type === MESSAGE_TYPES.AM_I_ALIVE){
+        window.serverOffline = false;
+        const lostServerConnectionModal = document.getElementById("lostServerConnection");
+        if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
+          // If user has login enabled then we need to refresh the session...
+          if(!!message?.loginRequired){
+            await reloadWindow();
+          }else{
+            await closeModal();
+          }
 
-      }
+        }
+    }
+
+    if(type === MESSAGE_TYPES.FILE_UPDATE){
+      await updateLiveFileInformation(id, message)
     }
   };
   evtSource.onopen = function (e) {
-    console.debug("Connected to servers Am I Alive stream...");
+    console.debug("Connected to servers event stream...");
     // Reset reconnect frequency upon successful connection
     reconnectFrequencySeconds = 3;
   };

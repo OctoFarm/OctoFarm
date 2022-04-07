@@ -10,7 +10,7 @@ const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monit
 const { promiseTimeout } = require("../../utils/promise.utils");
 
 async function fetchApi(url, method, apikey, bodyData = undefined) {
-  return await fetch(url, {
+  return fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +23,7 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
 async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = undefined) {
   const startTime = ConnectionMonitorService.startTimer();
   if (!fetchTimeout || method !== "GET") {
-    return await fetchApi(url, method, apikey, bodyData)
+    return fetchApi(url, method, apikey, bodyData)
       .then((res) => {
         const endTime = ConnectionMonitorService.stopTimer();
         ConnectionMonitorService.updateOrAddResponse(
@@ -40,7 +40,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
-        logger.error("Failed to fetch", e);
+        logger.debug("Failed to fetch", e);
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -53,6 +53,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
           REQUEST_KEYS.LAST_RESPONSE,
           ConnectionMonitorService.calculateTimer(startTime, endTime)
         );
+        return e;
       });
   }
 
@@ -73,7 +74,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
-      logger.error("Failed fetch timeout!", e);
+      logger.debug("Failed fetch timeout!", e);
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
@@ -86,7 +87,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         REQUEST_KEYS.LAST_RESPONSE,
         ConnectionMonitorService.calculateTimer(startTime, endTime)
       );
-      throw e;
+      return e;
     });
 }
 
@@ -115,9 +116,11 @@ class OctoprintApiService {
    */
   async getRetry(item) {
     try {
-      return await this.get(item);
+      return await this.get(item).catch(e => {
+        return e;
+      });
     } catch (e) {
-      logger.error("Error with get request", e);
+      logger.http("Error with get request", e);
       switch (e.code) {
         case "ECONNREFUSED":
           ConnectionMonitorService.updateOrAddResponse(
@@ -125,35 +128,35 @@ class OctoprintApiService {
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 502;
+          return 502;
         case "ECONNRESET":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 502;
+          return 461;
         case "EHOSTUNREACH":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 404;
+          return 404;
         case "ENOTFOUND":
           ConnectionMonitorService.updateOrAddResponse(
             this.printerURL + item,
             REQUEST_TYPE.GET,
             REQUEST_KEYS.CONNECTION_FAILURES
           );
-          throw 404;
+          return 404;
         default:
           // If timeout exceeds max cut off then give up... Printer is considered offline.
           const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
           if (cutOffIn <= 0) {
-            logger.error(`${this.printerURL} | Cutoff reached! marking offline!`);
+            logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
           } else {
-            logger.error(
+            logger.debug(
               `${this.printerURL} | Current Timeout: ${
                 this.#currentTimeout
               } | Cut off in ${cutOffIn}`
@@ -165,19 +168,21 @@ class OctoprintApiService {
             REQUEST_KEYS.RETRY_REQUESTED
           );
           if (cutOffIn <= 0) {
-            logger.error(
+            logger.debug(
               `${this.printerURL} | Timeout Exceeded: ${item} | Timeout: ${this.#currentTimeout}`
             );
             // Reset the timeout after failed...
             this.#currentTimeout = JSON.parse(JSON.stringify(this.timeout.apiTimeout));
-            throw 408;
+            return 408;
           }
           // Make sure to use the settings for api retry.
           this.#currentTimeout = this.#currentTimeout + 5000;
-          logger.error(this.printerURL + " | Initial timeout failed increasing...", {
+          logger.debug(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });
-          return await this.getRetry(item);
+          return this.getRetry(item).catch(e => {
+            return e;
+          });
       }
     }
   }
@@ -191,13 +196,33 @@ class OctoprintApiService {
    */
   async post(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return await fetchApiTimeout(
+    return fetchApiTimeout(
       url,
       "POST",
       this.apikey,
       timeout ? this.#currentTimeout : false,
       data
-    );
+    ).catch((e) => {
+      return e;
+    });
+  }
+
+  /**
+   * Delete request onto OctoPrint API
+   * @param route
+   * @param timeout
+   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
+   */
+  async delete(route, timeout = true) {
+    const url = new URL(route, this.printerURL).href;
+    return fetchApiTimeout(
+      url,
+      "DELETE",
+      this.apikey,
+      timeout ? this.#currentTimeout : false
+    ).catch((e) => {
+      return e;
+    });
   }
 
   /**
@@ -208,7 +233,11 @@ class OctoprintApiService {
    */
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return await fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false);
+    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false).catch(
+      (e) => {
+        return e;
+      }
+    );
   }
 
   /**
@@ -220,7 +249,7 @@ class OctoprintApiService {
    */
   patch(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data);
+    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data).catch(e => {return e;});
   }
 
   // /**

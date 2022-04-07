@@ -115,7 +115,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
-            <div class="col-sm-6 col-md-4 col-lg-2 col-xl-1 pt-0 pb-0" id="viewPanel-${
+            <div class="col-sm-12 col-md-6 col-lg-3 col-xl-2 pt-0 pb-0" id="viewPanel-${
               current.index
             }">
                 <div id="currentOpCard-${current.index}"

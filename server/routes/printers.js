@@ -20,6 +20,7 @@ const M_VALID = require("../constants/validate-mongo.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { generateRandomName } = require("../services/printer-name-generator.service");
+const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 
 /**
  * @swagger
@@ -84,9 +85,8 @@ router.post(
   async (req, res) => {
     // Grab the API body
     const printers = req.body;
-
     // Send Dashboard to Runner..
-    logger.info("Update printers request: ", printers);
+    logger.info("Add printers request: ", printers);
     const p = await getPrinterManagerCache().addPrinter(printers);
     //Return printers added...
     res.send({ printersAdded: [p], status: 200 });
@@ -115,10 +115,10 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     // Grab the API body
-    const printers = req.body.idList;
+    const idList = req.body.idList;
     // Send Dashboard to Runner..
-    logger.info("Delete printers request: ", printers);
-    const p = await getPrinterManagerCache().bulkDeletePrinters(printers);
+    logger.info("Delete printers request: ", idList);
+    const p = await getPrinterManagerCache().bulkDeletePrinters(idList);
     // Return printers added...
     res.send({ printersRemoved: p, status: 200 });
   }
@@ -139,18 +139,72 @@ router.post("/removefolder", ensureAuthenticated, async (req, res) => {
   getPrinterStoreCache().deleteFolder(folder.index, folder.fullPath);
   res.send(true);
 });
-router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
-  // Check required fields
-  const file = req.body;
-  logger.info("File Re-sync request for: ", file);
-  let ret = null;
-  if (typeof file.fullPath !== "undefined") {
-    ret = await getPrinterStoreCache().resyncFile(file.i, file.fullPath);
-  } else {
-    ret = await getPrinterStoreCache().resyncFilesList(file.i);
+router.post(
+  "/resyncFile",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.FILE_SYNC),
+  async (req, res) => {
+    // Check required fields
+    const file = req.body;
+    let ret;
+    if (!!file?.fullPath) {
+      logger.info("Printer single file resync request", {
+        printer_id: file.id,
+        file_path: file.fullPath
+      });
+      ret = await getPrinterStoreCache().resyncFile(file.id, file.fullPath);
+    } else {
+      logger.info("Full printer files resync request", {
+        printer_id: file.id
+      });
+      ret = await getPrinterStoreCache().resyncFilesList(file.id);
+    }
+    res.send(ret);
   }
-  res.send(ret);
-});
+);
+router.post(
+  "/nukeFiles",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.PRINTER_ID),
+  async (req, res) => {
+    // Check required fields
+    const { id } = req.body;
+    logger.info("Nuke all files and folders requested!", id);
+    const deletedList = await getPrinterStoreCache().deleteAllFilesAndFolders(id);
+    res.send(deletedList);
+  }
+);
+router.post(
+  "/getHouseCleanList",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.HOUSE_KEEPING),
+  async (req, res) => {
+    // Check required fields
+    const { id, days } = req.body;
+    logger.info("File house clean requested!", {
+      printerID: id,
+      days
+    });
+    const fileList = getPrinterStoreCache().getHouseCleanFileList(id, days);
+
+    res.send(fileList);
+  }
+);
+router.post(
+  "/houseCleanFiles",
+  ensureAuthenticated,
+  validateBodyMiddleware(P_VALID.BULK_FILE_DELETE),
+  async (req, res) => {
+    // Check required fields
+    const { id, pathList } = req.body;
+    logger.info("File house clean requested!", {
+      printerID: id,
+      pathList
+    });
+    const deletedList = await getPrinterStoreCache().houseCleanFiles(id, pathList);
+    res.send(deletedList);
+  }
+);
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const step = req.body;
@@ -169,13 +223,24 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   getPrinterStoreCache().updateFeedRate(step.printer, step.newSteps);
   res.send("success");
 });
+router.post("/editPrinter", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  // Check required fields
+  const settings = req.body;
+  logger.info("Update printers settings request: ", settings);
+  try {
+    const editPrinter = await getPrinterStoreCache().editPrinterConnectionSettings(settings);
+    res.send({ status: editPrinter });
+  } catch (e) {
+    logger.error("Couldn't update settings...", e.message);
+    res.send({ status: 500 });
+  }
+});
 router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   // Check required fields
   const settings = req.body;
-  logger.info("Update printers request: ", settings);
+  logger.info("Update printers settings request: ", settings);
   try {
     const updateSets = await getPrinterStoreCache().updatePrinterSettings(settings);
-    console.log(updateSets);
     res.send({ status: updateSets });
   } catch (e) {
     logger.error("Couldn't update settings...", e.message);
@@ -186,7 +251,7 @@ router.post("/updateSettings", ensureAuthenticated, ensureAdministrator, async (
 router.get("/groups", ensureAuthenticated, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const groups = [];
-  for (let printer of printers) {
+  for (const printer of printers) {
     groups.push({
       _id: printer._id,
       group: printer.group
@@ -204,8 +269,12 @@ router.post(
     const id = req.body.i;
     let returnedPrinterInformation;
     if (!id) {
-      const disabled = req.query.disabled === "true";
-      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(false, disabled);
+      const onlyDisabled = req.query.disabled === "true";
+      const showFullList = req.query.fullList === "true";
+      returnedPrinterInformation = getPrinterStoreCache().listPrintersInformation(
+        showFullList,
+        onlyDisabled
+      );
     } else {
       returnedPrinterInformation = getPrinterStoreCache().getPrinterInformation(id);
     }
@@ -290,6 +359,7 @@ router.post("/wakeHost", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Action wake host: ", data);
   await Script.wol(data);
+  res.sendStatus(201);
 });
 router.post(
   "/updateSortIndex",
@@ -298,7 +368,6 @@ router.post(
   validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const data = req.body.idList;
-    console.log(data.length);
     logger.info("Update printer sort indexes: ", data);
     res.send(await getPrinterManagerCache().updatePrinterSortIndexes(data));
   }
@@ -309,9 +378,9 @@ router.get(
   ensureAdministrator,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
-    let id = req.paramString("id");
+    const id = req.paramString("id");
     logger.info("Grabbing connection logs for: ", id);
-    let connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
+    const connectionLogs = await getPrinterStoreCache().generatePrinterConnectionLogs(id);
 
     res.send(connectionLogs);
   }
@@ -358,19 +427,19 @@ router.get(
 router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const { searchForDevicesOnNetwork } = require("../services/octoprint-auto-discovery.service.js");
 
-  let devices = await searchForDevicesOnNetwork();
+  const devices = await searchForDevicesOnNetwork();
 
   res.json(devices);
 });
 
 router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
-  let uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
+  const uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
   res.json(uniqueFolderPaths);
 });
 
 router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
   //DISCOVER Where's this gone!?
-  let uniqueFolderPaths = getPrinterStoreCache().listUniqueFiles();
+  const uniqueFolderPaths = getPrinterStoreCache().listUniqueFiles();
   res.json(uniqueFolderPaths);
 });
 
@@ -380,7 +449,7 @@ router.get(
   validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const idList = req.paramString("idList");
-    let uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
+    const uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
     res.json(uniqueFolderPaths);
   }
 );
@@ -393,7 +462,7 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
   const returnArray = [];
   const printers = getPrinterStoreCache().listPrintersInformation();
 
-  for (let printer of printers) {
+  for (const printer of printers) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printer._id);
 
     if (!stats) {
@@ -417,30 +486,40 @@ router.get("/connectionOverview", ensureAuthenticated, ensureAdministrator, (req
   res.send(printerConnectionStats);
 });
 
-router.patch(
-  "/disable/:id",
+router.post(
+  "/disable",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(M_VALID.MONGO_ID),
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   (req, res) => {
-    const id = req.paramString("id");
-    res.send(getPrinterStoreCache().disablePrinter(id));
+    const idList = req.body.idList;
+    res.send(getPrinterManagerCache().disablePrinters(idList));
   }
 );
 
-router.patch(
-  "/enable/:id",
+router.post(
+  "/enable",
   ensureAuthenticated,
   ensureAdministrator,
-  validateParamsMiddleware(M_VALID.MONGO_ID),
+  validateBodyMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
-    const id = req.paramString("id");
-    res.send(await getPrinterStoreCache().enablePrinter(id));
+    const idList = req.body.idList;
+    res.send(await getPrinterManagerCache().enablePrinters(idList));
   }
 );
 
 router.get("/generate_printer_name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   res.send(generateRandomName());
+});
+
+router.get(
+  "/events/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    res.send(getEventEmitterCache().get(printerID));
 });
 
 module.exports = router;

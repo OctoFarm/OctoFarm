@@ -17,11 +17,11 @@ class Logs {
   static async grabLogs() {
     const fileArray = [];
     const folderContents = readdirSync(logFolder);
-    for (let i = 0; i < folderContents.length; i++) {
-      const logFilePath = join(logFolder, folderContents[i]);
+    for (const folder of folderContents) {
+      const logFilePath = join(logFolder, folder);
       const stats = statSync(logFilePath);
       const logFile = {
-        name: folderContents[i],
+        name: folder,
         path: logFilePath,
         size: stats?.size,
         modified: stats?.mtime,
@@ -35,13 +35,16 @@ class Logs {
   /**
    * Deletes a log file by name
    * @param name
-   * @returns {void}
+   * @returns Boolean
    */
   static deleteLogByName(name = undefined) {
-    if (!name) return;
+    if (!name) {
+      return false;
+    }
     const logFilePath = join(logFolder, name);
     logger.debug("Deleting log file: " + logFilePath);
-    return unlinkSync(logFilePath);
+    unlinkSync(logFilePath);
+    return true;
   }
 
   /**
@@ -54,8 +57,8 @@ class Logs {
     const folderContents = readdirSync(logFolder);
     const now = new Date();
     const yesterday = now.setDate(now.getDate() - days);
-    for (let i = 0; i < folderContents.length; i++) {
-      const logFilePath = join(logFolder, folderContents[i]);
+    for (const folder of folderContents) {
+      const logFilePath = join(logFolder, folder);
       const stats = statSync(logFilePath);
       const endTime = new Date(stats.birthtime).getTime() + 3600000;
       if (yesterday > endTime) {
@@ -74,13 +77,15 @@ class Logs {
     const fileList = [];
 
     // Generate nice text file of system information
-    let octofarmInformationTxt = await generateOctoFarmSystemInformationTxt();
-    if (!octofarmInformationTxt) throw "Couldn't generate octofarms_information.txt file...";
+    const octofarmInformationTxt = await generateOctoFarmSystemInformationTxt();
+    if (!octofarmInformationTxt) {
+      throw new Error("Couldn't generate octofarms_information.txt file...");
+    }
 
     fileList.push(octofarmInformationTxt);
 
     // Collect all latest log files
-    let currentLogFiles = await this.grabLogs();
+    const currentLogFiles = await this.grabLogs();
 
     // Let me know if there's a better way here. Just always used forEach.
     currentLogFiles.forEach((logPath) => {

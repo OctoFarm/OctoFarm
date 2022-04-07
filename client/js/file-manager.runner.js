@@ -6,13 +6,16 @@ import {createFilamentSelector} from "./services/filament-manager-plugin.service
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 import {allowedFileTypes} from "./constants/file-types.constants"
 
+import {printerIsOnline} from "./utils/octofarm.utils";
+
+
 let lastId = null;
 
 //Setup global listeners...
 const multiUploadBtn = document.getElementById("multUploadBtn");
 if (multiUploadBtn) {
-  multiUploadBtn.addEventListener("click", (e) => {
-    FileManagerService.multiUpload();
+  multiUploadBtn.addEventListener("click", async () => {
+    await FileManagerService.multiUpload();
   });
 }
 
@@ -21,10 +24,24 @@ class Manager {
     let printers = await OctoFarmClient.listPrinters();
     const printerList = document.getElementById("printerList");
     printerList.innerHTML = "";
+
+    const onlinePrinters = printers.some(printer => {
+      return printerIsOnline(printer);
+    })
+
+    if(!printerList || !onlinePrinters){
+      printerList.innerHTML = `
+      <div class="alert alert-dark text-center" role="alert">
+        No printers are online... Please refresh when they are!
+      </div>
+      `
+      return;
+    }
+
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
-      if (printer.printerState.colour.category !== "Offline") {
+      if (printerIsOnline(printer)) {
         onlinePrinterList.push(printer);
       }
     });
@@ -47,7 +64,8 @@ class Manager {
       }
 
       let extruderList = "";
-      for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+
+      for (let i = 0; i < printer?.currentProfile?.extruder?.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
       }
 
@@ -107,9 +125,9 @@ class Manager {
       );
       //Setup for first printer
       const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
-      listItem.addEventListener("click", (e) => {
+      listItem.addEventListener("click", async (e) => {
         if (!e.target.id.includes("tool")) {
-          Manager.changePrinter(e, printer._id);
+          await Manager.changePrinter(e, printer._id);
         }
       });
 
@@ -137,12 +155,11 @@ class Manager {
     await Manager.drawPrinterList();
   }
 
-  static changePrinter(e, target) {
+  static async changePrinter(e, target) {
     if (!e.target.id.includes("filamentDrop")) {
       const fileList = document.getElementById("fileBody");
       if (!!fileList) {
         fileList.innerHTML = "";
-        fileList.scrollTop = 0;
       }
 
       //Set old one deselected
@@ -159,7 +176,7 @@ class Manager {
       panel.classList.remove("bg-secondary");
       const firstElement = document.getElementById("currentPrinter");
       firstElement.innerHTML = `<i class="fas fa-print"></i> ${printerName}`;
-      Manager.updatePrinterList(target);
+      await Manager.updatePrinterList(target);
     }
   }
 
@@ -179,7 +196,7 @@ class Manager {
             <button
                     id="createFolderBtn"
                     type="button"
-                    class="btn btn-warning float-left mr-1 mb-0 bg-colour-3"
+                    class="btn btn-warning float-left mr-1 mb-0 text-dark"
                     data-toggle="collapse"
                     href="#createFolder"
                     role="button"
@@ -188,8 +205,14 @@ class Manager {
             >
               <i class="fas fa-folder-plus"></i> Create Folder
             </button>
-            <button id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
+            <button title="Re-Sync OctoPrints file list back to OctoFarm" id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
               <i class="fas fa-sync"></i> Re-Sync
+            </button>
+            <button title="Delete all file from OctoPrint" id="fileDeleteAll" type="button" class="btn btn-outline-danger mb-0 float-right">
+              <i class="fa-solid fa-trash-can"></i> Delete All
+            </button>
+            <button title="Run house keeping on file list" id="fileHouseKeeping" type="button" class="btn btn-warning text-dark mb-0 mr-1 float-right">
+              <i class="fa-solid fa-broom"></i> House Keeping
             </button>
           </div>
         </div>
@@ -201,9 +224,8 @@ class Manager {
         `<div id="fileList-${id}" class="list-group" data-jplist-group="files"></div>`
       );
 
-    let printer = await OctoFarmClient.getPrinter(id);
-
-    await FileManagerSortingService.loadSort(printer._id);
+    const printer = await OctoFarmClient.getPrinter(id);
+    await FileManagerSortingService.loadSort(id);
     document.getElementById("backBtn").innerHTML =
       "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";
     const fileButtons = {
@@ -214,6 +236,8 @@ class Manager {
         uploadFiles: document.getElementById("fileUploadBtn"),
         uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
         syncFiles: document.getElementById("fileReSync"),
+        fileDeleteAll: document.getElementById("fileDeleteAll"),
+        fileHouseKeeping: document.getElementById("fileHouseKeeping"),
         back: document.getElementById("fileBackBtn"),
         createFolderBtn: document.getElementById("createFolderBtn")
       }
@@ -249,6 +273,22 @@ class Manager {
     });
     fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
       await FileManagerService.reSyncFiles(e, printer);
+    });
+    fileButtons.fileManager.fileDeleteAll.addEventListener("click", async (e) => {
+      await FileManagerService.deleteAllFiles(e, printer);
+    });
+    fileButtons.fileManager.fileHouseKeeping.addEventListener("click", async (e) => {
+      bootbox.prompt({
+        title: "Clean all files older than 'X' days...",
+        message: "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
+        inputType: "number",
+        callback: async function (result) {
+          if(!!result){
+            await FileManagerService.fileHouseKeeping(e, printer, result);
+          }
+        }
+      });
+
     });
   }
 }

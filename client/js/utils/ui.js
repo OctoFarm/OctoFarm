@@ -271,9 +271,9 @@ export default class UI {
   }
 
   static isPrinterDisabled(e) {
-    if (e.target.innerHTML.includes("running")) {
+    if (e.target.innerHTML.includes("wheelchair")) {
       return false;
-    } else if (e.target.innerHTML.includes("wheelchair")) {
+    } else if (e.target.innerHTML.includes("running")) {
       return true;
     }
   }
@@ -294,13 +294,11 @@ export default class UI {
     const printerCard = document.getElementById(`printerCard-${id}`);
 
     if (e.target.innerHTML.includes("running")) {
-      e.target.classList = "btn btn-outline-light btn-sm";
-      e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disabled";
+      e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disable";
       e.target.title = "Printer is Disabled, click to enable";
       printerCard.classList = "printerDisabled";
     } else if (e.target.innerHTML.includes("wheelchair")) {
-      e.target.classList = "btn btn-outline-success btn-sm";
-      e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enabled";
+      e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enable";
       e.target.title = "Printer is Enabled, click to disable";
       printerCard.classList = "";
     }
