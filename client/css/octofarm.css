@@ -542,7 +542,13 @@ label {
   z-index: -1;
 }
 
-.modal-overflow {
+.modal-dialog {
+  margin-bottom: 0 !important;
+}
+
+.modal-body {
+  min-height: 80vh;
+  height: 80vh;
   max-height: 80vh;
   overflow-y: scroll;
 }
@@ -574,7 +580,7 @@ label {
   .sticky-table {
     min-width:100px;
     position: sticky;
-    top: 40px;
+    top: 0px;
     z-index: 1000;
   }
 
@@ -587,7 +593,7 @@ label {
   .sticky-table {
     min-width:100px;
     position: sticky;
-    top: 40px;
+    top: 0;
     z-index: 1000;
   }
 }

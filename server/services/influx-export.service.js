@@ -52,6 +52,9 @@ function writePoints(tags, measurement, dataPoints) {
         fields: dataPoints
       }
     ]).catch((err) => {
+      logger.error("Influx Tags", tags);
+      logger.error("Influx Measurement", measurement);
+      logger.error("Influx Datapoints", dataPoints);
       logger.error(`Error saving data to InfluxDB! ${err.stack}`);
     });
   }

@@ -19,6 +19,7 @@ import { updatePrinterSettingsModal } from "../../services/printer-settings.serv
 import {
   loadPrinterHealthChecks,
   reSyncAPI,
+  loadPrintersRegisteredEvents
 } from "./functions/printer-manager.functions";
 import { removeAlertsLog, updateAlertsLog } from "./alerts-log";
 
@@ -78,7 +79,7 @@ function updatePrinterInfo(printer) {
   let printerName = JSON.parse(JSON.stringify(printer?.printerName));
 
   if (!printerName) {
-    printerName = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    printerName = "<i class=\"fa-solid fa-spinner fa-spin\"></i>";
   }
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
@@ -110,6 +111,25 @@ function checkIfPrinterHealthOK(printer) {
   }
 }
 
+function checkIfPrinterHasEvents(printer){
+  const eventsAlerts = document.getElementById(`printerEventsAlert-${printer._id}`);
+  const printerEventsCount = document.getElementById(`printerEventsCount-${printer._id}`);
+  if(printer?.registeredEvents.length > 0){
+    updateAlertsLog({
+      id: "printerEvents-" + printer._id,
+      name: "Printer events are registered!",
+      printerName: printer.printerName,
+      colour: "Info",
+    });
+    printerEventsCount.innerHTML = printer.registeredEvents.length;
+    UI.addDisplayNoneToElement(eventsAlerts);
+    return;
+  }
+  UI.removeDisplayNoneFromElement(eventsAlerts);
+  removeAlertsLog({ id: "printerEvents-" + printer._id });
+
+}
+
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
@@ -138,7 +158,7 @@ function setupReconnectingIn(printer) {
     UI.addDisplayNoneToElement(printerReScanButton);
     // updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
-      printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
+      printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -150,7 +170,7 @@ function setupReconnectingIn(printer) {
   } else {
     // removeAlertsLog({id: "apiReconnect-"+printer._id})
     UI.removeDisplayNoneFromElement(printerReScanButton);
-    printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -170,7 +190,7 @@ function reconnectingWebsocketIn(printer) {
     // updateAlertsLog({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML =
-        '<i class="fas fa-sync-alt fa-sm fa-spin"></i>';
+        "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -182,7 +202,7 @@ function reconnectingWebsocketIn(printer) {
   } else {
     UI.removeDisplayNoneFromElement(printerReScanButton);
     // removeAlertsLog({id: "socketReconnect-"+printer._id})
-    printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -336,7 +356,8 @@ function updatePrinterRow(printer) {
 
       checkForOctoPrintPluginUpdates(printer);
 
-      checkForApiErrors(printer);
+      //TODO - needs to update online only... same with a few others... also doesn't remove itself.
+      //checkForApiErrors(printer);
 
       checkIfPrinterHealthOK(printer);
 
@@ -345,6 +366,8 @@ function updatePrinterRow(printer) {
       checkIfMultiUserIssueFlagged(printer);
 
       corsWarningCheck(printer);
+
+      checkIfPrinterHasEvents(printer);
     }
   }
 }
@@ -446,10 +469,10 @@ export function createOrUpdatePrinterTableRow(printers) {
 
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel',
+                label: "<i class=\"fa fa-times\"></i> Cancel",
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm',
+                label: "<i class=\"fa fa-check\"></i> Confirm",
               },
             },
             callback: async function (result) {
@@ -499,6 +522,10 @@ export function createOrUpdatePrinterTableRow(printers) {
             await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id, true);
           });
 
+      document.getElementById("printerEventsAlert-" + printer._id).addEventListener("click", async () => {
+            await loadPrintersRegisteredEvents(printer._id);
+      })
+
       document
           .getElementById("restartRequired-" + printer._id)
           .addEventListener("click", async (e) => {
@@ -506,12 +533,12 @@ export function createOrUpdatePrinterTableRow(printers) {
               message: "This will restart your OctoPrint instance, are you sure?",
               buttons: {
                 confirm: {
-                  label: 'Yes',
-                  className: 'btn-success'
+                  label: "Yes",
+                  className: "btn-success"
                 },
                 cancel: {
-                  label: 'No',
-                  className: 'btn-danger'
+                  label: "No",
+                  className: "btn-danger"
                 }
               },
               callback: async function (result) {

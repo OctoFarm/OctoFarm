@@ -171,39 +171,32 @@ function sendToInflux(printersInformation) {
   printersInformation.forEach((printer) => {
     if (printer.printerState.colour.category !== "Offline") {
       const date = Date.now();
-      let group = " ";
-      if (printer.group === "") {
-        group = " ";
-      } else {
-        group = printer.group;
-      }
 
       const tags = {
-        name: printer.printerName,
-        group: group,
-        url: printer.printerURL,
-        state: printer.printerState.state,
-        stateCategory: printer.printerState.colour.category,
-        host_state: printer.hostState.state,
-        websocket_state: printer.webSocketState.colour,
-        octoprint_version: printer.octoPrintVersion
+        name: printer?.printerName ? printer.printerName : " ",
+        group: printer?.group ? printer.group : " ",
+        url: printer?.printerURL ? printer.printerURL : " ",
+        state: printer?.printerState?.state ? printer.printerState.state : " ",
+        stateCategory: printer?.printerState?.colour?.category ? printer.printerState?.colour?.category : " ",
+        host_state: printer?.hostState?.state ? printer.hostState?.state : " ",
+        websocket_state: printer?.webSocketState?.colour ? printer.webSocketState?.colour : " ",
+        octoprint_version: printer?.octoPrintVersion ? printer.octoPrintVersion : " "
       };
       const printerData = {
-        name: printer.printerName,
-        group: group,
-        url: printer.printerURL,
-        state: printer.printerState.state,
-        host_state: printer.hostState.state,
-        websocket_state: printer.webSocketState.colour,
-        octoprint_version: printer.octoPrintVersion,
-        group: group,
-        state_category: printer.printerState.colour.category,
-        current_idle_time: parseFloat(printer.currentIdle),
-        current_active_time: parseFloat(printer.currentActive),
-        current_offline_time: parseFloat(printer.currentOffline),
-        date_added: parseFloat(printer.dateAdded),
-        storage_free: parseFloat(printer.storage.free),
-        storage_total: parseFloat(printer.storage.total),
+        name: printer?.printerName ? printer.printerName : " ",
+        group: printer?.group ? printer.group : " ",
+        url: printer?.printerURL ? printer.printerURL : " ",
+        state: printer?.printerState?.state ? printer.printerState.state : " ",
+        host_state: printer?.hostState?.state ? printer.hostState.state : " ",
+        websocket_state: printer?.webSocketState?.colour ? printer.webSocketState.colour : " ",
+        octoprint_version: printer?.octoPrintVersion ? printer.octoPrintVersion : " ",
+        state_category: printer?.printerState?.colour?.category ? printer.printerState.colour.category : " ",
+        current_idle_time: printer.currentIdle ? parseFloat(printer.currentIdle) : 0,
+        current_active_time: printer.currentActive ? parseFloat(printer.currentActive) : 0,
+        current_offline_time: printer.currentOffline ? parseFloat(printer.currentOffline) : 0,
+        date_added: printer.dateAdded ? parseFloat(printer.dateAdded) : 0,
+        storage_free: printer?.storage?.free ? parseFloat(printer.storage.free) : 0,
+        storage_total: printer?.storage?.total ? parseFloat(printer.storage.total) : 0,
         timestamp: date
       };
       if (typeof printer.resends !== "undefined") {

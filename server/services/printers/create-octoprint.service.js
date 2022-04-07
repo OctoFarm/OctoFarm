@@ -91,6 +91,7 @@ class OctoPrintPrinter {
   resends = undefined;
   tools = undefined;
   currentJob = undefined;
+  job = undefined;
   currentZ = undefined;
   currentProfile = undefined;
   currentConnection = undefined;

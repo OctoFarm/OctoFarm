@@ -20,6 +20,7 @@ const M_VALID = require("../constants/validate-mongo.constants");
 const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { generateRandomName } = require("../services/printer-name-generator.service");
+const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 
 /**
  * @swagger
@@ -84,7 +85,6 @@ router.post(
   async (req, res) => {
     // Grab the API body
     const printers = req.body;
-
     // Send Dashboard to Runner..
     logger.info("Add printers request: ", printers);
     const p = await getPrinterManagerCache().addPrinter(printers);
@@ -510,6 +510,16 @@ router.post(
 
 router.get("/generate_printer_name", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   res.send(generateRandomName());
+});
+
+router.get(
+  "/events/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    res.send(getEventEmitterCache().get(printerID));
 });
 
 module.exports = router;

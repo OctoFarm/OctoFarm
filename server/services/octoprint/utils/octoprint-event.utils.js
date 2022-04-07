@@ -7,9 +7,7 @@ const { ScriptRunner } = require("../../local-scripts.service");
 const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
 const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
-const { MESSAGE_TYPES } = require("../../../constants/sse.constants");
 const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
-const { FileClean } = require("../../file-cleaner.service");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -255,9 +253,15 @@ const captureMetadataAnalysisStarted = (id, data) => {
     });
 };
 const captureMetadataStatisticsUpdated = (id, data) => {
-  console.log("META DATA UPDATED", data)
-  //getPrinterStoreCache().updateFileInformation(id, data);
-
+  getPrinterStoreCache()
+    .resyncFile(id, data.path)
+    .then((res) => {
+      logger.warning("Automatically updated file information!", res);
+      return res;
+    })
+    .catch((e) => {
+      logger.error("Failed to automatically update file information", e);
+    });
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "metadataupdated", undefined)
     .then((res) => {
       logger.info("Successfully checked metadata updated script", res);
@@ -305,12 +309,6 @@ const captureFinishedPrint = (id, data, success) => {
   HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success)
     .then((res) => {
       logger.info("Successfully captured print!", res);
-      setTimeout(function () {
-        //TODO check to see if file meta analysis is fired after successful print, would accomplish this!
-        setTimeout(function () {
-          console.log("DONT BE EMPTY");
-        }, 5000);
-      }, 10000);
     })
     .catch((e) => {
       logger.error("Failed to capture print!", e);
@@ -375,6 +373,7 @@ const captureTransferStarted = (id, data) => {
     });
 };
 const captureUpdatedFiles = (id, data) => {
+  console.log("Updated file", data);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "fileupdate", undefined)
     .then((res) => {
       logger.info("Successfully checked file update script", res);

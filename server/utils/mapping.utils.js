@@ -1,4 +1,4 @@
-const _ = require("lodash");
+const { cloneDeep } = require("lodash");
 
 function mapProgressToColor(progress) {
   progress = parseInt(progress);
@@ -43,11 +43,11 @@ function checkTempRange(state, target, actual, heatingVariation, coolDown) {
 }
 
 const clonePayloadDataForHistory = function (payload, farmPrinter) {
-  const payloadData = Object.assign({}, payload);
-  const printer = Object.assign({}, farmPrinter);
-  const job = Object.assign({}, farmPrinter.job);
-  const files = Object.assign({}, farmPrinter.fileList.files);
-  const resendStats = Object.assign({}, farmPrinter.resends);
+  const payloadData = cloneDeep(payload);
+  const printer = cloneDeep(farmPrinter);
+  const job = cloneDeep(farmPrinter.job);
+  const files = cloneDeep(farmPrinter.fileList.fileList);
+  const resendStats = cloneDeep(farmPrinter.resends);
 
   return { payloadData, printer, job, files, resendStats };
 };

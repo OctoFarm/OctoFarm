@@ -296,6 +296,7 @@ class OctoprintWebsocketMessageService {
     //logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {
+    console.log("PRINTER PLUGIN DATA", message)
     const OP_EM = OctoprintWebsocketMessageService;
     const { header, data } = OP_EM.parseOctoPrintPluginMessage(message);
 
@@ -306,8 +307,8 @@ class OctoprintWebsocketMessageService {
         capturePluginManagerData(printerID, type, data);
         break;
       case OP_WS_PLUGIN_KEYS.klipper:
-        //console.log(type);
-        //captureKlipperPluginData(printerID, data);
+        console.log(type);
+        captureKlipperPluginData(printerID, data);
         break;
     }
   }

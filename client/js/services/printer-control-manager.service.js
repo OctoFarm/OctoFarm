@@ -1092,7 +1092,6 @@ export default class PrinterControlManagerService {
       elements.jobStatus.progressBar.innerHTML = 0 + "%";
       elements.jobStatus.progressBar.style.width = 0 + "%";
     }
-
     elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
       printer.currentJob.expectedPrintTime
     );

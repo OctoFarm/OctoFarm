@@ -4,6 +4,7 @@ const { PrinterClean } = require("../../printer-cleaner.service");
 const { JobClean } = require("../../job-cleaner.service");
 const TempHistoryDB = require("../../../models/TempHistory");
 const { mapStateToCategory } = require("../../printers/utils/printer-state.utils");
+const { eventListConstants } = require("../../../constants/event.constants");
 
 const Logger = require("../../../handlers/logger");
 const logger = new Logger("OctoFarm-State");
@@ -65,7 +66,7 @@ const coolDownEvent = (id, temps) => {
   const { printerState } = getPrinterStoreCache().getPrinterState(id);
 
   if (printerState.colour.category === "Active") {
-    getPrinterStoreCache().addPrinterEvent(id, "coolDown");
+    getPrinterStoreCache().addPrinterEvent(id, eventListConstants.COOL_DOWN.id);
   }
   if (printerState.colour.category === "Complete") {
     const { coolDown } = getPrinterStoreCache().getTempTriggers(id);
@@ -73,7 +74,7 @@ const coolDownEvent = (id, temps) => {
       parseFloat(temps[0].tool0.actual) < parseFloat(coolDown) &&
       parseFloat(temps[0].bed.actual) < parseFloat(coolDown)
     ) {
-      getPrinterStoreCache().emitPrinterEvent(id, "coolDown");
+      getPrinterStoreCache().emitPrinterEvent(id, eventListConstants.COOL_DOWN.id);
     }
   }
 };
@@ -81,6 +82,9 @@ const coolDownEvent = (id, temps) => {
 const captureJobData = (id, data) => {
   if (!!data) {
     //Make sure we have at least a tool!
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      job: data
+    });
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       currentJob: JobClean.generate(
         data,

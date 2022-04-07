@@ -37,6 +37,15 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fas fa-users"></i>
     </button>
+        <button title="Printer Events Registered"
+            type="button"
+            class="tag btn btn-outline-info btn-sm d-none"
+            data-toggle="modal"
+            data-target="#printerEventsModal"
+            id="printerEventsAlert-${id}"
+    >
+        <i class="fa-solid fa-calendar-check"></i> <span id="printerEventsCount-${id}"></span>
+    </button>
     <a title="CORS is not enable on OctoPrint!"
             type="button"
             class="tag btn btn-outline-info btn-sm d-none"

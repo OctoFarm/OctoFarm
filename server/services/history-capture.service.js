@@ -325,19 +325,22 @@ class HistoryCollection {
   }
 
   static async updateInfluxDB(historyID, measurement, printer) {
-    let historyArchive = getHistoryCache().historyClean;
-    let currentArchive = findIndex(historyArchive, function (o) {
-      return JSON.stringify(o._id) === JSON.stringify(historyID);
-    });
-    if (currentArchive > -1) {
+    try{
+      let historyArchive = getHistoryCache().historyClean;
+      let currentArchive = findIndex(historyArchive, function (o) {
+        return JSON.stringify(o._id) === JSON.stringify(historyID);
+      });
+      if (currentArchive <= -1) {
+        return;
+      }
       let workingHistory = historyArchive[currentArchive];
       let startDateSplit = workingHistory.startDate.split(" ");
       let endDateSplit = workingHistory.endDate.split(" ");
       const trueStartDate = Date.parse(
-        `${startDateSplit[2]} ${startDateSplit[1]} ${startDateSplit[3]} ${startDateSplit[5]}`
+          `${startDateSplit[2]} ${startDateSplit[1]} ${startDateSplit[3]} ${startDateSplit[5]}`
       );
       const trueEndDate = Date.parse(
-        `${endDateSplit[2]} ${endDateSplit[1]} ${endDateSplit[3]} ${endDateSplit[5]}`
+          `${endDateSplit[2]} ${endDateSplit[1]} ${endDateSplit[3]} ${endDateSplit[5]}`
       );
       let currentState = " ";
       if (workingHistory.state.includes("Success")) {
@@ -393,15 +396,16 @@ class HistoryCollection {
       if (!isNaN(averagePrintTime)) {
         printerData["file_last_print_time"] = lastPrintTime;
       }
-
       if (typeof workingHistory.resend !== "undefined") {
         printerData["job_resends"] = `${workingHistory.resend.count} / ${
-          workingHistory.resend.transmitted / 1000
+            workingHistory.resend.transmitted / 1000
         }K (${workingHistory.resend.ratio.toFixed(0)})`;
       }
-
       writePoints(tags, "HistoryInformation", printerData);
+    }catch(e){
+      logger.error(e)
     }
+
   }
 
   static async updateFilamentInfluxDB(selectedFilament, history, previousFilament, printer) {
@@ -609,6 +613,7 @@ class HistoryCollection {
     };
     // Update influx if it's active
     if (serverSettingsCache.influxExport.active) {
+      console.log("UPDATING INFLUXDB")
       await HistoryCollection.updateFilamentInfluxDB(
         printer.selectedFilament,
         printHistory,
@@ -620,103 +625,120 @@ class HistoryCollection {
     const saveHistory = new History({
       printHistory
     });
+
     // Save initial history
-    await saveHistory
-      .save()
-      .then(async (res) => {
-        // Capture thumbnails if enabled
-        if (serverSettingsCache.history.thumbnails.onComplete && state) {
-          const thumbnail = await HistoryCollection.thumbnailCheck(
-            payload,
-            files,
-            res._id,
-            printer
-          );
-          History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
-            .then((res) => {
-              logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
-            })
-            .catch((e) => {
-              console.error("Failed to update history record thumbnail!", e);
-            });
-        }
-        if (serverSettingsCache.history.thumbnails.onFailure && !state) {
-          const thumbnail = await HistoryCollection.thumbnailCheck(
-            payload,
-            files,
-            res._id,
-            printer
-          );
-          History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
-            .then((res) => {
-              logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
-            })
-            .catch((e) => {
-              console.error("Failed to update history record thumbnail!", e);
-            });
-        }
+    console.log(state)
+    if (serverSettingsCache.history.thumbnails.onComplete && state) {
+      console.log("THUMBNAILS CHECK")
+      saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
+          payload,
+          files,
+          saveHistory._id,
+          printer
+      );
 
-        if (serverSettingsCache.history.snapshot.onComplete && state) {
-          const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
-          History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
-            .then((res) => {
-              logger.debug("Successfully to update history record snapshot with: ", snapshot);
-            })
-            .catch((e) => {
-              console.error("Failed to update history record snapshot!", e);
-            });
-        }
-        if (serverSettingsCache.history.snapshot.onFailure && !state) {
-          const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
-          History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
-            .then((res) => {
-              logger.debug("Successfully to update history record snapshot with: ", snapshot);
-            })
-            .catch((e) => {
-              console.error("Failed to update history record snapshot!", e);
-            });
-        }
+    }
 
-        if (serverSettingsCache.history.timelapse.onComplete && state) {
-          await HistoryCollection.timelapseCheck(
-            printer,
-            payload.name,
-            payload.time,
-            res._id,
-            printerAPIConnector
-          );
-        }
-        if (serverSettingsCache.history.timelapse.onFailure && !state) {
-          await HistoryCollection.timelapseCheck(printer, payload.name, payload.time, res._id);
-        }
-        printer.fileName = payload.display;
-        printer.filePath = payload.path;
-        if (!state) {
-          await ScriptRunner.check(printer, "failed", saveHistory._id);
-        } else {
-          await ScriptRunner.check(printer, "done", saveHistory._id);
-        }
+    console.log(saveHistory)
 
-        await res
-          .save()
-          .then(async (res) => {
-            // Update cache after save
-            await getHistoryCache().initCache();
-            setTimeout(async function () {
-              // Re-D
-              await getHistoryCache().initCache();
-              if (serverSettingsCache.influxExport.active) {
-                await HistoryCollection.updateInfluxDB(res._id, "history", printer);
-              }
-            }, 5000);
-          })
-          .catch((e) => {
-            throw new Error(e);
-          });
-      })
-      .catch((e) => {
-        throw new Error(e);
-      });
+    await saveHistory.save();
+    // await saveHistory
+    //   .save()
+    //   .then(async (res) => {
+    //     // Capture thumbnails if enabled
+    //     if (serverSettingsCache.history.thumbnails.onComplete && state) {
+    //       console.log("THUMBNAILS CHECK")
+    //       const thumbnail = await HistoryCollection.thumbnailCheck(
+    //         payload,
+    //         files,
+    //         res._id,
+    //         printer
+    //       );
+    //       History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
+    //         .then((res) => {
+    //           logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
+    //         })
+    //         .catch((e) => {
+    //           console.error("Failed to update history record thumbnail!", e);
+    //         });
+    //     }
+    //     if (serverSettingsCache.history.thumbnails.onFailure && !state) {
+    //       const thumbnail = await HistoryCollection.thumbnailCheck(
+    //         payload,
+    //         files,
+    //         res._id,
+    //         printer
+    //       );
+    //       History.findByIdAndUpdate(res._id, { "printHistory.thumbnail": thumbnail })
+    //         .then((res) => {
+    //           logger.debug("Successfully to update history record thumbnail with: ", thumbnail);
+    //         })
+    //         .catch((e) => {
+    //           console.error("Failed to update history record thumbnail!", e);
+    //         });
+    //     }
+    //
+    //     if (serverSettingsCache.history.snapshot.onComplete && state) {
+    //       const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
+    //       History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
+    //         .then((res) => {
+    //           logger.debug("Successfully to update history record snapshot with: ", snapshot);
+    //         })
+    //         .catch((e) => {
+    //           console.error("Failed to update history record snapshot!", e);
+    //         });
+    //     }
+    //     if (serverSettingsCache.history.snapshot.onFailure && !state) {
+    //       const snapshot = await HistoryCollection.snapshotCheck(printer, res._id, payload);
+    //       History.findByIdAndUpdate(res._id, { "printHistory.snapshot": snapshot })
+    //         .then((res) => {
+    //           logger.debug("Successfully to update history record snapshot with: ", snapshot);
+    //         })
+    //         .catch((e) => {
+    //           console.error("Failed to update history record snapshot!", e);
+    //         });
+    //     }
+    //
+    //     if (serverSettingsCache.history.timelapse.onComplete && state) {
+    //       await HistoryCollection.timelapseCheck(
+    //         printer,
+    //         payload.name,
+    //         payload.time,
+    //         res._id,
+    //         printerAPIConnector
+    //       );
+    //     }
+    //     if (serverSettingsCache.history.timelapse.onFailure && !state) {
+    //       await HistoryCollection.timelapseCheck(printer, payload.name, payload.time, res._id);
+    //     }
+    //     printer.fileName = payload.display;
+    //     printer.filePath = payload.path;
+    //     if (!state) {
+    //       await ScriptRunner.check(printer, "failed", saveHistory._id);
+    //     } else {
+    //       await ScriptRunner.check(printer, "done", saveHistory._id);
+    //     }
+    //
+    //     await res
+    //       .save()
+    //       .then(async (res) => {
+    //         // Update cache after save
+    //         await getHistoryCache().initCache();
+    //         setTimeout(async function () {
+    //           // Re-D
+    //           await getHistoryCache().initCache();
+    //           if (serverSettingsCache.influxExport.active) {
+    //             await HistoryCollection.updateInfluxDB(res._id, "history", printer);
+    //           }
+    //         }, 5000);
+    //       })
+    //       .catch((e) => {
+    //         throw new Error(e);
+    //       });
+    //   })
+    //   .catch((e) => {
+    //     throw new Error(e);
+    //   });
   }
 
   static async errorLog(payload, printer, job, files) {

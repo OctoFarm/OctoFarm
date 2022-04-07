@@ -1,5 +1,6 @@
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Events");
+const { eventListConstants, EVENT_ID_MAP } = require("../constants/event.constants")
 
 class EventEmitterService {
   #listeners = {}; // key-value pair
@@ -11,6 +12,18 @@ class EventEmitterService {
     }
     return this;
   }
+
+  get(printerID){
+    const eventList = [];
+    Object.keys(this.#listeners).forEach((event) => {
+      if(event.includes(printerID)){
+        const eventSplit = event.split("-");
+        eventList.push(eventListConstants[EVENT_ID_MAP[eventSplit[1]]]);
+      }
+    })
+    return eventList;
+  }
+
   on(event, fn) {
     logger.warning("Adding new event listener", event);
     return this.#addListener(event, fn);

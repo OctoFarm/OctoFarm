@@ -222,9 +222,9 @@ export default class PrinterFileManagerService {
 
           </div>
             `;
-      FileManagerSortingService.loadSort(printer._id);
+      await FileManagerSortingService.loadSort(printer._id);
 
-      CustomGenerator.generateButtons(printer);
+      await CustomGenerator.generateButtons(printer);
     } catch (e) {
       UI.createAlert(
         "error",
@@ -318,11 +318,11 @@ export default class PrinterFileManagerService {
     }
 
     if (typeof printer.storage !== "undefined") {
-      elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+      elements.fileManager.printerStorage.innerHTML = `${Calc.bytes(
         printer.storage.free
       )} / ${Calc.bytes(printer.storage.total)}`;
     } else {
-      elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+      elements.fileManager.printerStorage.innerHTML = `${Calc.bytes(
         0
       )} / ${Calc.bytes(0)}`;
     }
