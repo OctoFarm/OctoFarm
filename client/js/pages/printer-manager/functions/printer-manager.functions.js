@@ -81,7 +81,6 @@ export async function loadPrintersRegisteredEvents(id){
   printerEventsContent.innerHTML = "";
 
   printerEvents.forEach((event) => {
-    console.log(event);
     printerEventsContent.insertAdjacentHTML("beforeend", `
       <div class="card text-white bg-info mb-3">
         <div class="card-header"><i class="${event.icon}"></i> ${event.name}</div>
