@@ -13,6 +13,7 @@ const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const logger = new Logger("OctoFarm-State");
+const { cloneDeepAndStripFunctions } = require("../utils/sanitize-utils");
 
 class PrinterStore {
   #printersList = undefined;
@@ -56,16 +57,16 @@ class PrinterStore {
     if (onlyDisabled) {
       this.#printersList.forEach((printer) => {
         if (printer?.disabled) {
-          returnList.push(JSON.parse(JSON.stringify(printer)));
+          returnList.push(cloneDeepAndStripFunctions(printer));
         }
       });
     } else {
       this.#printersList.forEach((printer) => {
         if (disabled) {
-          returnList.push(JSON.parse(JSON.stringify(printer)));
+          returnList.push(cloneDeepAndStripFunctions(printer));
         } else {
           if (!printer.disabled) {
-            returnList.push(JSON.parse(JSON.stringify(printer)));
+            returnList.push(cloneDeepAndStripFunctions(printer));
           }
         }
       });
@@ -75,7 +76,7 @@ class PrinterStore {
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
         fileList: FileClean.generate(
-          printer.fileList,
+          cloneDeep(printer.fileList),
           printer.selectedFilament,
           printer.costSettings
         )
@@ -145,14 +146,6 @@ class PrinterStore {
     return printer.selectedFilament;
   }
 
-  getFileList(id) {
-    const printer = this.#findMePrinter(id);
-    const newPrinter = JSON.parse(JSON.stringify(printer));
-    return Object.assign(newPrinter, {
-      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
-    });
-  }
-
   getCurrentZ(id) {
     const printer = this.#findMePrinter(id);
     return printer.currentZ;
@@ -210,7 +203,7 @@ class PrinterStore {
 
   getPrinterInformation(id) {
     const printer = this.#findMePrinter(id);
-    const newPrinter = JSON.parse(JSON.stringify(printer));
+    const newPrinter = cloneDeepAndStripFunctions(printer);
     return Object.assign(newPrinter, {
       fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
     });
@@ -946,7 +939,7 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
 
     printer.fileList = await printer.acquireOctoPrintFilesData(true, true);
-    const newPrinter = JSON.parse(JSON.stringify(printer));
+    const newPrinter = cloneDeepAndStripFunctions(printer);
     return Object.assign(newPrinter, {
       fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
     });
@@ -955,7 +948,7 @@ class PrinterStore {
   async resyncFile(id, fullPath) {
     const printer = this.#findMePrinter(id);
     const fileInformation = await printer.acquireOctoPrintFileData(fullPath, true);
-    const newFile = JSON.parse(JSON.stringify(fileInformation));
+    const newFile = cloneDeep(fileInformation);
     return FileClean.generateSingle(newFile, printer.selectedFilament, printer.costSettings);
   }
 
@@ -1027,7 +1020,7 @@ class PrinterStore {
       path = folder.path;
       name = `${path}/${name}`;
     }
-    const display = JSON.parse(JSON.stringify(name));
+    const display = cloneDeepAndStripFunctions(name);
     name = name.replace(/ /g, "_");
     const newFolder = {
       name,

@@ -3,6 +3,11 @@ function sanitizeString(str) {
   return str.trim();
 }
 
+function cloneDeepAndStripFunctions(object) {
+  return JSON.parse(JSON.stringify(object))
+}
+
 module.exports = {
-  sanitizeString
+  sanitizeString,
+  cloneDeepAndStripFunctions
 };
