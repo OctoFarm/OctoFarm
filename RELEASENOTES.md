@@ -48,7 +48,7 @@
  - Moved filament cleaner startup to app-core
  - Made NODE_ENV to be production by default causing the @octofarm/client bundle to be loaded and console logging to be filtered with level INFO/ERROR
  - File manager: gave printer titles a badge. Gave selected printer a yellow border.
- - Refactor of History Runner with new OctoPrint Client service and added test coverage.
+ - Refactor of HistoryRoutes Runner with new OctoPrint Client service and added test coverage.
  - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
  - Refactor of Printer Manager client code bringing a little speed boost (avg 40fps -> 50fps) and better fault tolerance.
  - Refactor of SSE client into re-usable file.
