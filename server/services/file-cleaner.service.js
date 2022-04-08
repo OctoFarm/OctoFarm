@@ -1,6 +1,6 @@
 "use strict";
 
-const _ = require("lodash");
+const { uniqBy, cloneDeep } = require("lodash");
 const Logger = require("../handlers/logger.js");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
 
@@ -28,11 +28,12 @@ class FileCleanerService {
     const fileCount = [];
     const folderCount = [];
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
-    for (let p = 0; p < farmPrinters.length; p++) {
-      let printer = farmPrinters[p];
-      let fileList = JSON.parse(JSON.stringify(printer.fileList));
-      fileList = FileCleanerService.generate(
-        fileList,
+    for (const printer of farmPrinters) {
+      const uncleanFileList = cloneDeep(printer.fileList);
+      const folderList = cloneDeep(printer.fileList.folderList);
+
+      const fileList = FileCleanerService.generate(
+        uncleanFileList,
         printer.selectedFilament,
         printer.costSettings
       );
@@ -46,25 +47,24 @@ class FileCleanerService {
         devices.push(device);
       }
       if (!!fileList) {
-        for (let i = 0; i < fileList?.fileList?.length; i++) {
-          const file = fileList.fileList[i];
-
+        for (const file of fileList.fileList){
           if (!isNaN(file.fileSize)) {
             fileSizes.push(file.fileSize);
           }
           if (!isNaN(file.filamentLength)) {
+
             fileLengths.push(file.filamentLength / 1000);
           }
 
           fileCount.push(file);
         }
-        for (let i = 0; i < printer.fileList.folderList.length; i++) {
-          folderCount.push(printer.fileList.folderList[i]);
+        for (const folder of folderList) {
+          folderCount.push(folder);
         }
       }
     }
 
-    const uniqueDevices = _.uniqBy(devices, "printerURL");
+    const uniqueDevices = uniqBy(devices, "printerURL");
     uniqueDevices.forEach((device) => {
       storageFree.push(device.storage.free);
       storageTotal.push(device.storage.total);
@@ -170,6 +170,17 @@ class FileCleanerService {
     return sortedFile;
   }
 
+  static defaultSpoolCalculation (toolNumber, length) {
+    const radius = 1.75 / 2;
+    const volume = length * Math.PI * radius * radius;
+    const usage = volume * 1.24;
+    return {
+      length,
+      usage,
+      string: `<b>Tool ${toolNumber}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
+    }
+  }
+
   /**
    * @param filamentSelection
    * @param fileLength
@@ -196,16 +207,18 @@ class FileCleanerService {
             const usage = volume * parseFloat(filamentSelection[l].spools.profile.density);
             lengthArray.push(length);
             weightArray.push(usage);
-            strings.push(`<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`);
+            strings.push(`<b>Tool${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`);
           } else {
-            lengthArray.push(0);
-            weightArray.push(0);
-            strings.push(`<b>Tool ${l}:</b> (No Spool)`);
+            const { length: calcLength, usage, string } = FileCleanerService.defaultSpoolCalculation(l, length);
+            lengthArray.push(calcLength);
+            weightArray.push(usage);
+            strings.push(string);
           }
         } else {
-          lengthArray.push(0);
-          weightArray.push(0);
-          strings.push(`<b>Tool ${l}:</b> (No Spool)`);
+          const { length: calcLength, usage, string } = FileCleanerService.defaultSpoolCalculation(l, length);
+          lengthArray.push(calcLength);
+          weightArray.push(usage);
+          strings.push(string);
         }
       }
 
@@ -224,14 +237,13 @@ class FileCleanerService {
    * @returns {*[]}
    */
   static getCost(filamentSelection, units) {
-    units = JSON.parse(JSON.stringify(units));
+    units = cloneDeep(units);
     if (!Array.isArray(units) || units.length === 0) {
       return [];
     }
-
     const strings = [];
     const costArray = [];
-    filamentSelection = JSON.parse(JSON.stringify(filamentSelection));
+    filamentSelection = cloneDeep(filamentSelection);
     filamentSelection.unshift("SKIP");
     for (let u = 0; u < units.length; u++) {
       if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
@@ -257,6 +269,7 @@ class FileCleanerService {
       }
     }
     const totalCost = costArray.reduce((a, b) => a + b, 0);
+
     strings.unshift(totalCost.toFixed(2));
     return strings;
   }

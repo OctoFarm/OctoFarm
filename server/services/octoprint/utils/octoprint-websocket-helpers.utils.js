@@ -89,7 +89,7 @@ const captureJobData = (id, data) => {
       currentJob: JobClean.generate(
         data,
         getPrinterStoreCache().getSelectedFilament(id),
-        getPrinterStoreCache().getFileList(id),
+        getPrinterStoreCache().getPrinterInformation(id),
         getPrinterStoreCache().getCurrentZ(id),
         getPrinterStoreCache().getCostSettings(id),
         getPrinterStoreCache().getPrinterProgress(id)
