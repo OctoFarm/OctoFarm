@@ -651,7 +651,7 @@ async function renderSystemCharts() {
 }
 
 async function updateCurrentActiveUsers() {
-  const activeUserList = await OctoFarmClient.get("system/activeUsers");
+  const activeUserList = await OctoFarmClient.get("settings/system/activeUsers");
   const activeUserListContainer = document.getElementById(
     "activeUserListContainer"
   );
@@ -677,7 +677,7 @@ async function updateLiveSystemInformation() {
       text: "No data to display yet!",
     },
   };
-  const systemInformation = await OctoFarmClient.get("system/info");
+  const systemInformation = await OctoFarmClient.get("settings/system/info");
   const sysUptimeElem = document.getElementById("systemUptime");
   const procUptimeElem = document.getElementById("processUpdate");
 
@@ -742,7 +742,7 @@ async function startUpdateInfoRunner() {
 // REFACTOR utilise the events server for this...
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {
-    const taskManagerState = await OctoFarmClient.get("system/tasks");
+    const taskManagerState = await OctoFarmClient.get("settings/system/tasks");
 
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];

@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const _ = require("lodash");
-const History = require("../models/History.js");
+const HistoryRoutes = require("../models/History.js");
 const { ensureAuthenticated } = require("../middleware/auth");
 const Printers = require("../models/Printer.js");
 const Spools = require("../models/Filament.js");
@@ -19,7 +19,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const note = req.bodyString("note");
   const filamentId = req.bodyString("filamentId");
-  const history = await History.findOne({ _id: latest.id });
+  const history = await HistoryRoutes.findOne({ _id: latest.id });
   if (history.printHistory.notes != note) {
     history.printHistory.notes = note;
   }
@@ -96,7 +96,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
 router.post("/delete", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const deleteHistory = req.bodyString("id");
-  await History.findOneAndDelete({ _id: deleteHistory }).then(() => {
+  await HistoryRoutes.findOneAndDelete({ _id: deleteHistory }).then(() => {
     getHistoryCache().initCache();
   });
   res.send("success");
@@ -201,7 +201,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   const latest = req.bodyString("id");
 
   // Find history and matching printer ID
-  const historyEntity = await History.findOne({ _id: latest });
+  const historyEntity = await HistoryRoutes.findOne({ _id: latest });
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
     return o.settingsAppearance.name === historyEntity.printHistory.printerName;
