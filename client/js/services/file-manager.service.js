@@ -52,7 +52,7 @@ const handleUploadFromQueue = async (current, index) => {
     file.index = current.index;
     file.uploadDate = currentDate.getTime() / 1000;
     fileUploads.remove();
-    await OctoFarmClient.post("printers/newFiles", file);
+    // await OctoFarmClient.post("printers/newFiles", file);
 
     const currentFolder = document.getElementById("currentFolder").innerHTML;
     const fileFolder = "local/"+file.files.local.path;
@@ -61,7 +61,7 @@ const handleUploadFromQueue = async (current, index) => {
     const filePrinter = current.printerInfo.printerName;
 
     if(fileFolder.includes(currentFolder) && currentPrinter.includes(filePrinter)){
-      await FileManagerSortingService.loadSort(current.index);
+      // await FileManagerSortingService.loadSort(current.index);
     }
 
     const uploadsRemaining = document.getElementById("uploadsRemaining");
@@ -376,9 +376,9 @@ export default class FileManagerService {
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
     e.target.disabled = true;
-    const how = await OctoFarmClient.post("printers/resyncFile", {
-      id: printer._id,
-    });
+    // const how = await OctoFarmClient.post("printers/resyncFile", {
+    //   id: printer._id,
+    // });
 
     if (how) {
       e.target.className = buttonSuccess;
@@ -391,7 +391,7 @@ export default class FileManagerService {
       e.target.disabled = false;
     }, 1000);
     e.target.disabled = false;
-    await FileManagerSortingService.loadSort(printer._id);
+    // await FileManagerSortingService.loadSort(printer._id);
   }
 
   static async deleteAllFiles(e, printer) {
@@ -403,9 +403,9 @@ export default class FileManagerService {
         if(!!result) {
           e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
           e.target.disabled = true;
-          const deletedList = await OctoFarmClient.post("printers/nukeFiles", {
-            id: printer._id
-          });
+          // const deletedList = await OctoFarmClient.post("printers/nukeFiles", {
+          //   id: printer._id
+          // });
 
           const prettyFolderList = [];
           const prettyFilesList = [];
@@ -427,7 +427,7 @@ export default class FileManagerService {
             if(deletedList.deletedFolders.length > 0){
               UI.createAlert("success", "Successfully deleted folders: <br>" + prettyFolderList, 5000, "Clicked")
             }
-            await FileManagerSortingService.loadSort(printer._id);
+            // await FileManagerSortingService.loadSort(printer._id);
           }, 1000);
         }
       }
@@ -435,13 +435,13 @@ export default class FileManagerService {
   }
 
   static async fileHouseKeeping(e, printer, days) {
-    const houseCleanFiles = await OctoFarmClient.post(
-      "printers/getHouseCleanList",
-      {
-        id: printer._id,
-        days,
-      }
-    );
+    // const houseCleanFiles = await OctoFarmClient.post(
+    //   "printers/getHouseCleanList",
+    //   {
+    //     id: printer._id,
+    //     days,
+    //   }
+    // );
     const prettyList = [];
 
     let buttons = {}
@@ -482,13 +482,13 @@ export default class FileManagerService {
       callback: async function (result) {
         if(!!result){
           e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
-          const deletedList = await OctoFarmClient.post(
-              "printers/houseCleanFiles",
-              {
-                id: printer._id,
-                pathList: houseCleanFiles
-              }
-          );
+          // const deletedList = await OctoFarmClient.post(
+          //     "printers/houseCleanFiles",
+          //     {
+          //       id: printer._id,
+          //       pathList: houseCleanFiles
+          //     }
+          // );
           const prettyDelete = [];
 
           for(const file of deletedList){
@@ -499,7 +499,7 @@ export default class FileManagerService {
 
           setTimeout(async () => {
             e.target.innerHTML = "<i class=\"fa-solid fa-broom\"></i> House Keeping";
-            await FileManagerSortingService.loadSort(printer._id);
+            // await FileManagerSortingService.loadSort(printer._id);
           }, 500);
 
         }
@@ -514,7 +514,7 @@ export default class FileManagerService {
   static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
     if (typeof target !== "undefined" && target.type === "button") {
-      await FileManagerSortingService.loadSort(printer._id);
+      // await FileManagerSortingService.loadSort(printer._id);
       return;
     }
     if (typeof folder !== "undefined") {
@@ -535,7 +535,7 @@ export default class FileManagerService {
         fileBackButtonElement.disabled = true;
       }
     }
-    await FileManagerSortingService.loadSort(printer._id);
+    // await FileManagerSortingService.loadSort(printer._id);
   }
 
   static async refreshFiles(printer, spinnerIcon) {
@@ -711,12 +711,12 @@ export default class FileManagerService {
     const folders = document.querySelectorAll(".folderAction");
     folders.forEach((folder) => {
       folder.addEventListener("click", async (e) => {
-        const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
-        await FileManagerService.openFolder(
-          folder.id,
-          e.target,
-          updatedPrinter
-        );
+        // const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
+        // await FileManagerService.openFolder(
+        //   folder.id,
+        //   e.target,
+        //   updatedPrinter
+        // );
       });
     });
     const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
@@ -1035,10 +1035,10 @@ export class FileActions {
     if (input === "") {
       // No search term so reset view
       document.getElementById("currentFolder").value = "local/";
-      await FileManagerSortingService.loadSort(printer._id);
+      // await FileManagerSortingService.loadSort(printer._id);
     } else {
       document.getElementById("currentFolder").value = "local/";
-      await FileManagerSortingService.loadSort(printer._id, "recursive");
+      // await FileManagerSortingService.loadSort(printer._id, "recursive");
     }
     if (fileList) {
       const buttons = fileList.querySelectorAll("*[id^=\"file-\"]");
@@ -1078,8 +1078,8 @@ export class FileActions {
               foldername: result,
               path: currentFolder,
             };
-            await OctoFarmClient.post("printers/newFolder", opts);
-            await FileManagerSortingService.loadSort(printer._id);
+            // await OctoFarmClient.post("printers/newFolder", opts);
+            // await FileManagerSortingService.loadSort(printer._id);
             UI.createAlert(
               "success",
               "Successfully created your new folder...",
@@ -1123,8 +1123,8 @@ export class FileActions {
           foldername: folderSplit[path],
           path: octofarmPath,
         };
-        await OctoFarmClient.post("printers/newFolder", opts);
-        await FileManagerSortingService.loadSort(files);
+        // await OctoFarmClient.post("printers/newFolder", opts);
+        // await FileManagerSortingService.loadSort(files);
         return {
           status: "success",
           message: "Successfully created your missing folder!",
@@ -1220,15 +1220,15 @@ export class FileActions {
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
     refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Syncing...";
-    const how = await OctoFarmClient.post("printers/resyncFile", {
-      id: printer._id,
-      fullPath,
-    });
+    // const how = await OctoFarmClient.post("printers/resyncFile", {
+    //   id: printer._id,
+    //   fullPath,
+    // });
     if (how) {
       refreshBtn.className = buttonSuccess;
       const fileElem = getFileListElement(printer._id);
       fileElem.innerHTML = "";
-      await FileManagerSortingService.loadSort(printer._id);
+      // await FileManagerSortingService.loadSort(printer._id);
     } else {
       refreshBtn.className = buttonFailed;
     }
@@ -1290,8 +1290,8 @@ export class FileActions {
               fileName: json.name,
               newFullPath: json.path,
             };
-            await OctoFarmClient.post("printers/moveFile", opts);
-            await FileManagerSortingService.loadSort(printer._id);
+            // await OctoFarmClient.post("printers/moveFile", opts);
+            // await FileManagerSortingService.loadSort(printer._id);
             UI.createAlert(
               "success",
               "Successfully moved your file...",
@@ -1317,7 +1317,7 @@ export class FileActions {
       },
       async callback(result) {
         if (result) {
-          const {status} = await OctoPrintClient.file(printer, fullPath, "delete");
+          // const {status} = await OctoPrintClient.file(printer, fullPath, "delete");
           if (status === 404) {
             UI.createAlert(
                 "error",
@@ -1337,7 +1337,7 @@ export class FileActions {
               i: printer._id,
               fullPath,
             };
-            await OctoFarmClient.post("printers/removefile", opt);
+            // await OctoFarmClient.post("printers/removefile", opt);
             document.getElementById(`file-${fullPath}`).remove();
             UI.createAlert(
                 "success",
@@ -1368,8 +1368,8 @@ export class FileActions {
           fullPath,
         };
         if (result) {
-          await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
-          await OctoFarmClient.post("printers/removefolder", opts);
+          // await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
+          // await OctoFarmClient.post("printers/removefolder", opts);
           document.getElementById(`file-${fullPath}`).remove();
         }
       },
@@ -1424,8 +1424,8 @@ export class FileActions {
                 newFullPath: result,
                 folderName: json.path,
               };
-              await OctoFarmClient.post("printers/moveFolder", opts);
-              await FileManagerSortingService.loadSort(printer._id);
+              // await OctoFarmClient.post("printers/moveFolder", opts);
+              // await FileManagerSortingService.loadSort(printer._id);
               UI.createAlert(
                 "success",
                 "Successfully moved your file...",
