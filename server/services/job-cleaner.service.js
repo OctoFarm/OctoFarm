@@ -51,16 +51,15 @@ class JobCleanerService {
       thumbnail: null
     };
 
-    // console.log(selectedFilament);
-
     if (!!printerJob) {
       if (!!printerJob?.file?.name) {
         currentJob.fileName = printerJob.file.name;
-        const foundFile = findIndex(printer?.fileList.fileList, (o) => {
-          return o.name === printerJob.file.name;
+        const fileIndex = findIndex(printer?.fileList.fileList, (o) => {
+          return o.fullPath === printerJob.file.path;
         });
-        if (!!foundFile) {
-          currentJob.thumbnail = printer.fileList.fileList[foundFile]?.thumbnail;
+
+        if (fileIndex > -1) {
+          currentJob.thumbnail = printer.fileList.fileList[fileIndex]?.thumbnail;
         }
       }
       if (!!printerJob?.file?.display) currentJob.fileDisplay = printerJob.file.display;
