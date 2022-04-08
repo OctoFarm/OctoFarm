@@ -39,8 +39,7 @@ marked.setOptions({
 const md = function (filename) {
   const path = "../" + filename;
   const include = fs.readFileSync(path, "utf8");
-  const html = marked.parse(include);
-  return html;
+  return marked.parse(include);
 };
 
 const version = process.env[AppConstants.VERSION_KEY];
