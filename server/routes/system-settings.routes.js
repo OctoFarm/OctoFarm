@@ -33,6 +33,9 @@ const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { sanitizeString } = require("../utils/sanitize-utils");
 const { databaseNamesList } = require("../constants/database.constants");
+const {TaskManager} = require("../services/task-manager.service");
+const {SystemRunner} = require("../services/system-information.service");
+const {listActiveClients} = require("../services/server-side-events.service");
 
 module.exports = router;
 
@@ -415,3 +418,22 @@ router.get(
     res.send(returnCode);
   }
 );
+
+/**
+ * Acquire system information from system info runner
+ */
+router.get("/system/info", ensureAuthenticated, (req, res) => {
+    TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
+    const systemInformation = SystemRunner.returnInfo(true);
+    res.send(systemInformation);
+});
+
+router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+    const taskManagerState = TaskManager.getTaskState();
+
+    res.send(taskManagerState);
+});
+
+router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
+
+module.exports = router;

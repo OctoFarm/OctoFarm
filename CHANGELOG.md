@@ -39,7 +39,7 @@ All notable changes to this project will be documented in this file.
   - Added a quick setup button for Filament Manager Plugin in System. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
   - System manager can now view the running OctoFarm tasks.
-  - History now has server side pagination, should reduce resources some and make the history page load snappier.
+  - HistoryRoutes now has server side pagination, should reduce resources some and make the history page load snappier.
   - Any history data requests are now filtered starting from the first day of the last month. You should see at least 1
     months worth of data( when available ) as well as any from the current month.
   - Filament Manager has some new settings in System -> Server -> Filament Manager:
@@ -89,7 +89,7 @@ All notable changes to this project will be documented in this file.
   - Moved filament cleaner startup to app-core
   - Made NODE_ENV to be production by default causing the @octofarm/client bundle to be loaded and console logging to be filtered with level INFO/ERROR
   - File manager: gave printer titles a badge. Gave selected printer a yellow border.
-  - Refactor of History Runner with new OctoPrint Client service and added test coverage.
+  - Refactor of HistoryRoutes Runner with new OctoPrint Client service and added test coverage.
   - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
   - Refactor of Printer Manager client code bringing a little speed boost (avg 40fps -> 50fps) and better fault tolerance.
   - Refactor of SSE client into re-usable file.
@@ -139,7 +139,7 @@ All notable changes to this project will be documented in this file.
   - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
   - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost.
     All other info is inspectable in the "view" button.
-  - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics
+  - Refreshed the HistoryRoutes page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics
     Modal, Pagination, Sorting, Range and Filters.
   - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action.
   - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value
@@ -310,14 +310,14 @@ All notable changes to this project will be documented in this file.
   - Fixed #353: Filament Manager Spools list is not ignoring Spools Modal pagination.
   - Fixed #386: Server update notification would show to all users, not just Administrator group.
   - Fixed #430: Replace user and group check with middleware.
-  - Fixed #396: History cleaner wouldn't run after print capture.
+  - Fixed #396: HistoryRoutes cleaner wouldn't run after print capture.
   - Fixed #397: Thumbnails wouldn't capture on history, even with setting on.
-  - Fixed #414: History failing to generate due to missing default settings.
+  - Fixed #414: HistoryRoutes failing to generate due to missing default settings.
   - Fixed #438: File manager fails to load due to toFixed error.
   - Fixed #442: Re-Input catch statements for "git" commands on updater logic.
   - Fixed #444: Add in npm functions for updater command to keep packages up to date.
   - Fixed #439: Views not updating due to offline printer in first instance.
-  - Fixed #414: History would fail to capture due to missing settings.
+  - Fixed #414: HistoryRoutes would fail to capture due to missing settings.
   - Fixed #475: Loading system page would cause error in console due to missing settings.
   - Fixed #459: Duplicate Id's on printer manager page.
   - Fixed #472: System page would crash if release check didn't find a release.
@@ -406,7 +406,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
    - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.
-   - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
+   - Gave gmccauley (and possibly others) the new Filament and HistoryRoutes graphs. Big Thanks for your data basically... I'm a dodo at times XD
    - New Client Settings - Control Panel File Top: Checking this as true will put the file section at the top of printer control. Print Status and Tools underneigth.
    - Added #252 - OctoPrint feed rate settings now allows for 10% to 300% inline with OctoPrint.
    - Added - New button in Printer manager called "Gcode Scripts". Allows for creating pre-defined gcode scripts that can be used from Printer Contol under the terminal + Bulk Gcode button. Thanks to @MTrab Discussion #250 + Issue #253
@@ -424,7 +424,7 @@ All notable changes to this project will be documented in this file.
   - Fixed - Graph for filament daily usage would not stack values by day
   - Fixed - Auto grab of OctoPrint camera URL would incorrectly add :8080 to the url.
   - Fixed - Date range and conversion issue with filament graphs
-  - Fixed #235 - Filament / History graphs failing to generate data...
+  - Fixed #235 - Filament / HistoryRoutes graphs failing to generate data...
   - Fixed - Port preference undefined, would happen on printer management when offline printer was added.
   - Fixed - Fixed server start on some systems not correctly attaching to ipv4 interface.
   - Fixed - Issue with quick connect button sending the port as a string causing a 500 response.
@@ -452,7 +452,7 @@ All notable changes to this project will be documented in this file.
      - New Usage By Day chart - will show stacked values totaled by day of filament usage.
      - New Usage Over Time chart - will show incrementing total filemant usage by day.
      - Moved Re-Sync Filament Manager button to show with others (manage profile/spools).
-   - New History Chart - Will show daily totals of success / cancelled and failed prints.
+   - New HistoryRoutes Chart - Will show daily totals of success / cancelled and failed prints.
    - Dashboard has the 3 new charts detailed above available.
 
 
@@ -461,7 +461,7 @@ All notable changes to this project will be documented in this file.
    - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences.
    - Printer Logs Modal for OctoPrint logs now includes line number
    - Re-organised the System dashboard settings page to include new graph options
-   - History statistics now only take into account successful prints.
+   - HistoryRoutes statistics now only take into account successful prints.
 
 ### Fixed
 
@@ -527,16 +527,16 @@ All notable changes to this project will be documented in this file.
     - New UI buttons for these.
       1. Printers Manager on the list view, individual buttons for updating 1 instance.
       2. Global buttons added to the
-  - History will now capture an image from the mjpeg stream you input into camera url can be turned off in the new History section in System.
-  - History now has the ability to capture a timelapse generated by OctoPrint. This currently only works with the mp4 output due to browser limitations.
-    - There are 3 settings now on System -> History for this. OnCompletion, OnFailure and Delete After.
+  - HistoryRoutes will now capture an image from the mjpeg stream you input into camera url can be turned off in the new HistoryRoutes section in System.
+  - HistoryRoutes now has the ability to capture a timelapse generated by OctoPrint. This currently only works with the mp4 output due to browser limitations.
+    - There are 3 settings now on System -> HistoryRoutes for this. OnCompletion, OnFailure and Delete After.
   - Added initial support for OctoPrint 1.5.0 Resend statistics. Currently is captured on history and shown in the printer control view.
   - Added back in the view filters for Panel,List, Control.
-  - Alerts can now send through OctoFarms History ID on capture of a Failed,Error,Successful print trigger.
+  - Alerts can now send through OctoFarms HistoryRoutes ID on capture of a Failed,Error,Successful print trigger.
   - InfluxDB Export: You can find setup instructions/information in System -> Server -> InfluxDB Export.
      - exports the following information:
          - Printers Information - All farm printer information, generated every 2000ms.
-         - History Information - Every log to history is pushed to the database (not back dated), sent on history capture.
+         - HistoryRoutes Information - Every log to history is pushed to the database (not back dated), sent on history capture.
          - Filament Information - Same as history.
    - Changes to folder display in file manager:
      - Folders when created will stay ordered by creation date. Folders when sorted will be organised first at the top of the list, then files afterwards. There's only folder name information available to sorting for those so for now will stick to name based for all folders. This will be actioned when a page load happens, or the sorting is updated. New folders will not be sorted until that trigger. It follows the A->Z, Z->A ordering of the sorting options now too.
@@ -547,7 +547,7 @@ All notable changes to this project will be documented in this file.
   - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal.
   - Allowed Printer Settings Modal to be opened whilst offline. Disables any settings relevant/requiring OctoPrint connection.
   - Export printer json now in human readable format
-  - History now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
+  - HistoryRoutes now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
   - Printer scanning client display greatly improved. Now displays updated host state whilst stuff is going on in the background on the server.
   - Combined the Views settings into one tab. All views react now to the same settings for displaying Current Operations, Offline/Disconnected Printer. Note: More customise options coming in a later version.
   - Updated Printer Manager functions:
@@ -565,7 +565,7 @@ All notable changes to this project will be documented in this file.
   - File Manager link no longer hidden on mobile views.
   - Changed the time displays for all views, now follows unified format. Applied currently on Panel/List/Camera.
   - Camera view now hides print information (times / tools) until hovering over.
-  - History page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
+  - HistoryRoutes page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
   - Added the option for websockets to follow 301 redirects. Should help with 301 errors.
   - Camera view now opens overlay with fullscreen.
   - Tweaks have been made to the websocket connection system. Should better recover from errors and state if user action required.
@@ -637,7 +637,7 @@ All notable changes to this project will be documented in this file.
   - Moved Logs above About on System Side bar.
   - Files no longer "a" element, can't be clicked anymore. Was confusing, suggested an action.
   - Implemented new file sorting function. Settings default to name, and will save per client in local storage.
-  - File path now shows on hover if available in History table.
+  - File path now shows on hover if available in HistoryRoutes table.
   - Tweaks to SSE browser cache, should force re-update of data rather than blasting the client with a lot of data as it caught up... (Testing and feedback would be awesome)
   - Client side images/javascript/css is now minified and generates a source map properly for all dependancies. This should improve load times, and increase browser support going forward. These are pre-built for the client, so no action required on a users part.
 
@@ -670,7 +670,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-  - history will now update the file after it's generated. History is generated 10 seconds after a print.
+  - history will now update the file after it's generated. HistoryRoutes is generated 10 seconds after a print.
 
 ### Fixed
 
@@ -687,7 +687,7 @@ All notable changes to this project will be documented in this file.
   - Added version output to console log.
   - WOL Support: Wake on Lan for clients now supported. In your Printers power settings you will have a new option to enable Wake on lan. Enabling puts a new "Wake Host" Option in the normal power dropdown.
   - Message to websocket icon regarding use of global api key.
-  - History now shows Print Time in red formatted as {hours}:{minutes}:{seconds} underneith the original format.
+  - HistoryRoutes now shows Print Time in red formatted as {hours}:{minutes}:{seconds} underneith the original format.
   - Added a true server alive check. Client now polls this whilst active and throws a modal up when connection lost. Will reload the page automatically (manual also) when connection restored.
 
 ### Changed
@@ -725,20 +725,20 @@ All notable changes to this project will be documented in this file.
   - Power button now asks for confirmation when switching off
   - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop.
   - Thumbnail to history view modal. Captures and stores it on the webserver.
-  - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results.
+  - Added percent bar for Status on HistoryRoutes Filters. Will show total failed/success/cancelled percentages on filtered results.
   - Added hover information to file actions on file list
   - New Monilithic docker builds, builds with MongoDB included.
   - Printer Control now supports multiple tools
   - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
-  - History now displays multiple tool information if it was collected in the record. All successful prints will contain this information.
+  - HistoryRoutes now displays multiple tool information if it was collected in the record. All successful prints will contain this information.
   - pm2 now outputs full process logs into log folder.
   - Printer Control now has web and power buttons.
   - Printers Manager now shows status for the 6 checks an OctoPrint client will go through. API, File, State, Profile, Settings and System. Red shows not yet scanned and green shows scanned.
   - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
   - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
   - Filament manager plugin can now be resynced from the filament manager screen.
-  - History now calculates print cost per hour for each print.
-  - History statistics now show average cost per hour in the history filters sections
+  - HistoryRoutes now calculates print cost per hour for each print.
+  - HistoryRoutes statistics now show average cost per hour in the history filters sections
   - New patreon members lactose, scott and jose. Big thanks for your support!
   - Views now display "Tool #" next to filament if already displayed on the view.
   - Panel & list view now displays individual tool numbers and temps associated, bed and chamber will also be shown if enabled.
@@ -763,7 +763,7 @@ All notable changes to this project will be documented in this file.
     - Filament Cost requires a filament to be selected to generate. Re-Sync to update.
     - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated.
   - Client now uses service workers for information retrieval.
-  - History information now generated on server side then sent to the client, should improve loading times.
+  - HistoryRoutes information now generated on server side then sent to the client, should improve loading times.
   - Filament information now generated on server side then sent to the client, should improve loading times.
   - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
     - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually.
@@ -799,7 +799,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
-  - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.
+  - HistoryRoutes may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.
 
 ## [Released]
 
@@ -815,7 +815,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
   - Error's are now captured as a full log set. To be displayed in UI at a later date.
-  - History.js is non-destructive to filament
+  - HistoryRoutes.js is non-destructive to filament
 
 ### Removed
 
@@ -890,7 +890,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-  - History Page:
+  - HistoryRoutes Page:
     - File Name Search
     - Path Filter
     - Spool Name Search
@@ -927,7 +927,7 @@ All notable changes to this project will be documented in this file.
   - Moved filament manager plugin sync to server settings under Filament Manager Settings.
   - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
   - Filament Manager allows selection when printer active IF filament Manager plugin is not linked.
-  - History now asks if your sure on deletions...
+  - HistoryRoutes now asks if your sure on deletions...
   - Server settings now only prompts to restart when changing setting that requires restart
   - OctoFarm now rescans the client when updating throttle settings.
   - Temps now all read from unified temperature file, should keep consistency across the board.
@@ -960,7 +960,7 @@ All notable changes to this project will be documented in this file.
   - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
   - Current Operations View. Displays full screen the current operations bar.
   - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group.
-  - History page now has metrics.
+  - HistoryRoutes page now has metrics.
   - Can now select and save filament changes in history.
   - Server Settings re-activated with the following:
     - Shows server Status here instead of dashboard.
@@ -970,10 +970,10 @@ All notable changes to this project will be documented in this file.
   - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service.
   - Client settings to show extra information on views. List, Panel and Camera View
   - File manager shows weight when length is calculated. Defaults to 1.24 density with 1.75mm filament.
-  - History button to set default sort function button and pagination. Remembers previously set values on client.
+  - HistoryRoutes button to set default sort function button and pagination. Remembers previously set values on client.
   - File Manager now has sort capabilities. File Name, Print Time, Upload Date.
   - New Printer settings modal. Connection Defaults, Profile Changes, Power Button actions, Gcode Script and Other Settings (Camera / Heating Triggers)
-  - History now has filter dropdowns for File Name, Printer Name, Filament Type.
+  - HistoryRoutes now has filter dropdowns for File Name, Printer Name, Filament Type.
   - Activated the restart/shutdown host and octoprint buttons
   - Added checks for power state if enabled. Will check every 20 seconds for a state change unless powered off/on/toggled through the UI.
   - Added buttons to activate the settings for power control. You will only see options for which you have setup.
@@ -990,8 +990,8 @@ All notable changes to this project will be documented in this file.
     - Enter in your printers Power Consumption, kilowat price, purchase price, esitmated life span, maintenance costs
     - Will be calculated on history grab.
     - Due to cost settings been captured on history grab no backwards compatablility. Have added ability to "Update Cost" settings, if printer doesn't exist in database anymore then a default set of values will be used.
-    - History statistic totals now include Total Printer Cost/Highest Printer Cost
-    - History filter totals now show printer cost total and combined total.
+    - HistoryRoutes statistic totals now include Total Printer Cost/Highest Printer Cost
+    - HistoryRoutes filter totals now show printer cost total and combined total.
   - Added drag and drop to all views and printer control panel
     - Currently when you drag a file and hover over a printer/file list you will get a darkened box, dropping your file here will initiate the upload.
     - If you only have a single file it will ask if you would like to print the file.
@@ -1007,12 +1007,12 @@ All notable changes to this project will be documented in this file.
     - Will now track costs if available.
     - Can also apply temperature offsets with these, whatever is entered -/+ into the offset field will now be applied at the start of a print.
   - Reduced the width of printer manager, allowing for click close outside of the modal window.
-  - History page now loads latest first as default.
+  - HistoryRoutes page now loads latest first as default.
   - Removed underscores from history page.
-  - History page will only load now with history added. Message to collect some before activation pops up.
+  - HistoryRoutes page will only load now with history added. Message to collect some before activation pops up.
   - Job information is now captured within history for cancelled prints. May use in UI at a later date.
   - If filament exists in library then ask if you'd like to select before print.
-  - History now captures information and waits 10 seconds before triggering the collection. This is for filament manager sync to collect the latest values before proceding.
+  - HistoryRoutes now captures information and waits 10 seconds before triggering the collection. This is for filament manager sync to collect the latest values before proceding.
   - Power Settings and Alerts are now saved in database
 
 ### Removed
@@ -1020,7 +1020,7 @@ All notable changes to this project will be documented in this file.
   - Old filament manager and database structure.
   - Removed serverConfig file, now stored in the database and edited through the UI.
   - Removed file statistic from dashboard
-  - Remove old sort function from History
+  - Remove old sort function from HistoryRoutes
 
 ### Fixed
 
@@ -1033,7 +1033,7 @@ All notable changes to this project will be documented in this file.
   - Fixed groups not hiding when none availabe.
   - Fixed errant blank group showing.
   - Cancelled prints not grabbing name of printer
-  - History collection creates unique ID based on the last captured print index, rather than the history length.
+  - HistoryRoutes collection creates unique ID based on the last captured print index, rather than the history length.
   - Fixed issue with selected filament getting overwritten when passing to history.
   - Fixed weight calculation been unusually high.
   - Fix for jobs not been captured
@@ -1060,7 +1060,7 @@ All notable changes to this project will be documented in this file.
   - Tool tip explanations for states on Printers Page. Host, Printer and Websockets.
   - New state when printer fresh on the farm, "Setting Up" Whilst awaiting for scanner to finish with other printers. Hits searching state straight after.
   - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons, camera view, panel view and list view and current operations.
-  - Any table headers are now clickable and can be sorted by the text below. This includes, Printer Management, Filament List, List View, History. Hovering will display a sort icon to indicate can be sorted.
+  - Any table headers are now clickable and can be sorted by the text below. This includes, Printer Management, Filament List, List View, HistoryRoutes. Hovering will display a sort icon to indicate can be sorted.
   - Sort Index is now viewable on Printer List, will auto update after moving a printer into a new sort index.
   - Note to README regarding thanks to JetBrains for use of their IDE.
   - New dependancy "requests" Required for API calls to user endpoints.
@@ -1081,7 +1081,7 @@ All notable changes to this project will be documented in this file.
   - View pages no longer inside dropdown
   - Editing printers only re-scans the currently edited set.
   - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
-  - History now shows view icon instead of edit for captured prints, Notes are still editable.
+  - HistoryRoutes now shows view icon instead of edit for captured prints, Notes are still editable.
   - Changed up the farm Status styling to more match inline with OctoFarm colours
   - All views inc... Printer Control now truncate names to not overflow, add "..." to the end of the string to state it has been truncated.
   - All views inc... Printer Control now display the full path when hovering over file name.
@@ -1178,7 +1178,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
   - Printer Management, see changed regarding dashboard.
-  - History and file statistics from Dashboard.
+  - HistoryRoutes and file statistics from Dashboard.
   - Removed systemInformationService from database, extra uneeded steps as data is all gathered live anyway.
 
 ### Fixed
@@ -1220,7 +1220,7 @@ All notable changes to this project will be documented in this file.
 - async information reception from server -> client.
 - State should now show if Serial Error occurs on OctoPrint.
 - Shutdown printers, that have been scanned by the farm will now wait 15-seconds before trying to grab an API connection. This should help those with websockets not connecting initially.
-- History now captures and displays selected rolls of filament. No usage available from OctoPrint currently.
+- HistoryRoutes now captures and displays selected rolls of filament. No usage available from OctoPrint currently.
 - An initial API connection timeout now increases until it hit's an upper limit. So all API connections will attempt at the default of 1000ms, this will then increase to 10000ms after the first attempt hitting the upper limit and hard fail afterwards. These are configurable in serverConfig/server.js.
 
 ### Deprecated
@@ -1310,8 +1310,8 @@ All notable changes to this project will be documented in this file.
   - Pressing on an Offline printer will attempt to re-establish the lost websocket connection then update the instace from OctoPrint.
   - Pressing on an Online printer will update the instance from OctoPrint.
 - New button on Printer List in Dashboard. You can drag and drop this button to re-order your printer list. This will also persist a reboot, all views respect this order.
-- History list delete button is now enabled.
-- History list edit button is now enabled.
+- HistoryRoutes list delete button is now enabled.
+- HistoryRoutes list edit button is now enabled.
 
 ### Changed
 
@@ -1347,7 +1347,7 @@ All notable changes to this project will be documented in this file.
 - Statistic runners now close with printer update.
 - Fixed annoying message in logs when a client connects
 - Times no longer chop off multiple's of 10
-- Fixed issue where filament was sometimes not collected in History.
+- Fixed issue where filament was sometimes not collected in HistoryRoutes.
 - Fixed issue where flowRate was getting confused with feedRate. Both values are correctly applied now.
 - Never online printers now correctly re-grab printer information when connection is re-established.
 - Deleting a printer should not require server restart anymore. Please inform me if this is not the case, my testings suggests it's fine now.
@@ -1401,7 +1401,7 @@ All notable changes to this project will be documented in this file.
 - Converted to server, database and client package
 - Uses websocket for real time information from your octoprint instances
 - Uses Server Side Events to keep the OctoFarm web client up to date with what your Server is tracking.
-- History section which will
+- HistoryRoutes section which will
 - Filament Manager to track what's on your printer and what you used on a print stored in history
 - Brand new file manager with multi upload and queue features.
 - Current Operations window configurable to be viewable on any of the monitoring screens as well as it's home on the dashboard.
