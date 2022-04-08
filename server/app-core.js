@@ -118,19 +118,25 @@ async function ensureSystemSettingsInitiated() {
  */
 function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/users", require("./routes/users", { page: "route" }));
-  app.use("/printers", printerActionLimits, require("./routes/printers", { page: "route" }));
-  app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/filament", require("./routes/filament", { page: "route" }));
-  app.use("/history", require("./routes/history", { page: "route" }));
-  app.use("/scripts", require("./routes/scripts", { page: "route" }));
-  app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
-  app.use("/system", require("./routes/system", { page: "route" }));
-  app.use("/client", require("./routes/sorting", { page: "route" }));
-  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
-  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK - This may as well be an API call
-  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
-  app.use("/events", require("./routes/events.sse.js", { page: "route" }));
+  app.use("/users", require("./routes/users.routes.js", { page: "route" }));
+  app.use(
+    "/printers",
+    printerActionLimits,
+    require("./routes/printer-manager.routes.js", { page: "route" })
+  );
+  app.use("/settings", require("./routes/system-settings.routes.js", { page: "route" }));
+  app.use("/filament", require("./routes/filament-manager.routes.js", { page: "route" }));
+  app.use("/history", require("./routes/history.routes.js", { page: "route" }));
+  app.use("/scripts", require("./routes/local-scripts-manager.routes.js", { page: "route" }));
+  app.use("/input", require("./routes/external-data-collection.routes.js", { page: "route" }));
+  app.use("/client", require("./routes/printer-sorting.routes.js", { page: "route" }));
+  app.use("/printersInfo", require("./routes/sse.printer-manager.routes.js", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
+  app.use("/dashboardInfo", require("./routes/sse.dashboard.routes.js", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK - This may as well be an API call
+  app.use(
+    "/monitoringInfo",
+    require("./routes/sse.printer-monitoring.routes.js", { page: "route" })
+  ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
+  app.use("/events", require("./routes/sse.events.routes.js", { page: "route" }));
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
