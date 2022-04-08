@@ -124,14 +124,13 @@ function serveOctoFarmRoutes(app) {
     printerActionLimits,
     require("./routes/printer-manager.routes.js", { page: "route" })
   );
-  app.use("/settings", require("./routes/settings.routes.js", { page: "route" }));
+  app.use("/settings", require("./routes/system-settings.routes.js", { page: "route" }));
   app.use("/filament", require("./routes/filament-manager.routes.js", { page: "route" }));
   app.use("/history", require("./routes/history.routes.js", { page: "route" }));
   app.use("/scripts", require("./routes/local-scripts-manager.routes.js", { page: "route" }));
   app.use("/input", require("./routes/external-data-collection.routes.js", { page: "route" }));
-  app.use("/system", require("./routes/system-settings.routes.js", { page: "route" }));
   app.use("/client", require("./routes/printer-sorting.routes.js", { page: "route" }));
-  app.use("/printersInfo", require("./routes/sse.printer-info.routes.js", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
+  app.use("/printersInfo", require("./routes/sse.printer-manager.routes.js", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
   app.use("/dashboardInfo", require("./routes/sse.dashboard.routes.js", { page: "route" })); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK - This may as well be an API call
   app.use(
     "/monitoringInfo",
