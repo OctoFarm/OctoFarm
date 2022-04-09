@@ -123,7 +123,7 @@ const UPDATE_OCTOPRINT_PLUGINS_LIST = async () => {
 };
 
 const CHECK_FOR_OCTOPRINT_UPDATES = async () => {
-  //await getPrinterManagerCache().checkForOctoPrintUpdates();
+  await getPrinterManagerCache().checkForOctoPrintUpdates();
 };
 
 const GENERATE_PRINTER_SPECIFIC_STATISTICS = async () => {

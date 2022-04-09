@@ -369,6 +369,7 @@ class PrinterManagerService {
     for (let printer of printerList) {
       await printer.acquireOctoPrintUpdatesData(true);
       await printer.acquireOctoPrintPluginsListData(true);
+      await printer.acquireOctoPrintPiPluginData(true);
     }
   }
 
