@@ -1,8 +1,6 @@
 const { returnConnectionLogs } = require("./connection-monitor.service");
 const { SettingsClean } = require("./settings-cleaner.service");
-const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
-const { isValidWebsocketUrl, isValidHttpUrl } = require("../utils/url.utils")
+const { isValidWebsocketUrl, isValidHttpUrl } = require("../utils/url.utils");
 
 const printerChecks = (printer) => {
   const { printerURL, webSocketURL, camURL } = printer;
@@ -56,8 +54,7 @@ const websocketChecks = (printerURL) => {
   let logs = false;
 
   if (connectionLogs?.connections) {
-    for (let i = 0; i < connectionLogs.connections.length; i++) {
-      const log = connectionLogs.connections[i];
+    for (const log of connectionLogs.connections) {
       if (log.url.includes("/sockjs/websocket")) {
         logs = log.log;
       }
@@ -140,20 +137,13 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
   const connectionLogs = returnConnectionLogs(printerURL);
 
   const logs = [];
-  const WS_logs = [];
 
-  const { timeout, onlinePolling } = SettingsClean.returnSystemSettings();
+  const { timeout } = SettingsClean.returnSystemSettings();
 
   if (connectionLogs?.connections) {
-    for (let i = 0; i < connectionLogs.connections.length; i++) {
-      const log = connectionLogs.connections[i];
+    for (const log of connectionLogs.connections) {
       if (!log.url.includes("/sockjs/websocket")) {
         logs.push({
-          url: log.url,
-          responseTimes: log.log.lastResponseTimes
-        });
-      } else {
-        WS_logs.push({
           url: log.url,
           responseTimes: log.log.lastResponseTimes
         });
@@ -163,8 +153,7 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
 
   const responses = [];
 
-  for (let i = 0; i < logs.length; i++) {
-    const log = logs[i];
+  for (const log of logs) {
     if (log.responseTimes.length === 0) {
       log.responseTimes = [0];
     }
@@ -180,50 +169,7 @@ const checkConnectionsMatchRetrySettings = (printerURL) => {
     }
   }
 
-  const WS_responses = [];
-
-  const THROTTLE_MS = parseFloat(onlinePolling.seconds) * 1000;
-
-  for (let i = 0; i < WS_logs.length; i++) {
-    const log = WS_logs[i];
-    if (log.responseTimes.length === 0) {
-      WS_responses.push({
-        url: log.url,
-        throttle: false,
-        over: false,
-        under: false,
-        responsesAverage: 0,
-        throttleMS: 0
-      });
-    }
-
-    if (log?.responseTimes?.length > 1) {
-      const responsesAverage =
-        log?.responseTimes?.reduce((a, b) => a + b) / log?.responseTimes?.length;
-
-      if (responsesAverage) {
-        logger.debug("Throttle Generation", {
-          url: log.url,
-          throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 400,
-          over: responsesAverage > THROTTLE_MS + 400,
-          under: responsesAverage < THROTTLE_MS - 500,
-          responsesAverage: responsesAverage,
-          throttleMS: THROTTLE_MS
-        });
-        WS_responses.push({
-          url: log.url,
-          throttle: responsesAverage > THROTTLE_MS - 500 || responsesAverage < THROTTLE_MS + 500,
-          over: responsesAverage > THROTTLE_MS + 400,
-          under: responsesAverage < THROTTLE_MS - 500,
-          responsesAverage: responsesAverage,
-          throttleMS: THROTTLE_MS
-        });
-      }
-    }
-  }
-
   return {
-    webSocketResponses: WS_responses,
     apiResponses: responses
   };
 };

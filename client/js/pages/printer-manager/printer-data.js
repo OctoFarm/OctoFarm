@@ -288,6 +288,55 @@ function checkIfMultiUserIssueFlagged(printer) {
   }
 }
 
+function checkIfUnderVoltagedPi(printer) {
+  const {octoPi} = printer
+
+  if(!octoPi || Object.keys(octoPi).length === 0){
+    return;
+  }
+  const printerUnderVoltaged = document.getElementById(
+      "printerUnderVoltaged-" + printer._id
+  );
+  const { throttle_state } = octoPi;
+  if (throttle_state.current_undervoltage) {
+    updateAlertsLog({
+      id: "underVoltageIssue-" + printer._id,
+      name: "Pi is reporting been undervoltaged!",
+      printerName: printer.printerName,
+      colour: "Offline",
+    });
+    UI.addDisplayNoneToElement(printerUnderVoltaged);
+  } else {
+    removeAlertsLog({ id: "underVoltageIssue-" + printer._id });
+    UI.removeDisplayNoneFromElement(printerUnderVoltaged);
+  }
+}
+
+function checkIfOverheatingPi(printer) {
+  const {octoPi} = printer
+
+  if(!octoPi || Object.keys(octoPi).length === 0){
+    return;
+  }
+  const printerOverHeating = document.getElementById(
+      "printerOverHeating-" + printer._id
+  );
+  const { throttle_state } = octoPi;
+  if (throttle_state.current_overheat) {
+    updateAlertsLog({
+      id: "overheatingIssue-" + printer._id,
+      name: "Pi is reporting it is overheating!",
+      printerName: printer.printerName,
+      colour: "Offline",
+    });
+    UI.addDisplayNoneToElement(printerOverHeating);
+  } else {
+    removeAlertsLog({ id: "overheatingIssue-" + printer._id });
+    UI.removeDisplayNoneFromElement(printerOverHeating);
+  }
+}
+
+
 function checkForApiErrors(printer) {
   if (
     printer.printerState.colour.category !== "Offline" &&
@@ -367,6 +416,10 @@ function updatePrinterRow(printer) {
       corsWarningCheck(printer);
 
       checkIfPrinterHasEvents(printer);
+
+      checkIfUnderVoltagedPi(printer);
+
+      checkIfOverheatingPi(printer);
     }
   }
 }
@@ -548,6 +601,50 @@ export function createOrUpdatePrinterTableRow(printers) {
               }
             });
           });
+
+
+      document.getElementById("printerOverHeating-" + printer._id).addEventListener("click", async () => {
+        bootbox.dialog({
+          title: 'Reported overheating by your Pi!',
+          message: "<p>Your RaspberryPi has reported it's overheating... Please sort the issue and ReScan the API!</p>",
+          size: 'small',
+          buttons: {
+            cancel: {
+              label: "Ignore",
+              className: 'btn-danger'
+            },
+            ok: {
+              label: "Sorted, ReScan API!",
+              className: 'btn-info',
+              callback: async () =>{
+                await reSyncAPI(true, printer._id);
+              }
+            }
+          }
+        });
+      })
+
+
+      document.getElementById("printerUnderVoltaged-" + printer._id).addEventListener("click", async () => {
+        bootbox.dialog({
+          title: 'Reported undervoltage by your Pi!',
+          message: "<p>Your RaspberryPi has reported it's undervoltaged... Please sort the issue and ReScan the API!</p>",
+          size: 'small',
+          buttons: {
+            cancel: {
+              label: "Ignore",
+              className: 'btn-danger'
+            },
+            ok: {
+              label: "Sorted, ReScan API!",
+              className: 'btn-info',
+              callback: async () =>{
+                await reSyncAPI(true, printer._id);
+              }
+            }
+          }
+        });
+      })
     }
 
   });

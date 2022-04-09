@@ -1494,7 +1494,7 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
 
-    if (this?.fileList.fileList.length === 0 || force) {
+    if (this?.fileList?.fileList?.length === 0 || force) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
         logger.http("Failed Aquire files data", e);
         return false;
@@ -1711,7 +1711,7 @@ class OctoPrintPrinter {
       return o.fullPath === fullPath;
     });
 
-    if (typeof fileIndex !== "undefined") {
+    if (fileIndex > -1 && !!result) {
       logger.debug("Updating file information with generated OctoPrint data", data);
       const { estimatedPrintTime, filament } = result;
 

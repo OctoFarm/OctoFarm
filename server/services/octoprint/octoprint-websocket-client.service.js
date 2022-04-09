@@ -13,6 +13,7 @@ const ConnectionMonitorService = require("../../services/connection-monitor.serv
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
+const { averageMeanOfArray } = require("../../utils/math.utils.js");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -43,6 +44,11 @@ class WebSocketClient {
   currentUser = undefined;
   sessionKey = undefined;
   reconnectingIn = 0;
+  currentThrottleRate = 1;
+  throttleRateMeasurements = [];
+  throttleRateMeasurementsSize = 20;
+  throttleBase = 500;
+  throttleMargin = 150;
 
   constructor(
     webSocketURL = undefined,
@@ -62,7 +68,6 @@ class WebSocketClient {
       throw new Error("Missing required keys");
 
     this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
-    this.polling = this.systemSettings.onlinePolling.seconds;
     this.id = id;
     this.url = webSocketURL + ENDPOINT;
     this.currentUser = currentUser;
@@ -141,7 +146,6 @@ class WebSocketClient {
       );
       // These will get overridden.
       getPrinterStoreCache().updatePrinterState(this.id, PRINTER_STATES().PRINTER_TENTATIVE);
-      // this.heartBeat();
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
       this.sendAuth();
@@ -162,6 +166,8 @@ class WebSocketClient {
         REQUEST_KEYS.LAST_RESPONSE,
         ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
       );
+
+      this.checkMessageSpeed(timeDifference - this.#lastMessage);
 
       this.#onMessage(this.id, data);
 
@@ -316,22 +322,45 @@ class WebSocketClient {
     );
   }
 
-  sendThrottle(seconds = undefined) {
-    let throttle = (this.polling * 1000) / 500;
-    if (!!seconds) {
-      throttle = (seconds * 1000) / 500;
+  checkMessageSpeed(ms) {
+    if (this.throttleRateMeasurements.length >= this.throttleRateMeasurementsSize) {
+      this.throttleRateMeasurements.shift();
     }
-    logger.debug("Throttling websocket connection to: " + this.polling + " seconds");
-    PrinterTicker.addIssue(
-      new Date(),
-      this.url,
-      "Throttling websocket connection to: " + this.polling + " seconds",
-      "Active",
-      this.id
+    this.throttleRateMeasurements.push(ms);
+    const currentAverage = averageMeanOfArray(this.throttleRateMeasurements);
+
+    const throttleLimit = this.currentThrottleRate * this.throttleBase;
+    if (ms > throttleLimit + this.throttleMargin) {
+      this.increaseMessageThrottle();
+    } else if (this.currentThrottleRate > 1) {
+      const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
+      const lowerProcessingLimit =
+        (this.currentThrottleRate - 1) * (currentAverage + this.throttleMargin);
+      if (maxProcessingLimit < lowerProcessingLimit) {
+        this.decreaseMessageThrottle();
+      }
+    }
+  }
+
+  increaseMessageThrottle() {
+    this.currentThrottleRate++;
+    this.sendThrottle();
+    logger.warning("Increasing websocket throttle time...", this.currentThrottleRate);
+  }
+
+  decreaseMessageThrottle() {
+    this.currentThrottleRate--;
+    this.sendThrottle();
+    logger.warning("Decreasing websocket throttle time...", this.currentThrottleRate);
+  }
+
+  sendThrottle() {
+    logger.silly(
+      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
     );
     this.send(
       JSON.stringify({
-        throttle: throttle
+        throttle: this.currentThrottleRate
       })
     );
   }
@@ -351,14 +380,15 @@ class WebSocketClient {
         this.url,
         `Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
           this.#retryNumber
-        }. Subsequent logs will be silenced...`,
+        }. Subsequent logs will be silenced... Error:${e}`,
         "Active",
         this.id
       );
       logger.info(
         `${this.url} Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
           this.#retryNumber
-        }`
+        }`,
+        e
       );
     }
     ConnectionMonitorService.updateOrAddResponse(
