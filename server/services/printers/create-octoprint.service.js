@@ -1711,7 +1711,7 @@ class OctoPrintPrinter {
       return o.fullPath === fullPath;
     });
 
-    if (typeof fileIndex !== "undefined") {
+    if (fileIndex > -1 && !!result) {
       logger.debug("Updating file information with generated OctoPrint data", data);
       const { estimatedPrintTime, filament } = result;
 
