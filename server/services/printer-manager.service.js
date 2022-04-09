@@ -2,7 +2,7 @@ const Logger = require("../handlers/logger.js");
 
 const PrinterService = require("./printer.service");
 const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
-const { CATEGORIES, PRINTER_STATES } = require("./printers/constants/printer-state.constants");
+const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
 const { isEmpty, findIndex } = require("lodash");
@@ -131,12 +131,7 @@ class PrinterManagerService {
     for (const printer of printersList) {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
-      if (
-        !disabled &&
-        category !== "Offline" &&
-        category !== "Searching" &&
-        category !== "Setting Up"
-      ) {
+      if (!disabled && category !== "Offline" && category !== "Searching...") {
         printer.ping();
       }
     }
@@ -345,8 +340,7 @@ class PrinterManagerService {
       if (Array.isArray(printer.selectedFilament)) {
         for (let f = 0; f < printer.selectedFilament.length; f++) {
           if (printer.selectedFilament[f] !== null) {
-            const newInfo = await Filament.findById(printer.selectedFilament[f]._id);
-            printer.selectedFilament[f] = newInfo;
+            printer.selectedFilament[f] = await Filament.findById(printer.selectedFilament[f]._id);
             const currentFilament = await Runner.compileSelectedFilament(
               farmPrinters[i].selectedFilament,
               i
@@ -375,6 +369,10 @@ class PrinterManagerService {
     for (let printer of printerList) {
       await printer.acquireOctoPrintUpdatesData(true);
       await printer.acquireOctoPrintPluginsListData(true);
+      if(Object.keys(printer.octoPi).length !== 0){
+        await printer.acquireOctoPrintPiPluginData(true);
+      }
+
     }
   }
 

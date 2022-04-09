@@ -1161,12 +1161,14 @@ class PrinterSettingsService {
       });
       throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
-
-    pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
+    if(!currentPrinter){
+      return;
+    }
+    pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter?.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter?.printerState?.state}`;
     pageElements.mainPage.status.className = `btn btn-${currentPrinter?.printerState?.colour?.name} mb-1 btn-block`;
-    pageElements.mainPage.host.innerHTML = `<b>Host Status</b><br>${currentPrinter.hostState.state}`;
-    pageElements.mainPage.host.className = `btn btn-${currentPrinter.hostState.colour.name} mb-1 btn-block`;
+    pageElements.mainPage.host.innerHTML = `<b>Host Status</b><br>${currentPrinter?.hostState?.state}`;
+    pageElements.mainPage.host.className = `btn btn-${currentPrinter?.hostState.colour.name} mb-1 btn-block`;
     pageElements.mainPage.socket.innerHTML = `<b>WebSocket Status</b><br>${currentPrinter.webSocketState.desc}`;
     pageElements.mainPage.socket.className = `btn btn-${currentPrinter.webSocketState.colour} mb-1 btn-block`;
 

@@ -1,22 +1,6 @@
-// <th scope="col" className="sticky-table table-dark" style="">Printer Name</th>
-// <!--                                Printer Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">Printer Settings</th>
-// <!--                                Webscket Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">Websocket Checks</th>
-// <!--                                API Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">API</th>
-// <!--                                Websocket Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">Network Issues</th>
-// <!--                                Connection Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">Printer Connection</th>
-// <!--                                Profile Checks-->
-// <th scope="col" className="sticky-table table-dark" style="">Printer Profile</th>
-// <!--                                Webcam Settings-->
-// <th scope="col" className="sticky-table table-dark" style="">Webcam Settings</th>
-// Bootbox over bootstrap modal fix for scrolling...
 import Calc from "../../../utils/calc"
 
-$(document).on("hidden.bs.modal", ".bootbox.modal", function (e) {
+$(document).on("hidden.bs.modal", ".bootbox.modal", function () {
   if ($(".modal").hasClass("show")) {
     $("body").addClass("modal-open");
   }
@@ -142,16 +126,11 @@ const returnBootBox = (
 };
 
 const returnNetworkConnection = (issues) => {
-  const { apiResponses, webSocketResponses } = issues;
+  const { apiResponses } = issues;
 
   let html = "";
 
   if (apiResponses.length < 1) {
-    return `
-        No connection has ever been established
-      `;
-  }
-  if (webSocketResponses.length < 1) {
     return `
         No connection has ever been established
       `;
@@ -161,14 +140,8 @@ const returnNetworkConnection = (issues) => {
   const printerURL = urlSplit[0] + "//" + urlSplit[2];
   const pClean = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
 
-  const urlSplit_W = webSocketResponses[0].url.split("/");
-  const printerURL_W = urlSplit_W[0] + "//" + urlSplit_W[2];
-  const pClean_W = printerURL_W.replace(/[^\w\-]+/g, "-").toLowerCase();
-
   let totalInitial = 0;
   let totalCutOff = 0;
-
-  let throttle = 0;
 
   apiResponses.forEach((issue) => {
     const endPoint = issue.url.includes("api")
@@ -197,29 +170,11 @@ const returnNetworkConnection = (issues) => {
         `;
   });
 
-  webSocketResponses.forEach((issue) => {
-    const urlSplit_W = webSocketResponses[0].url.split("/");
-    const printerURL_W = urlSplit_W[0] + "//" + urlSplit_W[2];
-    const pClean_W = printerURL_W.replace(/[^\w\-]+/g, "-").toLowerCase();
-    let endPoint = issue.url.replace(printerURL_W + "/", "");
-    endPoint = endPoint.replace("/", "-");
-    throttle += issue.throttle ? 1 : 0;
-
-    html += `
-        <small>${endPoint}: ${returnButton(
-      issue.throttle,
-      "<i class=\"fas fa-motorcycle\"></i>",
-      E.NETWORK + endPoint + pClean_W + "socket",
-      VALID_TIMEOUT("Websocket Throttle")
-    )}
-        `;
-  });
-
-  const collapse = `
+  return `
     <a class="btn btn-sm btn-outline-info mb-1"  data-toggle="collapse" href="#${
       E.NETWORK + pClean
-    }CollapseTimeout" role="button" aria-expanded="false" aria-controls="${
-    E.NETWORK + pClean
+  }CollapseTimeout" role="button" aria-expanded="false" aria-controls="${
+      E.NETWORK + pClean
   }CollapseTimeout">
     ${printerURL} 
     </a><br>
@@ -228,19 +183,13 @@ const returnNetworkConnection = (issues) => {
       "<i class=\"fas fa-history\"></i>",
       E.NETWORK + pClean + "initial",
       VALID_TIMEOUT("All Initial")
-    )}
+  )}
     ${returnButton(
       totalCutOff < 1,
       "<i class=\"fas fa-stopwatch\"></i>",
       E.NETWORK + pClean + "cuttOff",
       VALID_TIMEOUT("All Cut Off")
-    )}
-    ${returnButton(
-      throttle,
-      "<i class=\"fas fa-motorcycle\"></i>",
-      E.NETWORK + pClean_W + "throttle",
-      VALID_TIMEOUT("Websocket Throttle")
-    )}
+  )}
     <div class="collapse" id="${E.NETWORK + pClean}CollapseTimeout">
       <div class="card card-body">
       ${html} 
@@ -248,32 +197,29 @@ const returnNetworkConnection = (issues) => {
     </div>
 
 `;
-
-  return collapse;
 };
 
 const returnHistoryCamera = (pClean, history) => {
-  let html = `
+  return `
     ${returnButton(
       history.ffmpegPath,
       "<i class=\"fas fa-terminal\"></i>",
       E.H_FFMPEG + pClean,
       VALID("The FFmpeg Path")
-    )}
+  )}
     ${returnButton(
       history.ffmpegVideoCodex,
       "<i class=\"fas fa-video\"></i>",
       E.H_CODEC + pClean,
       VALID("The Video Codex")
-    )}
+  )}
     ${returnButton(
       history.timelapseEnabled,
       "<i class=\"fas fa-hourglass-start\"></i>",
       E.H_TIMELAPSE + pClean,
       VALID("The timelapse")
-    )}
+  )}
     `;
-  return html;
 };
 const VALID = (check) => {
   return `&#x2713; ${check} is valid and setup correctly!`;
@@ -444,7 +390,7 @@ export function addHealthCheckListeners(check) {
   const pClean = check.printerName.replace(/[^\w\-]+/g, "-").toLowerCase();
 
   if (!check.printerChecks.match) {
-    document.getElementById(E.MATCH + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.MATCH + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your socket url and printer url don't match... either the IP/PORT/URL or the http -> ws / https -> ws protocol doesn't match.",
         "Use either the Printer Settings / Bulk Printer editor and update your printer URL. This should match them both back up.",
@@ -454,7 +400,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.printerChecks.webSocketURL) {
-    document.getElementById(E.WEBSOCKET + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.WEBSOCKET + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your socket url isn't a valid url format.",
         "Use either the Printer Settings / Bulk Printer editor and update your printer URL.",
@@ -463,7 +409,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.printerChecks.printerURL) {
-    document.getElementById(E.PRINTER_URL + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.PRINTER_URL + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your printer url isn't a valid url format.",
         "Use either the Printer Settings / Bulk Printer editor and update your printer URL.",
@@ -472,7 +418,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.printerChecks.cameraURL) {
-    document.getElementById(E.CAM + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.CAM + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your camera url isn't a valid url format.",
         "Use either the Printer Settings / Bulk Printer editor and update your printers camera URL.",
@@ -482,7 +428,7 @@ export function addHealthCheckListeners(check) {
   }
 
   if (!check.websocketChecks.totalPingPong || parseInt(check.websocketChecks.totalPingPong) > 5) {
-    document.getElementById(E.PING_PONG + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.PING_PONG + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your socket connection has failed the Ping/Pong check " +
           check.websocketChecks.totalPingPong +
@@ -499,7 +445,7 @@ export function addHealthCheckListeners(check) {
     "This endpoint is required to have a fully functioning printer on OctoFarm. Your printer will fail to initialise without it.";
 
   if (!check.apiChecksRequired.userCheck) {
-    document.getElementById(E.USER + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.USER + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm failed to acquire OctoPrints user information.",
         apiFixText,
@@ -509,7 +455,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksRequired.stateCheck) {
-    document.getElementById(E.STATE + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.STATE + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm uses the state endpoint to correctly understand some settings defaults if you have them setup on OctoPrint.",
         apiFixText,
@@ -519,7 +465,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksRequired.profileCheck) {
-    document.getElementById(E.SETTINGS + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.SETTINGS + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm uses the profile to correctly understand your printer specific functionality and allow to connect to the printer from the UI.",
         apiFixText,
@@ -529,7 +475,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksRequired.systemCheck) {
-    document.getElementById(E.SYSTEM + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.SYSTEM + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm uses a lot of OctoPrints settings to base it's setup on and will also use this endpoint to react to Plugin settings that you might have.",
         apiFixText,
@@ -539,7 +485,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksRequired.settingsCheck) {
-    document.getElementById(E.SETTINGS + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.SETTINGS + pClean).addEventListener("click", () => {
       returnBootBox(
         "OctoFarm uses a lot of OctoPrints settings to base it's setup on and will also use this endpoint to react to Plugin settings that you might have.",
         apiFixText,
@@ -549,7 +495,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksOptional.filesCheck) {
-    document.getElementById(E.FILES + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.FILES + pClean).addEventListener("click", () => {
       returnBootBox(
         "This endpoint is not required unless you want to use OctoFarm to action Prints and manage files. The system will handle no files been available.",
         apiFixText
@@ -557,7 +503,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksOptional.octoPrintPluginsCheck) {
-    document.getElementById(E.OP_PLUGIN + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.OP_PLUGIN + pClean).addEventListener("click", () => {
       returnBootBox(
         "This endpoint will require OctoPrint to have some active internet connection, without it OctoFarm will not scan. The information is only used to alert OctoFarm users of plugin updates and allow the installation of plugins through OctoFarm, it's not required.",
         apiFixText
@@ -566,7 +512,7 @@ export function addHealthCheckListeners(check) {
   }
 
   if (!check.apiChecksOptional.octoPrintSystemInfo) {
-    document.getElementById(E.OP_SYS_INFO + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.OP_SYS_INFO + pClean).addEventListener("click", () => {
       returnBootBox(
         "This endpoint only exists in OctoPrint after V1.4.2, if you have a version below that this will skip the check entirely. The information is only used in Printer Manager and when generating a log dump, it's not required.",
         apiFixText
@@ -574,7 +520,7 @@ export function addHealthCheckListeners(check) {
     });
   }
   if (!check.apiChecksOptional.octoPrintUpdatesCheck) {
-    document.getElementById(E.OP_UPDATES + pClean).addEventListener("click", (e) => {
+    document.getElementById(E.OP_UPDATES + pClean).addEventListener("click", () => {
       returnBootBox(
         "This endpoint will require OctoPrint to have some active internet connection, without it OctoFarm will not scan. The information is only used to alert OctoFarm users of updates for the OctoPrint service, it's not required.",
         apiFixText
@@ -665,33 +611,17 @@ export function addHealthCheckListeners(check) {
   }
   const apiSettingsWarning =
     "This will not really effect OctoFarms operations much. It will however effect the user experience as messages may not arrive in the expected time or initial scans of offline printers could take to long to resolve.";
-  const { apiResponses, webSocketResponses } = check.connectionIssues;
+  const { apiResponses  } = check.connectionIssues;
   if (apiResponses.length < 1) {
     return false;
   }
-  if (webSocketResponses.length < 1) {
-    return false;
-  }
 
-  const socketResponseInfo = (faster, slower) => {
-    return `
-    Your socket is responding ${faster ? "faster" : ""} ${slower ? "slower" : ""} than expected...
-    `;
-  };
   const timeoutResponseInfo = (setting) => {
     return `
     Your ${setting} is too high for the response times...
     `;
   };
-  const socketResponseFix = (response, settings) => {
-    return `
-    The socket is responding, on average, in ${
-      response ? response : ""
-    }ms <br> Your settings are currently: ${settings ? settings : ""}ms and are under by ${
-      response - settings
-    }ms.
-    `;
-  };
+
   const timeoutResponseFix = (response, settings) => {
     return `
     The endpoint is responding, on average, in ${
@@ -714,16 +644,10 @@ export function addHealthCheckListeners(check) {
   let totalInitial = 0;
   let totalCutOff = 0;
 
-  let throttle = 0;
-
   const urlSplit = apiResponses[0].url.split("/");
 
   const printerURL = urlSplit[0] + "//" + urlSplit[2];
   const pCleanURL = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
-
-  const urlSplit_W = webSocketResponses[0].url.split("/");
-  const printerURL_W = urlSplit_W[0] + "//" + urlSplit_W[2];
-  const pClean_W = printerURL_W.replace(/[^\w\-]+/g, "-").toLowerCase();
 
   if (apiResponses.length > 1) {
     apiResponses.forEach((issue) => {
@@ -769,29 +693,6 @@ export function addHealthCheckListeners(check) {
       apiSettingsWarning
     );
   });
-  if (webSocketResponses.length > 0) {
-    webSocketResponses.forEach((issue) => {
-      let endPoint = issue.url.replace(printerURL_W + "/", "");
-      endPoint = endPoint.replace("/", "-");
-      throttle += issue.throttle ? 1 : 0;
-      document
-        .getElementById(E.NETWORK + endPoint + pClean_W + "socket")
-        .addEventListener("click", () => {
-          returnBootBox(
-            socketResponseInfo(issue.under, issue.over),
-            socketResponseFix(issue.responsesAverage, issue.throttleMS),
-            apiSettingsWarning
-          );
-        });
-    });
-  }
-  document.getElementById(E.NETWORK + pClean_W + "throttle").addEventListener("click", () => {
-    returnBootBox(
-      "The websocket endpoint is not sending data at the speed your Websocket Throttle is set at.",
-      "Click the blue button containing your printer url to investigate the specific endpoint further.",
-      "This will not really effect OctoFarms operations much. It will however effect the user experience as messages may not arrive in the expected time or initial scans of offline printers could take to long to resolve."
-    );
-  });
 }
 
 export function returnFarmOverviewTableRow(
@@ -803,9 +704,46 @@ export function returnFarmOverviewTableRow(
   printerCancelRate,
   printerErrorRate,
   printerIdleRate,
-  printerOfflineRate
+  printerOfflineRate,
+  octoPi
 ) {
   const NO_DATA = "No Data";
+  const octoPiTableRows = document.querySelectorAll('[id^="trOctoPi-"]')
+  let octoPiColumns = "";
+  if(!!octoPi && Object.keys(octoPi).length !== 0){
+    const {octopi_version, model, throttle_state} = octoPi
+    octoPiColumns = `
+      <td>${model ? model : NO_DATA}</td>
+      <td>${octopi_version ? octopi_version : NO_DATA}</td>
+      <td>${
+      throttle_state?.current_issue
+        ? "<i title=\"OctoPi is reporting that it's in a throttled state! Please check your power supply!\" class=\"fas fa-thumbs-down text-danger\"></i>"
+        : "<i title=\"OctoPi is reporting it's not in a throttled state!\" class=\"fas fa-thumbs-up text-success\"></i>"
+      }</td>
+      <td>${
+        throttle_state?.current_overheat
+        ? "<i title=\"OctoPi is reporting an overheating issue! Blow on it and ReScan the API!\" class=\"fa-solid fa-fire text-danger\"></i>"
+        : "<i title=\"OctoPi is running cool!\" class=\"fa-solid fa-fire text-success\"></i>"
+      }</td>
+      <td>${
+        throttle_state?.current_undervoltage
+        ? "<i title=\"OctoPi is reporting that it's undervoltaged! Fix your PSU and Re-Scan the API.\" class=\"fa-solid fa-plug-circle-bolt text-danger\"></i>"
+        : "<i title=\"OctoPi is juiced up!\" class=\"fa-solid fa-plug-circle-bolt text-success\"></i>"
+      }</td>
+    `
+    octoPiTableRows.forEach(tableRow => {
+      tableRow.classList.remove("d-none");
+    })
+  }else{
+    octoPiColumns = `
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    `
+  }
+
   return `
   <tr>
       <th scope="row">${currentPrinter.printerName}  </th>
@@ -826,8 +764,8 @@ export function returnFarmOverviewTableRow(
       }  </td>
       <td>${
         octoSysInfo?.["octoprint.safe_mode"]
-          ? "<i title=\"You are not in safe mode, all is fine\" class=\"fas fa-thumbs-down text-success\"></i>"
-          : "<i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-up text-success\"></i>"
+            ? "<i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-down text-danger\"></i>"
+            : "<i title=\"You are not in safe mode, all is fine\" class=\"fas fa-thumbs-up text-success\"></i>"
       } </td>
       <td>
         <div class="progress" title="Success:  ${printerSuccessRate.toFixed(0)}% / Cancel: ${printerCancelRate.toFixed(0)}% / Error: ${printerErrorRate.toFixed(0)}%">
@@ -844,7 +782,7 @@ export function returnFarmOverviewTableRow(
         </div>
       </td>
       <td>${currentPrinter.printerResendRatioTotal} %</td>
+      ${octoPiColumns}
     </tr>
-  
   `;
 }

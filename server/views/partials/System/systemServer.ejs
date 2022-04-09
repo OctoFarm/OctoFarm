@@ -159,10 +159,10 @@
                     <input id="serverPortNo" type="number" class="form-control"
                            placeholder="6" aria-label="Refresh Rate"
                            disabled
-                           id="serverPortNumber" value="4000" step="1">
+                           value="4000" step="1">
 
                 </div>
-                <small id="emailHelp" class="form-text text-muted">Requires a server
+                <small class="form-text text-muted">Requires a server
                     restart</small>
                 <hr>
                 <div class="row">
@@ -206,29 +206,6 @@
             </div>
             <div class="tab-pane fade" id="server-timeout" role="tabpanel"
                  aria-labelledby="server-timeout">
-                <p class="font-weight-bold">WebSocket Throttle</p>
-                <p>You may be trying to run OctoFarm/OctoPrint on a potato, which
-                    I've no aversion too but the CPU on the potato might not like
-                    it. If you find that to be the case then please increase the
-                    throttle amount.</p>
-                <p>Currently the OctoPrint client will send a message every 500ms,
-                    so the server will process at that rate.</p>
-
-                <p><b>Min</b>: 0.5 seconds (Default), <b>Max:</b> 10 seconds</p>
-
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Throttle:</span>
-                    </div>
-                    <input id="webSocketThrottle" type="number" class="form-control"
-                           placeholder="6" aria-label="Refresh Rate"
-                           id="onlinePollRate" value="<%= serverSettings.onlinePolling.seconds %>" min="0.5" max="10"
-                           step="0.5">
-                    <div class="input-group-append">
-                        <span class="input-group-text">Seconds</span>
-                    </div>
-
-                </div>
                 <small class="form-text text-muted">Does not require a server
                     restart</small>
                 <hr>
@@ -247,7 +224,7 @@
                             </div>
                             <input id="webSocketRetry" type="number"
                                    class="form-control" placeholder="6"
-                                   aria-label="Refresh Rate" id="onlinePollRate"
+                                   aria-label="Refresh Rate"
                                    value="<%= serverSettings.timeout.webSocketRetry/1000 %>" min="5" max="30" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
@@ -272,7 +249,7 @@
                             </div>
                             <input id="APITimeout" type="number"
                                    class="form-control" placeholder="6"
-                                   aria-label="Refresh Rate" id="onlinePollRate"
+                                   aria-label="Refresh Rate"
                                    value="<%= serverSettings.timeout.apiTimeout/1000 %>" min="1" max="10" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
@@ -297,7 +274,7 @@
                             </div>
                             <input id="APIRetryTimeout" type="number"
                                    class="form-control" placeholder="6"
-                                   aria-label="Refresh Rate" id="onlinePollRate"
+                                   aria-label="Refresh Rate"
                                    value="<%= serverSettings.timeout.apiRetryCutoff/1000 %>" min="5" max="60" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
@@ -321,7 +298,7 @@
                             </div>
                             <input id="APIRetry" type="number" class="form-control"
                                    placeholder="6" aria-label="Refresh Rate"
-                                   id="onlinePollRate" value="<%= serverSettings.timeout.apiRetry/1000 %>" min="30" max="60"
+                                   value="<%= serverSettings.timeout.apiRetry/1000 %>" min="30" max="60"
                                    step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
