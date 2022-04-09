@@ -93,16 +93,11 @@ const checkAndUpdatePrinterFlag = (id, checks) => {
   const { ffmpegPath, ffmpegVideoCodex, timelapseEnabled } = historySetup;
   if (!ffmpegPath || !ffmpegVideoCodex || !timelapseEnabled) healthChecksPass = false;
 
-  const { webSocketResponses, apiResponses } = checks.connectionIssues;
+  const { apiResponses } = checks.connectionIssues;
 
   const log_throttle = {};
   const log_timeout = {};
   const log_cutoff = {};
-
-  webSocketResponses.forEach((res) => {
-    log_throttle[res.url] = { throttle: !!res.throttle };
-    if (!res.throttle) healthChecksPass = false;
-  });
 
   apiResponses.forEach((res) => {
     log_timeout[res.url] = { cutOffTimeout: !!res.cutOffTimeout };
@@ -122,7 +117,6 @@ const checkAndUpdatePrinterFlag = (id, checks) => {
     log_cutoff
   });
 
-  //logger.debug(printerURL + " :" + healthChecksPass);
   getPrinterStoreCache().updatePrinterLiveValue(id, {
     healthChecksPass: healthChecksPass
   });

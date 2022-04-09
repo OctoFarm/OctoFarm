@@ -464,6 +464,7 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
 
   for (const printer of printers) {
     let stats = getPrinterStoreCache().getPrinterStatistics(printer._id);
+    const octoPi = printer?.octoPi;
 
     if (!stats) {
       stats = await generatePrinterStatistics(printer._id);
@@ -473,7 +474,8 @@ router.get("/farmOverview", ensureAuthenticated, ensureAdministrator, async (req
     returnArray.push({
       octoPrintVersion: printer?.octoPrintVersion,
       printerFirmware: printer?.printerFirmware,
-      statistics: stats
+      statistics: stats,
+      octoPi
     });
   }
 
@@ -520,6 +522,7 @@ router.get(
   async (req, res) => {
     const printerID = req.paramString("id");
     res.send(getEventEmitterCache().get(printerID));
-});
+  }
+);
 
 module.exports = router;
