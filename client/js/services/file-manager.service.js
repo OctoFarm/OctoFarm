@@ -52,7 +52,7 @@ const handleUploadFromQueue = async (current, index) => {
     file.index = current.index;
     file.uploadDate = currentDate.getTime() / 1000;
     fileUploads.remove();
-    // await OctoFarmClient.post("printers/newFiles", file);
+    //await OctoFarmClient.post("printers/newFiles", file);
 
     const currentFolder = document.getElementById("currentFolder").innerHTML;
     const fileFolder = "local/"+file.files.local.path;
@@ -261,7 +261,7 @@ export default class FileManagerService {
       if (file.print) {
         formData.append("print", "true");
       }
-      const url = `${printerInfo.printerURL}/api/files/local`;
+      const url = `files/uploadFile/${printerInfo._id}`;
       const xhr = new XMLHttpRequest();
       file = file.file;
 

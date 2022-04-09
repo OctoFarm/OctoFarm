@@ -1196,6 +1196,11 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return printer.getPrinterStatistics();
   }
+
+  getPrinterFileUploadURL(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.printerURL + "/api/files/local/";
+  }
 }
 
 module.exports = PrinterStore;

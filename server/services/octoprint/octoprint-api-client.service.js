@@ -196,6 +196,10 @@ class OctoprintApiClientService extends OctoprintApiService {
       return e;
     });
   }
+
+  returnFileUploadURL(path) {
+    return apiFile(path)
+  }
 }
 
 module.exports = {

@@ -124,6 +124,7 @@ function serveOctoFarmRoutes(app) {
     printerActionLimits,
     require("./routes/printer-manager.routes.js", { page: "route" })
   );
+  app.use("/files", require("./routes/files-manager.routes.js", { page: "route" }));
   app.use("/settings", require("./routes/system-settings.routes.js", { page: "route" }));
   app.use("/filament", require("./routes/filament-manager.routes.js", { page: "route" }));
   app.use("/history", require("./routes/history.routes.js", { page: "route" }));
