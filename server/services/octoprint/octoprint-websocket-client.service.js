@@ -13,7 +13,7 @@ const ConnectionMonitorService = require("../../services/connection-monitor.serv
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
-const { averageMeanOfArray } = require("../../utils/math.utils.js")
+const { averageMeanOfArray } = require("../../utils/math.utils.js");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -48,6 +48,7 @@ class WebSocketClient {
   throttleRateMeasurements = [];
   throttleRateMeasurementsSize = 20;
   throttleBase = 500;
+  throttleMargin = 150;
 
   constructor(
     webSocketURL = undefined,
@@ -166,7 +167,7 @@ class WebSocketClient {
         ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
       );
 
-      this.checkMessageSpeed( timeDifference - this.#lastMessage);
+      this.checkMessageSpeed(timeDifference - this.#lastMessage);
 
       this.#onMessage(this.id, data);
 
@@ -321,46 +322,41 @@ class WebSocketClient {
     );
   }
 
-  checkMessageSpeed(ms){
-    if(this.throttleRateMeasurements.length >= this.throttleRateMeasurementsSize){
+  checkMessageSpeed(ms) {
+    if (this.throttleRateMeasurements.length >= this.throttleRateMeasurementsSize) {
       this.throttleRateMeasurements.shift();
     }
     this.throttleRateMeasurements.push(ms);
     const currentAverage = averageMeanOfArray(this.throttleRateMeasurements);
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
-    if(ms > throttleLimit){
+    if (ms > throttleLimit + this.throttleMargin) {
       this.increaseMessageThrottle();
-    } else if(this.currentThrottleRate > 1) {
+    } else if (this.currentThrottleRate > 1) {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
-      const lowerProcessingLimit = (this.currentThrottleRate - 1) * (currentAverage + 100);
+      const lowerProcessingLimit =
+        (this.currentThrottleRate - 1) * (currentAverage + this.throttleMargin);
       if (maxProcessingLimit < lowerProcessingLimit) {
         this.decreaseMessageThrottle();
       }
-
     }
   }
 
-  increaseMessageThrottle(){
+  increaseMessageThrottle() {
     this.currentThrottleRate++;
     this.sendThrottle();
-    logger.warning("Increasing websocket throttle time...", this.currentThrottleRate)
+    logger.silly("Increasing websocket throttle time...", this.currentThrottleRate);
   }
 
-  decreaseMessageThrottle(){
+  decreaseMessageThrottle() {
     this.currentThrottleRate--;
     this.sendThrottle();
-    logger.warning("Decreasing websocket throttle time...", this.currentThrottleRate)
+    logger.silly("Decreasing websocket throttle time...", this.currentThrottleRate);
   }
 
   sendThrottle() {
-    logger.debug("Throttling websocket connection to: " + this.currentThrottleRate + " seconds");
-    PrinterTicker.addIssue(
-      new Date(),
-      this.url,
-      "Throttling websocket connection to: " + this.currentThrottleRate + " seconds",
-      "Active",
-      this.id
+    logger.debug(
+      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
     );
     this.send(
       JSON.stringify({
@@ -384,14 +380,15 @@ class WebSocketClient {
         this.url,
         `Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
           this.#retryNumber
-        }. Subsequent logs will be silenced...`,
+        }. Subsequent logs will be silenced... Error:${e}`,
         "Active",
         this.id
       );
       logger.info(
         `${this.url} Setting up reconnect in ${this.autoReconnectInterval}ms retry #${
           this.#retryNumber
-        }`
+        }`,
+        e
       );
     }
     ConnectionMonitorService.updateOrAddResponse(
