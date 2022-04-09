@@ -708,23 +708,40 @@ export function returnFarmOverviewTableRow(
   octoPi
 ) {
   const NO_DATA = "No Data";
-  const octoPiTableRows = "trOctoPi-"
+  const octoPiTableRows = document.querySelectorAll('[id^="trOctoPi-"]')
   let octoPiColumns = "";
-  if(!!octoPi){
-    const {octopi_version, model, octopiuptodate_build, throttle_state} = octoPi
+  if(!!octoPi && Object.keys(octoPi).length !== 0){
+    const {octopi_version, model, throttle_state} = octoPi
     octoPiColumns = `
       <td>${model ? model : NO_DATA}</td>
       <td>${octopi_version ? octopi_version : NO_DATA}</td>
-      <td>${octopiuptodate_build ? octopiuptodate_build : NO_DATA}</td>
       <td>${
-        throttle_state
-            ? "<i title=\"OctoPi is reporting that it's in a throttled state! Please check your power supply!\" class=\"fas fa-thumbs-down text-danger\"></i>"
-            : "<i title=\"OctoPi is reporting it's not in a throttled state!\" class=\"fas fa-thumbs-up text-success\"></i>"
-    }</td>
+      throttle_state?.current_issue
+        ? "<i title=\"OctoPi is reporting that it's in a throttled state! Please check your power supply!\" class=\"fas fa-thumbs-down text-danger\"></i>"
+        : "<i title=\"OctoPi is reporting it's not in a throttled state!\" class=\"fas fa-thumbs-up text-success\"></i>"
+      }</td>
+      <td>${
+        throttle_state?.current_overheat
+        ? "<i title=\"OctoPi is reporting an overheating issue! Blow on it and ReScan the API!\" class=\"fa-solid fa-fire text-danger\"></i>"
+        : "<i title=\"OctoPi is running cool!\" class=\"fa-solid fa-fire text-success\"></i>"
+      }</td>
+      <td>${
+        throttle_state?.current_undervoltage
+        ? "<i title=\"OctoPi is reporting that it's undervoltaged! Fix your PSU and Re-Scan the API.\" class=\"fa-solid fa-plug-circle-bolt text-danger\"></i>"
+        : "<i title=\"OctoPi is juiced up!\" class=\"fa-solid fa-plug-circle-bolt text-success\"></i>"
+      }</td>
     `
     octoPiTableRows.forEach(tableRow => {
       tableRow.classList.remove("d-none");
     })
+  }else{
+    octoPiColumns = `
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    `
   }
 
   return `

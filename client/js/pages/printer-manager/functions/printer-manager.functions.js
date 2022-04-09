@@ -389,7 +389,7 @@ export async function loadFarmOverviewInformation() {
           (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
       const printerOfflineRate = (currentPrinter.offlineTimeTotal * 100) / printUtilisationTotal || 0;
       const octoSysInfo = currentPrinter.octoPrintSystemInfo;
-      const octoPi = currentPrinter?.octoPi;
+      const octoPi = printer?.octoPi;
       farmOverviewInformation.insertAdjacentHTML(
         "beforeend",
         returnFarmOverviewTableRow(

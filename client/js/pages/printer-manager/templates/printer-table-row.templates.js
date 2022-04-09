@@ -50,18 +50,19 @@ const returnAlerts = (id, printerURL) => {
             type="button"
             class="tag btn btn-outline-info btn-sm d-none"
             id="corsIssue-${id}" 
-            href="printerURL"
+            target="_blank"
+            href="${printerURL}"
     >
         <i class="fas fa-crosshairs"></i>
     </a>
-    <button  title="Offline Rescan planned"
+    <button  title="Offline Setup Scan Planned"
                  id="printerAPIScanning-${id}"
                  type="button"
                  class="tag btn btn-outline-danger btn-sm d-none"
                 >
                <span id="apiReScanIcon-${id}"><i class="fas fa-redo fa-sm"></i></span><span id="apiReScanText-${id}"></span> 
     </button>
-        <button  title="Offline Rescan planned"
+        <button  title="Offline Websocket Scan Planned"
                  id="printerWebsocketScanning-${id}"
                  type="button"
                  class="tag btn btn-outline-warning btn-sm d-none"
@@ -71,18 +72,24 @@ const returnAlerts = (id, printerURL) => {
     <button  title="Safe mode triggered!"
          id="printerSafeMode-${id}"
          type="button"
-         class="tag btn btn-outline-warning btn-sm"
+         class="tag btn btn-outline-warning btn-sm d-none"
         >
         <i class="fa-solid fa-shield-heart"></i>
     </button>
-    <button  title="Safe mode triggered!"
-         id="printerWebsocketScanning-${id}"
+    <button  title="Your Pi is undervoltaged!"
+         id="printerUnderVoltaged-${id}"
          type="button"
-         class="tag btn btn-outline-warning btn-sm"
+         class="tag btn btn-outline-warning btn-sm d-none"
         >
-       <i class="fa-light fa-plug-circle-bolt"></i>
+       <i class="fa-solid fa-plug-circle-bolt"></i>
     </button>
-
+    <button  title="Your Pi is overheating!"
+         id="printerOverHeating-${id}"
+         type="button"
+         class="tag btn btn-outline-danger btn-sm d-none"
+        >
+       <i class="fa-solid fa-fire"></i>
+    </button>
    `;
 };
 
