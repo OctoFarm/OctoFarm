@@ -24,7 +24,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="container-fluid">
                     <div class="row" id="<%= modal.id %>">
                         <% if (!bodyFile) { %>
                             <em> This widget failed to render due to missing 'tile.bodyId' or 'bodyFile' alternative </em>
@@ -32,7 +31,6 @@
                             <%# More complex card-body content %>
                             <%- include(bodyFile) %>
                         <% } %>
-                    </div>
                 </div>
             </div>
             <div id="<%= modal.id %>ModalFooter" class="modal-footer">

@@ -1,13 +1,6 @@
 const mongoose = require("mongoose");
 
 const ServerSettingsSchema = new mongoose.Schema({
-  onlinePolling: {
-    seconds: {
-      type: String,
-      default: "0.5",
-      required: true
-    }
-  },
   server: {
     loginRequired: {
       type: Boolean,
