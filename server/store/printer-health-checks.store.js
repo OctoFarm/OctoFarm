@@ -31,32 +31,32 @@ const updatePrinterHealthChecks = async () => {
   const farmPrinters = getPrinterStoreCache().listPrintersInformation();
   printerHealthChecks = [];
   logger.warning(`Found ${farmPrinters.length} to health check.`);
-  for (let i = 0; i < farmPrinters.length; i++) {
-    if (farmPrinters[i].printerState.colour.category !== "Offline") {
+  for (const printer of farmPrinters) {
+    if (printer.printerState.colour.category !== "Offline") {
       logger.debug("Checking printer", { printer: farmPrinters[i].printerURL });
       const currentURL = new URL(farmPrinters[i].printerURL);
 
       const printerCheck = {
         dateChecked: new Date(),
-        printerName: farmPrinters[i].printerName,
-        printerID: farmPrinters[i]._id,
-        printerChecks: printerChecks(farmPrinters[i]),
-        apiChecksRequired: apiChecksRequired(farmPrinters[i].systemChecks.scanning),
-        apiChecksOptional: apiChecksOptional(farmPrinters[i].systemChecks.scanning),
+        printerName: printer.printerName,
+        printerID: printer._id,
+        printerChecks: printerChecks(printer),
+        apiChecksRequired: apiChecksRequired(printer.systemChecks.scanning),
+        apiChecksOptional: apiChecksOptional(printer.systemChecks.scanning),
         websocketChecks: websocketChecks(currentURL.host),
         connectionChecks: printerConnectionCheck(
-          farmPrinters[i].currentConnection,
-          farmPrinters[i].connectionOptions
+            printer.currentConnection,
+            printer.connectionOptions
         ),
-        profileChecks: profileChecks(farmPrinters[i].currentProfile),
+        profileChecks: profileChecks(printer.currentProfile),
         webcamChecks: webcamChecks(
-          farmPrinters[i].camURL,
-          farmPrinters[i]?.otherSettings?.webCamSettings
+            printer.camURL,
+            printer?.otherSettings?.webCamSettings
         ),
         connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
       };
-      logger.debug("Printer checked", { printer: farmPrinters[i].printerURL });
-      checkAndUpdatePrinterFlag(farmPrinters[i]._id, printerCheck);
+      logger.debug("Printer checked", { printer: printer.printerURL });
+      checkAndUpdatePrinterFlag(printer._id, printerCheck);
 
       printerHealthChecks.push(printerCheck);
     }
