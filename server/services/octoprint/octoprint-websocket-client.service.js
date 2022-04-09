@@ -345,17 +345,17 @@ class WebSocketClient {
   increaseMessageThrottle() {
     this.currentThrottleRate++;
     this.sendThrottle();
-    logger.silly("Increasing websocket throttle time...", this.currentThrottleRate);
+    logger.warning("Increasing websocket throttle time...", this.currentThrottleRate);
   }
 
   decreaseMessageThrottle() {
     this.currentThrottleRate--;
     this.sendThrottle();
-    logger.silly("Decreasing websocket throttle time...", this.currentThrottleRate);
+    logger.warning("Decreasing websocket throttle time...", this.currentThrottleRate);
   }
 
   sendThrottle() {
-    logger.debug(
+    logger.silly(
       "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
     );
     this.send(

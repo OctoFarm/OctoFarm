@@ -389,6 +389,7 @@ export async function loadFarmOverviewInformation() {
           (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
       const printerOfflineRate = (currentPrinter.offlineTimeTotal * 100) / printUtilisationTotal || 0;
       const octoSysInfo = currentPrinter.octoPrintSystemInfo;
+      const octoPi = currentPrinter?.octoPi;
       farmOverviewInformation.insertAdjacentHTML(
         "beforeend",
         returnFarmOverviewTableRow(
@@ -400,7 +401,8 @@ export async function loadFarmOverviewInformation() {
           printerCancelRate,
           printerErrorRate,
           printerIdleRate,
-          printerOfflineRate
+          printerOfflineRate,
+          octoPi
         )
       );
     }
@@ -424,7 +426,7 @@ export async function loadConnectionOverViewInformation() {
      currentPrinter.connections.forEach(con => {
        const log = con.log;
        const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
-       const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0)
+       const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) / totalConnections
        const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections
        const failedPercent = (log.totalRequestsFailed * 100) / totalConnections
        const apiFailures = log.connectionFailures
@@ -449,10 +451,10 @@ export async function loadConnectionOverViewInformation() {
     const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length
     const actualFailedPercent = totalFailedPercent / totalsArray[index].length
     let averageTotalCountLength = 0;
-    const averageTotalCount = totalsArray[index].reduce( function(a, b){
+    const averageTotalCount = (totalsArray[index].reduce( function(a, b){
            averageTotalCountLength = averageTotalCountLength + 1;
            return a + b["totalResponse"]
-         }, 0)
+         }, 0) / totalsArray[index].length);
     const totalAPIFailed = totalsArray[index].reduce( function(a, b){
       return a + b["apiFailures"]
     }, 0)
@@ -463,7 +465,7 @@ export async function loadConnectionOverViewInformation() {
 
       const collapseableRow = collapsableRow(index,
           currentPrinter.printerURL,
-          averageTotalCalc,
+          averageTotalCalc.toFixed(2) || 0,
           actualSuccessPercent,
           actualFailedPercent,
           totalsArray,
@@ -490,7 +492,7 @@ export async function loadConnectionOverViewInformation() {
        }
 
       const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0);
-      const averageCalculation = (averageCount / log.lastResponseTimes.length) || 0;
+      const averageCalculation = (averageCount / log.lastResponseTimes.length).toFixed(2) || 0;
       const totalConnections = (log.totalRequestsSuccess + log.totalRequestsFailed)
       const successPercent = (log.totalRequestsSuccess * 100) / totalConnections;
       const failedPercent =  (log.totalRequestsFailed * 100) / totalConnections;
