@@ -1494,7 +1494,7 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
 
-    if (this?.fileList.fileList.length === 0 || force) {
+    if (this?.fileList?.fileList?.length === 0 || force) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
         logger.http("Failed Aquire files data", e);
         return false;
