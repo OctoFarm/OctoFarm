@@ -68,6 +68,21 @@ const returnAlerts = (id, printerURL) => {
                 >
                <span id="webosocketScanIcon-${id}"><i class="fas fa-sync-alt fa-sm"></i></span><span id="websocketScanText-${id}"></span> 
     </button>
+    <button  title="Safe mode triggered!"
+         id="printerSafeMode-${id}"
+         type="button"
+         class="tag btn btn-outline-warning btn-sm"
+        >
+        <i class="fa-solid fa-shield-heart"></i>
+    </button>
+    <button  title="Safe mode triggered!"
+         id="printerWebsocketScanning-${id}"
+         type="button"
+         class="tag btn btn-outline-warning btn-sm"
+        >
+       <i class="fa-light fa-plug-circle-bolt"></i>
+    </button>
+
    `;
 };
 
