@@ -9,7 +9,7 @@ const addClientConnection = (req, res) => {
   // Set necessary headers to establish a stream of events
   const headers = {
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
     Pragma: "no-cache",
     Expires: 0,
     Connection: "keep-alive"
@@ -81,6 +81,8 @@ const notifySubscribers = (id, type, message) => {
 
     clientList.forEach((client) => {
       client.res.write(`retry: ${10000} \n`);
+      client.res.write(`id: ${id}\n`);
+      client.res.write(`type: ${type}\n`);
       client.res.write(`data: ${stringify(payload)} \n\n`);
     });
   }
