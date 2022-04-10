@@ -150,7 +150,7 @@
                  role="tabpanel" aria-labelledby="server-settings-list">
                 <p class="font-weight-bold">Server Port</p>
                 <p>The port that OctoFarm will accept connections from for it's
-                    inbuilt client.</p>
+                    inbuilt client. Use the .env file in your OctoFarm folder to change...</p>
                 <p><b>Default</b>: 4000</p>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -238,10 +238,8 @@
 
                     <div class="col-md-6 col-lg-6">
                         <p class="font-weight-bold">API Initial Timeout</p>
-                        <p>The timeout set for the initial connection attempt to
-                            OctoPrints API when it hasn't managed to establish a
-                            connection</p>
-                        <p><b>Min</b>: 1 second (Default), <b>Max:</b> 10 seconds
+                        <p>The length of time OctoFarm will wait for a response from the OctoPrint API. Any request going over this will be considered offline...</p>
+                        <p><b>Min</b>: 1 second (Default: 2 seconds), <b>Max:</b> 10 seconds
                         </p>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -251,31 +249,6 @@
                                    class="form-control" placeholder="6"
                                    aria-label="Refresh Rate"
                                    value="<%= serverSettings.timeout.apiTimeout/1000 %>" min="1" max="10" step="0.5">
-                            <div class="input-group-append">
-                                <span class="input-group-text">Seconds</span>
-                            </div>
-
-                        </div>
-                        <small id="emailHelp" class="form-text text-muted">Requires
-                            a server restart</small>
-                        <hr>
-                    </div>
-                    <div class="col-md-6 col-lg-6">
-
-                        <p class="font-weight-bold">API Secondary Timeout</p>
-                        <p>The secondary timeout for slower OctoPrint connection
-                            attempts to the API, when the first fails it will try
-                            again with this number.</p>
-                        <p><b>Min</b>: 5 seconds, <b>Max:</b> 60 seconds, <b>Default:</b>
-                            10 seconds</p>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Secondary API Timeout:</span>
-                            </div>
-                            <input id="APIRetryTimeout" type="number"
-                                   class="form-control" placeholder="6"
-                                   aria-label="Refresh Rate"
-                                   value="<%= serverSettings.timeout.apiRetryCutoff/1000 %>" min="5" max="60" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
                             </div>

@@ -33,9 +33,9 @@ const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { sanitizeString } = require("../utils/sanitize-utils");
 const { databaseNamesList } = require("../constants/database.constants");
-const {TaskManager} = require("../services/task-manager.service");
-const {SystemRunner} = require("../services/system-information.service");
-const {listActiveClients} = require("../services/server-side-events.service");
+const { TaskManager } = require("../services/task-manager.service");
+const { SystemRunner } = require("../services/system-information.service");
+const { listActiveClients } = require("../services/server-side-events.service");
 
 module.exports = router;
 
@@ -287,14 +287,12 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const sentOnline = JSON.parse(JSON.stringify(req.body));
     const actualOnline = JSON.parse(JSON.stringify(checked[0]));
 
-    const onlineChanges = isEqual(actualOnline.onlinePolling, sentOnline.onlinePolling);
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
     const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
     const historyChanges = isEqual(actualOnline.history, sentOnline.history);
     const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
-    checked[0].onlinePolling = sentOnline.onlinePolling;
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
     checked[0].filament = sentOnline.filament;
@@ -303,22 +301,9 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].monitoringViews = sentOnline.monitoringViews;
 
     if (
-      [
-        onlineChanges,
-        serverChanges,
-        timeoutChanges,
-        filamentChanges,
-        historyChanges,
-        influxExport
-      ].includes(false)
+      [serverChanges, timeoutChanges, filamentChanges, historyChanges, influxExport].includes(false)
     ) {
       restartRequired = true;
-    }
-
-    if (onlineChanges) {
-      await getPrinterStoreCache().updateAllPrintersSocketThrottle(
-        checked[0].onlinePolling.seconds
-      );
     }
 
     //Check the influx export to see if all information exists... disable if not...
@@ -423,15 +408,15 @@ router.get(
  * Acquire system information from system info runner
  */
 router.get("/system/info", ensureAuthenticated, (req, res) => {
-    TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
-    const systemInformation = SystemRunner.returnInfo(true);
-    res.send(systemInformation);
+  TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
+  const systemInformation = SystemRunner.returnInfo(true);
+  res.send(systemInformation);
 });
 
 router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-    const taskManagerState = TaskManager.getTaskState();
+  const taskManagerState = TaskManager.getTaskState();
 
-    res.send(taskManagerState);
+  res.send(taskManagerState);
 });
 
 router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);

@@ -35,9 +35,9 @@ import { serverDatabaseKeys } from "../../server/constants/database.constants"
 // Setup Page
 for (const key in serverDatabaseKeys) {
   if (serverDatabaseKeys.hasOwnProperty(key)) {
-    const element = document.getElementById(`nuke${serverDatabaseKeys[key]}`);
-    if (element) {
-      element.addEventListener("click", async (e) => {
+    const elementNuke = document.getElementById(`nuke${serverDatabaseKeys[key]}`);
+    if (elementNuke) {
+      elementNuke.addEventListener("click", async (e) => {
         const alert = UI.createAlert(
           "warning",
           `${UI.returnSpinnerTemplate()} Deleting ${serverDatabaseKeys[key]} database...`
@@ -48,10 +48,10 @@ for (const key in serverDatabaseKeys) {
     }
 
     if (key !== "ALL") {
-      const element = document.getElementById(`export${serverDatabaseKeys[key]}`);
+      const elementExport = document.getElementById(`export${serverDatabaseKeys[key]}`);
 
-      if (element) {
-        element.addEventListener("click", async (e) => {
+      if (elementExport) {
+        elementExport.addEventListener("click", async (e) => {
           const alert = UI.createAlert(
             "warning",
             `${UI.returnSpinnerTemplate()} Preparing ${serverDatabaseKeys[key]} database...`

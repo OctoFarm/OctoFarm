@@ -20,12 +20,6 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: 2000,
       required: true
     },
-    // Cut off timeout... don't try to connect for more than 10 seconds...
-    apiRetryCutoff: {
-      type: Number,
-      default: 5000,
-      required: true
-    },
     // When to retry the connections, this is a base for the
     apiRetry: {
       type: Number,

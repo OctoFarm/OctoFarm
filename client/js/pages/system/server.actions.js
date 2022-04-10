@@ -346,9 +346,6 @@ async function checkFilamentManagerPluginState() {
 
 async function updateServerSettings() {
   const opts = {
-    onlinePolling: {
-      seconds: settingsElements.onlinePolling.seconds.value,
-    },
     server: {
       // Deprecated Port
       port: parseInt(settingsElements.server.port.value),
@@ -358,7 +355,6 @@ async function updateServerSettings() {
     timeout: {
       webSocketRetry: settingsElements.timeout.webSocketRetry.value * 1000,
       apiTimeout: settingsElements.timeout.apiTimeout.value * 1000,
-      apiRetryCutoff: settingsElements.timeout.apiRetryCutoff.value * 1000,
       apiRetry: settingsElements.timeout.apiRetry.value * 1000,
     },
     filament: {
@@ -771,7 +767,7 @@ function startUpdateTasksRunner() {
         UI.doesElementNeedUpdating(
           theTask.duration
             ? UI.generateMilisecondsTime(theTask.duration)
-            : '<i class="fas fa-sync fa-spin"></i>',
+            : "<i class=\"fas fa-sync fa-spin\"></i>",
           document.getElementById("duration-" + task),
           "innerHTML"
         );
