@@ -6,7 +6,7 @@
   "scripts": {
     "prestart": "npm ci",
     "start": "pm2 flush && pm2 start ecosystem.config.js",
-    "start-alpha": "pm2 flush && pm2 start app.js --name OctoFarm-Testing -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
+    "start-alpha": "pm2 flush && pm2 start ecosystem-alpha.config.js",
     "dev": "nodemon ./app.js",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
