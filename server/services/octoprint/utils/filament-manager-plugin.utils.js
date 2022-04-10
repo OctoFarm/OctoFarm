@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const { findIndex } = require("lodash");
-const Spool = require("../models/Filament.js");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const Spool = require("../../../models/Filament.js");
+const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 
 const getOnlinePrinterList = async function () {
   const printerList = getPrinterStoreCache().listPrintersInformation();
@@ -18,7 +18,24 @@ const getOnlinePrinterList = async function () {
   }
   return onlinePrintersList;
 };
-// TODO Filament manager plugin existance check should not use printers.
+
+const findFirstOnlinePrinter = async function () {
+  const printerList = getPrinterStoreCache().listPrintersInformation();
+  let firstOnlinePrinter = null;
+  for (const printer of printerList) {
+    if (
+      printer.printerState.colour.category === "Disconnected" ||
+      printer.printerState.colour.category === "Idle" ||
+      printer.printerState.colour.category === "Active" ||
+      printer.printerState.colour.category === "Complete"
+    ) {
+      firstOnlinePrinter = printer;
+      break;
+    }
+  }
+  return firstOnlinePrinter;
+};
+
 const checkIfFilamentManagerPluginExists = async function (printers) {
   const missingPlugin = [];
 
@@ -85,6 +102,7 @@ const checkIfProfileAttachedToSpool = async function (profileId) {
 
 module.exports = {
   getOnlinePrinterList,
+  findFirstOnlinePrinter,
   checkIfFilamentManagerPluginExists,
   checkFilamentManagerPluginSettings,
   checkIfSpoolAttachedToPrinter,

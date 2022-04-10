@@ -49,7 +49,6 @@
     <% } %>
     </div>
     <div class="row">
-        <% if(profiles.length !== 0 && spools.length !== 0) {%>
         <%- include(table, {
             table:{
                 id:"filamentOverviewTable", contentId:"filamentOverviewList", hide:false, headers: [
@@ -67,7 +66,6 @@
                 bodyFile:'./Filament/spool.table.ejs'
             })
         %>
-    <% } %>
     </div>
     <!-- Spool Modal -->
     <div class="modal fade" id="profileManagerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
