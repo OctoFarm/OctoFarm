@@ -15,6 +15,7 @@ const addClientConnection = (req, res) => {
     Connection: "keep-alive"
   };
   res.writeHead(200, headers);
+  res.write("\n");
 
   // Add a new client that just connected
   // Store the id and the whole response object with a clone of the user information
@@ -77,6 +78,7 @@ const notifySubscribers = (id, type, message) => {
     };
 
     clientList.forEach((client) => {
+      client.res.write(`retry: ${10000} \n`);
       client.res.write(`data: ${stringify(payload)} \n\n`);
     });
   }
