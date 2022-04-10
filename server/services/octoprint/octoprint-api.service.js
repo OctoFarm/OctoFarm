@@ -112,13 +112,11 @@ class OctoprintApiService {
   /**
    * Retry mechanism for slow/timeout state OctoPrint entries
    * @param item
-   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)|*|undefined>}
+   * @returns {Promise<unknown>}
    */
   async getRetry(item) {
     try {
-      return await this.get(item).catch(e => {
-        return e;
-      });
+      return await this.get(item);
     } catch (e) {
       logger.http("Error with get request", e);
       switch (e.code) {
@@ -180,8 +178,8 @@ class OctoprintApiService {
           logger.debug(this.printerURL + " | Initial timeout failed increasing...", {
             timeout: this.#currentTimeout
           });
-          return this.getRetry(item).catch(e => {
-            return e;
+          return this.getRetry(item).catch((error) => {
+            return error;
           });
       }
     }
@@ -192,7 +190,7 @@ class OctoprintApiService {
    * @param route
    * @param data
    * @param timeout optional race to timeout (default: true)
-   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
+   * @returns {Promise<unknown>}
    */
   async post(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
@@ -211,7 +209,7 @@ class OctoprintApiService {
    * Delete request onto OctoPrint API
    * @param route
    * @param timeout
-   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
+   * @returns {Promise<unknown>}
    */
   async delete(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
@@ -229,7 +227,7 @@ class OctoprintApiService {
    * Acquire a GET resource
    * @param route
    * @param timeout optional race to timeout (default: true)
-   * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
+   * @returns {Promise<unknown>}
    */
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
@@ -245,11 +243,19 @@ class OctoprintApiService {
    * @param route
    * @param data body to be patched
    * @param timeout optional race to timeout (default: true)
-   * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)>}
+   * @returns {Promise<unknown>}
    */
   patch(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "PATCH", this.apikey, timeout ? this.#currentTimeout : false, data).catch(e => {return e;});
+    return fetchApiTimeout(
+      url,
+      "PATCH",
+      this.apikey,
+      timeout ? this.#currentTimeout : false,
+      data
+    ).catch((e) => {
+      return e;
+    });
   }
 
   // /**

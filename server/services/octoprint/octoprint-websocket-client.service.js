@@ -330,13 +330,16 @@ class WebSocketClient {
     const currentAverage = averageMeanOfArray(this.throttleRateMeasurements);
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
+
     if (ms > throttleLimit + this.throttleMargin) {
+      logger.warning(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
       this.increaseMessageThrottle();
     } else if (this.currentThrottleRate > 1) {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
       const lowerProcessingLimit =
         (this.currentThrottleRate - 1) * (currentAverage + this.throttleMargin);
       if (maxProcessingLimit < lowerProcessingLimit) {
+        logger.warning(`Messages speed normalising at: ${ms}ms throttling connection speed...`);
         this.decreaseMessageThrottle();
       }
     }
@@ -345,19 +348,20 @@ class WebSocketClient {
   increaseMessageThrottle() {
     this.currentThrottleRate++;
     this.sendThrottle();
-    logger.warning("Increasing websocket throttle time...", this.currentThrottleRate);
+    logger.warning(this.id + "Increasing websocket throttle time...", {
+      throttleRate: this.currentThrottleRate / 2
+    });
   }
 
   decreaseMessageThrottle() {
     this.currentThrottleRate--;
     this.sendThrottle();
-    logger.warning("Decreasing websocket throttle time...", this.currentThrottleRate);
+    logger.warning(this.id + " Decreasing websocket throttle time...", {
+      throttleRate: this.currentThrottleRate / 2
+    });
   }
 
   sendThrottle() {
-    logger.silly(
-      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
-    );
     this.send(
       JSON.stringify({
         throttle: this.currentThrottleRate
