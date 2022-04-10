@@ -80,10 +80,10 @@ const notifySubscribers = (id, type, message) => {
     };
 
     clientList.forEach((client) => {
-      client.res.write(`retry: ${10000} \n`);
+      client.res.write(`retry: ${10000}\n`);
       client.res.write(`id: ${id}\n`);
       client.res.write(`type: ${type}\n`);
-      client.res.write(`data: ${stringify(payload)} \n\n`);
+      client.res.write(`data: ${stringify(payload)}\n\n`);
     });
   }
 };
