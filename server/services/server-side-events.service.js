@@ -42,7 +42,9 @@ const addClientConnection = (req, res) => {
 
   req.on("error", (e) => {
     logger.warning(
-      `${client?.user?.name ? client.user.name : UNKNOWN_USER} has disconnected from the endpoint: ${e}`
+      `${
+        client?.user?.name ? client.user.name : UNKNOWN_USER
+      } has disconnected from the endpoint: ${e}`
     );
     removeClient(id);
   });
