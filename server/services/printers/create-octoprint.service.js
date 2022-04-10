@@ -31,7 +31,7 @@ const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
-const { MESSAGE_TYPES } = require("../../constants/sse.constants")
+const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -810,7 +810,7 @@ class OctoPrintPrinter {
       const { api } = await globalAPIKeyCheck.json();
 
       if (!api) {
-        logger.http(`Settings json does not exist: ${this.printerURL}`);
+        logger.error(`Settings json does not exist: ${this.printerURL}`);
         return false;
       }
       const keyCheck = api.key !== this.apikey;
@@ -823,7 +823,7 @@ class OctoPrintPrinter {
       }
     } else {
       // Hard failure as can't setup websocket
-      logger.error("API key is global... cannot connect...")
+      logger.error("API key is global... cannot connect...");
       this.#apiPrinterTickerWrap("API key is global API key", "Offline");
       return false;
     }
@@ -844,12 +844,8 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Passive login was successful!", "Complete");
       return this.sessionKey;
     } else {
-      logger.http("Passive login failed...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Passive login failed...",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      logger.http("Passive login failed..." + passiveLogin);
+      this.#apiPrinterTickerWrap("Passive login failed...", "Offline", globalStatusCode);
       return globalStatusCode;
     }
   }
@@ -925,12 +921,8 @@ class OctoPrintPrinter {
       });
       return true;
     } else {
-      logger.http("Failed to acquire user list...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Failed to acquire user list...",
-        "Offline",
-        "Status Code: " + globalStatusCode
-      );
+      logger.http("Failed to acquire user list..." + usersCheck);
+      this.#apiPrinterTickerWrap("Failed to acquire user list...", "Offline", usersCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "danger", true);
       return globalStatusCode;
     }
@@ -946,12 +938,11 @@ class OctoPrintPrinter {
     }
 
     let versionCheck = await this.#api.getVersion(true).catch((e) => {
-      logger.http("Failed OctoPrint version data", e);
+      logger.http("Hard failure on version check", e);
       return {
         status: e
       };
     });
-
     const globalStatusCode = checkApiStatusResponse(versionCheck);
     if (globalStatusCode === 200) {
       let server = undefined;
@@ -976,12 +967,12 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Successfully found printer on the high sea!", "Complete");
       return true;
     } else {
-      logger.http("Failed to acquire version data...", globalStatusCode);
+      logger.http("Failed to acquire version data..." + versionCheck);
       if (this.#retryNumber === 0) {
         this.#apiPrinterTickerWrap(
           "Failed to find printer on the high sea! marking offline...",
           "Offline",
-          "Error Code: " + globalStatusCode
+          versionCheck
         );
       }
 
@@ -1012,8 +1003,8 @@ class OctoPrintPrinter {
         this.#db.update({
           octoPi: this.octoPi
         });
-        logger.http("Failed to acquire raspberry pi data...", globalStatusCode);
-        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline");
+        logger.http("Failed to acquire raspberry pi data..." + piPluginCheck);
+        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline", piPluginCheck);
         return globalStatusCode;
       }
     } else {
@@ -1052,12 +1043,8 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
-      logger.http("Failed to acquire system data...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Failed to acquire system data",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      logger.http("Failed to acquire system data..." + systemCheck);
+      this.#apiPrinterTickerWrap("Failed to acquire system data", "Offline", systemCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "danger", true);
       return globalStatusCode;
     }
@@ -1093,12 +1080,8 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
-      logger.http("Failed to acquire profile data...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Failed to acquire profile data",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      logger.http("Failed to acquire profile data..." + profileCheck);
+      this.#apiPrinterTickerWrap("Failed to acquire profile data", "Offline", profileCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "danger", true);
       return globalStatusCode;
     }
@@ -1147,12 +1130,8 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
-      logger.http("Failed to acquire state data...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Failed to acquire state data",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      logger.http("Failed to acquire state data..." + stateCheck);
+      this.#apiPrinterTickerWrap("Failed to acquire state data", "Offline", stateCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "danger", true);
       return globalStatusCode;
     }
@@ -1227,12 +1206,8 @@ class OctoPrintPrinter {
       this.#db.update({ onboarding: this.onboarding });
       return true;
     } else {
-      logger.http("Failed to acquire settings data...", globalStatusCode);
-      this.#apiPrinterTickerWrap(
-        "Failed to acquire settings data",
-        "Offline",
-        "Error Code: " + globalStatusCode
-      );
+      logger.http("Failed to acquire settings data..." + settingsCheck);
+      this.#apiPrinterTickerWrap("Failed to acquire settings data", "Offline", settingsCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "danger", true);
       return globalStatusCode;
     }
@@ -1264,11 +1239,11 @@ class OctoPrintPrinter {
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
         return true;
       } else {
-        logger.http("Failed to acquire system info data...", globalStatusCode);
+        logger.http("Failed to acquire system info data..." + systemInfoCheck);
         this.#apiPrinterTickerWrap(
           "Failed to acquire system information plugin data",
           "Offline",
-          "Error Code: " + globalStatusCode
+          systemInfoCheck
         );
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "danger", true);
         return globalStatusCode;
@@ -1318,12 +1293,8 @@ class OctoPrintPrinter {
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "success", true);
         return true;
       } else {
-        logger.http("Failed to acquire plugin data...", globalStatusCode);
-        this.#apiPrinterTickerWrap(
-          "Failed to acquire plugin lists data",
-          "Offline",
-          "Error Code: " + globalStatusCode
-        );
+        logger.http("Failed to acquire plugin data..." + pluginList);
+        this.#apiPrinterTickerWrap("Failed to acquire plugin lists data", "Offline", pluginList);
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "danger", true);
         return globalStatusCode;
       }
@@ -1393,11 +1364,11 @@ class OctoPrintPrinter {
 
         return true;
       } else {
-        logger.http("Failed to acquire octoprint updates data...", globalStatusCode);
+        logger.http("Failed to acquire octoprint updates data..." + updateCheck);
         this.#apiPrinterTickerWrap(
           "Failed to acquire OctoPrint updates data",
           "Offline",
-          "Error Code: " + globalStatusCode
+          updateCheck
         );
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "danger", true);
         return globalStatusCode;
@@ -1485,7 +1456,7 @@ class OctoPrintPrinter {
 
       return fileInformation;
     } else {
-      logger.http("File could not be re-synced", globalStatusCode);
+      logger.http("File could not be re-synced" + filesCheck);
       return false;
     }
   }
@@ -1541,12 +1512,8 @@ class OctoPrintPrinter {
           };
         }
       } else {
-        logger.http("Failed to acquire file list data...", globalStatusCode);
-        this.#apiPrinterTickerWrap(
-          "Failed to acquire file list data",
-          "Offline",
-          "Error Code: " + globalStatusCode
-        );
+        logger.http("Failed to acquire file list data..." + filesCheck);
+        this.#apiPrinterTickerWrap("Failed to acquire file list data", "Offline", filesCheck);
         this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "danger", true);
         return globalStatusCode;
       }

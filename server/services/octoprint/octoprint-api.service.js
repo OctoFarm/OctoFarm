@@ -40,7 +40,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
-        logger.debug("Failed to fetch", e);
+        logger.error("Failed to fetch", e);
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
@@ -107,82 +107,6 @@ class OctoprintApiService {
   updateConnectionInformation(printerURL, apikey) {
     this.printerURL = printerURL;
     this.apikey = apikey;
-  }
-
-  /**
-   * Retry mechanism for slow/timeout state OctoPrint entries
-   * @param item
-   * @returns {Promise<unknown>}
-   */
-  async getRetry(item) {
-    try {
-      return await this.get(item);
-    } catch (e) {
-      logger.http("Error with get request", e);
-      switch (e.code) {
-        case "ECONNREFUSED":
-          ConnectionMonitorService.updateOrAddResponse(
-            this.printerURL + item,
-            REQUEST_TYPE.GET,
-            REQUEST_KEYS.CONNECTION_FAILURES
-          );
-          return 502;
-        case "ECONNRESET":
-          ConnectionMonitorService.updateOrAddResponse(
-            this.printerURL + item,
-            REQUEST_TYPE.GET,
-            REQUEST_KEYS.CONNECTION_FAILURES
-          );
-          return 461;
-        case "EHOSTUNREACH":
-          ConnectionMonitorService.updateOrAddResponse(
-            this.printerURL + item,
-            REQUEST_TYPE.GET,
-            REQUEST_KEYS.CONNECTION_FAILURES
-          );
-          return 404;
-        case "ENOTFOUND":
-          ConnectionMonitorService.updateOrAddResponse(
-            this.printerURL + item,
-            REQUEST_TYPE.GET,
-            REQUEST_KEYS.CONNECTION_FAILURES
-          );
-          return 404;
-        default:
-          // If timeout exceeds max cut off then give up... Printer is considered offline.
-          const cutOffIn = this.timeout.apiRetryCutoff - this.#currentTimeout;
-          if (cutOffIn <= 0) {
-            logger.debug(`${this.printerURL} | Cutoff reached! marking offline!`);
-          } else {
-            logger.debug(
-              `${this.printerURL} | Current Timeout: ${
-                this.#currentTimeout
-              } | Cut off in ${cutOffIn}`
-            );
-          }
-          ConnectionMonitorService.updateOrAddResponse(
-            this.printerURL + item,
-            REQUEST_TYPE.GET,
-            REQUEST_KEYS.RETRY_REQUESTED
-          );
-          if (cutOffIn <= 0) {
-            logger.debug(
-              `${this.printerURL} | Timeout Exceeded: ${item} | Timeout: ${this.#currentTimeout}`
-            );
-            // Reset the timeout after failed...
-            this.#currentTimeout = JSON.parse(JSON.stringify(this.timeout.apiTimeout));
-            return 408;
-          }
-          // Make sure to use the settings for api retry.
-          this.#currentTimeout = this.#currentTimeout + 5000;
-          logger.debug(this.printerURL + " | Initial timeout failed increasing...", {
-            timeout: this.#currentTimeout
-          });
-          return this.getRetry(item).catch((error) => {
-            return error;
-          });
-      }
-    }
   }
 
   /**
