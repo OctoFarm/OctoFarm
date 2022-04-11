@@ -4,10 +4,19 @@ let countDownInterval = false;
 let triggerTimeout = false;
 let countDownSeconds = 5;
 let reloadListenerAdded = false;
-export let reconnectFrequencySeconds = 5;
+export const reconnectFrequency = {
+    seconds: 3,
+    get getSeconds() {
+        return this.seconds;
+    },
+    set setSeconds(seconds) {
+        this.seconds = seconds;
+    }
+};
 
 export const triggerCountDownTimer = (seconds) => {
-    countDownSeconds = seconds;
+    console.log(seconds)
+    countDownSeconds = seconds
     if(!countDownInterval){
         countDownInterval = setInterval(() => {
             if(countDownSeconds <= 1){
@@ -16,7 +25,7 @@ export const triggerCountDownTimer = (seconds) => {
                 countDownInterval = false;
             }else{
                 countDownSeconds--
-                document.getElementById("lostServerConnectionTimer").innerHTML = countDownSeconds;
+                document.getElementById("lostServerConnectionTimer").innerHTML = `${countDownSeconds}`;
             }
         },1000)
     }
@@ -38,7 +47,7 @@ export const drawModal = async () => {
 export const closeModal = async () => {
     $("#lostServerConnection").modal("hide");
 };
-export const setServerAlive = async () => {
+export const setServerAlive = async (message) => {
     window.serverOffline = false;
     const lostServerConnectionModal = document.getElementById("lostServerConnection");
     if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {

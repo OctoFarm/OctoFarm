@@ -1,7 +1,7 @@
 import { asyncParse, debounce } from "./utils/sse.utils";
 import { MESSAGE_TYPES } from "../../server/constants/sse.constants"
 import { updateLiveFileInformation } from "./pages/file-manager/file-manager-sse.handler";
-import { triggerCountDownTimer, drawModal, setServerAlive, reconnectFrequencySeconds } from "./services/amialive.service";
+import { triggerCountDownTimer, drawModal, setServerAlive, reconnectFrequency } from "./services/amialive.service";
 
 
 // Keeping hold of this, may return a use for later...
@@ -75,16 +75,15 @@ let evtSource;
 const reconnectFunc = debounce(
   function () {
     setupEventSource();
-    // Double every attempt to avoid overwhelming server
-
-    reconnectFrequencySeconds *= 2;
+    // Double every attempt to avoid overwhelming client
+    reconnectFrequency.setSeconds = reconnectFrequency.getSeconds * 2;
     // Max out at ~1 minute as a compromise between user experience and server load
-    if (reconnectFrequencySeconds >= 64) {
-      reconnectFrequencySeconds = 64;
+    if (reconnectFrequency.getSeconds >= 64) {
+      reconnectFrequency.setSeconds = 64;
     }
   },
   function () {
-    return reconnectFrequencySeconds * 1000;
+    return reconnectFrequency.getSeconds * 1000;
   }
 );
 
@@ -94,7 +93,7 @@ function setupEventSource() {
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
     if(type === MESSAGE_TYPES.AM_I_ALIVE){
-      await setServerAlive();
+      await setServerAlive(message);
     }
 
     if(type === MESSAGE_TYPES.FILE_UPDATE){
@@ -104,12 +103,13 @@ function setupEventSource() {
   evtSource.onopen = function (e) {
     console.debug("Connected to servers event stream...");
     // Reset reconnect frequency upon successful connection
-    reconnectFrequencySeconds = 5;
+    reconnectFrequency.setSeconds = 3;
   };
   evtSource.onerror = async function (e) {
+    console.log(reconnectFrequency.getSeconds)
     window.serverOffline = true;
-    console.debug("Server connection lost! Re-connecting in... " + reconnectFrequencySeconds + "s");
-    triggerCountDownTimer(reconnectFrequencySeconds)
+    console.debug("Server connection lost! Re-connecting in... " + reconnectFrequency.getSeconds + "s");
+    triggerCountDownTimer(reconnectFrequency.getSeconds)
     console.error(e);
     await drawModal();
     evtSource.close();
@@ -117,8 +117,8 @@ function setupEventSource() {
   };
   evtSource.onclose = async function (e) {
     window.serverOffline = true;
-    console.debug("Server connection closed! Re-establishing..." + reconnectFrequencySeconds + "s");
-    triggerCountDownTimer(reconnectFrequencySeconds)
+    console.debug("Server connection closed! Re-establishing..." + reconnectFrequency.getSeconds + "s");
+    triggerCountDownTimer(reconnectFrequency.getSeconds)
     console.warn(e);
     await drawModal();
     evtSource.close();
