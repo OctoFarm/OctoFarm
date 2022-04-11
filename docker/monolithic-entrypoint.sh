@@ -12,4 +12,4 @@ else
     echo "Logs folder already exists..."
 fi
 
-cd server && pm2 flush && pm2 start ecosystem.config.js
+pm2 flush && pm2 start ecosystem.config.js
