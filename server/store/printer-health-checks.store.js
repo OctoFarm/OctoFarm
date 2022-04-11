@@ -45,14 +45,11 @@ const updatePrinterHealthChecks = async () => {
         apiChecksOptional: apiChecksOptional(printer.systemChecks.scanning),
         websocketChecks: websocketChecks(currentURL.host),
         connectionChecks: printerConnectionCheck(
-            printer.currentConnection,
-            printer.connectionOptions
+          printer.currentConnection,
+          printer.connectionOptions
         ),
         profileChecks: profileChecks(printer.currentProfile),
-        webcamChecks: webcamChecks(
-            printer.camURL,
-            printer?.otherSettings?.webCamSettings
-        ),
+        webcamChecks: webcamChecks(printer.camURL, printer?.otherSettings?.webCamSettings),
         connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
       };
       logger.debug("Printer checked", { printer: printer.printerURL });
@@ -97,12 +94,9 @@ const checkAndUpdatePrinterFlag = (id, checks) => {
 
   const log_throttle = {};
   const log_timeout = {};
-  const log_cutoff = {};
 
   apiResponses.forEach((res) => {
-    log_timeout[res.url] = { cutOffTimeout: !!res.cutOffTimeout };
-    log_cutoff[res.url] = { cutOffTimeout: !!res.cutOffTimeout };
-    if (!res.initialTimeout || !res.cutOffTimeout) healthChecksPass = false;
+    if (!res.initialTimeout) healthChecksPass = false;
   });
 
   logger.debug("Results: ", {
@@ -113,8 +107,7 @@ const checkAndUpdatePrinterFlag = (id, checks) => {
     cam_setup: { camSetup },
     history_setup: { ffmpegPath, ffmpegVideoCodex, timelapseEnabled },
     log_throttle,
-    log_timeout,
-    log_cutoff
+    log_timeout
   });
 
   getPrinterStoreCache().updatePrinterLiveValue(id, {

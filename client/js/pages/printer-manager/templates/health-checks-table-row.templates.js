@@ -151,9 +151,6 @@ const returnNetworkConnection = (issues) => {
     if (totalInitial !== 1) {
       totalInitial = issue.initialTimeout ? 0 : 1;
     }
-    if (totalCutOff !== 1) {
-      totalCutOff = issue.cutOffTimeout ? 0 : 1;
-    }
 
     html += `
         <small>${endPoint}: ${returnButton(
@@ -161,13 +158,7 @@ const returnNetworkConnection = (issues) => {
       "<i class=\"fas fa-history\"></i>",
       E.NETWORK + endPoint + pClean + "timeout",
       VALID_TIMEOUT("Initial")
-    )} | ${returnButton(
-      issue.cutOffTimeout,
-      "<i class=\"fas fa-stopwatch\"></i>",
-      E.NETWORK + endPoint + pClean + "cutoff",
-      VALID_TIMEOUT("Cut Off")
-    )} </small>
-        `;
+    )} </small>`;
   });
 
   return `
@@ -183,12 +174,6 @@ const returnNetworkConnection = (issues) => {
       "<i class=\"fas fa-history\"></i>",
       E.NETWORK + pClean + "initial",
       VALID_TIMEOUT("All Initial")
-  )}
-    ${returnButton(
-      totalCutOff < 1,
-      "<i class=\"fas fa-stopwatch\"></i>",
-      E.NETWORK + pClean + "cuttOff",
-      VALID_TIMEOUT("All Cut Off")
   )}
     <div class="collapse" id="${E.NETWORK + pClean}CollapseTimeout">
       <div class="card card-body">
@@ -631,15 +616,6 @@ export function addHealthCheckListeners(check) {
     }ms.
     `;
   };
-  const cutOffTimeoutFix = (response, settings) => {
-    return `
-    Your endpoint is responding, on average, in ${
-      response ? response : ""
-    }ms <br> Your settings are currently: ${settings ? settings : ""}ms and overshoot by ${
-      settings - response
-    }ms.
-    `;
-  };
 
   let totalInitial = 0;
   let totalCutOff = 0;
@@ -667,28 +643,12 @@ export function addHealthCheckListeners(check) {
             apiSettingsWarning
           );
         });
-      document
-        .getElementById(E.NETWORK + endPoint + pCleanURL + "cutoff")
-        .addEventListener("click", () => {
-          returnBootBox(
-            timeoutResponseInfo("cut off"),
-            cutOffTimeoutFix(issue.responsesAverage, issue.timeoutSettings.apiRetryCutoff),
-            apiSettingsWarning
-          );
-        });
     });
   }
 
   document.getElementById(E.NETWORK + pCleanURL + "initial").addEventListener("click", () => {
     returnBootBox(
       "One of your endpoints isn't responding by the time you have setup in your initial timeout",
-      "Click the blue button containing your printer url to investigate the specific endpoint further.",
-      apiSettingsWarning
-    );
-  });
-  document.getElementById(E.NETWORK + pCleanURL + "cuttOff").addEventListener("click", () => {
-    returnBootBox(
-      "One of your endpoints is taking longer than your cut off to respond.",
       "Click the blue button containing your printer url to investigate the specific endpoint further.",
       apiSettingsWarning
     );
@@ -708,7 +668,7 @@ export function returnFarmOverviewTableRow(
   octoPi
 ) {
   const NO_DATA = "No Data";
-  const octoPiTableRows = document.querySelectorAll('[id^="trOctoPi-"]')
+  const octoPiTableRows = document.querySelectorAll("[id^=\"trOctoPi-\"]")
   let octoPiColumns = "";
   if(!!octoPi && Object.keys(octoPi).length !== 0){
     const {octopi_version, model, throttle_state} = octoPi

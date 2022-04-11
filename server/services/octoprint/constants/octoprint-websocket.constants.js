@@ -108,7 +108,8 @@ const OP_WS_PLUGIN_KEYS = {
   klipper: "klipper",
   displayLayerProgress: "DisplayLayerProgress",
   softwareupdate: "softwareupdate",
-  psucontrol: "psucontrol" //Not used
+  psucontrol: "psucontrol", //Not used
+  pi_support: "pi_support"
 };
 
 module.exports = {

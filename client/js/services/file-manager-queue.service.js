@@ -59,7 +59,11 @@ export default class Queue {
       name: record.file.name,
     }
     setTimeout(() => {
-      document.getElementById(`queueRow-${getFileRowID(file)}`).remove();
+      const queRow = document.getElementById(`queueRow-${getFileRowID(file)}`)
+      if(!!queRow){
+        queRowf.remove();
+      }
+
     }, 3000)
 
   }

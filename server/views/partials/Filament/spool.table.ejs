@@ -1,7 +1,21 @@
 
 <% let hideEmpty = serverSettings.filament.hideEmpty %>
+<% if(spools.length === 0) {%>
+    <tr>
+        <th style="display: none;"> </th>
+        <th></th>
+        <th scope="row"></th>
+        <td></td>
+        <td></td>
+        <td><i class="fas fa-toilet-paper"></i> No spools found, please create some!</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+<% }else{ %>
 <% spools.forEach(spool => { %>
-    <% if(!hideEmpty || (spool.weight - spool.used) > 1){ %>
+    <% if(!hideEmpty && (spool.weight - spool.used) > 1){ %>
     <tr>
         <th style="display: none;"> </th>
         <th><i class="fas fa-toilet-paper"></i></th>
@@ -19,3 +33,4 @@
     <% } %>
 
 <%   }) %>
+<% } %>

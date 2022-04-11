@@ -146,6 +146,19 @@ class PrinterStore {
     return printer.selectedFilament;
   }
 
+  getFileList(id) {
+    const printer = this.#findMePrinter(id);
+    const newPrinter = JSON.parse(JSON.stringify(printer));
+    return Object.assign(newPrinter, {
+      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
+    });
+  }
+
+  getOctoPiData(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.octoPi;
+  }
+
   getCurrentZ(id) {
     const printer = this.#findMePrinter(id);
     return printer.currentZ;
@@ -1005,7 +1018,6 @@ class PrinterStore {
       .catch((e) => {
         logger.error("Issue updating file list", e);
       });
-
 
     return printer;
   }

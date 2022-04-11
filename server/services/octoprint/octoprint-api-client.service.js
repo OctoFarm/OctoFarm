@@ -52,26 +52,14 @@ class OctoprintApiClientService extends OctoprintApiService {
     });
   }
 
-  async getWithOptionalRetry(route, retry = false) {
-    if (retry) {
-      return this.getRetry(route).catch((e) => {
-        return e;
-      });
-    } else {
-      return this.get(route).catch((e) => {
-        return e;
-      });
-    }
-  }
-
   async getSettings(retry = false) {
-    return this.getWithOptionalRetry(apiSettingsPart, retry).catch((e) => {
+    return this.get(apiSettingsPart, retry).catch((e) => {
       return e;
     });
   }
 
   async getVersion(retry = false) {
-    return this.getWithOptionalRetry(apiVersion, retry).catch((e) => {
+    return this.get(apiVersion, retry).catch((e) => {
       return e;
     });
   }
@@ -84,7 +72,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFiles(recursive = false, retry = false) {
-    return this.getWithOptionalRetry(apiFiles(recursive), retry).catch((e) => {
+    return this.get(apiFiles(recursive), retry).catch((e) => {
       return e;
     });
   }
@@ -97,7 +85,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFile(path, retry = false) {
-    return this.getWithOptionalRetry(apiFile(path), retry).catch((e) => {
+    return this.get(apiFile(path), retry).catch((e) => {
       return e;
     });
   }
@@ -109,13 +97,13 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getConnection(retry = false) {
-    return this.getWithOptionalRetry(apiConnection, retry).catch((e) => {
+    return this.get(apiConnection, retry).catch((e) => {
       return e;
     });
   }
 
   async getPrinterProfiles(retry = false) {
-    return this.getWithOptionalRetry(apiPrinterProfiles, retry).catch((e) => {
+    return this.get(apiPrinterProfiles, retry).catch((e) => {
       return e;
     });
   }
@@ -125,37 +113,37 @@ class OctoprintApiClientService extends OctoprintApiService {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
-    return this.getWithOptionalRetry(route, retry).catch((e) => {
+    return this.get(route, retry).catch((e) => {
       return e;
     });
   }
 
   async getSystemInfo(retry = false) {
-    return this.getWithOptionalRetry(apiSystemInfo, retry).catch((e) => {
+    return this.get(apiSystemInfo, retry).catch((e) => {
       return e;
     });
   }
 
   async getSystemCommands(retry = false) {
-    return this.getWithOptionalRetry(apiSystemCommands, retry).catch((e) => {
+    return this.get(apiSystemCommands, retry).catch((e) => {
       return e;
     });
   }
 
   async getSoftwareUpdateCheck(force, retry = false) {
-    return this.getWithOptionalRetry(apiSoftwareUpdateCheck(force), retry).catch((e) => {
+    return this.get(apiSoftwareUpdateCheck(force), retry).catch((e) => {
       return e;
     });
   }
 
   async getUsers(retry = false) {
-    return this.getWithOptionalRetry(apiUsers, retry).catch((e) => {
+    return this.get(apiUsers, retry).catch((e) => {
       return e;
     });
   }
 
   async getPluginPiSupport(retry = false) {
-    return this.getWithOptionalRetry(apiPluginPiSupport, retry).catch((e) => {
+    return this.get(apiPluginPiSupport, retry).catch((e) => {
       return e;
     });
   }
@@ -168,7 +156,7 @@ class OctoprintApiClientService extends OctoprintApiService {
       throw OPClientErrors.filamentIDNotANumber;
     }
     const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
-    return this.getWithOptionalRetry(getURL, false).catch((e) => {
+    return this.get(getURL, false).catch((e) => {
       return e;
     });
   }
@@ -180,7 +168,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getTimelapses(unrendered = true) {
-    return this.getWithOptionalRetry(apiTimelapse(unrendered), true).catch((e) => {
+    return this.get(apiTimelapse(unrendered), true).catch((e) => {
       return e;
     });
   }

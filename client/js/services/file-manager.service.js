@@ -56,23 +56,24 @@ const handleUploadFromQueue = async (current, index) => {
 
     const currentFolder = document.getElementById("currentFolder").innerHTML;
     const fileFolder = "local/"+file.files.local.path;
-
-    const currentPrinter = document.getElementById("currentPrinter").innerHTML;
+    const currentPrinter = document.getElementById("currentPrinter");
     const filePrinter = current.printerInfo.printerName;
-
-    if(fileFolder.includes(currentFolder) && currentPrinter.includes(filePrinter)){
-      // await FileManagerSortingService.loadSort(current.index);
+    if(!!currentPrinter && !!fileFolder){
+      if(fileFolder.includes(currentFolder) && currentPrinter.innerHTML.includes(filePrinter)){
+        await FileManagerSortingService.loadSort(current.index);
+      }
     }
 
+
     const uploadsRemaining = document.getElementById("uploadsRemaining");
-    if (uploadsRemaining) {
+    if (!!uploadsRemaining) {
       uploadsRemaining.innerHTML = `${fileUploads.size()}`;
     }
     const fileCounts = document.getElementById(`fileCounts-${current.index}`);
-    if (fileCounts && fileCounts.innerHTML === "1") {
+    if (!!fileCounts && fileCounts.innerHTML === "1") {
       fileCounts.innerHTML = "0";
     }
-    if (uploadsRemaining && uploadsRemaining.innerHTML === "1") {
+    if (!!uploadsRemaining && uploadsRemaining.innerHTML === "1") {
       uploadsRemaining.innerHTML = "0";
     }
   }
@@ -121,7 +122,7 @@ export default class FileManagerService {
         }
       }
       const uploadsSpinnerIcon = document.getElementById("uploadsSpinnerIcon");
-      if (uploadsSpinnerIcon) {
+      if (!!uploadsSpinnerIcon) {
         uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner fa-spin'></i>";
       }
       newObject.file = file;
@@ -149,7 +150,7 @@ export default class FileManagerService {
       uploadsRemaining.innerHTML = `${uploadSize}`;
     }
 
-    if (uploadsSpinnerIcon) {
+    if (!!uploadsSpinnerIcon) {
       uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner fa-spin'></i>";
       const percentLoad = (loaded / total) * 100;
       if (isNaN(percentLoad)) {
@@ -314,7 +315,10 @@ export default class FileManagerService {
           );
           const uploadsSpinnerIcon =
             document.getElementById("uploadsSpinnerIcon");
-          uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner'></i>";
+          if(!!uploadsSpinnerIcon){
+            uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner'></i>";
+          }
+
         } else {
           fileUploads.remove();
           resolve(xhr.response);
@@ -981,10 +985,10 @@ export default class FileManagerService {
     function grabFiles(Afiles) {
       Afiles = [...Afiles];
       selectedFile = Afiles;
-      const files = document.getElementById("multiFileSelectedNow");
-      files.innerHTML = "";
+      const multiUpload = document.getElementById("multiFileSelectedNow");
+      multiUpload.innerHTML = "";
       selectedFile.forEach((file) => {
-        files.insertAdjacentHTML(
+        multiUpload.insertAdjacentHTML(
           "beforeend",
           `
            <div class="card col-2 px-1 py-1">
@@ -1176,17 +1180,23 @@ export class FileActions {
     if (ret?.status === 200 || ret?.status === 201 || ret?.status === 204) {
       UI.createAlert(
         "success",
-        `${printer.printerName}: Successfully started printing ${filePath}`
+        `${printer.printerName}: Successfully started printing ${filePath}`,
+          3000,
+          "Clicked"
       );
     } else if (ret?.status === 409) {
       UI.createAlert(
         "warning",
-        `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`
+        `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`,
+          3000,
+          "Clicked"
       );
     } else {
       UI.createAlert(
         "danger",
-        `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`
+        `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`,
+          3000,
+          "Clicked"
       );
     }
   }
