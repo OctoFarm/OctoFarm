@@ -26,10 +26,12 @@ const { FilamentManagerPlugin } = filamentManagerPlugin;
 
 const {
   getOnlinePrinterList,
+  checkFilamentManagerPluginSettings,
   checkIfFilamentManagerPluginExists,
   checkIfSpoolAttachedToPrinter,
-  checkIfProfileAttachedToSpool
-} = require("../services/octoprint.service");
+  checkIfProfileAttachedToSpool,
+  findFirstOnlinePrinter
+} = require("../services/octoprint/utils/filament-manager-plugin.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { TaskManager } = require("../services/task-manager.service");
 
@@ -76,7 +78,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   const filament = req.body;
   logger.info("Saving Filament Manager Spool: ", filament);
   const filamentManagerID = null;
-
+  console.log(filamentManager);
   if (filamentManager) {
     const printerList = getPrinterStoreCache().listPrintersInformation();
     let printer = null;
@@ -295,23 +297,16 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
   const newProfile = req.body;
-  const error = [];
+  const errors = [];
   logger.info("Saving Filament Manager Profile: ", newProfile);
-  const filamentManagerID = null;
+  let profile = null;
+
   if (filamentManager) {
-    let printer = null;
-    for (let newPrinter of printerList) {
-      if (
-        newPrinter.stateColour.category === "Disconnected" ||
-        newPrinter.stateColour.category === "Idle" ||
-        newPrinter.stateColour.category === "Active" ||
-        newPrinter.stateColour.category === "Complete"
-      ) {
-        printer = newPrinter;
-        break;
-      }
+    let printer = findFirstOnlinePrinter();
+    if (printer === null) {
+      errors.push("Unable to update Filament Manager Plugin... No online printer!");
     }
-    const profile = {
+    profile = {
       vendor: newProfile.manufacturer,
       material: newProfile.material,
       density: newProfile.density,
@@ -327,35 +322,36 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       },
       body: JSON.stringify({ profile })
     });
-    await updateFilamentManager.json();
-    const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
+    console.log(await updateFilamentManager.json());
 
-    res.send({
-      res: "success",
-      dataProfile: reSync.newProfiles,
-      filamentManager
-    });
+    // const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
+
+    // res.send({
+    //   res: "success",
+    //   dataProfile: reSync.newProfiles,
+    //   filamentManager
+    // });
   } else {
-    const profile = {
-      index: filamentManagerID,
+    profile = {
+      index: null,
       manufacturer: newProfile.manufacturer,
       material: newProfile.material,
       density: newProfile.density,
       diameter: newProfile.diameter
     };
-    const dataProfile = new Profiles({
-      profile
-    });
-
-    dataProfile
-      .save()
-      .then(async (e) => {
-        logger.info("New profile saved to database, running filament cleaner", e);
-        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-        res.send({ res: error, dataProfile, filamentManager });
-      })
-      .catch((e) => logger.error(e));
   }
+
+  // const dataProfile = new Profiles({
+  //   profile
+  // });
+  // await dataProfile.save().catch((e) => {
+  //   errors.push("Couldn't save to OctoFarms database!");
+  //   logger.error(e);
+  // });
+  //
+  // logger.info("New profile saved to database, running filament cleaner");
+  // TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+  // res.send({ res: errors, dataProfile, filamentManager });
 });
 router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
@@ -520,7 +516,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     return res.send({ errors, warnings });
   }
 
-  const filamentManagerSettingsCheck = await n(onlinePrinterList);
+  const filamentManagerSettingsCheck = await checkFilamentManagerPluginSettings(onlinePrinterList);
   if (filamentManagerSettingsCheck.length > 0) {
     let message = "These instances don't have the plugin setup correctly... Cannot continue!";
     filamentManagerSettingsCheck.forEach((printer) => {

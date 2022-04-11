@@ -388,7 +388,7 @@ async function addSpool(
   };
   let post = await OctoFarmClient.post("filament/save/filament", opts);
 
-  if (post) {
+  if (post || post?.errors?.length === 0) {
     UI.createMessage(
       {
         type: "success",
@@ -453,6 +453,11 @@ async function addSpool(
     await updateProfileDrop();
     return true;
   } else {
+    const errorMessage = "";
+    post.errors.forEach(error => {
+
+    })
+
     UI.createMessage(
       {
         type: "error",
