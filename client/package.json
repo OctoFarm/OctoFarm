@@ -1,6 +1,6 @@
 {
   "name": "@notexpectedyet/octofarm-client",
-  "version": "0.9.9-alpha.19",
+  "version": "0.9.9-alpha.20",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
