@@ -27,6 +27,7 @@ RUN npm ci
 RUN npm install -g pm2
 
 EXPOSE 4000
+WORKDIR /app
 
 COPY docker/monolithic-entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
