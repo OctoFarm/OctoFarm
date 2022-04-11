@@ -331,7 +331,7 @@ class WebSocketClient {
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
 
-    if (ms > throttleLimit + this.throttleMargin) {
+    if (ms > throttleLimit + (this.throttleBase - this.throttleMargin)) {
       logger.warning(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
       this.increaseMessageThrottle();
     } else if (this.currentThrottleRate > 1) {
