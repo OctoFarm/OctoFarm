@@ -4,17 +4,18 @@ const logger = new Logger("OctoFarm-API");
 const { stringify } = require("flatted");
 let clientList = [];
 const UNKNOWN_USER = "Administrator";
-let count = 0;
+
 const addClientConnection = (req, res) => {
   // Set necessary headers to establish a stream of events
   const headers = {
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache, no-store, must-revalidate",
+    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
     Pragma: "no-cache",
     Expires: 0,
     Connection: "keep-alive"
   };
   res.writeHead(200, headers);
+  res.write("\n");
 
   // Add a new client that just connected
   // Store the id and the whole response object with a clone of the user information
@@ -41,7 +42,9 @@ const addClientConnection = (req, res) => {
 
   req.on("error", (e) => {
     logger.warning(
-      `${client?.user?.name ? client.user.name : UNKNOWN_USER} has disconnected from the endpoint.`
+      `${
+        client?.user?.name ? client.user.name : UNKNOWN_USER
+      } has disconnected from the endpoint: ${e}`
     );
     removeClient(id);
   });
@@ -77,26 +80,13 @@ const notifySubscribers = (id, type, message) => {
     };
 
     clientList.forEach((client) => {
-      client.res.write(`data: ${stringify(payload)} \n\n`);
+      client.res.write(`retry: ${10000}\n`);
+      client.res.write(`id: ${id}\n`);
+      client.res.write(`type: ${type}\n`);
+      client.res.write(`data: ${stringify(payload)}\n\n`);
     });
   }
 };
-
-// setInterval(() => {
-//   if (count === 0) {
-//     notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
-//       key: "fileDate",
-//       value: "I Was updated from SSE!"
-//     });
-//     count = 1;
-//   } else {
-//     notifySubscribers("TRex_Tail_B_D.gcode", "file_update", {
-//       key: "fileDate",
-//       value: "I was changed from SSE!"
-//     });
-//     count = 0;
-//   }
-// }, 5000);
 
 module.exports = {
   addClientConnection,
