@@ -26,7 +26,6 @@ const {
   getUpdateNotificationIfAny
 } = require("../services/octofarm-update.service.js");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
 const S_VALID = require("../constants/validate-settings.constants");
 const { validateParamsMiddleware } = require("../middleware/validators");
@@ -289,9 +288,9 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
-    const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
-    const historyChanges = isEqual(actualOnline.history, sentOnline.history);
     const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
+
+    console.log(serverChanges, timeoutChanges, influxExport)
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -301,7 +300,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].monitoringViews = sentOnline.monitoringViews;
 
     if (
-      [serverChanges, timeoutChanges, filamentChanges, historyChanges, influxExport].includes(false)
+      [serverChanges, timeoutChanges, influxExport].includes(false)
     ) {
       restartRequired = true;
     }
