@@ -6,7 +6,7 @@
   "scripts": {
     "prestart": "npm ci",
     "start": "pm2 flush && pm2 start ecosystem.config.js",
-    "start-alpha": "pm2 flush && pm2 start ecosystem-alpha.config.js",
+    "start-alpha": "npm ci && pm2 flush && pm2 start ecosystem-alpha.config.js",
     "dev": "nodemon ./app.js",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
