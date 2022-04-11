@@ -1165,7 +1165,6 @@ export async function bulkOctoPrintPluginAction(action) {
         callback: async function (result) {
           if (result) {
             const pluginAmount = result.length * printersForPluginAction.length;
-            let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
             showBulkActionsModal();
             updateBulkActionsProgress(0, pluginAmount);
             generateTableRows(printersForPluginAction);
@@ -1173,7 +1172,7 @@ export async function bulkOctoPrintPluginAction(action) {
               const response = await octoPrintPluginInstallAction(
                   printersForPluginAction[p],
                   result,
-                  cleanAction
+                  action
               );
               updateTableRow(printersForPluginAction[p]._id, response.status, response.message);
               updateBulkActionsProgress(p, pluginAmount);
