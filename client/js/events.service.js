@@ -1,18 +1,8 @@
-import {asyncParse, debounce} from "./utils/sse.utils";
-import {MESSAGE_TYPES} from "../../server/constants/sse.constants"
-import {updateLiveFileInformation} from "./pages/file-manager/file-manager-sse.handler";
+import { asyncParse, debounce } from "./utils/sse.utils";
+import { MESSAGE_TYPES } from "../../server/constants/sse.constants"
+import { updateLiveFileInformation } from "./pages/file-manager/file-manager-sse.handler";
+import { triggerCountDownTimer, drawModal, setServerAlive, reconnectFrequencySeconds } from "./services/amialive.service";
 
-
-const reloadWindow = async function () {
-  if (location.href.includes("submitEnvironment")) {
-    const hostName = window.location.protocol + "//" + window.location.host + "";
-    window.location.replace(hostName);
-    return false;
-  } else {
-    window.location.reload();
-    return false;
-  }
-};
 
 // Keeping hold of this, may return a use for later...
 // function checkUpdateAndNotify(updateResponse) {
@@ -79,12 +69,8 @@ const reloadWindow = async function () {
 //   }
 // }
 // reconnectFrequencySeconds doubles every retry
-let reconnectFrequencySeconds = 3;
+
 let evtSource;
-let countDownInterval = false;
-let triggerTimeout = false;
-let countDownSeconds = 5;
-let reloadListenerAdded = false;
 
 const reconnectFunc = debounce(
   function () {
@@ -102,38 +88,13 @@ const reconnectFunc = debounce(
   }
 );
 
-function triggerCountDownTimer(seconds){
-  countDownSeconds = seconds;
-  if(!countDownInterval){
-    countDownInterval = setInterval(() => {
-      if(reconnectFrequencySeconds <= 1){
-        //reset the counter
-        clearInterval(countDownInterval)
-        countDownInterval = false;
-      }else{
-        countDownSeconds = countDownSeconds - 1
-        document.getElementById("lostServerConnectionTimer").innerHTML = countDownSeconds;
-      }
-    },1000)
-  }
-}
 
 function setupEventSource() {
   evtSource = new EventSource("/events");
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
     if(type === MESSAGE_TYPES.AM_I_ALIVE){
-        window.serverOffline = false;
-        const lostServerConnectionModal = document.getElementById("lostServerConnection");
-        if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
-          // If user has login enabled then we need to refresh the session...
-          if(!!message?.loginRequired){
-            await reloadWindow();
-          }else{
-            await closeModal();
-          }
-
-        }
+      await setServerAlive();
     }
 
     if(type === MESSAGE_TYPES.FILE_UPDATE){
@@ -143,7 +104,7 @@ function setupEventSource() {
   evtSource.onopen = function (e) {
     console.debug("Connected to servers event stream...");
     // Reset reconnect frequency upon successful connection
-    reconnectFrequencySeconds = 3;
+    reconnectFrequencySeconds = 5;
   };
   evtSource.onerror = async function (e) {
     window.serverOffline = true;
@@ -166,22 +127,6 @@ function setupEventSource() {
 
 }
 
-const drawModal = async function () {
-  if(!reloadListenerAdded){
-    document.getElementById("forceRefreshPageButton").addEventListener("click", () => {
-      reloadWindow();
-    })
-  }
 
-  if(!triggerTimeout){
-    triggerTimeout = setTimeout(() => {
-      $("#lostServerConnection").modal("show");
-      triggerTimeout = false;
-    },2000)
-  }
-};
-const closeModal = async function () {
-  $("#lostServerConnection").modal("hide");
-};
 
 setupEventSource();
