@@ -133,6 +133,7 @@ export default class PrinterFileManagerService {
           <div class="row bg-secondary rounded-top">
                 <div class="col-12">
                      <h5 class="float-left  mb-0">
+                     <span id="currentPrinter" class="d-none">${printer.printerName}</span>
                       <button id="printerFileCount" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
                         <i class="fas fa-file"></i> Loading... <i class="fas fa-folder"></i> Loading...
                       </button>
@@ -140,6 +141,7 @@ export default class PrinterFileManagerService {
   
                         <i class="fas fa-hdd"></i> Loading...
                       </button>
+                     
                     </h5>
                     <h5 class="float-left mb-0">
                       <button type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
@@ -250,7 +252,7 @@ export default class PrinterFileManagerService {
       await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
     });
 
-    elements.fileManager.uploadFiles.addEventListener("change", async () => {
+    elements.fileManager.uploadFiles.addEventListener("change", async function () {
       UI.createAlert(
         "warning",
         "Your files for Printer: " +
@@ -267,7 +269,7 @@ export default class PrinterFileManagerService {
     elements.fileManager.fileSearch.addEventListener("keyup", async () => {
       await FileManagerService.search(currentPrinter._id);
     });
-    elements.fileManager.uploadPrintFile.addEventListener("change", async () => {
+    elements.fileManager.uploadPrintFile.addEventListener("change", async function() {
       await FileManagerService.handleFiles(this?.files, currentPrinter, "print");
     });
     elements.fileManager.back.addEventListener("click", async () => {
