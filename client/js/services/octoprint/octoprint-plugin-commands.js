@@ -122,28 +122,28 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
 }
 
 export async function octoPrintPluginInstallAction(printer, pluginList, action) {
-  let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
+  let cleanAction = JSON.stringify(action.charAt(0).toUpperCase() + action.slice(1));
   if (action === "install") {
     cleanAction = cleanAction + "ing";
   }
 
   if (printer.printerState.colour.category !== "Active") {
-    for (let r = 0; r < pluginList.length; r++) {
+    for (const plugin of pluginList) {
       let alert = UI.createAlert(
         "warning",
-        `${printer.printerName}: ${cleanAction} - ${pluginList[r]}<br>Do not navigate away from this screen!`
+        `${printer.printerName}: ${cleanAction} - ${plugin}<br>Do not navigate away from this screen!`
       );
       let postData = {};
       if (action === "install") {
         postData = {
           command: action.toLowerCase(),
           dependency_links: false,
-          url: pluginList[r]
+          url: plugin
         };
       } else {
         postData = {
           command: action.toLowerCase(),
-          plugin: pluginList[r]
+          plugin: plugin
         };
       }
 
@@ -157,7 +157,7 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
       } else if (post.status === 400) {
         return {
           status: bulkActionsStates.ERROR,
-          message: "OctoPrint did not action the request, please open an issue!"
+          message: `OctoPrint did not action the request, please open an issue! Error in data: ${postData}`
         };
       } else if (post.status === 200) {
         let response = await post.json();

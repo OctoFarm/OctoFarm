@@ -1166,9 +1166,6 @@ export async function bulkOctoPrintPluginAction(action) {
           if (result) {
             const pluginAmount = result.length * printersForPluginAction.length;
             let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
-            if (action === "install") {
-              cleanAction = `${cleanAction}ing`;
-            }
             showBulkActionsModal();
             updateBulkActionsProgress(0, pluginAmount);
             generateTableRows(printersForPluginAction);
