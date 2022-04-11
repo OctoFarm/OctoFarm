@@ -3,6 +3,8 @@ import UI from "../utils/ui";
 
 let settings;
 
+//Big fix coming...
+
 export async function checkFilamentManager() {
   if (!settings) {
     settings = await OctoFarmClient.get("settings/server/get");
@@ -26,7 +28,7 @@ export async function isFilamentManagerPluginSyncEnabled() {
 
 export function setupFilamentManagerDisableBtn() {
   const disableFilManagerBtn = document.getElementById("disable-FilamentManager");
-  disableFilManagerBtn.addEventListener("click", async (event) => {
+  disableFilManagerBtn.addEventListener("click", async () => {
     let filamentManagerDisabled = await OctoFarmClient.post("filament/disableFilamentPlugin", {
       activate: true
     });
@@ -48,7 +50,7 @@ export function setupFilamentManagerDisableBtn() {
 
 export function setupFilamentManagerSyncBtn() {
   const filamentManagerSyncBtn = document.getElementById("resyncFilamentManagerBtn");
-  filamentManagerSyncBtn.addEventListener("click", async (event) => {
+  filamentManagerSyncBtn.addEventListener("click", async () => {
     UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
     filamentManagerSyncBtn.disabled = true;
     const filamentManagerAlert = UI.createAlert(
@@ -95,7 +97,7 @@ export function setupFilamentManagerReSyncBtn() {
   const filamentManagerEnabled = isFilamentManagerPluginSyncEnabled();
   if (filamentManagerEnabled) {
     const resyncBtn = document.getElementById("resyncFilamentManagerBtn");
-    resyncBtn.addEventListener("click", async (e) => {
+    resyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(resyncBtn);
       const post = await OctoFarmClient.post("filament/filamentManagerReSync");
       UI.createAlert(
@@ -142,9 +144,9 @@ export async function createFilamentSelector(element, printer, toolIndex) {
     element.insertAdjacentHTML("beforeend", filament);
   });
   if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
-    for (let i = 0; i < printer.selectedFilament.length; i++) {
-      if (!!printer.selectedFilament[i]) {
-        element.value = printer.selectedFilament[i]._id;
+    for (const selectedFilament of printer.selectedFilament) {
+      if (!!selectedFilament) {
+        element.value = selectedFilament._id;
       }
     }
   }

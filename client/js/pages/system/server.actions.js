@@ -261,7 +261,7 @@ async function generateLogDumpFile() {
 
   if (logDumpDownloadBtn) {
     logDumpDownloadBtn.classList.remove("d-none");
-    logDumpDownloadBtn.addEventListener("click", (e) => {
+    logDumpDownloadBtn.addEventListener("click", () => {
       setTimeout(() => {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
@@ -346,9 +346,6 @@ async function checkFilamentManagerPluginState() {
 
 async function updateServerSettings() {
   const opts = {
-    onlinePolling: {
-      seconds: settingsElements.onlinePolling.seconds.value,
-    },
     server: {
       // Deprecated Port
       port: parseInt(settingsElements.server.port.value),
@@ -358,7 +355,6 @@ async function updateServerSettings() {
     timeout: {
       webSocketRetry: settingsElements.timeout.webSocketRetry.value * 1000,
       apiTimeout: settingsElements.timeout.apiTimeout.value * 1000,
-      apiRetryCutoff: settingsElements.timeout.apiRetryCutoff.value * 1000,
       apiRetry: settingsElements.timeout.apiRetry.value * 1000,
     },
     filament: {
@@ -552,7 +548,7 @@ async function grabOctoFarmLogList() {
     );
     document
       .getElementById(logs.name + "-download")
-      .addEventListener("click", (event) => {
+      .addEventListener("click", () => {
         window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
       });
     document
@@ -652,6 +648,9 @@ async function renderSystemCharts() {
 
 async function updateCurrentActiveUsers() {
   const activeUserList = await OctoFarmClient.get("settings/system/activeUsers");
+  if(!activeUserList){
+    return;
+  }
   const activeUserListContainer = document.getElementById(
     "activeUserListContainer"
   );
@@ -746,8 +745,8 @@ function startUpdateTasksRunner() {
 
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
-      const { options } = theTask;
-      const { periodic } = options;
+      const { options: taskOptions } = theTask;
+      const { periodic } = taskOptions;
 
       if (periodic) {
         UI.doesElementNeedUpdating(
@@ -771,7 +770,7 @@ function startUpdateTasksRunner() {
         UI.doesElementNeedUpdating(
           theTask.duration
             ? UI.generateMilisecondsTime(theTask.duration)
-            : '<i class="fas fa-sync fa-spin"></i>',
+            : "<i class=\"fas fa-sync fa-spin\"></i>",
           document.getElementById("duration-" + task),
           "innerHTML"
         );
@@ -851,12 +850,12 @@ async function createNewUser() {
     $("#userCreateModal").modal("hide");
     document
       .getElementById(`deleteUserBtn-${createdUser._id}`)
-      .addEventListener("click", (e) => {
+      .addEventListener("click", () => {
         deleteUser(createdUser._id);
       });
     document
       .getElementById(`resetPasswordBtn-${createdUser._id}`)
-      .addEventListener("click", (e) => {
+      .addEventListener("click", () => {
         userActionElements.resetPasswordFooter.innerHTML = `
         ${returnSaveBtn()}
         `;
@@ -867,7 +866,7 @@ async function createNewUser() {
       });
     document
       .getElementById(`editUserBtn-${createdUser._id}`)
-      .addEventListener("click", async (e) => {
+      .addEventListener("click", async () => {
         userActionElements.editUserFooter.innerHTML = `
         ${returnSaveBtn()}
         `;

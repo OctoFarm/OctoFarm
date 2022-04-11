@@ -66,7 +66,13 @@ class Manager {
       let extruderList = "";
 
       for (let i = 0; i < printer?.currentProfile?.extruder?.count; i++) {
-        extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
+        extruderList += `
+        <div class="input-group mb-1">
+            <div class="input-group-prepend"> 
+                <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label>
+            </div> 
+            <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select>
+        </div>`;
       }
 
       printerList.insertAdjacentHTML(
@@ -84,7 +90,6 @@ class Manager {
                 class="col-lg-2"
                 style="display:flex; justify-content:center; align-items:center;"
               >
-                <center>
                   <i class="fas fa-print fa-2x"></i><br>
                   <td>
                   <small>
@@ -100,10 +105,9 @@ class Manager {
                   </small>
                   </small>
                   </td>
-                  </center>
               </div>
               <div class="col-lg-10">
-                <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0px; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
+                <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
                 ${storageWarning}
                 <div class="row">
 
@@ -256,10 +260,10 @@ class Manager {
     fileButtons.fileManager.uploadFiles.addEventListener("change", function () {
       FileManagerService.handleFiles(this.files, printer);
     });
-    fileButtons.fileManager.createFolderBtn.addEventListener("click", (e) => {
+    fileButtons.fileManager.createFolderBtn.addEventListener("click", () => {
       FileManagerService.createFolder(printer);
     });
-    fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
+    fileButtons.fileManager.fileSearch.addEventListener("keyup", () => {
       FileManagerService.search(printer._id);
     });
     fileButtons.fileManager.uploadPrintFile.addEventListener("change", async function () {
@@ -268,13 +272,13 @@ class Manager {
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
-    fileButtons.fileManager.back.addEventListener("click", async (e) => {
+    fileButtons.fileManager.back.addEventListener("click", async () => {
       await FileManagerService.openFolder(undefined, undefined, printer);
     });
     fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
       await FileManagerService.reSyncFiles(e, printer);
     });
-    fileButtons.fileManager.fileDeleteAll.addEventListener("click", async (e) => {
+    fileButtons.fileManager.fileDeleteAll.addEventListener("click", async () => {
       await FileManagerService.deleteAllFiles(e, printer);
     });
     fileButtons.fileManager.fileHouseKeeping.addEventListener("click", async (e) => {
