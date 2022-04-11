@@ -15,17 +15,18 @@ export const reconnectFrequency = {
 };
 
 export const triggerCountDownTimer = (seconds) => {
-    console.log(seconds)
     countDownSeconds = seconds
+    const lostConnectionTimer = document.getElementById("lostServerConnectionTimer");
     if(!countDownInterval){
         countDownInterval = setInterval(() => {
             if(countDownSeconds <= 1){
                 //reset the counter
+                lostConnectionTimer.innerHTML = "Now!";
                 clearInterval(countDownInterval)
                 countDownInterval = false;
             }else{
                 countDownSeconds--
-                document.getElementById("lostServerConnectionTimer").innerHTML = `${countDownSeconds}`;
+                lostConnectionTimer.innerHTML = `${countDownSeconds} seconds...`;
             }
         },1000)
     }
@@ -51,13 +52,19 @@ export const setServerAlive = async (message) => {
     window.serverOffline = false;
     const lostServerConnectionModal = document.getElementById("lostServerConnection");
     if (lostServerConnectionModal && lostServerConnectionModal.className.includes("show")) {
-        // If user has login enabled then we need to refresh the session...
+        // If user has login enabled then we need to refresh the session..
+        let reMessage = ""
+        if(!!message?.loginRequired){
+            reMessage = "Server is alive, reloading screen..."
+        }else{
+            reMessage = "Server is alive!"
+        }
+        document.getElementById("lostServerConnectionTimer").innerHTML = reMessage;
         if(!!message?.loginRequired){
             await reloadWindow();
         }else{
             await closeModal();
         }
-
     }
 }
 

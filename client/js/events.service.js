@@ -106,7 +106,6 @@ function setupEventSource() {
     reconnectFrequency.setSeconds = 3;
   };
   evtSource.onerror = async function (e) {
-    console.log(reconnectFrequency.getSeconds)
     window.serverOffline = true;
     console.debug("Server connection lost! Re-connecting in... " + reconnectFrequency.getSeconds + "s");
     triggerCountDownTimer(reconnectFrequency.getSeconds)
