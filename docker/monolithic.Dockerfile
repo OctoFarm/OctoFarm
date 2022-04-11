@@ -1,4 +1,4 @@
-FROM node:14.17-stretch
+FROM node:14.19-bullseye
 
 # Update Local Repository Index
 RUN apt-get update
@@ -7,7 +7,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -yq
 # Install package utils
 RUN DEBIAN_FRONT=noninteractive apt-get install -yq apt-utils
 # Install MongoDB
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq mongodb
+RUN apt-get install -y ca-certificates
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add
+RUN echo 'deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse' | tee /etc/apt/sources.list.d/mongodb.list
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq mongodb-org
+
 # Remove package files fetched for install
 RUN apt-get clean
 # Remove unwanted files
