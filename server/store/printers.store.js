@@ -153,6 +153,11 @@ class PrinterStore {
     });
   }
 
+  getOctoPiData(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.octoPi;
+  }
+
   getCurrentZ(id) {
     const printer = this.#findMePrinter(id);
     return printer.currentZ;
@@ -1012,7 +1017,6 @@ class PrinterStore {
       .catch((e) => {
         logger.error("Issue updating file list", e);
       });
-
 
     return printer;
   }

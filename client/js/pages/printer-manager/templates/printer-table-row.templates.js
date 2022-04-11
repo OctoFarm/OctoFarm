@@ -90,6 +90,13 @@ const returnAlerts = (id, printerURL) => {
         >
        <i class="fa-solid fa-fire"></i>
     </button>
+        <button  title="Your connection is throttled!"
+         id="printerConnectionThrottled-${id}"
+         type="button"
+         class="tag btn btn-outline-info btn-sm d-none"
+        >
+       <i class="fa-solid fa-toilet"></i> <span id="printerConnectionThrottledCount-${id}"></span>
+    </button>
    `;
 };
 

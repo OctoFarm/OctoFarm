@@ -31,7 +31,7 @@ const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
-const { MESSAGE_TYPES } = require("../../constants/sse.constants")
+const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -168,6 +168,7 @@ class OctoPrintPrinter {
     this.settingsWebcam,
     this.settingsServer
   );
+  websocket_throttle = 1;
 
   constructor(printer) {
     if (
@@ -823,7 +824,7 @@ class OctoPrintPrinter {
       }
     } else {
       // Hard failure as can't setup websocket
-      logger.error("API key is global... cannot connect...")
+      logger.error("API key is global... cannot connect...");
       this.#apiPrinterTickerWrap("API key is global API key", "Offline");
       return false;
     }

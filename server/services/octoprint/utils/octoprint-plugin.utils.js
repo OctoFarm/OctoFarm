@@ -167,9 +167,39 @@ const captureLogLines = (id, data) => {
   }
 };
 
+const captureThrottlePluginData = (id, data) => {
+  const {
+    state: { current_undervoltage, current_overheat }
+  } = data;
+
+  if (current_undervoltage) {
+    addOctoPrintLogWrapper(
+      id,
+      "OctoPrint reporting throttled state! Undervoltage issue!",
+      "Offline"
+    );
+  }
+
+  if (current_overheat) {
+    addOctoPrintLogWrapper(
+      id,
+      "OctoPrint reporting throttled state! Overheating issue!",
+      "Offline"
+    );
+  }
+
+  let octoPi = JSON.stringify(JSON.parse(getPrinterStoreCache().getOctoPiData(id)));
+
+  octoPi.throttled_state.current_overheat = current_overheat;
+  octoPi.throttled_state.current_undervoltage = current_undervoltage;
+
+  getPrinterStoreCache().updatePrinterDatabase(id, { octoPi });
+};
+
 module.exports = {
   testAndCollectPSUControlPlugin,
   testAndCollectCostPlugin,
   captureKlipperPluginData,
-  capturePluginManagerData
+  capturePluginManagerData,
+  captureThrottlePluginData
 };

@@ -111,6 +111,8 @@ function checkIfPrinterHealthOK(printer) {
   }
 }
 
+
+
 function checkIfPrinterHasEvents(printer){
   const eventsAlerts = document.getElementById(`printerEventsAlert-${printer._id}`);
   const printerEventsCount = document.getElementById(`printerEventsCount-${printer._id}`);
@@ -127,6 +129,18 @@ function checkIfPrinterHasEvents(printer){
   }
   UI.removeDisplayNoneFromElement(eventsAlerts);
   removeAlertsLog({ id: "printerEvents-" + printer._id });
+}
+
+function checkIfPrinterConnectionThrottled(printer){
+  const printerConnectionThrottled = document.getElementById(`printerConnectionThrottled-${printer._id}`);
+  const printerConnectionThrottledCount = document.getElementById(`printerConnectionThrottledCount-${printer._id}`);
+  console.log(printer.websocket_throttle)
+  if(printer?.websocket_throttle > 1){
+    printerConnectionThrottledCount.innerHTML = printer.websocket_throttle;
+    UI.addDisplayNoneToElement(printerConnectionThrottled);
+    return;
+  }
+  UI.removeDisplayNoneFromElement(printerConnectionThrottled);
 }
 
 function corsWarningCheck(printer) {
@@ -420,6 +434,8 @@ function updatePrinterRow(printer) {
       checkIfUnderVoltagedPi(printer);
 
       checkIfOverheatingPi(printer);
+
+      checkIfPrinterConnectionThrottled(printer);
     }
   }
 }
@@ -605,17 +621,17 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document.getElementById("printerOverHeating-" + printer._id).addEventListener("click", async () => {
         bootbox.dialog({
-          title: 'Reported overheating by your Pi!',
+          title: "Reported overheating by your Pi!",
           message: "<p>Your RaspberryPi has reported it's overheating... Please sort the issue and ReScan the API!</p>",
-          size: 'small',
+          size: "small",
           buttons: {
             cancel: {
               label: "Ignore",
-              className: 'btn-danger'
+              className: "btn-danger"
             },
             ok: {
               label: "Sorted, ReScan API!",
-              className: 'btn-info',
+              className: "btn-info",
               callback: async () =>{
                 await reSyncAPI(true, printer._id);
               }
@@ -627,20 +643,42 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document.getElementById("printerUnderVoltaged-" + printer._id).addEventListener("click", async () => {
         bootbox.dialog({
-          title: 'Reported undervoltage by your Pi!',
+          title: "Reported undervoltage by your Pi!",
           message: "<p>Your RaspberryPi has reported it's undervoltaged... Please sort the issue and ReScan the API!</p>",
-          size: 'small',
+          size: "small",
           buttons: {
             cancel: {
               label: "Ignore",
-              className: 'btn-danger'
+              className: "btn-danger"
             },
             ok: {
               label: "Sorted, ReScan API!",
-              className: 'btn-info',
+              className: "btn-info",
               callback: async () =>{
                 await reSyncAPI(true, printer._id);
               }
+            }
+          }
+        });
+      })
+
+      document.getElementById("printerConnectionThrottled-" + printer._id).addEventListener("click", async () => {
+        bootbox.dialog({
+          title: "Printer connection is throttled!",
+          message: "<p>This is just an alert to let you know. Your printer connection is been throttled because the websocket messages are returning" +
+              " slower than the throttle rate on OctoPrint.</p><br><p>There's not much to do to resolve it apart from upgrading/reducing your network conjestion." +
+              "</p><br><p>The count on the icon is indicative to how much it is currently been throttled. You can devide the value by 2 to get the milisecond " +
+              "rate your messages will come through from OctoPrint at. The default amount is 1 which results in a message speed of 500ms (0.5 seconds). The warning" +
+              " will only trigger when a throttle rate above 1 is activated by the server. This is an automated process currently.</p>",
+          size: "small",
+          buttons: {
+            cancel: {
+              label: "Ignore",
+              className: "btn-danger d-none"
+            },
+            ok: {
+              label: "Ok!",
+              className: "btn-info",
             }
           }
         });
