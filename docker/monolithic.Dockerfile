@@ -11,8 +11,8 @@ RUN apt-get install -y ca-certificates
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add
 RUN echo 'deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse' | tee /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update
-RUN apt-get install -y mongodb
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq mongodb
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq mongodb-org
+
 # Remove package files fetched for install
 RUN apt-get clean
 # Remove unwanted files
