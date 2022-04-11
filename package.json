@@ -17,7 +17,8 @@
     "build-client": "cd client && npm run build",
     "setup-dev": "npm run install-server && npm run install-client",
     "setup-alpha": "cd server && npm run start-alpha",
-    "update-alpha": "git pull && npm run setup-alpha"
+    "update-alpha": "git pull && npm run setup-alpha && pm2 restart OctoFarm-Testing",
+    "update-main":  "git pull && npm run install-server && pm2 restart OctoFarm"
   },
   "repository": {
     "type": "git",
