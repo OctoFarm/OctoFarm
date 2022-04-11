@@ -134,7 +134,6 @@ function checkIfPrinterHasEvents(printer){
 function checkIfPrinterConnectionThrottled(printer){
   const printerConnectionThrottled = document.getElementById(`printerConnectionThrottled-${printer._id}`);
   const printerConnectionThrottledCount = document.getElementById(`printerConnectionThrottledCount-${printer._id}`);
-  console.log(printer.websocket_throttle)
   if(printer?.websocket_throttle > 1){
     printerConnectionThrottledCount.innerHTML = printer.websocket_throttle;
     UI.addDisplayNoneToElement(printerConnectionThrottled);
