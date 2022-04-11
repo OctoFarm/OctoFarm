@@ -362,6 +362,12 @@ class WebSocketClient {
   }
 
   sendThrottle() {
+    logger.silly(
+      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
+    );
+    getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+      websocket_throttle: this.currentThrottleRate
+    });
     this.send(
       JSON.stringify({
         throttle: this.currentThrottleRate

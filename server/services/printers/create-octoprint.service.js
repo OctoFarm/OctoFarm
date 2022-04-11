@@ -168,6 +168,7 @@ class OctoPrintPrinter {
     this.settingsWebcam,
     this.settingsServer
   );
+  websocket_throttle = 1;
 
   constructor(printer) {
     if (
