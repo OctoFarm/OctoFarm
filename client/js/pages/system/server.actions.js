@@ -261,7 +261,7 @@ async function generateLogDumpFile() {
 
   if (logDumpDownloadBtn) {
     logDumpDownloadBtn.classList.remove("d-none");
-    logDumpDownloadBtn.addEventListener("click", (e) => {
+    logDumpDownloadBtn.addEventListener("click", () => {
       setTimeout(() => {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
@@ -548,7 +548,7 @@ async function grabOctoFarmLogList() {
     );
     document
       .getElementById(logs.name + "-download")
-      .addEventListener("click", (event) => {
+      .addEventListener("click", () => {
         window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
       });
     document
@@ -648,6 +648,9 @@ async function renderSystemCharts() {
 
 async function updateCurrentActiveUsers() {
   const activeUserList = await OctoFarmClient.get("settings/system/activeUsers");
+  if(!activeUserList){
+    return;
+  }
   const activeUserListContainer = document.getElementById(
     "activeUserListContainer"
   );
@@ -742,8 +745,8 @@ function startUpdateTasksRunner() {
 
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
-      const { options } = theTask;
-      const { periodic } = options;
+      const { options: taskOptions } = theTask;
+      const { periodic } = taskOptions;
 
       if (periodic) {
         UI.doesElementNeedUpdating(
@@ -847,12 +850,12 @@ async function createNewUser() {
     $("#userCreateModal").modal("hide");
     document
       .getElementById(`deleteUserBtn-${createdUser._id}`)
-      .addEventListener("click", (e) => {
+      .addEventListener("click", () => {
         deleteUser(createdUser._id);
       });
     document
       .getElementById(`resetPasswordBtn-${createdUser._id}`)
-      .addEventListener("click", (e) => {
+      .addEventListener("click", () => {
         userActionElements.resetPasswordFooter.innerHTML = `
         ${returnSaveBtn()}
         `;
@@ -863,7 +866,7 @@ async function createNewUser() {
       });
     document
       .getElementById(`editUserBtn-${createdUser._id}`)
-      .addEventListener("click", async (e) => {
+      .addEventListener("click", async () => {
         userActionElements.editUserFooter.innerHTML = `
         ${returnSaveBtn()}
         `;
