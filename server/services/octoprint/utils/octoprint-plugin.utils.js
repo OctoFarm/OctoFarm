@@ -188,7 +188,7 @@ const captureThrottlePluginData = (id, data) => {
     );
   }
 
-  let octoPi = JSON.stringify(JSON.parse(getPrinterStoreCache().getOctoPiData(id)));
+  const octoPi = JSON.stringify(JSON.parse(getPrinterStoreCache().getOctoPiData(id)));
 
   octoPi.throttled_state.current_overheat = current_overheat;
   octoPi.throttled_state.current_undervoltage = current_undervoltage;
