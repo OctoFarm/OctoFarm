@@ -197,7 +197,7 @@ class PrinterManagerService {
   async bulkDeletePrinters(deleteList) {
     const removedPrinterList = [];
     this.clearPrinterQueuesTimeout();
-    for (let id of deleteList) {
+    for (const id of deleteList) {
       const printer = getPrinterStoreCache().getPrinterInformation(id);
       await getPrinterStoreCache().deletePrinter(printer._id);
       removedPrinterList.push({

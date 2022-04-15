@@ -228,8 +228,8 @@ class PrinterCleanerService {
 
   static grabPrinterName(settingsAppearance, printerURL) {
     const randomisedName = generateRandomName();
-    if (!!settingsAppearance) {
-      return settingsAppearance?.name !== "" ? settingsAppearance.name : randomisedName;
+    if (settingsAppearance) {
+      return settingsAppearance?.name.length !== 0 ? settingsAppearance.name : randomisedName;
     } else {
       return randomisedName ? randomisedName : printerURL;
     }

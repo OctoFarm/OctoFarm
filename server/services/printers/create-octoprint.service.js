@@ -1004,7 +1004,7 @@ class OctoPrintPrinter {
         this.#db.update({
           octoPi: this.octoPi
         });
-        logger.http("Failed to acquire raspberry pi data..." + piPluginCheck);
+        logger.http("Failed to acquire raspberry pi data...", piPluginCheck);
         this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline", piPluginCheck);
         return globalStatusCode;
       }
@@ -1173,15 +1173,20 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        if (this.settingsAppearance.name === "") {
-          this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
-        } else {
-          this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+        if (this.settingsAppearance.name !== appearance.name) {
+          this.settingsAppearance.name = appearance.name;
+        }
+        if (this.settingsAppearance.name.length === 0) {
+          this.settingsAppearance.name = PrinterClean.grabPrinterName(
+              appearance.name,
+              this.printerURL
+          );
         }
       }
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
       }
+
       this.#db.update({
         camURL: this.camURL,
         settingsAppearance: this.settingsAppearance,

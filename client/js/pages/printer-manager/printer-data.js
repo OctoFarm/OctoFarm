@@ -27,7 +27,7 @@ const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
   "Shutdown",
   "Offline",
-  "Searching",
+  "Searching...",
   "Setting Up",
   "Incorrect API Key",
   "Error!",
@@ -76,11 +76,13 @@ function updatePrinterInfo(printer) {
   );
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
-  let printerName = JSON.parse(JSON.stringify(printer?.printerName));
+  let printerName = "<i class=\"fa-solid fa-arrows-spin fa-spin\"></i>"
 
-  if (!printerName) {
-    printerName = "<i class=\"fa-solid fa-spinner fa-spin\"></i>";
+  if(printer?.printerName && printer.printerName !== "Grabbing from OctoPrint..."){
+    printerName = JSON.parse(JSON.stringify(printer?.printerName));
   }
+
+
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
   UI.doesElementNeedUpdating(printerName, printName, "innerHTML");
@@ -417,8 +419,7 @@ function updatePrinterRow(printer) {
 
       checkForOctoPrintPluginUpdates(printer);
 
-      //TODO - needs to update online only... same with a few others... also doesn't remove itself.
-      //checkForApiErrors(printer);
+      checkForApiErrors(printer);
 
       checkIfPrinterHealthOK(printer);
 
