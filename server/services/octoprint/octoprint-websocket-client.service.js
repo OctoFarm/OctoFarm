@@ -48,7 +48,8 @@ class WebSocketClient {
   throttleRateMeasurements = [];
   throttleRateMeasurementsSize = 20;
   throttleBase = 500;
-  throttleMargin = 150;
+  upperThrottleHysteresis = 100;
+  lowerThrottleHysteresis = 250;
 
   constructor(
     webSocketURL = undefined,
@@ -331,13 +332,16 @@ class WebSocketClient {
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
 
-    if (ms > throttleLimit + (this.throttleBase - this.throttleMargin)) {
+    if (ms > throttleLimit + (this.throttleBase + this.upperThrottleHysteresis)) {
       logger.warning(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
       this.increaseMessageThrottle();
     } else if (this.currentThrottleRate > 1) {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
       const lowerProcessingLimit =
-        (this.currentThrottleRate - 1) * (currentAverage + this.throttleMargin);
+        (this.currentThrottleRate - 1) * (currentAverage + this.lowerThrottleHysteresis);
+      console.log("CURRENT MS: ", ms)
+      console.log("LOWER LIMIT: ", lowerProcessingLimit)
+
       if (maxProcessingLimit < lowerProcessingLimit) {
         logger.warning(`Messages speed normalising at: ${ms}ms throttling connection speed...`);
         this.decreaseMessageThrottle();
