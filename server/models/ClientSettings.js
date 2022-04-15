@@ -139,7 +139,7 @@ const ClientSettingsSchema = new mongoose.Schema({
     showDisconnected: {
       type: Boolean,
       required: true,
-      default: false
+      default: true
     },
     cameraColumns: {
       type: Number,
