@@ -339,9 +339,6 @@ class WebSocketClient {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
       const lowerProcessingLimit =
         (this.currentThrottleRate - 1) * (currentAverage + this.lowerThrottleHysteresis);
-      console.log("CURRENT MS: ", ms)
-      console.log("LOWER LIMIT: ", lowerProcessingLimit)
-
       if (maxProcessingLimit < lowerProcessingLimit) {
         logger.warning(`Messages speed normalising at: ${ms}ms throttling connection speed...`);
         this.decreaseMessageThrottle();
