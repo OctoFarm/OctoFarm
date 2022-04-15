@@ -1,50 +1,51 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../utils/ui";
 
-let settings;
-
-//Big fix coming...
-
-export async function checkFilamentManager() {
-  if (!settings) {
-    settings = await OctoFarmClient.get("settings/server/get");
-  }
-  return settings.filamentManager;
-}
-
 export async function isFilamentManagerPluginSyncEnabled() {
-  try {
     const systemSettings = await OctoFarmClient.get("settings/server/get");
     return systemSettings.filamentManager;
-  } catch (e) {
-    console.error(e);
+}
+
+async function disabledFilamentManagerSync(){
+  let filamentManagerDisabled = await OctoFarmClient.post("filament/disableFilamentPlugin", {
+    activate: true
+  });
+  if (filamentManagerDisabled) {
     UI.createAlert(
-      "error",
-      "There was an issue contacting the server, please check your logs",
-      3000
+        "success",
+        "Successfully disabled filament manager and removed all spools / profiles.",
+        3000
+    );
+  } else {
+    UI.createAlert(
+        "error",
+        "Unable to disable filament manager please check the filament manager logs.",
+        3000
     );
   }
 }
 
 export function setupFilamentManagerDisableBtn() {
-  const disableFilManagerBtn = document.getElementById("disable-FilamentManager");
-  disableFilManagerBtn.addEventListener("click", async () => {
-    let filamentManagerDisabled = await OctoFarmClient.post("filament/disableFilamentPlugin", {
-      activate: true
+  const disableFilManagerBtn = document.getElementById("disableFilamentManager");
+  disableFilManagerBtn.addEventListener("click",  () => {
+    bootbox.confirm({
+      message: "This will disable the filament manager plugin sync and remove all those spools from OctoFarm's database... are you sure?",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success"
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger"
+        }
+      },
+      callback: async function (result) {
+        if(result){
+          await disabledFilamentManagerSync()
+        }
+      }
     });
-    if (filamentManagerDisabled) {
-      UI.createAlert(
-        "success",
-        "Successfully disabled filament manager and removed all spools / profiles.",
-        3000
-      );
-    } else {
-      UI.createAlert(
-        "error",
-        "Unable to disable filament manager please check the filament manager logs.",
-        3000
-      );
-    }
   });
 }
 
@@ -100,12 +101,16 @@ export function setupFilamentManagerReSyncBtn() {
     resyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(resyncBtn);
       const post = await OctoFarmClient.post("filament/filamentManagerReSync");
-      UI.createAlert(
-        "success",
-        `Successfully synced filament manager! <br> Profiles - Updated: ${post.updatedProfiles} / New: ${post.newProfiles} <br> Spools - Updated: ${post.updatedSpools} / New: ${post.newSpools}`,
-        4000,
-        "Clicked"
-      );
+      if(post.errors.length === 0){
+        UI.createAlert(
+            "success",
+            `Successfully synced filament manager! <br> Profiles - Updated: ${post.updatedProfiles} / New: ${post.newProfiles} <br> Spools - Updated: ${post.updatedSpools} / New: ${post.newSpools}`,
+            4000,
+            "Clicked"
+        );
+      }else{
+        UI.createAlert("error", "There was an issue updating your spools and profiles, please check the logs!", 3000, "Clicked")
+      }
       UI.removeLoaderFromElementInnerHTML(resyncBtn);
     });
   }

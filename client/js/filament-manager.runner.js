@@ -224,7 +224,7 @@ async function addProfile(manufacturer, material, density, diameter) {
     diameter: diameter.value
   };
   let post = await OctoFarmClient.post("filament/save/profile", opts);
-  if (post) {
+  if (post && post.errors.length === 0) {
     UI.createMessage(
       {
         type: "success",
@@ -236,47 +236,44 @@ async function addProfile(manufacturer, material, density, diameter) {
     material.value = "";
     density.value = 1.25;
     diameter.value = 1.75;
-    let profileID = null;
-    filamentManager = post.filamentManager;
-    if (filamentManager) {
-      profileID = post.dataProfile.profile.index;
-    } else {
-      profileID = post.dataProfile._id;
-    }
-    post = post.dataProfile;
     await reRenderPageInformation();
     await updateProfileDrop();
+    const { dataProfile: profile } = post;
     document.getElementById("addProfilesTable").insertAdjacentHTML(
-      "beforeend",
+      "beforebegin",
       `
                 <tr data-jplist-item>
-                  <th style="display: none;">${profileID}</th>
-                  <th scope="row"><input class="form-control" type="text" placeholder="${post.profile.manufacturer}"></th>
-                  <td><input class="form-control" type="text" placeholder="${post.profile.material}"></td>
-                  <td><input class="form-control" type="text" placeholder="${post.profile.density}"></p></td>
-                  <td><input class="form-control" type="text" placeholder="${post.profile.diameter}"></p></td>
-                  <td><button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
+                  <th style="display: none;">${profile._id}</th>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${profile.profile.manufacturer}"></th>
+                  <td><input class="form-control" type="text" placeholder="${profile.profile.material}"></td>
+                  <td><input class="form-control" type="text" placeholder="${profile.profile.density}"></p></td>
+                  <td><input class="form-control" type="text" placeholder="${profile.profile.diameter}"></p></td>
+                  <td><button id="edit-${profile._id}" type="button" class="btn btn-sm btn-primary edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
-                  <button id="save-${profileID}" type="button" class="btn btn-sm d-none btn-success save">
+                  <button id="save-${profile._id}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${profile._id}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>
                 `
     );
+    jplist.refresh();
   } else {
-    UI.createMessage(
-      {
-        type: "error",
-        msg: "Could not add roll to database... is it alive?"
-      },
-      "profilesMessage"
-    );
+    printProfileErrors(post.errors)
   }
 }
+
+function printProfileErrors(errors) {
+  let errorMessage = "There were issues editing your spool: <br>";
+  errors.forEach(error => {
+    errorMessage += error + "<br>"
+  })
+  UI.createAlert("error", errorMessage, 6000, "Clicked");
+}
+
 async function editProfile(e) {
   const row = e.parentElement.parentElement;
   const editable = row.querySelectorAll("input");
@@ -304,11 +301,14 @@ async function saveProfile(e) {
     profile
   };
   let post = await OctoFarmClient.post("filament/edit/profile", data);
-  if (post) {
+  console.log(post)
+  if (post && post.errors.length === 0) {
     await reRenderPageInformation();
     await updateProfileDrop();
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
+  }else{
+    printProfileErrors(post.errors)
   }
   jplist.refresh();
 }
@@ -318,7 +318,7 @@ async function deleteProfile(e) {
     let post = await OctoFarmClient.post("filament/delete/profile", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
-    if (post?.profiles) {
+    if (post && post.errors.length === 0) {
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
@@ -331,14 +331,10 @@ async function deleteProfile(e) {
         });
       }
       await reRenderPageInformation();
-      updateProfileDrop(post);
+      await updateProfileDrop();
+      UI.createAlert("success", "Successfully deleted your profile!", 3000, "Clicked")
     } else {
-      UI.createAlert(
-        "error",
-        "There was a conflict when deleting this profile, is it attached to a spool?",
-        4000,
-        "Clicked"
-      );
+      printProfileErrors(post.errors)
     }
   }
 }

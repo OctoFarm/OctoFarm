@@ -57,19 +57,14 @@ class FilamentCleanerService {
     const spoolsArray = [];
     const profilesArray = [];
 
-    for (let pr = 0; pr < profiles.length; pr++) {
+    for (const pr of profiles) {
       const profile = {
-        _id: null,
-        manufacturer: profiles[pr].profile.manufacturer,
-        material: profiles[pr].profile.material,
-        density: profiles[pr].profile.density,
-        diameter: profiles[pr].profile.diameter
+        _id: pr._id,
+        manufacturer: pr.profile.manufacturer,
+        material: pr.profile.material,
+        density: pr.profile.density,
+        diameter: pr.profile.diameter
       };
-      if (filamentManager) {
-        profile._id = profiles[pr].profile.index;
-      } else {
-        profile._id = profiles[pr]._id;
-      }
       profilesArray.push(profile);
     }
     for (let sp = 0; sp < spools.length; sp++) {

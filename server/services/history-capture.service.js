@@ -8,8 +8,8 @@ const filamentProfiles = require("../models/Profiles.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const Spool = require("../models/Filament.js");
 const {
-  FilamentManagerPlugin
-} = require("./octoprint/octoprint-filament-manager-plugin.service.js");
+  filamentManagerReSync
+} = require("../services/octoprint/utils/filament-manager-plugin.utils");
 const { ScriptRunner } = require("./local-scripts.service.js");
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
@@ -84,7 +84,7 @@ class HistoryCollection {
       }
     }
 
-    const reSync = await FilamentManagerPlugin.filamentManagerReSync();
+    const reSync = await filamentManagerReSync();
     // Return success
     logger.info(reSync);
     return returnSpools;
