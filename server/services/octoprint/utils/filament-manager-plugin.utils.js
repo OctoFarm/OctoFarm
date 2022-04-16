@@ -6,7 +6,7 @@ const { findIndex } = require("lodash");
 const Spool = require("../../../models/Filament.js");
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const Profile = require("../../../models/Profiles");
-const {TaskManager} = require("../../task-manager.service");
+const { TaskManager } = require("../../task-manager.service");
 
 const getOnlinePrinterList = async function () {
   const printerList = getPrinterStoreCache().listPrintersInformation();
@@ -65,7 +65,7 @@ const checkIfFilamentManagerPluginExists = async function (printers) {
   return missingPlugin;
 };
 
-const getFilamentManagerPluginSettings = async function (printer){
+const getFilamentManagerPluginSettings = async function (printer) {
   let settingsList = await fetch(`${printer.printerURL}/api/settings`, {
     method: "GET",
     headers: {
@@ -75,7 +75,7 @@ const getFilamentManagerPluginSettings = async function (printer){
   });
   const responseJSON = await settingsList.json();
   return responseJSON?.plugins["filamentmanager"];
-}
+};
 
 const checkFilamentManagerPluginSettings = async function (printers) {
   const notSetupCorrectly = [];
@@ -95,9 +95,7 @@ const checkIfSpoolAttachedToPrinter = function (spoolId) {
   const filteredList = printerList.filter((printer) => printer.selectedFilament.length > 0);
   let isSpoolAttached = false;
   for (const element of filteredList) {
-    const doWeHaveSpoolIndex = element.selectedFilament.some(
-      (spool) => spool?._id == spoolId
-    );
+    const doWeHaveSpoolIndex = element.selectedFilament.some((spool) => spool?._id == spoolId);
     if (doWeHaveSpoolIndex) {
       isSpoolAttached = true;
     }
@@ -124,117 +122,121 @@ const checkIfDatabaseCanBeConnected = async function (printers) {
       },
       body: JSON.stringify({ config: database })
     });
-    if(!databaseCheck.ok){
+    if (!databaseCheck.ok) {
       unconnectedDatabases.push({ url: printer.printerURL });
     }
-
   }
 
   return unconnectedDatabases;
-}
+};
 
-const filamentManagerReSync = async function() {
+const filamentManagerReSync = async function () {
   const errors = [];
-  try {
-    let printer = findFirstOnlinePrinter();
 
-    if (printer === null) {
-      errors.push("Cannot find online printer to update records!")
-    }
-    const spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    });
-    const profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    });
-
-    // Make sure filament manager responds...
-    if (spools.status !== 200 || profiles.status !== 200) {
-      errors.push("Unable to contact printer for spools and profiles!")
-    }
-
-    const newSpools = [];
-    const updatedSpools = [];
-    const newProfiles = [];
-    const updatedProfiles = [];
-
-    const spoolsFM = await spools.json();
-    const profilesFM = await profiles.json();
-
-    const S = "Spool";
-    const P = "Profile";
-
-    for (const sp of spoolsFM.spools) {
-      const spool = {
-        name: sp.name,
-        profile: sp.profile.id,
-        price: sp.cost,
-        weight: sp.weight,
-        used: sp.used,
-        tempOffset: sp.temp_offset,
-        fmID: sp.id
-      };
-      const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
-      if (oldSpool !== null) {
-        logger.info("Updating Spool: ", spools);
-        oldSpool.spools = spool;
-        oldSpool.markModified("spools");
-        await oldSpool.save();
-        updatedSpools.push(S);
-      } else {
-        // New Spool
-        logger.info("Saving New Spool: ", spools);
-        const newSpool = await new Spool({ spools });
-        await newSpool.save();
-        newSpools.push(S);
-      }
-    }
-
-    for (const pr of profilesFM.profiles) {
-      const profile = {
-        index: pr.id,
-        density: pr.density,
-        diameter: pr.diameter,
-        manufacturer: pr.vendor,
-        material: pr.material
-      };
-      const oldProfile = await Profile.findOne({ "profile.index": pr.id });
-      if (oldProfile !== null) {
-        logger.info("Updating Profile: ", profile);
-        oldProfile.profile = profile;
-        oldProfile.markModified("profile");
-        await oldProfile.save();
-        updatedProfiles.push(P);
-      } else {
-        // New Profile
-        logger.info("Saving New Profile: ", profile);
-        const newProfile = await new Profile({ profile });
-        await newProfile.save();
-        newProfiles.push(P);
-      }
-    }
-    await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-    logger.info("Successfully synced filament manager with octofarm.");
-    return {
-      success: true,
-      newSpools: newSpools.length,
-      updatedSpools: updatedSpools.length,
-      newProfiles: newProfiles.length,
-      updatedProfiles: updatedProfiles.length,
-      errors
-    };
-  } catch (e) {
-    logger.error("Failed to resync filament manager plugin", e);
+  let printer = findFirstOnlinePrinter();
+  if (printer === null) {
+    errors.push("Cannot find online printer to update records!");
+    return errors;
   }
-}
+  const spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
+    }
+  });
+  const profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
+    }
+  });
+
+  // Make sure filament manager responds...
+  if (spools.status !== 200 || profiles.status !== 200) {
+    errors.push("Unable to contact printer for spools and profiles!");
+    return errors;
+  }
+
+  const newSpools = [];
+  const updatedSpools = [];
+  const newProfiles = [];
+  const updatedProfiles = [];
+
+  const spoolsFM = await spools.json();
+  const profilesFM = await profiles.json();
+
+  const S = "Spool";
+  const P = "Profile";
+
+  for (const pr of profilesFM.profiles) {
+    const profile = {
+      index: pr.id,
+      density: pr.density,
+      diameter: pr.diameter,
+      manufacturer: pr.vendor,
+      material: pr.material
+    };
+    const oldProfile = await Profile.findOne({ "profile.index": pr.id });
+    if (oldProfile !== null) {
+      logger.info("Updating Profile: ", profile);
+      oldProfile.profile = profile;
+      oldProfile.markModified("profile");
+      await oldProfile.save();
+      updatedProfiles.push(P);
+    } else {
+      // New Profile
+      logger.info("Saving New Profile: ", profile);
+      const newProfile = await new Profile({ profile });
+      await newProfile.save();
+      newProfiles.push(P);
+    }
+  }
+
+  for (const sp of spoolsFM.spools) {
+    const spool = {
+      name: sp.name,
+      profile: sp.profile.id,
+      price: parseFloat(sp.cost),
+      weight: parseFloat(sp.weight),
+      used: parseFloat(sp.used),
+      tempOffset: parseInt(sp.temp_offset),
+      bedOffset: 0,
+      fmID: sp.id
+    };
+    const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
+    const octofarmProfileId = await Profile.findOne({ "profile.index": sp.profile.id });
+    if (oldSpool !== null) {
+      logger.info("Updating Spool: ", spool);
+      const bedOffset = JSON.parse(JSON.stringify(oldSpool.spools.bedOffset));
+      oldSpool.spools = spool;
+      oldSpool.spools.bedOffset = bedOffset;
+      oldSpool.spools.profile = octofarmProfileId._id;
+      oldSpool.markModified("spools");
+      await oldSpool.save();
+      updatedSpools.push(S);
+    } else {
+      // New Spool
+      logger.info("Saving New Spool: ", spool);
+      const newSpool = await new Spool({ spools: spool });
+      newSpool.spools.profile = octofarmProfileId._id;
+      await newSpool.save();
+      newSpools.push(S);
+    }
+  }
+
+  await TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+  logger.info("Successfully synced filament manager with octofarm.");
+  return {
+    success: true,
+    newSpools: newSpools.length,
+    updatedSpools: updatedSpools.length,
+    newProfiles: newProfiles.length,
+    updatedProfiles: updatedProfiles.length,
+    errors
+  };
+};
 
 module.exports = {
   getOnlinePrinterList,

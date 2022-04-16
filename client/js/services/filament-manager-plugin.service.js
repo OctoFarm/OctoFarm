@@ -109,7 +109,11 @@ export function setupFilamentManagerReSyncBtn() {
             "Clicked"
         );
       }else{
-        UI.createAlert("error", "There was an issue updating your spools and profiles, please check the logs!", 3000, "Clicked")
+        let errorText = "There was an issue updating your spools and profiles! Error(s): <br>";
+        errors.forEach(error => {
+          errorText += error +" <br>"
+        })
+        UI.createAlert("error", errorText, 3000, "Clicked")
       }
       UI.removeLoaderFromElementInnerHTML(resyncBtn);
     });

@@ -72,45 +72,35 @@ router.post("/assign", ensureAuthenticated, async (req, res) => {
 
 router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   const filamentManager = SettingsClean.returnFilamentManagerSettings();
-
   const filament = req.body;
+  const errors = [];
   logger.info("Saving Filament Manager Spool: ", filament);
-  const filamentManagerID = null;
-  console.log(filamentManager);
   if (filamentManager) {
-    const printerList = getPrinterStoreCache().listPrintersInformation();
-    let printer = null;
-
-    for (let newPrinter of printerList) {
-      if (
-        newPrinter.stateColour.category === "Disconnected" ||
-        newPrinter.stateColour.category === "Idle" ||
-        newPrinter.stateColour.category === "Active" ||
-        newPrinter.stateColour.category === "Complete"
-      ) {
-        printer = newPrinter;
-        break;
-      }
+    let printer = findFirstOnlinePrinter();
+    if (!printer && !printer?.printerURL) {
+      errors.push("Unable to update Filament Manager Plugin... No online printer!");
     }
-    const profiles = await Profiles.find({});
-    const findID = _.findIndex(profiles, function (o) {
-      return o.profile.index == filament.spoolsProfile;
-    });
+    const dataProfile = await Profiles.findById(filament.spoolsProfile);
+    if (!dataProfile) {
+      errors.push("Couldn't find matching profile! Please Resync your spools...");
+      res.send({ errors });
+    }
 
     const profile = {
-      vendor: profiles[findID].profile.manufacturer,
-      material: profiles[findID].profile.material,
-      density: profiles[findID].profile.density,
-      diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index
+      vendor: dataProfile.profile.manufacturer,
+      material: dataProfile.profile.material,
+      density: dataProfile.profile.density,
+      diameter: dataProfile.profile.diameter,
+      id: dataProfile.profile.index
     };
+
     const spool = {
       name: filament.spoolsName,
       profile,
-      cost: filament.spoolsPrice,
-      weight: filament.spoolsWeight,
-      used: filament.spoolsUsed,
-      temp_offset: filament.spoolsTempOffset
+      cost: parseFloat(filament.spoolsPrice),
+      weight: parseFloat(filament.spoolsWeight),
+      used: parseFloat(filament.spoolsUsed),
+      temp_offset: parseFloat(filament.spoolsTempOffset)
     };
     logger.info("Updating OctoPrint: ", spool);
     // REFACTOR move to octoprint service
@@ -123,29 +113,40 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       },
       body: JSON.stringify({ spool })
     });
-    await updateFilamentManager.json();
-    const reSync = await filamentManagerReSync("AddSpool");
-    res.send({ res: "success", spools: reSync.newSpools, filamentManager });
+    if (!updateFilamentManager.ok) {
+      errors.push("Unable to create ");
+    }
+    await filamentManagerReSync();
+    res.send({ errors });
   } else {
-    const spools = {
+    const toSaveSpool = {
       name: filament.spoolsName,
       profile: filament.spoolsProfile,
-      price: filament.spoolsPrice,
-      weight: filament.spoolsWeight,
-      used: filament.spoolsUsed,
-      tempOffset: filament.spoolsTempOffset,
-      bedOffset: filament.spoolsBedOffset,
-      fmID: filamentManagerID
+      price: parseFloat(filament.spoolsPrice),
+      weight: parseFloat(filament.spoolsWeight),
+      used: parseFloat(filament.spoolsUsed),
+      tempOffset: parseInt(filament.spoolsTempOffset),
+      bedOffset: parseInt(filament.spoolsBedOffset),
+      fmID: null
     };
-    const newFilament = new Spool({
-      spools
-    });
-    newFilament.save().then(async (e) => {
-      logger.info("New Spool saved successfully: ", newFilament);
-      await filamentManagerReSync();
-      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-      res.send({ res: "success", spools: newFilament, filamentManager });
-    });
+    if (errors.length === 0) {
+      const dataFilament = new Spool({
+        spools: toSaveSpool
+      });
+      dataFilament
+        .save()
+        .catch((e) => {
+          errors.push("Couldn't save spool to OctoFarms database! Please check the logs...");
+          logger.error("Couldn't save spool to OctoFarms database", e);
+        })
+        .finally(async () => {
+          logger.info("New Spool saved successfully: ", dataFilament);
+          TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+          res.send({ errors, dataFilament });
+        });
+    } else {
+      res.send({ errors });
+    }
   }
 });
 router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
@@ -292,13 +293,10 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
 });
 
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const { filamentManager } = serverSettings;
+  const filamentManager = SettingsClean.returnFilamentManagerSettings();
   const newProfile = req.body;
   const errors = [];
   logger.info("Saving Filament Manager Profile: ", newProfile);
-  let toSaveProfile;
-
   if (filamentManager) {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
@@ -306,10 +304,11 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     }
 
     const profile = {
+      index: null,
       vendor: newProfile.manufacturer,
       material: newProfile.material,
-      density: newProfile.density,
-      diameter: newProfile.diameter
+      density: parseFloat(newProfile.density),
+      diameter: parseFloat(newProfile.diameter)
     };
     logger.info("Updating OctoPrint: ", profile);
 
@@ -326,53 +325,40 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     );
 
     if (!updateFilamentManager.ok) {
-      errors.push("Unable to create spool on Plugin... skipping spool creation!");
-    } else {
-      await filamentManagerReSync();
+      errors.push("Unable to create profile on Plugin... skipping spool creation!");
       res.send({ errors });
-      // Nob head plugin developers... no need for this expensive call just to add a profile!
-      // Time to hack that plugin apart and write it with OctoFarm in mind.
-      // const JSONData = await updateFilamentManager.json();
-      // toSaveProfile = {
-      //   index: profilesLength.length + 1,
-      //   manufacturer: JSONData.profile.vendor,
-      //   material: JSONData.profile.material,
-      //   density: JSONData.profile.density,
-      //   diameter: JSONData.profile.diameter
-      // };
     }
+
+    await filamentManagerReSync();
+    res.send({ errors });
   } else {
-    toSaveProfile = {
+    const toSaveProfile = {
       index: null,
       manufacturer: newProfile.manufacturer,
       material: newProfile.material,
       density: newProfile.density,
       diameter: newProfile.diameter
     };
-  }
-
-  if (errors.length === 0) {
-    const dataProfile = new Profiles({
-      profile: toSaveProfile
-    });
-    await dataProfile
-      .save()
-      .catch((e) => {
-        errors.push("Couldn't save to OctoFarms database!");
-        logger.error(e);
-      })
-      .finally(() => {
-        logger.info("New profile saved to database, running filament cleaner");
-        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-        res.send({ errors, dataProfile });
-      });
-  } else {
-    res.send({ errors });
+    if (errors.length === 0) {
+      const dataProfile = new Profiles({ profile: toSaveProfile });
+      await dataProfile
+        .save()
+        .catch((e) => {
+          errors.push("Couldn't save to OctoFarms database! Please check the logs...");
+          logger.error("Couldn't save profile to OctoFarms database", e);
+        })
+        .finally(async () => {
+          logger.info("New profile saved to database, running filament cleaner");
+          TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+          res.send({ errors, dataProfile });
+        });
+    } else {
+      res.send({ errors });
+    }
   }
 });
 router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const { filamentManager } = serverSettings;
+  const filamentManager = SettingsClean.returnFilamentManagerSettings();
   let searchId = req.bodyString("id");
   const newContent = req.body.profile;
   const errors = [];

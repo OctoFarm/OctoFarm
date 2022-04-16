@@ -100,7 +100,7 @@ const filamentStore = [
 ];
 
 async function reRenderPageInformation() {
-  let { statistics, spools } = await OctoFarmClient.getFilamentStatistics();
+  let { statistics } = await OctoFarmClient.getFilamentStatistics();
   pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
   pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
   pageElements.filamentSpoolsActiveTotals.innerHTML = statistics.activeSpoolCount;
@@ -193,6 +193,8 @@ async function reRenderPageInformation() {
   });
 
   pageElements.filamentOverviewList.innerHTML = spoolList;
+
+  jpList.refresh()
 }
 
 // Profile functions
@@ -238,36 +240,13 @@ async function addProfile(manufacturer, material, density, diameter) {
     diameter.value = 1.75;
     await reRenderPageInformation();
     await updateProfileDrop();
-    const { dataProfile: profile } = post;
-    document.getElementById("addProfilesTable").insertAdjacentHTML(
-      "beforebegin",
-      `
-                <tr data-jplist-item>
-                  <th style="display: none;">${profile._id}</th>
-                  <th scope="row"><input class="form-control" type="text" placeholder="${profile.profile.manufacturer}"></th>
-                  <td><input class="form-control" type="text" placeholder="${profile.profile.material}"></td>
-                  <td><input class="form-control" type="text" placeholder="${profile.profile.density}"></p></td>
-                  <td><input class="form-control" type="text" placeholder="${profile.profile.diameter}"></p></td>
-                  <td><button id="edit-${profile._id}" type="button" class="btn btn-sm btn-primary edit">
-                    <i class="fas fa-edit editIcon"></i>
-                  </button>
-                  <button id="save-${profile._id}" type="button" class="btn btn-sm d-none btn-success save">
-                    <i class="fas fa-save saveIcon"></i>
-                  </button>
-                  <button id="delete-${profile._id}" type="button" class="btn btn-sm btn-danger delete">
-                    <i class="fas fa-trash deleteIcon"></i>
-                  </button></td>
-                </tr>
-                `
-    );
-    jplist.refresh();
   } else {
-    printProfileErrors(post.errors)
+    printErrors(post.errors)
   }
 }
 
-function printProfileErrors(errors) {
-  let errorMessage = "There were issues editing your spool: <br>";
+function printErrors(errors) {
+  let errorMessage = "OctoFarm is having issues! Error(s): <br>";
   errors.forEach(error => {
     errorMessage += error + "<br>"
   })
@@ -307,7 +286,7 @@ async function saveProfile(e) {
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
   }else{
-    printProfileErrors(post.errors)
+    printErrors(post.errors)
   }
   jplist.refresh();
 }
@@ -333,7 +312,7 @@ async function deleteProfile(e) {
       await updateProfileDrop();
       UI.createAlert("success", "Successfully deleted your profile!", 3000, "Clicked")
     } else {
-      printProfileErrors(post.errors)
+      printErrors(post.errors)
     }
   }
 }
@@ -391,12 +370,6 @@ async function addSpool(
       },
       "addSpoolsMessage"
     );
-    filamentManager = post.filamentManager;
-
-    let multiple = "";
-    if (!filamentManager) {
-      multiple = "multiple=true";
-    }
 
     spoolsName.value = "";
     spoolsPrice.value = "";
@@ -404,63 +377,12 @@ async function addSpool(
     spoolsUsed.value = 0;
     spoolsTempOffset.value = 0.0;
     spoolsBedOffset.value = 0;
-    post = post.spools;
-    document.getElementById("addSpoolsTable").insertAdjacentHTML(
-      "afterbegin",
-      `
-                <tr data-jplist-item>
-                  <th style="display: none;">${post?._id}</th>
-                  <th scope="row"><input class="form-control" type="text" placeholder="${post?.spools?.name}"></th>
-                  <td>
-                       <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
-                       <select id="spoolsProfile-${post?._id}" class="form-control" disabled>
-
-                       </select>
-                   </td>
-                  <td><input class="form-control" type="text" step="0.01" placeholder="${post?.spools?.price}" disabled></td>
-                  <td><input class="form-control" type="text" placeholder="${post?.spools?.weight}" disabled></td>
-                  <td><input class="form-control" type="text" placeholder="${post?.spools?.used}"></td>
-                  <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
-                  <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
-                   <td>
-                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" disabled="true" ${multiple} disabled>
-
-                       </select>
-                   </td>
-                  <td>
-                  <button title="Clone Spool" id="clone-${post?._id}" type="button" class="btn btn-sm btn-success clone">
-                      <i class="far fa-copy"></i>
-                  </button>
-                  <button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
-                    <i class="fas fa-edit editIcon"></i>
-                  </button>
-                  <button id="save-${post?._id}" type="button" class="btn btn-sm d-none btn-success save">
-                    <i class="fas fa-save saveIcon"></i>
-                  </button>
-                  <button id="delete-${post?._id}" type="button" class="btn btn-sm btn-danger delete">
-                    <i class="fas fa-trash deleteIcon"></i>
-                  </button></td>
-                </tr>
-                `
-    );
     await reRenderPageInformation();
     await updatePrinterDrops();
     await updateProfileDrop();
     return true;
   } else {
-    const errorMessage = "";
-    post.errors.forEach(error => {
-
-    })
-
-    UI.createMessage(
-      {
-        type: "error",
-        msg: "Could not add roll to database... is it alive?"
-      },
-      "addSpoolsMessage"
-    );
-    return false;
+    printErrors(post.errors)
   }
 }
 
@@ -608,9 +530,8 @@ async function saveSpool(e) {
 async function updateProfileDrop() {
   // Update filament selection profile drop
   const spoolsProfile = document.getElementById("spoolsProfile");
-  let profiles = await OctoFarmClient.get("filament/get/profile");
-  let fill = await OctoFarmClient.get("filament/get/filament");
-  let profile = await OctoFarmClient.get("filament/get/profile");
+  const profiles = await OctoFarmClient.get("filament/get/profile");
+  const fill = await OctoFarmClient.get("filament/get/filament");
   if (!!profiles) {
     spoolsProfile.innerHTML = "";
     profiles.profiles.forEach((profile) => {
@@ -639,12 +560,12 @@ async function updateProfileDrop() {
     });
     const spoolID = drop?.id.split("-");
     const spool = _.findIndex(fill?.Spool, function (o) {
-      return o?._id == spoolID[1];
+      return o?._id === spoolID[1];
     });
     if (typeof fill?.Spool[spool] !== "undefined") {
       drop.value = fill?.Spool[spool].profile;
       const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id == fill?.Spool[spool].profile;
+        return o._id === fill?.Spool[spool].profile;
       });
       drop.className = `form-control ${profiles?.profiles[profileID]?.material.replace(/ /g, "_")}`;
       spoolsMaterialText[index].innerHTML = `${profiles?.profiles[profileID]?.material}`;
@@ -654,11 +575,11 @@ async function updateProfileDrop() {
   spoolsListManufacture.forEach((text) => {
     const spoolID = text.id.split("-");
     const spool = _.findIndex(fill?.Spool, function (o) {
-      return o._id == spoolID[1];
+      return o._id === spoolID[1];
     });
     if (typeof fill?.Spool[spool] !== "undefined") {
       const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id == fill?.Spool[spool]?.profile;
+        return o._id === fill?.Spool[spool]?.profile;
       });
       text.innerHTML = `${profiles?.profiles[profileID]?.manufacturer}`;
     }
@@ -666,11 +587,11 @@ async function updateProfileDrop() {
   printerListMaterials.forEach((text) => {
     const spoolID = text.id.split("-");
     const spool = _.findIndex(fill?.Spool, function (o) {
-      return o._id == spoolID[1];
+      return o._id === spoolID[1];
     });
     if (typeof fill?.Spool[spool] !== "undefined") {
       const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id == fill?.Spool[spool]?.profile;
+        return o._id === fill?.Spool[spool]?.profile;
       });
       text.innerHTML = `${profiles?.profiles[profileID]?.material}`;
     }
