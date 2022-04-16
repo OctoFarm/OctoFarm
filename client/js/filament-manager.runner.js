@@ -15,7 +15,8 @@ const pageElements = {
   filamentOverviewList: document.getElementById("filamentOverviewList")
 };
 
-let filamentManager = false;
+let filamentManagerSettings = false;
+
 const filamentStore = [
   {
     code: "pla",
@@ -100,7 +101,9 @@ const filamentStore = [
 ];
 
 async function reRenderPageInformation() {
-  let { statistics } = await OctoFarmClient.getFilamentStatistics();
+  const { statistics } = await OctoFarmClient.getFilamentStatistics();
+  const { profiles } = await OctoFarmClient.getFilamentProfiles();
+  const { spools } = await OctoFarmClient.getFilamentSpools();
   pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
   pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
   pageElements.filamentSpoolsActiveTotals.innerHTML = statistics.activeSpoolCount;
@@ -176,6 +179,7 @@ async function reRenderPageInformation() {
   spools.forEach((spool) => {
     spoolList += `
                 <tr>
+                WHERE IS THIS
                     <th style="display: none;"> </th>
                     <th><i class="fas fa-toilet-paper"></i></th>
                     <th scope="row">${spool.name}</th>
@@ -530,11 +534,11 @@ async function saveSpool(e) {
 async function updateProfileDrop() {
   // Update filament selection profile drop
   const spoolsProfile = document.getElementById("spoolsProfile");
-  const profiles = await OctoFarmClient.get("filament/get/profile");
-  const fill = await OctoFarmClient.get("filament/get/filament");
+  const { profiles } = await OctoFarmClient.getFilamentProfiles()
+  const  { spools }  = await OctoFarmClient.getFilamentSpools()
   if (!!profiles) {
     spoolsProfile.innerHTML = "";
-    profiles.profiles.forEach((profile) => {
+    profiles.forEach((profile) => {
       let profileID = null;
       profileID = profile?._id;
       spoolsProfile.insertAdjacentHTML(
@@ -552,48 +556,48 @@ async function updateProfileDrop() {
   const spoolsMaterialText = document.querySelectorAll("[id^='spoolsMaterialText-']");
   printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
-    profiles?.profiles.forEach((prof) => {
+    profiles.forEach((prof) => {
       drop.insertAdjacentHTML(
         "beforeend",
         `<option value="${prof?._id}">${prof?.manufacturer} (${prof?.material})</option>`
       );
     });
     const spoolID = drop?.id.split("-");
-    const spool = _.findIndex(fill?.Spool, function (o) {
+    const spool = _.findIndex(spools, function (o) {
       return o?._id === spoolID[1];
     });
-    if (typeof fill?.Spool[spool] !== "undefined") {
-      drop.value = fill?.Spool[spool].profile;
-      const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id === fill?.Spool[spool].profile;
+    if (typeof spools[spool] !== "undefined") {
+      drop.value = spools[spool].profile;
+      const profileID = _.findIndex(profiles, function (o) {
+        return o._id === spools[spool].profile;
       });
-      drop.className = `form-control ${profiles?.profiles[profileID]?.material.replace(/ /g, "_")}`;
-      spoolsMaterialText[index].innerHTML = `${profiles?.profiles[profileID]?.material}`;
+      drop.className = `form-control ${profiles[profileID]?.material.replace(/ /g, "_")}`;
+      spoolsMaterialText[index].innerHTML = `${profiles[profileID]?.material}`;
     }
   });
   //Fix for not updating main spool list with correct information, not skipping fo shizzle
   spoolsListManufacture.forEach((text) => {
     const spoolID = text.id.split("-");
-    const spool = _.findIndex(fill?.Spool, function (o) {
+    const spool = _.findIndex(spools, function (o) {
       return o._id === spoolID[1];
     });
-    if (typeof fill?.Spool[spool] !== "undefined") {
-      const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id === fill?.Spool[spool]?.profile;
+    if (typeof spools[spool] !== "undefined") {
+      const profileID = _.findIndex(profiles, function (o) {
+        return o._id === spools[spool]?.profile;
       });
-      text.innerHTML = `${profiles?.profiles[profileID]?.manufacturer}`;
+      text.innerHTML = `${profiles[profileID]?.manufacturer}`;
     }
   });
   printerListMaterials.forEach((text) => {
     const spoolID = text.id.split("-");
-    const spool = _.findIndex(fill?.Spool, function (o) {
+    const spool = _.findIndex(spools, function (o) {
       return o._id === spoolID[1];
     });
-    if (typeof fill?.Spool[spool] !== "undefined") {
+    if (typeof spools[spool] !== "undefined") {
       const profileID = _.findIndex(profiles?.profiles, function (o) {
-        return o._id === fill?.Spool[spool]?.profile;
+        return o._id === spools[spool]?.profile;
       });
-      text.innerHTML = `${profiles?.profiles[profileID]?.material}`;
+      text.innerHTML = `${profiles[profileID]?.material}`;
     }
   });
 }
@@ -633,8 +637,8 @@ async function updatePrinterDrops() {
 
     const selectedValues = [];
 
-    if (typeof filament.Spool[spool] !== "undefined") {
-      filament?.Spool[spool]?.printerAssignment.forEach((printer) => {
+    if (typeof filament[spool] !== "undefined") {
+      filament[spool]?.printerAssignment.forEach((printer) => {
         selectedValues.push(`${printer?.id}-${printer?.tool}`);
       });
     }
@@ -649,12 +653,12 @@ async function updatePrinterDrops() {
     text.innerHTML = "";
     const split = text.id.split("-");
     const spoolID = split[1];
-    const spool = _.findIndex(filament?.Spool, function (o) {
+    const spoolIndex = _.findIndex(spool, function (o) {
       return o?._id == spoolID;
     });
-    if (typeof filament?.Spool[spool] !== "undefined") {
-      if (filament?.Spool[spool]?.printerAssignment.length > 0) {
-        filament?.Spool[spool]?.printerAssignment.forEach((printer) => {
+    if (typeof filament[spoolIndex] !== "undefined") {
+      if (filament[spoolIndex]?.printerAssignment.length > 0) {
+        filament[spoolIndex]?.printerAssignment.forEach((printer) => {
           text.innerHTML +=
             "<small>" + printer.name + ": Tool" + printer.tool + "<br>" + "</small>";
         });

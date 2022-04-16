@@ -39,12 +39,8 @@ router.get("/get/printerList", ensureAuthenticated, (req, res) => {
 });
 router.get("/get/statistics", ensureAuthenticated, async (req, res) => {
   const statistics = FilamentClean.getStatistics();
-  const spools = FilamentClean.getSpools();
-  const profiles = FilamentClean.getProfiles();
   res.send({
-    statistics,
-    spools,
-    profiles
+    statistics
   });
 });
 router.get("/get/profile", ensureAuthenticated, (req, res) => {
@@ -53,7 +49,7 @@ router.get("/get/profile", ensureAuthenticated, (req, res) => {
 });
 router.get("/get/filament", ensureAuthenticated, (req, res) => {
   const spools = FilamentClean.getSpools();
-  res.send({ Spool: spools });
+  res.send({ spools });
 });
 router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
   const selected = FilamentClean.getDropDown();

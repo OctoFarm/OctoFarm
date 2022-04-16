@@ -80,6 +80,8 @@ export default class OctoFarmClient {
   static serverSettingsRoute = "/settings/server";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
+  static filamentProfiles = `${this.filamentRoute}/get/profile`;
+  static filamentSpools = `${this.filamentRoute}/get/filament`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
   static userRoute = `/users/users`;
@@ -198,6 +200,14 @@ export default class OctoFarmClient {
 
   static async getFilamentStatistics() {
     return this.get(this.filamentStatistics);
+  }
+
+  static async getFilamentSpools(){
+    return this.get(this.filamentSpools)
+  }
+
+  static async getFilamentProfiles(){
+    return this.get(this.filamentProfiles)
   }
 
   static async updateServerSettings(settingsObject) {
