@@ -55,13 +55,13 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   if (currentSettings === null) {
     if (plugins["psucontrol"]) {
       return {
-        powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+        powerOnCommand: JSON.stringify({ command: "turnPSUOn" }),
         powerOnURL: "[PrinterURL]/api/plugin/control",
-        powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+        powerOffCommand: JSON.stringify({ command: "turnPSUOff" }),
         powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerToggleCommand: "{\"command\":\"togglePSU\"}",
+        powerToggleCommand: JSON.stringify({ command: "togglePSU" }),
         powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerStatusCommand: "{\"command\":\"getPSUState\"}",
+        powerStatusCommand: JSON.stringify({ command: "getPSUState" }),
         powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
         wol: {
           enabled: false,
@@ -121,15 +121,17 @@ const capturePluginManagerData = (id, type, data) => {
 
 const captureResultsData = (id, data) => {
   const { action, result, needs_restart } = data;
-  if (needs_restart) {
+
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    restartRequired: false
+  });
+
+  if (needs_restart === true) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       restartRequired: true
     });
-  } else {
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      restartRequired: false
-    });
   }
+
   const message = `Action: ${action} has ${
     result ? "successfully completed" : "failed to complete"
   } | Restart Required: ${needs_restart}`;

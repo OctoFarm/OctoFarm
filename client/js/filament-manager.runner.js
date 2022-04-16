@@ -301,7 +301,6 @@ async function saveProfile(e) {
     profile
   };
   let post = await OctoFarmClient.post("filament/edit/profile", data);
-  console.log(post)
   if (post && post.errors.length === 0) {
     await reRenderPageInformation();
     await updateProfileDrop();
