@@ -1178,8 +1178,8 @@ class OctoPrintPrinter {
         }
         if (this.settingsAppearance.name.length === 0) {
           this.settingsAppearance.name = PrinterClean.grabPrinterName(
-              appearance.name,
-              this.printerURL
+            appearance.name,
+            this.printerURL
           );
         }
       }
@@ -1389,7 +1389,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintFileData(fullPath, generate = false) {
+  async acquireOctoPrintFileData(fullPath) {
     const filesCheck = await this.#api.getFile(fullPath, true).catch((e) => {
       logger.http("Failed Aquire file data", e);
       return false;
@@ -1678,6 +1678,18 @@ class OctoPrintPrinter {
     return this.#db.delete();
   }
 
+  async secondaryFileInformationUpdate(fullPath) {
+    const fileInformation = await this.acquireOctoPrintFileData(fullPath);
+    const fileIndex = findIndex(this.fileList.fileList, function (o) {
+      return o.fullPath === fullPath;
+    });
+    if (fileIndex > -1 && !!fileInformation) {
+      this.notifySubscribersOfFileInformationChange(fullPath, fileIndex, {
+        printerURL: this.printerURL
+      });
+    }
+  }
+
   async updateFileInformation(data) {
     const { result, path: fullPath } = data;
     const fileIndex = findIndex(this.fileList.fileList, function (o) {
@@ -1702,17 +1714,26 @@ class OctoPrintPrinter {
 
       this.#db.update({ fileList: this.fileList });
 
-      notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
-        key: "fileInformationUpdated",
-        value: FileClean.generateSingle(
-          JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
-          this.selectedFilament,
-          this.costSettings
-        )
-      });
+      this.notifySubscribersOfFileInformationChange(fullPath, fileIndex);
+      //Grab api once more after this for full update of file... including thumbnail
+      setTimeout(async () => {
+        await this.secondaryFileInformationUpdate(fullPath);
+      }, 2000);
     } else {
       logger.error("updateFileInformation: Couldn't find file index to update!", fullPath);
     }
+  }
+
+  notifySubscribersOfFileInformationChange(fullPath, fileIndex, additionalInformation = undefined){
+    notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
+      key: "fileInformationUpdated",
+      value: FileClean.generateSingle(
+          JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
+          this.selectedFilament,
+          this.costSettings
+      ),
+      additionalInformation
+    });
   }
 
   updatePrinterStatistics(statistics) {
