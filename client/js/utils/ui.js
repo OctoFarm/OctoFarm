@@ -296,11 +296,11 @@ export default class UI {
     if (e.target.innerHTML.includes("running")) {
       e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disable";
       e.target.title = "Printer is Disabled, click to enable";
-      printerCard.classList = "printerDisabled";
+      printerCard.classList = "";
     } else if (e.target.innerHTML.includes("wheelchair")) {
       e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enable";
       e.target.title = "Printer is Enabled, click to disable";
-      printerCard.classList = "";
+      printerCard.classList = "printerDisabled";
     }
   }
 
