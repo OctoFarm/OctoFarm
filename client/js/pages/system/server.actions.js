@@ -347,8 +347,6 @@ async function checkFilamentManagerPluginState() {
 async function updateServerSettings() {
   const opts = {
     server: {
-      // Deprecated Port
-      port: parseInt(settingsElements.server.port.value),
       loginRequired: settingsElements.server.loginRequired.checked,
       registration: settingsElements.server.registration.checked,
     },

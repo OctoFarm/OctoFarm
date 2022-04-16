@@ -95,7 +95,6 @@ router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, as
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.paramString("name");
   const file = `${getLogsPath()}/${download}`;
-  console.log(file);
   res.download(file, download); // Set disposition and send it.
 });
 router.post(
