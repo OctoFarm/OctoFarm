@@ -526,74 +526,20 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     return res.send({ errors, warnings });
   }
 
-  let spools = await fetch(`${onlinePrinterList[0].printerURL}/plugin/filamentmanager/spools`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": onlinePrinterList[0].apikey
-    }
-  });
-  let profiles = await fetch(`${onlinePrinterList[0].printerURL}/plugin/filamentmanager/profiles`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": onlinePrinterList[0].apikey
-    }
-  });
-  // Make sure filament manager responds...
-  if (spools.status !== 200 || profiles.status !== 200) {
-    logger.info(
-      "Couldn't grab something: Profiles Status:" +
-        profiles.status +
-        " Spools Status: " +
-        spools.status
-    );
-    errors.push({
-      msg:
-        "Couldn't grab something: Profiles Status:" +
-        profiles.status +
-        " Spools Status: " +
-        spools.status
-    });
-    // Again early bail out, cannot continue without spools/profiles
-    return res.send({ errors, warnings });
-  }
-
   await Spool.deleteMany({});
   await Profiles.deleteMany({});
-  spools = await spools.json();
-  profiles = await profiles.json();
 
-  spools.spools.forEach((sp) => {
-    logger.info("Saving Spool: ", sp);
-    const newSpool = {
-      name: sp.name,
-      profile: sp.profile.id,
-      price: sp.cost,
-      weight: sp.weight,
-      used: sp.used,
-      tempOffset: sp.temp_offset,
-      fmID: sp.id
-    };
-    const newS = new Spool({
-      newSpool
+  const { success, newSpools, newProfiles, errors: SyncErrors } = await filamentManagerReSync();
+
+  if (SyncErrors.length > 0) {
+    SyncErrors.forEach((e) => {
+      errors.push(e);
     });
-    newS.save();
-  });
-  profiles.profiles.forEach((sp) => {
-    logger.info("Saving Profile: ", sp);
-    const profile = {
-      index: sp.id,
-      density: sp.density,
-      diameter: sp.diameter,
-      manufacturer: sp.vendor,
-      material: sp.material
-    };
-    const newP = new Profiles({
-      profile
-    });
-    newP.save();
-  });
+  }
+
+  if (errors.length > 0) {
+    res.send({ errors });
+  }
 
   const serverSettings = await ServerSettings.find({});
   serverSettings[0].filamentManager = true;
@@ -608,8 +554,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   return res.send({
     errors,
     warnings,
-    spoolCount: spools.spools.length,
-    profileCount: profiles.profiles.length
+    spoolCount: newSpools.length,
+    profileCount: newProfiles.length
   });
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {

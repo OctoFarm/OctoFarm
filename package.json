@@ -16,12 +16,18 @@
     "dev-client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
     "setup-dev": "npm run install-server && npm run install-client",
-    "setup-alpha": "cd server && npm run start-alpha",
+    "setup-alpha": "cd server && npm run st art-alpha",
     "update-alpha": "git pull && npm run setup-alpha && pm2 restart OctoFarm-Testing",
     "update-main":  "git pull && npm run install-server && pm2 restart OctoFarm"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/OctoFarm/OctoFarm"
+  },
+  "pkg": {
+    "scripts": ["package.json", "../.env"],
+    "assets": ["../.env","server/views/**/*", "node_modules/**/*", "server/utis/bg_default.jpg", "routes/fallbacks/**/*"],
+    "targets": [ "node14-linux-arm64" ],
+    "outputPath": "dist"
   }
 }
