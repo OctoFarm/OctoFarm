@@ -1,5 +1,9 @@
 import Calc from "../../utils/calc";
 
+const getSpinnerElement = () => {
+    return "<i class=\"fa-solid fa-circle-notch fa-spin\"></i>"
+}
+
 export const getFolderTemplate = (folder, id) => {
   return `
     <a
@@ -46,9 +50,14 @@ export const getFolderTemplate = (folder, id) => {
 
 export const getFileTemplate = (file, printerURL, id) => {
   let toolInfo = "";
-  file.toolUnits.forEach((unit, index) => {
-    toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-  });
+  if(file.toolUnits.length === 0){
+      toolInfo = getSpinnerElement();
+  }else{
+      file.toolUnits.forEach((unit, index) => {
+          toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+      });
+  }
+
   let thumbnail =
     "<span class=\"text-center\"><i class=\"fas fa-file-code fa-2x\"></i></span>";
   if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
@@ -112,7 +121,7 @@ export const getFileTemplate = (file, printerURL, id) => {
   }</span><span id="fileDate-${file.fullPath}"> ${dateString} ${timeString}</span><br>
                 <span class="size" id="fileSize-${
                   file.fullPath
-                }">${Calc.bytes(file.fileSize)}</span> <br>
+                }">${!!file?.fileSize ? Calc.bytes(file.fileSize) : getSpinnerElement()}</span> <br>
             <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
               file.fullPath
             }"> ${toolInfo} </span>
