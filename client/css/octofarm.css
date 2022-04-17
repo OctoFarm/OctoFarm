@@ -306,8 +306,6 @@ a.notyet {
 }
 .printerDisabled {
   border-left: #e74c3c 4px solid;
-  background-color: transparent;
-  opacity: 0.8;
 }
 .printerEnabled {
   border-left: green 4px solid;
