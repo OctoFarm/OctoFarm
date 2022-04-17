@@ -75,6 +75,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
+      res.send({ errors });
     }
     const dataProfile = await Profiles.findById(filament.spoolsProfile);
     if (!dataProfile) {
@@ -146,146 +147,123 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   }
 });
 router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const { filamentManager } = serverSettings;
-
+  const filamentManager = SettingsClean.returnFilamentManagerSettings();
+  const errors = [];
   let searchId = req.bodyString("id");
-  logger.info("Deleting Filament Manager Profile: ", searchId);
+  logger.info("Deleting Filament Manager Spool: ", searchId);
 
   const isSpoolAttached = checkIfSpoolAttachedToPrinter(searchId);
-
-  if (isSpoolAttached) return res.send({ spool: false });
+  if (isSpoolAttached) {
+    errors.push("Your spool is attached to a printer, your need to de-attach the spool first!");
+    res.send({ errors });
+  }
 
   if (filamentManager) {
-    let printer = null;
-    for (let newPrinter of printerList) {
-      if (
-        newPrinter.stateColour.category === "Disconnected" ||
-        newPrinter.stateColour.category === "Idle" ||
-        newPrinter.stateColour.category === "Active" ||
-        newPrinter.stateColour.category === "Complete"
-      ) {
-        printer = newPrinter;
-        break;
-      }
+    let printer = findFirstOnlinePrinter();
+    if (!printer && !printer?.printerURL) {
+      errors.push("Unable to update Filament Manager Plugin... No online printer!");
+      res.send({ errors });
     }
     searchId = await Spool.findById(searchId);
     logger.info("Updating Octoprint to remove: ", searchId);
     const url = `${printer.printerURL}/plugin/filamentmanager/spools/${searchId.spools.fmID}`;
-    await fetch(url, {
+    const deletedSpool = await fetch(url, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": printer.apikey
       }
     });
-
-    const rel = await Spool.deleteOne({ _id: searchId }).exec();
-    logger.info("Successfully deleted: ", searchId);
-    rel.status = 200;
-    Spool.find({}).then((spools) => {
-      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-      res.send({ spool: spools });
-    });
-  } else {
-    const rel = await Spool.deleteOne({ _id: searchId }).exec();
-    logger.info("Successfully deleted: ", searchId);
-    rel.status = 200;
-    Spool.find({}).then((spools) => {
-      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-      res.send({ spool: spools });
-    });
+    if (!deletedSpool.ok) {
+      errors.push("Unable to update client with deletion! Try Resyncing...");
+      res.send({ errors });
+    }
   }
+  await Spool.deleteOne({ _id: searchId })
+    .catch((e) => {
+      logger.error("Unable to delete spool... please resync!", e);
+      errors.push("Unable to delete spool... please resync!");
+    })
+    .finally(() => {
+      logger.info("Spool deleted successfully");
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+      return res.send({ errors });
+    });
 });
 router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
   const filamentManager = await SettingsClean.returnFilamentManagerSettings();
   const searchId = req.bodyString("id");
-  logger.info("Request to update spool id: ", searchId);
-  logger.info("New details: ", req.body.spool);
+  const errors = [];
   const newContent = req.body.spool;
-  const spools = await Spool.findById(searchId);
+  const oldSpoolData = await Spool.findById(searchId);
+
+  logger.info("New details: ", req.body.spool);
   if (filamentManager) {
-    const printerList = getPrinterStoreCache().listPrintersInformation();
-    let printer = null;
-    for (let newPrinter of printerList) {
-      if (
-        newPrinter.stateColour.category === "Disconnected" ||
-        newPrinter.stateColour.category === "Idle" ||
-        newPrinter.stateColour.category === "Active" ||
-        newPrinter.stateColour.category === "Complete"
-      ) {
-        printer = newPrinter;
-        break;
-      }
+    let printer = findFirstOnlinePrinter();
+    if (!printer && !printer?.printerURL) {
+      errors.push("Unable to update Filament Manager Plugin... No online printer!");
+      res.send({ errors });
     }
-    const filamentManagerID = newContent[5];
-    const profiles = await Profiles.find({});
-    const findID = _.findIndex(profiles, function (o) {
-      return o.profile.index == filamentManagerID;
-    });
+
+    const dataProfile = await Profiles.findById(oldSpoolData.profile);
+    if (!dataProfile) {
+      errors.push("Couldn't find matching profile! Please Resync your spools...");
+      res.send({ errors });
+    }
 
     const profile = {
-      vendor: profiles[findID].profile.manufacturer,
-      material: profiles[findID].profile.material,
-      density: profiles[findID].profile.density,
-      diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index
+      vendor: dataProfile.profile.manufacturer,
+      material: dataProfile.profile.material,
+      density: parseFloat(dataProfile.profile.density),
+      diameter: parseFloat(dataProfile.profile.diameter),
+      id: dataProfile.profile.index
     };
-    const spool = {
+
+    const newSpool = {
       name: newContent[0],
       profile,
-      cost: newContent[1],
-      weight: newContent[2],
-      used: newContent[3],
-      temp_offset: newContent[4]
+      cost: parseFloat(newContent[1]),
+      weight: parseFloat(newContent[2]),
+      used: parseFloat(newContent[3]),
+      temp_offset: parseFloat(newContent[4])
     };
-    logger.info("Updating OctoPrint: ", spool);
-    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
+    logger.info("Updating OctoPrint: ", newSpool);
+    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${oldSpoolData.spools.fmID}`;
     await fetch(url, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ spool })
+      body: JSON.stringify({ spool: newSpool })
     });
+    if (!updateFilamentManager.ok) {
+      errors.push("Unable to create profile on Plugin... skipping spool creation!");
+      res.send({ errors });
+    }
   }
-  if (spools.spools.name != newContent[0]) {
-    spools.spools.name = newContent[0];
-    spools.markModified("spools");
-  }
-  if (spools.spools.profile != newContent[6]) {
-    spools.spools.profile = newContent[6];
-    spools.markModified("spools");
-  }
-  if (spools.spools.price != newContent[1]) {
-    spools.spools.price = newContent[1];
-    spools.markModified("spools");
-  }
-  if (spools.spools.weight != newContent[2]) {
-    spools.spools.weight = newContent[2];
-    spools.markModified("spools");
-  }
-  if (spools.spools.used != newContent[3]) {
-    spools.spools.used = newContent[3];
-    spools.markModified("spools");
-  }
-  if (spools.spools.tempOffset != newContent[4]) {
-    spools.spools.tempOffset = newContent[4];
-    spools.markModified("spools");
-  }
-  if (spools.spools.bedOffset != newContent[5]) {
-    spools.spools.bedOffset = newContent[5];
-    spools.markModified("spools");
-  }
-  await spools.save();
 
-  Spool.find({}).then((newSpool) => {
-    logger.info("New spool details saved: ", req.body.spool);
-    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+  oldSpoolData.spools.name = newContent[0];
+  oldSpoolData.spools.profile = newContent[6];
+  oldSpoolData.spools.price = parseFloat(newContent[1]);
+  oldSpoolData.spools.weight = parseFloat(newContent[2]);
+  oldSpoolData.spools.used = parseFloat(newContent[3]);
+  oldSpoolData.spools.tempOffset = parseInt(newContent[4]);
+  oldSpoolData.spools.bedOffset = parseInt(newContent[5]);
 
-    res.send({ newSpool });
-  });
+  oldSpoolData.markModified("spools");
+
+  await oldSpoolData
+    .save()
+    .catch((e) => {
+      errors.push("Couldn't save to OctoFarms database!");
+      logger.error(e);
+    })
+    .finally(() => {
+      logger.info("Updated spool saved to database, running filament cleaner");
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+      res.send({ errors });
+    });
 });
 
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {
@@ -332,25 +310,22 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       index: null,
       manufacturer: newProfile.manufacturer,
       material: newProfile.material,
-      density: newProfile.density,
-      diameter: newProfile.diameter
+      density: parseFloat(newProfile.density),
+      diameter: parseFloat(newProfile.diameter)
     };
-    if (errors.length === 0) {
-      const dataProfile = new Profiles({ profile: toSaveProfile });
-      await dataProfile
-        .save()
-        .catch((e) => {
-          errors.push("Couldn't save to OctoFarms database! Please check the logs...");
-          logger.error("Couldn't save profile to OctoFarms database", e);
-        })
-        .finally(async () => {
-          logger.info("New profile saved to database, running filament cleaner");
-          TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-          res.send({ errors, dataProfile });
-        });
-    } else {
-      res.send({ errors });
-    }
+
+    const dataProfile = new Profiles({ profile: toSaveProfile });
+    await dataProfile
+      .save()
+      .catch((e) => {
+        errors.push("Couldn't save to OctoFarms database! Please check the logs...");
+        logger.error("Couldn't save profile to OctoFarms database", e);
+      })
+      .finally(async () => {
+        logger.info("New profile saved to database, running filament cleaner");
+        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+        res.send({ errors });
+      });
   }
 });
 router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
@@ -358,6 +333,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   let searchId = req.bodyString("id");
   const newContent = req.body.profile;
   const errors = [];
+
   const oldProfileData = await Profiles.findById(searchId);
 
   logger.info("Profile Edit Request: ", newContent);
@@ -365,13 +341,14 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
+      res.send({ errors });
     }
 
     const newProfile = {
       vendor: newContent[0],
       material: newContent[1],
-      density: newContent[2],
-      diameter: newContent[3]
+      density: parseFloat(newContent[2]),
+      diameter: parseFloat(newContent[3])
     };
     logger.info("Updating OctoPrint: ", newProfile);
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${oldProfileData.profile.index}`;
@@ -385,30 +362,27 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     });
 
     if (!updateFilamentManager.ok) {
-      errors.push("Unable to create spool on Plugin... skipping spool creation!");
+      errors.push("Unable to create profile on Plugin... skipping spool creation!");
+      res.send({ errors });
     }
   }
 
   oldProfileData.profile.manufacturer = newContent[0];
   oldProfileData.profile.material = newContent[1];
-  oldProfileData.profile.density = newContent[2];
-  oldProfileData.profile.diameter = newContent[3];
+  oldProfileData.profile.density = parseFloat(newContent[2]);
+  oldProfileData.profile.diameter = parseFloat(newContent[3]);
   oldProfileData.markModified("profile");
-  if (errors.length === 0) {
-    await oldProfileData
-      .save()
-      .catch((e) => {
-        errors.push("Couldn't save to OctoFarms database!");
-        logger.error(e);
-      })
-      .finally(() => {
-        logger.info("New profile saved to database, running filament cleaner");
-        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-        res.send({ errors });
-      });
-  } else {
-    res.send({ errors });
-  }
+  await oldProfileData
+    .save()
+    .catch((e) => {
+      errors.push("Couldn't save to OctoFarms database!");
+      logger.error(e);
+    })
+    .finally(() => {
+      logger.info("Updated profile saved to database, running filament cleaner");
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+      res.send({ errors });
+    });
 });
 router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
   const filamentManager = SettingsClean.returnFilamentManagerSettings();
@@ -421,15 +395,17 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
   const isProfileAttached = await checkIfProfileAttachedToSpool(searchId);
 
   if (isProfileAttached) {
-    errors.push("Your profile is attached to a spool! You need to delete the spool first...");
+    errors.push("Your profile is attached to a spool! You need to delete the spool(s) first...");
+    res.send({ errors });
   }
 
   if (filamentManager) {
-    const oldProfileData = await Profiles.findById(searchId);
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
+      res.send({ errors });
     }
+    const oldProfileData = await Profiles.findById(searchId);
     logger.info("Updating OctoPrint: ", searchId);
     // REFACTOR move to api service
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${oldProfileData.profile.index}`;
@@ -442,22 +418,19 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     });
     if (!deleteProfile.ok) {
       errors.push("Unable to update client with deletion! Try Resyncing...");
+      res.send({ errors });
     }
   }
-  if (errors.length === 0) {
-    await Profiles.deleteOne({ _id: searchId })
-      .catch((e) => {
-        logger.error("Unable to delete profile... please resync!", e);
-        errors.push("Unable to delete profile... please resync!");
-      })
-      .finally(() => {
-        logger.info("Profile deleted successfully");
-        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-        return res.send({ errors });
-      });
-  } else {
-    return res.send({ errors });
-  }
+  await Profiles.deleteOne({ _id: searchId })
+    .catch((e) => {
+      logger.error("Unable to delete profile... please resync!", e);
+      errors.push("Unable to delete profile... please resync!");
+    })
+    .finally(() => {
+      logger.info("Profile deleted successfully");
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+      return res.send({ errors });
+    });
 });
 
 router.post(
@@ -525,7 +498,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   await Spool.deleteMany({});
   await Profiles.deleteMany({});
 
-  const { success, newSpools, newProfiles, errors: SyncErrors } = await filamentManagerReSync();
+  const { newSpools, newProfiles, errors: SyncErrors } = await filamentManagerReSync();
 
   if (SyncErrors.length > 0) {
     SyncErrors.forEach((e) => {
@@ -540,9 +513,11 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   const serverSettings = await ServerSettings.find({});
   serverSettings[0].filamentManager = true;
   serverSettings[0].filament.filamentCheck = true;
+  serverSettings[0].filament.allowMultiSelect = false;
   await FilamentClean.start(serverSettings[0].filamentManager);
   serverSettings[0].markModified("filamentManager");
   serverSettings[0].markModified("filament.filamentCheck");
+  serverSettings[0].markModified("filament.allowMultiSelect");
   serverSettings[0].save();
   await SettingsClean.start();
 

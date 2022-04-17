@@ -2,7 +2,7 @@ import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./utils/calc.js";
 import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
-import {createFilamentSelector} from "./services/filament-manager-plugin.service";
+import {createFilamentSelector} from "./services/octoprint/filament-manager-plugin.service";
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 import {allowedFileTypes} from "./constants/file-types.constants"
 

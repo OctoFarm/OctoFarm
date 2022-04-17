@@ -11,7 +11,7 @@ import {
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn,
-} from "../../services/filament-manager-plugin.service";
+} from "../../services/octoprint/filament-manager-plugin.service";
 import {
   filamentManagerPluginActionElements,
   returnSaveBtn,
@@ -336,7 +336,8 @@ async function restartOctoFarmServer() {
 }
 
 async function checkFilamentManagerPluginState() {
-  if (await isFilamentManagerPluginSyncEnabled()) {
+  const { filamentManagerEnabled } = await isFilamentManagerPluginSyncEnabled()
+  if (filamentManagerEnabled) {
     setupFilamentManagerReSyncBtn();
     setupFilamentManagerDisableBtn();
   } else {
@@ -360,6 +361,7 @@ async function updateServerSettings() {
       hideEmpty: settingsElements.filament.hideEmpty.checked,
       downDateFailed: settingsElements.filament.downDateFailed.checked,
       downDateSuccess: settingsElements.filament.downDateSuccess.checked,
+      allowMultiSelect: settingsElements.filament.allowMultiSelect.checked
     },
     history: {
       snapshot: {

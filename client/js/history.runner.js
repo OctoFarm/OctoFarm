@@ -1,6 +1,6 @@
 import Calc from "./utils/calc.js";
 import UI from "./utils/ui.js";
-import {returnDropDown} from "./services/filament-manager-plugin.service";
+import {returnDropDown} from "./services/octoprint/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
 import {ELEMENTS, HISTORY_CONSTANTS, SORT_CONSTANTS} from "./constants/history.constants";

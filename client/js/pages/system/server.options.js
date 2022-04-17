@@ -70,7 +70,8 @@ const settingsElements = {
     filamentCheck: document.getElementById("checkFilament"),
     hideEmpty: document.getElementById("hideEmpty"),
     downDateFailed: document.getElementById("downDateFailed"),
-    downDateSuccess: document.getElementById("downDateSuccess")
+    downDateSuccess: document.getElementById("downDateSuccess"),
+    allowMultiSelect: document.getElementById("allowMultiSelect")
   },
   history: {
     snapshot: {

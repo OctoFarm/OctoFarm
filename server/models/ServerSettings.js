@@ -58,6 +58,11 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
       required: true
+    },
+    allowMultiSelect: {
+      type: Boolean,
+      default: true,
+      required: true
     }
   },
   history: {

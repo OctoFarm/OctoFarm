@@ -95,7 +95,7 @@ const checkIfSpoolAttachedToPrinter = function (spoolId) {
   const filteredList = printerList.filter((printer) => printer.selectedFilament.length > 0);
   let isSpoolAttached = false;
   for (const element of filteredList) {
-    const doWeHaveSpoolIndex = element.selectedFilament.some((spool) => spool?._id == spoolId);
+    const doWeHaveSpoolIndex = element.selectedFilament.some((spool) => spool?._id === spoolId);
     if (doWeHaveSpoolIndex) {
       isSpoolAttached = true;
     }

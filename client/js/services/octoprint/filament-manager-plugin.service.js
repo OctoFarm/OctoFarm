@@ -1,9 +1,16 @@
-import OctoFarmClient from "../services/octofarm-client.service";
-import UI from "../utils/ui";
+import OctoFarmClient from "../octofarm-client.service";
+import UI from "../../utils/ui";
+
+let filamentManagerPluginIsEnabled;
+let allowMultiSelectIsEnabled;
 
 export async function isFilamentManagerPluginSyncEnabled() {
-    const systemSettings = await OctoFarmClient.get("settings/server/get");
-    return systemSettings.filamentManager;
+    if(typeof filamentManagerSettings === "undefined"){
+      const { filamentManager, filament: { allowMultiSelect } } = await OctoFarmClient.get("settings/server/get");
+      filamentManagerPluginIsEnabled = filamentManager;
+      allowMultiSelectIsEnabled = allowMultiSelect;
+    }
+    return { filamentManagerPluginIsEnabled, allowMultiSelectIsEnabled };
 }
 
 async function disabledFilamentManagerSync(){
@@ -95,7 +102,7 @@ export function setupFilamentManagerSyncBtn() {
 }
 
 export function setupFilamentManagerReSyncBtn() {
-  const filamentManagerEnabled = isFilamentManagerPluginSyncEnabled();
+  const { filamentManagerEnabled } = isFilamentManagerPluginSyncEnabled();
   if (filamentManagerEnabled) {
     const resyncBtn = document.getElementById("resyncFilamentManagerBtn");
     resyncBtn.addEventListener("click", async () => {

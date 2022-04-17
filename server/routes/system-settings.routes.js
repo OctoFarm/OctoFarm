@@ -289,8 +289,6 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
     const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
-    console.log(serverChanges, timeoutChanges, influxExport)
-
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
     checked[0].filament = sentOnline.filament;

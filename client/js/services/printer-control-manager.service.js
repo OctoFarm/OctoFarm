@@ -2,7 +2,7 @@ import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
-import {createFilamentSelector} from "./filament-manager-plugin.service";
+import {createFilamentSelector} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {fileActionStatusResponse} from "../pages/file-manager/file-manager.helpers";

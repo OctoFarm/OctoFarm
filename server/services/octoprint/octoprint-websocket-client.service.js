@@ -79,6 +79,9 @@ class WebSocketClient {
   }
 
   open() {
+    getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+      restartRequired: false
+    });
     logger.debug(`${this.url}: Opening websocket connection...`);
     PrinterTicker.addIssue(
       new Date(),
@@ -350,7 +353,7 @@ class WebSocketClient {
     this.currentThrottleRate++;
     this.sendThrottle();
     logger.warning(this.id + "Increasing websocket throttle time...", {
-      throttleRate: this.currentThrottleRate / 2
+      throttleRate: this.currentThrottleRate
     });
   }
 
@@ -358,13 +361,13 @@ class WebSocketClient {
     this.currentThrottleRate--;
     this.sendThrottle();
     logger.warning(this.id + " Decreasing websocket throttle time...", {
-      throttleRate: this.currentThrottleRate / 2
+      throttleRate: this.currentThrottleRate
     });
   }
 
   sendThrottle() {
     logger.silly(
-      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
+      "Throttling websocket connection to: " + this.currentThrottleRate
     );
     getPrinterStoreCache().updatePrinterLiveValue(this.id, {
       websocket_throttle: this.currentThrottleRate

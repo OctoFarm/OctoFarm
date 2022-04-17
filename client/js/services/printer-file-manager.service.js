@@ -2,7 +2,7 @@ import OctoPrintClient from "./octoprint-client.service";
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
 import FileManagerService from "./file-manager.service.js";
-import {returnDropDown} from "./filament-manager-plugin.service";
+import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";

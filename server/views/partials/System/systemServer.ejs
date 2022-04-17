@@ -289,7 +289,7 @@
             <div class="tab-pane fade" id="server-filament" role="tabpanel"
                  aria-labelledby="server-filament-list">
                 <div id="filamentManagerSetup" class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <h5>Check Spool?</h5>
                         <div class="alert alert-info small" role="alert">
                             OctoFarm will throw a nag screen when trying to start a print without a spool attached.
@@ -307,7 +307,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <h5>Hide Empty Spools?</h5>
                         <div class="alert alert-info small" role="alert">
                             Any spool going below 0 will be hidden from the interfaces select menu's.
@@ -331,7 +331,7 @@
                         <% disableDownDate = true; %>
                         <% disableDownDateMessage = `This is disabled as you have Filament Manager Plugin Sync activated!` %>
                     <% } %>
-                        <div class="col-lg-3">
+                        <div class="col-lg-2">
                             <h5>Downdate Successful Usage?</h5>
                             <div class="alert alert-info small" role="alert">
                                 On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
@@ -342,7 +342,7 @@
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
                                     <input type="checkbox" class="custom-control-input" <%= (disableDownDate) ? "disabled" : "" %>
-                                           id="downDateSuccess" required <%= (serverSettings?.server?.downDateSuccess) ? "checked" : "" %>>
+                                           id="downDateSuccess" required <%= (serverSettings?.filament?.downDateSuccess) ? "checked" : "" %>>
                                     <label class="custom-control-label"
                                            for="downDateSuccess">Downdate Successful</label>
                                     <div class="valid-feedback">Downdate usage
@@ -352,11 +352,32 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-3">
-                            <h5>Downdate Failed/Cancelled Usage?</h5>
+                        <div class="col-lg-2">
+                        <h5>Downdate Failed/Cancelled Usage?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                            <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                        </div>
+                        <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <%= disableDownDateMessage %>
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                       id="downDateFailed" required <%= (serverSettings?.server?.downDateFailed) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="downDateFailed">Downdate failed/cancelled</label>
+                                <div class="valid-feedback">Downdate usage
+                                </div>
+                                <div class="invalid-feedback">Ignore usage
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                        <div class="col-lg-2">
+                            <h5>Allow Single Spools on Multiple Printers?</h5>
                             <div class="alert alert-info small" role="alert">
-                                On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
-                                <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                                Allow the selection of single spools on multiple printers. Great if your only tracking filament by type.. you can have 1 spool attached to multiple printers to get more accurate grams calculations this way.
                             </div>
                             <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
                                 <%= disableDownDateMessage %>
@@ -364,29 +385,25 @@
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
                                     <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
-                                           id="downDateFailed" required <%= (serverSettings?.server?.downDateFailed) ? "checked" : "" %>>
+                                           id="allowMultiSelect" required <%= (serverSettings?.filament?.allowMultiSelect) ? "checked" : "" %>>
                                     <label class="custom-control-label"
-                                           for="downDateFailed">Downdate failed/cancelled</label>
-                                    <div class="valid-feedback">Downdate usage
+                                           for="allowMultiSelect">Allow Multiple Select</label>
+                                    <div class="valid-feedback">Select multiple
                                     </div>
-                                    <div class="invalid-feedback">Ignore usage
+                                    <div class="invalid-feedback">Select single
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    <div class="col-lg-12">
+                        <div class="col-lg-6">
                         <h5>Filament Manager Sync</h5>
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="alert alert-info" role="alert">
-                                    <h5>Update your instances settings</h5>
-                                    The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.
-                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
-                                            class="btn btn-outline-dark btn-block mt-1">
-                                        Setup Your Farm!
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="alert alert-info" role="alert">
+                            <h5>Update your instances settings</h5>
+                            The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.
+                            <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
+                                    class="btn btn-outline-dark btn-block mt-1">
+                                Setup Your Farm!
+                            </button>
                         </div>
                         <p class="mb-1">Click the button below to activate filament
                             manager plugin and link it to OctoFarm. Please read the

@@ -121,7 +121,6 @@ const capturePluginManagerData = (id, type, data) => {
 
 const captureResultsData = (id, data) => {
   const { action, result, needs_restart } = data;
-
   getPrinterStoreCache().updatePrinterLiveValue(id, {
     restartRequired: false
   });

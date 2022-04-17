@@ -67,20 +67,20 @@ class FilamentCleanerService {
       };
       profilesArray.push(profile);
     }
-    for (let sp = 0; sp < spools.length; sp++) {
+    for (const sp of spools) {
       const spool = {
-        _id: spools[sp]._id,
-        name: spools[sp].spools.name,
-        profile: spools[sp].spools.profile,
-        price: spools[sp].spools.price,
-        weight: spools[sp].spools.weight,
-        used: spools[sp].spools.used,
-        remaining: spools[sp].spools.weight - spools[sp].spools.used,
-        percent: 100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
-        tempOffset: spools[sp].spools.tempOffset,
-        bedOffset: spools[sp].spools.bedOffset,
-        printerAssignment: FilamentCleanerService.getPrinterAssignment(spools[sp]._id, farmPrinters),
-        fmID: spools[sp].spools.fmID
+        _id: sp._id,
+        name: sp.spools.name,
+        profile: sp.spools.profile,
+        price: sp.spools.price,
+        weight: sp.spools.weight,
+        used: sp.spools.used,
+        remaining: sp.spools.weight - sp.spools.used,
+        percent: 100 - (sp.spools.used / sp.spools.weight) * 100,
+        tempOffset: sp.spools.tempOffset,
+        bedOffset: sp.spools.bedOffset,
+        printerAssignment: FilamentCleanerService.getPrinterAssignment(sp._id, farmPrinters),
+        fmID: sp.spools.fmID
       };
       spoolsArray.push(spool);
     }
@@ -93,8 +93,13 @@ class FilamentCleanerService {
       profilesArray,
       selectedFilamentList
     );
-    await FilamentCleanerService.createPrinterList(farmPrinters, filamentManager);
-    await FilamentCleanerService.dropDownList(spools, profiles, filamentManager, selectedFilamentList);
+    await FilamentCleanerService.createPrinterList();
+    await FilamentCleanerService.dropDownList(
+      spools,
+      profiles,
+      filamentManager,
+      selectedFilamentList
+    );
     logger.info("Filament information cleaned and ready for consumption...");
   }
 
@@ -108,7 +113,7 @@ class FilamentCleanerService {
       let profileId = null;
       if (filamentManager) {
         profileId = _.findIndex(profiles, function (o) {
-          return o.profile.index == spool.spools.profile;
+          return o.profile.index === spool.spools.profile;
         });
       } else {
         profileId = _.findIndex(profiles, function (o) {
@@ -246,20 +251,20 @@ class FilamentCleanerService {
 
   static getPrinterAssignment(spoolID, farmPrinters) {
     const assignments = [];
-    for (let p = 0; p < farmPrinters.length; p++) {
+    for (const printer of farmPrinters) {
       if (
-        typeof farmPrinters[p] !== "undefined" &&
-        Array.isArray(farmPrinters[p].selectedFilament)
+        !!printer &&
+        Array.isArray(printer.selectedFilament)
       ) {
-        for (let s = 0; s < farmPrinters[p].selectedFilament.length; s++) {
-          if (farmPrinters[p].selectedFilament[s] !== null) {
-            if (farmPrinters[p].selectedFilament[s]._id.toString() === spoolID.toString()) {
-              const printer = {
-                id: farmPrinters[p]._id,
+        for (let s = 0; s < printer.selectedFilament.length; s++) {
+          if (printer.selectedFilament[s] !== null) {
+            if (printer.selectedFilament[s]._id.toString() === spoolID.toString()) {
+              const printerAssignment = {
+                id: printer._id,
                 tool: s,
-                name: farmPrinters[p].printerName
+                name: printer.printerName
               };
-              assignments.push(printer);
+              assignments.push(printerAssignment);
             }
           }
         }
@@ -284,17 +289,20 @@ class FilamentCleanerService {
     return assignmentList;
   }
 
-  static async createPrinterList(farmPrinters, filamentManager) {
+  static async createPrinterList() {
+    const farmPrinters = getPrinterStoreCache().listPrintersInformation();
+    const multipleSelect = SettingsClean.isMultipleSelectEnabled();
+
     const printerList = [];
-    if (filamentManager) {
-      printerList.push('<option value="0">Not Assigned</option>');
-    }
+
+    printerList.push('<option value="0">Not Assigned</option>');
+
     const assignedPrinters = this.getPrinterAssignmentList();
 
-    farmPrinters.forEach((printer) => {
+    for(const printer of farmPrinters){
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-          if (filamentManager) {
+          if (!multipleSelect) {
             if (
               printer.printerState.colour.category === "Offline" ||
               printer.printerState.colour.category === "Active"
@@ -329,7 +337,7 @@ class FilamentCleanerService {
           }
         }
       }
-    });
+    }
     printerFilamentList = printerList;
   }
 }

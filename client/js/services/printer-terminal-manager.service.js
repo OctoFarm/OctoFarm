@@ -1,7 +1,7 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import UI from "../utils/ui.js";
-import {returnDropDown} from "./filament-manager-plugin.service";
+import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 
