@@ -12,6 +12,8 @@ const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const {JobClean} = require("../services/job-cleaner.service");
+const {getPrinterStoreCache} = require("../cache/printer-store.cache");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -947,6 +949,11 @@ class PrinterStore {
     return printer.getSessionkey();
   }
 
+  getOctoPrintResourceMonitorValues(id){
+    const printer = this.#findMePrinter(id);
+    return printer.octoResourceMonitor;
+  }
+
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
 
@@ -1122,15 +1129,20 @@ class PrinterStore {
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
 
-    if (SettingsClean.returnFilamentManagerSettings()) {
+    const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
+    // Unassign existing printers
+    if (!multiSelectEnabled) {
       this.deattachSpoolFromAllPrinters(spoolID);
     }
 
     // Asign new printer id's;
     for (let id of printerIDs) {
+      if (!id?.tool) {
+        this.deattachSpoolFromAllPrinters(spoolID);
+        continue;
+      }
       const tool = id.tool;
-      const split = id.printer.split("-");
-      const printerID = split[0];
+      const printerID = id.printer;
       const printerIndex = findIndex(farmPrinters, function (o) {
         return o._id === printerID;
       });
@@ -1154,7 +1166,6 @@ class PrinterStore {
 
   deattachSpoolFromAllPrinters(filamentID) {
     const farmPrinters = this.listPrintersInformation(true);
-    // Unassign existing printers
     const farmPrintersAssigned = farmPrinters.filter(
       (printer) =>
         findIndex(printer.selectedFilament, function (o) {
@@ -1163,11 +1174,10 @@ class PrinterStore {
           }
         }) > -1
     );
-
     farmPrintersAssigned.forEach((printer) => {
-      printer.selectedFilament.forEach((spool) => {
+      printer.selectedFilament.forEach((spool, index) => {
         logger.debug("Resetting spool to null", spool);
-        spool = null;
+        printer.selectedFilament[index] = null;
         logger.debug("Spool reset", spool);
       });
       PrinterService.findOneAndUpdate(printer._id, {

@@ -109,6 +109,7 @@ class OctoPrintPrinter {
   };
   //Updated by API / database
   octoPi = undefined;
+  octoResourceMonitor = undefined;
   costSettings = {
     powerConsumption: 0.5,
     electricityCosts: 0.15,

@@ -7,6 +7,7 @@ import FileManagerSortingService from "./services/file-manager-sorting.service.j
 import {allowedFileTypes} from "./constants/file-types.constants"
 
 import {printerIsOnline} from "./utils/octofarm.utils";
+import {printerTemplate} from "./pages/file-manager/file.template";
 
 
 let lastId = null;
@@ -78,53 +79,7 @@ class Manager {
       printerList.insertAdjacentHTML(
         "beforeend",
         `
-        <a
-            data-jplist-item
-            id="fileManagerPrinter-${printer._id}"
-            class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
-            style="display: block;
-            padding: 0.7rem 0.1rem;"
-          >
-            <div class="row">
-              <div
-                class="col-lg-2"
-                style="display:flex; justify-content:center; align-items:center;"
-              >
-                  <i class="fas fa-print fa-2x"></i><br>
-                  <td>
-                  <small>
-                      <span title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill ${printer.printerState.colour.category}">
-                          ${printer.printerState.state}
-                      </span>
-                      <span id="fileManagerfileCount-${printer._id}" class="badge badge-dark badge-pill">
-                        Files: ${printer.fileList.fileList.length}
-                    </span>
-                    <span id="fileManagerFolderCount-${printer._id}" class="badge badge-dark badge-pill">
-                       Folders: ${printer.fileList.folderList.length}
-                    </span>
-                  </small>
-                  </small>
-                  </td>
-              </div>
-              <div class="col-lg-10">
-                <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
-                ${storageWarning}
-                <div class="row">
-
-                </div>
-                  <small class="pt-2 float-left"
-                  ><i class="fas fa-cube"></i> <b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm</small
-                ><br><!--Fix for firefox-->
-                <small class="pt-2 pb-2 float-left"
-                  ><i class="fas fa-pen"></i> <b>Extruders:</b>
-                  ${printer.currentProfile.extruder.count}
-                  <b>Nozzle Size:</b> 
-                  ${printer.currentProfile.extruder.nozzleDiameter}mm</small
-                >
-                                ${extruderList}
-              </div>
-            </div>
-          </a>
+          ${printerTemplate(printer, storageWarning, extruderList)}
       `
       );
       //Setup for first printer

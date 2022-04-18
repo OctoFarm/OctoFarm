@@ -197,10 +197,44 @@ const captureThrottlePluginData = (id, data) => {
   getPrinterStoreCache().updatePrinterDatabase(id, { octoPi });
 };
 
+const captureResourceMonitorData = (id, data) => {
+  const {
+    cpu: { average },
+    memory: { percent }
+  } = data;
+
+  let octoPrintResourceMonitor = getPrinterStoreCache().getOctoPrintResourceMonitorValues(id);
+
+  if(!octoPrintResourceMonitor){
+    octoPrintResourceMonitor = {
+      system_cpu: [],
+      system_memory: []
+    }
+  }
+  if(!!average){
+    octoPrintResourceMonitor.system_cpu.push(average);
+  }
+  if(!!percent){
+    octoPrintResourceMonitor.system_memory.push(percent);
+  }
+
+  if(octoPrintResourceMonitor.system_cpu.length > 50){
+    octoPrintResourceMonitor.system_cpu.shift()
+  }
+
+  if(octoPrintResourceMonitor.system_memory.length > 50){
+    octoPrintResourceMonitor.system_memory.shift()
+  }
+
+
+  getPrinterStoreCache().updatePrinterLiveValue(id, { octoResourceMonitor: octoPrintResourceMonitor });
+}
+
 module.exports = {
   testAndCollectPSUControlPlugin,
   testAndCollectCostPlugin,
   captureKlipperPluginData,
   capturePluginManagerData,
-  captureThrottlePluginData
+  captureThrottlePluginData,
+  captureResourceMonitorData
 };

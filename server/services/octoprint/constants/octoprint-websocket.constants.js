@@ -109,7 +109,8 @@ const OP_WS_PLUGIN_KEYS = {
   displayLayerProgress: "DisplayLayerProgress",
   softwareupdate: "softwareupdate",
   psucontrol: "psucontrol", //Not used
-  pi_support: "pi_support"
+  pi_support: "pi_support",
+  resource_monitor: "resource_monitor"
 };
 
 module.exports = {
