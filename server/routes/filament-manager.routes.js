@@ -34,7 +34,7 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { TaskManager } = require("../services/task-manager.service");
 
 router.get("/get/printerList", ensureAuthenticated, (req, res) => {
-  const printerList = FilamentClean.returnFilamentList();
+  const printerList = FilamentClean.createPrinterList();
   res.send({ printerList });
 });
 router.get("/get/statistics", ensureAuthenticated, async (req, res) => {
@@ -59,7 +59,7 @@ router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);
 
   await getPrinterStoreCache().assignSpoolToPrinters(
-    req.bodyString("printers"),
+    req.body.printers,
     req.bodyString("spoolId")
   );
   TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
@@ -75,12 +75,12 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
-      res.send({ errors });
+      return res.send({ errors });
     }
     const dataProfile = await Profiles.findById(filament.spoolsProfile);
     if (!dataProfile) {
       errors.push("Couldn't find matching profile! Please Resync your spools...");
-      res.send({ errors });
+      return res.send({ errors });
     }
 
     const profile = {
@@ -114,7 +114,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       errors.push("Unable to create ");
     }
     await filamentManagerReSync();
-    res.send({ errors });
+    return res.send({ errors });
   } else {
     const toSaveSpool = {
       name: filament.spoolsName,
@@ -142,7 +142,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
           res.send({ errors, dataFilament });
         });
     } else {
-      res.send({ errors });
+      return res.send({ errors });
     }
   }
 });
@@ -155,14 +155,14 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
   const isSpoolAttached = checkIfSpoolAttachedToPrinter(searchId);
   if (isSpoolAttached) {
     errors.push("Your spool is attached to a printer, your need to de-attach the spool first!");
-    res.send({ errors });
+    return res.send({ errors });
   }
 
   if (filamentManager) {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
-      res.send({ errors });
+      return res.send({ errors });
     }
     searchId = await Spool.findById(searchId);
     logger.info("Updating Octoprint to remove: ", searchId);
@@ -176,7 +176,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
     });
     if (!deletedSpool.ok) {
       errors.push("Unable to update client with deletion! Try Resyncing...");
-      res.send({ errors });
+      return res.send({ errors });
     }
   }
   await Spool.deleteOne({ _id: searchId })
@@ -202,13 +202,13 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
-      res.send({ errors });
+      return res.send({ errors });
     }
 
     const dataProfile = await Profiles.findById(oldSpoolData.profile);
     if (!dataProfile) {
       errors.push("Couldn't find matching profile! Please Resync your spools...");
-      res.send({ errors });
+      return res.send({ errors });
     }
 
     const profile = {
@@ -239,7 +239,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     });
     if (!updateFilamentManager.ok) {
       errors.push("Unable to create profile on Plugin... skipping spool creation!");
-      res.send({ errors });
+      return res.send({ errors });
     }
   }
 
@@ -262,7 +262,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     .finally(() => {
       logger.info("Updated spool saved to database, running filament cleaner");
       TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-      res.send({ errors });
+      return res.send({ errors });
     });
 });
 
@@ -300,11 +300,11 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
 
     if (!updateFilamentManager.ok) {
       errors.push("Unable to create profile on Plugin... skipping spool creation!");
-      res.send({ errors });
+      return res.send({ errors });
     }
 
     await filamentManagerReSync();
-    res.send({ errors });
+    return res.send({ errors });
   } else {
     const toSaveProfile = {
       index: null,
@@ -324,7 +324,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       .finally(async () => {
         logger.info("New profile saved to database, running filament cleaner");
         TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-        res.send({ errors });
+        return res.send({ errors });
       });
   }
 });
@@ -341,7 +341,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
-      res.send({ errors });
+      return res.send({ errors });
     }
 
     const newProfile = {
@@ -363,7 +363,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
 
     if (!updateFilamentManager.ok) {
       errors.push("Unable to create profile on Plugin... skipping spool creation!");
-      res.send({ errors });
+      return res.send({ errors });
     }
   }
 
@@ -381,7 +381,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     .finally(() => {
       logger.info("Updated profile saved to database, running filament cleaner");
       TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
-      res.send({ errors });
+      return res.send({ errors });
     });
 });
 router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
@@ -396,14 +396,14 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
 
   if (isProfileAttached) {
     errors.push("Your profile is attached to a spool! You need to delete the spool(s) first...");
-    res.send({ errors });
+    return res.send({ errors });
   }
 
   if (filamentManager) {
     let printer = findFirstOnlinePrinter();
     if (!printer && !printer?.printerURL) {
       errors.push("Unable to update Filament Manager Plugin... No online printer!");
-      res.send({ errors });
+      return res.send({ errors });
     }
     const oldProfileData = await Profiles.findById(searchId);
     logger.info("Updating OctoPrint: ", searchId);
@@ -418,7 +418,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     });
     if (!deleteProfile.ok) {
       errors.push("Unable to update client with deletion! Try Resyncing...");
-      res.send({ errors });
+      return res.send({ errors });
     }
   }
   await Profiles.deleteOne({ _id: searchId })
@@ -507,7 +507,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   }
 
   if (errors.length > 0) {
-    res.send({ errors });
+    return res.send({ errors });
   }
 
   const serverSettings = await ServerSettings.find({});

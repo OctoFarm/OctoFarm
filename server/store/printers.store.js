@@ -13,7 +13,7 @@ const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const {JobClean} = require("../services/job-cleaner.service");
-const {getPrinterStoreCache} = require("../cache/printer-store.cache");
+const {Job} = require("toad-scheduler");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -1137,8 +1137,9 @@ class PrinterStore {
 
     // Asign new printer id's;
     for (let id of printerIDs) {
+      // No tool is de-attach request
       if (!id?.tool) {
-        this.deattachSpoolFromAllPrinters(spoolID);
+        console.log(id.tool)
         continue;
       }
       const tool = id.tool;
@@ -1152,13 +1153,12 @@ class PrinterStore {
       } else {
         farmPrinters[printerIndex].selectedFilament[tool] = null;
       }
-      PrinterService.findOneAndUpdate(printerID, {
-        selectedFilament: farmPrinters[printerIndex].selectedFilament
-      })
-        .then()
-        .catch((e) => {
-          logger.error("Issue updating spool list", e);
-        });
+      this.updatePrinterDatabase(farmPrinters[printerIndex]._id, { selectedFilament: farmPrinters[printerIndex].selectedFilament });
+      FileClean.generate(
+        farmPrinters[printerIndex].fileList,
+        farmPrinters[printerIndex].selectedFilament,
+        farmPrinters[printerIndex].costSettings
+      );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
@@ -1180,13 +1180,12 @@ class PrinterStore {
         printer.selectedFilament[index] = null;
         logger.debug("Spool reset", spool);
       });
-      PrinterService.findOneAndUpdate(printer._id, {
-        selectedFilament: printer.selectedFilament
-      })
-        .then()
-        .catch((e) => {
-          logger.error("Issue updating file list", e);
-        });
+      this.updatePrinterDatabase(printer._id, { selectedFilament: printer.selectedFilament });
+      FileClean.generate(
+          printer.fileList,
+          printer.selectedFilament,
+          printer.costSettings
+      );
     });
   }
 

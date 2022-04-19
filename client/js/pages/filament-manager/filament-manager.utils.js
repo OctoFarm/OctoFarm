@@ -8,7 +8,7 @@ import {
     spoolsManagerTableRow
 } from "./filament-manager.templates"
 import {cloneSpool} from "./filament-manager-clone-spools.utils";
-import { editSpool, deleteSpool, saveSpool, editProfile, deleteProfile, saveProfile, addSpool, addProfile } from "./filament-manager.actions";
+import { editSpool, deleteSpool, saveSpool, editProfile, deleteProfile, saveProfile, addSpool, addProfile, unAssignSpool } from "./filament-manager.actions";
 import {isFilamentManagerPluginSyncEnabled} from "../../services/octoprint/filament-manager-plugin.service";
 
 const materialsList = [
@@ -221,16 +221,11 @@ export const loadOverviewTable = async () => {
                 </tr>
     `;
     });
-
     pageElements.filamentOverviewList.innerHTML = spoolList;
-
-    jplist.refresh()
 }
 
 export const renderFilamentUsageCharts = async () => {
     const {history: {totalByDay, usageOverTime}} = await OctoFarmClient.getHistoryStatistics();
-
-    console.log(totalByDay, usageOverTime)
 
     if (usageOverTime.length > 1) {
         const filamentUsageOverTimeChart = new ApexCharts(
@@ -255,26 +250,42 @@ export const renderFilamentUsageCharts = async () => {
 
 export const renderSpoolsManagerTable = async () => {
     const { spools } = await OctoFarmClient.getFilamentSpools();
-    pageElements.spoolsManagerTable.innerHTML = "";
+
+
+    // if($(".jpSpoolItem").length !== 0){
+    //     jplist.resetContent(function(){
+    //         $(".jpSpoolItem").remove();
+    //     });
+    // }
+
     const { allowMultiSelectIsEnabled } = await isFilamentManagerPluginSyncEnabled();
     spools.forEach(spool => {
-        pageElements.spoolsManagerTable.insertAdjacentHTML("beforeend", `
+        const listItem = document.getElementById("spoolList-"+spool._id);
+        if(!listItem) {
+            pageElements.spoolsManagerTable.insertAdjacentHTML("beforeend", `
             ${spoolsManagerTableRow(spool, allowMultiSelectIsEnabled)}
         `)
+        }
     })
 }
 
 export const renderProfilesManagerTable = async () => {
     const { profiles } = await OctoFarmClient.getFilamentProfiles();
-    pageElements.profileManagerTable.innerHTML = "";
+    // if($(".jpProfileItem").length !== 0){
+    //     jplist.resetContent(function(){
+    //         $(".jpProfileItem").remove();
+    //     });
+    // }
 
     profiles.forEach(profile => {
-        pageElements.profileManagerTable.insertAdjacentHTML("beforeend", `
+        const listItem = document.getElementById("profileList-"+profile._id);
+        if(!listItem){
+            pageElements.profileManagerTable.insertAdjacentHTML("beforeend", `
             ${profileManagerTableRow(profile)}
-        `)
+            `)
+        }
+
     })
-
-
 }
 
 export const addProfileTableListeners = () => {
@@ -301,6 +312,8 @@ export const addSpoolTableListeners = () => {
             await saveSpool(e.target);
         } else if (e.target.classList.contains("clone")) {
             await cloneSpool(e.target);
+        }else if(e.target.classList.contains("unassign")){
+            await unAssignSpool(e.target);
         }
     });
 }

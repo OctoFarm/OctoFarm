@@ -25,7 +25,7 @@ function returnActionBtnTemplate(id, webURL) {
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-            <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Actions</h6>
+            <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer</h6>
              <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
             <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
             <button  
@@ -45,6 +45,15 @@ function returnActionBtnTemplate(id, webURL) {
               disabled
           >
             <i class="fas fa-fire text-warning"></i> Pre-Heat
+          </button> 
+          <button
+             title="Uses the values from your selected filament and pre-heats to those values."
+             id="printerHome-${id}"
+             type="button"
+             class="dropdown-item d-none"
+              disabled
+          >
+            <i class="fa-solid fa-house-flag"></i> Home
           </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
           <a title="Open OctoPrint"

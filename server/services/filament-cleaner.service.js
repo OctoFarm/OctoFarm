@@ -18,16 +18,8 @@ let dropDownList = {
   historyDropDown: []
 };
 
-//FIX ME PLZ
-
-let printerFilamentList = [];
-
 class FilamentCleanerService {
   static noSpoolOptions = '<option value="0">No Spool Selected</option>';
-
-  static returnFilamentList() {
-    return printerFilamentList;
-  }
 
   static getSpools() {
     return spoolsClean;
@@ -84,16 +76,19 @@ class FilamentCleanerService {
       };
       spoolsArray.push(spool);
     }
+
+
     spoolsClean = spoolsArray;
     profilesClean = profilesArray;
 
     selectedFilamentList = await FilamentCleanerService.selectedFilament(farmPrinters);
+    console.log("SELECTED FILAMANET LIST", selectedFilamentList)
     statisticsClean = FilamentCleanerService.createStatistics(
       spoolsArray,
       profilesArray,
       selectedFilamentList
     );
-    await FilamentCleanerService.createPrinterList();
+    FilamentCleanerService.createPrinterList();
     await FilamentCleanerService.dropDownList(
       spools,
       profiles,
@@ -285,60 +280,45 @@ class FilamentCleanerService {
         assignmentList.push(`${printer.id}-${printer.tool}`);
       });
     });
-
+    console.log("ASSIGNMENT LIST", assignmentList)
     return assignmentList;
   }
 
-  static async createPrinterList() {
+  static createPrinterList() {
     const farmPrinters = getPrinterStoreCache().listPrintersInformation();
     const multipleSelect = SettingsClean.isMultipleSelectEnabled();
 
     const printerList = [];
-
+    console.log("CREATING PRINTER LISt")
     printerList.push('<option value="0">Not Assigned</option>');
-
     const assignedPrinters = this.getPrinterAssignmentList();
 
     for(const printer of farmPrinters){
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-          if (!multipleSelect) {
-            if (
-              printer.printerState.colour.category === "Offline" ||
-              printer.printerState.colour.category === "Active"
-            ) {
-              printerList.push(
+          if (assignedPrinters.includes(`${printer._id}-${i}`)) {
+            printerList.push(
                 `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`
-              );
-            } else {
-              printerList.push(
-                `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`
-              );
-            }
+            );
           } else {
-            if (assignedPrinters.includes(`${printer._id}-${i}`)) {
-              printerList.push(
-                `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`
-              );
-            } else {
-              if (
+            if (
                 printer.printerState.colour.category === "Offline" ||
                 printer.printerState.colour.category === "Active"
-              ) {
-                printerList.push(
+            ) {
+              printerList.push(
                   `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`
-                );
-              } else {
-                printerList.push(
+              );
+            } else {
+              printerList.push(
                   `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`
-                );
-              }
+              );
             }
           }
         }
       }
     }
-    printerFilamentList = printerList;
+    console.log(printerList)
+    return printerList;
   }
 }
 

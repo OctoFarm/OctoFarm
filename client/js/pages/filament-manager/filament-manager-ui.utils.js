@@ -112,6 +112,9 @@ export const updatePrinterDrops = async () => {
                 option.selected = true;
             }
         }
+        if(selectedValues.length === 0){
+            drop.value = 0;
+        }
         drop.disabled = true;
     });
     printerAssignments.forEach((text) => {
@@ -157,5 +160,6 @@ export const reRenderPageInformation = async () => {
     await updateProfileDrop();
     await updatePrinterDrops();
     renderMaterialsList();
-    jplist.refresh();
+    jplist.resetContent();
+    jplist.resetControl();
 }

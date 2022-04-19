@@ -1,3 +1,6 @@
+import { updateProfileDrop } from "./filament-manager-ui.utils";
+import { addSpool } from "./filament-manager.actions";
+
 const clonedSpools = [];
 
 export const cloneSpool = async (e) => {

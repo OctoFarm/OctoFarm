@@ -4,7 +4,7 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
         multiple = "multiple=true"
     }
     return `
-    <tr data-jplist-item>
+    <tr data-jplist-item id="spoolList-${ spool._id }" class="jpSpoolItem">
         <th style="display: none;">${ spool._id }</th>
         <th scope="row"><input class="form-control name" type="text" placeholder="${spool.name}" disabled></th>
         <td>
@@ -23,13 +23,16 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
         </select>
     </td>
         <td>
-            <button title="Clone Spool" id="clone-${spool._id}" type="button" class="btn btn-sm btn-info clone bg-colour-4">
+            <button title="Unassign Spool" id="unassign-${spool._id}" type="button" class="btn btn-sm btn-warning unassign">
+                <i class="fa-solid fa-ban text-dark"></i>
+            </button>
+            <button title="Clone Spool" id="clone-${spool._id}" type="button" class="btn btn-sm btn-success clone">
                 <i class="far fa-copy"></i>
             </button>
-            <button title="Edit Spool" id="edit-${spool._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1">
+            <button title="Edit Spool" id="edit-${spool._id}" type="button" class="btn btn-sm btn-primary edit">
                 <i class="fas fa-edit editIcon"></i>
             </button>
-            <button title="Save Spool" id="save-${spool._id}" type="button" class="btn btn-sm d-none btn-success save bg-colour-2">
+            <button title="Save Spool" id="save-${spool._id}" type="button" class="btn btn-sm d-none btn-success save">
                 <i class="fas fa-save saveIcon"></i>
             </button>
             <button title="Delete Spool" id="delete-${spool._id}" type="button" class="btn btn-sm btn-danger delete">
@@ -41,7 +44,7 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
 
 export const profileManagerTableRow = (profile) => {
     return ` 
-    <tr data-jplist-item>
+    <tr data-jplist-item id="profileList-${ profile._id }" class="jpProfileItem">
         <td class="d-none">
             ${ profile._id }
         </td>

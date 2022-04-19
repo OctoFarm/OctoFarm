@@ -14,6 +14,10 @@ const currentModals = [
 ];
 
 export default class UI {
+  static elementsScrollPosition = {
+    scrollTop: null,
+    scrollLeft: null
+  }
   //Colour function
   static getColour(state) {
     if (state === "Operational") {
@@ -375,4 +379,13 @@ export default class UI {
       return x[0].toUpperCase() + x.substr(1).toLowerCase();
     }).join(" ");
   };
+
+  static captureScrollPosition(element){
+    this.elementsScrollPosition.scrollTop = element.scrollTop;
+    this.elementsScrollPosition.scrollLeft = element.scrollLeft;
+  }
+  static reApplyScrollPosition(element){
+    element.scrollTop = this.elementsScrollPosition.scrollTop;
+    element.scrollLeft = this.elementsScrollPosition.scrollLeft;
+  }
 }

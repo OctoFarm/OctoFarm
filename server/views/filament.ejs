@@ -165,11 +165,11 @@
                         <table class="table-hover table table-responsive-sm table-responsive-md">
                             <thead>
                             <tr>
-                                <th scope="col">Manufacturer</th>
-                                <th scope="col">Material</th>
-                                <th scope="col">Density</th>
-                                <th scope="col">Diameter</th>
-                                <th scope="col" width="200px"></th>
+                                <th scope="col" style="min-width: 250px">Manufacturer</th>
+                                <th scope="col" style="min-width: 250px">Material</th>
+                                <th scope="col" style="max-width: 50px">Density</th>
+                                <th scope="col" style="max-width: 50px">Diameter</th>
+                                <th scope="col" style="min-width: 250px"></th>
                             </tr>
                             </thead>
                             <tbody id="addProfilesTable" data-jplist-group="profiles">
@@ -194,7 +194,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="addSpoolModalBody">
                 <div id="addSpoolsMessage"></div>
                 <form>
                     <div class="form-row">
@@ -400,15 +400,15 @@
                 <table class="table-hover table table-responsive-sm table-responsive-md col-lg-12">
                     <thead>
                     <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col" width="200px">Profile</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Weight (g)</th>
-                        <th scope="col">Used (g)</th>
-                        <th scope="col">Tool Offset (°C)</th>
-                        <th scope="col">Bed Offset (°C)</th>
-                        <th scope="col" width="200px">Printer Assignment</th>
-                        <th scope="col" width="150px"></th>
+                        <th scope="col" style="min-width: 250px;">Name</th>
+                        <th scope="col" style="min-width: 200px">Profile</th>
+                        <th scope="col" style="max-width: 50px">Price</th>
+                        <th scope="col" style="max-width: 100px">Weight (g)</th>
+                        <th scope="col" style="max-width: 100px">Used (g)</th>
+                        <th scope="col" style="max-width: 50px">Tool Offset (°C)</th>
+                        <th scope="col" style="max-width: 50px">Bed Offset (°C)</th>
+                        <th scope="col" style="min-width: 300px">Printer Assignment</th>
+                        <th scope="col" style="min-width: 200px"></th>
                     </tr>
                     </thead>
                     <tbody id="addSpoolsTable" data-jplist-group="spools">
@@ -462,7 +462,7 @@
                                 <th scope="col">Density</th>
                             </tr>
                             </thead>
-                            <tbody id="materialsListTable" data-jplist-group="profiles">
+                            <tbody id="materialsListTable">
                             </tbody>
                         </table>
                     </div>

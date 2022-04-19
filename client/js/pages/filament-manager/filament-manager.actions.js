@@ -1,25 +1,21 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
 import UI from "../../utils/ui";
-import { reRenderPageInformation, printErrors, getSelectValues } from "./filament-manager-ui.utils";
+import {reRenderPageInformation, printErrors, getSelectValues, updatePrinterDrops} from "./filament-manager-ui.utils";
 
 
 async function selectFilament(spools, id) {
     let printerIds = [];
     for (const spool of spools) {
         const meta = spool.split("-");
-        const printerId = meta[0];
         printerIds.push({
-            printer: printerId,
+            printer: meta[0],
             tool: meta[1]
         });
     }
-
     await OctoFarmClient.post("/filament/assign", {
         printers: printerIds,
         spoolId: id
     });
-
-    await reRenderPageInformation();
 }
 
 export const editProfile = async (e) => {
@@ -52,10 +48,11 @@ export const saveProfile = async (e) => {
     if (post && post.errors.length === 0) {
         document.getElementById(`save-${id}`).classList.add("d-none");
         document.getElementById(`edit-${id}`).classList.remove("d-none");
+
+        await reRenderPageInformation();
     }else{
         printErrors(post.errors)
     }
-    jplist.refresh();
 }
 export const deleteProfile = async (e) => {
     document.getElementById("profilesMessage").innerHTML = "";
@@ -69,13 +66,14 @@ export const deleteProfile = async (e) => {
                     // remove element with id = el1
                     e.parentElement.parentElement.parentElement.remove();
                 });
+
             } else {
                 jplist.resetContent(function () {
                     // remove element with id = el1
                     e.parentElement.parentElement.remove();
                 });
+
             }
-            await reRenderPageInformation();
             UI.createAlert("success", "Successfully deleted your profile!", 3000, "Clicked")
         } else {
             printErrors(post.errors)
@@ -197,6 +195,7 @@ export const addProfile = async (manufacturer, material, density, diameter) => {
 }
 
 export const editSpool = async (e) => {
+    UI.captureScrollPosition(document.getElementById("addSpoolModalBody"))
     const row = e.parentElement.parentElement;
     const editable = row.querySelectorAll("input");
     const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
@@ -216,7 +215,6 @@ export const deleteSpool = async (e) => {
             id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
         });
         if (post && post.errors.length === 0) {
-            await reRenderPageInformation();
             if (e.classList.contains("deleteIcon")) {
                 jplist.resetContent(function () {
                     // remove element with id = el1
@@ -261,8 +259,15 @@ export const saveSpool = async (e) => {
             getSelectValues(document.getElementById(`spoolsPrinterAssignment-${id}`)),
             id
         );
-        jplist.refresh();
+        await reRenderPageInformation()
     }else{
         printErrors(post.errors)
     }
+    // UI.reApplyScrollPosition(document.getElementById("addSpoolModalBody"))
+}
+
+export const unAssignSpool = async (e) => {
+    const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+    await selectFilament(["0"], id)
+    await reRenderPageInformation();
 }
