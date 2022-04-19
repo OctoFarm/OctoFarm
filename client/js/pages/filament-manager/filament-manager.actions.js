@@ -145,6 +145,7 @@ export const addSpool = async (
         return true;
     } else {
         printErrors(post.errors)
+        return false;
     }
 }
 // Profile functions

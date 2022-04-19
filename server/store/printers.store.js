@@ -1156,6 +1156,14 @@ class PrinterStore {
         farmPrinters[printerIndex].selectedFilament,
         farmPrinters[printerIndex].costSettings
       );
+      JobClean.generate(
+        farmPrinters[printerIndex].job,
+        farmPrinters[printerIndex].selectedFilament,
+        farmPrinters[printerIndex].fileList,
+        farmPrinters[printerIndex].currentZ,
+        farmPrinters[printerIndex].costSettings,
+        farmPrinters[printerIndex].progress
+      );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";

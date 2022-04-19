@@ -5,6 +5,8 @@ const { DateTime } = require("luxon");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
 const { HistoryClean } = require("./history-cleaner.service.js");
 const { floatOrZero } = require("../utils/number.util");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-InformationCleaning")
 
 const cleanJobs = [];
 
@@ -123,7 +125,7 @@ class JobCleanerService {
         printerProgress.completion
       );
     }
-
+    logger.debug("Job information cleaned and ready for consumption", currentJob)
     return currentJob;
   }
 }
