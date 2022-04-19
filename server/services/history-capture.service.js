@@ -218,7 +218,7 @@ class HistoryCollection {
                     logger.debug("Successfully updated history records timelapse with: ", lapse);
                   })
                   .catch((e) => {
-                    console.error("Failed to update history record timelapse!", e);
+                    logger.error("Failed to update history record timelapse!", e);
                   });
                 await getHistoryCache().initCache();
                 logger.info("Successfully grabbed timelapse!");
@@ -228,7 +228,7 @@ class HistoryCollection {
                     logger.debug("Successfully updated history records timelapse with: ", snapshot);
                   })
                   .catch((e) => {
-                    console.error("Failed to update history record timelapse!", e);
+                    logger.error("Failed to update history record timelapse!", e);
                   });
                 await getHistoryCache().initCache();
                 logger.error("Failed to grab a timelapse...");

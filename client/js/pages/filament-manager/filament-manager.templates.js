@@ -1,7 +1,13 @@
 export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
     let multiple = "";
+    let unassignSpools = "";
     if(allowMultiSelectIsEnabled){
         multiple = "multiple=true"
+        unassignSpools = `
+            <button title="Unassign Spool" id="unassign-${spool._id}" type="button" class="btn btn-sm btn-warning unassign">
+                <i class="fa-solid fa-ban text-dark"></i>
+            </button>
+        `
     }
     return `
     <tr data-jplist-item id="spoolList-${ spool._id }" class="jpSpoolItem">
@@ -23,9 +29,7 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
         </select>
     </td>
         <td>
-            <button title="Unassign Spool" id="unassign-${spool._id}" type="button" class="btn btn-sm btn-warning unassign">
-                <i class="fa-solid fa-ban text-dark"></i>
-            </button>
+            ${unassignSpools}
             <button title="Clone Spool" id="clone-${spool._id}" type="button" class="btn btn-sm btn-success clone">
                 <i class="far fa-copy"></i>
             </button>

@@ -1129,18 +1129,15 @@ class PrinterStore {
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
 
-    const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
+
     // Unassign existing printers
-    if (!multiSelectEnabled) {
-      this.deattachSpoolFromAllPrinters(spoolID);
-    }
+    this.deattachSpoolFromAllPrinters(spoolID);
 
     // Asign new printer id's;
     for (let id of printerIDs) {
       // No tool is de-attach request
       if (!id?.tool) {
-        console.log(id.tool)
-        continue;
+        break;
       }
       const tool = id.tool;
       const printerID = id.printer;
@@ -1165,6 +1162,7 @@ class PrinterStore {
   }
 
   deattachSpoolFromAllPrinters(filamentID) {
+    console.log(filamentID)
     const farmPrinters = this.listPrintersInformation(true);
     const farmPrintersAssigned = farmPrinters.filter(
       (printer) =>

@@ -1,6 +1,6 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
 import UI from "../../utils/ui";
-import {reRenderPageInformation, printErrors, getSelectValues, updatePrinterDrops} from "./filament-manager-ui.utils";
+import {reRenderPageInformation, printErrors, getSelectValues} from "./filament-manager-ui.utils";
 
 
 async function selectFilament(spools, id) {

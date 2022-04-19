@@ -82,7 +82,6 @@ class FilamentCleanerService {
     profilesClean = profilesArray;
 
     selectedFilamentList = await FilamentCleanerService.selectedFilament(farmPrinters);
-    console.log("SELECTED FILAMANET LIST", selectedFilamentList)
     statisticsClean = FilamentCleanerService.createStatistics(
       spoolsArray,
       profilesArray,
@@ -280,7 +279,6 @@ class FilamentCleanerService {
         assignmentList.push(`${printer.id}-${printer.tool}`);
       });
     });
-    console.log("ASSIGNMENT LIST", assignmentList)
     return assignmentList;
   }
 
@@ -289,8 +287,10 @@ class FilamentCleanerService {
     const multipleSelect = SettingsClean.isMultipleSelectEnabled();
 
     const printerList = [];
-    console.log("CREATING PRINTER LISt")
-    printerList.push('<option value="0">Not Assigned</option>');
+    if(!multipleSelect){
+      printerList.push('<option value="0">Not Assigned</option>');
+    }
+
     const assignedPrinters = this.getPrinterAssignmentList();
 
     for(const printer of farmPrinters){
@@ -303,8 +303,8 @@ class FilamentCleanerService {
           } else {
             if (
                 printer.printerState.colour.category === "Offline" ||
-                printer.printerState.colour.category === "Active"
-            ) {
+                printer.printerState.colour.category === "Active" && assignedPrinters.includes(`${printer._id}-${i}`)
+          ) {
               printerList.push(
                   `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`
               );
@@ -317,7 +317,6 @@ class FilamentCleanerService {
         }
       }
     }
-    console.log(printerList)
     return printerList;
   }
 }

@@ -495,6 +495,14 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     return res.send({ errors, warnings });
   }
 
+  if(checked[0].filament.allowMultiSelect === false){
+    const spoolList = FilamentClean.getSpools();
+    spoolList.forEach(spool => {
+      getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
+    })
+    TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+  }
+
   await Spool.deleteMany({});
   await Profiles.deleteMany({});
 

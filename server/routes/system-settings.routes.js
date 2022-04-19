@@ -35,6 +35,8 @@ const { databaseNamesList } = require("../constants/database.constants");
 const { TaskManager } = require("../services/task-manager.service");
 const { SystemRunner } = require("../services/system-information.service");
 const { listActiveClients } = require("../services/server-side-events.service");
+const {getPrinterStoreCache} = require("../cache/printer-store.cache");
+const {FilamentClean} = require("../services/filament-cleaner.service");
 
 module.exports = router;
 
@@ -130,7 +132,7 @@ router.get(
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
     const databaseName = req.paramString("databaseName");
-    await getPrinterManagerCache().killAllConnections();
+    getPrinterManagerCache().killAllConnections();
     if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
       await ClientSettingsDB.deleteMany({});
@@ -300,6 +302,14 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
       [serverChanges, timeoutChanges, influxExport].includes(false)
     ) {
       restartRequired = true;
+    }
+
+    if(checked[0].filament.allowMultiSelect === false){
+        const spoolList = FilamentClean.getSpools();
+        spoolList.forEach(spool => {
+            getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
+        })
+        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
     //Check the influx export to see if all information exists... disable if not...
