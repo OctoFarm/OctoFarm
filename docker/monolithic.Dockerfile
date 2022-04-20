@@ -1,4 +1,4 @@
-FROM node:14.19-bullseye
+FROM node:14.16-stretch
 
 # Update Local Repository Index
 RUN apt-get update
