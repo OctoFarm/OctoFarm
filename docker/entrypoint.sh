@@ -19,9 +19,9 @@ then
     echo "OCTOFARM_PORT=$OCTOFARM_PORT is not defined, the default of 4000 will be assumed. You can override this at any point."
 fi
 
-if [ -d "logs" ]
+if [ -d "../logs" ]
 then
-    mkdir -p logs
+    mkdir -p ../logs
 else
     echo "Logs folder already exists..."
 fi
