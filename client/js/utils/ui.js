@@ -388,4 +388,5 @@ export default class UI {
     element.scrollTop = this.elementsScrollPosition.scrollTop;
     element.scrollLeft = this.elementsScrollPosition.scrollLeft;
   }
+
 }

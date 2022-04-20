@@ -4,6 +4,9 @@ import UI from "../utils/ui.js";
 import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
+import "../utils/cleanup-modals.util"
+import {setupConnectButton} from "./connect-button.service";
+import {closePrinterManagerModalIfDisconnected, closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
 
 let currentIndex = 0;
 
@@ -12,18 +15,6 @@ let currentPrinter = null;
 let filamentManager = false;
 
 const refreshCounter = 5000;
-$("#printerManagerModal").on("hidden.bs.modal", function (e) {
-  // Fix for mjpeg stream not ending when element removed...
-
-  if (document.getElementById("printerControlCamera")) {
-    document.getElementById("printerControlCamera").src = "";
-  }
-});
-$("#connectionModal").on("hidden.bs.modal", function (e) {
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
 
 export default class PrinterTerminalManagerService {
   static async init(index, printers, printerControlList) {
@@ -54,7 +45,7 @@ export default class PrinterTerminalManagerService {
       );
       const elements = PrinterTerminalManagerService.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";
-      PrinterTerminalManagerService.applyState(currentPrinter, elements);
+      await PrinterTerminalManagerService.applyState(currentPrinter, elements);
       PrinterTerminalManagerService.applyListeners(elements, printers, filamentDropDown);
     } else {
       if (document.getElementById("terminal")) {
@@ -64,7 +55,7 @@ export default class PrinterTerminalManagerService {
         currentPrinter = printers[id];
 
         const elements = PrinterTerminalManagerService.grabPage();
-        PrinterTerminalManagerService.applyState(currentPrinter, elements);
+        await PrinterTerminalManagerService.applyState(currentPrinter, elements);
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     }
@@ -72,78 +63,7 @@ export default class PrinterTerminalManagerService {
 
   static async loadPrinter(printer, printerControlList, filamentDropDown) {
     try {
-      const printerPort = document.getElementById("printerPortDrop");
-      const printerBaud = document.getElementById("printerBaudDrop");
-      const printerProfile = document.getElementById("printerProfileDrop");
-      const printerConnect = document.getElementById("printerConnect");
-
-      printerPort.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
-    `;
-      printerBaud.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
-    `;
-      printerProfile.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
-    `;
-      printer.connectionOptions.baudrates.forEach((baud) => {
-        if (baud !== 0) {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">${baud}</option>`);
-        } else {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">AUTO</option>`);
-        }
-      });
-      if (printer.connectionOptions.baudratePreference != null) {
-        document.getElementById("pmBaudrate").value = printer.connectionOptions.baudratePreference;
-      }
-      printer.connectionOptions.ports.forEach((port) => {
-        document
-          .getElementById("pmSerialPort")
-          .insertAdjacentHTML("beforeend", `<option value="${port}">${port}</option>`);
-      });
-      if (printer.connectionOptions.portPreference != null) {
-        document.getElementById("pmSerialPort").value = printer.connectionOptions.portPreference;
-      }
-      printer.connectionOptions.printerProfiles.forEach((profile) => {
-        document
-          .getElementById("pmProfile")
-          .insertAdjacentHTML(
-            "beforeend",
-            `<option value="${profile.id}">${profile.name}</option>`
-          );
-      });
-      if (printer.connectionOptions.printerProfilePreference != null) {
-        document.getElementById("pmProfile").value =
-          printer.connectionOptions.printerProfilePreference;
-      }
-      if (
-        printer.printerState.state === "Disconnected" ||
-        printer.printerState.state === "Error!"
-      ) {
-        printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
-        document.getElementById("pmSerialPort").disabled = false;
-        document.getElementById("pmBaudrate").disabled = false;
-        document.getElementById("pmProfile").disabled = false;
-      } else {
-        printerConnect.innerHTML =
-          "<center> <button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div></center>";
-        document.getElementById("pmSerialPort").disabled = true;
-        document.getElementById("pmBaudrate").disabled = true;
-        document.getElementById("pmProfile").disabled = true;
-      }
+      setupConnectButton(printer);
       let serverSettings = await OctoFarmClient.getServerSettings();
       filamentManager = serverSettings.filamentManager;
       //Load tools
@@ -369,6 +289,10 @@ export default class PrinterTerminalManagerService {
   }
 
   static async applyState(printer, elements) {
+    if(closePrinterManagerModalIfOffline(printer)){
+      return
+    }
+
     //Garbage collection for terminal
     const isScrolledToBottom =
       elements.terminal.terminalWindow.scrollHeight -

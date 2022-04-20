@@ -10,7 +10,7 @@ import {
     init as actionButtonInit
 } from "../../services/printer-action-buttons.service.js";
 import OctoPrintClient from "../../services/octoprint-client.service.js";
-import {checkTemps} from "../../services/temperature-check.util.js";
+import {checkTemps} from "../../utils/temperature-check.util.js";
 import doubleClickFullScreen from "../../utils/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import {getControlList, getPrinterInfo} from "./monitoring-view.state";
@@ -26,8 +26,8 @@ import PrinterTerminalManagerService from "../../services/printer-terminal-manag
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
-import {printerIsAvailableToView} from "../../utils/octofarm.utils";
-import {initialiseCurrentJobPopover} from "../../services/printer-current-job-service";
+import {isPrinterDisconnected, printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
+import {initialiseCurrentJobPopover} from "../../services/printer-current-job.service";
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
 
 let elems = [];
@@ -472,34 +472,36 @@ function addGroupListeners(printers) {
 }
 
 function grabElements(printer) {
-  if (typeof elems[printer._id] !== "undefined") {
-    return elems[printer._id];
+  const { _id } = printer;
+  if (typeof elems[_id] !== "undefined") {
+    return elems[_id];
   } else {
-    elems[printer._id] = {
-      row: document.getElementById("panel-" + printer._id),
-      name: document.getElementById("name-" + printer._id),
-      control: document.getElementById("printerButton-" + printer._id),
-      files: document.getElementById("printerFilesBtn-" + printer._id),
-      terminal: document.getElementById("printerTerminalButton-" + printer._id),
-      connect: document.getElementById("printerQuickConnect-" + printer._id),
-      start: document.getElementById("play-" + printer._id),
-      stop: document.getElementById("cancel-" + printer._id),
-      pause: document.getElementById("pause-" + printer._id),
-      restart: document.getElementById("restart-" + printer._id),
-      resume: document.getElementById("resume-" + printer._id),
-      camera: document.getElementById("camera-" + printer._id),
-      currentFile: document.getElementById("currentFile-" + printer._id),
-      currentFilament: document.getElementById("currentFilament-" + printer._id),
-      state: document.getElementById("state-" + printer._id),
-      layerData: document.getElementById("displayLayerProgressData-" + printer._id),
-      printTimeElapsed: document.getElementById("printTimeElapsed-" + printer._id),
-      remainingPrintTime: document.getElementById("remainingTime-" + printer._id),
-      cameraContain: document.getElementById("cameraContain-" + printer._id),
-      progress: document.getElementById("progress-" + printer._id),
-      bed: document.getElementById("badTemp-" + printer._id),
-      chamber: document.getElementById("chamberTemp-" + printer._id)
+    elems[_id] = {
+      row: document.getElementById("panel-" + _id),
+      name: document.getElementById("name-" + _id),
+      control: document.getElementById("printerButton-" + _id),
+      files: document.getElementById("printerFilesBtn-" + _id),
+      terminal: document.getElementById("printerTerminalButton-" + _id),
+      job: document.getElementById("printerInfoButton-" + _id),
+      connect: document.getElementById("printerQuickConnect-" + _id),
+      start: document.getElementById("play-" + _id),
+      stop: document.getElementById("cancel-" + _id),
+      pause: document.getElementById("pause-" + _id),
+      restart: document.getElementById("restart-" + _id),
+      resume: document.getElementById("resume-" + _id),
+      camera: document.getElementById("camera-" + _id),
+      currentFile: document.getElementById("currentFile-" + _id),
+      currentFilament: document.getElementById("currentFilament-" + _id),
+      state: document.getElementById("state-" + _id),
+      layerData: document.getElementById("displayLayerProgressData-" + _id),
+      printTimeElapsed: document.getElementById("printTimeElapsed-" + _id),
+      remainingPrintTime: document.getElementById("remainingTime-" + _id),
+      cameraContain: document.getElementById("cameraContain-" + _id),
+      progress: document.getElementById("progress-" + _id),
+      bed: document.getElementById("badTemp-" + _id),
+      chamber: document.getElementById("chamberTemp-" + _id)
     };
-    return elems[printer._id];
+    return elems[_id];
   }
 }
 function grabGroupElements(group) {
@@ -554,11 +556,12 @@ async function updateState(printer, clientSettings, view, index) {
 
   //Printer
   checkQuickConnectState(printer);
-  const isOffline = printer.printerState.colour.category === "Offline";
+  const isOffline = !printerIsOnline(printer);
 
   elements.control.disabled = isOffline;
   elements.files.disabled = isOffline;
   elements.terminal.disabled = isOffline;
+  elements.job.disabled = isOffline;
 
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
@@ -936,6 +939,9 @@ async function updateState(printer, clientSettings, view, index) {
       }
     }
   } else if (printer.printerState.state === "Disconnected") {
+
+
+
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
     }

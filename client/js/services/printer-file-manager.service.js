@@ -7,6 +7,9 @@ import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {allowedFileTypes} from "../constants/file-types.constants";
+import "../utils/cleanup-modals.util"
+import {setupConnectButton} from "./connect-button.service";
+import {closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
 
 let currentIndex = 0;
 let currentPrinter = null;
@@ -53,78 +56,7 @@ export default class PrinterFileManagerService {
   static async loadPrinter(printer) {
     //Load Connection Panel
     try {
-      const printerPort = document.getElementById("printerPortDrop");
-      const printerBaud = document.getElementById("printerBaudDrop");
-      const printerProfile = document.getElementById("printerProfileDrop");
-      const printerConnect = document.getElementById("printerConnect");
-
-      printerPort.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
-    `;
-      printerBaud.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
-    `;
-      printerProfile.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
-    `;
-      printer.connectionOptions.baudrates.forEach((baud) => {
-        if (baud !== 0) {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">${baud}</option>`);
-        } else {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">AUTO</option>`);
-        }
-      });
-      if (printer.connectionOptions.baudratePreference != null) {
-        document.getElementById("pmBaudrate").value = printer.connectionOptions.baudratePreference;
-      }
-      printer.connectionOptions.ports.forEach((port) => {
-        document
-          .getElementById("pmSerialPort")
-          .insertAdjacentHTML("beforeend", `<option value="${port}">${port}</option>`);
-      });
-      if (printer.connectionOptions.portPreference != null) {
-        document.getElementById("pmSerialPort").value = printer.connectionOptions.portPreference;
-      }
-      printer.connectionOptions.printerProfiles.forEach((profile) => {
-        document
-          .getElementById("pmProfile")
-          .insertAdjacentHTML(
-            "beforeend",
-            `<option value="${profile.id}">${profile.name}</option>`
-          );
-      });
-      if (printer.connectionOptions.printerProfilePreference != null) {
-        document.getElementById("pmProfile").value =
-          printer.connectionOptions.printerProfilePreference;
-      }
-      if (
-        printer.printerState.state === "Disconnected" ||
-        printer.printerState.state === "Error!"
-      ) {
-        printerConnect.innerHTML =
-          "<button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div>";
-        document.getElementById("pmSerialPort").disabled = false;
-        document.getElementById("pmBaudrate").disabled = false;
-        document.getElementById("pmProfile").disabled = false;
-      } else {
-        printerConnect.innerHTML =
-          "<button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div>";
-        document.getElementById("pmSerialPort").disabled = true;
-        document.getElementById("pmBaudrate").disabled = true;
-        document.getElementById("pmProfile").disabled = true;
-      }
+      setupConnectButton(printer);
       //Load tools
       document.getElementById("printerControls").innerHTML = `
           <div class="row">
@@ -314,6 +246,7 @@ export default class PrinterFileManagerService {
   }
 
   static async applyState(printer, elements) {
+    closePrinterManagerModalIfOffline(printer);
     //Garbage collection for terminal
     if (typeof printer.fileList !== "undefined") {
       elements.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
