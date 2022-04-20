@@ -9,7 +9,7 @@ RUN DEBIAN_FRONT=noninteractive apt-get install -yq apt-utils
 # Install MongoDB
 RUN DEBIAN_FRONT=noninteractive apt-get install -yq ca-certificates
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add
-RUN echo 'deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.4' | tee /etc/apt/sources.list.d/mongodb.list
+RUN echo 'deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.4 main' | tee /etc/apt/sources.list.d/mongodb.list
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -yq mongodb-org
 
