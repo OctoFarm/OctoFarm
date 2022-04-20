@@ -27,6 +27,8 @@ import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
 import {printerIsAvailableToView} from "../../utils/octofarm.utils";
+import {initialiseCurrentJobPopover} from "../../services/printer-current-job-service";
+import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
 
 let elems = [];
 let groupElems = [];
@@ -65,6 +67,12 @@ const returnPrinterInfo = (id) => {
 
 function addListeners(printer) {
   //For now Control has to be seperated
+  document.getElementById(`printerInfoButton-${printer._id}`).addEventListener("click", async () => {
+    currentOpenModal.innerHTML = "Printer Job Status: ";
+    const printerInfo = getPrinterInfo();
+    const controlList = getControlList();
+    await initialiseCurrentJobPopover(printer._id, printerInfo, controlList);
+  });
   document.getElementById(`printerButton-${printer._id}`).addEventListener("click", async () => {
     currentOpenModal.innerHTML = "Printer Control: ";
     const printerInfo = getPrinterInfo();
@@ -706,10 +714,8 @@ async function updateState(printer, clientSettings, view, index) {
     elements.currentFile.setAttribute("title", "No File Selected");
     elements.currentFile.innerHTML = "<i class=\"fas fa-file-code\"></i> " + "No File Selected";
   }
-
   if (!!printer?.layerData) {
-    const formatLayerData = `<i class="fas fa-layer-group"></i> ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
-    UI.doesElementNeedUpdating(formatLayerData, elements.layerData, "innerHTML");
+    UI.doesElementNeedUpdating(returnMinimalLayerDataDisplay(printer.layerData), elements.layerData, "innerHTML");
   }
   if (!!printer.tools) {
     const toolKeys = Object.keys(printer.tools[0]);
@@ -1303,8 +1309,9 @@ export async function initMonitoring(printers, clientSettings, view) {
         await PrinterControlManagerService.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
         await PrinterTerminalManagerService.init("", printers, getControlList());
+      }else if(currentOpenModal.innerHTML.includes("Job")){
+        await initialiseCurrentJobPopover("", printers, getControlList());
       }
-      break;
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {

@@ -199,7 +199,7 @@ const captureThrottlePluginData = (id, data) => {
 
 const captureResourceMonitorData = (id, data) => {
   const {
-    cpu: { average },
+    cpu: { average, octoprint },
     memory: { percent }
   } = data;
 
@@ -208,9 +208,15 @@ const captureResourceMonitorData = (id, data) => {
   if(!octoPrintResourceMonitor){
     octoPrintResourceMonitor = {
       system_cpu: [],
-      system_memory: []
+      system_memory: [],
+      octoprint_cpu: []
     }
   }
+
+  if(!!octoprint){
+    octoPrintResourceMonitor.octoprint_cpu.push(octoprint)
+  }
+
   if(!!average){
     octoPrintResourceMonitor.system_cpu.push(average);
   }
@@ -218,16 +224,24 @@ const captureResourceMonitorData = (id, data) => {
     octoPrintResourceMonitor.system_memory.push(percent);
   }
 
+  if(octoPrintResourceMonitor.octoprint_cpu.length > 50){
+    octoPrintResourceMonitor.octoprint_cpu.shift();
+  }
+
   if(octoPrintResourceMonitor.system_cpu.length > 50){
-    octoPrintResourceMonitor.system_cpu.shift()
+    octoPrintResourceMonitor.system_cpu.shift();
   }
 
   if(octoPrintResourceMonitor.system_memory.length > 50){
-    octoPrintResourceMonitor.system_memory.shift()
+    octoPrintResourceMonitor.system_memory.shift();
   }
 
 
   getPrinterStoreCache().updatePrinterLiveValue(id, { octoResourceMonitor: octoPrintResourceMonitor });
+}
+
+const captureDisplayLayerProgress = (id, data) => {
+  getPrinterStoreCache().updatePrinterLiveValue(id, { layerData: data });
 }
 
 module.exports = {
@@ -236,5 +250,6 @@ module.exports = {
   captureKlipperPluginData,
   capturePluginManagerData,
   captureThrottlePluginData,
-  captureResourceMonitorData
+  captureResourceMonitorData,
+  captureDisplayLayerProgress
 };

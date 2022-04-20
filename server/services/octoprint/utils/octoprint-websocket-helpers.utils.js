@@ -81,7 +81,6 @@ const coolDownEvent = (id, temps) => {
 
 const captureJobData = (id, data) => {
   if (!!data) {
-    //Make sure we have at least a tool!
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       job: data
     });

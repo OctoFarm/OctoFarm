@@ -547,6 +547,7 @@ label {
 .modal-body {
   max-height: 80vh;
   overflow-y: scroll;
+  overflow-wrap: normal;
 }
 
 .sortableList {

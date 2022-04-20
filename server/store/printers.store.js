@@ -150,9 +150,11 @@ class PrinterStore {
   getFileList(id) {
     const printer = this.#findMePrinter(id);
     const newPrinter = JSON.parse(JSON.stringify(printer));
-    return Object.assign(newPrinter, {
-      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
-    });
+    return FileClean.generate(
+      newPrinter.fileList,
+      newPrinter.selectedFilament,
+      newPrinter.costSettings
+    );
   }
 
   getOctoPiData(id) {
@@ -1156,14 +1158,14 @@ class PrinterStore {
         farmPrinters[printerIndex].selectedFilament,
         farmPrinters[printerIndex].costSettings
       );
-      JobClean.generate(
-        farmPrinters[printerIndex].job,
-        farmPrinters[printerIndex].selectedFilament,
-        farmPrinters[printerIndex].fileList,
-        farmPrinters[printerIndex].currentZ,
-        farmPrinters[printerIndex].costSettings,
-        farmPrinters[printerIndex].progress
-      );
+      // JobClean.generate(
+      //   farmPrinters[printerIndex].job,
+      //   farmPrinters[printerIndex].selectedFilament,
+      //   farmPrinters[printerIndex].fileList,
+      //   farmPrinters[printerIndex].currentZ,
+      //   farmPrinters[printerIndex].costSettings,
+      //   farmPrinters[printerIndex].progress
+      // );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";

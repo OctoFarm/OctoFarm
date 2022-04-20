@@ -31,6 +31,7 @@ const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
+const { JobClean } = require("../job-cleaner.service");
 const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 
 const logger = new Logger("OctoFarm-State");
@@ -88,6 +89,12 @@ class OctoPrintPrinter {
   printerName = undefined;
   //Live printer state data
   layerData = undefined;
+  progress = {
+    completion: null,
+    filepos: null,
+    printTime: null,
+    printTimeLeft: null
+  };
   resends = undefined;
   tools = undefined;
   currentJob = undefined;
@@ -141,7 +148,7 @@ class OctoPrintPrinter {
   current = undefined;
   options = undefined;
   profiles = undefined;
-  pluginListEnabled = undefined;
+  pluginsListEnabled = undefined;
   pluginsListDisabled = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
@@ -1774,6 +1781,8 @@ class OctoPrintPrinter {
     this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
 
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+
+    this.currentJob = JobClean.generate(this.job, this.selectedFilament, this.fileList, this.currentZ, this.costSettings, this.progress)
   }
 
   async deleteAllFilesAndFolders() {

@@ -58,7 +58,17 @@ export function drawListView(printer, clientSettings) {
            ${printer.printerState.state}
           </td>
           <td class="py-auto">
-                                    <button
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                            >
+                            <i class="fa-solid fa-circle-info"></i>
+                          </button>
+                            <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
@@ -90,8 +100,8 @@ export function drawListView(printer, clientSettings) {
                            >
                               <i class="fas fa-terminal"></i>
                         </button>
-          </td>
-          <td class="py-auto">
+                    </td>
+                    <td class="py-auto">
                     <button
                             title="Start your currently selected print"
                             id="play-${printer._id}"
@@ -307,6 +317,16 @@ export function drawPanelView(printer, clientSettings) {
                           >
                             <i class="fas fa-square"></i> Cancel
                           </button> <br>
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                            >
+                            <i class="fa-solid fa-circle-info"></i> Job
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -528,6 +548,15 @@ export function drawCameraView(printer, clientSettings) {
                           
                          </small>
                           <small class="float-left">
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal">
+                            <i class="fa-solid fa-circle-info"></i>
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -729,6 +758,15 @@ export function drawCombinedView(printer, clientSettings) {
                           >
                             <i class="fas fa-square"></i> Cancel
                           </button> <br>
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal">
+                            <i class="fa-solid fa-circle-info"></i> Job
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"

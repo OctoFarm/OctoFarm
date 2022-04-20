@@ -56,7 +56,8 @@ const {
   captureKlipperPluginData,
   capturePluginManagerData,
   captureThrottlePluginData,
-  captureResourceMonitorData
+  captureResourceMonitorData,
+  captureDisplayLayerProgress
 } = require("./utils/octoprint-plugin.utils");
 
 const Logger = require("../../handlers/logger");
@@ -299,7 +300,7 @@ class OctoprintWebsocketMessageService {
   }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
-    //console.log("PRINTER PLUGIN DATA", message);
+    // console.log("PRINTER PLUGIN DATA", message);
     const { header, data } = OP_EM.parseOctoPrintPluginMessage(message);
 
     const type = OP_EM.parseOctoPrintPluginType(data);
@@ -317,6 +318,10 @@ class OctoprintWebsocketMessageService {
         break;
       case OP_WS_PLUGIN_KEYS.resource_monitor:
         captureResourceMonitorData(printerID, data);
+        break;
+      case OP_WS_PLUGIN_KEYS.display_layer_progress:
+        captureDisplayLayerProgress(printerID, data)
+        break;
     }
   }
   static handleTimelapseData(printerID, data) {}

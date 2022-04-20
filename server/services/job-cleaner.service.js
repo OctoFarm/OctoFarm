@@ -45,7 +45,7 @@ class JobCleanerService {
       expectedFilamentCosts: null,
       expectedPrinterCosts: null,
       expectedTotals: null,
-      currentZ: null,
+      currentZ: 0,
       printTimeElapsed: null,
       printTimeRemaining: null,
       averagePrintTime: null,
@@ -53,17 +53,15 @@ class JobCleanerService {
       thumbnail: null
     };
 
-    // console.log(selectedFilament);
-
     if (!!printerJob) {
       if (!!printerJob?.file?.name) {
         currentJob.fileName = printerJob.file.name;
-        const { files } = fileList;
-        const foundFile = findIndex(files, (o) => {
-          return o.name === printerJob.file.name;
+
+        const fileIndex = findIndex(fileList.fileList, (o) => {
+          return o.fullPath === printerJob.file.path;
         });
-        if (!!foundFile) {
-          currentJob.thumbnail = foundFile?.thumbnail;
+        if (fileIndex > -1) {
+          currentJob.thumbnail = fileList.fileList[fileIndex]?.thumbnail;
         }
       }
       if (!!printerJob?.file?.display) currentJob.fileDisplay = printerJob.file.display;

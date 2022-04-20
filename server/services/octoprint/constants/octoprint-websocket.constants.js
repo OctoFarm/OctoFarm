@@ -110,7 +110,8 @@ const OP_WS_PLUGIN_KEYS = {
   softwareupdate: "softwareupdate",
   psucontrol: "psucontrol", //Not used
   pi_support: "pi_support",
-  resource_monitor: "resource_monitor"
+  resource_monitor: "resource_monitor",
+  display_layer_progress: "DisplayLayerProgress-websocket-payload"
 };
 
 module.exports = {
