@@ -75,7 +75,7 @@ jobs:
       # Grab the client package version into a variable.
       - name: get-client-current-version
         id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@master
+        uses: martinbeentjes/npm-get-version-action@main
         with:
           path: client
 
