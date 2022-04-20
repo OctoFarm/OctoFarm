@@ -25,7 +25,7 @@ const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
-let influxCounter = 2000;
+let influxCounter = 5000;
 
 const sortMe = function (printers) {
   const sortBy = getSorting();
@@ -112,8 +112,9 @@ async function sendData() {
     await SettingsClean.start();
     serverSettings = SettingsClean.returnSystemSettings();
   }
+
   if (!!serverSettings.influxExport?.active) {
-    if (influxCounter >= 2000) {
+    if (influxCounter >= 5000) {
       sendToInflux(printersInformation);
       influxCounter = 0;
     } else {

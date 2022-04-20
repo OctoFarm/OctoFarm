@@ -289,7 +289,6 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
-    const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -299,7 +298,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].monitoringViews = sentOnline.monitoringViews;
 
     if (
-      [serverChanges, timeoutChanges, influxExport].includes(false)
+      [serverChanges, timeoutChanges].includes(false)
     ) {
       restartRequired = true;
     }
