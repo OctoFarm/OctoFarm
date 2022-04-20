@@ -1,3 +1,4 @@
+import UI from "../../utils/ui"
 const formatLayerDataPercent = (currentLayer, totalLayer) => {
     let layerPercent = "0"
     if(currentLayer !== "-" && totalLayer !== "-"){
@@ -8,7 +9,7 @@ const formatLayerDataPercent = (currentLayer, totalLayer) => {
 const formatLayerHeightPercent = (currentHeightFormatted, totalHeightFormatted) => {
     let heightPercent = "0"
     if(currentHeightFormatted !== "-" && totalHeightFormatted !== "-"){
-        heightPercent = (currentHeightFormatted / totalHeightFormatted * 100).toFixed(2);
+        heightPercent = (currentHeightFormatted / totalHeightFormatted * 100).toFixed(0);
     }
     return heightPercent;
 }
@@ -23,5 +24,28 @@ export const returnMinimalLayerDataDisplay = (layerData) => {
 }
 
 export const returnExpandedLayerDataDisplay = (layerData) => {
-    console.log(layerData)
+    const { currentLayer, totalLayer, currentHeightFormatted, totalHeightFormatted, averageLayerDurationInSeconds, lastLayerDurationInSeconds, fanspeed, feedrate } = layerData;
+    const layerPercent = formatLayerDataPercent(currentLayer, totalLayer)
+    let heightPercent = formatLayerHeightPercent(currentHeightFormatted, totalHeightFormatted)
+    return {
+        layerData: `
+            <i class="fa-solid fa-layer-group"></i> ${currentLayer} / ${totalLayer} (${layerPercent}%) 
+        `,
+        heightData: `
+            <i class="fa-solid fa-ruler"></i> ${currentHeightFormatted}mm / ${totalHeightFormatted}mm (${heightPercent}%)
+        `,
+        averageLayerDuration: `
+            <i class="fa-solid fa-gauge"></i> ${UI.generateMilisecondsTime(averageLayerDurationInSeconds * 1000)}
+        `,
+        lastLayerTime: `
+            <i class="fa-solid fa-stopwatch"></i> ${UI.generateMilisecondsTime(lastLayerDurationInSeconds * 1000)}
+        `,
+        currentFanSpeed: `
+            <i class="fa-solid fa-fan"></i> ${fanspeed}
+        `,
+        currentFeedRate: `
+            <i class="fa-solid fa-paint-roller"></i> ${feedrate}
+        `,
+
+    }
 }

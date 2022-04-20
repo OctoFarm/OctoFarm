@@ -1,7 +1,10 @@
 import Calc from "../utils/calc";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import UI from "../utils/ui";
-import {returnMinimalLayerDataDisplay} from "./octoprint/octoprint-display-layer-plugin.service";
+import {
+    returnExpandedLayerDataDisplay,
+    returnMinimalLayerDataDisplay
+} from "./octoprint/octoprint-display-layer-plugin.service";
 
 let currentIndex;
 let currentPrinter;
@@ -59,14 +62,19 @@ const returnPageElements = () => {
             printerResends: document.getElementById("printerResends"),
             resendTitle: document.getElementById("resentTitle"),
             dlpPluginDataTitle: document.getElementById("dlpPluginDataTitle"),
-            dlpPluginDataData: document.getElementById("dlpPluginDataData")
+            dlpLayerProgress: document.getElementById("dlpLayerProgress"),
+            dlpHeightProgress: document.getElementById("dlpHeightProgress"),
+            dlpAvgLayerDuration: document.getElementById("dlpAvgLayerDuration"),
+            dlpLastLayerTime: document.getElementById("dlpLastLayerTime"),
+            dlpFanSpeed: document.getElementById("dlpFanSpeed"),
+            dlpFeedRate: document.getElementById("dlpFeedRate")
     }
 }
 
 const loadPrintersJobStatus = (printer) => {
     let thumbnailClass = "d-none";
     if (!!printer?.currentJob?.thumbnail) {
-        thumbnailClass = "col-md-12 col-lg-3";
+        thumbnailClass = "col-md-3 col-lg-2";
     }
     const printerPort = document.getElementById("printerPortDrop");
     const printerBaud = document.getElementById("printerBaudDrop");
@@ -163,7 +171,7 @@ const loadPrintersJobStatus = (printer) => {
     document.getElementById("printerControls").innerHTML = `
         <div class="row">
         <!-- Camera --> 
-          <div class="col-md-4 col-lg-3 text-center">
+          <div class="col-md-3 col-lg-2 text-center">
           <h5>Camera</h5><hr>
           <span id="cameraRow">  
             <div class="row">
@@ -174,22 +182,23 @@ const loadPrintersJobStatus = (printer) => {
           </span>
         </div>
         <!-- Print Status -->  
-        <div class="col-md-8 col-lg-9 text-center">       
+        <div class="col-md-9 col-lg-10 text-center">       
             <h5>Print Status</h5><hr>    
                <div class="progress mb-2">
                  <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="100">Loading... </div>
                </div>
                <div class="row">
-                 <div class="col-md-6 col-lg-3">
+                 <div id="fileThumbnail" class="${thumbnailClass}"></div>
+                 <div class="col-md-4 col-lg-4">
                      <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
                  </div>
-                 <div class="col-md-4 col-lg-3">
+                 <div class="col-md-3 col-lg-2">
                         <b>Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">Loading...</p>
                  </div>
-                 <div class="col-md-6 col-lg-3">
+                 <div class="col-md-3 col-lg-3">
                     <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
                  </div>
-                 <div id="fileThumbnail" class="${thumbnailClass}"></div>
+
                </div>
                 <div class="row text-center">
                     <div class="col-md-4 col-lg-3">
@@ -206,10 +215,28 @@ const loadPrintersJobStatus = (printer) => {
                     </div>
                 </div>
            </div>   
-        <div class="col-12">
-            <div class="col-md-4 col-lg-3">                    
-              <b id="dlpPluginDataTitle" class="mb-1 d-none">Layer Progress: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="dlpPluginDataData">Loading...</p>            
-            </div>
+                <div class="col-12 text-center d-none" id="dlpPluginDataTitle">
+              <h5>Additional Information</h5><hr>               
+              <div class="row">
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Layer Progress: </b><br><p title="Current layer progress" class="tag mb-1" id="dlpLayerProgress">Loading...</p>
+                </div>
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Height Progress: </b><br><p title="Current height progress" class="tag mb-1e" id="dlpHeightProgress">Loading...</p>
+                </div>
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Average Layer Duration: </b><br><p title="Average duration of layers" class="tag mb-1" id="dlpAvgLayerDuration">Loading...</p>
+                </div>
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Last Layer Time: </b><br><p title="Time to complete last layer" class="tag mb-1" id="dlpLastLayerTime">Loading...</p>
+                </div>
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Current Fan Speed: </b><br><p title="Current fan speed" class="tag mb-1" id="dlpFanSpeed">Loading...</p>
+                </div>
+                <div class="col-sm-3 col-lg-2">
+                    <b class="mb-1">Current Feed Rate: </b><br><p title="Current feed rate" class="tag mb-1" id="dlpFeedRate">Loading...</p>
+                </div>
+              </div>
         </div> 
         <div class="col-lg-12 text-center">
                  <h5>Expected Costs</h5><hr> 
@@ -304,9 +331,20 @@ const updateCurrentJobStatus = (printer, elements) => {
     if (!!printer?.layerData) {
         if (elements.dlpPluginDataTitle.classList.contains("d-none")) {
             elements.dlpPluginDataTitle.classList.remove("d-none");
-            elements.dlpPluginDataData.classList.remove("d-none");
         }
-        elements.dlpPluginDataData.innerHTML = returnMinimalLayerDataDisplay(printer.layerData);
+        const { layerData,
+            heightData,
+            averageLayerDuration,
+            lastLayerTime,
+            currentFanSpeed,
+            currentFeedRate } = returnExpandedLayerDataDisplay(printer.layerData);
+            elements.dlpLayerProgress.innerHTML = layerData;
+            elements.dlpHeightProgress.innerHTML = heightData;
+            elements.dlpAvgLayerDuration.innerHTML = averageLayerDuration;
+            elements.dlpLastLayerTime.innerHTML = lastLayerTime;
+            elements.dlpFanSpeed.innerHTML = currentFanSpeed;
+            elements.dlpFanSpeed.innerHTML = currentFanSpeed;
+            elements.dlpFeedRate.innerHTML = currentFeedRate;
     }
 
     if (typeof printer.currentJob !== "undefined" && printer.currentJob.progress !== null) {
