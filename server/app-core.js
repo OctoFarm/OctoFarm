@@ -78,7 +78,9 @@ function setupExpressServer() {
       resave: false,
       saveUninitialized: true,
       store: new MongoStore({
-        mongoUrl: process.env[AppConstants.MONGO_KEY]
+        mongoUrl: process.env[AppConstants.MONGO_KEY],
+        ttl: 14 * 24 * 60 * 60,
+        autoRemove: "native"
       })
     })
   );
