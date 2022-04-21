@@ -127,6 +127,7 @@ const captureDisconnected = (id, data) => {
       logger.error("Failed to check disconnected script", e);
       return e;
     });
+  getPrinterStoreCache().reRunJobCleaner(id);
 };
 const captureDwelling = (id, data) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "dwelling", undefined)
@@ -144,7 +145,7 @@ const captureError = (id, data) => {
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-
+  getPrinterStoreCache().reRunJobCleaner(id);
   // Register cancelled print...
   HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
     .then((res) => {

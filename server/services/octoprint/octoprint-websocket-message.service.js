@@ -320,7 +320,7 @@ class OctoprintWebsocketMessageService {
         captureResourceMonitorData(printerID, data);
         break;
       case OP_WS_PLUGIN_KEYS.display_layer_progress:
-        captureDisplayLayerProgress(printerID, data)
+        captureDisplayLayerProgress(printerID, data);
         break;
     }
   }

@@ -96,7 +96,7 @@ class OctoPrintPrinter {
     printTimeLeft: null
   };
   resends = undefined;
-  tools = undefined;
+  tools = null;
   currentJob = undefined;
   job = undefined;
   currentZ = undefined;
@@ -424,6 +424,8 @@ class OctoPrintPrinter {
     if (!!settingsAppearance) {
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
     }
+
+    this.resetJobInformation();
   }
 
   /*
@@ -491,6 +493,7 @@ class OctoPrintPrinter {
   }
 
   reConnectWebsocket() {
+    this.resetJobInformation();
     if (!!this?.#ws) {
       this.#ws.terminate();
       return "Successfully terminated websocket! Please wait for reconnect.";
@@ -1732,13 +1735,13 @@ class OctoPrintPrinter {
     }
   }
 
-  notifySubscribersOfFileInformationChange(fullPath, fileIndex, additionalInformation = undefined){
+  notifySubscribersOfFileInformationChange(fullPath, fileIndex, additionalInformation = undefined) {
     notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
       key: "fileInformationUpdated",
       value: FileClean.generateSingle(
-          JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
-          this.selectedFilament,
-          this.costSettings
+        JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
+        this.selectedFilament,
+        this.costSettings
       ),
       additionalInformation
     });
@@ -1764,6 +1767,41 @@ class OctoPrintPrinter {
     }
   }
 
+  resetJobInformation() {
+    const job = {
+      file: {
+        name: null,
+        path: null,
+        display: null,
+        origin: null,
+        size: null,
+        date: null
+      },
+      estimatedPrintTime: null,
+      averagePrintTime: null,
+      lastPrintTime: null,
+      filament: null,
+      user: null
+    };
+
+    const progress = {
+      completion: null,
+      filepos: null,
+      printTime: null,
+      printTimeLeft: null,
+      printTimeLeftOrigin: null
+    };
+
+    this.currentJob = JobClean.generate(
+      job,
+      this.selectedFilament,
+      this.fileList,
+      0,
+      this.costSettings,
+      progress
+    );
+  }
+
   cleanPrintersInformation() {
     this.otherSettings = PrinterClean.sortOtherSettings(
       this.tempTriggers,
@@ -1782,7 +1820,14 @@ class OctoPrintPrinter {
 
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
 
-    this.currentJob = JobClean.generate(this.job, this.selectedFilament, this.fileList, this.currentZ, this.costSettings, this.progress)
+    this.currentJob = JobClean.generate(
+      this.job,
+      this.selectedFilament,
+      this.fileList,
+      this.currentZ,
+      this.costSettings,
+      this.progress
+    );
   }
 
   async deleteAllFilesAndFolders() {

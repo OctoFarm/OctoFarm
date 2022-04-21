@@ -12,8 +12,8 @@ const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
-const {JobClean} = require("../services/job-cleaner.service");
-const {Job} = require("toad-scheduler");
+const { JobClean } = require("../services/job-cleaner.service");
+const { Job } = require("toad-scheduler");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -951,7 +951,7 @@ class PrinterStore {
     return printer.getSessionkey();
   }
 
-  getOctoPrintResourceMonitorValues(id){
+  getOctoPrintResourceMonitorValues(id) {
     const printer = this.#findMePrinter(id);
     return printer.octoResourceMonitor;
   }
@@ -1131,7 +1131,6 @@ class PrinterStore {
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
 
-
     // Unassign existing printers
     this.deattachSpoolFromAllPrinters(spoolID);
 
@@ -1152,27 +1151,33 @@ class PrinterStore {
       } else {
         farmPrinters[printerIndex].selectedFilament[tool] = null;
       }
-      this.updatePrinterDatabase(farmPrinters[printerIndex]._id, { selectedFilament: farmPrinters[printerIndex].selectedFilament });
+      this.updatePrinterDatabase(farmPrinters[printerIndex]._id, {
+        selectedFilament: farmPrinters[printerIndex].selectedFilament
+      });
       FileClean.generate(
         farmPrinters[printerIndex].fileList,
         farmPrinters[printerIndex].selectedFilament,
         farmPrinters[printerIndex].costSettings
       );
-      // JobClean.generate(
-      //   farmPrinters[printerIndex].job,
-      //   farmPrinters[printerIndex].selectedFilament,
-      //   farmPrinters[printerIndex].fileList,
-      //   farmPrinters[printerIndex].currentZ,
-      //   farmPrinters[printerIndex].costSettings,
-      //   farmPrinters[printerIndex].progress
-      // );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
   }
 
+  reRunJobCleaner = (id) => {
+    const printer = this.#findMePrinter(id);
+    JobClean.generate(
+      printer.job,
+      printer.selectedFilament,
+      printer.fileList,
+      printer.currentZ,
+      printer.costSettings,
+      printer.progress
+    );
+  };
+
   deattachSpoolFromAllPrinters(filamentID) {
-    console.log(filamentID)
+    console.log(filamentID);
     const farmPrinters = this.listPrintersInformation(true);
     const farmPrintersAssigned = farmPrinters.filter(
       (printer) =>
@@ -1189,11 +1194,7 @@ class PrinterStore {
         logger.debug("Spool reset", spool);
       });
       this.updatePrinterDatabase(printer._id, { selectedFilament: printer.selectedFilament });
-      FileClean.generate(
-          printer.fileList,
-          printer.selectedFilament,
-          printer.costSettings
-      );
+      FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings);
     });
   }
 
