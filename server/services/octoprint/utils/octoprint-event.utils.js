@@ -190,10 +190,12 @@ const captureFileRemoved = (id, data) => {
     });
 };
 const captureFirmwareData = (id, data) => {
-  const { name } = data;
-  logger.warning("Updating printer firmware version", name);
+  const {
+    data: { FIRMWARE_NAME, FIRMWARE_VERSION }
+  } = data;
+  logger.warning("Updating printer firmware version", data);
   getPrinterStoreCache().updatePrinterDatabase(id, {
-    printerFirmware: name
+    printerFirmware: `${FIRMWARE_NAME} ${FIRMWARE_VERSION}`
   });
 };
 const captureFolderAdded = (id, data) => {
@@ -307,14 +309,7 @@ const capturePrintFailed = (id, data) => {
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  HistoryCollection.capturePrint(
-    payloadData,
-    printer,
-    job,
-    files,
-    resendStats,
-    false
-  )
+  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, false)
     .then((res) => {
       logger.info("Successfully captured failed print!", res);
       ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res._id)

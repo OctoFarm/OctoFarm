@@ -142,7 +142,6 @@ class OctoPrintPrinter {
       MAC: ""
     }
   };
-  klipperFirmwareVersion = undefined;
   printerFirmware = undefined;
   octoPrintVersion = undefined;
   current = undefined;

@@ -310,7 +310,6 @@ class OctoprintWebsocketMessageService {
         capturePluginManagerData(printerID, type, data);
         break;
       case OP_WS_PLUGIN_KEYS.klipper:
-        console.log(data);
         captureKlipperPluginData(printerID, data);
         break;
       case OP_WS_PLUGIN_KEYS.pi_support:

@@ -97,14 +97,10 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   }
 };
 
-//TODO Make sure the Klipper Plugin Data capture works.
 const captureKlipperPluginData = (id, data) => {
-  const { payload } = data;
-  if (payload.includes("Firmware version:")) {
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      klipperFirmwareVersion: payload.replace("Firmware version: ", "")
-    });
-  }
+  const { payload, subtype } = data;
+  const state = subtype === "info" ? "Info" : "Offline";
+  addOctoPrintIssueWrapper(id, payload, state);
 };
 
 const capturePluginManagerData = (id, type, data) => {
@@ -204,43 +200,45 @@ const captureResourceMonitorData = (id, data) => {
   } = data;
   let octoPrintResourceMonitor = getPrinterStoreCache().getOctoPrintResourceMonitorValues(id);
 
-  if(!octoPrintResourceMonitor){
+  if (!octoPrintResourceMonitor) {
     octoPrintResourceMonitor = {
       system_cpu: [],
       system_memory: [],
       octoprint_cpu: []
-    }
+    };
   }
 
-  if(!!octoprint){
-    octoPrintResourceMonitor.octoprint_cpu.push(octoprint)
+  if (!!octoprint) {
+    octoPrintResourceMonitor.octoprint_cpu.push(octoprint);
   }
 
-  if(!!average){
+  if (!!average) {
     octoPrintResourceMonitor.system_cpu.push(average);
   }
-  if(!!percent){
+  if (!!percent) {
     octoPrintResourceMonitor.system_memory.push(percent);
   }
 
-  if(octoPrintResourceMonitor.octoprint_cpu.length > 50){
+  if (octoPrintResourceMonitor.octoprint_cpu.length > 50) {
     octoPrintResourceMonitor.octoprint_cpu.shift();
   }
 
-  if(octoPrintResourceMonitor.system_cpu.length > 50){
+  if (octoPrintResourceMonitor.system_cpu.length > 50) {
     octoPrintResourceMonitor.system_cpu.shift();
   }
 
-  if(octoPrintResourceMonitor.system_memory.length > 50){
+  if (octoPrintResourceMonitor.system_memory.length > 50) {
     octoPrintResourceMonitor.system_memory.shift();
   }
 
-  getPrinterStoreCache().updatePrinterLiveValue(id, { octoResourceMonitor: octoPrintResourceMonitor });
-}
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    octoResourceMonitor: octoPrintResourceMonitor
+  });
+};
 
 const captureDisplayLayerProgress = (id, data) => {
   getPrinterStoreCache().updatePrinterLiveValue(id, { layerData: data });
-}
+};
 
 module.exports = {
   testAndCollectPSUControlPlugin,
