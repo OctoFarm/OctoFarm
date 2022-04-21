@@ -114,7 +114,7 @@ export default class UI {
   }
   //REFACTOR: Move to a templates folder
   static returnSpinnerTemplate() {
-    return "<i class=\"fas fa-spinner fa-spin\"></i>";
+    return `<i class="fas fa-spinner fa-spin"></i>`;
   }
 
   static removeLoaderFromElementInnerHTML(element) {

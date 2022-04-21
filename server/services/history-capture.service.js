@@ -19,8 +19,6 @@ const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cle
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
-let counter = 0;
-let errorCounter = 0;
 
 const routeBase = "../images/historyCollection";
 const PATHS = {
@@ -561,10 +559,10 @@ class HistoryCollection {
 
     if (serverSettingsCache.history.thumbnails.onComplete) {
       saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
-          payload,
-          files,
-          saveHistory._id,
-          printer
+        payload,
+        files,
+        saveHistory._id,
+        printer
       );
     }
 
@@ -756,13 +754,7 @@ class HistoryCollection {
 
       const endDate = new Date();
 
-      if (errorCollection.length === 0) {
-        errorCounter = 0;
-      } else {
-        errorCounter = errorCollection[errorCollection.length - 1].errorLog.historyIndex + 1;
-      }
       const errorLog = {
-        historyIndex: errorCounter,
         printerIndex: printer.index,
         printerID: printer._id,
         costSettings: printer.costSettings,
