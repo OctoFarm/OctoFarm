@@ -132,25 +132,18 @@ function checkIfPrinterHasEvents(printer){
 }
 
 function checkIfCpuDataAvailable(printer){
-  const octoprintCpuUsage = document.getElementById(`octoprintCpuUsage-${printer._id}`);
+  const octoprintCpuUsage = document.getElementById(`octoPrintsUsage-${printer._id}`);
   const octoprintCpuUsagePercent = document.getElementById(`octoprintCpuUsagePercent-${printer._id}`);
-  if(!!printer?.octoResourceMonitor?.system_cpu){
+  const octoprintMemoryUsagePercent = document.getElementById(`octoprintMemoryUsagePercent-${printer._id}`);
+  const octoprintsCpuUsage = document.getElementById(`octoprintsCpuUsagePercent-${printer._id}`);
+  if(!!printer?.octoResourceMonitor){
     octoprintCpuUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_cpu[printer?.octoResourceMonitor?.system_cpu.length - 1].toFixed(0);
+    octoprintMemoryUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_memory[printer?.octoResourceMonitor?.system_memory.length - 1].toFixed(0);
+    octoprintsCpuUsage.innerHTML = printer?.octoResourceMonitor?.octoprint_cpu[printer?.octoResourceMonitor?.octoprint_cpu.length - 1].toFixed(0);
     UI.addDisplayNoneToElement(octoprintCpuUsage);
     return;
   }
   UI.removeDisplayNoneFromElement(octoprintCpuUsage);
-}
-
-function checkIfMemoryDataAvailable(printer){
-  const octoprintMemoryUsage = document.getElementById(`octoprintMemoryUsage-${printer._id}`);
-  const octoprintMemoryUsagePercent = document.getElementById(`octoprintMemoryUsagePercent-${printer._id}`);
-  if(!!printer?.octoResourceMonitor?.system_memory){
-    octoprintMemoryUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_memory[printer?.octoResourceMonitor?.system_memory.length - 1].toFixed(0);
-    UI.addDisplayNoneToElement(octoprintMemoryUsage);
-    return;
-  }
-  UI.removeDisplayNoneFromElement(octoprintMemoryUsage);
 }
 
 function checkIfPrinterConnectionThrottled(printer){
@@ -457,8 +450,6 @@ function updatePrinterRow(printer) {
 
       checkIfPrinterConnectionThrottled(printer);
 
-      checkIfMemoryDataAvailable(printer);
-
       checkIfCpuDataAvailable(printer);
     }
   }
@@ -707,13 +698,9 @@ export function createOrUpdatePrinterTableRow(printers) {
           }
         });
       })
-      document.getElementById("octoprintCpuUsage-" + printer._id).addEventListener("click", async () => {
+      document.getElementById("octoPrintsUsage-" + printer._id).addEventListener("click", async () => {
         UI.createAlert("warning", "Doesn't do anything..... YET!", 3000)
       });
-      document.getElementById("octoprintMemoryUsage-" + printer._id).addEventListener("click", async () => {
-        UI.createAlert("warning", "Doesn't do anything..... YET!", 3000)
-      })
-
     }
 
   });

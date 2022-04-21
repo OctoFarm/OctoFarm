@@ -97,19 +97,12 @@ const returnAlerts = (id, printerURL) => {
         >
        <i class="fa-solid fa-toilet"></i> <span id="printerConnectionThrottledCount-${id}"></span>
     </button>
-    <button title="OctoPrint System CPU Usage"
-         id="octoprintCpuUsage-${id}"
-         type="button"
-         class="tag btn btn-outline-info btn-sm d-none"
-        >
-       <i class="fa-solid fa-microchip"></i> <span id="octoprintCpuUsagePercent-${id}"></span>% 
-    </button>
-    <button title="Your connection is throttled!"
-         id="octoprintMemoryUsage-${id}"
-         type="button"
-         class="tag btn btn-outline-info btn-sm d-none"
-        >
-       <i class="fa-solid fa-memory"></i> <span id="octoprintMemoryUsagePercent-${id}"></span>%
+    <button title="OctoPrints CPU Usage | OctoPrint System CPU Usage | OctoPrints System Memory Usage"
+            id="octoPrintsUsage-${id}"
+            type="button"
+            class="tag btn btn-outline-info btn-sm d-none"
+    >
+        <i class="fab fa-octopus-deploy"></i> <span id="octoprintsCpuUsagePercent-${id}"></span>% | <i class="fa-solid fa-microchip"></i> <span id="octoprintCpuUsagePercent-${id}"></span>% | <i class="fa-solid fa-memory"></i> <span id="octoprintMemoryUsagePercent-${id}"></span>%
     </button>
    `;
 };

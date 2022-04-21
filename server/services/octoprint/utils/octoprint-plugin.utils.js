@@ -202,7 +202,6 @@ const captureResourceMonitorData = (id, data) => {
     cpu: { average, octoprint },
     memory: { percent }
   } = data;
-
   let octoPrintResourceMonitor = getPrinterStoreCache().getOctoPrintResourceMonitorValues(id);
 
   if(!octoPrintResourceMonitor){
@@ -235,7 +234,6 @@ const captureResourceMonitorData = (id, data) => {
   if(octoPrintResourceMonitor.system_memory.length > 50){
     octoPrintResourceMonitor.system_memory.shift();
   }
-
 
   getPrinterStoreCache().updatePrinterLiveValue(id, { octoResourceMonitor: octoPrintResourceMonitor });
 }
