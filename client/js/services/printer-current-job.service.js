@@ -56,6 +56,8 @@ const returnPageElements = () => {
             expectedPrinterCost: document.getElementById("pmExpectedPrinterCost"),
             expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
             expectedTotalCosts: document.getElementById("pmJobCosts"),
+            expectededElectricityCosts: document.getElementById("pmExpectedElectricity"),
+            expectededMaintainanceCosts: document.getElementById("pmExpectedMaintainance"),
             printerResends: document.getElementById("printerResends"),
             resendTitle: document.getElementById("resentTitle"),
             dlpPluginDataTitle: document.getElementById("dlpPluginDataTitle"),
@@ -169,12 +171,13 @@ const loadPrintersJobStatus = (printer) => {
         <div class="col-lg-12 text-center">
                  <h5>Expected Costs</h5><hr> 
         </div>   
-        <div class="col-md-4 col-lg-3 text-center">
-            <b>Job Cost: </b><p class="mb-1" id="pmJobCosts">Loading...</p></center>          
-          </div>
-          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
-          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p></div>
-          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Material Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>    
+          <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
+          <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Materials: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>  
+          <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Electricity: </b><br><p class="tag mb-1" id="pmExpectedElectricity">Loading...</p></div>
+          <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Maintainance: </b><br><p class="tag mb-1" id="pmExpectedMaintainance">Loading...</p></div>
+           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Total Printer: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p></div>
+          <div class="col-md-4 col-lg-2 text-center"><b>Total Job: </b><p class="mb-1" id="pmJobCosts">Loading...</p></center></div>
+           
         </div>
 
     `
@@ -318,7 +321,11 @@ const updateCurrentJobStatus = (printer, elements) => {
 
         elements.expectedFilamentCost.innerHTML = filamentCost;
 
-        elements.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts;
+        elements.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts.toFixed(2);
+
+        elements.expectededMaintainanceCosts.innerHTML = printer.currentJob.expectedMaintenanceCosts.toFixed(2);
+
+        elements.expectededElectricityCosts.innerHTML = printer.currentJob.expectedElectricityCosts.toFixed(2);
     }
 }
 

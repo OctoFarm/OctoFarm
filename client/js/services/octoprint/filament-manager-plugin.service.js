@@ -1,6 +1,7 @@
 import OctoFarmClient from "../octofarm-client.service";
 import UI from "../../utils/ui";
 
+let filamentManagerSettings;
 let filamentManagerPluginIsEnabled;
 let allowMultiSelectIsEnabled;
 
@@ -20,7 +21,7 @@ async function disabledFilamentManagerSync(){
   if (filamentManagerDisabled) {
     UI.createAlert(
         "success",
-        "Successfully disabled filament manager and removed all spools / profiles.",
+        "Successfully disabled filament manager and removed all spools / profiles from OctoFarm.",
         3000
     );
   } else {
@@ -34,76 +35,83 @@ async function disabledFilamentManagerSync(){
 
 export function setupFilamentManagerDisableBtn() {
   const disableFilManagerBtn = document.getElementById("disableFilamentManager");
-  disableFilManagerBtn.addEventListener("click",  () => {
-    bootbox.confirm({
-      message: "This will disable the filament manager plugin sync and remove all those spools from OctoFarm's database... are you sure?",
-      buttons: {
-        confirm: {
-          label: "Yes",
-          className: "btn-success"
+  if(!!disableFilManagerBtn){
+    disableFilManagerBtn.addEventListener("click",  () => {
+      bootbox.confirm({
+        message: "This will disable the filament manager plugin sync and remove all those spools from OctoFarm's database... are you sure?",
+        buttons: {
+          confirm: {
+            label: "Yes",
+            className: "btn-success"
+          },
+          cancel: {
+            label: "No",
+            className: "btn-danger"
+          }
         },
-        cancel: {
-          label: "No",
-          className: "btn-danger"
+        callback: async function (result) {
+          if(result){
+            await disabledFilamentManagerSync()
+            disableFilManagerBtn.disabled = true;
+          }
         }
-      },
-      callback: async function (result) {
-        if(result){
-          await disabledFilamentManagerSync()
-        }
-      }
+      });
     });
-  });
+  }
+
 }
 
 export function setupFilamentManagerSyncBtn() {
-  const filamentManagerSyncBtn = document.getElementById("resyncFilamentManagerBtn");
-  filamentManagerSyncBtn.addEventListener("click", async () => {
-    UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
-    filamentManagerSyncBtn.disabled = true;
-    const filamentManagerAlert = UI.createAlert(
-      "info",
-      "Enabling filament manager plugin sync... Please wait whilst checks have finished!"
-    );
-    const filamentManagerSyncEnabled = await OctoFarmClient.post("filament/filamentManagerSync", {
-      activate: true
-    });
-
-    if (filamentManagerSyncEnabled.errors.length > 0) {
-      filamentManagerAlert.close();
-      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-      filamentManagerSyncBtn.disabled = false;
-      filamentManagerSyncEnabled.errors.forEach((error) => {
-        UI.createAlert("error", error.msg, 0, "Clicked");
-      });
-    } else if (filamentManagerSyncEnabled.warnings.length > 0) {
-      filamentManagerAlert.close();
-      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-      filamentManagerSyncEnabled.warnings.forEach((error) => {
-        UI.createAlert("warning", error.msg, 0, "Clicked");
-        UI.createAlert(
-          "success",
-          `Filament Manager Plugin has been enabled regardless of the warnings! <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
-          0,
-          "Clicked"
-        );
-      });
-    } else {
-      filamentManagerAlert.close();
-      UI.createAlert(
-        "success",
-        `Filament Manager Plugin has been enabled and synced!  <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
-        0,
-        "Clicked"
+  const filamentManagerSyncBtn = document.getElementById("setupFilamentManagerBtn");
+  if(!!filamentManagerSyncBtn){
+    filamentManagerSyncBtn.addEventListener("click", async () => {
+      UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
+      filamentManagerSyncBtn.disabled = true;
+      const filamentManagerAlert = UI.createAlert(
+          "info",
+          "Enabling filament manager plugin sync... Please wait whilst checks have finished!"
       );
-      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-    }
-  });
+      const filamentManagerSyncEnabled = await OctoFarmClient.post("filament/filamentManagerSync", {
+        activate: true
+      });
+
+      if (filamentManagerSyncEnabled.errors.length > 0) {
+        filamentManagerAlert.close();
+        UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
+        filamentManagerSyncBtn.disabled = false;
+        filamentManagerSyncEnabled.errors.forEach((error) => {
+          UI.createAlert("error", error.msg, 0, "Clicked");
+        });
+      } else if (filamentManagerSyncEnabled.warnings.length > 0) {
+        filamentManagerAlert.close();
+        UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
+        filamentManagerSyncEnabled.warnings.forEach((error) => {
+          UI.createAlert("warning", error.msg, 0, "Clicked");
+          UI.createAlert(
+              "success",
+              `Filament Manager Plugin has been enabled regardless of the warnings! <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
+              0,
+              "Clicked"
+          );
+        });
+      } else {
+        filamentManagerAlert.close();
+        UI.createAlert(
+            "success",
+            `Filament Manager Plugin has been enabled and synced!  <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
+            0,
+            "Clicked"
+        );
+        UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
+      }
+    });
+  }
+
 }
 
 export function setupFilamentManagerReSyncBtn() {
-  const { filamentManagerEnabled } = isFilamentManagerPluginSyncEnabled();
-  if (filamentManagerEnabled) {
+  const { filamentManagerPluginIsEnabled } = isFilamentManagerPluginSyncEnabled();
+  if (filamentManagerPluginIsEnabled) {
     const resyncBtn = document.getElementById("resyncFilamentManagerBtn");
     resyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(resyncBtn);

@@ -2,11 +2,7 @@
 
 const { findIndex } = require("lodash");
 const { DateTime } = require("luxon");
-const {
-  getPrintCostNumeric,
-  getElectricityCosts,
-  getMaintenanceCosts
-} = require("../utils/print-cost.util");
+const { getElectricityCosts, getMaintenanceCosts } = require("../utils/print-cost.util");
 const { HistoryClean } = require("./history-cleaner.service.js");
 const { floatOrZero } = require("../utils/number.util");
 const Logger = require("../handlers/logger");
@@ -36,7 +32,7 @@ class JobCleanerService {
    * @param currentZ
    * @param costSettings
    * @param printerProgress
-   * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: null, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
+   * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: number, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
    */
   static generate(printerJob, selectedFilament, fileList, currentZ, costSettings, printerProgress) {
     const currentJob = {
@@ -49,6 +45,8 @@ class JobCleanerService {
       expectedFilamentCosts: null,
       expectedPrinterCosts: null,
       expectedTotals: null,
+      expectedMaintenanceCosts: null,
+      expectedElectricityCosts: null,
       currentZ: 0,
       printTimeElapsed: null,
       printTimeRemaining: null,
@@ -77,15 +75,16 @@ class JobCleanerService {
       if (!!currentZ) {
         currentJob.currentZ = currentZ;
       }
-      currentJob.electricityCosts = getElectricityCosts(
+      currentJob.expectedElectricityCosts = getElectricityCosts(
         printerJob.estimatedPrintTime,
         costSettings
       );
-      currentJob.maintenanceCosts = getMaintenanceCosts(
+      currentJob.expectedMaintenanceCosts = getMaintenanceCosts(
         printerJob.estimatedPrintTime,
         costSettings
       );
-      currentJob.expectedPrinterCosts = currentJob.electricityCosts + currentJob.maintenanceCosts;
+      currentJob.expectedPrinterCosts =
+        currentJob.expectedElectricityCosts + currentJob.expectedMaintenanceCosts;
 
       currentJob.expectedFilamentCosts = HistoryClean.getSpool(
         selectedFilament,

@@ -13,7 +13,7 @@ function returnErrorMessage(options) {
      <div class="py-3">
         Please report this error to <a href="https://github.com/octofarm/octofarm/issues">OctoFarm Issues</a>!
      </div>
-     ${options.message}
+     ${options?.message ? options.message: options.toString()}
   `;
 }
 
@@ -31,10 +31,16 @@ function returnModalDeveloperInfo(options) {
 }
 
 function openErrorModal(options) {
+  let errorObject = {};
   if (!options?.statusCode) {
-    options.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
-    options.name = ClientErrors.UNKNOWN_ERROR.type;
+    errorObject.message = options.toString();
+    errorObject.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
+    errorObject.name = ClientErrors.UNKNOWN_ERROR.type;
+    errorObject.type = ClientErrors.UNKNOWN_ERROR.type;
+    errorObject.code = ClientErrors.UNKNOWN_ERROR.code;
+    errorObject.color = ClientErrors.UNKNOWN_ERROR.color;
   }
+
   const apiErrorTitle = document.getElementById("apiErrorTitle");
   const apiErrorMessage = document.getElementById("apiErrorMessage");
   const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
@@ -42,9 +48,9 @@ function openErrorModal(options) {
   apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
-  if(options.code === "UNKNOWN_ERROR" || options.code === "SILENT_ERROR"){
+  if(errorObject?.statusCode === 999){
     setTimeout(async () => {
-      await OctoFarmClient.sendError(options)
+      await OctoFarmClient.sendError(errorObject)
     }, 1000)
     if(options.code === "SILENT_ERROR"){
       return;

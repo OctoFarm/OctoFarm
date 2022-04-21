@@ -58,10 +58,7 @@ router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);
 
-  await getPrinterStoreCache().assignSpoolToPrinters(
-    req.body.printers,
-    req.bodyString("spoolId")
-  );
+  await getPrinterStoreCache().assignSpoolToPrinters(req.body.printers, req.bodyString("spoolId"));
   TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   res.send({ status: 200 });
 });
@@ -495,11 +492,13 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     return res.send({ errors, warnings });
   }
 
-  if(checked[0].filament.allowMultiSelect === false){
+  const systemSettings = SettingsClean.returnSystemSettings();
+
+  if (systemSettings.filament.allowMultiSelect === false) {
     const spoolList = FilamentClean.getSpools();
-    spoolList.forEach(spool => {
+    spoolList.forEach((spool) => {
       getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
-    })
+    });
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   }
 

@@ -338,9 +338,8 @@ async function restartOctoFarmServer() {
 }
 
 async function checkFilamentManagerPluginState() {
-  const { filamentManagerEnabled } = await isFilamentManagerPluginSyncEnabled()
-  if (filamentManagerEnabled) {
-    setupFilamentManagerReSyncBtn();
+  const { filamentManagerPluginIsEnabled } = await isFilamentManagerPluginSyncEnabled()
+  if (filamentManagerPluginIsEnabled) {
     setupFilamentManagerDisableBtn();
   } else {
     setupFilamentManagerSyncBtn();

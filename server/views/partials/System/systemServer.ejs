@@ -428,27 +428,21 @@
                         <code><b>Note:</b></code> <span>Any spool within OctoFarm will be deleted
                             upon successful sync and replaced with those on your filament manager database...</span>
                         <% if(!serverSettings.filamentManager){ %>
-                            <center>
+                            <span class="text-center">
                                 <br>
-                                <button id="resyncFilamentManagerBtn" type="button"
+                                <button id="setupFilamentManagerBtn" type="button"
                                         class="btn btn-warning text-dark mb-1 btn-lg"><i
                                             class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
                                 </button>
-                            </center>
+
                         <% }else{ %>
-                            <center>
-                                <br>
-                                <button id="resyncFilamentManagerBtn" type="button"
-                                        class="btn btn-warning text-dark mb-1 btn-lg"><i
-                                            class="fas fa-sync"></i><br> Resync Spools / Profiles
-                                </button>
                                 <br>
                                 <button id="disableFilamentManager" type="button"
                                         class="btn btn-danger mb-1 btn-lg"><i
                                             class="fas fa-skull-crossbones"></i><br>
                                     Disable Filament Manager
                                 </button>
-                            </center>
+                            </span>
                         <% } %>
                     </div>
                 </div>
