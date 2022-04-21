@@ -379,6 +379,13 @@
                             <div class="alert alert-info small" role="alert">
                                 Allow the selection of single spools on multiple printers. Great if your only tracking filament by type.. you can have 1 spool attached to multiple printers to get more accurate grams calculations this way.
                             </div>
+                            <% let multiSelectOff = "d-none"; %>
+                            <% if(serverSettings?.filament?.allowMultiSelect) { %>
+                                <% multiSelectOff = "" %>
+                            <% }%>
+                            <div class="alert alert-warning small text-dark <%= multiSelectOff %>" role="alert">
+                                Turning this off will remove all your current filament assignments.
+                            </div>
                             <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
                                 <%= disableDownDateMessage %>
                             </div>
@@ -395,7 +402,7 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-12">
                         <h5>Filament Manager Sync</h5>
                         <div class="alert alert-info" role="alert">
                             <h5>Update your instances settings</h5>

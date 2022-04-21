@@ -8,6 +8,8 @@ import "../utils/cleanup-modals.util"
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {closePrinterManagerModalIfOffline,
   imageOrCamera} from "../utils/octofarm.utils";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 let currentIndex = 0;
 
@@ -126,18 +128,14 @@ export default class PrinterTerminalManagerService {
                 </div>
             </div>
             `;
-      CustomGenerator.generateButtons(printer);
+      await CustomGenerator.generateButtons(printer);
 
       return true;
     } catch (e) {
-      UI.createAlert(
-        "error",
-        "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " +
-          e,
-        0,
-        "clicked"
-      );
       console.error(e);
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer Terminal - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 

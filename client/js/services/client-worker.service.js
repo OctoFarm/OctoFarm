@@ -1,4 +1,6 @@
 import UI from "../utils/ui.js";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 let worker = null;
 let savedWorkerEventFunction = null;
@@ -46,6 +48,9 @@ export function createClientSSEWorker(url, workerEventFunction) {
         0
       );
       console.error(`Couldn't create the web worker, please log a github issue... <br> ${e}`);
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Bulk Commands - ${e}`
+      throw new ApplicationError(errorObject)
     }
   } else {
     // Sorry! No Web Worker support..
@@ -55,6 +60,9 @@ export function createClientSSEWorker(url, workerEventFunction) {
       0
     );
     console.error(`Web workers not available... sorry! <br> ${e}`);
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `Client Worker - ${e}`
+    throw new ApplicationError(errorObject)
   }
   document.addEventListener("visibilitychange", handleVisibilityChange, false);
 }

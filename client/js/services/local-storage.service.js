@@ -23,6 +23,9 @@ export function removeLocalStorage(key) {
     return true
   }catch (e){
     UI.createAlert("error", `Error checking supplied key! Error ${e}`, 5000, "Clicked")
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `Bulk Commands - ${e}`
+    throw new ApplicationError(errorObject)
     return false
   }
 
@@ -34,6 +37,9 @@ export function getLocalStorage(key) {
     return JSON.parse(storage);
   }catch (e){
     UI.createAlert("error", `Error checking supplied key! Error ${e}`, 5000, "Clicked")
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `Bulk Commands - ${e}`
+    throw new ApplicationError(errorObject)
   }
   return {}
 }
@@ -44,7 +50,7 @@ export function saveLocalStorage(key, data){
     localStorage.setItem(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG, JSON.stringify(data));
     return true;
   }catch (e){
-    UI.createAlert("erro", `Error checking supplied key! Error ${e}`, 5000, "Clicked")
+    UI.createAlert("error", `Error checking supplied key! Error ${e}`, 5000, "Clicked")
   }
   return false
 }

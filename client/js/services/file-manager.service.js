@@ -23,6 +23,8 @@ import {
   generatePathList,
   getFileListElement,
 } from "../pages/file-manager/file-manager.helpers";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 const fileUploads = new Queue();
 
@@ -1449,6 +1451,9 @@ export class FileActions {
                 0,
                 "Clicked"
               );
+              const errorObject = ClientErrors.SILENT_ERROR;
+              errorObject.message =  `Bulk Commands - ${e}`
+              throw new ApplicationError(errorObject)
             }
           }
         }

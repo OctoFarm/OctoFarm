@@ -29,6 +29,8 @@ import {printActionStatusResponse} from "../../services/octoprint/octoprint.help
 import {isPrinterDisconnected, printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
 import {initialiseCurrentJobPopover} from "../../services/printer-current-job.service";
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
 
 let elems = [];
 let groupElems = [];
@@ -1341,6 +1343,9 @@ export async function initMonitoring(printers, clientSettings, view) {
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
             } else {
               console.error("printerPanel could not determine view type to update", view);
+              const errorObject = ClientErrors.SILENT_ERROR;
+              errorObject.message =  `Bulk Commands - ${e}`
+              throw new ApplicationError(errorObject)
             }
 
             if (view !== "group") {

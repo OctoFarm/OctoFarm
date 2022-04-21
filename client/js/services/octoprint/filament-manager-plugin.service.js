@@ -128,17 +128,12 @@ export function setupFilamentManagerReSyncBtn() {
 }
 
 export async function returnDropDown(history) {
-  try {
     let dropDownLists = await OctoFarmClient.get("filament/get/dropDownList");
     if (history) {
       return dropDownLists.selected.historyDropDown;
     } else {
       return dropDownLists.selected.normalDropDown;
     }
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", "Issue contacting server, please check the logs...");
-  }
 }
 
 export async function selectFilament(printers, spoolId) {

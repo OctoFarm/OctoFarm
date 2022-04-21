@@ -15,6 +15,7 @@ const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
+const clientLogger = new Logger("OctoFarm-Client");
 const multer = require("multer");
 const { isEqual } = require("lodash");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
@@ -35,8 +36,8 @@ const { databaseNamesList } = require("../constants/database.constants");
 const { TaskManager } = require("../services/task-manager.service");
 const { SystemRunner } = require("../services/system-information.service");
 const { listActiveClients } = require("../services/server-side-events.service");
-const {getPrinterStoreCache} = require("../cache/printer-store.cache");
-const {FilamentClean} = require("../services/filament-cleaner.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { FilamentClean } = require("../services/filament-cleaner.service");
 
 module.exports = router;
 
@@ -297,18 +298,16 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].influxExport = sentOnline.influxExport;
     checked[0].monitoringViews = sentOnline.monitoringViews;
 
-    if (
-      [serverChanges, timeoutChanges].includes(false)
-    ) {
+    if ([serverChanges, timeoutChanges].includes(false)) {
       restartRequired = true;
     }
 
-    if(checked[0].filament.allowMultiSelect === false){
-        const spoolList = FilamentClean.getSpools();
-        spoolList.forEach(spool => {
-            getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
-        })
-        TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+    if (checked[0].filament.allowMultiSelect === false) {
+      const spoolList = FilamentClean.getSpools();
+      spoolList.forEach((spool) => {
+        getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
+      });
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
     //Check the influx export to see if all information exists... disable if not...
@@ -425,5 +424,20 @@ router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req
 });
 
 router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
+
+router.post("/client/logs", ensureAuthenticated, async (req, res) => {
+  const errorLog = req.body;
+  const message = `${errorLog.code}: ${errorLog.message}`;
+  const errorObject = {
+    name: errorLog.name,
+    statusCode: errorLog.statusCode,
+    type: errorLog.type
+  };
+  if (errorLog.color === "danger") {
+    clientLogger.error(message, errorObject);
+  } else {
+    clientLogger.warning(message, errorObject);
+  }
+});
 
 module.exports = router;

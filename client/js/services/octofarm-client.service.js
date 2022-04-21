@@ -78,12 +78,14 @@ export default class OctoFarmClient {
   static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
   static printerStepChange = this.printerRoute + "/stepChange";
   static serverSettingsRoute = "/settings/server";
+  static clientSettingsRoute = "/settings/client";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
   static filamentProfiles = `${this.filamentRoute}/get/profile`;
   static filamentSpools = `${this.filamentRoute}/get/filament`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`
   static userRoute = `/users/users`;
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
   static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
@@ -245,6 +247,9 @@ export default class OctoFarmClient {
 
   static getConnectionOverview() {
     return this.get(this.connectionOverviewRoute);
+  }
+  static sendError(error){
+    return this.post(this.fireLogToServerRoute, error)
   }
 
 

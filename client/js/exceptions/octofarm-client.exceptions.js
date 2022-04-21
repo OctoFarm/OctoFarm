@@ -29,5 +29,12 @@ export const ClientErrors = {
     message:
       "We encountered an unknown error! Please help the developer out and send a issue report!",
     statusCode: 999
+  },
+  SILENT_ERROR: {
+    type: errorTypes.UNKNOWN,
+    color: "danger",
+    code: "SILENT_ERROR",
+    message: "",
+    statusCode: 999
   }
 };

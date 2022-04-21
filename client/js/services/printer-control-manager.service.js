@@ -11,6 +11,8 @@ import {
   closePrinterManagerModalIfOffline,
   imageOrCamera
 } from "../utils/octofarm.utils";
+import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../exceptions/application-error.handler";
 
 let currentIndex = 0;
 
@@ -19,8 +21,7 @@ let currentPrinter = null;
 let filamentManager = false;
 
 export default class PrinterControlManagerService {
-  static async init(index, printers, printerControlList) {
-    try {
+  static async init(index, printers, printerControlList) {try {
       //clear camera
       if (index !== "") {
         currentIndex = index;
@@ -51,13 +52,10 @@ export default class PrinterControlManagerService {
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     } catch (e) {
-      console.log(e)
-      UI.createAlert(
-        "danger",
-        "The volatility of this is astounding... Error:",
-        0,
-        "Clicked"
-      );
+      console.error(e)
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer Control - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 
@@ -301,6 +299,9 @@ export default class PrinterControlManagerService {
         "clicked"
       );
       console.error(e);
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer Control - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 

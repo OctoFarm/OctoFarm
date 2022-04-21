@@ -21,6 +21,8 @@ import {
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";
 import { activeUserListRowTemplate } from "./system.templates";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
 
 let historicUsageGraph;
 let cpuUsageDonut;
@@ -404,12 +406,43 @@ async function updateServerSettings() {
     },
   };
 
-  OctoFarmClient.post("settings/server/update", opts).then((res) => {
-    UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
-    if (res.restartRequired) {
-      bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
-    }
-  });
+  const previousSettings = await OctoFarmClient.get("settings/server/get");
+  if(previousSettings.filament.allowMultiSelect === true && settingsElements.filament.allowMultiSelect.checked === false){
+    bootbox.confirm({
+      message: "You are turning off Mutli-Select, this will remove all your current assignments... are you sure?",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success"
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger"
+        }
+      },
+      callback: function (result) {
+        if(result){
+          OctoFarmClient.post("settings/server/update", opts).then((res) => {
+            UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
+            if (res.restartRequired) {
+              bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
+            }
+          });
+          return;
+        }else{
+          settingsElements.filament.allowMultiSelect.checked = true
+        }
+      }
+    });
+  }else{
+    OctoFarmClient.post("settings/server/update", opts).then((res) => {
+      UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
+      if (res.restartRequired) {
+        bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
+      }
+    });
+  }
+
 }
 
 async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
@@ -625,6 +658,9 @@ async function clearOldLogs() {
     });
   } catch (e) {
     UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked");
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `Bulk Commands - ${e}`
+    throw new ApplicationError(errorObject)
   }
 }
 

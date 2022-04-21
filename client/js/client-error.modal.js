@@ -1,5 +1,5 @@
 import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
-
+import OctoFarmClient from "./services/octofarm-client.service";
 const octoFarmErrorModalElement = "#octofarmErrorModal";
 let dealingWithError = false;
 
@@ -42,13 +42,21 @@ function openErrorModal(options) {
   apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
+  if(options.code === "UNKNOWN_ERROR" || options.code === "SILENT_ERROR"){
+    setTimeout(async () => {
+      await OctoFarmClient.sendError(options)
+    }, 1000)
+    if(options.code === "SILENT_ERROR"){
+      return;
+    }
+
+  }
   setTimeout(() => {
     $(octoFarmErrorModalElement).modal("show");
-  }, 3000)
-
+  }, 2000)
 }
 
-function handleEvent() {
+function handleEvent(event) {
   if (!event?.reason) {
     openErrorModal(event);
   } else {

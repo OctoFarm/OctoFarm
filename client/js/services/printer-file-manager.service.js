@@ -10,6 +10,8 @@ import {allowedFileTypes} from "../constants/file-types.constants";
 import "../utils/cleanup-modals.util"
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 let currentIndex = 0;
 let currentPrinter = null;
@@ -162,6 +164,9 @@ export default class PrinterFileManagerService {
         "clicked"
       );
       console.error(e);
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer File Manager - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 

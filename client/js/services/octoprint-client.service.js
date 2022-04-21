@@ -1,5 +1,7 @@
 import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -378,6 +380,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     } else {
       try {
@@ -404,6 +409,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     }
     return "done";
