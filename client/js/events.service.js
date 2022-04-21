@@ -111,12 +111,11 @@ function setupEventSource() {
     window.serverOffline = true;
     console.debug("Server connection lost! Re-connecting in... " + reconnectFrequency.getSeconds + "s");
     triggerCountDownTimer(reconnectFrequency.getSeconds)
-    console.error(e);
     await drawModal();
     evtSource.close();
     reconnectFunc();
     const errorObject = ClientErrors.SILENT_ERROR;
-    errorObject.message =  `Bulk Commands - ${e}`
+    errorObject.message =  `Events Service - ${e.target.url}`
     throw new ApplicationError(errorObject)
   };
   evtSource.onclose = async function (e) {

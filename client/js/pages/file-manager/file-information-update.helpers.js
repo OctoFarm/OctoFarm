@@ -74,3 +74,24 @@ export const updateFileSize = (id, fileSize) => {
         UI.doesElementNeedUpdating(Calc.bytes(fileSize), fileSizeEl, "innerHTML")
     }
 }
+
+export const updateMaintenanceCost = (id, maintainenceCost) => {
+    if(!id){
+        return;
+    }
+    if(!!maintainenceCost){
+        const fileMainEl = document.getElementById(`fileMaintainenceCost-${id}`);
+        UI.doesElementNeedUpdating(maintainenceCost, fileMainEl, "innerHTML")
+    }
+}
+
+export const updateElectricityCost = (id, electricityCost) => {
+    if(!id){
+        return;
+    }
+    console.log(electricityCost)
+    if(!!electricityCost){
+        const fileElectEl = document.getElementById(`fileElectricityCost-${id}`);
+        UI.doesElementNeedUpdating(electricityCost, fileElectEl, "innerHTML")
+    }
+}

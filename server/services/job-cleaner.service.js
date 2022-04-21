@@ -2,11 +2,15 @@
 
 const { findIndex } = require("lodash");
 const { DateTime } = require("luxon");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const {
+  getPrintCostNumeric,
+  getElectricityCosts,
+  getMaintenanceCosts
+} = require("../utils/print-cost.util");
 const { HistoryClean } = require("./history-cleaner.service.js");
 const { floatOrZero } = require("../utils/number.util");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-InformationCleaning")
+const logger = new Logger("OctoFarm-InformationCleaning");
 
 const cleanJobs = [];
 
@@ -73,11 +77,15 @@ class JobCleanerService {
       if (!!currentZ) {
         currentJob.currentZ = currentZ;
       }
-
-      currentJob.expectedPrinterCosts = getPrintCostNumeric(
+      currentJob.electricityCosts = getElectricityCosts(
         printerJob.estimatedPrintTime,
         costSettings
-      )?.toFixed(2);
+      );
+      currentJob.maintenanceCosts = getMaintenanceCosts(
+        printerJob.estimatedPrintTime,
+        costSettings
+      );
+      currentJob.expectedPrinterCosts = currentJob.electricityCosts + currentJob.maintenanceCosts;
 
       currentJob.expectedFilamentCosts = HistoryClean.getSpool(
         selectedFilament,
@@ -123,7 +131,7 @@ class JobCleanerService {
         printerProgress.completion
       );
     }
-    logger.debug("Job information cleaned and ready for consumption", currentJob)
+    logger.debug("Job information cleaned and ready for consumption", currentJob);
     return currentJob;
   }
 }

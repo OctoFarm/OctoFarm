@@ -109,8 +109,19 @@ export const getFileTemplate = (file, printerURL, id) => {
                 <i class="fas fa-dollar-sign"></i> 
                 <span title="Expected Printer Cost" class="cost" id="fileCost-${
                   file.fullPath
-                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
-            <span title="Expected Filament Cost"> </span>
+                }"> Printer Cost: ${!!file.printCost ? file.printCost.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                <i class="fa-solid fa-bolt"></i> 
+                <span title="Expected Printer Cost" class="cost" id="fileElectricityCost-${
+                  file.fullPath
+              }">
+               
+                Electricity Cost: ${!!file.electricityCosts ? file.electricityCosts.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                <i class="fa-solid fa-wrench"></i>
+                <span title="Expected Printer Cost" class="cost" id="fileMaintainenceCost-${
+                      file.fullPath
+                  }"> 
+                Maintainence Cost: ${!!file.maintenanceCosts ? file.maintenanceCosts.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                <span title="Expected Filament Cost"> </span>
 
                 </p>
                 <p class="mb-1 float-left">
