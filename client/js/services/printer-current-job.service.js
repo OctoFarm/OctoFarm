@@ -1,14 +1,11 @@
 import Calc from "../utils/calc";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
-import UI from "../utils/ui";
 import {
-    returnExpandedLayerDataDisplay,
-    returnMinimalLayerDataDisplay
+    returnExpandedLayerDataDisplay
 } from "./octoprint/octoprint-display-layer-plugin.service";
-import { setupConnectButton } from "./connect-button.service";
+import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import "../utils/cleanup-modals.util"
 import {
-    closePrinterManagerModalIfDisconnected,
     closePrinterManagerModalIfOffline,
     imageOrCamera
 } from "../utils/octofarm.utils";
@@ -32,7 +29,9 @@ export const initialiseCurrentJobPopover = (index, printers, printerControlList)
             setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
             loadPrintersJobStatus(currentPrinter);
             const elements = returnPageElements();
+            applyListeners(currentPrinter, elements);
             updateCurrentJobStatus(currentPrinter, elements);
+            // applyTemps(currentPrinter, elements)
         } else {
             const id = _.findIndex(printers, function (o) {
                 return o._id === currentIndex;
@@ -65,8 +64,17 @@ const returnPageElements = () => {
             dlpAvgLayerDuration: document.getElementById("dlpAvgLayerDuration"),
             dlpLastLayerTime: document.getElementById("dlpLastLayerTime"),
             dlpFanSpeed: document.getElementById("dlpFanSpeed"),
-            dlpFeedRate: document.getElementById("dlpFeedRate")
+            dlpFeedRate: document.getElementById("dlpFeedRate"),
+            connectButton: document.getElementById("pmConnect"),
+            printerPortDrop: document.getElementById("printerPortDrop"),
+            printerBaudDrop: document.getElementById("printerBaudDrop"),
+            printerProfileDrop: document.getElementById("printerProfileDrop"),
+            status: document.getElementById("pmStatus")
     }
+}
+
+const applyListeners = (printer, elements) => {
+    setupConnectButtonListeners(printer, elements.connectButton)
 }
 
 const loadPrintersJobStatus = (printer) => {
@@ -176,6 +184,8 @@ const updateCurrentJobStatus = (printer, elements) => {
     if(closePrinterManagerModalIfOffline(printer)){
         return
     }
+
+    updateConnectButtonState(printer, elements.status, elements.connectButton, elements.printerPortDrop, elements.printerBaudDrop, elements.printerProfileDrop)
 
     let dateComplete;
     if (
@@ -309,5 +319,35 @@ const updateCurrentJobStatus = (printer, elements) => {
         elements.expectedFilamentCost.innerHTML = filamentCost;
 
         elements.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts;
+    }
+}
+
+const applyTemps = (printer, elements) => {
+    if(printer?.tools !== null) {
+        const currentTemp = printer.tools[0];
+        elements.temperatures.tempTime.innerHTML =
+            "Updated: <i class=\"far fa-clock\"></i> " + new Date().toTimeString().substring(1, 8);
+        if (currentTemp.bed.actual !== null) {
+            elements.temperatures.bed[0].innerHTML = currentTemp.bed.actual + "°C";
+            elements.temperatures.bed[1].placeholder = currentTemp.bed.target + "°C";
+        }
+        if (currentTemp.chamber.actual !== null) {
+            elements.temperatures.chamber[0].innerHTML = currentTemp.chamber.actual + "°C";
+            elements.temperatures.chamber[1].placeholder = currentTemp.chamber.target + "°C";
+        }
+        let keys = Object.keys(currentTemp);
+        keys = keys.reverse();
+        keys.forEach((key) => {
+            if (key.includes("tool")) {
+                elements.temperatures.tools.forEach((tool) => {
+                    if (tool.id.includes(key) && tool.id.includes("Actual")) {
+                        tool.innerHTML = currentTemp[key].actual + "°C";
+                    }
+                    if (tool.id.includes(key) && tool.id.includes("Target")) {
+                        tool.placeholder = currentTemp[key].target + "°C";
+                    }
+                });
+            }
+        });
     }
 }

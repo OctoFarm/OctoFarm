@@ -1,4 +1,5 @@
 import {printerIsDisconnectedOrError} from "../utils/octofarm.utils";
+import OctoPrintClient from "./octoprint-client.service";
 
 export const setupConnectButton = (printer) => {
     const { connectionOptions: { baudrates, baudratePreference, ports, portPreference, printerProfiles, printerProfilePreference  }} = printer;
@@ -79,6 +80,43 @@ export const setupConnectButton = (printer) => {
     }
 }
 
-export const setupConnectButtonListeners = (printer) => {
+export const setupConnectButtonListeners = (printer, connectButton) => {
+    connectButton.addEventListener("click", async () => {
+        connectButton.disabled = true;
+        await OctoPrintClient.connect(connectButton.value, printer);
+    });
+}
+
+export const updateConnectButtonState = (printer, statusElement, connectButton, printerPort, printerBaud, printerProfile) => {
+    const { printerState: {state, colour: {name}} } = printer;
+
+    statusElement.innerHTML = state;
+    statusElement.className = `btn btn-${name} mb-2`;
+
+    if(!printerIsDisconnectedOrError(printer)){
+        connectButton.value = "disconnect";
+        connectButton.innerHTML = "Disconnect";
+        connectButton.classList = "btn btn-danger inline";
+        connectButton.disabled = false;
+
+        printerPort.disabled = false;
+        printerBaud.disabled = false;
+        printerProfile.disabled = false;
+    }else{
+        connectButton.value = "connect";
+        connectButton.innerHTML = "Connect";
+        connectButton.classList = "btn btn-success inline";
+        connectButton.disabled = false;
+
+        printerPort.disabled = true;
+        printerBaud.disabled = true;
+        printerProfile.disabled = true;
+    }
+
+
+
+
+
+
 
 }

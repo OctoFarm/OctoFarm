@@ -27,6 +27,14 @@ export const returnExpandedLayerDataDisplay = (layerData) => {
     const { currentLayer, totalLayer, currentHeightFormatted, totalHeightFormatted, averageLayerDurationInSeconds, lastLayerDurationInSeconds, fanspeed, feedrate } = layerData;
     const layerPercent = formatLayerDataPercent(currentLayer, totalLayer)
     let heightPercent = formatLayerHeightPercent(currentHeightFormatted, totalHeightFormatted)
+    let averageLayerDuration = 0;
+    if(averageLayerDurationInSeconds !== "-"){
+        averageLayerDuration = averageLayerDurationInSeconds
+    }
+    let lastLayerDuration = 0;
+    if(lastLayerDurationInSeconds !== "-"){
+        lastLayerDuration = lastLayerDurationInSeconds
+    }
     return {
         layerData: `
             <i class="fa-solid fa-layer-group"></i> ${currentLayer} / ${totalLayer} (${layerPercent}%) 
@@ -35,10 +43,10 @@ export const returnExpandedLayerDataDisplay = (layerData) => {
             <i class="fa-solid fa-ruler"></i> ${currentHeightFormatted}mm / ${totalHeightFormatted}mm (${heightPercent}%)
         `,
         averageLayerDuration: `
-            <i class="fa-solid fa-gauge"></i> ${UI.generateMilisecondsTime(averageLayerDurationInSeconds * 1000)}
+            <i class="fa-solid fa-gauge"></i> ${ UI.generateMilisecondsTime(averageLayerDuration * 1000)}
         `,
         lastLayerTime: `
-            <i class="fa-solid fa-stopwatch"></i> ${UI.generateMilisecondsTime(lastLayerDurationInSeconds * 1000)}
+            <i class="fa-solid fa-stopwatch"></i> ${ UI.generateMilisecondsTime(lastLayerDuration * 1000 )}
         `,
         currentFanSpeed: `
             <i class="fa-solid fa-fan"></i> ${fanspeed}

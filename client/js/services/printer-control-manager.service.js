@@ -6,9 +6,8 @@ import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {printActionStatusResponse} from "./octoprint/octoprint.helpers-commands";
 import "../utils/cleanup-modals.util";
-import {setupConnectButton} from "./connect-button.service";
+import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {
-  closePrinterManagerModalIfDisconnected,
   closePrinterManagerModalIfOffline,
   imageOrCamera
 } from "../utils/octofarm.utils";
@@ -312,12 +311,8 @@ export default class PrinterControlManagerService {
         e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
       });
     });
-    if (currentPrinter.state !== "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", async () => {
-        elements.connectPage.connectButton.disabled = true;
-       await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    }
+
+    setupConnectButtonListeners(currentPrinter, elements.connectPage.connectButton)
 
     //Control Listeners... There's a lot!
     elements.printerControls.xPlus.addEventListener("click", async (e) => {
@@ -833,9 +828,7 @@ export default class PrinterControlManagerService {
       return
     }
 
-    //Garbage collection for terminal
-    elements.mainPage.status.innerHTML = printer.printerState.state;
-    elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
+    updateConnectButtonState(printer, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
 
     if (printer.printerState.colour.category === "Active") {
       await PrinterControlManagerService.controls(true, true);
@@ -854,13 +847,7 @@ export default class PrinterControlManagerService {
       printer.printerState.colour.category === "Complete"
     ) {
       await PrinterControlManagerService.controls(false);
-      elements.connectPage.connectButton.value = "disconnect";
-      elements.connectPage.connectButton.innerHTML = "Disconnect";
-      elements.connectPage.connectButton.classList = "btn btn-danger inline";
-      elements.connectPage.connectButton.disabled = false;
-      elements.connectPage.printerPort.disabled = true;
-      elements.connectPage.printerBaud.disabled = true;
-      elements.connectPage.printerProfile.disabled = true;
+
       if (typeof printer.job !== "undefined" && printer.job.filename === "No File Selected") {
         elements.printerControls.printStart.disabled = true;
         elements.printerControls.printStart.style.display = "inline-block";
@@ -902,15 +889,7 @@ export default class PrinterControlManagerService {
       printer.printerState.colour.category === "Offline" ||
       printer.printerState.colour.category === "Disconnected"
     ) {
-      if (printer.printerState.state === "Error!") {
-        document.getElementById("pmSerialPort").disabled = false;
-        document.getElementById("pmBaudrate").disabled = false;
-        document.getElementById("pmProfile").disabled = false;
-      }
-      elements.connectPage.connectButton.value = "connect";
-      elements.connectPage.connectButton.innerHTML = "Connect";
-      elements.connectPage.connectButton.classList = "btn btn-success inline";
-      elements.connectPage.connectButton.disabled = false;
+
       await PrinterControlManagerService.controls(true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
@@ -922,13 +901,6 @@ export default class PrinterControlManagerService {
       elements.printerControls.printRestart.style.display = "none";
       elements.printerControls.printResume.disabled = true;
       elements.printerControls.printResume.style.display = "none";
-      if (
-        printer.printerState.state.category === "Offline" ||
-        printer.state === "Shutdown" ||
-        printer.state === "Searching..."
-      ) {
-        $("#printerManagerModal").modal("hide");
-      }
     }
   }
 

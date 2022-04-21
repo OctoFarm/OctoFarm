@@ -8,17 +8,11 @@ import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {allowedFileTypes} from "../constants/file-types.constants";
 import "../utils/cleanup-modals.util"
-import {setupConnectButton} from "./connect-button.service";
+import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
 
 let currentIndex = 0;
 let currentPrinter = null;
-
-$("#connectionModal").on("hidden.bs.modal", function () {
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
 
 export default class PrinterFileManagerService {
   static async init(index, printers, printerControlList) {
@@ -179,10 +173,7 @@ export default class PrinterFileManagerService {
       });
     });
 
-    elements.connectPage.connectButton.addEventListener("click", async () => {
-      elements.connectPage.connectButton.disabled = true;
-      await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-    });
+    setupConnectButtonListeners(currentPrinter, elements.connectPage.connectButton)
 
     elements.fileManager.uploadFiles.addEventListener("change", async function () {
       UI.createAlert(
@@ -262,7 +253,8 @@ export default class PrinterFileManagerService {
       )} / ${Calc.bytes(0)}`;
     }
 
-    elements.mainPage.status.innerHTML = printer.printerState.state;
-    elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
+
+    updateConnectButtonState(printer, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
+
   }
 }

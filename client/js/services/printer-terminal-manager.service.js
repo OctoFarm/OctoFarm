@@ -5,8 +5,9 @@ import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import "../utils/cleanup-modals.util"
-import {setupConnectButton} from "./connect-button.service";
-import {closePrinterManagerModalIfDisconnected, closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
+import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
+import {closePrinterManagerModalIfOffline,
+  imageOrCamera} from "../utils/octofarm.utils";
 
 let currentIndex = 0;
 
@@ -20,10 +21,6 @@ export default class PrinterTerminalManagerService {
   static async init(index, printers, printerControlList) {
     //clear camera
     if (index !== "") {
-      if (document.getElementById("printerControlCamera")) {
-        document.getElementById("printerControlCamera").src = "";
-      }
-
       currentIndex = index;
       const id = _.findIndex(printers, function (o) {
         return o._id == index;
@@ -46,7 +43,8 @@ export default class PrinterTerminalManagerService {
       const elements = PrinterTerminalManagerService.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";
       await PrinterTerminalManagerService.applyState(currentPrinter, elements);
-      PrinterTerminalManagerService.applyListeners(elements, printers, filamentDropDown);
+      PrinterTerminalManagerService.applyListeners(elements, currentPrinter);
+      elements.terminal.terminalWindow.scrollTop = elements.terminal.terminalWindow.scrollHeight + 1
     } else {
       if (document.getElementById("terminal")) {
         const id = _.findIndex(printers, function (o) {
@@ -61,7 +59,7 @@ export default class PrinterTerminalManagerService {
     }
   }
 
-  static async loadPrinter(printer, printerControlList, filamentDropDown) {
+  static async loadPrinter(printer) {
     try {
       setupConnectButton(printer);
       let serverSettings = await OctoFarmClient.getServerSettings();
@@ -69,10 +67,13 @@ export default class PrinterTerminalManagerService {
       //Load tools
       document.getElementById("printerControls").innerHTML = `
           <div class="row">
-                <div class="col-12">
-                    <center>
+                <div class="col-sm-12 col-md-4 col-lg-2 text-center">
+                <h5>Camera</h5><hr>
+                    ${imageOrCamera(printer)}
+               </div>
+              
+                <div class="col-sm-12 col-md-8 col-lg-10 text-center">
                         <h5>Custom Gocde Scripts</h5>
-                    </center>
                     <hr>
                 </div>
               <div id="customGcodeCommandsArea" class="col-lg-12 text-center">
@@ -140,18 +141,8 @@ export default class PrinterTerminalManagerService {
     }
   }
 
-  static applyListeners(elements) {
-    if (currentPrinter.state != "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    } else {
-      elements.connectPage.connectButton.addEventListener("click", (e) => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    }
+  static applyListeners(elements, printer) {
+    setupConnectButtonListeners(printer, elements.connectPage.connectButton)
 
     const submitTerminal = async function (e) {
       let input = elements.terminal.input.value.match(/[^\r\n]+/g);
@@ -372,7 +363,8 @@ export default class PrinterTerminalManagerService {
         elements.terminal.terminalWindow.scrollHeight -
         elements.terminal.terminalWindow.clientHeight;
     }
-    elements.mainPage.status.innerHTML = printer.printerState.state;
-    elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
+
+    updateConnectButtonState(currentPrinter, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
+
   }
 }
