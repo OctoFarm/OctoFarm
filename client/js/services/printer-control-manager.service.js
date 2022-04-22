@@ -1,7 +1,6 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import UI from "../utils/ui.js";
-import {createFilamentSelector} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import {printActionStatusResponse} from "./octoprint/octoprint.helpers-commands";
@@ -11,8 +10,13 @@ import {
   closePrinterManagerModalIfOffline,
   imageOrCamera
 } from "../utils/octofarm.utils";
+import {
+  findBigFilamentDropDowns,
+  returnBigFilamentSelectorTemplate
+} from "../services/printer-filament-selector.service";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../exceptions/application-error.handler";
+import {fillFilamentDropDownList} from "./printer-filament-selector.service";
 
 let currentIndex = 0;
 
@@ -228,18 +232,10 @@ export default class PrinterControlManagerService {
                         <button class="btn btn-md btn-light m-0 p-1" type="button" id="tool${i}Set">Set</button>
                     </div>
                 </div>
-                <div class="md-form input-group mb-3">
-                    <div title="Actual Tool temperature" class="input-group-prepend">
-                        <span class="input-group-text"><span>${i}: </span></span>
-                    </div>
-                    <select class="custom-select bg-secondary text-light" id="tool${i}FilamentSelect"><option value="" selected></option></select>
-          
-                </div>
-               
+                ${returnBigFilamentSelectorTemplate(i)}
               `
               );
-              const pmFilamentDrop = document.getElementById(`tool${i}FilamentSelect`);
-              await createFilamentSelector(pmFilamentDrop, printer, i);
+              await fillFilamentDropDownList(document.getElementById(`tool-${i}-bigFilamentSelect`), printer, i);
             }
           } else if (keys[t].includes("heatedBed")) {
             if (printer.currentProfile[keys[t]]) {
@@ -820,7 +816,7 @@ export default class PrinterControlManagerService {
         chamber: document.querySelectorAll("[id^='chamber']"),
         tools: document.querySelectorAll("[id^='tool']")
       },
-      filamentDrops: document.querySelectorAll("[id$=FilamentSelect]")
+      filamentDrops: findBigFilamentDropDowns()
     };
   }
 
@@ -940,44 +936,45 @@ export default class PrinterControlManagerService {
   static async controls(enable, printing) {
     let elements = PrinterControlManagerService.grabPage();
     const { filamentDrops } = elements;
-    elements = elements.printerControls;
+    const { printerControls } = elements
+
     let spool = true;
     if (!filamentManager) {
       spool = false;
     }
 
     if (typeof printing !== "undefined" && printing) {
-      elements.feedRate.disabled = !printing;
-      elements.flowRate.disabled = !printing;
-      elements.fansOn.disabled = !printing;
-      elements.fansOff.disabled = !printing;
+      printerControls.feedRate.disabled = !printing;
+      printerControls.flowRate.disabled = !printing;
+      printerControls.fansOn.disabled = !printing;
+      printerControls.fansOff.disabled = !printing;
       filamentDrops.forEach((drop) => {
         drop.disabled = spool;
       });
     } else {
-      elements.feedRate.disabled = enable;
-      elements.flowRate.disabled = enable;
-      elements.fansOn.disabled = enable;
-      elements.fansOff.disabled = enable;
+      printerControls.feedRate.disabled = enable;
+      printerControls.flowRate.disabled = enable;
+      printerControls.fansOn.disabled = enable;
+      printerControls.fansOff.disabled = enable;
       filamentDrops.forEach((drop) => {
         drop.disabled = enable;
       });
     }
-    elements.xPlus.disabled = enable;
-    elements.xMinus.disabled = enable;
-    elements.yPlus.disabled = enable;
-    elements.yMinus.disabled = enable;
-    elements.xyHome.disabled = enable;
-    elements.zPlus.disabled = enable;
-    elements.zMinus.disabled = enable;
-    elements.zHome.disabled = enable;
-    elements.step01.disabled = enable;
-    elements.step1.disabled = enable;
-    elements.step10.disabled = enable;
-    elements.step100.disabled = enable;
+    printerControls.xPlus.disabled = enable;
+    printerControls.xMinus.disabled = enable;
+    printerControls.yPlus.disabled = enable;
+    printerControls.yMinus.disabled = enable;
+    printerControls.xyHome.disabled = enable;
+    printerControls.zPlus.disabled = enable;
+    printerControls.zMinus.disabled = enable;
+    printerControls.zHome.disabled = enable;
+    printerControls.step01.disabled = enable;
+    printerControls.step1.disabled = enable;
+    printerControls.step10.disabled = enable;
+    printerControls.step100.disabled = enable;
 
-    elements.motorsOff.disabled = enable;
-    elements.extrude.disabled = enable;
-    elements.retract.disabled = enable;
+    printerControls.motorsOff.disabled = enable;
+    printerControls.extrude.disabled = enable;
+    printerControls.retract.disabled = enable;
   }
 }

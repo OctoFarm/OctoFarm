@@ -91,81 +91,42 @@ class FilamentCleanerService {
     await FilamentCleanerService.dropDownList(
       spools,
       profiles,
-      filamentManager,
       selectedFilamentList
     );
     logger.info("Filament information cleaned and ready for consumption...");
   }
 
-  static dropDownList(spools, profiles, filamentManager, selected) {
+  static dropDownList(spools, profiles, selected) {
     const currentSettings = SettingsClean.returnSystemSettings();
     const { filament } = currentSettings;
     const { hideEmpty } = filament;
-    const normalDropObject = [this.noSpoolOptions];
-    const historyDropObject = [this.noSpoolOptions];
+    const createList = [this.noSpoolOptions];
     spools.forEach((spool) => {
-      let profileId = null;
-      if (filamentManager) {
-        profileId = _.findIndex(profiles, function (o) {
-          return o.profile.index === spool.spools.profile;
-        });
-      } else {
-        profileId = _.findIndex(profiles, function (o) {
-          return o._id == spool.spools.profile;
-        });
-      }
+      let profileId = _.findIndex(profiles, function (o) {
+        return o._id == spool.spools.profile;
+      });
+
       const index = _.findIndex(selected, function (o) {
         return o == spool._id;
       });
       if (profileId >= 0) {
         const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
 
-        if (hideEmpty && amountLeft < 1) {
-        } else {
-          if (filamentManager) {
-            historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-              profiles[profileId].profile.manufacturer
-            })</option>
-              `);
-            if (index > -1) {
-              normalDropObject.push(`
-                  <option value="${spool._id}" disabled>${spool.spools.name} (${(
-                spool.spools.weight - spool.spools.used
-              ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-                profiles[profileId].profile.manufacturer
-              })</option>
-              `);
-            } else {
-              normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-                spool.spools.weight - spool.spools.used
-              ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-                profiles[profileId].profile.manufacturer
-              })</option>
-              `);
-            }
-          } else {
-            historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
-              `);
-            normalDropObject.push(`
-                <option value="${spool._id}">${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-              profiles[profileId].profile.manufacturer
-            })</option>
-          `);
-          }
+        if (!hideEmpty && !amountLeft < 1) {
+          createList.push({
+            spoolID: spool._id,
+            spoolName: spool.spools.name,
+            spoolWeight: spool.spools.weight,
+            spoolUsed: spool.spools.used,
+            spoolRemain: amountLeft,
+            spoolMaterial: profiles[profileId].profile.material,
+            spoolManufacturer: profiles[profileId].profile.manufacturer,
+            selected: (index > -1)
+          })
         }
       }
     });
-    dropDownList = {
-      normalDropDown: normalDropObject,
-      historyDropDown: historyDropObject
-    };
+    dropDownList = createList;
   }
 
   static async selectedFilament(printers) {

@@ -30,15 +30,26 @@ function returnModalDeveloperInfo(options) {
   `;
 }
 
+function returnDeveloperObject(options) {
+  const { lineNumber, columnNumber, fileName, stack } = options
+  return {
+    lineNumber,
+    columnNumber,
+    fileName,
+    stack
+  }
+}
+
 function openErrorModal(options) {
   let errorObject = {};
-  if (!options?.statusCode) {
+  if (!options?.statusCode || options.statusCode === 999) {
     errorObject.message = options.toString();
     errorObject.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
     errorObject.name = ClientErrors.UNKNOWN_ERROR.type;
     errorObject.type = ClientErrors.UNKNOWN_ERROR.type;
     errorObject.code = ClientErrors.UNKNOWN_ERROR.code;
     errorObject.color = ClientErrors.UNKNOWN_ERROR.color;
+    errorObject.developerMessage = returnDeveloperObject(options);
   }
 
   const apiErrorTitle = document.getElementById("apiErrorTitle");

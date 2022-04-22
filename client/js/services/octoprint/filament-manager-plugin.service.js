@@ -1,17 +1,15 @@
 import OctoFarmClient from "../octofarm-client.service";
 import UI from "../../utils/ui";
 
-let filamentManagerSettings;
-let filamentManagerPluginIsEnabled;
-let allowMultiSelectIsEnabled;
+let filamentManagerSettings = {};
 
 export async function isFilamentManagerPluginSyncEnabled() {
-    if(typeof filamentManagerSettings === "undefined"){
+    if(_.isEmpty(filamentManagerSettings)){
       const { filamentManager, filament: { allowMultiSelect } } = await OctoFarmClient.get("settings/server/get");
-      filamentManagerPluginIsEnabled = filamentManager;
-      allowMultiSelectIsEnabled = allowMultiSelect;
+      filamentManagerSettings.filamentManagerPluginIsEnabled = filamentManager;
+      filamentManagerSettings.allowMultiSelectIsEnabled = allowMultiSelect;
     }
-    return { filamentManagerPluginIsEnabled, allowMultiSelectIsEnabled };
+    return { filamentManagerPluginIsEnabled: filamentManagerSettings.filamentManagerPluginIsEnabled, allowMultiSelectIsEnabled: filamentManagerSettings.allowMultiSelectIsEnabled };
 }
 
 async function disabledFilamentManagerSync(){
@@ -133,43 +131,4 @@ export function setupFilamentManagerReSyncBtn() {
       UI.removeLoaderFromElementInnerHTML(resyncBtn);
     });
   }
-}
-
-export async function returnDropDown(history) {
-    let dropDownLists = await OctoFarmClient.get("filament/get/dropDownList");
-    if (history) {
-      return dropDownLists.selected.historyDropDown;
-    } else {
-      return dropDownLists.selected.normalDropDown;
-    }
-}
-
-export async function selectFilament(printers, spoolId) {
-  const data = {
-    printers,
-    spoolId
-  };
-  try {
-    await OctoFarmClient.post("filament/assign", data);
-  } catch (e) {
-    UI.createAlert("error", "Issue changing your spool, please check the logs...");
-  }
-}
-
-export async function createFilamentSelector(element, printer, toolIndex) {
-  element.innerHTML = "";
-  const filamentDropDown = await returnDropDown();
-  filamentDropDown.forEach((filament) => {
-    element.insertAdjacentHTML("beforeend", filament);
-  });
-  if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
-    for (const selectedFilament of printer.selectedFilament) {
-      if (!!selectedFilament) {
-        element.value = selectedFilament._id;
-      }
-    }
-  }
-  element.addEventListener("change", (event) => {
-    selectFilament([{ printer: printer._id, tool: toolIndex }], event.target.value);
-  });
 }

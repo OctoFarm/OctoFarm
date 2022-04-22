@@ -52,8 +52,7 @@ router.get("/get/filament", ensureAuthenticated, (req, res) => {
   res.send({ spools });
 });
 router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
-  const selected = FilamentClean.getDropDown();
-  res.send({ status: 200, selected });
+  res.send({ dropDownList: FilamentClean.getDropDown() });
 });
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);

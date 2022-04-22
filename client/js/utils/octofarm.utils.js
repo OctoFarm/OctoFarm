@@ -91,7 +91,7 @@ export function checkGroupColumns(clientSettings) {
  * @param printer
  * @returns {string}
  */
-export function imageOrCamera(printer, doNotDisplay) {
+export function imageOrCamera(printer, doNotDisplay = false) {
     if(doNotDisplay){
         return "";
     }

@@ -1,7 +1,5 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
-import UI from "../utils/ui.js";
-import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
 import "../utils/cleanup-modals.util"
@@ -36,11 +34,9 @@ export default class PrinterTerminalManagerService {
       setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
 
       //Load the printer dropdown
-      const filamentDropDown = await returnDropDown();
       await PrinterTerminalManagerService.loadPrinter(
         currentPrinter,
-        printerControlList,
-        filamentDropDown
+        printerControlList
       );
       const elements = PrinterTerminalManagerService.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";

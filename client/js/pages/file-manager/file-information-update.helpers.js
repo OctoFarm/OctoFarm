@@ -81,7 +81,7 @@ export const updateMaintenanceCost = (id, maintainenceCost) => {
     }
     if(!!maintainenceCost){
         const fileMainEl = document.getElementById(`fileMaintainenceCost-${id}`);
-        UI.doesElementNeedUpdating(maintainenceCost, fileMainEl, "innerHTML")
+        UI.doesElementNeedUpdating(maintainenceCost.toFixed(2), fileMainEl, "innerHTML")
     }
 }
 
@@ -92,6 +92,6 @@ export const updateElectricityCost = (id, electricityCost) => {
     console.log(electricityCost)
     if(!!electricityCost){
         const fileElectEl = document.getElementById(`fileElectricityCost-${id}`);
-        UI.doesElementNeedUpdating(electricityCost, fileElectEl, "innerHTML")
+        UI.doesElementNeedUpdating(electricityCost.toFixed(2), fileElectEl, "innerHTML")
     }
 }

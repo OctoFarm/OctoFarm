@@ -3,7 +3,7 @@ import UI from "../../utils/ui";
 import {reRenderPageInformation, printErrors, getSelectValues} from "./filament-manager-ui.utils";
 
 
-async function selectFilament(spools, id) {
+export async function selectFilament(spools, id) {
     let printerIds = [];
     for (const spool of spools) {
         const meta = spool.split("-");

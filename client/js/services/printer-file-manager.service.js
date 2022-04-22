@@ -1,8 +1,7 @@
-import OctoPrintClient from "./octoprint-client.service";
+
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
 import FileManagerService from "./file-manager.service.js";
-import {returnDropDown} from "./octoprint/filament-manager-plugin.service";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import CustomGenerator from "./custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "./modal-printer-select.service";
@@ -32,11 +31,10 @@ export default class PrinterFileManagerService {
 
       setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
 
-      const filamentDropDown = await returnDropDown();
       await PrinterFileManagerService.loadPrinter(currentPrinter);
       const elements = PrinterFileManagerService.grabPage();
       await PrinterFileManagerService.applyState(currentPrinter, elements);
-      PrinterFileManagerService.applyListeners(elements, printers, filamentDropDown);
+      PrinterFileManagerService.applyListeners(elements, printers);
     } else {
       const id = _.findIndex(printers, function (o) {
         return o._id === currentIndex;

@@ -426,17 +426,18 @@ router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req
 router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
 
 router.post("/client/logs", ensureAuthenticated, async (req, res) => {
-  const errorLog = req.body;
-  const message = `${errorLog.code}: ${errorLog.message}`;
+  const { code, message, name, statusCode, type, color, developerMessage } = req.body;
+  const loggingMessage = `${code ? code : "No Code"}: ${message ? message : "No Message"}`;
   const errorObject = {
-    name: errorLog.name,
-    statusCode: errorLog.statusCode,
-    type: errorLog.type
+    name,
+    statusCode,
+    type
   };
-  if (errorLog.color === "danger") {
-    clientLogger.error(message, errorObject);
+  if (color !== "danger") {
+    clientLogger.warning(loggingMessage, errorObject);
   } else {
-    clientLogger.warning(message, errorObject);
+    clientLogger.error(loggingMessage, errorObject);
+    clientLogger.info("Developer Message: ", developerMessage)
   }
 });
 
