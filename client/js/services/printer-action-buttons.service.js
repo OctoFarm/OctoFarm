@@ -1,4 +1,4 @@
-import PrinterPowerService from "./printer-power-service.js";
+import PrinterPowerService from "./printer-power.service.js";
 import UI from "../utils/ui";
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";

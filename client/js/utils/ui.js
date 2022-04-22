@@ -294,6 +294,18 @@ export default class UI {
     }
   }
 
+  static addNotYetToElement(element){
+    if (element.classList.contains("notyet")) {
+      element.classList.remove("notyet");
+    }
+  }
+
+  static removeNotYetFromElement(element){
+    if (!element.classList.contains("notyet")) {
+      element.classList.add("notyet");
+    }
+  }
+
   static togglePrinterDisableState(e, id) {
     const printerCard = document.getElementById(`printerCard-${id}`);
 

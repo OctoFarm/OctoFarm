@@ -13,6 +13,7 @@ import {
 import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "../../services/printer-logs.service.js";
+import PrinterStatisticsService from "../../services/printer-statistics.service"
 import PrinterEditService from "../../services/printer-edit.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../../services/printer-settings.service";
@@ -503,13 +504,13 @@ export function createOrUpdatePrinterTableRow(printers) {
           let connectionLogs = await OctoFarmClient.get(
             "printers/connectionLogs/" + printer._id
           );
-          PrinterLogsService.loadLogs(printerInfo, connectionLogs);
+          PrinterLogsService.initialise(printerInfo, connectionLogs);
         });
 
       document
         .getElementById(`printerStatistics-${printer._id}`)
         .addEventListener("click", async (e) => {
-          await PrinterLogsService.loadStatistics(printer._id);
+          await PrinterStatisticsService.loadStatistics(printer._id);
         });
 
       document

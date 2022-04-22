@@ -3,13 +3,25 @@ const { PrinterTicker } = require("../../printer-connection-log.service");
 
 const defaultWOLSubnetMask = "255.255.255.0";
 
-const addOctoPrintLogWrapper = (id, message, state) => {
-  PrinterTicker.addOctoPrintLog(
-    getPrinterStoreCache().getPrinter(id),
-    message,
-    state,
-    "pluginmanager"
-  );
+const addOctoPrintLogWrapper = (id, message, state, plugin) => {
+  //TODO save to a database, and add more plugins!
+  const today = new Date();
+
+  const newLog = {
+    id: today.getTime(),
+    date: today,
+    message: message,
+    printerID: id,
+    printer: getPrinterStoreCache().getPrinterURL(id),
+    state: state,
+    pluginDisplay: plugin
+  };
+
+  if (plugin === "OctoKlipper") {
+    getPrinterStoreCache().pushUpdatePrinterDatabase(id, "klipperLogs", newLog);
+    return;
+  }
+  getPrinterStoreCache().pushUpdatePrinterDatabase(id, "pluginLogs", newLog);
 };
 
 const addOctoPrintIssueWrapper = (id, message, state) => {
@@ -98,12 +110,21 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
 };
 
 const captureKlipperPluginData = (id, data) => {
+  //TODO this needs to output to a klipper log, doesn't need to be in connection on Printer Manager
   const { payload, subtype } = data;
 
   let state = subtype === "info" ? "Info" : "Offline";
 
   if (payload.includes("file")) {
     return;
+  }
+
+  if (payload.includes("Disconnect") || payload.includes("Lost")) {
+    state = "Offline";
+  }
+
+  if (payload.includes("Ready")) {
+    state = "Complete";
   }
 
   if (payload.includes("probe")) {
@@ -114,7 +135,7 @@ const captureKlipperPluginData = (id, data) => {
     state = "Warning";
   }
 
-  addOctoPrintIssueWrapper(id, payload, state);
+  addOctoPrintLogWrapper(id, payload, state, "OctoKlipper");
 };
 
 const capturePluginManagerData = (id, type, data) => {
@@ -145,7 +166,6 @@ const captureResultsData = (id, data) => {
     result ? "successfully completed" : "failed to complete"
   } | Restart Required: ${needs_restart}`;
   const state = result ? "Complete" : "Offline";
-  addOctoPrintLogWrapper(id, message, state);
   addOctoPrintIssueWrapper(id, message, state);
 };
 
@@ -153,25 +173,29 @@ const captureLogLines = (id, data) => {
   if (!!data && data.length > 0) {
     data.forEach((line) => {
       if (line.stream === "call" || line.stream === "message") {
-        addOctoPrintLogWrapper(id, line.line, "Active");
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
       }
       if (line.stream === "stdout") {
-        addOctoPrintLogWrapper(id, line.line, "Complete");
+        addOctoPrintLogWrapper(id, line.line, "Complete", "Plugin Manager");
       }
       if (line.stream === "stderr") {
-        addOctoPrintLogWrapper(id, line.line, "Offline");
+        addOctoPrintLogWrapper(id, line.line, "Offline", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Offline");
       }
       if (line.line.includes("Successfully installed")) {
+        addOctoPrintLogWrapper(id, line.line, "Complete", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Complete");
       }
       if (line.line.includes("Successfully built")) {
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Active");
       }
       if (line.line.includes("Uninstalling")) {
+        addOctoPrintLogWrapper(id, line.line, "Offline", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Offline");
       }
       if (line.line.includes("Processing")) {
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Active");
       }
     });
@@ -187,7 +211,8 @@ const captureThrottlePluginData = (id, data) => {
     addOctoPrintLogWrapper(
       id,
       "OctoPrint reporting throttled state! Undervoltage issue!",
-      "Offline"
+      "Offline",
+      "Pi Support"
     );
   }
 
@@ -195,7 +220,8 @@ const captureThrottlePluginData = (id, data) => {
     addOctoPrintLogWrapper(
       id,
       "OctoPrint reporting throttled state! Overheating issue!",
-      "Offline"
+      "Offline",
+      "Pi Support"
     );
   }
 

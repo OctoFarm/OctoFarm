@@ -1,4 +1,4 @@
-const { findIndex, cloneDeep } = require("lodash");
+const { findIndex } = require("lodash");
 const { ScriptRunner } = require("../services/local-scripts.service");
 const { PrinterTicker } = require("../services/printer-connection-log.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -6,14 +6,12 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const Logger = require("../handlers/logger");
 const { PrinterClean } = require("../services/printer-cleaner.service");
 const Filament = require("../models/Filament");
-const { SettingsClean } = require("../services/settings-cleaner.service");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const { JobClean } = require("../services/job-cleaner.service");
-const { Job } = require("toad-scheduler");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -29,10 +27,10 @@ class PrinterStore {
     }
 
     return this.#printersList[
-        findIndex(this.#printersList, function (o) {
-          return o._id === id;
-        })
-        ];
+      findIndex(this.#printersList, function (o) {
+        return o._id === id;
+      })
+    ];
   };
 
   #removeFromStore = (id) => {
@@ -77,9 +75,9 @@ class PrinterStore {
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
         fileList: FileClean.generate(
-            printer.fileList,
-            printer.selectedFilament,
-            printer.costSettings
+          printer.fileList,
+          printer.selectedFilament,
+          printer.costSettings
         )
       });
     });
@@ -142,6 +140,11 @@ class PrinterStore {
     printer.updatePrinterData(data);
   }
 
+  pushUpdatePrinterDatabase(id, key, data) {
+    const printer = this.#findMePrinter(id);
+    printer.pushUpdatePrinterDatabase(key, data);
+  }
+
   getSelectedFilament(id) {
     const printer = this.#findMePrinter(id);
     return printer?.selectedFilament;
@@ -151,9 +154,9 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     const newPrinter = JSON.parse(JSON.stringify(printer));
     return FileClean.generate(
-        newPrinter.fileList,
-        newPrinter.selectedFilament,
-        newPrinter.costSettings
+      newPrinter.fileList,
+      newPrinter.selectedFilament,
+      newPrinter.costSettings
     );
   }
 
@@ -290,17 +293,17 @@ class PrinterStore {
 
       //Check for a printer name change...
       if (
-          !!newPrinterInfo?.settingsAppearance?.name &&
-          oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name
+        !!newPrinterInfo?.settingsAppearance?.name &&
+        oldPrinter.settingsAppearance.name !== newPrinterInfo.settingsAppearance.name
       ) {
         const loggerMessage = `Changed printer name from ${oldPrinter.settingsAppearance.name} to ${newPrinterInfo.settingsAppearance.name}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
-            new Date(),
-            oldPrinter.printerURL,
-            loggerMessage,
-            "Active",
-            oldPrinter._id
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
           settingsAppearance: {
@@ -309,9 +312,9 @@ class PrinterStore {
         });
 
         if (
-            findIndex(this.#printersList, function (o) {
-              return o._id === newPrinterInfo._id;
-            }) !== -1
+          findIndex(this.#printersList, function (o) {
+            return o._id === newPrinterInfo._id;
+          }) !== -1
         ) {
           changesList.push({
             _id: newPrinterInfo._id,
@@ -325,18 +328,18 @@ class PrinterStore {
         const loggerMessage = `Changed printer url from ${oldPrinter.printerURL} to ${newPrinterInfo.printerURL}`;
         logger.warning(loggerMessage);
         PrinterTicker.addIssue(
-            new Date(),
-            oldPrinter.printerURL,
-            loggerMessage,
-            "Active",
-            oldPrinter._id
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
         );
         if (newPrinterInfo.printerURL[newPrinterInfo.printerURL.length - 1] === "/") {
           newPrinterInfo.printerURL = newPrinterInfo.printerURL.replace(/\/?$/, "");
         }
         if (
-            !newPrinterInfo.printerURL.includes("https://") &&
-            !newPrinterInfo.printerURL.includes("http://")
+          !newPrinterInfo.printerURL.includes("https://") &&
+          !newPrinterInfo.printerURL.includes("http://")
         ) {
           newPrinterInfo.printerURL = `http://${newPrinterInfo.printerURL}`;
         }
@@ -345,9 +348,9 @@ class PrinterStore {
           webSocketURL: convertHttpUrlToWebsocket(newPrinterInfo.printerURL)
         });
         if (
-            findIndex(this.#printersList, function (o) {
-              return o._id === newPrinterInfo._id;
-            }) !== -1
+          findIndex(this.#printersList, function (o) {
+            return o._id === newPrinterInfo._id;
+          }) !== -1
         ) {
           changesList.push({
             _id: newPrinterInfo._id,
@@ -365,20 +368,20 @@ class PrinterStore {
         const loggerMessage = `Changed apiKey from ${oldPrinter.apikey} to ${newPrinterInfo.apikey}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
-            new Date(),
-            oldPrinter.printerURL,
-            loggerMessage,
-            "Active",
-            oldPrinter._id
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
           apikey: newPrinterInfo.apikey
         });
 
         if (
-            findIndex(this.#printersList, function (o) {
-              return o._id === newPrinterInfo._id;
-            }) !== -1
+          findIndex(this.#printersList, function (o) {
+            return o._id === newPrinterInfo._id;
+          }) !== -1
         ) {
           changesList.push({
             _id: newPrinterInfo._id,
@@ -395,19 +398,19 @@ class PrinterStore {
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
-            new Date(),
-            oldPrinter.printerURL,
-            loggerMessage,
-            "Active",
-            oldPrinter._id
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
           group: newPrinterInfo.group
         });
         if (
-            findIndex(this.#printersList, function (o) {
-              return o._id === newPrinterInfo._id;
-            }) !== -1
+          findIndex(this.#printersList, function (o) {
+            return o._id === newPrinterInfo._id;
+          }) !== -1
         ) {
           changesList.push({
             _id: newPrinterInfo._id,
@@ -421,20 +424,20 @@ class PrinterStore {
         const loggerMessage = `Changed camera url from ${oldPrinter.camURL} to ${newPrinterInfo.camURL}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
-            new Date(),
-            oldPrinter.printerURL,
-            loggerMessage,
-            "Active",
-            oldPrinter._id
+          new Date(),
+          oldPrinter.printerURL,
+          loggerMessage,
+          "Active",
+          oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
           camURL: newPrinterInfo.camURL
         });
 
         if (
-            findIndex(this.#printersList, function (o) {
-              return o._id === newPrinterInfo._id;
-            }) !== -1
+          findIndex(this.#printersList, function (o) {
+            return o._id === newPrinterInfo._id;
+          }) !== -1
         ) {
           changesList.push({
             _id: newPrinterInfo._id,
@@ -467,8 +470,8 @@ class PrinterStore {
   }
 
   async editPrinterConnectionSettings(settings) {
-    const {printer} = settings;
-    const {printerName, printerURL, cameraURL, apikey, currentUser, index} = printer;
+    const { printer } = settings;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
 
     const originalPrinter = this.#findMePrinter(index);
 
@@ -493,7 +496,7 @@ class PrinterStore {
     // Update OctoFarms data
     this.updatePrintersBasicInformation([octoFarmConnectionSettings]);
 
-    return {status: 200};
+    return { status: 200 };
 
     // Refresh OctoPrint Updates
   }
@@ -517,10 +520,10 @@ class PrinterStore {
       gcode,
       other
     } = settings;
-    const {index} = printer;
+    const { index } = printer;
     const originalPrinter = this.#findMePrinter(index);
 
-    const {preferredPort, preferredBaud, preferredProfile} = connection;
+    const { preferredPort, preferredBaud, preferredProfile } = connection;
     // Connection is always sent so can just update.
     if (!!preferredPort || !!preferredBaud || !!preferredProfile) {
       this.updatePrinterDatabase(index, {
@@ -554,59 +557,59 @@ class PrinterStore {
     } = costSettings;
 
     if (
-        !!powerConsumption ||
-        !!electricityCosts ||
-        !!purchasePrice ||
-        !!estimatedLifeSpan ||
-        !!maintenanceCosts
+      !!powerConsumption ||
+      !!electricityCosts ||
+      !!purchasePrice ||
+      !!estimatedLifeSpan ||
+      !!maintenanceCosts
     ) {
       const costSettingsNew = {
         ...(!!powerConsumption
-            ? {powerConsumption}
-            : {powerConsumption: originalPrinter.costSettings.powerConsumption}),
+          ? { powerConsumption }
+          : { powerConsumption: originalPrinter.costSettings.powerConsumption }),
         ...(!!electricityCosts
-            ? {electricityCosts}
-            : {electricityCosts: originalPrinter.costSettings.electricityCosts}),
+          ? { electricityCosts }
+          : { electricityCosts: originalPrinter.costSettings.electricityCosts }),
         ...(!!purchasePrice
-            ? {purchasePrice}
-            : {purchasePrice: originalPrinter.costSettings.purchasePrice}),
+          ? { purchasePrice }
+          : { purchasePrice: originalPrinter.costSettings.purchasePrice }),
         ...(!!estimatedLifeSpan
-            ? {estimateLifespan: estimatedLifeSpan}
-            : {estimateLifespan: originalPrinter.costSettings.estimateLifespan}),
+          ? { estimateLifespan: estimatedLifeSpan }
+          : { estimateLifespan: originalPrinter.costSettings.estimateLifespan }),
         ...(!!maintenanceCosts
-            ? {maintenanceCosts}
-            : {maintenanceCosts: originalPrinter.costSettings.maintenanceCosts})
+          ? { maintenanceCosts }
+          : { maintenanceCosts: originalPrinter.costSettings.maintenanceCosts })
       };
-      this.updatePrinterDatabase(index, {costSettingsNew});
+      this.updatePrinterDatabase(index, { costSettingsNew });
     }
 
-    const {name, model, volume, heatedBed, heatedChamber, axes, extruder} = profile;
+    const { name, model, volume, heatedBed, heatedChamber, axes, extruder } = profile;
 
     if (!!name || !!model || !!volume || !!heatedBed || !!heatedChamber || !!axes || !!extruder) {
       const originalProfile = originalPrinter.profiles[profileID];
       const newAxes = {
         x: {
-          ...(!!axes?.x?.speed ? {speed: axes.x.speed} : {speed: originalProfile.axes.x.speed}),
+          ...(!!axes?.x?.speed ? { speed: axes.x.speed } : { speed: originalProfile.axes.x.speed }),
           inverted: axes.x.inverted
         },
         y: {
-          ...(!!axes?.y?.speed ? {speed: axes.y.speed} : {speed: originalProfile.axes.y.speed}),
+          ...(!!axes?.y?.speed ? { speed: axes.y.speed } : { speed: originalProfile.axes.y.speed }),
           inverted: axes.y.inverted
         },
         z: {
-          ...(!!axes?.z?.speed ? {speed: axes.z.speed} : {speed: originalProfile.axes.z.speed}),
+          ...(!!axes?.z?.speed ? { speed: axes.z.speed } : { speed: originalProfile.axes.z.speed }),
           inverted: axes.z.inverted
         },
         e: {
-          ...(!!axes?.e?.speed ? {speed: axes.e.speed} : {speed: originalProfile.axes.e.speed}),
+          ...(!!axes?.e?.speed ? { speed: axes.e.speed } : { speed: originalProfile.axes.e.speed }),
           inverted: axes.e.inverted
         }
       };
       const newExtruder = {
         count: extruder?.count ? extruder.count : originalProfile.extruder.count,
         nozzleDiameter: extruder?.nozzleDiameter
-            ? extruder.nozzleDiameter
-            : originalProfile.extruder.nozzleDiameter,
+          ? extruder.nozzleDiameter
+          : originalProfile.extruder.nozzleDiameter,
         sharedNozzle: extruder.sharedNozzle
       };
       const newVolume = {
@@ -653,50 +656,50 @@ class PrinterStore {
     } = powerCommands;
 
     if (
-        !!powerOnCommand ||
-        !!powerOnURL ||
-        !!powerOffURL ||
-        !!powerOffCommand ||
-        !!powerToggleCommand ||
-        !!powerToggleURL ||
-        !!powerStatusCommand ||
-        !!powerStatusURL ||
-        !!wol
+      !!powerOnCommand ||
+      !!powerOnURL ||
+      !!powerOffURL ||
+      !!powerOffCommand ||
+      !!powerToggleCommand ||
+      !!powerToggleURL ||
+      !!powerStatusCommand ||
+      !!powerStatusURL ||
+      !!wol
     ) {
-      const {enabled, ip, port, interval, packet, MAC} = wol;
+      const { enabled, ip, port, interval, packet, MAC } = wol;
       const newWOL = {
         enabled,
-        ...(!!ip ? {ip} : {ip: originalPrinter.powerSettings.wol.ip}),
-        ...(!!port ? {port} : {port: originalPrinter.powerSettings.wol.port}),
-        ...(!!interval ? {interval} : {interval: originalPrinter.powerSettings.wol.interval}),
-        ...(!!packet ? {packet} : {packet: originalPrinter.powerSettings.wol.packet}),
-        ...(!!MAC ? {MAC} : {MAC: originalPrinter.powerSettings.wol.MAC})
+        ...(!!ip ? { ip } : { ip: originalPrinter.powerSettings.wol.ip }),
+        ...(!!port ? { port } : { port: originalPrinter.powerSettings.wol.port }),
+        ...(!!interval ? { interval } : { interval: originalPrinter.powerSettings.wol.interval }),
+        ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
+        ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
       };
       const newPowerSettings = {
         ...(!!powerOnCommand
-            ? {powerOnCommand}
-            : {powerOnCommand: originalPrinter.powerSettings.powerOnCommand}),
+          ? { powerOnCommand }
+          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
         ...(!!powerOnURL
-            ? {powerOnURL}
-            : {powerOnURL: originalPrinter.powerSettings.powerOnURL}),
+          ? { powerOnURL }
+          : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
         ...(!!powerOffURL
-            ? {powerOffURL}
-            : {powerOffURL: originalPrinter.powerSettings.powerOffURL}),
+          ? { powerOffURL }
+          : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
         ...(!!powerOffCommand
-            ? {powerOffCommand}
-            : {powerOffCommand: originalPrinter.powerSettings.powerOffCommand}),
+          ? { powerOffCommand }
+          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
         ...(!!powerToggleCommand
-            ? {powerToggleCommand}
-            : {powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand}),
+          ? { powerToggleCommand }
+          : { powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand }),
         ...(!!powerToggleURL
-            ? {powerToggleURL}
-            : {powerToggleURL: originalPrinter.powerSettings.powerToggleURL}),
+          ? { powerToggleURL }
+          : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
         ...(!!powerStatusCommand
-            ? {powerStatusCommand}
-            : {powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand}),
+          ? { powerStatusCommand }
+          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
         ...(!!powerStatusURL
-            ? {powerStatusURL}
-            : {powerStatusURL: originalPrinter.powerSettings.powerStatusURL}),
+          ? { powerStatusURL }
+          : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),
         wol: newWOL
       };
 
@@ -705,21 +708,21 @@ class PrinterStore {
       });
     }
 
-    const {systemShutdown, systemRestart, serverRestart} = systemCommands;
+    const { systemShutdown, systemRestart, serverRestart } = systemCommands;
 
     if (!!systemShutdown || !!systemRestart || !!serverRestart) {
       newOctoPrintSettings.server = {
         allowFraming: originalPrinter.settingsServer.allowFraming,
         commands: {
           systemShutdownCommand: systemShutdown
-              ? systemShutdown
-              : originalPrinter.settingsServer.commands.systemShutdownCommand,
+            ? systemShutdown
+            : originalPrinter.settingsServer.commands.systemShutdownCommand,
           systemRestartCommand: systemRestart
-              ? systemRestart
-              : originalPrinter.settingsServer.commands.systemRestartCommand,
+            ? systemRestart
+            : originalPrinter.settingsServer.commands.systemRestartCommand,
           serverRestartCommand: serverRestart
-              ? serverRestart
-              : originalPrinter.settingsServer.commands.serverRestartCommand
+            ? serverRestart
+            : originalPrinter.settingsServer.commands.serverRestartCommand
         },
         diskspace: originalPrinter.settingsServer.diskspace,
         onlineCheck: originalPrinter.settingsServer.onlineCheck,
@@ -744,46 +747,46 @@ class PrinterStore {
     } = gcode;
 
     if (
-        !!afterPrintCancelled ||
-        !!afterPrintDone ||
-        !!afterPrintPaused ||
-        !!afterPrinterConnected ||
-        !!afterToolChange ||
-        !!beforePrintResumed ||
-        !!beforePrintStarted ||
-        !!beforePrinterDisconnected ||
-        !!beforeToolChange
+      !!afterPrintCancelled ||
+      !!afterPrintDone ||
+      !!afterPrintPaused ||
+      !!afterPrinterConnected ||
+      !!afterToolChange ||
+      !!beforePrintResumed ||
+      !!beforePrintStarted ||
+      !!beforePrinterDisconnected ||
+      !!beforeToolChange
     ) {
       const newCustomGcode = {
         ...(!!afterPrintCancelled
-            ? {afterPrintCancelled}
-            : {afterPrintCancelled: originalPrinter?.settingsScripts?.afterPrintCancelled}),
+          ? { afterPrintCancelled }
+          : { afterPrintCancelled: originalPrinter?.settingsScripts?.afterPrintCancelled }),
         ...(!!afterPrintDone
-            ? {afterPrintDone}
-            : {afterPrintDone: originalPrinter?.settingsScripts?.afterPrintDone}),
+          ? { afterPrintDone }
+          : { afterPrintDone: originalPrinter?.settingsScripts?.afterPrintDone }),
         ...(!!afterPrintPaused
-            ? {afterPrintPaused}
-            : {afterPrintPaused: originalPrinter?.settingsScripts?.afterPrintPaused}),
+          ? { afterPrintPaused }
+          : { afterPrintPaused: originalPrinter?.settingsScripts?.afterPrintPaused }),
         ...(!!afterPrinterConnected
-            ? {afterPrinterConnected}
-            : {afterPrinterConnected: originalPrinter?.settingsScripts?.afterPrinterConnected}),
+          ? { afterPrinterConnected }
+          : { afterPrinterConnected: originalPrinter?.settingsScripts?.afterPrinterConnected }),
         ...(!!afterToolChange
-            ? {afterToolChange}
-            : {afterToolChange: originalPrinter?.settingsScripts?.afterToolChange}),
+          ? { afterToolChange }
+          : { afterToolChange: originalPrinter?.settingsScripts?.afterToolChange }),
         ...(!!beforePrintResumed
-            ? {beforePrintResumed}
-            : {beforePrintResumed: originalPrinter?.settingsScripts?.beforePrintResumed}),
+          ? { beforePrintResumed }
+          : { beforePrintResumed: originalPrinter?.settingsScripts?.beforePrintResumed }),
         ...(!!beforePrintStarted
-            ? {beforePrintStarted}
-            : {beforePrintStarted: originalPrinter?.settingsScripts?.beforePrintStarted}),
+          ? { beforePrintStarted }
+          : { beforePrintStarted: originalPrinter?.settingsScripts?.beforePrintStarted }),
         ...(!!beforePrinterDisconnected
-            ? {beforePrinterDisconnected}
-            : {
+          ? { beforePrinterDisconnected }
+          : {
               beforePrinterDisconnected: originalPrinter?.settingsScripts?.beforePrinterDisconnected
             }),
         ...(!!beforeToolChange
-            ? {beforeToolChange}
-            : {beforeToolChange: originalPrinter?.settingsScripts?.beforeToolChange})
+          ? { beforeToolChange }
+          : { beforeToolChange: originalPrinter?.settingsScripts?.beforeToolChange })
       };
       this.updatePrinterDatabase(index, {
         settingsScripts: newCustomGcode
@@ -804,21 +807,21 @@ class PrinterStore {
     } = other;
 
     if (
-        !!enableCamera ||
-        !!rotateCamera ||
-        !!flipHCamera ||
-        !!flipVCamera ||
-        !!enableTimeLapse ||
-        !!heatingVariation ||
-        coolDown
+      !!enableCamera ||
+      !!rotateCamera ||
+      !!flipHCamera ||
+      !!flipVCamera ||
+      !!enableTimeLapse ||
+      !!heatingVariation ||
+      coolDown
     ) {
       const tempTriggers = {
         ...(!!heatingVariation
-            ? {heatingVariation: parseInt(heatingVariation)}
-            : {heatingVariation: originalPrinter?.tempTriggers?.heatingVariation}),
+          ? { heatingVariation: parseInt(heatingVariation) }
+          : { heatingVariation: originalPrinter?.tempTriggers?.heatingVariation }),
         ...(!!coolDown
-            ? {coolDown: parseInt(coolDown)}
-            : {coolDown: originalPrinter?.tempTriggers?.coolDown})
+          ? { coolDown: parseInt(coolDown) }
+          : { coolDown: originalPrinter?.tempTriggers?.coolDown })
       };
       const settingsWebcam = {
         bitrate: originalPrinter.settingsWebcam.bitrate,
@@ -850,8 +853,8 @@ class PrinterStore {
     originalPrinter.cleanPrintersInformation();
 
     profileCheck = await originalPrinter.updateOctoPrintProfileData(
-        {profile: octoPrintProfiles[profileID]},
-        profileID
+      { profile: octoPrintProfiles[profileID] },
+      profileID
     );
     settingsCheck = await originalPrinter.updateOctoPrintSettingsData(newOctoPrintSettings);
 
@@ -863,7 +866,7 @@ class PrinterStore {
       originalPrinter.acquireOctoPrintPluginsListData(true)
     ]);
 
-    return {octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck};
+    return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
 
     // Refresh OctoPrint Updates
   }
@@ -922,9 +925,9 @@ class PrinterStore {
         }
       }
       if (
-          fileChecks.every(function (e) {
-            return e === true;
-          })
+        fileChecks.every(function (e) {
+          return e === true;
+        })
       ) {
         filesThatExistOnAllPrinters.push(fileToCheck);
       }
@@ -990,12 +993,12 @@ class PrinterStore {
   }
 
   addNewFile(file) {
-    const {index, files} = file;
+    const { index, files } = file;
     const printer = this.#findMePrinter(index);
 
     const date = new Date();
 
-    const {name, path} = files.local;
+    const { name, path } = files.local;
 
     let filePath = "";
 
@@ -1021,18 +1024,18 @@ class PrinterStore {
       last: null
     };
     PrinterService.findOneAndPush(index, "fileList.fileList", data)
-        .then(() => {
-          printer.fileList.fileList.push(data);
-        })
-        .catch((e) => {
-          logger.error("Issue updating file list", e);
-        });
+      .then(() => {
+        printer.fileList.fileList.push(data);
+      })
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
 
     return printer;
   }
 
   addNewFolder(folder) {
-    const {i, foldername} = folder;
+    const { i, foldername } = folder;
     const printer = this.#findMePrinter(i);
 
     let path = "local";
@@ -1050,12 +1053,12 @@ class PrinterStore {
     };
 
     PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
-        .then(() => {
-          printer.fileList.folderList.push(newFolder);
-        })
-        .catch((e) => {
-          logger.error("Issue updating file list", e);
-        });
+      .then(() => {
+        printer.fileList.folderList.push(newFolder);
+      })
+      .catch((e) => {
+        logger.error("Issue updating file list", e);
+      });
 
     return printer;
   }
@@ -1068,7 +1071,7 @@ class PrinterStore {
     printer.fileList.fileList.forEach((file, index) => {
       if (file.path === oldFolder) {
         const fileName = printer.fileList.fileList[index].fullPath.substring(
-            printer.fileList.fileList[index].fullPath.lastIndexOf("/") + 1
+          printer.fileList.fileList[index].fullPath.lastIndexOf("/") + 1
         );
         printer.fileList.fileList[index].fullPath = `${folderName}/${fileName}`;
         printer.fileList.fileList[index].path = folderName;
@@ -1156,9 +1159,9 @@ class PrinterStore {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
       });
       FileClean.generate(
-          farmPrinters[printerIndex].fileList,
-          farmPrinters[printerIndex].selectedFilament,
-          farmPrinters[printerIndex].costSettings
+        farmPrinters[printerIndex].fileList,
+        farmPrinters[printerIndex].selectedFilament,
+        farmPrinters[printerIndex].costSettings
       );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
@@ -1168,12 +1171,12 @@ class PrinterStore {
   reRunJobCleaner = (id) => {
     const printer = this.#findMePrinter(id);
     JobClean.generate(
-        printer.job,
-        printer.selectedFilament,
-        printer.fileList,
-        printer.currentZ,
-        printer.costSettings,
-        printer.progress
+      printer.job,
+      printer.selectedFilament,
+      printer.fileList,
+      printer.currentZ,
+      printer.costSettings,
+      printer.progress
     );
   };
 
@@ -1181,12 +1184,12 @@ class PrinterStore {
     console.log(filamentID);
     const farmPrinters = this.listPrintersInformation(true);
     const farmPrintersAssigned = farmPrinters.filter(
-        (printer) =>
-            findIndex(printer.selectedFilament, function (o) {
-              if (!!o) {
-                return o._id === filamentID;
-              }
-            }) > -1
+      (printer) =>
+        findIndex(printer.selectedFilament, function (o) {
+          if (!!o) {
+            return o._id === filamentID;
+          }
+        }) > -1
     );
     farmPrintersAssigned.forEach((printer) => {
       printer.selectedFilament.forEach((spool, index) => {
@@ -1194,7 +1197,7 @@ class PrinterStore {
         printer.selectedFilament[index] = null;
         logger.debug("Spool reset", spool);
       });
-      this.updatePrinterDatabase(printer._id, {selectedFilament: printer.selectedFilament});
+      this.updatePrinterDatabase(printer._id, { selectedFilament: printer.selectedFilament });
       FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings);
     });
   }
@@ -1205,11 +1208,11 @@ class PrinterStore {
   }
 
   updateFeedRate(id, feedRate) {
-    this.updatePrinterDatabase(id, {feedRate: feedRate});
+    this.updatePrinterDatabase(id, { feedRate: feedRate });
   }
 
   updateFlowRate(id, flowRate) {
-    this.updatePrinterDatabase(id, {flowRate: flowRate});
+    this.updatePrinterDatabase(id, { flowRate: flowRate });
   }
 
   updatePrinterStatistics(id, statistics) {

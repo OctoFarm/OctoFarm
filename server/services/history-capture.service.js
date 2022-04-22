@@ -332,14 +332,8 @@ class HistoryCollection {
         return;
       }
       let workingHistory = historyArchive[currentArchive];
-      let startDateSplit = workingHistory.startDate.split(" ");
-      let endDateSplit = workingHistory.endDate.split(" ");
-      const trueStartDate = Date.parse(
-        `${startDateSplit[2]} ${startDateSplit[1]} ${startDateSplit[3]} ${startDateSplit[5]}`
-      );
-      const trueEndDate = Date.parse(
-        `${endDateSplit[2]} ${endDateSplit[1]} ${endDateSplit[3]} ${endDateSplit[5]}`
-      );
+      let startDateSplit = new Date(workingHistory.startDate);
+      let endDateSplit = new Date(workingHistory.endDate);
       let currentState = " ";
       if (workingHistory.state.includes("Success")) {
         currentState = "Success";

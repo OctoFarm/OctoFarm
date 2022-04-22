@@ -1580,6 +1580,11 @@ class OctoPrintPrinter {
     logger.silly("Updating live printer data", object);
   }
 
+  pushUpdatePrinterDatabase(key, data) {
+    logger.silly("Push updating printer database", { key, data });
+    this?.#db?.pushAndUpdate(this._id, key, data);
+  }
+
   updatePrinterData(data) {
     logger.silly("Updating printer database: ", data);
     this.#db.update(data);

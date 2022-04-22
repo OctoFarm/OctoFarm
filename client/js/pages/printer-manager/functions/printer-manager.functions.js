@@ -2,7 +2,7 @@ import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
-import PrinterPowerService from "../../../services/printer-power-service";
+import PrinterPowerService from "../../../services/printer-power.service";
 import PrinterControlManagerService from "../../../services/printer-control-manager.service";
 import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
 import Validate from "../../../utils/validate";

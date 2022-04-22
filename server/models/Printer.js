@@ -229,6 +229,14 @@ const PrinterSchema = new mongoose.Schema({
   core: {
     type: Array,
     required: false
+  },
+  pluginLogs: {
+    type: Array,
+    required: false
+  },
+  klipperLogs: {
+    type: Array,
+    required: false
   }
 });
 

@@ -3,6 +3,7 @@ const { orderBy } = require("lodash");
 
 const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
+const Printers = require("../models/Printer.js");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
@@ -22,16 +23,18 @@ class PrinterCleanerService {
   }
 
   static async generateConnectionLogs(farmPrinter) {
-    let printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id });
+    const printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id });
+    const { pluginLogs, klipperLogs } = await Printers.findById(farmPrinter._id);
 
     let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
     let currentTempLogs = [];
     let currentOctoPrintLogs = [];
-    for (let e = 0; e < printerErrorLogs.length; e++) {
+    let currentKlipperLogs = [];
+    for (let e = 0; e < 300; e++) {
       if (
-        typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
-        JSON.stringify(printerErrorLogs[e].errorLog.printerID) === JSON.stringify(farmPrinter._id)
+        !!printerErrorLogs[e]?.errorLog?.printerID &&
+        printerErrorLogs[e].errorLog.printerID === farmPrinter._id
       ) {
         let errorFormat = {
           date: printerErrorLogs[e].errorLog.endDate,
@@ -43,8 +46,8 @@ class PrinterCleanerService {
       }
     }
     let currentIssues = PrinterTicker.returnIssue();
-    for (let i = 0; i < currentIssues.length; i++) {
-      if (JSON.stringify(currentIssues[i].printerID) === JSON.stringify(farmPrinter._id)) {
+    for (let i = 0; i < 300; i++) {
+      if (!!currentIssues[i] && currentIssues[i].printerID === farmPrinter._id) {
         let errorFormat = {
           date: currentIssues[i].date,
           message: currentIssues[i].message,
@@ -54,18 +57,29 @@ class PrinterCleanerService {
         currentOctoFarmLogs.push(errorFormat);
       }
     }
-
-    let octoprintLogs = PrinterTicker.returnOctoPrintLogs();
-    for (let i = 0; i < octoprintLogs.length; i++) {
-      if (JSON.stringify(octoprintLogs[i].printerID) === JSON.stringify(farmPrinter._id)) {
+    for (let i = 0; i < 300; i++) {
+      if (!!pluginLogs[i]) {
         let octoFormat = {
-          date: octoprintLogs[i].date,
-          message: octoprintLogs[i].message,
-          printer: octoprintLogs[i].printer,
-          pluginDisplay: octoprintLogs[i].pluginDisplay,
-          state: octoprintLogs[i].state
+          date: pluginLogs[i].date,
+          message: pluginLogs[i].message,
+          printer: pluginLogs[i].printer,
+          pluginDisplay: pluginLogs[i].pluginDisplay,
+          state: pluginLogs[i].state
         };
         currentOctoPrintLogs.push(octoFormat);
+      }
+    }
+
+    for (let i = 0; i < 300; i++) {
+      if (!!klipperLogs[i]) {
+        let octoFormat = {
+          date: klipperLogs[i].date,
+          message: klipperLogs[i].message,
+          printer: klipperLogs[i].printer,
+          pluginDisplay: klipperLogs[i].pluginDisplay,
+          state: klipperLogs[i].state
+        };
+        currentKlipperLogs.push(octoFormat);
       }
     }
 
@@ -73,7 +87,7 @@ class PrinterCleanerService {
       printer_id: farmPrinter._id
     })
       .sort({ _id: -1 })
-      .limit(500);
+      .limit(1000);
     if (typeof tempHistory !== "undefined") {
       for (let h = 0; h < tempHistory.length; h++) {
         let hist = tempHistory[h].currentTemp;
@@ -146,12 +160,14 @@ class PrinterCleanerService {
     currentOctoFarmLogs = orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
     currentTempLogs = orderBy(currentTempLogs, ["date"], ["desc"]);
     currentOctoPrintLogs = orderBy(currentOctoPrintLogs, ["date"], ["desc"]);
+    currentKlipperLogs = orderBy(currentKlipperLogs, ["date"], ["desc"]);
 
     return {
       currentErrorLogs,
       currentOctoFarmLogs,
       currentTempLogs,
-      currentOctoPrintLogs
+      currentOctoPrintLogs,
+      currentKlipperLogs
     };
   }
 
