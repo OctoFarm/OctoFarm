@@ -90,6 +90,7 @@ export default class OctoFarmClient {
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
   static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
   static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
+  static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -171,6 +172,10 @@ export default class OctoFarmClient {
 
   static async getServerSettings() {
     return this.get(`${this.serverSettingsRoute}/get`);
+  }
+
+  static async getSelectedFilament(id){
+    return this.get(`${this.selectedFilamentRoute}/${id}`);
   }
 
   static async setPrinterSteps(id, newSteps) {

@@ -2,12 +2,19 @@ import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./utils/calc.js";
 import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
-import {createFilamentSelector} from "./services/octoprint/filament-manager-plugin.service";
+import {
+  findBigFilamentDropDowns,
+  returnBigFilamentSelectorTemplate,
+  fillFilamentDropDownList
+} from "./services/printer-filament-selector.service";
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
 import {allowedFileTypes} from "./constants/file-types.constants"
 
 import {printerIsOnline} from "./utils/octofarm.utils";
 import {printerTemplate} from "./pages/file-manager/file.template";
+import UI from "./utils/ui";
+import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "./exceptions/application-error.handler";
 
 
 let lastId = null;
@@ -46,39 +53,33 @@ class Manager {
         onlinePrinterList.push(printer);
       }
     });
-    onlinePrinterList.forEach((printer, index) => {
+    for (const [index, printer] of onlinePrinterList.entries()) {
       let storageWarning = "";
       if (printer?.storage) {
         const percentRemain = (printer.storage.free * 100) / printer.storage.total;
         if (percentRemain > 90) {
           storageWarning = `<button type="button" class="btn btn-outline-danger text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
-                                     0
-                                   )}% Space Left</button>`;
+              0
+          )}% Space Left</button>`;
         }
         if (percentRemain > 80) {
           storageWarning = `<button type="button" class="btn btn-outline-warning text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
-                                     0
-                                   )}% Space Left</button>`;
+              0
+          )}% Space Left</button>`;
         }
       }
 
       let extruderList = "";
 
       for (let i = 0; i < printer?.currentProfile?.extruder?.count; i++) {
-        extruderList += `
-        <div class="input-group mb-1">
-            <div class="input-group-prepend"> 
-                <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label>
-            </div> 
-            <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select>
-        </div>`;
+        extruderList += `${returnBigFilamentSelectorTemplate(i, printer._id)}`;
       }
 
       printerList.insertAdjacentHTML(
-        "beforeend",
-        `
+          "beforeend",
+          `
           ${printerTemplate(printer, storageWarning, extruderList)}
       `
       );
@@ -93,8 +94,7 @@ class Manager {
       dragAndDropEnable(listItem, printer);
 
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-        const filamentDrop = document.getElementById("tool" + i + "-" + printer._id);
-        createFilamentSelector(filamentDrop, printer, i);
+        await fillFilamentDropDownList(document.getElementById(`tool-${printer._id}-${i}-bigFilamentSelect`), printer, i);
       }
 
       if (index === 0) {
@@ -104,9 +104,9 @@ class Manager {
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
         firstElement.innerHTML = `<i class="fas fa-print"></i> ${printer.printerName}`;
-        Manager.updatePrinterList(printer._id);
+        await Manager.updatePrinterList(printer._id);
       }
-    });
+    }
   }
 
   static async init() {
@@ -252,4 +252,8 @@ class Manager {
   }
 }
 
-Manager.init();
+Manager.init().catch(e => {
+  const errorObject = ClientErrors.UNKNOWN_ERROR;
+  errorObject.message =  `File Manager - ${e}`
+  throw new ApplicationError(errorObject)
+});

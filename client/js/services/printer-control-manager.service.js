@@ -12,11 +12,11 @@ import {
 } from "../utils/octofarm.utils";
 import {
   findBigFilamentDropDowns,
-  returnBigFilamentSelectorTemplate
-} from "../services/printer-filament-selector.service";
+  returnBigFilamentSelectorTemplate,
+  fillFilamentDropDownList
+} from "./printer-filament-selector.service";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../exceptions/application-error.handler";
-import {fillFilamentDropDownList} from "./printer-filament-selector.service";
 
 let currentIndex = 0;
 

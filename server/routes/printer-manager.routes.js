@@ -525,4 +525,14 @@ router.get(
   }
 );
 
+router.get(
+    "/selectedFilament/:id",
+    ensureAuthenticated,
+    validateParamsMiddleware(M_VALID.MONGO_ID),
+    async (req, res) => {
+        const printerID = req.paramString("id");
+        res.send(getPrinterStoreCache().getSelectedFilament(printerID));
+    }
+);
+
 module.exports = router;

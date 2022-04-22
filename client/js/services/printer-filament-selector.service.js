@@ -28,13 +28,17 @@ const findMiniFilamnetDropDowns = () => {
     return document.querySelectorAll("[id$=miniFilamentSelect]")
 }
 
-export const returnBigFilamentSelectorTemplate = (toolNumber) => {
+export const returnBigFilamentSelectorTemplate = (toolNumber, printerID = undefined) => {
+    let toolID = toolNumber
+    if(!!printerID){
+        toolID = `${printerID}-${toolNumber}`
+    }
     return `
       <div class="md-form input-group mb-3">
         <div title="Actual Tool temperature" class="input-group-prepend">
             <span class="input-group-text"><span>${toolNumber}: </span></span>
         </div>
-        <select class="custom-select bg-secondary text-light" id="tool-${toolNumber}-bigFilamentSelect"><option value="" selected></option></select>
+        <select class="custom-select bg-secondary text-light" id="tool-${toolID}-bigFilamentSelect"><option value="" selected></option></select>
       </div>
     `
 }
@@ -54,7 +58,7 @@ export async function returnDropDownList() {
     return dropDownList
 }
 
-export async function fillFilamentDropDownList(element, printer, toolIndex) {
+async function redrawFilamentDropDownList (element, printer){
     element.innerHTML = "";
     const filamentDropDown = await returnDropDownList();
     const { allowMultiSelectIsEnabled } = await isFilamentManagerPluginSyncEnabled();
@@ -63,14 +67,21 @@ export async function fillFilamentDropDownList(element, printer, toolIndex) {
     filamentDropDown.forEach((spool) => {
         element.insertAdjacentHTML("beforeend", dropDownListTemplate(spool, allowMultiSelectIsEnabled));
     });
-    if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
-        for (const selectedFilament of printer.selectedFilament) {
-            if (!!selectedFilament) {
-                element.value = selectedFilament._id;
+    const { _id: printerID } = printer;
+    const selectedFilament = await OctoFarmClient.getSelectedFilament(printerID);
+    if (Array.isArray(selectedFilament) && selectedFilament.length !== 0) {
+        for (const spool of selectedFilament) {
+            if (!!spool) {
+                element.value = spool._id;
             }
         }
     }
-    element.addEventListener("change", (event) => {
-        selectFilament([`${printer._id}-${toolIndex}`], event.target.value);
+}
+
+export async function fillFilamentDropDownList(element, printer, toolIndex) {
+    await redrawFilamentDropDownList(element, printer)
+    element.addEventListener("change", async (event) => {
+        await selectFilament([`${printer._id}-${toolIndex}`], event.target.value);
+        await redrawFilamentDropDownList(element, printer)
     });
 }
