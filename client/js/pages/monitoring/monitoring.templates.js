@@ -7,6 +7,7 @@ import {
   isHidden
 } from "../../utils/octofarm.utils";
 import { getPrinterNameBadge } from "../../templates/printer.templates"
+import { returnMiniFilamentSelectorTemplate } from "../../services/printer-filament-selector.service"
 
 export function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
@@ -14,9 +15,7 @@ export function drawListView(printer, clientSettings) {
   let environment = "";
   if (!!printer?.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block m-0\" role=\"group\" aria-label=\"Basic example\">";
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
     if (printer.currentProfile.heatedBed && printer.currentProfile.heatedChamber) {
       environment = `<small
@@ -198,9 +197,7 @@ export function drawPanelView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block m-0\" role=\"group\" aria-label=\"Basic example\">";
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {
@@ -408,7 +405,8 @@ export function drawCameraView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
+      // toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {
@@ -611,9 +609,7 @@ export function drawCombinedView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {

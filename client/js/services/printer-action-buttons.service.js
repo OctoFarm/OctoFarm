@@ -9,17 +9,12 @@ function returnActionBtnTemplate(id, webURL) {
   return `
       <div id="printerManageDropDown-${id}" class="btn-group dropright">
          <button  
-           title="Quickly connect/disconnect your printer"
+           title="Quickly bring your printer online! Power -> Connect"
            id="printerQuickConnect-${id}"
            type="button"
            class="tag btn btn-danger btn-sm"
            >
               <i class="fas fa-toggle-off"></i>
-        </button>
-        <button title="Toggle your printers power"
-              id="printerPowerToggle-${id}"
-              class="btn btn-outline-danger btn-sm" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
-          <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
         </button>
         <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
@@ -86,14 +81,14 @@ function printerQuickConnected(id) {
   connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
-  connectBtn.title = "Press to connect your printer!";
+  connectBtn.title = "Quickly bring your printer online! Power -> Connect";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
   connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
-  connectBtn.title = "Press to connect your printer!";
+  connectBtn.title = "Quickly take your printer offline! Disconnect -> Power Off";
 }
 
 function groupInit(printers) {

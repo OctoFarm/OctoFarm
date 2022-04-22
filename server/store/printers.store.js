@@ -144,7 +144,7 @@ class PrinterStore {
 
   getSelectedFilament(id) {
     const printer = this.#findMePrinter(id);
-    return printer.selectedFilament;
+    return printer?.selectedFilament;
   }
 
   getFileList(id) {
@@ -1225,11 +1225,6 @@ class PrinterStore {
   getPrinterStatistics(id) {
     const printer = this.#findMePrinter(id);
     return printer.getPrinterStatistics();
-  }
-
-  getSelectedFilament(id) {
-    const printer = this.#findMePrinter(id)
-    return printer.selectedFilament;
   }
 }
 

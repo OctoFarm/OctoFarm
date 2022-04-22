@@ -31,6 +31,10 @@ import {initialiseCurrentJobPopover} from "../../services/printer-current-job.se
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
 import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "../../exceptions/application-error.handler";
+import {
+  fillMiniFilamentDropDownList,
+  findMiniFilamentDropDowns, findMiniFilamentDropDownsButton, findMiniFilamentDropDownsSelect
+} from "../../services/printer-filament-selector.service";
 
 let elems = [];
 let groupElems = [];
@@ -67,7 +71,7 @@ const returnPrinterInfo = (id) => {
   }
 };
 
-function addListeners(printer) {
+async function addListeners(printer) {
   //For now Control has to be seperated
   document.getElementById(`printerInfoButton-${printer._id}`).addEventListener("click", async () => {
     currentOpenModal.innerHTML = "Printer Job Status: ";
@@ -181,6 +185,13 @@ function addListeners(printer) {
       doubleClickFullScreen(e.target);
     });
   }
+  if(!!printer?.currentProfile){
+    for(let i = 0; i < printer.currentProfile?.extruder?.count; i++){
+      const miniFilamentDropdownSelect = findMiniFilamentDropDownsSelect(printer._id, i);
+      await fillMiniFilamentDropDownList(miniFilamentDropdownSelect, printer, i);
+    }
+  }
+
 
   return "done";
 }
@@ -1344,7 +1355,7 @@ export async function initMonitoring(printers, clientSettings, view) {
             } else {
               console.error("printerPanel could not determine view type to update", view);
               const errorObject = ClientErrors.SILENT_ERROR;
-              errorObject.message =  `Bulk Commands - ${e}`
+              errorObject.message =  `Monitoring Updater - ${e}`
               throw new ApplicationError(errorObject)
             }
 
@@ -1354,7 +1365,7 @@ export async function initMonitoring(printers, clientSettings, view) {
               //Setup Action Buttons
               await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
               //Add page listeners
-              addListeners(printers[p]);
+              await addListeners(printers[p]);
               //Grab elements
               await grabElements(printers[p]);
               //Initialise Drag and Drop
