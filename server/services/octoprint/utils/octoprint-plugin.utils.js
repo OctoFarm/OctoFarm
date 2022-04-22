@@ -99,7 +99,21 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
 
 const captureKlipperPluginData = (id, data) => {
   const { payload, subtype } = data;
-  const state = subtype === "info" ? "Info" : "Offline";
+
+  let state = subtype === "info" ? "Info" : "Offline";
+
+  if (payload.includes("file")) {
+    return;
+  }
+
+  if (payload.includes("probe")) {
+    state = "Active";
+  }
+
+  if (subtype === "debug") {
+    state = "Warning";
+  }
+
   addOctoPrintIssueWrapper(id, payload, state);
 };
 
