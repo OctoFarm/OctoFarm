@@ -323,7 +323,9 @@ class OctoprintWebsocketMessageService {
         break;
     }
   }
-  static handleTimelapseData(printerID, data) {}
+  // seems to just be settings -_-
+  static handleTimelapseData(printerID, data) {
+  }
   static handleSlicingData(printerID, data) {}
 }
 module.exports = OctoprintWebsocketMessageService;

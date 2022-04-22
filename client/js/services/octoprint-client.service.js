@@ -92,11 +92,7 @@ export default class OctoPrintClient {
     };
     const post = await OctoPrintClient.post(printer, "printer/tool", opt);
 
-    if (post.status === 204) {
-      return true;
-    } else {
-      return false;
-    }
+    return post.status === 204;
   }
 
   static async system(printer, action) {
@@ -139,7 +135,7 @@ export default class OctoPrintClient {
 
   static async systemNoConfirm(printer, action) {
     const url = "system/commands/core/" + action;
-    return await OctoPrintClient.post(printer, url);
+    return OctoPrintClient.post(printer, url);
   }
 
   static async move(element, printer, action, axis, dir) {
@@ -157,7 +153,7 @@ export default class OctoPrintClient {
         axes: axis
       };
     } else if (action === "jog") {
-      if (dir != undefined) {
+      if (typeof dir !== "undefined") {
         amount = Number(dir + amount);
       } else {
         amount = Number(amount);
