@@ -78,7 +78,6 @@ async function redrawMiniFilamentDropDownList (element, printer){
     element.insertAdjacentHTML("beforeend", "<option value=\"0\">No Spool</option>");
     filamentDropDown.shift();
     filamentDropDown.forEach((spool) => {
-        console.log(spool)
         element.insertAdjacentHTML("beforeend", dropDownListTemplate(spool, allowMultiSelectIsEnabled));
     });
     const { _id: printerID } = printer;
@@ -87,7 +86,6 @@ async function redrawMiniFilamentDropDownList (element, printer){
         for (const spool of selectedFilament) {
             if (!!spool) {
                 element.value = spool._id;
-                console.log(element)
             }
         }
     }

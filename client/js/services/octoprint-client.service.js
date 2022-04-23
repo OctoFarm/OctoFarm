@@ -2,6 +2,7 @@ import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "../exceptions/application-error.handler";
+import { printActionStatusResponse } from "../services/octoprint/octoprint.helpers-commands"
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -24,6 +25,7 @@ export default class OctoPrintClient {
       }
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -39,6 +41,7 @@ export default class OctoPrintClient {
       body: JSON.stringify(data)
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -54,6 +57,7 @@ export default class OctoPrintClient {
       body: JSON.stringify(data)
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -68,6 +72,7 @@ export default class OctoPrintClient {
       body: data
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -82,6 +87,7 @@ export default class OctoPrintClient {
       }
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -259,16 +265,14 @@ export default class OctoPrintClient {
     if (typeof checkSettings.filament !== "undefined") {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
+
     let printerCheck = false;
     if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-      if(printer.selectedFilament.length === 0){
-        printerCheck = true;
-      }
       printerCheck = printer.selectedFilament.some(function (e) {
-        console.log(e)
-        return e === null
+        return e !== null
       });
     }
+
 
     if (opts.command === "start") {
       await OctoPrintClient.updateFeedAndFlow(printer);
@@ -292,7 +296,9 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            return OctoPrintClient.post(printer, "job", opts);
+            const { status } = await OctoPrintClient.post(printer, "job", opts);
+            console.log(status)
+            printActionStatusResponse(status)
           }
         }
       });

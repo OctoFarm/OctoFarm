@@ -109,8 +109,10 @@ async function addListeners(printer) {
         command: "start"
       };
       const print = returnPrinterInfo(printer._id);
-      const { status } = await OctoPrintClient.jobAction(print, opts, e);
-      printActionStatusResponse(status, "print")
+      const octoPrintCall = await OctoPrintClient.jobAction(print, opts, e);
+      if(!!octoPrintCall?.status){
+        printActionStatusResponse(octoPrintCall?.status, "print")
+      }
     });
   }
   let cancelBtn = document.getElementById("cancel-" + printer._id);
@@ -1334,7 +1336,6 @@ export async function initMonitoring(printers, clientSettings, view) {
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
-        const noCamera = printers[0].camURL === "";
         if (printerIsAvailableToView(printers[p])) {
           let printerPanel = document.getElementById("panel-" + printers[p]._id);
           if (!printerPanel) {
