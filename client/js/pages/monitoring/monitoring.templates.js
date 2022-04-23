@@ -438,8 +438,6 @@ export function drawCameraView(printer, clientSettings) {
                <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
         </div>
-   
-     
         </div>
         <div
           class="card-body cameraContain text-truncate noBlue"
@@ -469,17 +467,6 @@ export function drawCameraView(printer, clientSettings) {
           </div>
           
           ${cameraElement}
-          
-          <div class="camTemps">
-            <small id="displayLayerProgressData-${printer._id}"></small><br>
-            <small
-              id="toolTemps-${printer._id}"
-              class="mb-0 text-center"
-            >
-             ${toolList}
-             ${environment}
-            </small>
-          </div>
           <div class="progress camProgress">
             <div class="d-none percent">Loading...</div>
             <div
@@ -594,8 +581,19 @@ export function drawCameraView(printer, clientSettings) {
    
             </div>
           </div>
-
+          <div class="camTemps">
+            <small id="displayLayerProgressData-${printer._id}"></small><br>  
+          </div>
         </div>
+        <div class="card-footer p-0">
+            <small
+              id="toolTemps-${printer._id}"
+              class="mb-0 text-center"
+            >
+             ${toolList}
+             ${environment}
+            </small>
+         </div>
       </div>
     </div>
   `;

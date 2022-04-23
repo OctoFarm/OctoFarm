@@ -89,6 +89,7 @@ export function checkGroupColumns(clientSettings) {
 /**
  *
  * @param printer
+ * @param doNotDisplay
  * @returns {string}
  */
 export function imageOrCamera(printer, doNotDisplay = false) {

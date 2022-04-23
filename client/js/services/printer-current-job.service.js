@@ -84,11 +84,13 @@ const loadPrintersJobStatus = (printer) => {
     let hideCamera = false;
     let hideCameraDisplay = "";
     let thumbnailElement = "";
-    let printStatusClass = "col-md-9 col-lg-10 text-center";
+    let printStatusClass = "col-md-8 col-lg-9 text-center";
     if (!!printer?.currentJob?.thumbnail) {
-        printStatusClass = "col-12 text-center";
         thumbnailClass = "col-md-3 col-lg-3";
         thumbnailElement = `<img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
+    }
+    if(printer.camURL === ""){
+        printStatusClass = "col-12 text-center";
         hideCamera = true;
         hideCameraDisplay = "d-none"
     }
@@ -101,7 +103,7 @@ const loadPrintersJobStatus = (printer) => {
     document.getElementById("printerControls").innerHTML = `
         <div class="row">
         <!-- Camera --> 
-          <div class="col-md-3 col-lg-2 text-center ${hideCameraDisplay}">
+          <div class="col-md-4 col-lg-3 text-center ${hideCameraDisplay}">
           <h5>Camera</h5><hr>
           <span id="cameraRow">  
             <div class="row">

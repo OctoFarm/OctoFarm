@@ -65,12 +65,12 @@ export default class PrinterTerminalManagerService {
       //Load tools
       document.getElementById("printerControls").innerHTML = `
           <div class="row">
-                <div class="col-sm-12 col-md-4 col-lg-2 text-center">
+                <div class="col-sm-12 col-md-4 col-lg-3 text-center">
                 <h5>Camera</h5><hr>
                     ${imageOrCamera(printer)}
                </div>
               
-                <div class="col-sm-12 col-md-8 col-lg-10 text-center">
+                <div class="col-sm-12 col-md-8 col-lg-9 text-center">
                         <h5>Custom Gocde Scripts</h5>
                     <hr>
                 </div>

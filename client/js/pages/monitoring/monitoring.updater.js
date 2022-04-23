@@ -1334,6 +1334,7 @@ export async function initMonitoring(printers, clientSettings, view) {
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
+        const noCamera = printers[0].camURL === "";
         if (printerIsAvailableToView(printers[p])) {
           let printerPanel = document.getElementById("panel-" + printers[p]._id);
           if (!printerPanel) {
