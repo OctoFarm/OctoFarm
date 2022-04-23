@@ -77,7 +77,7 @@ const options = {
     type: "category",
     labels: {
       formatter(value) {
-        const date = new Date(value);
+        const date = new Date(value * 1000);
         var weekday = new Array(7);
         weekday[0] = "Sun";
         weekday[1] = "Mon";

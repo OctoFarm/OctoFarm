@@ -37,7 +37,7 @@ const captureTemperatureData = (id, data) => {
     // 1 hour in miliseconds = 3600 * 1000 = 3,600,000
     // 5 seconds = 5000 miliseconds.
     // 1 hour has 3,600,000 / 5000 = 720 points of 5000 miliseconds. To pull a hour out of database reference 720 points.
-    // Take the base reference of a message every 500 miliseconds, collect every 5000 miliseconds.
+    // Temp data comes every 3 seconds or 3000 miliseconds, so we increment 4000 to the timer to capture every 2 times it comes in. Averaging around 6 seconds...
 
     if (tempTimers[id] >= 5000) {
       const datebaseTemp = {
@@ -55,7 +55,7 @@ const captureTemperatureData = (id, data) => {
         });
       tempTimers[id] = 0;
     } else {
-      tempTimers[id] = tempTimers[id] + 500;
+      tempTimers[id] = tempTimers[id] + 4000;
     }
 
     coolDownEvent(id, temps);
