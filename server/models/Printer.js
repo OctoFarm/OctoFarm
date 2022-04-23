@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { shiftOverItems } = require("../utils/array.util");
 
 const PrinterSchema = new mongoose.Schema({
   disabled: {
@@ -227,14 +228,6 @@ const PrinterSchema = new mongoose.Schema({
     required: false
   },
   core: {
-    type: Array,
-    required: false
-  },
-  pluginLogs: {
-    type: Array,
-    required: false
-  },
-  klipperLogs: {
     type: Array,
     required: false
   }

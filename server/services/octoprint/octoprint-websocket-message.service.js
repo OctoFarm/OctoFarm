@@ -324,7 +324,6 @@ class OctoprintWebsocketMessageService {
     }
   }
   static handleTimelapseData(printerID, data) {
-    console.log(printerID, data);
   }
   static handleSlicingData(printerID, data) {}
 }

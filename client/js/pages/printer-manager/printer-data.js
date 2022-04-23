@@ -101,7 +101,7 @@ function updatePrinterInfo(printer) {
 function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
   if (!printer.healthChecksPass) {
-    UI.addDisplayNoneToElement(healthAlert);
+    UI.removeDisplayNoneFromElement(healthAlert);
     updateAlertsLog({
       id: "healthCheck-" + printer._id,
       name: "Failed health check!",
@@ -109,7 +109,7 @@ function checkIfPrinterHealthOK(printer) {
       colour: "Active",
     });
   } else {
-    UI.removeDisplayNoneFromElement(healthAlert);
+    UI.addDisplayNoneToElement(healthAlert);
     removeAlertsLog({ id: "healthCheck-" + printer._id });
   }
 }
@@ -125,10 +125,10 @@ function checkIfPrinterHasEvents(printer){
       colour: "Info",
     });
     printerEventsCount.innerHTML = printer.registeredEvents.length;
-    UI.addDisplayNoneToElement(eventsAlerts);
+    UI.removeDisplayNoneFromElement(eventsAlerts);
     return;
   }
-  UI.removeDisplayNoneFromElement(eventsAlerts);
+  UI.addDisplayNoneToElement(eventsAlerts);
   removeAlertsLog({ id: "printerEvents-" + printer._id });
 }
 
@@ -141,10 +141,10 @@ function checkIfCpuDataAvailable(printer){
     octoprintCpuUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_cpu[printer?.octoResourceMonitor?.system_cpu.length - 1].toFixed(0);
     octoprintMemoryUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_memory[printer?.octoResourceMonitor?.system_memory.length - 1].toFixed(0);
     octoprintsCpuUsage.innerHTML = printer?.octoResourceMonitor?.octoprint_cpu[printer?.octoResourceMonitor?.octoprint_cpu.length - 1].toFixed(0);
-    UI.addDisplayNoneToElement(octoprintCpuUsage);
+    UI.removeDisplayNoneFromElement(octoprintCpuUsage);
     return;
   }
-  UI.removeDisplayNoneFromElement(octoprintCpuUsage);
+  UI.addDisplayNoneToElement(octoprintCpuUsage);
 }
 
 function checkIfPrinterConnectionThrottled(printer){
@@ -152,10 +152,10 @@ function checkIfPrinterConnectionThrottled(printer){
   const printerConnectionThrottledCount = document.getElementById(`printerConnectionThrottledCount-${printer._id}`);
   if(printer?.websocket_throttle > 1){
     printerConnectionThrottledCount.innerHTML = `${parseInt(printer.websocket_throttle)}`;
-    UI.addDisplayNoneToElement(printerConnectionThrottled);
+    UI.removeDisplayNoneFromElement(printerConnectionThrottled);
     return;
   }
-  UI.removeDisplayNoneFromElement(printerConnectionThrottled);
+  UI.addDisplayNoneToElement(printerConnectionThrottled);
 }
 
 function corsWarningCheck(printer) {
@@ -167,10 +167,10 @@ function corsWarningCheck(printer) {
       printerName: printer.printerName,
       colour: "Offline",
     });
-    UI.addDisplayNoneToElement(corsAlert);
+    UI.removeDisplayNoneFromElement(corsAlert);
   } else {
     removeAlertsLog({ id: "corsCheck-" + printer._id });
-    UI.removeDisplayNoneFromElement(corsAlert);
+    UI.addDisplayNoneToElement(corsAlert);
   }
 }
 
@@ -183,7 +183,7 @@ function setupReconnectingIn(printer) {
   const printerReScanText = document.getElementById("apiReScanText-" + _id);
   const reconnectingInCalculation = reconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
-    UI.addDisplayNoneToElement(printerReScanButton);
+    UI.removeDisplayNoneFromElement(printerReScanButton);
     // updateAlertsLog({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
@@ -197,7 +197,7 @@ function setupReconnectingIn(printer) {
     }
   } else {
     // removeAlertsLog({id: "apiReconnect-"+printer._id})
-    UI.removeDisplayNoneFromElement(printerReScanButton);
+    UI.addDisplayNoneToElement(printerReScanButton);
     printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
@@ -214,7 +214,7 @@ function reconnectingWebsocketIn(printer) {
   const printerReScanText = document.getElementById("websocketScanText-" + _id);
   const reconnectingInCalculation = websocketReconnectingIn - Date.now();
   if (reconnectingInCalculation > 1000) {
-    UI.addDisplayNoneToElement(printerReScanButton);
+    UI.removeDisplayNoneFromElement(printerReScanButton);
     // updateAlertsLog({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML =
@@ -228,7 +228,7 @@ function reconnectingWebsocketIn(printer) {
       );
     }
   } else {
-    UI.removeDisplayNoneFromElement(printerReScanButton);
+    UI.addDisplayNoneToElement(printerReScanButton);
     // removeAlertsLog({id: "socketReconnect-"+printer._id})
     printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
@@ -239,7 +239,7 @@ function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
 
   if (printer?.octoPrintUpdate?.updateAvailable) {
-    UI.addDisplayNoneToElement(updateButton);
+    UI.removeDisplayNoneFromElement(updateButton);
     updateAlertsLog({
       id: "opUpdate-" + printer._id,
       name: "OctoPrint update available!",
@@ -251,7 +251,7 @@ function checkForOctoPrintUpdate(printer) {
       "You have an OctoPrint Update to install!"
     );
   } else {
-    UI.removeDisplayNoneFromElement(updateButton);
+    UI.addDisplayNoneToElement(updateButton);
     removeAlertsLog({ id: "opUpdate-" + printer._id });
     updateButton.setAttribute("title", "No OctoPrint updates available!");
   }
@@ -266,7 +266,7 @@ function checkForOctoPrintPluginUpdates(printer) {
     printer.octoPrintPluginUpdates &&
     printer.octoPrintPluginUpdates.length > 0
   ) {
-    UI.addDisplayNoneToElement(updatePluginButton);
+    UI.removeDisplayNoneFromElement(updatePluginButton);
     updateAlertsLog({
       id: "pluginUpdate-" + printer._id,
       name: "OctoPrint plugin update(s) available!",
@@ -275,7 +275,7 @@ function checkForOctoPrintPluginUpdates(printer) {
     });
     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
   } else {
-    UI.removeDisplayNoneFromElement(updatePluginButton);
+    UI.addDisplayNoneToElement(updatePluginButton);
     removeAlertsLog({ id: "pluginUpdate-" + printer._id });
     updatePluginButton.title = "No OctoPrint plugin updates available!";
   }
@@ -292,10 +292,10 @@ function checkIfRestartRequired(printer) {
       printerName: printer.printerName,
       colour: "Active",
     });
-    UI.addDisplayNoneToElement(restartRequiredTag);
+    UI.removeDisplayNoneFromElement(restartRequiredTag);
   } else {
     removeAlertsLog({ id: "restartWaiting-" + printer._id });
-    UI.removeDisplayNoneFromElement(restartRequiredTag);
+    UI.addDisplayNoneToElement(restartRequiredTag);
   }
 }
 
@@ -310,10 +310,10 @@ function checkIfMultiUserIssueFlagged(printer) {
       printerName: printer.printerName,
       colour: "Offline",
     });
-    UI.addDisplayNoneToElement(multiUserIssueAlert);
+    UI.removeDisplayNoneFromElement(multiUserIssueAlert);
   } else {
     removeAlertsLog({ id: "userIssue-" + printer._id });
-    UI.removeDisplayNoneFromElement(multiUserIssueAlert);
+    UI.addDisplayNoneToElement(multiUserIssueAlert);
   }
 }
 
@@ -334,10 +334,10 @@ function checkIfUnderVoltagedPi(printer) {
       printerName: printer.printerName,
       colour: "Offline",
     });
-    UI.addDisplayNoneToElement(printerUnderVoltaged);
+    UI.removeDisplayNoneFromElement(printerUnderVoltaged);
   } else {
     removeAlertsLog({ id: "underVoltageIssue-" + printer._id });
-    UI.removeDisplayNoneFromElement(printerUnderVoltaged);
+    UI.addDisplayNoneToElement(printerUnderVoltaged);
   }
 }
 
@@ -358,10 +358,10 @@ function checkIfOverheatingPi(printer) {
       printerName: printer.printerName,
       colour: "Offline",
     });
-    UI.addDisplayNoneToElement(printerOverHeating);
+    UI.removeDisplayNoneFromElement(printerOverHeating);
   } else {
     removeAlertsLog({ id: "overheatingIssue-" + printer._id });
-    UI.removeDisplayNoneFromElement(printerOverHeating);
+    UI.addDisplayNoneToElement(printerOverHeating);
   }
 }
 

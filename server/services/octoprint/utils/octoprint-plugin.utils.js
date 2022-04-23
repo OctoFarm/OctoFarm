@@ -1,5 +1,8 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
+const PluginLogs = require("../../../models/PluginLogs");
+const Logger = require("../../../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
 
 const defaultWOLSubnetMask = "255.255.255.0";
 
@@ -7,21 +10,26 @@ const addOctoPrintLogWrapper = (id, message, state, plugin) => {
   //TODO save to a database, and add more plugins!
   const today = new Date();
 
-  const newLog = {
+  const log = {
     id: today.getTime(),
     date: today,
     message: message,
     printerID: id,
-    printer: getPrinterStoreCache().getPrinterURL(id),
+    printerURL: getPrinterStoreCache().getPrinterURL(id),
     state: state,
     pluginDisplay: plugin
   };
 
-  if (plugin === "OctoKlipper") {
-    getPrinterStoreCache().pushUpdatePrinterDatabase(id, "klipperLogs", newLog);
-    return;
-  }
-  getPrinterStoreCache().pushUpdatePrinterDatabase(id, "pluginLogs", newLog);
+  const newLog = new PluginLogs(log);
+
+  newLog
+    .save()
+    .then((res) => {
+      logger.debug("Successfully saved plugin log data to database", res);
+    })
+    .catch((e) => {
+      logger.error("Couldn't save plugin log data", e);
+    });
 };
 
 const addOctoPrintIssueWrapper = (id, message, state) => {
@@ -167,6 +175,7 @@ const captureResultsData = (id, data) => {
   } | Restart Required: ${needs_restart}`;
   const state = result ? "Complete" : "Offline";
   addOctoPrintIssueWrapper(id, message, state);
+  addOctoPrintLogWrapper(id, message, "Active", "Plugin Manager");
 };
 
 const captureLogLines = (id, data) => {

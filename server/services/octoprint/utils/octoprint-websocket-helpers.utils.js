@@ -34,7 +34,12 @@ const captureTemperatureData = (id, data) => {
       tempTimers[id] = 0;
     }
 
-    if (tempTimers[id] >= 6000) {
+    // 1 hour in miliseconds = 3600 * 1000 = 3,600,000
+    // 5 seconds = 5000 miliseconds.
+    // 1 hour has 3,600,000 / 5000 = 720 points of 5000 miliseconds. To pull a hour out of database reference 720 points.
+    // Take the base reference of a message every 500 miliseconds, collect every 5000 miliseconds.
+
+    if (tempTimers[id] >= 5000) {
       const datebaseTemp = {
         currentTemp: temps[0],
         printer_id: id
@@ -50,7 +55,7 @@ const captureTemperatureData = (id, data) => {
         });
       tempTimers[id] = 0;
     } else {
-      tempTimers[id] = tempTimers[id] + 2000;
+      tempTimers[id] = tempTimers[id] + 500;
     }
 
     coolDownEvent(id, temps);

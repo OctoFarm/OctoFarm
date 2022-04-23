@@ -282,27 +282,40 @@ export default class UI {
     }
   }
 
-  static addDisplayNoneToElement(element) {
+  static removeDisplayNoneFromElement(element) {
     if (element.classList.contains("d-none")) {
       element.classList.remove("d-none");
     }
   }
 
-  static removeDisplayNoneFromElement(element) {
+  static addDisplayNoneToElement(element) {
     if (!element.classList.contains("d-none")) {
       element.classList.add("d-none");
     }
   }
 
+
+  static removeFaSpinFromElement(element) {
+    if (element.classList.contains("fa-spin")) {
+      element.classList.remove("fa-spin");
+    }
+  }
+
+  static addFaSpinToElement(element) {
+    if (!element.classList.contains("fa-spin")) {
+      element.classList.add("fa-spin");
+    }
+  }
+
   static addNotYetToElement(element){
-    if (element.classList.contains("notyet")) {
-      element.classList.remove("notyet");
+    if (!element.classList.contains("notyet")) {
+      element.classList.add("notyet");
     }
   }
 
   static removeNotYetFromElement(element){
-    if (!element.classList.contains("notyet")) {
-      element.classList.add("notyet");
+    if (element.classList.contains("notyet")) {
+      element.classList.remove("notyet");
     }
   }
 

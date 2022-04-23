@@ -2,6 +2,7 @@ import Calc from "../utils/calc";
 import OctoFarmClient from "./octofarm-client.service";
 import ApexCharts from "apexcharts";
 
+let historyBarChart = false;
 
 export default class PrinterStatisticsService{
     static async returnPrinterStatsTemplate(stats) {
