@@ -351,19 +351,20 @@ class HistoryCollection {
    * @returns {Promise<string>}
    */
   static async grabTimeLapse(fileName, url, id, printer) {
-    const serverSettingsCache = SettingsClean.returnSystemSettings();
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.timelapses);
 
     const filePath = `${PATHS.timelapses}/${id}-${fileName}`;
 
-    await downloadFromOctoPrint(url, filePath, printer.apikey);
+    await downloadFromOctoPrint(url, filePath, printer.apikey, async function (){
+      const serverSettingsCache = SettingsClean.returnSystemSettings();
+      if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
+        await HistoryCollection.deleteTimeLapse(printer, fileName);
+      }
+    });
 
     logger.info("Downloaded timelapse from: ", { url });
     logger.info("Saved timelapse to: ", { filePath });
-    if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
-      await HistoryCollection.deleteTimeLapse(printer, fileName);
-    }
 
     return filePath;
   }
@@ -756,8 +757,12 @@ class HistoryCollection {
       //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
       await saveHistory
         .save()
-        .then((res) => {
+        .then(async (res) => {
           logger.info("Successfully captured print!", res);
+          await sleep(20000)
+          if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
+            await HistoryCollection.deleteTimeLapse(printer, fileName);
+          }
         })
         .catch((e) => {
           logger.error("Failed to capture print!", e);
