@@ -310,19 +310,6 @@ const capturePrintFailed = (id, data) => {
     getPrinterStoreCache().getPrinter(id)
   );
   HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, false)
-    .then((res) => {
-      logger.info("Successfully captured failed print!", res);
-      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res)
-        .then((resScript) => {
-          logger.info("Successfully checked failed script", resScript);
-        })
-        .catch((e) => {
-          logger.error("Failed to check cancelled script", e);
-        });
-    })
-    .catch((e) => {
-      logger.error("Failed to capture print!", e);
-    });
 };
 const captureFinishedPrint = (id, data, success) => {
   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
@@ -337,20 +324,7 @@ const captureFinishedPrint = (id, data, success) => {
     resendStats,
     success
   )
-    .then((res) => {
-      logger.info("Successfully captured print!", res);
-      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", res)
-        .then((resScript) => {
-          logger.info("Successfully print finished script", resScript);
-          return res;
-        })
-        .catch((e) => {
-          logger.error("Failed to check print finished script", e);
-        });
-    })
-    .catch((e) => {
-      logger.error("Failed to capture print!", e);
-    });
+
 };
 const capturePrintPaused = (id) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "paused", undefined)

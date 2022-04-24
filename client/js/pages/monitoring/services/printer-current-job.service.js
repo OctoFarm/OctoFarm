@@ -64,7 +64,8 @@ const options = {
         "#ff0084"
     ],
     stroke: {
-        curve: "smooth"
+        curve: "smooth",
+        width: 2
     },
     toolbar: {
         show: false

@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const request = require("request");
 
-const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
+const downloadFromOctoPrint = async (url, path, apiKey) => {
   const res = await fetch(url, {
     method: "GET",
     headers: {
@@ -10,11 +10,12 @@ const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
       "X-Api-Key": apiKey
     }
   });
+
   const fileStream = fs.createWriteStream(path);
   await new Promise((resolve, reject) => {
     res.body.pipe(fileStream);
     res.body.on("error", reject);
-    fileStream.on("finish", callback);
+    fileStream.on("finish", resolve);
   });
 };
 

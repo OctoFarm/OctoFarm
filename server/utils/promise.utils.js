@@ -10,6 +10,11 @@ const promiseTimeout = function (ms, promise) {
   return Promise.race([promise, timeout]);
 };
 
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 module.exports = {
-  promiseTimeout
+  promiseTimeout,
+  sleep
 };

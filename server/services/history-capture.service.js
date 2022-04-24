@@ -1,10 +1,9 @@
-const { findIndex, cloneDeep } = require("lodash");
+const { findIndex } = require("lodash");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../handlers/logger.js");
-const filamentProfiles = require("../models/Profiles.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const Spool = require("../models/Filament.js");
 const {
@@ -17,6 +16,8 @@ const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { sleep } = require("../utils/promise.utils");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -97,6 +98,13 @@ class HistoryCollection {
   }
 
   static async grabThumbnail(url, thumbnail, id, printer) {
+    if (!url && !thumbnail) {
+      logger.error("Unable to download thumbnail! No URL or thumbnail provided", {
+        url,
+        thumbnail
+      });
+      return "";
+    }
     const thumbParts = thumbnail.split("/");
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
@@ -106,24 +114,28 @@ class HistoryCollection {
     ensureFolderExists(PATHS.thumbnails);
 
     await downloadImage(url, filePath, printer.apikey, () => {
-      logger.info("Downloaded: ", url);
-      logger.info(filePath);
+      logger.info("Thumbnail downloaded from: ", { url });
+      logger.info("Thumbnail saved as: ", { filePath });
     });
 
     return filePath;
   }
 
   static async snapPictureOfPrinter(url, id, fileDisplay) {
+    if (!url && url === "") {
+      logger.error("Unable to snap picture from camera, url doesn't exist!", {
+        url
+      });
+      return "";
+    }
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.snapshots);
-
     const decoder = MjpegDecoder.decoderForSnapshot(url);
     const frame = await decoder.takeSnapshot();
     const filePath = `${PATHS.snapshots}/${id}-${fileDisplay}.jpg`;
-
     await fs.writeFileSync(filePath, frame);
-    logger.info("Downloaded: ", url);
-    logger.info("Saved as: ", filePath);
+    logger.info("Snapshot downloaded as: ", url);
+    logger.info("Snapshot saved as: ", filePath);
     return filePath;
   }
 
@@ -160,7 +172,7 @@ class HistoryCollection {
         return base64Thumbnail;
       };
 
-      return await runCapture();
+      return runCapture();
     } catch (e) {
       logger.error("Couldn't capture thumbnail as requested!", e);
     }
@@ -169,112 +181,165 @@ class HistoryCollection {
   static async snapshotCheck(printer, id, payload) {
     // Use default settings if not present
     try {
-      return await HistoryCollection.snapPictureOfPrinter(printer.camURL, id, payload.name);
+      return HistoryCollection.snapPictureOfPrinter(printer.camURL, id, payload.name);
     } catch (e) {
       logger.error("Couldn't capture webcam snapshot as requested!", e);
     }
   }
 
   static async timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient) {
-    const serverSettingsCache = SettingsClean.returnSystemSettings();
-    if (printTime >= 10) {
-      let interval = false;
-      const grabTimelapse = async () => {
-        return await octoPrintApiClient.getTimelapses(true);
-      };
-      logger.info("Checking for timelapse...", fileName);
-      if (!interval) {
-        interval = setInterval(async function () {
-          let timelapse = await grabTimelapse();
-          if (timelapse.status === 200) {
-            const timelapseResponse = await timelapse.json();
-            logger.info("Successfully grabbed timelapse list... Checking for:", fileName);
-            let unrenderedFileName = null;
-            if (timelapseResponse.unrendered.length === 0) {
-              let cleanName = fileName;
-              if (fileName.includes(".gcode")) {
-                cleanName = fileName.replace(".gcode", "");
-              }
-              let lastTimelapse = null;
-              if (unrenderedFileName === null) {
-                lastTimelapse = findIndex(timelapseResponse.files, function (o) {
-                  return o.name.includes(cleanName);
-                });
-              } else {
-                lastTimelapse = findIndex(timelapseResponse.files, function (o) {
-                  return o.name.includes(unrenderedFileName);
-                });
-              }
-
-              if (
-                lastTimelapse !== -1 &&
-                !timelapseResponse.files[lastTimelapse].url.includes(".mpg")
-              ) {
-                let lapse = await HistoryCollection.grabTimeLapse(
-                  timelapseResponse.files[lastTimelapse].name,
-                  printer.printerURL + timelapseResponse.files[lastTimelapse].url,
-                  id,
-                  printer,
-                  serverSettingsCache
-                );
-                //Clearing interval
-                clearInterval(interval);
-                History.findByIdAndUpdate(id, { "printHistory.timelapse": lapse })
-                  .then((res) => {
-                    logger.debug("Successfully updated history records timelapse with: ", lapse);
-                  })
-                  .catch((e) => {
-                    logger.error("Failed to update history record timelapse!", e);
-                  });
-                await getHistoryCache().initCache();
-                logger.info("Successfully grabbed timelapse!");
-              } else {
-                History.findByIdAndUpdate(id, { "printHistory.timelapse": "" })
-                  .then((res) => {
-                    logger.debug("Successfully updated history records timelapse with: ", snapshot);
-                  })
-                  .catch((e) => {
-                    logger.error("Failed to update history record timelapse!", e);
-                  });
-                await getHistoryCache().initCache();
-                logger.error("Failed to grab a timelapse...");
-                clearInterval(interval);
-                return null;
-              }
-            } else {
-              if (unrenderedFileName === null) {
-                let unRenderedGrab = [...timelapseResponse.unrendered].filter(function (lapse) {
-                  let lapseName = lapse.name.replace(/\s/g, "_");
-                  let checkName = fileName.replace(/\s/g, "_");
-                  if (checkName.includes(".gcode")) {
-                    checkName = fileName.replace(".gcode", "");
-                  }
-                  return lapseName.includes(checkName);
-                });
-                if (unRenderedGrab.length === 1) {
-                  unrenderedFileName = unRenderedGrab[0].name;
-                  logger.info(
-                    "File is still rendering... awaiting completion:",
-                    unrenderedFileName
-                  );
-                } else {
-                  logger.info(
-                    "No un-rendered files... must be complete, attempting download.",
-                    unRenderedGrab
-                  );
-                }
-              } else {
-                logger.info(`Awaiting ${unrenderedFileName} to finish rendering`);
-              }
-            }
-          } else {
-            return null;
-          }
-        }, 5000);
-      }
-    } else {
-      return null;
+    console.log(id);
+    if (printTime <= 10) {
+      logger.warning("Print time too short, skipping timelapse grab...", { printTime });
+      return "";
     }
+
+    const timeLapseCall = await octoPrintApiClient.getTimelapses(true);
+
+    if (!timeLapseCall.ok) {
+      logger.error("Time lapse call failed to contact OctoPrint... skipping timelapse grab...", {
+        timeLapseCall
+      });
+      return "";
+    }
+
+    logger.info("Checking for timelapse...", fileName);
+
+    const timelapseResponse = await timeLapseCall.json();
+
+    logger.debug("Timelapse call: ", timelapseResponse);
+
+    //is it unrendered?
+    let cleanFileName = JSON.parse(JSON.stringify(fileName));
+    if (fileName.includes(".gcode")) {
+      cleanFileName = cleanFileName.replace(".gcode", "");
+    }
+
+    const unrenderedTimelapseIndex = findIndex(timelapseResponse.unrendered, function (o) {
+      return o.name.includes(cleanFileName);
+    });
+    console.log(unrenderedTimelapseIndex);
+    //if unrendered check timelapse again...
+    if (unrenderedTimelapseIndex > -1) {
+      logger.info("Timelapse not rendered yet... re-checking... in 5000ms", {
+        unrenderedTimelapseIndex
+      });
+      await sleep(5000);
+      console.log(id);
+      await this.timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient);
+    }
+    console.log(unrenderedTimelapseIndex);
+    const lastTimelapseIndex = findIndex(timelapseResponse.files, function (o) {
+      return o.name.includes(cleanFileName);
+    });
+    console.log(id);
+    console.log(lastTimelapseIndex);
+    if (lastTimelapseIndex > -1) {
+      return HistoryCollection.grabTimeLapse(
+        timelapseResponse.files[lastTimelapseIndex].name,
+        printer.printerURL + timelapseResponse.files[lastTimelapseIndex].url,
+        id,
+        printer
+      );
+    }
+
+    logger.error("Unable to determine correct timelapse file to download... skipped! ", {
+      timelapseFiles: timelapseResponse.files
+    });
+
+    return "";
+
+    //if rendered download
+
+    // if (!interval) {
+    //   interval = setInterval(async function () {
+    //     let timelapse = await grabTimelapse();
+    //     if (timelapse.status === 200) {
+    //       const timelapseResponse = await timelapse.json();
+    //       logger.info("Successfully grabbed timelapse list... Checking for:", fileName);
+    //       let unrenderedFileName = null;
+    //       if (timelapseResponse.unrendered.length === 0) {
+    //         let cleanName = fileName;
+    //         if (fileName.includes(".gcode")) {
+    //           cleanName = fileName.replace(".gcode", "");
+    //         }
+    //         let lastTimelapse = null;
+    //         if (unrenderedFileName === null) {
+    //           lastTimelapse = findIndex(timelapseResponse.files, function (o) {
+    //             return o.name.includes(cleanName);
+    //           });
+    //         } else {
+    //           lastTimelapse = findIndex(timelapseResponse.files, function (o) {
+    //             return o.name.includes(unrenderedFileName);
+    //           });
+    //         }
+    //
+    //         if (
+    //           lastTimelapse !== -1 &&
+    //           !timelapseResponse.files[lastTimelapse].url.includes(".mpg")
+    //         ) {
+    //           let lapse = await HistoryCollection.grabTimeLapse(
+    //             timelapseResponse.files[lastTimelapse].name,
+    //             printer.printerURL + timelapseResponse.files[lastTimelapse].url,
+    //             id,
+    //             printer,
+    //             serverSettingsCache
+    //           );
+    //           //Clearing interval
+    //           clearInterval(interval);
+    //           History.findByIdAndUpdate(id, { "printHistory.timelapse": lapse })
+    //             .then((res) => {
+    //               logger.debug("Successfully updated history records timelapse with: ", lapse);
+    //             })
+    //             .catch((e) => {
+    //               logger.error("Failed to update history record timelapse!", e);
+    //             });
+    //           await getHistoryCache().initCache();
+    //           logger.info("Successfully grabbed timelapse!");
+    //         } else {
+    //           History.findByIdAndUpdate(id, { "printHistory.timelapse": "" })
+    //             .then((res) => {
+    //               logger.debug("Successfully updated history records timelapse with: ", snapshot);
+    //             })
+    //             .catch((e) => {
+    //               logger.error("Failed to update history record timelapse!", e);
+    //             });
+    //           await getHistoryCache().initCache();
+    //           logger.error("Failed to grab a timelapse...");
+    //           clearInterval(interval);
+    //           return null;
+    //         }
+    //       } else {
+    //         if (unrenderedFileName === null) {
+    //           let unRenderedGrab = [...timelapseResponse.unrendered].filter(function (lapse) {
+    //             let lapseName = lapse.name.replace(/\s/g, "_");
+    //             let checkName = fileName.replace(/\s/g, "_");
+    //             if (checkName.includes(".gcode")) {
+    //               checkName = fileName.replace(".gcode", "");
+    //             }
+    //             return lapseName.includes(checkName);
+    //           });
+    //           if (unRenderedGrab.length === 1) {
+    //             unrenderedFileName = unRenderedGrab[0].name;
+    //             logger.info(
+    //               "File is still rendering... awaiting completion:",
+    //               unrenderedFileName
+    //             );
+    //           } else {
+    //             logger.info(
+    //               "No un-rendered files... must be complete, attempting download.",
+    //               unRenderedGrab
+    //             );
+    //           }
+    //         } else {
+    //           logger.info(`Awaiting ${unrenderedFileName} to finish rendering`);
+    //         }
+    //       }
+    //     } else {
+    //       return null;
+    //     }
+    //   }, 5000);
+    // }
   }
 
   /**
@@ -283,27 +348,22 @@ class HistoryCollection {
    * @param url
    * @param id
    * @param printer
-   * @param serverSettings
    * @returns {Promise<string>}
    */
-  static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
+  static async grabTimeLapse(fileName, url, id, printer) {
+    const serverSettingsCache = SettingsClean.returnSystemSettings();
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.timelapses);
 
     const filePath = `${PATHS.timelapses}/${id}-${fileName}`;
 
-    await downloadFromOctoPrint(
-      url,
-      filePath,
-      () => {
-        logger.info("Downloaded: ", url);
-        logger.info(filePath);
-        if (serverSettings?.history?.timelapse?.deleteAfter) {
-          HistoryCollection.deleteTimeLapse(printer, fileName);
-        }
-      },
-      printer.apikey
-    );
+    await downloadFromOctoPrint(url, filePath, printer.apikey);
+
+    logger.info("Downloaded timelapse from: ", { url });
+    logger.info("Saved timelapse to: ", { filePath });
+    if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
+      await HistoryCollection.deleteTimeLapse(printer, fileName);
+    }
 
     return filePath;
   }
@@ -405,7 +465,7 @@ class HistoryCollection {
     }
   }
 
-  static async updateFilamentInfluxDB(selectedFilament, history, previousFilament, printer) {
+  static async updateFilamentInfluxDB(selectedFilament, history, printer) {
     for (let i = 0; i < selectedFilament.length; i++) {
       if (selectedFilament[i] !== null) {
         let currentState = " ";
@@ -433,11 +493,6 @@ class HistoryCollection {
           history_state: currentState,
           file_name: history.fileName
         };
-
-        let used = 0;
-        if (typeof previousFilament !== "undefined" && previousFilament !== null) {
-          used = Math.abs(selectedFilament[i].spools.used - previousFilament[i].spools.used);
-        }
 
         let filamentData = {
           name: selectedFilament[i].spools.name,
@@ -553,13 +608,14 @@ class HistoryCollection {
     }
     // This should use the websocket events..
     if (serverSettingsCache.history.timelapse.onComplete) {
-      await HistoryCollection.timelapseCheck(
+      saveHistory.printHistory.timelapse = await HistoryCollection.timelapseCheck(
         printer,
         payload.name,
         payload.time,
         saveHistory._id,
         printerAPIConnector
       );
+      console.log("SUCCESS", saveHistory.printHistory.timelapse);
     }
   }
 
@@ -574,7 +630,6 @@ class HistoryCollection {
     files
   ) {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
-
     if (serverSettingsCache.history.thumbnails.onFailure) {
       saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
         payload,
@@ -591,17 +646,24 @@ class HistoryCollection {
       );
     }
     if (serverSettingsCache.history.timelapse.onFailure) {
-      await HistoryCollection.timelapseCheck(
+      saveHistory.printHistory.timelapse = await HistoryCollection.timelapseCheck(
         printer,
         payload.name,
         payload.time,
         saveHistory._id,
         printerAPIConnector
       );
+      console.log("FAILED", saveHistory.printHistory.timelapse);
     }
     if (serverSettingsCache.filament.downDateFailed && !serverSettingsCache.filamentManager) {
       // No point even trying to down date failed without these...
       if (!job?.estimatedPrintTime && !job?.lastPrintTime) {
+        logger.error(
+          "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
+          {
+            job
+          }
+        );
         return;
       }
       // Capture failed amount
@@ -621,7 +683,6 @@ class HistoryCollection {
       );
 
       const { startDate, endDate } = this.generateStartEndDates(payload);
-
 
       //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
       if (serverSettingsCache.filamentManager && Array.isArray(printer.selectedFilament)) {
@@ -671,6 +732,7 @@ class HistoryCollection {
           files
         );
       }
+
       if (!state) {
         await this.checkForAdditionalFailureProperties(
           payload,
@@ -684,14 +746,14 @@ class HistoryCollection {
         );
       }
 
-      await this.updateFilamentInfluxDB(
-        printer.selectedFilament,
-        printHistory,
-        printer.selectedFilament,
-        printer
-      );
+      // await this.updateFilamentInfluxDB(
+      //   printer.selectedFilament,
+      //   printHistory,
+      //   printer.selectedFilament,
+      //   printer
+      // );
 
-      await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
+      //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
       await saveHistory
         .save()
         .then((res) => {
@@ -700,19 +762,39 @@ class HistoryCollection {
         .catch((e) => {
           logger.error("Failed to capture print!", e);
         });
-
+      if (!state) {
+        ScriptRunner.check(
+          getPrinterStoreCache().getPrinter(printer._id),
+          "failed",
+          saveHistory._id
+        )
+          .then((resScript) => {
+            logger.info("Successfully checked failed script", resScript);
+          })
+          .catch((e) => {
+            logger.error("Failed to check cancelled script", e);
+          });
+      }
+      if (state) {
+        ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", saveHistory._id)
+          .then((resScript) => {
+            logger.info("Successfully print finished script", resScript);
+          })
+          .catch((e) => {
+            logger.error("Failed to check print finished script", e);
+          });
+      }
       setTimeout(async () => {
         // Re-generate history cache...
         await getHistoryCache().initCache();
       }, 5000);
-
-      return saveHistory._id;
     } catch (e) {
-      return e;
+      console.error(e);
+      logger.error("Failed to generate history data!", { e });
     }
   }
 
-  static async errorLog(payload, printer, job, files) {
+  static async errorLog(payload, printer, job) {
     try {
       let name = null;
       if (typeof printer.settingsAppearance !== "undefined") {
@@ -726,8 +808,6 @@ class HistoryCollection {
       }
       logger.info("Error Log Collection Triggered", payload + printer.printerURL);
       const today = new Date();
-      const errorCollection = await ErrorLog.find({});
-
       const printTime = new Date(payload.time * 1000);
       let startDate = today.getTime() - printTime.getTime();
       startDate = new Date(startDate);
@@ -750,9 +830,16 @@ class HistoryCollection {
       const saveError = new ErrorLog({
         errorLog
       });
-      await saveError.save();
+      await saveError
+        .save()
+        .then((res) => {
+          logger.info("Successfully saved error log!", res);
+        })
+        .catch((e) => {
+          logger.error("Failed to save error log!", e);
+        });
       await getHistoryCache().initCache();
-      ScriptRunner.check(printer, "error", saveError._id);
+      await ScriptRunner.check(printer, "error", saveError._id);
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {
       logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);

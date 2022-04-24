@@ -68,7 +68,7 @@ class PrinterStore {
         settingsAppearance: printer.settingsAppearance,
         multiUserIssue: printer.multiUserIssue,
         restartRequired: printer.restartRequired,
-        healthCheckPass: printer.healthCheckPass,
+        healthChecksPass: printer.healthChecksPass,
         octoPi: printer.octoPi,
         corsCheck: printer.corsCheck,
         octoResourceMonitor: printer.octoResourceMonitor,

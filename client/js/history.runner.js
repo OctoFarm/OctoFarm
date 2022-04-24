@@ -1132,7 +1132,7 @@ class History {
       if (
         typeof current.thumbnail !== "undefined" &&
         current.thumbnail != null &&
-        current.thumbnail != ""
+        current.thumbnail !== ""
       ) {
         thumbnailIndicators.insertAdjacentHTML(
           "beforeend",
@@ -1243,28 +1243,6 @@ class History {
         );
         await drawHistoryDropDown(document.getElementById(`tool-${i}-bigFilamentSelect`), spool[sp].spoolId);
       }
-      for (let i = 0; i < toolsArray.length; i++) {
-        const currentToolDropDown = document.getElementById(`tool-${index}-bigFilamentSelect`);
-        // currentToolDropDown.innerHTML = ;
-        // if (current.spools[i][toolsArray[i]].spoolId !== null) {
-        //   if (SelectHasValue(currentToolDropDown.id, current.spools[i][toolsArray[i]].spoolId)) {
-        //     currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
-        //   } else {
-        //     currentToolDropDown.insertAdjacentHTML(
-        //       "afterbegin",
-        //       `
-        //       <option value="${current.spools[i][toolsArray[i]].spoolId}">${
-        //         current.spools[i][toolsArray[i]].spoolName
-        //       }</option>
-        //   `
-        //     );
-        //     currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
-        //   }
-        // } else {
-        //   currentToolDropDown.value = 0;
-        // }
-      }
-
       viewTable.insertAdjacentHTML(
         "beforeend",
         `
