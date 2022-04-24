@@ -3,10 +3,6 @@ html {
   height: 100%;
 }
 
-.dropdown-menu {
-  z-index: 9999;
-}
-
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;
@@ -619,7 +615,6 @@ label {
   position: -webkit-sticky;
   position: sticky;
   top: 60px;
-  z-index: 1020;
 }
 
 .userpic {
