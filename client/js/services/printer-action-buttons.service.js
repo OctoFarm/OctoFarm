@@ -20,17 +20,15 @@ function returnActionBtnTemplate(id, webURL) {
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-            <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer</h6>
-             <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
-            <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
-            <button  
-             title="Runs a pre-configured gcode sequence so you can detect which printer this is."
-             id="printerFindMe-${id}"
+          <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer</h6>
+          <button
+             title="Uses the values from your selected filament and pre-heats to those values."
+             id="printerHome-${id}"
              type="button"
              class="dropdown-item d-none"
               disabled
           >
-              <i class="fas fa-search text-info"></i> Find Printer!
+            <i class="fa-solid fa-house-flag"></i> Home
           </button> 
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
@@ -45,10 +43,10 @@ function returnActionBtnTemplate(id, webURL) {
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerHome-${id}"
              type="button"
-             class="dropdown-item d-none"
+             class="dropdown-item text-info d-none"
               disabled
           >
-            <i class="fa-solid fa-house-flag"></i> Home
+            <i class="fa-solid fa-ban text-danger"></i> Emmergency Stop
           </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
           <a title="Open OctoPrint"
@@ -65,6 +63,17 @@ function returnActionBtnTemplate(id, webURL) {
             >
                 <i class="fas fa-sync text-warning"></i> Re-Connect Socket
             </button> 
+            <button  
+             title="Runs a pre-configured gcode sequence so you can detect which printer this is."
+             id="printerFindMe-${id}"
+             type="button"
+             class="dropdown-item d-none"
+              disabled
+          >
+              <i class="fas fa-search text-info"></i> Find Printer!
+          </button> 
+          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
           <h6 id="octoPrintPowerDivider" class="dropdown-header"><i class="fab fa-octopus-deploy" disabled></i> OctoPrint</h6>
           <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
           <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>

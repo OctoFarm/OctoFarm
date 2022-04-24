@@ -958,7 +958,7 @@ export function drawGroupViewPrinters(printers, clientSettings) {
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
       const skipElement = document.getElementById(`panel-${printer._id}`);
       const groupColumns = checkGroupColumns(clientSettings);
-      let panelColumns = 12;
+      let panelColumns;
       switch (groupColumns) {
         case 12:
           panelColumns = 1;

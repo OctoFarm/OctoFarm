@@ -50,9 +50,79 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
+  listPrintersInformationForPrinterManager(){
+    const returnList = this.#printersList.map((printer) => {
+      return {
+        _id: printer._id,
+        disabled: printer.disabled,
+        sortIndex: printer.sortIndex,
+        printerName: printer.printerName,
+        printerURL: printer.printerURL,
+        webSocketURL: printer.webSocketURL,
+        apikey: printer.apikey,
+        group: printer.group,
+        category: printer.category,
+        hostState: printer.hostState,
+        printerState: printer.printerState,
+        webSocketState: printer.webSocketState,
+        settingsAppearance: printer.settingsAppearance,
+        multiUserIssue: printer.multiUserIssue,
+        restartRequired: printer.restartRequired,
+        healthCheckPass: printer.healthCheckPass,
+        octoPi: printer.octoPi,
+        corsCheck: printer.corsCheck,
+        octoResourceMonitor: printer.octoResourceMonitor,
+        websocket_throttle: printer.websocket_throttle,
+        reconnectingIn: printer.reconnectingIn,
+        websocketReconnectingIn: printer.websocketReconnectingIn,
+        octoPrintUpdate: printer.octoPrintUpdate,
+        octoPrintPluginUpdates: printer.octoPrintPluginUpdates,
+        systemChecks: printer.systemChecks,
+        connectionOptions: printer.connectionOptions
+      };
+    });
+
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
+  }
+
+  listPrintersInformationForMonitoringViews(){
+    const returnList = this.#printersList.map((printer) => {
+      return {
+        _id: printer._id,
+        display: printer.display,
+        disabled: printer.disabled,
+        sortIndex: printer.sortIndex,
+        printerName: printer.printerName,
+        printerURL: printer.printerURL,
+        webSocketURL: printer.webSocketURL,
+        apikey: printer.apikey,
+        camURL: printer.camURL,
+        group: printer.group,
+        category: printer.category,
+        hostState: printer.hostState,
+        printerState: printer.printerState,
+        webSocketState: printer.webSocketState,
+        settingsAppearance: printer.settingsAppearance,
+        connectionOptions: printer.connectionOptions,
+        currentProfile: printer.currentProfile,
+        otherSettings: printer.otherSettings,
+        currentJob: printer.currentJob,
+        fileList: printer.fileList,
+        layerData: printer.layerData,
+        tools: printer.tools,
+        selectedFilament: printer.selectedFilament,
+        feedRate: printer.feedRate,
+        flowRate: printer.flowRate,
+        stepRate: printer.stepRate,
+        terminal: printer.terminal
+      };
+    });
+
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
+  }
+
   listPrintersInformation(disabled = false, onlyDisabled = false) {
     let returnList = [];
-
     if (onlyDisabled) {
       this.#printersList.forEach((printer) => {
         if (printer?.disabled) {
@@ -99,7 +169,7 @@ class PrinterStore {
 
   async updateLatestOctoPrintSettings(id, force = false) {
     const printer = this.#findMePrinter(id);
-    if (printer.printerState.state !== "Offline") {
+    if (!printer.disabled && printer.printerState.state !== "Offline") {
       await printer.acquireOctoPrintLatestSettings(force);
     }
   }
@@ -1179,6 +1249,11 @@ class PrinterStore {
       printer.progress
     );
   };
+
+  resetJob = (id) => {
+    const printer = this.#findMePrinter(id);
+    printer.resetJobInformation();
+  }
 
   deattachSpoolFromAllPrinters(filamentID) {
     console.log(filamentID);

@@ -9,7 +9,7 @@ export function checkTemps(element, actual, target, tempTriggers, state) {
   }
   if (state === "Complete") {
     if (actual > parseFloat(tempTriggers.coolDown)) {
-      const string = `<i class="far fa-circle toolUnder"></i>&nbsp;${actual}°C&nbsp;<i class="fas fa-bullseye"></i>&nbsp;${target}°C`;
+      const string = `<i class="far fa-circle"></i>&nbsp;${actual}°C&nbsp;<i class="fas fa-bullseye"></i>&nbsp;${target}°C`;
       if (element && element.innerHTML !== string) {
         element.innerHTML = string;
       }

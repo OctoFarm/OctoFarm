@@ -43,7 +43,7 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, function (re
 
 if (interval === false) {
   interval = setInterval(async function () {
-    let printersInformation = getPrinterStoreCache().listPrintersInformation(true);
+    let printersInformation = getPrinterStoreCache().listPrintersInformationForPrinterManager();
     printersInformation = printersInformation.map((p) => {
       p.registeredEvents = getEventEmitterCache().get(p._id);
       return p;

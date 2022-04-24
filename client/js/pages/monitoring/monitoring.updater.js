@@ -1,6 +1,6 @@
 import {dragAndDropEnable, dragAndDropGroupEnable, dragCheck} from "../../utils/dragAndDrop.js";
-import PrinterControlManagerService from "../../services/printer-control-manager.service.js";
-import PrinterFileManagerService from "../../services/printer-file-manager.service.js";
+import PrinterControlManagerService from "./services/printer-control-manager.service.js";
+import PrinterFileManagerService from "./services/printer-file-manager.service.js";
 import UI from "../../utils/ui.js";
 import Calc from "../../utils/calc.js";
 import {
@@ -22,18 +22,17 @@ import {
     drawListView,
     drawPanelView
 } from "./monitoring.templates";
-import PrinterTerminalManagerService from "../../services/printer-terminal-manager.service";
+import PrinterTerminalManagerService from "./services/printer-terminal-manager.service";
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
-import {isPrinterDisconnected, printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
-import {initialiseCurrentJobPopover} from "../../services/printer-current-job.service";
+import {printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
+import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
 import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "../../exceptions/application-error.handler";
 import {
-  fillMiniFilamentDropDownList,
-  findMiniFilamentDropDowns, findMiniFilamentDropDownsButton, findMiniFilamentDropDownsSelect
+  fillMiniFilamentDropDownList, findMiniFilamentDropDownsSelect
 } from "../../services/printer-filament-selector.service";
 
 let elems = [];
@@ -202,7 +201,7 @@ function updateGroupFileListeners(printers) {
   fileActionBtns.forEach((btn) => {
     // Gate Keeper listener for file action buttons
     const button = btn;
-    btn.addEventListener("click", async function (e) {
+    btn.addEventListener("click", async function () {
       printers.forEach((printer) => {
         const data = button.id.split("*");
         const action = data[1];
@@ -378,8 +377,7 @@ function addGroupListeners(printers) {
       if (playBtn) {
         playBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "start"
             };
@@ -405,8 +403,7 @@ function addGroupListeners(printers) {
             async callback(result) {
               if (result) {
                 e.target.disabled = true;
-                for (let p = 0; p < groupedPrinters[key].length; p++) {
-                  const printer = groupedPrinters[key][p];
+                for (const printer of groupedPrinters[key]) {
                   const print = returnPrinterInfo(printer._id);
                   const opts = {
                     command: "cancel"
@@ -423,8 +420,7 @@ function addGroupListeners(printers) {
       if (restartBtn) {
         restartBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "restart"
             };
@@ -438,8 +434,7 @@ function addGroupListeners(printers) {
       if (pauseBtn) {
         pauseBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
               action: "pause"
@@ -454,8 +449,7 @@ function addGroupListeners(printers) {
       if (resumeBtn) {
         resumeBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
               action: "resume"
@@ -470,8 +464,7 @@ function addGroupListeners(printers) {
       if (filesBtn) {
         filesBtn.addEventListener("click", async (e) => {
           const idList = [];
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             idList.push(printer._id);
           }
           const fileList = await OctoFarmClient.get(
@@ -737,42 +730,42 @@ async function updateState(printer, clientSettings, view, index) {
   }
   if (!!printer.tools) {
     const toolKeys = Object.keys(printer.tools[0]);
-    for (let t = 0; t < toolKeys.length; t++) {
-      if (toolKeys[t].includes("tool")) {
-        const toolNumber = toolKeys[t].replace("tool", "");
+    for (const element of toolKeys) {
+      if (element.includes("tool")) {
+        const toolNumber = element.replace("tool", "");
         if (document.getElementById(printer._id + "-temperature-" + toolNumber)) {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              document.getElementById(printer._id + "-temperature-" + toolNumber),
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         } else {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            0,
-            0,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              document.getElementById(printer._id + "-temperature-" + toolNumber),
+              0,
+              0,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         }
-      } else if (toolKeys[t].includes("bed")) {
+      } else if (element.includes("bed")) {
         if (elements.bed) {
           checkTemps(
-            elements.bed,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              elements.bed,
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         }
-      } else if (toolKeys[t].includes("chamber")) {
+      } else if (element.includes("chamber")) {
         if (elements.chamber) {
           checkTemps(
-            elements.chamber,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
+              elements.chamber,
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
           );
@@ -954,11 +947,10 @@ async function updateState(printer, clientSettings, view, index) {
       }
     }
   } else if (printer.printerState.state === "Disconnected") {
-
-
-
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
+    }else{
+      elements.row.classList.remove("hidden")
     }
     if (elements.start) {
       elements.start.disabled = true;

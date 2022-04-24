@@ -1,5 +1,5 @@
-import {printerIsDisconnectedOrError} from "../utils/octofarm.utils";
-import OctoPrintClient from "./octoprint-client.service";
+import {printerIsDisconnectedOrError} from "../../../utils/octofarm.utils";
+import OctoPrintClient from "../../../services/octoprint-client.service";
 
 export const setupConnectButton = (printer) => {
     const { connectionOptions: { baudrates, baudratePreference, ports, portPreference, printerProfiles, printerProfilePreference  }} = printer;

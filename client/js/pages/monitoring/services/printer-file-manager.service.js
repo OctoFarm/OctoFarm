@@ -1,16 +1,16 @@
 
-import Calc from "../utils/calc.js";
-import UI from "../utils/ui.js";
-import FileManagerService from "./file-manager.service.js";
-import FileManagerSortingService from "./file-manager-sorting.service.js";
-import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./modal-printer-select.service";
-import {allowedFileTypes} from "../constants/file-types.constants";
-import "../utils/cleanup-modals.util"
+import Calc from "../../../utils/calc.js";
+import UI from "../../../utils/ui.js";
+import FileManagerService from "../../../services/file-manager.service.js";
+import FileManagerSortingService from "../../../services/file-manager-sorting.service.js";
+import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
+import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
+import {allowedFileTypes} from "../../../constants/file-types.constants";
+import "../../../utils/cleanup-modals.util"
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
-import {closePrinterManagerModalIfOffline} from "../utils/octofarm.utils";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
+import {closePrinterManagerModalIfOffline} from "../../../utils/octofarm.utils";
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
 
 let currentIndex = 0;
 let currentPrinter = null;

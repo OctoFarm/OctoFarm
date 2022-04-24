@@ -1,27 +1,24 @@
 import OctoPrintClient from "../octoprint-client.service";
 import OctoFarmClient from "../octofarm-client.service";
 
-async function setupOctoPrintForTimelapses(printers) {
+async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   let successfulPrinters = "";
   let failedPrinters = "";
 
-  let webCamSettings = {
+  const webCamSettings = {
     webcam: {
       ffmpegVideoCodec: "libx264",
       webcamEnabled: true
     }
   };
-  let timeLapseSettings = {
-    type: "zchange"
-  };
-  for (let i = 0; i < printers.length; i++) {
-    if (printers[i].printerState.colour.category !== "Offline") {
-      await OctoPrintClient.post(printers[i], "settings", webCamSettings);
-      await OctoPrintClient.post(printers[i], "timelapse", timeLapseSettings);
-      await OctoFarmClient.refreshPrinterSettings(printers[i]._id);
-      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
+  for (const printer of printers) {
+    if (printer.printerState.colour.category !== "Offline") {
+      await OctoPrintClient.post(printer, "settings", webCamSettings);
+      await OctoPrintClient.post(printer, "timelapse", timeLapseSettings);
+      await OctoFarmClient.refreshPrinterSettings(printer._id);
+      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printer.printerName}: Settings Updated! <br>`;
     } else {
-      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printers[i].printerName}: Offline! <br>`;
+      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printer.printerName}: Offline! <br>`;
     }
   }
   return {

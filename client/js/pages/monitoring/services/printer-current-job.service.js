@@ -1,14 +1,14 @@
-import Calc from "../utils/calc";
-import {setupClientSwitchDropDown} from "./modal-printer-select.service";
+import Calc from "../../../utils/calc";
+import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
 import {
     returnExpandedLayerDataDisplay
-} from "./octoprint/octoprint-display-layer-plugin.service";
+} from "../../../services/octoprint/octoprint-display-layer-plugin.service";
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
-import "../utils/cleanup-modals.util"
+import "../../../utils/cleanup-modals.util"
 import {
     closePrinterManagerModalIfOffline,
     imageOrCamera
-} from "../utils/octofarm.utils";
+} from "../../../utils/octofarm.utils";
 
 let currentIndex;
 let currentPrinter;

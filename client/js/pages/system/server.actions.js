@@ -176,14 +176,14 @@ const memoryOptions = {
   labels: ["Memory (%)"],
 };
 
-async function setupOPTimelapseSettings() {
+async function setupOPTimelapseSettings(timelapseSettings) {
   const printers = await OctoFarmClient.listPrinters();
   const alert = UI.createAlert(
     "warning",
     `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
   );
   const { successfulPrinters, failedPrinters } =
-    await setupOctoPrintForTimelapses(printers);
+    await setupOctoPrintForTimelapses(printers, timelapseSettings);
   alert.close();
   bootbox.alert(successfulPrinters + failedPrinters);
 }

@@ -234,7 +234,6 @@ class OctoPrintPrinter {
       group,
       costSettings,
       powerSettings,
-      klipperFirmwareVersion,
       storage,
       fileList,
       current,
@@ -290,6 +289,7 @@ class OctoPrintPrinter {
     if (!!octoPrintVersion) {
       this.octoPrintVersion = octoPrintVersion;
     }
+
     if (!!tempTriggers) {
       this.tempTriggers = tempTriggers;
     }
@@ -307,9 +307,6 @@ class OctoPrintPrinter {
     }
     if (!!powerSettings) {
       this.powerSettings = powerSettings;
-    }
-    if (!!klipperFirmwareVersion) {
-      this.klipperFirmwareVersion = klipperFirmwareVersion;
     }
     if (!!storage) {
       this.storage = storage;
@@ -412,11 +409,11 @@ class OctoPrintPrinter {
       this.gcodeScripts = PrinterClean.sortGCODE(settingsScripts);
     }
 
-    if (!!tempTriggers && !!settingsWebcam && !!settingsServer) {
+    if (!!this.tempTriggers || !!this.settingsWebcam || !!this.settingsServer) {
       this.otherSettings = PrinterClean.sortOtherSettings(
-        tempTriggers,
-        settingsWebcam,
-        settingsServer
+        this.tempTriggers,
+        this.settingsWebcam,
+        this.settingsServer
       );
     }
 
@@ -862,13 +859,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintUsersList(force = true) {
+    this.#apiPrinterTickerWrap("Acquiring User List", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
+
     if (this.onboarding.userApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring User List", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
 
     let usersCheck = await this.#api.getUsers(true).catch((e) => {
       logger.http("Failed to acquire user list", e);
@@ -1026,13 +1023,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSystemData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring system data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
+
     if (this.onboarding.systemApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring system data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
 
     let systemCheck = await this.#api.getSystemCommands(true).catch((e) => {
       logger.http("Failed Aquire system data", e);
@@ -1062,13 +1059,14 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
+
+    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
+
     if (!force && this.onboarding.profileApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
     let profileCheck = await this.#api.getPrinterProfiles(true).catch((e) => {
       logger.http("Failed Aquire profile data", e);
@@ -1099,13 +1097,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintStateData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
+
     if (!force && this.onboarding.stateApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success", true);
       return false;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
     let stateCheck = await this.#api.getConnection(true).catch((e) => {
       logger.http("Failed Aquire state data", e);
@@ -1149,13 +1147,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSettingsData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
+
     if (!force && this.onboarding.settingsApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
 
     let settingsCheck = await this.#api.getSettings(true).catch((e) => {
       logger.http("Failed Aquire settings data", e);
@@ -1177,6 +1175,8 @@ class OctoPrintPrinter {
       this.settingsServer = server;
       this.settingsSystem = system;
       this.settingsWebcam = webcam;
+
+      console.log(webcam)
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {

@@ -1,21 +1,19 @@
-import OctoPrintClient from "./octoprint-client.service";
-import OctoFarmClient from "./octofarm-client.service";
-import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./modal-printer-select.service";
-import "../utils/cleanup-modals.util"
+import OctoPrintClient from "../../../services/octoprint-client.service";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
+import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
+import "../../../utils/cleanup-modals.util"
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {closePrinterManagerModalIfOffline,
-  imageOrCamera} from "../utils/octofarm.utils";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
+  imageOrCamera} from "../../../utils/octofarm.utils";
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
 
 let currentIndex = 0;
 
 let currentPrinter = null;
 
 let filamentManager = false;
-
-const refreshCounter = 5000;
 
 export default class PrinterTerminalManagerService {
   static async init(index, printers, printerControlList) {
@@ -65,12 +63,12 @@ export default class PrinterTerminalManagerService {
       //Load tools
       document.getElementById("printerControls").innerHTML = `
           <div class="row">
-                <div class="col-sm-12 col-md-4 col-lg-3 text-center">
+                <div class="col-sm-12 col-md-4 col-lg-4 text-center">
                 <h5>Camera</h5><hr>
                     ${imageOrCamera(printer)}
                </div>
               
-                <div class="col-sm-12 col-md-8 col-lg-9 text-center">
+                <div class="col-sm-12 col-md-8 col-lg-8 text-center">
                         <h5>Custom Gocde Scripts</h5>
                     <hr>
                 </div>
@@ -172,16 +170,16 @@ export default class PrinterTerminalManagerService {
     };
     elements.terminal.input.addEventListener("keypress", async (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
-        submitTerminal(e);
+        await submitTerminal(e);
       }
     });
     elements.terminal.sendBtn.addEventListener("click", async (e) => {
-      submitTerminal(e);
+      await submitTerminal(e);
     });
   }
 
   static grabPage() {
-    const printerManager = {
+    return {
       mainPage: {
         title: document.getElementById("printerSelection"),
         status: document.getElementById("pmStatus")
@@ -269,8 +267,6 @@ export default class PrinterTerminalManagerService {
       },
       filamentDrops: document.querySelectorAll("[id$=FilamentManagerFolderSelect]")
     };
-
-    return printerManager;
   }
 
   static async applyState(printer, elements) {
@@ -284,6 +280,7 @@ export default class PrinterTerminalManagerService {
         elements.terminal.terminalWindow.clientHeight <=
       elements.terminal.terminalWindow.scrollTop + 1;
     elements.terminal.terminalWindow.innerHTML = "";
+
     if (typeof printer.terminal !== "undefined") {
       const waitCheck = document.getElementById("waitMessages").checked;
       const tempCheck = document.getElementById("tempMessages").checked;

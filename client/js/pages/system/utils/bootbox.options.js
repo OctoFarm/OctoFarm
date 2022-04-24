@@ -5,20 +5,36 @@ const serverBootBoxOptions = {
     title: "Are you sure?",
     message:
       // eslint-disable-next-line max-len
-      "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint.",
+      "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. " +
+        "The script will update any online instances and there shouldn't be a restart necassary. " +
+        "It does however presume you have your ffmpeg path setup and your snapshot URL inputted into OctoPrints Webcam and Timelapse Settings. " +
+        "<br> This will turn on the following settings: <br><b>Webcam Enabled:</b> true, <br><b>Webcam Codec:</b> lib264x. <br> " +
+        "You may choose between ZChange or Timed triggers with the confirm buttons below. These settings will just use OctoPrints defaults.",
     buttons: {
-      confirm: {
-        label: "Yes",
-        class: "btn-success"
+      zchange: {
+        label: "ZChange",
+        className: "btn-primary",
+        callback: async function () {
+          await setupOPTimelapseSettings({
+            type: "zchange",
+            save: true
+          });
+        }
+      },
+      timed: {
+        label: "Timed",
+        className: "btn-info",
+        callback: async function () {
+          await setupOPTimelapseSettings({
+            type: "timed",
+            interval: 10,
+            save: true
+          });
+        }
       },
       cancel: {
         label: "No",
-        class: "btn-danger"
-      }
-    },
-    callback: async function (result) {
-      if (result) {
-        setupOPTimelapseSettings();
+        className: "btn-danger"
       }
     }
   },

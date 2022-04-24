@@ -3,14 +3,14 @@ import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
 import PrinterPowerService from "../../../services/printer-power.service";
-import PrinterControlManagerService from "../../../services/printer-control-manager.service";
+import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
 import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
 import Validate from "../../../utils/validate";
 import {PrintersManagement} from "../printer-constructor";
 import PrinterSelectionService from "../../../services/printer-selection.service";
 import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
-import PrinterFileManagerService from "../../../services/printer-file-manager.service";
+import PrinterFileManagerService from "../../monitoring/services/printer-file-manager.service";
 import {
   addHealthCheckListeners,
   returnFarmOverviewTableRow,
@@ -18,7 +18,7 @@ import {
 } from "../templates/health-checks-table-row.templates";
 import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
 import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates"
-import PrinterTerminalManagerService from "../../../services/printer-terminal-manager.service";
+import PrinterTerminalManagerService from "../../monitoring/services/printer-terminal-manager.service";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 

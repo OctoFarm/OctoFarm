@@ -383,6 +383,7 @@ class WebSocketClient {
   }
 
   reconnect(e) {
+    getPrinterStoreCache().resetJob(this.id);
     if (this.#retryNumber < 1) {
       PrinterTicker.addIssue(
         new Date(),

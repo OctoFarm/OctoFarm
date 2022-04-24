@@ -486,36 +486,36 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document
           .getElementById(`printerEdit-${printer._id}`)
-          .addEventListener("click", async (e) => {
+          .addEventListener("click", async () => {
             const printersInfo = await OctoFarmClient.listPrinters(false, true);
             await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id);
           });
 
       document
         .getElementById(`printerSettings-${printer._id}`)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           const printersInfo = await OctoFarmClient.listPrinters();
           await updatePrinterSettingsModal(printersInfo, printer._id);
         });
       document
         .getElementById(`printerLog-${printer._id}`)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           const printerInfo = await OctoFarmClient.getPrinter(printer._id);
           let connectionLogs = await OctoFarmClient.get(
             "printers/connectionLogs/" + printer._id
           );
-          PrinterLogsService.initialise(printerInfo, connectionLogs);
+          await PrinterLogsService.initialise(printerInfo, connectionLogs);
         });
 
       document
         .getElementById(`printerStatistics-${printer._id}`)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           await PrinterStatisticsService.loadStatistics(printer._id);
         });
 
       document
         .getElementById(`printerAPIReScan-${printer._id}`)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           bootbox.dialog({
             title: "Rescan All API endpoints",
             message:
