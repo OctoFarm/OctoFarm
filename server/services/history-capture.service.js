@@ -692,7 +692,6 @@ class HistoryCollection {
       );
 
       await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
-      console.log(saveHistory)
       await saveHistory
         .save()
         .then((res) => {

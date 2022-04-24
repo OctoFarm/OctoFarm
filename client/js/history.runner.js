@@ -2,7 +2,7 @@ import Calc from "./utils/calc.js";
 import UI from "./utils/ui.js";
 import {
   returnBigFilamentSelectorTemplate,
-  drawHistoryDropDown
+  drawHistoryDropDown, findBigFilamentDropDowns
 } from "./services/printer-filament-selector.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
@@ -1214,10 +1214,10 @@ class History {
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
       for(const [i, spool] of current.spools.entries()){
-
         const sp = Object.keys(spool)[0];
         const spoolSelector = returnBigFilamentSelectorTemplate(i);
         toolsArray.push(sp);
+        console.log(spool[sp])
         viewTable.insertAdjacentHTML(
             "beforeend",
             `
@@ -1241,7 +1241,7 @@ class History {
           </tr>
         `
         );
-        await drawHistoryDropDown(document.getElementById(`tool-${index}-bigFilamentSelect`), spool.spoolID);
+        await drawHistoryDropDown(document.getElementById(`tool-${i}-bigFilamentSelect`), spool[sp].spoolId);
       }
       for (let i = 0; i < toolsArray.length; i++) {
         const currentToolDropDown = document.getElementById(`tool-${index}-bigFilamentSelect`);
@@ -1314,7 +1314,7 @@ class History {
   }
 
   static async save(id) {
-    const filamentDrops = document.querySelectorAll("[id^='filament-tool']");
+    const filamentDrops = findBigFilamentDropDowns()
     const filamentID = [];
     filamentDrops.forEach((drop) => {
       filamentID.push(drop.value);

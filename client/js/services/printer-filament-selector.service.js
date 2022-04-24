@@ -10,7 +10,7 @@ const dropDownListTemplate = (spool, multiSelect) => {
     }
     if(multiSelect){
         return `
-        <option value="${spoolID}" ${disabled}>${spoolName} (${spoolManufacturer})</option>
+        <option value="${spoolID}" ${disabled}>${spoolName} - ${spoolMaterial} (${spoolManufacturer})</option>
     `
     }else{
         return `
@@ -121,6 +121,8 @@ export async function drawHistoryDropDown (element, selectedID){
     });
     if(!!selectedID){
         element.value = selectedID;
+    }else{
+        element.value = "0";
     }
 }
 
