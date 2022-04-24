@@ -1053,6 +1053,8 @@ class History {
       const jobCosting = document.getElementById("jobCosting");
       const jobHourlyCost = document.getElementById("jobHourlyCost");
       const resendStats = document.getElementById("resendStats");
+      const jobElectricityCost = document.getElementById("jobElectricityCost");
+      const jobMaintenanceCost = document.getElementById("jobMaintenanceCost");
 
       viewTable.innerHTML = "";
       printerName.innerHTML = " - ";
@@ -1074,6 +1076,8 @@ class History {
       jobCosting.placeholder = " - ";
       jobHourlyCost.placeholder = " - ";
       resendStats.placeholder = " - ";
+      jobElectricityCost.placeholder = " - ";
+      jobMaintenanceCost.placeholder = " - ";
 
       const thumbnail = document.getElementById("thumbnails");
       const thumbnailIndicators = document.getElementById("thumbnails-indicators");
@@ -1086,6 +1090,8 @@ class History {
       const current = this.historyList[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
+      jobElectricityCost.value = current?.electricityCosts ? current.electricityCosts.toFixed(2) : "";
+      jobMaintenanceCost.value = current?.maintenanceCosts ? current.maintenanceCosts.toFixed(2) : "";
       if (typeof current.resend !== "undefined" && current.resend !== null) {
         resendStats.placeholder = `${current.resend.count} / ${
           current.resend.transmitted / 1000
@@ -1102,6 +1108,8 @@ class History {
       let thbs = false;
       let counter = 0;
       let active = "active";
+
+      console.log(current)
 
       if (
         typeof current.snapshot !== "undefined" &&
@@ -1217,7 +1225,6 @@ class History {
         const sp = Object.keys(spool)[0];
         const spoolSelector = returnBigFilamentSelectorTemplate(i);
         toolsArray.push(sp);
-        console.log(spool[sp])
         viewTable.insertAdjacentHTML(
             "beforeend",
             `

@@ -214,9 +214,9 @@ class HistoryCollection {
       cleanFileName = cleanFileName.replace(".gcode", "");
     }
 
-    const unrenderedTimelapseIndex = findIndex(timelapseResponse.unrendered, function (o) {
-      return o.name.includes(cleanFileName);
-    });
+    const unrenderedTimelapseIndex = timelapseResponse.unrendered.findIndex((o) =>
+      o.name.includes(cleanFileName)
+    );
     //if unrendered check timelapse again...
     logger.debug("Unrendered Index: ", {
       unrenderedTimelapseIndex,
@@ -231,10 +231,9 @@ class HistoryCollection {
     }
 
     await sleep(5000);
-
-    const lastTimelapseIndex = findIndex(timelapseResponse.files, function (o) {
-      return o.name.includes(cleanFileName);
-    });
+    const lastTimelapseIndex = timelapseResponse.files.findIndex((o) =>
+      o.name.includes(cleanFileName)
+    );
     logger.debug("rendered Index: ", {
       lastTimelapseIndex,
       renderedList: timelapseResponse.files
