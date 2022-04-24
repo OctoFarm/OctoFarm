@@ -1,4 +1,4 @@
-const { findIndex, cloneDeep } = require("lodash");
+const { findIndex } = require("lodash");
 const { ScriptRunner } = require("../services/local-scripts.service");
 const { PrinterTicker } = require("../services/printer-connection-log.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -6,12 +6,12 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const Logger = require("../handlers/logger");
 const { PrinterClean } = require("../services/printer-cleaner.service");
 const Filament = require("../models/Filament");
-const { SettingsClean } = require("../services/settings-cleaner.service");
 const PrinterService = require("../services/printer.service");
 const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const { JobClean } = require("../services/job-cleaner.service");
 const logger = new Logger("OctoFarm-State");
 
 class PrinterStore {
@@ -50,9 +50,79 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
+  listPrintersInformationForPrinterManager(){
+    const returnList = this.#printersList.map((printer) => {
+      return {
+        _id: printer._id,
+        disabled: printer.disabled,
+        sortIndex: printer.sortIndex,
+        printerName: printer.printerName,
+        printerURL: printer.printerURL,
+        webSocketURL: printer.webSocketURL,
+        apikey: printer.apikey,
+        group: printer.group,
+        category: printer.category,
+        hostState: printer.hostState,
+        printerState: printer.printerState,
+        webSocketState: printer.webSocketState,
+        settingsAppearance: printer.settingsAppearance,
+        multiUserIssue: printer.multiUserIssue,
+        restartRequired: printer.restartRequired,
+        healthChecksPass: printer.healthChecksPass,
+        octoPi: printer.octoPi,
+        corsCheck: printer.corsCheck,
+        octoResourceMonitor: printer.octoResourceMonitor,
+        websocket_throttle: printer.websocket_throttle,
+        reconnectingIn: printer.reconnectingIn,
+        websocketReconnectingIn: printer.websocketReconnectingIn,
+        octoPrintUpdate: printer.octoPrintUpdate,
+        octoPrintPluginUpdates: printer.octoPrintPluginUpdates,
+        systemChecks: printer.systemChecks,
+        connectionOptions: printer.connectionOptions
+      };
+    });
+
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
+  }
+
+  listPrintersInformationForMonitoringViews(){
+    const returnList = this.#printersList.map((printer) => {
+      return {
+        _id: printer._id,
+        display: printer.display,
+        disabled: printer.disabled,
+        sortIndex: printer.sortIndex,
+        printerName: printer.printerName,
+        printerURL: printer.printerURL,
+        webSocketURL: printer.webSocketURL,
+        apikey: printer.apikey,
+        camURL: printer.camURL,
+        group: printer.group,
+        category: printer.category,
+        hostState: printer.hostState,
+        printerState: printer.printerState,
+        webSocketState: printer.webSocketState,
+        settingsAppearance: printer.settingsAppearance,
+        connectionOptions: printer.connectionOptions,
+        currentProfile: printer.currentProfile,
+        otherSettings: printer.otherSettings,
+        currentJob: printer.currentJob,
+        fileList: printer.fileList,
+        layerData: printer.layerData,
+        tools: printer.tools,
+        selectedFilament: printer.selectedFilament,
+        feedRate: printer.feedRate,
+        flowRate: printer.flowRate,
+        stepRate: printer.stepRate,
+        terminal: printer.terminal
+      };
+    });
+
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
+  }
+
   listPrintersInformation(disabled = false, onlyDisabled = false) {
     let returnList = [];
-
     if (onlyDisabled) {
       this.#printersList.forEach((printer) => {
         if (printer?.disabled) {
@@ -99,7 +169,7 @@ class PrinterStore {
 
   async updateLatestOctoPrintSettings(id, force = false) {
     const printer = this.#findMePrinter(id);
-    if (printer.printerState.state !== "Offline") {
+    if (!printer.disabled && printer.printerState.state !== "Offline") {
       await printer.acquireOctoPrintLatestSettings(force);
     }
   }
@@ -140,17 +210,24 @@ class PrinterStore {
     printer.updatePrinterData(data);
   }
 
+  pushUpdatePrinterDatabase(id, key, data) {
+    const printer = this.#findMePrinter(id);
+    printer.pushUpdatePrinterDatabase(key, data);
+  }
+
   getSelectedFilament(id) {
     const printer = this.#findMePrinter(id);
-    return printer.selectedFilament;
+    return printer?.selectedFilament;
   }
 
   getFileList(id) {
     const printer = this.#findMePrinter(id);
     const newPrinter = JSON.parse(JSON.stringify(printer));
-    return Object.assign(newPrinter, {
-      fileList: FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings)
-    });
+    return FileClean.generate(
+      newPrinter.fileList,
+      newPrinter.selectedFilament,
+      newPrinter.costSettings
+    );
   }
 
   getOctoPiData(id) {
@@ -461,6 +538,7 @@ class PrinterStore {
       });
     }
   }
+
   async editPrinterConnectionSettings(settings) {
     const { printer } = settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
@@ -947,6 +1025,11 @@ class PrinterStore {
     return printer.getSessionkey();
   }
 
+  getOctoPrintResourceMonitorValues(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.octoResourceMonitor;
+  }
+
   async resyncFilesList(id) {
     const printer = this.#findMePrinter(id);
 
@@ -1122,15 +1205,17 @@ class PrinterStore {
   async assignSpoolToPrinters(printerIDs, spoolID) {
     const farmPrinters = this.listPrintersInformation(true);
 
-    if (SettingsClean.returnFilamentManagerSettings()) {
-      this.deattachSpoolFromAllPrinters(spoolID);
-    }
+    // Unassign existing printers
+    this.deattachSpoolFromAllPrinters(spoolID);
 
     // Asign new printer id's;
     for (let id of printerIDs) {
+      // No tool is de-attach request
+      if (!id?.tool) {
+        break;
+      }
       const tool = id.tool;
-      const split = id.printer.split("-");
-      const printerID = split[0];
+      const printerID = id.printer;
       const printerIndex = findIndex(farmPrinters, function (o) {
         return o._id === printerID;
       });
@@ -1140,21 +1225,39 @@ class PrinterStore {
       } else {
         farmPrinters[printerIndex].selectedFilament[tool] = null;
       }
-      PrinterService.findOneAndUpdate(printerID, {
+      this.updatePrinterDatabase(farmPrinters[printerIndex]._id, {
         selectedFilament: farmPrinters[printerIndex].selectedFilament
-      })
-        .then()
-        .catch((e) => {
-          logger.error("Issue updating spool list", e);
-        });
+      });
+      FileClean.generate(
+        farmPrinters[printerIndex].fileList,
+        farmPrinters[printerIndex].selectedFilament,
+        farmPrinters[printerIndex].costSettings
+      );
     }
     TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     return "Attached all spools";
   }
 
+  reRunJobCleaner = (id) => {
+    const printer = this.#findMePrinter(id);
+    JobClean.generate(
+      printer.job,
+      printer.selectedFilament,
+      printer.fileList,
+      printer.currentZ,
+      printer.costSettings,
+      printer.progress
+    );
+  };
+
+  resetJob = (id) => {
+    const printer = this.#findMePrinter(id);
+    printer.resetJobInformation();
+  }
+
   deattachSpoolFromAllPrinters(filamentID) {
+    console.log(filamentID);
     const farmPrinters = this.listPrintersInformation(true);
-    // Unassign existing printers
     const farmPrintersAssigned = farmPrinters.filter(
       (printer) =>
         findIndex(printer.selectedFilament, function (o) {
@@ -1163,20 +1266,14 @@ class PrinterStore {
           }
         }) > -1
     );
-
     farmPrintersAssigned.forEach((printer) => {
-      printer.selectedFilament.forEach((spool) => {
+      printer.selectedFilament.forEach((spool, index) => {
         logger.debug("Resetting spool to null", spool);
-        spool = null;
+        printer.selectedFilament[index] = null;
         logger.debug("Spool reset", spool);
       });
-      PrinterService.findOneAndUpdate(printer._id, {
-        selectedFilament: printer.selectedFilament
-      })
-        .then()
-        .catch((e) => {
-          logger.error("Issue updating file list", e);
-        });
+      this.updatePrinterDatabase(printer._id, { selectedFilament: printer.selectedFilament });
+      FileClean.generate(printer.fileList, printer.selectedFilament, printer.costSettings);
     });
   }
 

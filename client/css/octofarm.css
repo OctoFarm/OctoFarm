@@ -3,10 +3,6 @@ html {
   height: 100%;
 }
 
-.dropdown-menu {
-  z-index: 9999;
-}
-
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;
@@ -306,8 +302,6 @@ a.notyet {
 }
 .printerDisabled {
   border-left: #e74c3c 4px solid;
-  background-color: transparent;
-  opacity: 0.8;
 }
 .printerEnabled {
   border-left: green 4px solid;
@@ -549,6 +543,7 @@ label {
 .modal-body {
   max-height: 80vh;
   overflow-y: scroll;
+  overflow-wrap: normal;
 }
 
 .sortableList {
@@ -620,7 +615,6 @@ label {
   position: -webkit-sticky;
   position: sticky;
   top: 60px;
-  z-index: 1020;
 }
 
 .userpic {

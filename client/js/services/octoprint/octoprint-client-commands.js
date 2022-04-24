@@ -4,7 +4,6 @@ import OctoFarmClient from "../octofarm-client.service";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 
 async function updateBtnOnClick(printerID) {
-  try {
     const printer = await OctoFarmClient.getPrinter(printerID);
     bootbox.confirm({
       message: "This will tell OctoPrint to update, are you sure?",
@@ -24,10 +23,6 @@ async function updateBtnOnClick(printerID) {
         }
       }
     });
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
-  }
 }
 
 export function setupUpdateOctoPrintClientBtn(printer) {

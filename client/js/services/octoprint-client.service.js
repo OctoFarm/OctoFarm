@@ -1,5 +1,8 @@
 import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
+import { printActionStatusResponse } from "../services/octoprint/octoprint.helpers-commands"
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -22,6 +25,7 @@ export default class OctoPrintClient {
       }
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -37,6 +41,7 @@ export default class OctoPrintClient {
       body: JSON.stringify(data)
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -52,6 +57,7 @@ export default class OctoPrintClient {
       body: JSON.stringify(data)
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -66,6 +72,7 @@ export default class OctoPrintClient {
       body: data
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -80,6 +87,7 @@ export default class OctoPrintClient {
       }
     }).catch((e) => {
       console.log(e);
+      return e;
     });
   }
 
@@ -90,11 +98,7 @@ export default class OctoPrintClient {
     };
     const post = await OctoPrintClient.post(printer, "printer/tool", opt);
 
-    if (post.status === 204) {
-      return true;
-    } else {
-      return false;
-    }
+    return post.status === 204;
   }
 
   static async system(printer, action) {
@@ -137,7 +141,7 @@ export default class OctoPrintClient {
 
   static async systemNoConfirm(printer, action) {
     const url = "system/commands/core/" + action;
-    return await OctoPrintClient.post(printer, url);
+    return OctoPrintClient.post(printer, url);
   }
 
   static async move(element, printer, action, axis, dir) {
@@ -155,7 +159,7 @@ export default class OctoPrintClient {
         axes: axis
       };
     } else if (action === "jog") {
-      if (dir != undefined) {
+      if (typeof dir !== "undefined") {
         amount = Number(dir + amount);
       } else {
         amount = Number(amount);
@@ -261,16 +265,14 @@ export default class OctoPrintClient {
     if (typeof checkSettings.filament !== "undefined") {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
+
     let printerCheck = false;
     if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-      if(printer.selectedFilament.length === 0){
-        printerCheck = true;
-      }
       printerCheck = printer.selectedFilament.some(function (e) {
-        console.log(e)
-        return e === null
+        return e !== null
       });
     }
+
 
     if (opts.command === "start") {
       await OctoPrintClient.updateFeedAndFlow(printer);
@@ -294,7 +296,9 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            return OctoPrintClient.post(printer, "job", opts);
+            const { status } = await OctoPrintClient.post(printer, "job", opts);
+            console.log(status)
+            printActionStatusResponse(status)
           }
         }
       });
@@ -378,6 +382,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     } else {
       try {
@@ -404,6 +411,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     }
     return "done";

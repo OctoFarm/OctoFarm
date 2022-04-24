@@ -1,4 +1,6 @@
 import {asyncParse, debounce} from "./utils/sse.utils";
+import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "./exceptions/application-error.handler";
 
 // reconnectFrequencySeconds doubles every retry
 let reconnectFrequencySeconds = 1;
@@ -43,9 +45,12 @@ function setupEventSource(url) {
     postMessage(false);
     evtSource.close();
     reconnectFunc();
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `SSE Error - ${e}`
+    throw new ApplicationError(errorObject)
   };
   evtSource.onclose = async function () {
-    console.error("Closed SSE connection... ");
+    console.warning("Closed SSE connection... ");
     postMessage(false);
     evtSource.close();
     reconnectFunc();

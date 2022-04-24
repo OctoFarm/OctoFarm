@@ -7,7 +7,6 @@ const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
 
 async function updateBtnOnClick(printerID) {
-  try {
     let data = {
       i: printerID
     };
@@ -42,10 +41,6 @@ async function updateBtnOnClick(printerID) {
         "Please rescan your device as there's no plugins actually available..."
       );
     }
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
-  }
 }
 
 export function setupUpdateOctoPrintPluginsBtn(printer) {

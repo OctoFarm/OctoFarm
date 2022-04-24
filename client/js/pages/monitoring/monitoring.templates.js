@@ -7,6 +7,7 @@ import {
   isHidden
 } from "../../utils/octofarm.utils";
 import { getPrinterNameBadge } from "../../templates/printer.templates"
+import { returnMiniFilamentSelectorTemplate } from "../../services/printer-filament-selector.service"
 
 export function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
@@ -14,9 +15,7 @@ export function drawListView(printer, clientSettings) {
   let environment = "";
   if (!!printer?.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
     if (printer.currentProfile.heatedBed && printer.currentProfile.heatedChamber) {
       environment = `<small
@@ -58,7 +57,18 @@ export function drawListView(printer, clientSettings) {
            ${printer.printerState.state}
           </td>
           <td class="py-auto">
-                                    <button
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                            disabled
+                            >
+                            <i class="fa-solid fa-circle-info"></i>
+                          </button>
+                            <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
@@ -66,6 +76,7 @@ export function drawListView(printer, clientSettings) {
                             role="button"
                             data-toggle="modal"
                             data-target="#printerManagerModal"
+                            disabled
                           >
                             <i class="fas fa-file-code"></i>
                           </button>
@@ -77,6 +88,7 @@ export function drawListView(printer, clientSettings) {
                             role="button"
                             data-toggle="modal"
                             data-target="#printerManagerModal"
+                            disabled
                           >
                             <i class="fas fa-print"></i>
                           </button>
@@ -87,11 +99,12 @@ export function drawListView(printer, clientSettings) {
                            class="tag btn btn-outline-info btn-sm"
                            data-toggle="modal"
                            data-target="#printerManagerModal"
+                           disabled
                            >
                               <i class="fas fa-terminal"></i>
                         </button>
-          </td>
-          <td class="py-auto">
+                    </td>
+                    <td class="py-auto">
                     <button
                             title="Start your currently selected print"
                             id="play-${printer._id}"
@@ -184,9 +197,7 @@ export function drawPanelView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {
@@ -307,6 +318,16 @@ export function drawPanelView(printer, clientSettings) {
                           >
                             <i class="fas fa-square"></i> Cancel
                           </button> <br>
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                            >
+                            <i class="fa-solid fa-circle-info"></i> Job
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -384,7 +405,8 @@ export function drawCameraView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
+      // toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {
@@ -416,8 +438,6 @@ export function drawCameraView(printer, clientSettings) {
                <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
         </div>
-   
-     
         </div>
         <div
           class="card-body cameraContain text-truncate noBlue"
@@ -447,17 +467,6 @@ export function drawCameraView(printer, clientSettings) {
           </div>
           
           ${cameraElement}
-          
-          <div class="camTemps">
-            <small id="displayLayerProgressData-${printer._id}"></small><br>
-            <small
-              id="toolTemps-${printer._id}"
-              class="mb-0 text-center"
-            >
-             ${toolList}
-             ${environment}
-            </small>
-          </div>
           <div class="progress camProgress">
             <div class="d-none percent">Loading...</div>
             <div
@@ -528,6 +537,15 @@ export function drawCameraView(printer, clientSettings) {
                           
                          </small>
                           <small class="float-left">
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal">
+                            <i class="fa-solid fa-circle-info"></i>
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -563,8 +581,19 @@ export function drawCameraView(printer, clientSettings) {
    
             </div>
           </div>
-
+          <div class="camTemps">
+            <small id="displayLayerProgressData-${printer._id}"></small><br>  
+          </div>
         </div>
+        <div class="card-footer p-0">
+            <small
+              id="toolTemps-${printer._id}"
+              class="mb-0 text-center"
+            >
+             ${toolList}
+             ${environment}
+            </small>
+         </div>
       </div>
     </div>
   `;
@@ -578,20 +607,18 @@ export function drawCombinedView(printer, clientSettings) {
   let environment = "";
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
+      toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
 
     if (printer.currentProfile.heatedBed) {
       environment +=
-        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
+        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Bed: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
       environment += "</div>";
     }
     if (printer.currentProfile.heatedChamber) {
       environment +=
-        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
+        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Chamber: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
       environment += "</div>";
     }
@@ -729,6 +756,15 @@ export function drawCombinedView(printer, clientSettings) {
                           >
                             <i class="fas fa-square"></i> Cancel
                           </button> <br>
+                          <button title="Hover to see detailed job status"
+                            id="printerInfoButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-info mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal">
+                            <i class="fa-solid fa-circle-info"></i> Job
+                          </button>
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -922,7 +958,7 @@ export function drawGroupViewPrinters(printers, clientSettings) {
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
       const skipElement = document.getElementById(`panel-${printer._id}`);
       const groupColumns = checkGroupColumns(clientSettings);
-      let panelColumns = 12;
+      let panelColumns;
       switch (groupColumns) {
         case 12:
           panelColumns = 1;

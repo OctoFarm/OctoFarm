@@ -1,7 +1,11 @@
 "use strict";
 
 const { arrayCounts, checkNested, checkNestedIndex } = require("../utils/array.util");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const {
+  getPrintCostNumeric,
+  getElectricityCosts,
+  getMaintenanceCosts
+} = require("../utils/print-cost.util");
 const {
   getDefaultHistoryStatistics,
   ALL_MONTHS,
@@ -694,7 +698,15 @@ class HistoryCleanerService {
 
     for (let hist of data) {
       const printHistory = hist.printHistory;
-      const printCost = getPrintCostNumeric(printHistory.printTime, printHistory.costSettings);
+      const electricityCosts = getElectricityCosts(
+        printHistory.printTime,
+        printHistory.costSettings
+      );
+      const maintenanceCosts = getMaintenanceCosts(
+        printHistory.printTime,
+        printHistory.costSettings
+      );
+      const printCost = electricityCosts + maintenanceCosts;
       const printSummary = {
         _id: hist._id,
         index: printHistory.historyIndex,
@@ -705,7 +717,9 @@ class HistoryCleanerService {
         endDate: printHistory.endDate,
         printTime: printHistory.printTime,
         notes: printHistory.notes,
-        printerCost: printCost?.toFixed(2) || noCostSettingsMessage,
+        printerCost: printCost?.toFixed(2),
+        maintenanceCosts,
+        electricityCosts,
         spools: HistoryCleanerService.getSpool(
           printHistory.filamentSelection,
           printHistory.job,

@@ -1,6 +1,6 @@
 import {dragAndDropEnable, dragAndDropGroupEnable, dragCheck} from "../../utils/dragAndDrop.js";
-import PrinterControlManagerService from "../../services/printer-control-manager.service.js";
-import PrinterFileManagerService from "../../services/printer-file-manager.service.js";
+import PrinterControlManagerService from "./services/printer-control-manager.service.js";
+import PrinterFileManagerService from "./services/printer-file-manager.service.js";
 import UI from "../../utils/ui.js";
 import Calc from "../../utils/calc.js";
 import {
@@ -10,7 +10,7 @@ import {
     init as actionButtonInit
 } from "../../services/printer-action-buttons.service.js";
 import OctoPrintClient from "../../services/octoprint-client.service.js";
-import {checkTemps} from "../../services/temperature-check.util.js";
+import {checkTemps} from "../../utils/temperature-check.util.js";
 import doubleClickFullScreen from "../../utils/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import {getControlList, getPrinterInfo} from "./monitoring-view.state";
@@ -22,11 +22,18 @@ import {
     drawListView,
     drawPanelView
 } from "./monitoring.templates";
-import PrinterTerminalManagerService from "../../services/printer-terminal-manager.service";
+import PrinterTerminalManagerService from "./services/printer-terminal-manager.service";
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
-import {printerIsAvailableToView} from "../../utils/octofarm.utils";
+import {printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
+import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
+import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
+import {
+  fillMiniFilamentDropDownList, findMiniFilamentDropDownsSelect
+} from "../../services/printer-filament-selector.service";
 
 let elems = [];
 let groupElems = [];
@@ -63,8 +70,14 @@ const returnPrinterInfo = (id) => {
   }
 };
 
-function addListeners(printer) {
+async function addListeners(printer) {
   //For now Control has to be seperated
+  document.getElementById(`printerInfoButton-${printer._id}`).addEventListener("click", async () => {
+    currentOpenModal.innerHTML = "Printer Job Status: ";
+    const printerInfo = getPrinterInfo();
+    const controlList = getControlList();
+    await initialiseCurrentJobPopover(printer._id, printerInfo, controlList);
+  });
   document.getElementById(`printerButton-${printer._id}`).addEventListener("click", async () => {
     currentOpenModal.innerHTML = "Printer Control: ";
     const printerInfo = getPrinterInfo();
@@ -95,8 +108,10 @@ function addListeners(printer) {
         command: "start"
       };
       const print = returnPrinterInfo(printer._id);
-      const { status } = await OctoPrintClient.jobAction(print, opts, e);
-      printActionStatusResponse(status, "print")
+      const octoPrintCall = await OctoPrintClient.jobAction(print, opts, e);
+      if(!!octoPrintCall?.status){
+        printActionStatusResponse(octoPrintCall?.status, "print")
+      }
     });
   }
   let cancelBtn = document.getElementById("cancel-" + printer._id);
@@ -171,6 +186,13 @@ function addListeners(printer) {
       doubleClickFullScreen(e.target);
     });
   }
+  if(!!printer?.currentProfile){
+    for(let i = 0; i < printer.currentProfile?.extruder?.count; i++){
+      const miniFilamentDropdownSelect = findMiniFilamentDropDownsSelect(printer._id, i);
+      await fillMiniFilamentDropDownList(miniFilamentDropdownSelect, printer, i);
+    }
+  }
+
 
   return "done";
 }
@@ -179,7 +201,7 @@ function updateGroupFileListeners(printers) {
   fileActionBtns.forEach((btn) => {
     // Gate Keeper listener for file action buttons
     const button = btn;
-    btn.addEventListener("click", async function (e) {
+    btn.addEventListener("click", async function () {
       printers.forEach((printer) => {
         const data = button.id.split("*");
         const action = data[1];
@@ -355,8 +377,7 @@ function addGroupListeners(printers) {
       if (playBtn) {
         playBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "start"
             };
@@ -382,8 +403,7 @@ function addGroupListeners(printers) {
             async callback(result) {
               if (result) {
                 e.target.disabled = true;
-                for (let p = 0; p < groupedPrinters[key].length; p++) {
-                  const printer = groupedPrinters[key][p];
+                for (const printer of groupedPrinters[key]) {
                   const print = returnPrinterInfo(printer._id);
                   const opts = {
                     command: "cancel"
@@ -400,8 +420,7 @@ function addGroupListeners(printers) {
       if (restartBtn) {
         restartBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "restart"
             };
@@ -415,8 +434,7 @@ function addGroupListeners(printers) {
       if (pauseBtn) {
         pauseBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
               action: "pause"
@@ -431,8 +449,7 @@ function addGroupListeners(printers) {
       if (resumeBtn) {
         resumeBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
               action: "resume"
@@ -447,8 +464,7 @@ function addGroupListeners(printers) {
       if (filesBtn) {
         filesBtn.addEventListener("click", async (e) => {
           const idList = [];
-          for (let p = 0; p < groupedPrinters[key].length; p++) {
-            const printer = groupedPrinters[key][p];
+          for (const printer of groupedPrinters[key]) {
             idList.push(printer._id);
           }
           const fileList = await OctoFarmClient.get(
@@ -464,34 +480,36 @@ function addGroupListeners(printers) {
 }
 
 function grabElements(printer) {
-  if (typeof elems[printer._id] !== "undefined") {
-    return elems[printer._id];
+  const { _id } = printer;
+  if (typeof elems[_id] !== "undefined") {
+    return elems[_id];
   } else {
-    elems[printer._id] = {
-      row: document.getElementById("panel-" + printer._id),
-      name: document.getElementById("name-" + printer._id),
-      control: document.getElementById("printerButton-" + printer._id),
-      files: document.getElementById("printerFilesBtn-" + printer._id),
-      terminal: document.getElementById("printerTerminalButton-" + printer._id),
-      connect: document.getElementById("printerQuickConnect-" + printer._id),
-      start: document.getElementById("play-" + printer._id),
-      stop: document.getElementById("cancel-" + printer._id),
-      pause: document.getElementById("pause-" + printer._id),
-      restart: document.getElementById("restart-" + printer._id),
-      resume: document.getElementById("resume-" + printer._id),
-      camera: document.getElementById("camera-" + printer._id),
-      currentFile: document.getElementById("currentFile-" + printer._id),
-      currentFilament: document.getElementById("currentFilament-" + printer._id),
-      state: document.getElementById("state-" + printer._id),
-      layerData: document.getElementById("displayLayerProgressData-" + printer._id),
-      printTimeElapsed: document.getElementById("printTimeElapsed-" + printer._id),
-      remainingPrintTime: document.getElementById("remainingTime-" + printer._id),
-      cameraContain: document.getElementById("cameraContain-" + printer._id),
-      progress: document.getElementById("progress-" + printer._id),
-      bed: document.getElementById("badTemp-" + printer._id),
-      chamber: document.getElementById("chamberTemp-" + printer._id)
+    elems[_id] = {
+      row: document.getElementById("panel-" + _id),
+      name: document.getElementById("name-" + _id),
+      control: document.getElementById("printerButton-" + _id),
+      files: document.getElementById("printerFilesBtn-" + _id),
+      terminal: document.getElementById("printerTerminalButton-" + _id),
+      job: document.getElementById("printerInfoButton-" + _id),
+      connect: document.getElementById("printerQuickConnect-" + _id),
+      start: document.getElementById("play-" + _id),
+      stop: document.getElementById("cancel-" + _id),
+      pause: document.getElementById("pause-" + _id),
+      restart: document.getElementById("restart-" + _id),
+      resume: document.getElementById("resume-" + _id),
+      camera: document.getElementById("camera-" + _id),
+      currentFile: document.getElementById("currentFile-" + _id),
+      currentFilament: document.getElementById("currentFilament-" + _id),
+      state: document.getElementById("state-" + _id),
+      layerData: document.getElementById("displayLayerProgressData-" + _id),
+      printTimeElapsed: document.getElementById("printTimeElapsed-" + _id),
+      remainingPrintTime: document.getElementById("remainingTime-" + _id),
+      cameraContain: document.getElementById("cameraContain-" + _id),
+      progress: document.getElementById("progress-" + _id),
+      bed: document.getElementById("badTemp-" + _id),
+      chamber: document.getElementById("chamberTemp-" + _id)
     };
-    return elems[printer._id];
+    return elems[_id];
   }
 }
 function grabGroupElements(group) {
@@ -546,11 +564,12 @@ async function updateState(printer, clientSettings, view, index) {
 
   //Printer
   checkQuickConnectState(printer);
-  const isOffline = printer.printerState.colour.category === "Offline";
+  const isOffline = !printerIsOnline(printer);
 
   elements.control.disabled = isOffline;
   elements.files.disabled = isOffline;
   elements.terminal.disabled = isOffline;
+  elements.job.disabled = isOffline;
 
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
@@ -706,49 +725,47 @@ async function updateState(printer, clientSettings, view, index) {
     elements.currentFile.setAttribute("title", "No File Selected");
     elements.currentFile.innerHTML = "<i class=\"fas fa-file-code\"></i> " + "No File Selected";
   }
-
   if (!!printer?.layerData) {
-    const formatLayerData = `<i class="fas fa-layer-group"></i> ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
-    UI.doesElementNeedUpdating(formatLayerData, elements.layerData, "innerHTML");
+    UI.doesElementNeedUpdating(returnMinimalLayerDataDisplay(printer.layerData), elements.layerData, "innerHTML");
   }
   if (!!printer.tools) {
     const toolKeys = Object.keys(printer.tools[0]);
-    for (let t = 0; t < toolKeys.length; t++) {
-      if (toolKeys[t].includes("tool")) {
-        const toolNumber = toolKeys[t].replace("tool", "");
+    for (const element of toolKeys) {
+      if (element.includes("tool")) {
+        const toolNumber = element.replace("tool", "");
         if (document.getElementById(printer._id + "-temperature-" + toolNumber)) {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              document.getElementById(printer._id + "-temperature-" + toolNumber),
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         } else {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            0,
-            0,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              document.getElementById(printer._id + "-temperature-" + toolNumber),
+              0,
+              0,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         }
-      } else if (toolKeys[t].includes("bed")) {
+      } else if (element.includes("bed")) {
         if (elements.bed) {
           checkTemps(
-            elements.bed,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
+              elements.bed,
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
+              printer.otherSettings.temperatureTriggers,
+              printer.printerState.colour.category
           );
         }
-      } else if (toolKeys[t].includes("chamber")) {
+      } else if (element.includes("chamber")) {
         if (elements.chamber) {
           checkTemps(
-            elements.chamber,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
+              elements.chamber,
+              printer.tools[0][element].actual,
+              printer.tools[0][element].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
           );
@@ -932,6 +949,8 @@ async function updateState(printer, clientSettings, view, index) {
   } else if (printer.printerState.state === "Disconnected") {
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
+    }else{
+      elements.row.classList.remove("hidden")
     }
     if (elements.start) {
       elements.start.disabled = true;
@@ -1303,8 +1322,9 @@ export async function initMonitoring(printers, clientSettings, view) {
         await PrinterControlManagerService.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
         await PrinterTerminalManagerService.init("", printers, getControlList());
+      }else if(currentOpenModal.innerHTML.includes("Job")){
+        await initialiseCurrentJobPopover("", printers, getControlList());
       }
-      break;
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
@@ -1328,6 +1348,9 @@ export async function initMonitoring(printers, clientSettings, view) {
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
             } else {
               console.error("printerPanel could not determine view type to update", view);
+              const errorObject = ClientErrors.SILENT_ERROR;
+              errorObject.message =  `Monitoring Updater - ${e}`
+              throw new ApplicationError(errorObject)
             }
 
             if (view !== "group") {
@@ -1336,7 +1359,7 @@ export async function initMonitoring(printers, clientSettings, view) {
               //Setup Action Buttons
               await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
               //Add page listeners
-              addListeners(printers[p]);
+              await addListeners(printers[p]);
               //Grab elements
               await grabElements(printers[p]);
               //Initialise Drag and Drop

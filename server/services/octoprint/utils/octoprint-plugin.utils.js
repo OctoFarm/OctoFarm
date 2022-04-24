@@ -1,15 +1,35 @@
 const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
+const PluginLogs = require("../../../models/PluginLogs");
+const Logger = require("../../../handlers/logger");
+const logger = new Logger("OctoFarm-Server");
 
 const defaultWOLSubnetMask = "255.255.255.0";
 
-const addOctoPrintLogWrapper = (id, message, state) => {
-  PrinterTicker.addOctoPrintLog(
-    getPrinterStoreCache().getPrinter(id),
-    message,
-    state,
-    "pluginmanager"
-  );
+const addOctoPrintLogWrapper = (id, message, state, plugin) => {
+  //TODO save to a database, and add more plugins!
+  const today = new Date();
+
+  const log = {
+    id: today.getTime(),
+    date: today,
+    message: message,
+    printerID: id,
+    printerURL: getPrinterStoreCache().getPrinterURL(id),
+    state: state,
+    pluginDisplay: plugin
+  };
+
+  const newLog = new PluginLogs(log);
+
+  newLog
+    .save()
+    .then((res) => {
+      logger.debug("Successfully saved plugin log data to database", res);
+    })
+    .catch((e) => {
+      logger.error("Couldn't save plugin log data", e);
+    });
 };
 
 const addOctoPrintIssueWrapper = (id, message, state) => {
@@ -55,13 +75,13 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   if (currentSettings === null) {
     if (plugins["psucontrol"]) {
       return {
-        powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+        powerOnCommand: JSON.stringify({ command: "turnPSUOn" }),
         powerOnURL: "[PrinterURL]/api/plugin/control",
-        powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+        powerOffCommand: JSON.stringify({ command: "turnPSUOff" }),
         powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerToggleCommand: "{\"command\":\"togglePSU\"}",
+        powerToggleCommand: JSON.stringify({ command: "togglePSU" }),
         powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerStatusCommand: "{\"command\":\"getPSUState\"}",
+        powerStatusCommand: JSON.stringify({ command: "getPSUState" }),
         powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
         wol: {
           enabled: false,
@@ -97,14 +117,33 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
   }
 };
 
-//TODO Make sure the Klipper Plugin Data capture works.
 const captureKlipperPluginData = (id, data) => {
-  const { payload } = data;
-  if (payload.includes("Firmware version:")) {
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      klipperFirmwareVersion: payload.replace("Firmware version: ", "")
-    });
+  //TODO this needs to output to a klipper log, doesn't need to be in connection on Printer Manager
+  const { payload, subtype } = data;
+
+  let state = subtype === "info" ? "Info" : "Offline";
+
+  if (payload.includes("file")) {
+    return;
   }
+
+  if (payload.includes("Disconnect") || payload.includes("Lost")) {
+    state = "Offline";
+  }
+
+  if (payload.includes("Ready")) {
+    state = "Complete";
+  }
+
+  if (payload.includes("probe")) {
+    state = "Active";
+  }
+
+  if (subtype === "debug") {
+    state = "Warning";
+  }
+
+  addOctoPrintLogWrapper(id, payload, state, "OctoKlipper");
 };
 
 const capturePluginManagerData = (id, type, data) => {
@@ -121,46 +160,51 @@ const capturePluginManagerData = (id, type, data) => {
 
 const captureResultsData = (id, data) => {
   const { action, result, needs_restart } = data;
-  if (needs_restart) {
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    restartRequired: false
+  });
+
+  if (needs_restart === true) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       restartRequired: true
     });
-  } else {
-    getPrinterStoreCache().updatePrinterLiveValue(id, {
-      restartRequired: false
-    });
   }
+
   const message = `Action: ${action} has ${
     result ? "successfully completed" : "failed to complete"
   } | Restart Required: ${needs_restart}`;
   const state = result ? "Complete" : "Offline";
-  addOctoPrintLogWrapper(id, message, state);
   addOctoPrintIssueWrapper(id, message, state);
+  addOctoPrintLogWrapper(id, message, "Active", "Plugin Manager");
 };
 
 const captureLogLines = (id, data) => {
   if (!!data && data.length > 0) {
     data.forEach((line) => {
       if (line.stream === "call" || line.stream === "message") {
-        addOctoPrintLogWrapper(id, line.line, "Active");
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
       }
       if (line.stream === "stdout") {
-        addOctoPrintLogWrapper(id, line.line, "Complete");
+        addOctoPrintLogWrapper(id, line.line, "Complete", "Plugin Manager");
       }
       if (line.stream === "stderr") {
-        addOctoPrintLogWrapper(id, line.line, "Offline");
+        addOctoPrintLogWrapper(id, line.line, "Offline", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Offline");
       }
       if (line.line.includes("Successfully installed")) {
+        addOctoPrintLogWrapper(id, line.line, "Complete", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Complete");
       }
       if (line.line.includes("Successfully built")) {
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Active");
       }
       if (line.line.includes("Uninstalling")) {
+        addOctoPrintLogWrapper(id, line.line, "Offline", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Offline");
       }
       if (line.line.includes("Processing")) {
+        addOctoPrintLogWrapper(id, line.line, "Active", "Plugin Manager");
         addOctoPrintIssueWrapper(id, line.line, "Active");
       }
     });
@@ -176,7 +220,8 @@ const captureThrottlePluginData = (id, data) => {
     addOctoPrintLogWrapper(
       id,
       "OctoPrint reporting throttled state! Undervoltage issue!",
-      "Offline"
+      "Offline",
+      "Pi Support"
     );
   }
 
@@ -184,7 +229,8 @@ const captureThrottlePluginData = (id, data) => {
     addOctoPrintLogWrapper(
       id,
       "OctoPrint reporting throttled state! Overheating issue!",
-      "Offline"
+      "Offline",
+      "Pi Support"
     );
   }
 
@@ -196,10 +242,59 @@ const captureThrottlePluginData = (id, data) => {
   getPrinterStoreCache().updatePrinterDatabase(id, { octoPi });
 };
 
+const captureResourceMonitorData = (id, data) => {
+  const {
+    cpu: { average, octoprint },
+    memory: { percent }
+  } = data;
+  let octoPrintResourceMonitor = getPrinterStoreCache().getOctoPrintResourceMonitorValues(id);
+
+  if (!octoPrintResourceMonitor) {
+    octoPrintResourceMonitor = {
+      system_cpu: [],
+      system_memory: [],
+      octoprint_cpu: []
+    };
+  }
+
+  if (!!octoprint) {
+    octoPrintResourceMonitor.octoprint_cpu.push(octoprint);
+  }
+
+  if (!!average) {
+    octoPrintResourceMonitor.system_cpu.push(average);
+  }
+  if (!!percent) {
+    octoPrintResourceMonitor.system_memory.push(percent);
+  }
+
+  if (octoPrintResourceMonitor.octoprint_cpu.length > 50) {
+    octoPrintResourceMonitor.octoprint_cpu.shift();
+  }
+
+  if (octoPrintResourceMonitor.system_cpu.length > 50) {
+    octoPrintResourceMonitor.system_cpu.shift();
+  }
+
+  if (octoPrintResourceMonitor.system_memory.length > 50) {
+    octoPrintResourceMonitor.system_memory.shift();
+  }
+
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    octoResourceMonitor: octoPrintResourceMonitor
+  });
+};
+
+const captureDisplayLayerProgress = (id, data) => {
+  getPrinterStoreCache().updatePrinterLiveValue(id, { layerData: data });
+};
+
 module.exports = {
   testAndCollectPSUControlPlugin,
   testAndCollectCostPlugin,
   captureKlipperPluginData,
   capturePluginManagerData,
-  captureThrottlePluginData
+  captureThrottlePluginData,
+  captureResourceMonitorData,
+  captureDisplayLayerProgress
 };

@@ -15,9 +15,9 @@ const updatePluginStore = async function () {
   });
   if (latestPluginCall.status === 200) {
     octoPrintPluginList = await latestPluginCall.json();
-    logger.debug("Successfully grabbed remote patreon data!");
+    logger.debug("Successfully plugin data from OctoPrint.org!");
   } else {
-    logger.error("Falling back to local patreon data...");
+    logger.error("Failed to grab plugin data from OctoPrint.org! Disabling");
   }
 };
 
@@ -27,9 +27,9 @@ const updatePluginNoticesStore = async function () {
   });
   if (latestNoticesCall.status === 200) {
     octoPrintPluginNoticesList = await latestNoticesCall.json();
-    logger.debug("Successfully grabbed remote patreon data!");
+    logger.debug("Successfully notices data from OctoPrint.org!");
   } else {
-    logger.error("Falling back to local patreon data...");
+    logger.error("Failed to grab notices data from OctoPrint.org! Disabling");
   }
 };
 

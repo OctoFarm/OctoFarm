@@ -89,11 +89,18 @@ export function checkGroupColumns(clientSettings) {
 /**
  *
  * @param printer
+ * @param doNotDisplay
  * @returns {string}
  */
-export function imageOrCamera(printer) {
+export function imageOrCamera(printer, doNotDisplay = false) {
+    if(doNotDisplay){
+        return "";
+    }
+
     const flip = isRotated(printer.otherSettings);
     const { flipH, flipV, rotate90 } = flip;
+
+    let hidden = false;
 
     //Is octoprints camera settings enabled?
     if (!!printer.otherSettings) {
@@ -131,7 +138,8 @@ export function imageOrCamera(printer) {
                 rotate90
             });
         } else {
-            return drawCamera(printer._id, { url: "", flipV, flipH, rotate90 });
+            hidden = true;
+            return drawCamera(printer._id, { url: "", flipV, flipH, rotate90, hidden });
         }
     }
 }
@@ -178,5 +186,27 @@ export function printerIsAvailableToView(printer){
 export function printerIsDisconnectedOrError(printer){
     const {printerState: {colour: {category}}} = printer;
 
-    return (category !== "Offline" && category === "Disconnected" || category === "Error!")
+    return (category !== "Offline" && category === "Disconnected" || category.includes("Error") || category.includes("error"))
 }
+
+export function isPrinterDisconnected(printer){
+    const {printerState: {colour: {category}}} = printer;
+
+    return (category !== "Offline" && category === "Disconnected")
+}
+
+export function closePrinterManagerModalIfOffline(printer){
+    if(!printerIsOnline(printer)){
+        $("#printerManagerModal").modal("hide");
+    }
+    return !printerIsOnline;
+}
+
+export function closePrinterManagerModalIfDisconnected(printer){
+    if(isPrinterDisconnected(printer)){
+        $("#printerManagerModal").modal("hide");
+    }
+    return isPrinterDisconnected()
+}
+
+

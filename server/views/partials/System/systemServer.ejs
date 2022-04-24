@@ -103,7 +103,7 @@
             <a class="nav-link"
                id="server-history-list" data-toggle="list" href="#server-history"
                role="tab" aria-controls="listview"><i class="fas fa-history"></i>
-                HistoryRoutes</a>
+                History</a>
         </li>
         <li class="nav-item">
             <a class="nav-link"
@@ -289,7 +289,7 @@
             <div class="tab-pane fade" id="server-filament" role="tabpanel"
                  aria-labelledby="server-filament-list">
                 <div id="filamentManagerSetup" class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <h5>Check Spool?</h5>
                         <div class="alert alert-info small" role="alert">
                             OctoFarm will throw a nag screen when trying to start a print without a spool attached.
@@ -307,7 +307,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <h5>Hide Empty Spools?</h5>
                         <div class="alert alert-info small" role="alert">
                             Any spool going below 0 will be hidden from the interfaces select menu's.
@@ -325,16 +325,24 @@
                             </div>
                         </form>
                     </div>
-                    <% if (!serverSettings.filamentManager){ %>
-                        <div class="col-lg-3">
+                    <% let disableDownDate = false %>
+                    <% let disableDownDateMessage = "" %>
+                    <% if (serverSettings.filamentManager){ %>
+                        <% disableDownDate = true; %>
+                        <% disableDownDateMessage = `This is disabled as you have Filament Manager Plugin Sync activated!` %>
+                    <% } %>
+                        <div class="col-lg-2">
                             <h5>Downdate Successful Usage?</h5>
                             <div class="alert alert-info small" role="alert">
-                                On a successful print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                                On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
+                            </div>
+                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <%= disableDownDateMessage %>
                             </div>
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
-                                    <input type="checkbox" class="custom-control-input"
-                                           id="downDateSuccess" required <%= (serverSettings?.server?.downDateSuccess) ? "checked" : "" %>>
+                                    <input type="checkbox" class="custom-control-input" <%= (disableDownDate) ? "disabled" : "" %>
+                                           id="downDateSuccess" required <%= (serverSettings?.filament?.downDateSuccess) ? "checked" : "" %>>
                                     <label class="custom-control-label"
                                            for="downDateSuccess">Downdate Successful</label>
                                     <div class="valid-feedback">Downdate usage
@@ -344,74 +352,97 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-3">
-                            <h5>Downdate Failed/Cancelled Usage?</h5>
+                        <div class="col-lg-2">
+                        <h5>Downdate Failed/Cancelled Usage?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                            <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                        </div>
+                        <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <%= disableDownDateMessage %>
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                       id="downDateFailed" required <%= (serverSettings?.server?.downDateFailed) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="downDateFailed">Downdate failed/cancelled</label>
+                                <div class="valid-feedback">Downdate usage
+                                </div>
+                                <div class="invalid-feedback">Ignore usage
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                        <div class="col-lg-2">
+                            <h5>Allow Single Spools on Multiple Printers?</h5>
                             <div class="alert alert-info small" role="alert">
-                                On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
-                                <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                                Allow the selection of single spools on multiple printers. Great if your only tracking filament by type.. you can have 1 spool attached to multiple printers to get more accurate grams calculations this way.
+                            </div>
+                            <% let multiSelectOff = "d-none"; %>
+                            <% if(serverSettings?.filament?.allowMultiSelect) { %>
+                                <% multiSelectOff = "" %>
+                            <% }%>
+                            <div class="alert alert-warning small text-dark <%= multiSelectOff %>" role="alert">
+                                Turning this off will remove all your current filament assignments.
+                            </div>
+                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                                <%= disableDownDateMessage %>
                             </div>
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
-                                    <input type="checkbox" class="custom-control-input"
-                                           id="downDateFailed" required <%= (serverSettings?.server?.downDateFailed) ? "checked" : "" %>>
+                                    <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                           id="allowMultiSelect" required <%= (serverSettings?.filament?.allowMultiSelect) ? "checked" : "" %>>
                                     <label class="custom-control-label"
-                                           for="downDateFailed">Downdate failed/cancelled</label>
-                                    <div class="valid-feedback">Downdate usage
+                                           for="allowMultiSelect">Allow Multiple Select</label>
+                                    <div class="valid-feedback">Select multiple
                                     </div>
-                                    <div class="invalid-feedback">Ignore usage
+                                    <div class="invalid-feedback">Select single
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    <% } %>
-                    <div class="col-lg-12">
+                        <div class="col-lg-12">
                         <h5>Filament Manager Sync</h5>
-                        <div class="row">
-                            <div class="col-4">
-                                <div class="alert alert-info" role="alert">
-                                    <h5>Update your instances settings</h5>
-                                    The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.
-                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
-                                            class="btn btn-outline-dark btn-block mt-1">
-                                        Setup Your Farm!
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="alert alert-info" role="alert">
+                            <h5>Update your instances settings</h5>
+                            The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.
+                            <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
+                                    class="btn btn-outline-dark btn-block mt-1">
+                                Setup Your Farm!
+                            </button>
                         </div>
                         <p class="mb-1">Click the button below to activate filament
                             manager plugin and link it to OctoFarm. Please read the
                             notes below before proceeding.</p>
-                        <code><b>Note:</b> OctoFarm expects filament manager
+                        <code><b>Note:</b></code> <span>OctoFarm expects filament manager
                             installed on every instance. If it isn't, and you
                             activate it you run the risk of some updates/selections
-                            failing to register.</code>
+                            failing to register.</span>
                         <br>
-                        <code><b>Note:</b> You must also have all these instances
+                        <code><b>Note:</b></code> <span>You must also have all these instances
                             setup with a postgres database. Without this you will
                             not be able to select filament on every
-                            instance.</code>
+                            instance.</span>
+                        <br>
+                        <code><b>Note:</b></code> <span>Any spool within OctoFarm will be deleted
+                            upon successful sync and replaced with those on your filament manager database...</span>
                         <% if(!serverSettings.filamentManager){ %>
-                            <center>
+                            <span class="text-center">
                                 <br>
-                                <button id="resyncFilamentManagerBtn" type="button"
+                                <button id="setupFilamentManagerBtn" type="button"
                                         class="btn btn-warning text-dark mb-1 btn-lg"><i
                                             class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
                                 </button>
-                            </center>
+
                         <% }else{ %>
-                            <center>
-                                <br>
-                                <button id="resyncFilamentManagerBtn" type="button"
-                                        class="btn btn-warning text-dark mb-1 btn-lg"><i
-                                            class="fas fa-sync"></i><br> Resync Spools / Profiles
-                                </button>
                                 <br>
                                 <button id="disableFilamentManager" type="button"
                                         class="btn btn-danger mb-1 btn-lg"><i
                                             class="fas fa-skull-crossbones"></i><br>
                                     Disable Filament Manager
                                 </button>
-                            </center>
+                            </span>
                         <% } %>
                     </div>
                 </div>
@@ -434,16 +465,16 @@
                     </div>
                 </div>
                  <div class="row">
-                         <% const viewNames = [ "Panel", "List", "Camera", "Group", "Current Operations", "Combined" ] %>
+                         <% const viewNames = [ "Panel", "List", "Camera", "Group", "Current Operations", "Super List" ] %>
                          <% Object.keys(serverSettings.monitoringViews.toJSON()).forEach((key, index) => { %>
                              <div class="col-md-4 col-lg-2">
                                  <form class="was-validated">
                                      <div class="custom-control custom-checkbox mb-3">
                                          <input type="checkbox" class="custom-control-input"
-                                                id="monitoring<%= key %>" required <%= (serverSettings.monitoringViews[key]) ? "checked" : "" %>
+                                                id="monitoring-<%= key %>" required <%= serverSettings.monitoringViews[key] ? "checked" : "" %>
                                          >
                                          <label class="custom-control-label"
-                                                for="monitoring<%= key %>"><%= viewNames[index] %> View</label>
+                                                for="monitoring-<%= key %>"><%= viewNames[index] %> View</label>
                                          <div class="valid-feedback"><%= viewNames[index] %> View Enabled</div>
                                          <div class="invalid-feedback"><%= viewNames[index] %> View Disabled</div>
                                      </div>
@@ -456,7 +487,7 @@
                  aria-labelledby="server-history-list">
                 <div class="alert alert-secondary" role="alert">
                     OctoFarm has the ability to save a snapshot/thumbnail into
-                    HistoryRoutes. These options are turned on by default as it will check
+                    History. These options are turned on by default as it will check
                     if the thumbnail/camera url exist before actually saving.
                 </div>
                 <div class="alert alert-warning text-dark text-dark" role="alert">
@@ -632,7 +663,7 @@
                                 data-target="#collapseExample2"
                                 aria-expanded="false"
                                 aria-controls="collapseExample2">
-                            HistoryRoutes Information
+                            History Information
                         </button>
                         <button class="btn btn-primary" type="button"
                                 data-toggle="collapse"
@@ -701,7 +732,7 @@
                     <div class="collapse" id="collapseExample2"
                          data-parent="#influxParent">
                         <div class="alert alert-dark" role="alert">
-                            HistoryRoutes information will be sent when a print is logged
+                            History information will be sent when a print is logged
                             as completed or failed (cancelled / error).
                         </div>
                         <div class="alert alert-warning text-dark text-dark" role="alert">

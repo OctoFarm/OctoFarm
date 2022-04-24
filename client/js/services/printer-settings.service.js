@@ -4,6 +4,7 @@ import Calc from "../utils/calc.js";
 import Script from "./octofarm-scripts.service.js";
 import {ApplicationError} from "../exceptions/application-error.handler";
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import "../utils/cleanup-modals.util"
 
 let currentPrinterIndex;
 let printerOnline;
@@ -11,13 +12,6 @@ let currentPrinter;
 let pageElements;
 let currentPrintersInformation;
 const NO_PREFERENCE = "<option value=\"0\">No Preference</option>"
-
-// Close modal event listeners...
-$("#connectionModal").on("hidden.bs.modal", function (e) {
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
 
 export async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements

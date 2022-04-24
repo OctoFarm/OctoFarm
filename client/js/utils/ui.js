@@ -14,6 +14,10 @@ const currentModals = [
 ];
 
 export default class UI {
+  static elementsScrollPosition = {
+    scrollTop: null,
+    scrollLeft: null
+  }
   //Colour function
   static getColour(state) {
     if (state === "Operational") {
@@ -110,7 +114,7 @@ export default class UI {
   }
   //REFACTOR: Move to a templates folder
   static returnSpinnerTemplate() {
-    return "<i class=\"fas fa-spinner fa-spin\"></i>";
+    return `<i class="fas fa-spinner fa-spin"></i>`;
   }
 
   static removeLoaderFromElementInnerHTML(element) {
@@ -278,15 +282,40 @@ export default class UI {
     }
   }
 
-  static addDisplayNoneToElement(element) {
+  static removeDisplayNoneFromElement(element) {
     if (element.classList.contains("d-none")) {
       element.classList.remove("d-none");
     }
   }
 
-  static removeDisplayNoneFromElement(element) {
+  static addDisplayNoneToElement(element) {
     if (!element.classList.contains("d-none")) {
       element.classList.add("d-none");
+    }
+  }
+
+
+  static removeFaSpinFromElement(element) {
+    if (element.classList.contains("fa-spin")) {
+      element.classList.remove("fa-spin");
+    }
+  }
+
+  static addFaSpinToElement(element) {
+    if (!element.classList.contains("fa-spin")) {
+      element.classList.add("fa-spin");
+    }
+  }
+
+  static addNotYetToElement(element){
+    if (!element.classList.contains("notyet")) {
+      element.classList.add("notyet");
+    }
+  }
+
+  static removeNotYetFromElement(element){
+    if (element.classList.contains("notyet")) {
+      element.classList.remove("notyet");
     }
   }
 
@@ -296,11 +325,11 @@ export default class UI {
     if (e.target.innerHTML.includes("running")) {
       e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disable";
       e.target.title = "Printer is Disabled, click to enable";
-      printerCard.classList = "printerDisabled";
+      printerCard.classList = "";
     } else if (e.target.innerHTML.includes("wheelchair")) {
       e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enable";
       e.target.title = "Printer is Enabled, click to disable";
-      printerCard.classList = "";
+      printerCard.classList = "printerDisabled";
     }
   }
 
@@ -375,4 +404,14 @@ export default class UI {
       return x[0].toUpperCase() + x.substr(1).toLowerCase();
     }).join(" ");
   };
+
+  static captureScrollPosition(element){
+    this.elementsScrollPosition.scrollTop = element.scrollTop;
+    this.elementsScrollPosition.scrollLeft = element.scrollLeft;
+  }
+  static reApplyScrollPosition(element){
+    element.scrollTop = this.elementsScrollPosition.scrollTop;
+    element.scrollLeft = this.elementsScrollPosition.scrollLeft;
+  }
+
 }

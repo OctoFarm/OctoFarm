@@ -1,5 +1,5 @@
 import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
-
+import OctoFarmClient from "./services/octofarm-client.service";
 const octoFarmErrorModalElement = "#octofarmErrorModal";
 let dealingWithError = false;
 
@@ -13,7 +13,7 @@ function returnErrorMessage(options) {
      <div class="py-3">
         Please report this error to <a href="https://github.com/octofarm/octofarm/issues">OctoFarm Issues</a>!
      </div>
-     ${options.message}
+     ${options?.message ? options.message: options.toString()}
   `;
 }
 
@@ -30,11 +30,28 @@ function returnModalDeveloperInfo(options) {
   `;
 }
 
-function openErrorModal(options) {
-  if (!options?.statusCode) {
-    options.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
-    options.name = ClientErrors.UNKNOWN_ERROR.type;
+function returnDeveloperObject(options) {
+  const { lineNumber, columnNumber, fileName, stack } = options
+  return {
+    lineNumber,
+    columnNumber,
+    fileName,
+    stack
   }
+}
+
+function openErrorModal(options) {
+  let errorObject = {};
+  if (!options?.statusCode || options.statusCode === 999) {
+    errorObject.message = options.toString();
+    errorObject.statusCode = ClientErrors.UNKNOWN_ERROR.statusCode;
+    errorObject.name = ClientErrors.UNKNOWN_ERROR.type;
+    errorObject.type = ClientErrors.UNKNOWN_ERROR.type;
+    errorObject.code = ClientErrors.UNKNOWN_ERROR.code;
+    errorObject.color = ClientErrors.UNKNOWN_ERROR.color;
+    errorObject.developerMessage = returnDeveloperObject(options);
+  }
+
   const apiErrorTitle = document.getElementById("apiErrorTitle");
   const apiErrorMessage = document.getElementById("apiErrorMessage");
   const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
@@ -42,13 +59,21 @@ function openErrorModal(options) {
   apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
+  if(errorObject?.statusCode === 999){
+    setTimeout(async () => {
+      await OctoFarmClient.sendError(errorObject)
+    }, 1000)
+    if(options.code === "SILENT_ERROR"){
+      return;
+    }
+
+  }
   setTimeout(() => {
     $(octoFarmErrorModalElement).modal("show");
-  }, 3000)
-
+  }, 2000)
 }
 
-function handleEvent() {
+function handleEvent(event) {
   if (!event?.reason) {
     openErrorModal(event);
   } else {

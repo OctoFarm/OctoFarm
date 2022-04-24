@@ -56,11 +56,7 @@ const localStorageKeys = {
 };
 
 const settingsElements = {
-  onlinePolling: {
-    seconds: document.getElementById("webSocketThrottle")
-  },
   server: {
-    port: document.getElementById("serverPortNo"),
     loginRequired: document.getElementById("requireLogin"),
     registration: document.getElementById("requireRegistration")
   },
@@ -74,7 +70,8 @@ const settingsElements = {
     filamentCheck: document.getElementById("checkFilament"),
     hideEmpty: document.getElementById("hideEmpty"),
     downDateFailed: document.getElementById("downDateFailed"),
-    downDateSuccess: document.getElementById("downDateSuccess")
+    downDateSuccess: document.getElementById("downDateSuccess"),
+    allowMultiSelect: document.getElementById("allowMultiSelect")
   },
   history: {
     snapshot: {
@@ -105,12 +102,12 @@ const settingsElements = {
     }
   },
   monitoringViews: {
-    panel: document.getElementById("monitoringpanel"),
-    list: document.getElementById("monitoringlist"),
-    camera: document.getElementById("monitoringcamera"),
-    group: document.getElementById("monitoringgroup"),
-    currentOperations: document.getElementById("monitoringcurrentOperations"),
-    combined: document.getElementById("monitoringcombined")
+    panel: document.getElementById("monitoring-panel"),
+    list: document.getElementById("monitoring-list"),
+    camera: document.getElementById("monitoring-camera"),
+    group: document.getElementById("monitoring-group"),
+    currentOperations: document.getElementById("monitoring-currentOperations"),
+    combined: document.getElementById("monitoring-combined")
   }
 };
 

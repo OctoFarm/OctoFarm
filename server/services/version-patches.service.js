@@ -15,8 +15,15 @@ const patchPrinterValues = async (printer) => {
   selectedFilamentNotArrayPatch(printer);
   await collateSelectedFilament(printer);
   categoryPatch(printer);
+  nameSearchPatch(printer);
   return printer;
 };
+
+const nameSearchPatch = (printer) => {
+  if(printer?.settingsAppearance?.name.length === 0){
+    printer.settingsAppearance.name = "Grabbing from OctoPrint..."
+  }
+}
 
 const categoryPatch = (printer) => {
   if (!printer?.category) {

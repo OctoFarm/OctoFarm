@@ -2,6 +2,8 @@ import { asyncParse, debounce } from "./utils/sse.utils";
 import { MESSAGE_TYPES } from "../../server/constants/sse.constants"
 import { updateLiveFileInformation } from "./pages/file-manager/file-manager-sse.handler";
 import { triggerCountDownTimer, drawModal, setServerAlive, reconnectFrequency } from "./services/amialive.service";
+import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "./exceptions/application-error.handler";
 
 
 // Keeping hold of this, may return a use for later...
@@ -113,6 +115,9 @@ function setupEventSource() {
     await drawModal();
     evtSource.close();
     reconnectFunc();
+    const errorObject = ClientErrors.SILENT_ERROR;
+    errorObject.message =  `Events Service - ${e.target.url}: ${e.target.readyState}`
+    throw new ApplicationError(errorObject)
   };
   evtSource.onclose = async function (e) {
     window.serverOffline = true;

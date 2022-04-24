@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { shiftOverItems } = require("../utils/array.util");
 
 const PrinterSchema = new mongoose.Schema({
   disabled: {

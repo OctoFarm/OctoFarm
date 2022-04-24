@@ -69,14 +69,16 @@ const listActiveClients = (req, res) => {
  * @param id Object ID relating to either files / printers / element in UI.
  * @param type Message type so the client knows what to do with it
  * @param message The actual message object the client has to deal with. 1 key 1 value only.
+ * @param printerInfo If required by message values, then send printer info. Not a required key...
  */
-const notifySubscribers = (id, type, message) => {
+const notifySubscribers = (id, type, message, printerInfo = undefined) => {
   if ((typeof message === "object" || Array.isArray(message)) && message !== null) {
     // Send a message to each subscriber
     const payload = {
       type,
       id,
-      message
+      message,
+      printerInfo
     };
 
     clientList.forEach((client) => {
