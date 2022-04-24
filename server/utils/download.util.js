@@ -14,12 +14,13 @@ const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
   await new Promise((resolve, reject) => {
     res.body.pipe(fileStream);
     res.body.on("error", reject);
-    fileStream.on("finish", resolve);
+    fileStream.on("close", async () => {
+      resolve()
+      if(!!deleteTimelapse){
+        deleteTimelapse();
+      }
+    });
   });
-  console.log("SHOULD AWAIT!")
-  if(!!deleteTimelapse){
-    deleteTimelapse();
-  }
 };
 
 const downloadImage = async (url, path, apiKey, callback) => {
