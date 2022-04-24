@@ -9,13 +9,116 @@ import {
     closePrinterManagerModalIfOffline,
     imageOrCamera
 } from "../../../utils/octofarm.utils";
+import ApexCharts from "apexcharts";
+
+$("#printerManagerModal").on("hidden.bs.modal", function () {
+    const tempChart = document.getElementById("temperatureChart")
+    if (tempChart) {
+        resetChartData(tempChart);
+    }
+});
+
+
+let chart = null;
+
+const options = {
+    chart: {
+        id: "realtime",
+        type: "line",
+        width: "100%",
+        height: "150",
+        animations: {
+            enabled: false,
+            easing: "linear",
+            dynamicAnimation: {
+                speed: 1000
+            }
+        },
+        toolbar: {
+            show: false
+        },
+        zoom: {
+            enabled: false
+        },
+        background: "#303030",
+    },
+    dataLabels: {
+        enabled: false
+    },
+    colors: [
+        "#3e0b0b",
+        "#fc2929",
+        "#003b28",
+        "#00ffae",
+        "#9b9300",
+        "#fff200",
+        "#190147",
+        "#5900ff",
+        "#5d0167",
+        "#e600ff",
+        "#5a4001",
+        "#ffb700",
+        "#2d4c0d",
+        "#93fc29",
+        "#450124",
+        "#ff0084"
+    ],
+    stroke: {
+        curve: "smooth"
+    },
+    toolbar: {
+        show: false
+    },
+    markers: {
+        size: 0
+    },
+    theme: {
+        mode: "dark"
+    },
+    noData: {
+        text: "Loading..."
+    },
+    series: [],
+    yaxis: [
+        {
+            title: {
+                text: "Temperature"
+            },
+            labels: {
+                formatter(value) {
+                    if (value !== null) {
+                        return `${value}°C`;
+                    }
+                }
+            },
+        }
+    ],
+    xaxis: {
+        //tickAmount: "dataPoints",
+        type: "category",
+        tickAmount: 10,
+        labels: {
+            formatter(value) {
+                const date = new Date(value * 1000);
+                return (
+                    date.toLocaleTimeString()
+                );
+            }
+        }
+    },
+    legend: {
+        show: true
+    },
+    tooltip: {
+        enabled: false
+    }
+};
 
 let currentIndex;
 let currentPrinter;
 
 export const initialiseCurrentJobPopover = (index, printers, printerControlList) => {
     //clear camera
-
         if (index !== "") {
             currentIndex = index;
             const id = _.findIndex(printers, function (o) {
@@ -32,6 +135,9 @@ export const initialiseCurrentJobPopover = (index, printers, printerControlList)
             applyListeners(currentPrinter, elements);
             updateCurrentJobStatus(currentPrinter, elements);
             // applyTemps(currentPrinter, elements)
+            resetChartData(elements.temperatureChart);
+            formatChartData(currentPrinter.tools);
+            updateChartData();
         } else {
             const id = _.findIndex(printers, function (o) {
                 return o._id === currentIndex;
@@ -40,7 +146,97 @@ export const initialiseCurrentJobPopover = (index, printers, printerControlList)
             const elements = returnPageElements();
             updateCurrentJobStatus(currentPrinter, elements);
             document.getElementById("printerManagerModal").style.overflow = "auto";
+            formatChartData(currentPrinter.tools)
+            updateChartData();
         }
+}
+
+const resetChartData = (tempChartElement) => {
+    if(chart !== null){
+        chart.destroy();
+    }
+    chart = null;
+    options.series = [];
+    if(!!tempChartElement){
+        chart = new ApexCharts(tempChartElement, options);
+        chart.render();
+    }
+
+}
+
+const createChartBase = function (tools) {
+    // create a new object to store full name.
+    let keys = Object.keys(tools[0]);
+    let array = [];
+    for (const element of keys) {
+        if (element !== "time") {
+            let target = {};
+            let actual = {};
+            target = {
+                name: element + "-target",
+                data: [].slice()
+            };
+            actual = {
+                name: element + "-actual",
+                data: [].slice()
+            };
+            array.push(target);
+            array.push(actual);
+        }
+    }
+    // return our new object.
+    return array;
+};
+
+const formatChartData = (tools) => {
+    if (!!tools) {
+        if(options.series.length === 0){
+            options.series = createChartBase(tools)
+        }else{
+            let keys = Object.keys(tools[0]);
+            for (const element of keys) {
+                if (element !== "time") {
+                    let actual = {
+                        x: tools[0]["time"],
+                        y: tools[0][element].actual
+                    };
+                    let target = {
+                        x: tools[0]["time"],
+                        y: tools[0][element].target
+                    };
+
+                    //get array position...
+                    let arrayTarget = options.series
+                        .map(function (e) {
+                            return e.name;
+                        })
+                        .indexOf(element + "-target");
+                    let arrayActual = options.series
+                        .map(function (e) {
+                            return e.name;
+                        })
+                        .indexOf(element + "-actual");
+                    if (options.series[arrayTarget].data.length <= 100) {
+                        options.series[arrayTarget].data.push(target);
+                    }else{
+                        options.series[arrayTarget].data.shift()
+                    }
+                    if (options.series[arrayActual].data.length <= 100) {
+                        options.series[arrayActual].data.push(actual);
+                    }else{
+                        options.series[arrayActual].data.shift()
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+const updateChartData = () => {
+    if(chart !== null){
+        chart.updateSeries(options.series);
+    }
 }
 
 const returnPageElements = () => {
@@ -71,7 +267,8 @@ const returnPageElements = () => {
             printerPortDrop: document.getElementById("printerPortDrop"),
             printerBaudDrop: document.getElementById("printerBaudDrop"),
             printerProfileDrop: document.getElementById("printerProfileDrop"),
-            status: document.getElementById("pmStatus")
+            status: document.getElementById("pmStatus"),
+            temperatureChart: document.getElementById("temperatureChart")
     }
 }
 
@@ -85,8 +282,10 @@ const loadPrintersJobStatus = (printer) => {
     let hideCameraDisplay = "";
     let thumbnailElement = "";
     let printStatusClass = "col-md-8 col-lg-9 text-center";
+    let temperatureClass = "col-md-12 text-center";
     if (!!printer?.currentJob?.thumbnail) {
-        thumbnailClass = "col-md-3 col-lg-3";
+        thumbnailClass = "col-md-3 col-lg-3 text-center";
+        temperatureClass = "col-md-9 text-center";
         thumbnailElement = `<img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
     }
     if(printer.camURL === ""){
@@ -116,38 +315,47 @@ const loadPrintersJobStatus = (printer) => {
         <!-- Print Status -->  
         <div class="${printStatusClass}">       
             <h5>Print Status</h5><hr>    
-               <div class="progress mb-2">
+               <div class="progress mb-1">
                  <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="100">Loading... </div>
                </div>
                <div class="row">
-                 <div id="fileThumbnail" class="${thumbnailClass}">${thumbnailElement}</div>
-                 <div class="col-md-4 col-lg-4">
+                 <div class="col-md-4 col-lg-2">
                      <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
                  </div>
                  <div class="col-md-3 col-lg-2">
                         <b>Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">Loading...</p>
                  </div>
-                 <div class="col-md-3 col-lg-3">
+                 <div class="col-md-3 col-lg-2">
                     <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
                  </div>
-
-               </div>
-                <div class="row text-center">
-                    <div class="col-md-4 col-lg-3">
+                    <div class="col-md-4 col-lg-2">
                         <b>Expected Time: </b><p class="mb-1" id="pmExpectedTime">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-3">
+                    <div class="col-md-4 col-lg-2">
                         <b>Time Remaining: </b><p class="mb-1" id="pmTimeRemain">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-3">                             
+                    <div class="col-md-4 col-lg-2">                             
                       <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-3">
+                    <div class="col-md-4 col-lg-2">
                       <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>                          
                     </div>
+               </div>
+                <div class="row text-center">
+
                 </div>
-           </div>   
-                <div class="col-12 text-center d-none" id="dlpPluginDataTitle">
+           </div>  
+        <div id="fileThumbnail" class="${thumbnailClass}">
+           <h5>Thumbnail</h5><hr>
+            ${thumbnailElement}
+            </div>   
+        <div class="${temperatureClass} text-center">
+           <h5>Temperature</h5><hr>
+           <div id="temperatureChart">
+           
+           </div>
+        </div>
+        <div class="col-12 text-center d-none" id="dlpPluginDataTitle">
               <h5>Additional Information</h5><hr>               
               <div class="row">
                 <div class="col-sm-3 col-lg-2">
@@ -173,12 +381,12 @@ const loadPrintersJobStatus = (printer) => {
         <div class="col-lg-12 text-center">
                  <h5>Expected Costs</h5><hr> 
         </div>   
-          <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
+          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Materials: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>  
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Electricity: </b><br><p class="tag mb-1" id="pmExpectedElectricity">Loading...</p></div>
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Maintainance: </b><br><p class="tag mb-1" id="pmExpectedMaintainance">Loading...</p></div>
            <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Total Printer: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p></div>
-          <div class="col-md-4 col-lg-2 text-center"><b>Total Job: </b><p class="mb-1" id="pmJobCosts">Loading...</p></center></div>
+          <div class="col-md-4 col-lg-1 text-center"><b>Total Job: </b><p class="mb-1" id="pmJobCosts">Loading...</p></center></div>
            
         </div>
 

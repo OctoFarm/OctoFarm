@@ -1,4 +1,4 @@
-$("#connectionModal").on("hidden.bs.modal", function () {
+$("#printerManagerModal").on("hidden.bs.modal", function () {
     if (document.getElementById("connectionAction")) {
         document.getElementById("connectionAction").remove();
     }

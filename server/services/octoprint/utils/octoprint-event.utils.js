@@ -312,7 +312,7 @@ const capturePrintFailed = (id, data) => {
   HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, false)
     .then((res) => {
       logger.info("Successfully captured failed print!", res);
-      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res._id)
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "failed", res)
         .then((resScript) => {
           logger.info("Successfully checked failed script", resScript);
         })
@@ -329,7 +329,7 @@ const captureFinishedPrint = (id, data, success) => {
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  const { _id } = HistoryCollection.capturePrint(
+  HistoryCollection.capturePrint(
     payloadData,
     printer,
     job,
@@ -339,7 +339,7 @@ const captureFinishedPrint = (id, data, success) => {
   )
     .then((res) => {
       logger.info("Successfully captured print!", res);
-      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", res._id)
+      ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "done", res)
         .then((resScript) => {
           logger.info("Successfully print finished script", resScript);
           return res;

@@ -111,6 +111,19 @@ async function redrawFilamentDropDownList (element, printer){
     }
 }
 
+export async function drawHistoryDropDown (element, selectedID){
+    element.innerHTML = "";
+    const filamentDropDown = await returnDropDownList();
+    element.insertAdjacentHTML("beforeend", filamentDropDown[0]);
+    filamentDropDown.shift();
+    filamentDropDown.forEach((spool) => {
+        element.insertAdjacentHTML("beforeend", dropDownListTemplate(spool, true));
+    });
+    if(!!selectedID){
+        element.value = selectedID;
+    }
+}
+
 export async function fillFilamentDropDownList(element, printer, toolIndex) {
     await redrawFilamentDropDownList(element, printer)
     element.addEventListener("change", async (event) => {

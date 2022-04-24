@@ -101,8 +101,8 @@ class PrinterCleanerService {
     }
 
     if (typeof tempHistory !== "undefined") {
-      for (let h = 0; h < tempHistory.length; h++) {
-        let hist = tempHistory[h].currentTemp;
+      for (const element of tempHistory) {
+        let hist = element.currentTemp;
         const reFormatTempHistory = async function (tempHistory) {
           // create a new object to store full name.
           let keys = Object.keys(tempHistory);
@@ -168,11 +168,11 @@ class PrinterCleanerService {
       }
     }
 
-    // currentErrorLogs = orderBy(currentErrorLogs, ["date"], ["desc"]);
+    currentErrorLogs = orderBy(currentErrorLogs, ["date"], ["desc"]);
     currentOctoFarmLogs = orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
-    // currentTempLogs = orderBy(currentTempLogs, ["date"], ["desc"]);
-    // currentPluginManagerLogs = orderBy(currentPluginManagerLogs, ["date"], ["desc"]);
-    // currentKlipperLogs = orderBy(currentKlipperLogs, ["date"], ["desc"]);
+    currentTempLogs = orderBy(currentTempLogs, ["date"], ["desc"]);
+    currentPluginManagerLogs = orderBy(currentPluginManagerLogs, ["date"], ["desc"]);
+    currentKlipperLogs = orderBy(currentKlipperLogs, ["date"], ["desc"]);
 
     return {
       currentErrorLogs,

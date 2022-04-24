@@ -47,11 +47,14 @@ function ensureBaseFolderExists() {
 class HistoryCollection {
   static async resyncFilament(printer, octoPrintApiClient) {
     const returnSpools = [];
-    for (let i = 0; i < printer.selectedFilament.length; i++) {
-      if (printer.selectedFilament[i] !== null) {
-        const filamentID = printer.selectedFilament[i].spools.fmID;
+    for (const element of printer.selectedFilament) {
+      if (element !== null) {
+        const filamentID = element.spools.fmID;
         if (!filamentID) {
-          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
+          logger.error(
+            `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`,
+            element.spools
+          );
         }
         const response = await octoPrintApiClient.getPluginFilamentManagerFilament(
           printer,
@@ -61,24 +64,29 @@ class HistoryCollection {
         logger.info(`${printer.printerURL}: spools fetched. Status: ${response.status}`);
         const sp = await response.json();
 
-        const spoolID = printer.selectedFilament[i]._id;
+        const spoolID = element._id;
         const spoolEntity = await Spool.findById(spoolID);
         if (!spoolEntity) {
-          throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
+          logger.error(
+            `Spool database entity by ID '${spoolID}' not found. Cant update filament.`,
+            element
+          );
+          const profileID = JSON.stringify(spoolEntity.spools.profile);
+          spoolEntity.spools = {
+            name: sp.spool.name,
+            profile: profileID,
+            price: sp.spool.cost,
+            weight: sp.spool.weight,
+            used: sp.spool.used,
+            tempOffset: sp.spool.temp_offset,
+            fmID: sp.spool.id
+          };
+          logger.info(`${printer.printerURL}: updating... spool status ${spoolEntity.spools}`);
+          spoolEntity.markModified("spools");
+          await spoolEntity.save();
+          returnSpools.push(spoolEntity);
         }
-        spoolEntity.spools = {
-          name: sp.spool.name,
-          profile: sp.spool.profile.id,
-          price: sp.spool.cost,
-          weight: sp.spool.weight,
-          used: sp.spool.used,
-          tempOffset: sp.spool.temp_offset,
-          fmID: sp.spool.id
-        };
-        logger.info(`${printer.printerURL}: updating... spool status ${spoolEntity.spools}`);
-        spoolEntity.markModified("spools");
-        await spoolEntity.save();
-        returnSpools.push(spoolEntity);
+        return;
       }
     }
 
@@ -302,7 +310,7 @@ class HistoryCollection {
 
   static async deleteTimeLapse(printer, fileName) {
     const deleteTimeLapse = async (fileName) => {
-      return await fetch(`${printer.printerURL}/api/timelapse/${fileName}`, {
+      return fetch(`${printer.printerURL}/api/timelapse/${fileName}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -332,8 +340,6 @@ class HistoryCollection {
         return;
       }
       let workingHistory = historyArchive[currentArchive];
-      let startDateSplit = new Date(workingHistory.startDate);
-      let endDateSplit = new Date(workingHistory.endDate);
       let currentState = " ";
       if (workingHistory.state.includes("Success")) {
         currentState = "Success";
@@ -360,8 +366,8 @@ class HistoryCollection {
         index: parseInt(workingHistory.index),
         state: currentState,
         printer_name: workingHistory.printer,
-        start_date: trueStartDate,
-        end_date: trueEndDate,
+        start_date: new Date(workingHistory.startDate),
+        end_date: new Date(workingHistory.endDate),
         print_time: parseInt(workingHistory.printTime),
         file_name: workingHistory.file.name,
         file_upload_date: parseFloat(workingHistory.file.uploadDate),
@@ -461,28 +467,6 @@ class HistoryCollection {
     return { startDate, endDate };
   }
 
-  static async populateFilamentProfile(selectedFilament) {
-    const serverSettingsCache = SettingsClean.returnSystemSettings();
-    const profiles = await filamentProfiles.find({});
-    if (selectedFilament !== null && Array.isArray(selectedFilament)) {
-      let profileId = [];
-      selectedFilament.forEach((spool, index) => {
-        if (spool !== null) {
-          if (serverSettingsCache.filamentManager) {
-            profileId = findIndex(profiles, function (o) {
-              return o.profile.index == selectedFilament[index].spools.profile;
-            });
-          } else {
-            profileId = findIndex(profiles, function (o) {
-              return o._id == selectedFilament[index].spools.profile;
-            });
-          }
-          selectedFilament[index].spools.profile = profiles[profileId].profile;
-        }
-      });
-    }
-    return selectedFilament;
-  }
   // repeated... could have imported I suppose...
   static generateWeightOfJobForASpool(length, filament, completionRatio) {
     if (!length) {
@@ -638,17 +622,14 @@ class HistoryCollection {
 
       const { startDate, endDate } = this.generateStartEndDates(payload);
 
-      // populate the filament profile
-      let currentSelectedFilament = await this.populateFilamentProfile(printer.selectedFilament);
-
-      // Need to actually use this one day... think it got superseded and isn't required anymore
-      const previousFilament = cloneDeep(currentSelectedFilament);
-      let currentFilament = cloneDeep(currentSelectedFilament);
 
       //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
-      if (serverSettingsCache.filamentManager && Array.isArray(currentFilament)) {
-        currentFilament = await HistoryCollection.resyncFilament(printer, printerAPIConnector);
-        logger.info("Grabbed latest filament values", currentFilament);
+      if (serverSettingsCache.filamentManager && Array.isArray(printer.selectedFilament)) {
+        printer.selectedFilament = await HistoryCollection.resyncFilament(
+          printer,
+          printerAPIConnector
+        );
+        logger.info("Grabbed latest filament values", printer.selectedFilament);
       }
 
       //If we're not using filament manager plugin... we need to check if the user has enabled automated spool updating.
@@ -664,8 +645,7 @@ class HistoryCollection {
         startDate,
         endDate,
         printTime: Math.round(payload.time),
-        filamentSelection: currentFilament,
-        previousFilamentSelection: previousFilament,
+        filamentSelection: printer.selectedFilament,
         job,
         notes: "",
         snapshot: "",
@@ -683,7 +663,7 @@ class HistoryCollection {
         await this.checkForAdditionalSuccessProperties(
           payload,
           job,
-          currentFilament,
+          printer.selectedFilament,
           state,
           printer,
           saveHistory,
@@ -695,7 +675,7 @@ class HistoryCollection {
         await this.checkForAdditionalFailureProperties(
           payload,
           job,
-          currentFilament,
+          printer.selectedFilament,
           state,
           printer,
           saveHistory,
@@ -707,20 +687,27 @@ class HistoryCollection {
       await this.updateFilamentInfluxDB(
         printer.selectedFilament,
         printHistory,
-        previousFilament,
+        printer.selectedFilament,
         printer
       );
 
       await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
-
-      await saveHistory.save();
+      console.log(saveHistory)
+      await saveHistory
+        .save()
+        .then((res) => {
+          logger.info("Successfully captured print!", res);
+        })
+        .catch((e) => {
+          logger.error("Failed to capture print!", e);
+        });
 
       setTimeout(async () => {
         // Re-generate history cache...
         await getHistoryCache().initCache();
       }, 5000);
 
-      return saveHistory;
+      return saveHistory._id;
     } catch (e) {
       return e;
     }
