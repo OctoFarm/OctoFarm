@@ -176,7 +176,6 @@ export async function printerEmergencyStop(printer) {
     commands: ["M112"]
   };
   const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
-  console.log(status)
   if (status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
@@ -190,28 +189,20 @@ export async function printerEmergencyStop(printer) {
   }
 }
 
-export async function printerHomeAllAxis(printer, result) {
-  let lines = result.match(/[^\r\n]+/g);
-  lines = lines.map(function (name) {
-    if (!name.includes("=")) {
-      return name.toLocaleUpperCase();
-    } else {
-      return name;
-    }
-  });
+export async function printerHomeAllAxis(printer) {
   const opt = {
-    commands: lines
+    commands: ["G28"]
   };
-  const post = await OctoPrintClient.post(printer, "printer/command", opt);
-  if (post.status === 204) {
+  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  if (status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
-      message: "Successfully sent your gcode script to the client!"
+      message: "Home printer command has successfully been actioned!"
     };
   } else {
     return {
       status: bulkActionsStates.ERROR,
-      message: "Failed to send your gcode script to the client!"
+      message: "Home printer command failed to send!"
     };
   }
 }

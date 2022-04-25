@@ -4,7 +4,7 @@ import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
 import {printerIsDisconnectedOrError, printerIsOnline, printerIsPrinting} from "../utils/octofarm.utils";
-import {printerEmergencyStop} from "./octoprint/octoprint-printer-commands";
+import {printerEmergencyStop, printerHomeAllAxis} from "./octoprint/octoprint-printer-commands";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -436,6 +436,12 @@ function addEventListeners(printer) {
         e.target.disabled = false;
       }
     });
+  })
+  document.getElementById(`printerHome-${printer._id}`).addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const {status, message} = await printerHomeAllAxis(printer);
+    UI.createAlert(status, message, 3000, "Clicked")
+    e.target.disabled = false;
   })
 }
 
