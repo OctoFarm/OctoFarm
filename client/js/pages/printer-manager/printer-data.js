@@ -68,7 +68,7 @@ function updatePrinterState(printer) {
   );
 }
 function updatePrinterInfo(printer) {
-  const printName = document.getElementById(`printerName-${printer._id}`);
+  const printName = document.getElementById(`name-${printer._id}`);
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
 

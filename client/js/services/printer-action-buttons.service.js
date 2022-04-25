@@ -319,7 +319,7 @@ function addEventListeners(printer) {
         const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
         //TODO enable quick connect setting for this to be enabled or disabled...
         if(canPowerOnThePrinter){
-          await PrinterPowerService.sendPowerCommandForPrinter(printer);
+          await PrinterPowerService.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOnURL, printer.powerSettings.powerOnCommand, "power on");
           // Should be long enough for the printer to boot up.
           // TODO also make customisable
           await UI.delay(3000)
