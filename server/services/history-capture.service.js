@@ -223,7 +223,7 @@ class HistoryCollection {
       unrenderedList: timelapseResponse.unrendered
     });
     if (unrenderedTimelapseIndex > -1) {
-      logger.info("Timelapse not rendered yet... re-checking... in 5000ms", {
+      logger.warning("Timelapse not rendered yet... re-checking... in 5000ms", {
         unrenderedTimelapseIndex
       });
       await sleep(10000);
