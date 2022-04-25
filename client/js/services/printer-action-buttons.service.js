@@ -3,7 +3,8 @@ import UI from "../utils/ui";
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
-import {printerIsDisconnectedOrError, printerIsOnline} from "../utils/octofarm.utils";
+import {printerIsDisconnectedOrError, printerIsOnline, printerIsPrinting} from "../utils/octofarm.utils";
+import {printerEmergencyStop} from "./octoprint/octoprint-printer-commands";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -26,7 +27,7 @@ function returnActionBtnTemplate(id, webURL) {
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-          <h6 id="printerActionsHeader-${id}" class="dropdown-header d-none"><i class="fas fa-print"></i> Printer</h6>
+          <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i> Printer</h6>
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerHome-${id}"
@@ -72,10 +73,10 @@ function returnActionBtnTemplate(id, webURL) {
           <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
           <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
           <h6 id="octoPrintPowerDivider" class="dropdown-header"><i class="fab fa-octopus-deploy" disabled></i> OctoPrint</h6>
-          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
-          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
+          <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
+          <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
           <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
-          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item" href="#" disabled><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
+          <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
 
         </div>
       </div>
@@ -425,13 +426,28 @@ function addEventListeners(printer) {
       }
       e.target.disabled = false;
     });
+  // Emergency Stop
+  document.getElementById(`printerEmergency-${printer._id}`).addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    bootbox.confirm("You are about to send \"M112\" to your printer, this will cause an emergency stop! Are you sure?", async function(result){
+      if(result){
+        const {status, message} = await printerEmergencyStop(printer);
+        UI.createAlert(status, message, 3000, "Clicked")
+        e.target.disabled = false;
+      }
+    });
+  })
 }
 
 function checkQuickConnectState(printer) {
   const isOnline = printerIsOnline(printer);
+  const isDisconnectedOrError = printerIsDisconnectedOrError(printer);
+  const isPrinting = printerIsPrinting(printer);
   document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
   document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
   document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
+  document.getElementById("printerHome-"+printer._id).disabled = isPrinting || isDisconnectedOrError;
+  document.getElementById("printerEmergency-"+printer._id).disabled = !isPrinting;
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||

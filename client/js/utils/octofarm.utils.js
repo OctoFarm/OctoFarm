@@ -176,6 +176,14 @@ export function printerIsOnline(printer) {
     return !(disabled || category === "Offline" || category === "Searching...");
 }
 
+export function printerIsPrinting(printer){
+    const { disabled } = printer;
+
+    const {printerState: {colour: {category}}} = printer;
+
+    return !(disabled || category !== "Active");
+}
+
 export function printerIsAvailableToView(printer){
     const { disabled } = printer;
 

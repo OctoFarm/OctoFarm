@@ -100,7 +100,6 @@ function updatePrinterInfo(printer) {
 
 function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
-  console.log(printer.healthChecksPass)
   if (printer?.healthChecksPass === false) {
     UI.removeDisplayNoneFromElement(healthAlert);
     updateAlertsLog({
