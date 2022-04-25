@@ -221,23 +221,22 @@ class HistoryCollection {
     logger.debug("Unrendered Index: ", {
       unrenderedTimelapseIndex,
       unrenderedList: timelapseResponse.unrendered
-    })
+    });
     if (unrenderedTimelapseIndex > -1) {
-      logger.info("Timelapse not rendered yet... re-checking... in 5000ms", {
+      logger.warning("Timelapse not rendered yet... re-checking... in 5000ms", {
         unrenderedTimelapseIndex
       });
       await sleep(10000);
       await this.timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient);
     }
 
-    await sleep(5000);
     const lastTimelapseIndex = timelapseResponse.files.findIndex((o) =>
       o.name.includes(cleanFileName)
     );
     logger.debug("rendered Index: ", {
       lastTimelapseIndex,
       renderedList: timelapseResponse.files
-    })
+    });
     if (lastTimelapseIndex > -1) {
       return HistoryCollection.grabTimeLapse(
         timelapseResponse.files[lastTimelapseIndex].name,
@@ -252,7 +251,6 @@ class HistoryCollection {
     });
 
     return "";
-
   }
 
   /**
@@ -269,18 +267,27 @@ class HistoryCollection {
 
     const filePath = `${PATHS.timelapses}/${id}-${fileName}`;
 
-    await downloadFromOctoPrint(url, filePath, printer.apikey, async function (){
+    await downloadFromOctoPrint(url, filePath, printer.apikey, async function () {
       const serverSettingsCache = SettingsClean.returnSystemSettings();
       if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
         await sleep(30000);
-        logger.info("Deleting time lapse from OctoPrint...", { url, filePath })
+        logger.info("Deleting time lapse from OctoPrint...", { url, filePath });
         await HistoryCollection.deleteTimeLapse(printer, fileName);
-        logger.info("Deleted timelapse from OctoPrint", { fileName })
+        logger.info("Deleted timelapse from OctoPrint", { fileName });
       }
     });
 
     logger.info("Downloaded timelapse from: ", { url });
     logger.info("Saved timelapse to: ", { filePath });
+
+    const historyRecord = await History.findById(id);
+
+    historyRecord.printHistory.timelapse = filePath;
+
+    await historyRecord.save().then(async () => {
+      logger.info("Successfully updated history record with timelapse url... re-running cache...");
+      await getHistoryCache().initCache();
+    });
 
     return filePath;
   }
@@ -521,7 +528,7 @@ class HistoryCollection {
     }
     // This should use the websocket events..
     if (serverSettingsCache.history.timelapse.onComplete) {
-      saveHistory.printHistory.timelapse = await HistoryCollection.timelapseCheck(
+      await HistoryCollection.timelapseCheck(
         printer,
         payload.name,
         payload.time,
@@ -558,7 +565,7 @@ class HistoryCollection {
       );
     }
     if (serverSettingsCache.history.timelapse.onFailure) {
-      saveHistory.printHistory.timelapse = await HistoryCollection.timelapseCheck(
+      await HistoryCollection.timelapseCheck(
         printer,
         payload.name,
         payload.time,
