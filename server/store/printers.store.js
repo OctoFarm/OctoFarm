@@ -78,7 +78,8 @@ class PrinterStore {
         octoPrintUpdate: printer.octoPrintUpdate,
         octoPrintPluginUpdates: printer.octoPrintPluginUpdates,
         systemChecks: printer.systemChecks,
-        connectionOptions: printer.connectionOptions
+        connectionOptions: printer.connectionOptions,
+        powerCommands: printer.powerCommands
       };
     });
 
@@ -114,7 +115,8 @@ class PrinterStore {
         feedRate: printer.feedRate,
         flowRate: printer.flowRate,
         stepRate: printer.stepRate,
-        terminal: printer.terminal
+        terminal: printer.terminal,
+        powerCommands: printer.powerCommands
       };
     });
 
@@ -650,7 +652,7 @@ class PrinterStore {
           ? { maintenanceCosts }
           : { maintenanceCosts: originalPrinter.costSettings.maintenanceCosts })
       };
-      this.updatePrinterDatabase(index, { costSettingsNew });
+      this.updatePrinterDatabase(index, { costSettings: costSettingsNew });
     }
 
     const { name, model, volume, heatedBed, heatedChamber, axes, extruder } = profile;
