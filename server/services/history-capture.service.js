@@ -230,6 +230,8 @@ class HistoryCollection {
       await this.timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient);
     }
 
+    await sleep(10000);
+    
     const lastTimelapseIndex = timelapseResponse.files.findIndex((o) =>
       o.name.includes(cleanFileName)
     );
