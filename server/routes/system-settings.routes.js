@@ -400,7 +400,10 @@ router.get(
     const all = await GcodeDB.find();
     const returnCode = [];
     all.forEach((script) => {
-      if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
+      if (
+        script.printerIds.includes(printerId) ||
+        script.printerIds.includes("99aa99aaa9999a99999999aa")
+      ) {
         returnCode.push(script);
       }
     });

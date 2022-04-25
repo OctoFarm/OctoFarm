@@ -36,6 +36,7 @@
         <div class="col-md-6">
             <label for="gcodeScriptPrinters">Select Printers</label>
             <select multiple class="custom-select" id="gcodeScriptPrinters" size="6">
+                <option value="99aa99aaa9999a99999999aa" selected>Allow all printers</option>
                 <% printers.forEach(printer => { %>
                     <option value="<%= printer._id %>"> <%= printer.printerName %> </option>
                 <% }) %>
