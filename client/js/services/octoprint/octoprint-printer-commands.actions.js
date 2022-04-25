@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint-client.service";
+import OctoPrintClient from "./octoprint-client.service";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 
 export async function printerPreHeatChamber(printer, chamberTemp) {

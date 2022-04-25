@@ -1,8 +1,8 @@
-import UI from "../utils/ui.js";
-import OctoFarmClient from "./octofarm-client.service";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
-import { printActionStatusResponse } from "../services/octoprint/octoprint.helpers-commands"
+import UI from "../../utils/ui.js";
+import OctoFarmClient from "../octofarm-client.service";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
+import { printActionStatusResponse } from "./octoprint.helpers-commands.actions"
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -426,22 +426,28 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
-    if (typeof command === "undefined" || command === "" || command === null) {
-      let post = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey
+    if (!!command || command === "") {
+      try{
+        let post = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Api-Key": printer.apikey
+          }
+        });
+        let status = false;
+        console.log(post)
+        if (post.status === 200 || post.status === 204) {
+          status = post.json();
         }
-      });
-      if (post.status !== 200 || post.status !== 204) {
-        return "No Status";
-      } else {
-        post = await post.json();
-        return post;
+        return status;
+      }catch(e){
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Power Status - ${e}`
+        throw new ApplicationError(errorObject)
       }
     } else {
-      try {
+      try{
         const post = await fetch(url, {
           method: "POST",
           headers: {
@@ -450,23 +456,16 @@ export default class OctoPrintClient {
           },
           body: command
         });
-        let status = "No Status";
+        let status = false;
+        console.log(post)
         if (post.status === 200 || post.status === 204) {
-          status = await post.json();
+          status = post.json();
         }
-
-        const powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
-        if (powerStatusPrinter) {
-          if (status === "No Status") {
-            powerStatusPrinter.style.color = "black";
-          } else if (status[Object.keys(status)[0]]) {
-            powerStatusPrinter.style.color = "green";
-          } else {
-            powerStatusPrinter.style.color = "red";
-          }
-        }
-      } catch (e) {
-        console.log("Printer Power Check failed... classing offline:", e);
+        return status;
+      }catch(e){
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Power Status - ${e}`
+        throw new ApplicationError(errorObject)
       }
     }
   }

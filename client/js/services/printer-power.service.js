@@ -1,264 +1,140 @@
-let listenersApplied = false;
+import {sendPowerCommandToOctoPrint} from "./octoprint/octoprint-client-commands.actions";
+import UI from "../utils/ui";
+import {
+  canWeDetectPrintersPowerState,
+  canWeRestartOctoPrint,
+  canWeRestartOctoPrintHost,
+  canWeShutdownOctoPrintHost,
+  canWeShutdownThePrinter,
+  canWeTurnOnThePrinter, printerIsPrinting
+} from "../utils/octofarm.utils";
+import OctoPrintClient from "./octoprint/octoprint-client.service";
 
 export default class PrinterPowerService {
-  static revealBulkPower() {
-    let bulkPowerBtn = document.getElementById("bulkPowerBtn");
-    if (bulkPowerBtn) {
-      if (bulkPowerBtn.classList.contains("d-none")) {
-        bulkPowerBtn.classList.remove("d-none");
+  static timer = {};
+
+  static async printerIsPoweredOn(printer) {
+    let powerStatus = false;
+    powerStatus = await OctoPrintClient.getPowerStatus(
+        printer,
+        printer.powerSettings.powerStatusURL,
+        printer.powerSettings.powerStatusCommand
+    );
+    return powerStatus;
+  }
+
+  static async revealPowerButtons(printer) {
+    if(printer.disabled){
+      return;
+    }
+    const canRestartOctoPrint = canWeRestartOctoPrint(printer);
+    const canRestartOctoPrintHost = canWeRestartOctoPrintHost(printer);
+    const canShutdownOctoPrintHost = canWeShutdownOctoPrintHost(printer);
+    const canShutdownThePrinter = canWeShutdownThePrinter(printer);
+    const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
+    const canDetectPowerState = canWeDetectPrintersPowerState(printer);
+
+    const isPrinting = printerIsPrinting(printer);
+
+    const restartOctoPrintButton = document.getElementById("printerRestartOctoPrint-"+printer._id);
+    if(canRestartOctoPrint){
+      restartOctoPrintButton.disabled = !canRestartOctoPrint;
+      UI.removeDisplayNoneFromElement(restartOctoPrintButton)
+    }
+    const restartOctoPrintHostButton = document.getElementById("printerRestartHost-"+printer._id);
+    if(canRestartOctoPrintHost){
+      restartOctoPrintHostButton.disabled = !canRestartOctoPrintHost;
+      UI.removeDisplayNoneFromElement(restartOctoPrintHostButton)
+    }
+    const shutdownOctoPrintHostButton = document.getElementById("printerShutdownHost-"+printer._id);
+    if(canShutdownOctoPrintHost){
+      shutdownOctoPrintHostButton.disabled = !canShutdownOctoPrintHost;
+      UI.removeDisplayNoneFromElement(shutdownOctoPrintHostButton)
+    }
+    const shutdownPrinterButton = document.getElementById("printerPowerOff-"+printer._id);
+    const turnOnThePrinterButton = document.getElementById("printerPowerOn-"+printer._id);
+    const powerBadge = document.getElementById(`powerState-${printer._id}`)
+    let isPoweredOn = false;
+
+    if(canDetectPowerState){
+      if(!this.timer[printer._id]){
+        this.timer[printer._id] = 0;
+      }
+      if(this.timer[printer._id] >= 5000){
+        this.timer[printer._id] = 0;
+        isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer);
+      }
+      this.timer[printer._id] = this.timer[printer._id] + 500;
+      UI.removeDisplayNoneFromElement(powerBadge);
+      if(!isPoweredOn){
+        if(!powerBadge.classList.contains("text-danger")){
+          powerBadge.classList.add("text-danger");
+          powerBadge.classList.remove("text-success");
+        }
+      }
+      if(isPoweredOn){
+        if(!powerBadge.classList.contains("text-success")){
+          powerBadge.classList.add("text-success");
+          powerBadge.classList.remove("text-danger")
+        }
       }
     }
-  }
 
-  static async powerButtons(printer) {
-    // const divider = document.getElementById("printerPowerDropDownMarker-" + printer._id);
-    // if (printer.powerSettings.powerOffURL !== "") {
-    //   if (divider.classList.contains("d-none")) {
-    //     divider.classList.remove("d-none");
-    //   }
-    //   const powerOffPrinter = document.getElementById("printerPowerOff-" + printer._id);
-    //   if (powerOffPrinter.classList.contains("d-none")) {
-    //     powerOffPrinter.classList.remove("d-none");
-    //     powerOffPrinter.addEventListener("click", async (event) => {
-    //       bootbox.confirm({
-    //         message: "Are you sure you would like to power down your printer?",
-    //         buttons: {
-    //           confirm: {
-    //             label: "Yes",
-    //             className: "btn-success"
-    //           },
-    //           cancel: {
-    //             label: "No",
-    //             className: "btn-danger"
-    //           }
-    //         },
-    //         callback: async function (result) {
-    //           if (result) {
-    //             await OctoPrintClient.power(
-    //               printer,
-    //               printer.powerSettings.powerOffURL,
-    //               "Power Off",
-    //               printer.powerSettings.powerOffCommand
-    //             );
-    //             if (printer.powerSettings.powerStatusURL !== "") {
-    //               await OctoPrintClient.getPowerStatus(
-    //                 printer,
-    //                 printer.powerSettings.powerStatusURL,
-    //                 printer.powerSettings.powerStatusCommand
-    //               );
-    //               await OctoPrintClient.getPowerStatus(
-    //                 printer,
-    //                 printer.powerSettings.powerStatusURL,
-    //                 printer.powerSettings.powerStatusCommand
-    //               );
-    //               await OctoPrintClient.getPowerStatus(
-    //                 printer,
-    //                 printer.powerSettings.powerStatusURL,
-    //                 printer.powerSettings.powerStatusCommand
-    //               );
-    //             }
-    //           }
-    //         }
-    //       });
-    //     });
-    //   }
-    // }
-    // if (printer.powerSettings.powerOnURL !== "") {
-    //   if (divider.classList.contains("d-none")) {
-    //     divider.classList.remove("d-none");
-    //   }
-    //   const powerOnnPrinter = document.getElementById("printerPowerOn-" + printer._id);
-    //   if (powerOnnPrinter.classList.contains("d-none")) {
-    //     powerOnnPrinter.classList.remove("d-none");
-    //     powerOnnPrinter.addEventListener("click", async (event) => {
-    //       await OctoPrintClient.power(
-    //         printer,
-    //         printer.powerSettings.powerOnURL,
-    //         "Power On",
-    //         printer.powerSettings.powerOnCommand
-    //       );
-    //       await OctoPrintClient.getPowerStatus(
-    //         printer,
-    //         printer.powerSettings.powerStatusURL,
-    //         printer.powerSettings.powerStatusCommand
-    //       );
-    //       await OctoPrintClient.getPowerStatus(
-    //         printer,
-    //         printer.powerSettings.powerStatusURL,
-    //         printer.powerSettings.powerStatusCommand
-    //       );
-    //       await OctoPrintClient.getPowerStatus(
-    //         printer,
-    //         printer.powerSettings.powerStatusURL,
-    //         printer.powerSettings.powerStatusCommand
-    //       );
-    //     });
-    //   }
-    // }
-    // if (printer.powerSettings.powerStatusURL !== "") {
-    //   if (divider.classList.contains("d-none")) {
-    //     divider.classList.remove("d-none");
-    //   }
-    //   const status = await OctoPrintClient.getPowerStatus(
-    //     printer,
-    //     printer.powerSettings.powerStatusURL,
-    //     printer.powerSettings.powerStatusCommand
-    //   );
-    // }
-    // if (printer.powerSettings.powerToggleURL !== "") {
-    //   if (divider.classList.contains("d-none")) {
-    //     divider.classList.remove("d-none");
-    //   }
-    //   const powerTogglePrinter = document.getElementById("printerPowerToggle-" + printer._id);
-    //   if (powerTogglePrinter) {
-    //     if (powerTogglePrinter.disabled === true) {
-    //       powerTogglePrinter.disabled = false;
-    //       powerTogglePrinter.addEventListener("click", async (event) => {
-    //         if (
-    //           document.getElementById("printerStatus-" + printer._id).style.color === "green" ||
-    //           document.getElementById("printerStatus-" + printer._id).style.color === "black"
-    //         ) {
-    //           bootbox.confirm({
-    //             message: "Are you sure you would like to power down your printer?",
-    //             buttons: {
-    //               confirm: {
-    //                 label: "Yes",
-    //                 className: "btn-success"
-    //               },
-    //               cancel: {
-    //                 label: "No",
-    //                 className: "btn-danger"
-    //               }
-    //             },
-    //             callback: async function (result) {
-    //               if (result) {
-    //                 const status = await OctoPrintClient.power(
-    //                   printer,
-    //                   printer.powerSettings.powerToggleURL,
-    //                   "Power Toggle",
-    //                   printer.powerSettings.powerToggleCommand
-    //                 );
-    //                 await OctoPrintClient.getPowerStatus(
-    //                   printer,
-    //                   printer.powerSettings.powerStatusURL,
-    //                   printer.powerSettings.powerStatusCommand
-    //                 );
-    //                 await OctoPrintClient.getPowerStatus(
-    //                   printer,
-    //                   printer.powerSettings.powerStatusURL,
-    //                   printer.powerSettings.powerStatusCommand
-    //                 );
-    //                 await OctoPrintClient.getPowerStatus(
-    //                   printer,
-    //                   printer.powerSettings.powerStatusURL,
-    //                   printer.powerSettings.powerStatusCommand
-    //                 );
-    //               }
-    //             }
-    //           });
-    //         } else {
-    //           const status = await OctoPrintClient.power(
-    //             printer,
-    //             printer.powerSettings.powerToggleURL,
-    //             "Power Toggle",
-    //             printer.powerSettings.powerToggleCommand
-    //           );
-    //           await OctoPrintClient.getPowerStatus(
-    //             printer,
-    //             printer.powerSettings.powerStatusURL,
-    //             printer.powerSettings.powerStatusCommand
-    //           );
-    //           await OctoPrintClient.getPowerStatus(
-    //             printer,
-    //             printer.powerSettings.powerStatusURL,
-    //             printer.powerSettings.powerStatusCommand
-    //           );
-    //           await OctoPrintClient.getPowerStatus(
-    //             printer,
-    //             printer.powerSettings.powerStatusURL,
-    //             printer.powerSettings.powerStatusCommand
-    //           );
-    //         }
-    //       });
-    //     }
-    //   }
-    // }
-  }
+    if(canShutdownThePrinter){
+      if(!canDetectPowerState){
+        shutdownPrinterButton.disabled = isPrinting || canDetectPowerState
+      }else{
+        shutdownPrinterButton.disabled = isPrinting || !isPoweredOn;
+      }
 
-  static async applyBtn(printer) {
-    // if (typeof printer?.otherSettings?.system !== "undefined" && !listenersApplied) {
-    //   if (
-    //     (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-    //       printer.otherSettings.system.commands.serverRestartCommand !== null) ||
-    //     (printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-    //       printer.otherSettings.system.commands.systemRestartCommand !== null) ||
-    //     (printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-    //       printer.otherSettings.system.commands.systemShutdownCommand !== null)
-    //   ) {
-    //     if (
-    //       printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-    //       printer.otherSettings.system.commands.serverRestartCommand !== null
-    //     ) {
-    //       const restartOctoPrint = document.getElementById(
-    //         "printerRestartOctoPrint-" + printer._id
-    //       );
-    //       const divider = document.getElementById("printerDropDownMaker-" + printer._id);
-    //       if (divider.classList.contains("d-none")) {
-    //         divider.classList.remove("d-none");
-    //       }
-    //       restartOctoPrint.classList.remove("d-none");
-    //       restartOctoPrint.addEventListener("click", (event) => {
-    //         OctoPrintClient.system(printer, "restart");
-    //       });
-    //     }
-    //     if (
-    //       printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-    //       printer.otherSettings.system.commands.systemRestartCommand !== null
-    //     ) {
-    //       const restartHost = document.getElementById("printerRestartHost-" + printer._id);
-    //       restartHost.classList.remove("d-none");
-    //       restartHost.addEventListener("click", (event) => {
-    //         OctoPrintClient.system(printer, "reboot");
-    //       });
-    //     }
-    //
-    //     if (
-    //       printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-    //       printer.otherSettings.system.commands.systemShutdownCommand !== null
-    //     ) {
-    //       const shutdownHost = document.getElementById("printerShutdownHost-" + printer._id);
-    //       shutdownHost.classList.remove("d-none");
-    //       shutdownHost.addEventListener("click", (event) => {
-    //         OctoPrintClient.system(printer, "shutdown");
-    //       });
-    //     }
-    //     listenersApplied = true;
-    //   }
-    // }
-    // if (printer?.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
-    //   if (printer.powerSettings.powerOnURL !== "") {
-    //     PrinterPowerService.powerButtons(printer);
-    //   }
-    //   if (typeof printer.powerSettings.wol !== "undefined") {
-    //     if (printer.powerSettings.wol.enabled) {
-    //       if (
-    //         printer.powerSettings.wol.ip === "" ||
-    //         printer.powerSettings.wol.port === "" ||
-    //         printer.powerSettings.wol.interval === "" ||
-    //         printer.powerSettings.wol.count === ""
-    //       ) {
-    //         console.log("ISSUE WITH WAKE ON LAN SETTINGS");
-    //       } else {
-    //         const wakeButton = document.getElementById("printerWakeHost-" + printer._id);
-    //         if (wakeButton.classList.contains("d-none")) {
-    //           wakeButton.classList.remove("d-none");
-    //           wakeButton.addEventListener("click", (e) => {
-    //             OctoFarmClient.post("printers/wakeHost", printer.powerSettings.wol);
-    //           });
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
+
+      UI.removeDisplayNoneFromElement(shutdownPrinterButton)
+    }
+
+    if(canPowerOnThePrinter){
+      if(!canDetectPowerState){
+        turnOnThePrinterButton.disabled = isPrinting || canDetectPowerState
+      }else{
+        turnOnThePrinterButton.disabled = isPrinting || isPoweredOn;
+      }
+
+      UI.removeDisplayNoneFromElement(turnOnThePrinterButton)
+    }
+
+    if(canRestartOctoPrint || canShutdownOctoPrintHost || canRestartOctoPrintHost || canShutdownThePrinter || canPowerOnThePrinter){
+      UI.removeDisplayNoneFromElement(document.getElementById("octoPrintHeader-"+printer._id));
+    }
+  }
+  static setupEventListeners(printer){
+    document.getElementById(`printerRestartOctoPrint-${printer._id}`).addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const {status, message} = await sendPowerCommandToOctoPrint(printer, "restart");
+      UI.createAlert(status, message, 3000, "Clicked")
+      e.target.disabled = false;
+    })
+    document.getElementById(`printerRestartHost-${printer._id}`).addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const {status, message} = await sendPowerCommandToOctoPrint(printer, "reboot");
+      UI.createAlert(status, message, 3000, "Clicked")
+      e.target.disabled = false;
+    })
+    document.getElementById(`printerShutdownHost-${printer._id}`).addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const {status, message} = await sendPowerCommandToOctoPrint(printer, "shutdown");
+      UI.createAlert(status, message, 3000, "Clicked")
+      e.target.disabled = false;
+    })
+    document.getElementById(`printerPowerOff-${printer._id}`).addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const {status, message} = await sendPowerCommandToOctoPrint(printer, "shutdown");
+      UI.createAlert(status, message, 3000, "Clicked")
+      e.target.disabled = false;
+    })
+    document.getElementById(`printerPowerOn-${printer._id}`).addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const {status, message} = await sendPowerCommandToOctoPrint(printer, "shutdown");
+      UI.createAlert(status, message, 3000, "Clicked")
+      e.target.disabled = false;
+    })
   }
 }

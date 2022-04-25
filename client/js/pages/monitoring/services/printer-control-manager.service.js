@@ -1,9 +1,9 @@
-import OctoPrintClient from "../../../services/octoprint-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import UI from "../../../utils/ui.js";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
-import {printActionStatusResponse} from "../../../services/octoprint/octoprint.helpers-commands";
+import {printActionStatusResponse} from "../../../services/octoprint/octoprint.helpers-commands.actions";
 import "../../../utils/cleanup-modals.util";
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {

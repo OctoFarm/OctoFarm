@@ -1,4 +1,4 @@
-import OctoPrintClient from "../../../services/octoprint-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";

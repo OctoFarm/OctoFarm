@@ -9,8 +9,8 @@ import {
 import {
   sendPowerCommandToOctoPrint,
   setupUpdateOctoPrintClientBtn
-} from "../../services/octoprint/octoprint-client-commands";
-import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands";
+} from "../../services/octoprint/octoprint-client-commands.actions";
+import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands.actions";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "../../services/printer-logs.service.js";
 import PrinterStatisticsService from "../../services/printer-statistics.service"

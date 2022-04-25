@@ -6,13 +6,13 @@ import PrinterSelectionService from "../../../services/printer-selection.service
 import {
   octoPrintPluginInstallAction,
   updateOctoPrintPlugins
-} from "../../../services/octoprint/octoprint-plugin-commands";
+} from "../../../services/octoprint/octoprint-plugin-commands.actions";
 import {
   disconnectPrinterFromOctoPrint,
   quickConnectPrinterToOctoPrint,
   sendPowerCommandToOctoPrint,
   updateOctoPrintClient
-} from "../../../services/octoprint/octoprint-client-commands";
+} from "../../../services/octoprint/octoprint-client-commands.actions";
 import {
   printerHomeAxis,
   printerMoveAxis,
@@ -25,7 +25,7 @@ import {
   printerSendGcode,
   printerStartPrint,
   printerStopPrint
-} from "../../../services/octoprint/octoprint-printer-commands";
+} from "../../../services/octoprint/octoprint-printer-commands.actions";
 import {setupOctoPrintForVirtualPrinter} from "../../../services/octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service";
 import {setupPluginSearch} from "./plugin-search.function";
@@ -41,7 +41,7 @@ import bulkActionsStates from "../bulk-actions.constants";
 import {allowedFileTypes} from "../../../constants/file-types.constants";
 
 import Queue from "../../../services/file-manager-queue.service.js";
-import OctoPrintClient from "../../../services/octoprint-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
 import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "../../../exceptions/application-error.handler";
 

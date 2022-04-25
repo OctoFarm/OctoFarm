@@ -207,7 +207,7 @@ export function closePrinterManagerModalIfOffline(printer){
     if(!printerIsOnline(printer)){
         $("#printerManagerModal").modal("hide");
     }
-    return !printerIsOnline;
+    return !printerIsOnline(printer);
 }
 
 export function closePrinterManagerModalIfDisconnected(printer){
@@ -217,4 +217,40 @@ export function closePrinterManagerModalIfDisconnected(printer){
     return isPrinterDisconnected()
 }
 
+export function canWeRestartOctoPrint(printer){
+    const { otherSettings: { commands: { serverRestartCommand } = {} } = {}  } = printer || {};
+
+    return (!!serverRestartCommand || serverRestartCommand !== "");
+}
+
+export function canWeRestartOctoPrintHost(printer){
+    const { otherSettings: { commands: { systemRestartCommand } = {} } = {}  } = printer || {};
+
+    return (!!systemRestartCommand || systemRestartCommand !== "");
+}
+
+export function canWeShutdownOctoPrintHost(printer){
+    const { otherSettings: { commands: { systemShutdownCommand } = {} } = {}  } = printer || {};
+
+    return (!!systemShutdownCommand || systemShutdownCommand !== "");
+}
+
+export function canWeShutdownThePrinter(printer){
+    const { powerSettings: { powerOffCommand } = {} } = printer || {}
+
+    return (!!powerOffCommand || powerOffCommand !== "")
+}
+
+export function canWeTurnOnThePrinter(printer){
+    const { powerSettings: { powerOnCommand } = {} } = printer || {}
+
+    return (!!powerOnCommand || powerOnCommand !== "")
+}
+
+export function canWeDetectPrintersPowerState(printer){
+    const { powerSettings: { powerStatusCommand } = {} } = printer || {}
+
+    return (!!powerStatusCommand || powerStatusCommand !== "")
+
+}
 

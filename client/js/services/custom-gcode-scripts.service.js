@@ -1,4 +1,4 @@
-import OctoPrintClient from "./octoprint-client.service";
+import OctoPrintClient from "./octoprint/octoprint-client.service";
 import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 

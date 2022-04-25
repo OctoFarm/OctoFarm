@@ -2,7 +2,6 @@ import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
-import PrinterPowerService from "../../../services/printer-power.service";
 import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
 import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
 import Validate from "../../../utils/validate";
@@ -22,8 +21,6 @@ import PrinterTerminalManagerService from "../../monitoring/services/printer-ter
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
-let powerTimer = 5000;
-
 export function workerEventFunction(data) {
   if (data) {
     const modalVisibility = UI.checkIfAnyModalShown();
@@ -39,15 +36,6 @@ export function workerEventFunction(data) {
       }
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
-      }
-      // REFACTOR clean up power buttons wants to be in printer-data.js
-      if (powerTimer >= 5000) {
-        data.printersInformation.forEach((printer) => {
-          PrinterPowerService.applyBtn(printer);
-        });
-        powerTimer = 0;
-      } else {
-        powerTimer += 500;
       }
     } else {
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {

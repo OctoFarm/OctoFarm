@@ -1,6 +1,6 @@
 import Calc from "../utils/calc.js";
 import OctoFarmClient from "./octofarm-client.service";
-import OctoPrintClient from "./octoprint-client.service.js";
+import OctoPrintClient from "./octoprint/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
 import UI from "../utils/ui"
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";

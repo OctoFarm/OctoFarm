@@ -1,5 +1,5 @@
 import Calc from "../utils/calc.js";
-import OctoPrintClient from "./octoprint-client.service.js";
+import OctoPrintClient from "./octoprint/octoprint-client.service.js";
 import OctoFarmClient from "./octofarm-client.service";
 
 let printers = [];

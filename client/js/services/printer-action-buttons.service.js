@@ -1,10 +1,14 @@
 import PrinterPowerService from "./printer-power.service.js";
 import UI from "../utils/ui";
-import OctoPrintClient from "./octoprint-client.service";
+import OctoPrintClient from "./octoprint/octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
-import {printerIsDisconnectedOrError, printerIsOnline, printerIsPrinting} from "../utils/octofarm.utils";
-import {printerEmergencyStop, printerHomeAllAxis} from "./octoprint/octoprint-printer-commands";
+import {
+  printerIsDisconnectedOrError,
+  printerIsOnline,
+  printerIsPrinting
+} from "../utils/octofarm.utils";
+import {printerEmergencyStop, printerHomeAllAxis} from "./octoprint/octoprint-printer-commands.actions";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -22,7 +26,7 @@ function returnActionBtnTemplate(id, webURL) {
                type="button"
                class="tag btn btn-info btn-sm"
                target="_blank"
-               href="${webURL}" role="button"><i class="fas fa-globe-europe "></i> </a>
+               href="${webURL}" role="button"><i class="fas fa-globe-europe "></i> </a>   
         <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
         </button>
@@ -52,27 +56,27 @@ function returnActionBtnTemplate(id, webURL) {
           >
             <i class="fa-solid fa-ban text-danger"></i> Emergency Stop
           </button> 
-          <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
-            <button
-               title="Terminate and reconnect OctoPrints Socket connection."
-               id="printerSyncButton-${id}"
-               type="button"
-               class="dropdown-item"
-            >
-                <i class="fas fa-sync text-warning"></i> Re-Connect Socket
-            </button> 
-            <button  
-             title="Runs a pre-configured gcode sequence so you can detect which printer this is."
-             id="printerFindMe-${id}"
-             type="button"
-             class="dropdown-item d-none"
-              disabled
-          >
-              <i class="fas fa-search text-info"></i> Find Printer!
-          </button> 
           <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
           <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
-          <h6 id="octoPrintPowerDivider" class="dropdown-header"><i class="fab fa-octopus-deploy" disabled></i> OctoPrint</h6>
+          <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
+          <button
+             title="Terminate and reconnect OctoPrints Socket connection."
+             id="printerSyncButton-${id}"
+             type="button"
+             class="dropdown-item"
+          >
+              <i class="fas fa-sync text-warning"></i> Re-Connect Socket
+          </button> 
+          <button  
+           title="Runs a pre-configured gcode sequence so you can detect which printer this is."
+           id="printerFindMe-${id}"
+           type="button"
+           class="dropdown-item d-none"
+            disabled
+        >
+            <i class="fas fa-search text-info"></i> Find Printer!
+          </button> 
+          <h6 id="octoPrintHeader-${id}" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint</h6>
           <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
           <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
           <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
@@ -126,7 +130,6 @@ function groupInit(printers) {
         printer.printerState.colour.category === "Offline";
     }
   });
-  // PrinterPowerService.applyBtn(groupId);
   addGroupEventListeners(printers);
 }
 
@@ -296,7 +299,6 @@ function init(printer, element) {
   document.getElementById(element).innerHTML = `
     ${returnActionBtnTemplate(printer._id, printer.printerURL)}
   `;
-  // PrinterPowerService.applyBtn(printer);
   checkQuickConnectState(printer);
 
   addEventListeners(printer);
@@ -443,6 +445,7 @@ function addEventListeners(printer) {
     UI.createAlert(status, message, 3000, "Clicked")
     e.target.disabled = false;
   })
+  PrinterPowerService.setupEventListeners(printer);
 }
 
 function checkQuickConnectState(printer) {
@@ -454,6 +457,11 @@ function checkQuickConnectState(printer) {
   document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
   document.getElementById("printerHome-"+printer._id).disabled = isPrinting || isDisconnectedOrError;
   document.getElementById("printerEmergency-"+printer._id).disabled = !isPrinting;
+
+  PrinterPowerService.revealPowerButtons(printer).catch(e => {
+    console.error(e)
+  });
+
   if (typeof printer.connectionOptions !== "undefined") {
     if (
       printer.connectionOptions.portPreference === null ||

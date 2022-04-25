@@ -79,7 +79,7 @@ class PrinterStore {
         octoPrintPluginUpdates: printer.octoPrintPluginUpdates,
         systemChecks: printer.systemChecks,
         connectionOptions: printer.connectionOptions,
-        powerCommands: printer.powerCommands
+        powerSettings: printer.powerSettings
       };
     });
 
@@ -116,7 +116,7 @@ class PrinterStore {
         flowRate: printer.flowRate,
         stepRate: printer.stepRate,
         terminal: printer.terminal,
-        powerCommands: printer.powerCommands
+        powerSettings: printer.powerSettings
       };
     });
 
