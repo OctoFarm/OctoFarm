@@ -56,8 +56,12 @@ router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
 });
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);
-
-  await getPrinterStoreCache().assignSpoolToPrinters(req.body.printers, req.bodyString("spoolId"));
+  const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
+  await getPrinterStoreCache().assignSpoolToPrinters(
+    req.body.printers,
+    req.bodyString("spoolId"),
+    multiSelectEnabled
+  );
   TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
   res.send({ status: 200 });
 });

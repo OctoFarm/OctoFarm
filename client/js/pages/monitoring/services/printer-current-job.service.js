@@ -3,13 +3,13 @@ import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.
 import {
     returnExpandedLayerDataDisplay
 } from "../../../services/octoprint/octoprint-display-layer-plugin.service";
-import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import "../../../utils/cleanup-modals.util"
 import {
     closePrinterManagerModalIfOffline,
     imageOrCamera
 } from "../../../utils/octofarm.utils";
 import ApexCharts from "apexcharts";
+import UI from "../../../utils/ui"
 
 $("#printerManagerModal").on("hidden.bs.modal", function () {
     const tempChart = document.getElementById("temperatureChart")
@@ -20,13 +20,14 @@ $("#printerManagerModal").on("hidden.bs.modal", function () {
 
 
 let chart = null;
+let chartTimer = 0;
 
 const options = {
     chart: {
         id: "realtime",
         type: "line",
         width: "100%",
-        height: "150",
+        height: "250px",
         animations: {
             enabled: false,
             easing: "linear",
@@ -102,7 +103,7 @@ const options = {
             formatter(value) {
                 const date = new Date(value * 1000);
                 return (
-                    date.toLocaleTimeString()
+                    date.toLocaleTimeString("en-gb", { hour12: false })
                 );
             }
         }
@@ -133,12 +134,13 @@ export const initialiseCurrentJobPopover = (index, printers, printerControlList)
             setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
             loadPrintersJobStatus(currentPrinter);
             const elements = returnPageElements();
-            applyListeners(currentPrinter, elements);
+            UI.addDisplayNoneToElement(elements.connectionRow)
             updateCurrentJobStatus(currentPrinter, elements);
-            // applyTemps(currentPrinter, elements)
-            resetChartData(elements.temperatureChart);
-            formatChartData(currentPrinter.tools);
-            updateChartData();
+            // applyTemps(currentPrinter, elements);
+            chartTimer = 0;
+            //resetChartData(elements.temperatureChart);
+            //formatChartData(currentPrinter.tools);
+           // updateChartData();
         } else {
             const id = _.findIndex(printers, function (o) {
                 return o._id === currentIndex;
@@ -147,8 +149,12 @@ export const initialiseCurrentJobPopover = (index, printers, printerControlList)
             const elements = returnPageElements();
             updateCurrentJobStatus(currentPrinter, elements);
             document.getElementById("printerManagerModal").style.overflow = "auto";
-            formatChartData(currentPrinter.tools)
-            updateChartData();
+            // if(chartTimer >= 5000){
+            //     formatChartData(currentPrinter.tools)
+            //     updateChartData();
+            //     return
+            // }
+            // chartTimer = chartTimer + 500;
         }
 }
 
@@ -217,12 +223,12 @@ const formatChartData = (tools) => {
                             return e.name;
                         })
                         .indexOf(element + "-actual");
-                    if (options.series[arrayTarget].data.length <= 100) {
+                    if (options.series[arrayTarget].data.length <= 30) {
                         options.series[arrayTarget].data.push(target);
                     }else{
                         options.series[arrayTarget].data.shift()
                     }
-                    if (options.series[arrayActual].data.length <= 100) {
+                    if (options.series[arrayActual].data.length <= 30) {
                         options.series[arrayActual].data.push(actual);
                     }else{
                         options.series[arrayActual].data.shift()
@@ -242,6 +248,7 @@ const updateChartData = () => {
 
 const returnPageElements = () => {
     return {
+            connectionRow: document.getElementById("connectionRow"),
             expectedCompletionDate: document.getElementById("pmExpectedCompletionDate"),
             expectedTime: document.getElementById("pmExpectedTime"),
             remainingTime: document.getElementById("pmTimeRemain"),
@@ -273,37 +280,39 @@ const returnPageElements = () => {
     }
 }
 
-const applyListeners = (printer, elements) => {
-    setupConnectButtonListeners(printer, elements.connectButton)
-}
-
 const loadPrintersJobStatus = (printer) => {
     let thumbnailClass = "d-none";
     let hideCamera = false;
     let hideCameraDisplay = "";
     let thumbnailElement = "";
-    let printStatusClass = "col-md-8 col-lg-9 text-center";
-    let temperatureClass = "col-md-12 text-center";
-    if (!!printer?.currentJob?.thumbnail) {
-        thumbnailClass = "col-md-3 col-lg-3 text-center";
-        temperatureClass = "col-md-9 text-center";
+    let printStatusClass = "col-md-4 col-lg-6 text-center";
+    // let temperatureClass = "col-md-8 text-center";
+    if (printer?.currentJob?.thumbnail !== null) {
+        printStatusClass = "col-6 text-center";
+        thumbnailClass = "col-md-4 col-lg-2 text-center";
+        // temperatureClass = "col-md-9 text-center";
         thumbnailElement = `<img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
+    }else{
+        printStatusClass = "col-8 text-center";
     }
     if(printer.camURL === ""){
-        printStatusClass = "col-12 text-center";
+        printStatusClass = "col-8 text-center";
+        thumbnailClass = "col-md-4 col-lg-4 text-center";
         hideCamera = true;
         hideCameraDisplay = "d-none"
     }
 
-    setupConnectButton(printer);
-
-    //setup power btn
-    // await PrinterPowerService.applyBtn(printer, "pmPowerBtn-");
-
     document.getElementById("printerControls").innerHTML = `
         <div class="row">
+            <div class="col-12 text-center">
+               <h5>File</h5><hr>
+               <p title="Loading..." id="pmFileName" class="mb-0">Loading...</p>
+   
+            </div>
+        </div>
+        <div class="row">
         <!-- Camera --> 
-          <div class="col-md-4 col-lg-3 text-center ${hideCameraDisplay}">
+        <div class="col-md-4 col-lg-4 text-center ${hideCameraDisplay}">
           <h5>Camera</h5><hr>
           <span id="cameraRow">  
             <div class="row">
@@ -314,48 +323,36 @@ const loadPrintersJobStatus = (printer) => {
           </span>
         </div>
         <!-- Print Status -->  
-        <div class="${printStatusClass}">       
-            <h5>Print Status</h5><hr>    
+        <div class="${printStatusClass}">    
+            <h5>Status</h5><hr>   
                <div class="progress mb-1">
-                 <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="100">Loading... </div>
-               </div>
+                     <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="100">Loading... </div>
+               </div>     
                <div class="row">
-                 <div class="col-md-4 col-lg-2">
-                     <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
-                 </div>
-                 <div class="col-md-3 col-lg-2">
+                 <div class="col-md-4 col-lg-4">
                         <b>Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">Loading...</p>
                  </div>
-                 <div class="col-md-3 col-lg-2">
-                    <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
+                 <div class="col-md-4 col-lg-4">
+                    <b>Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
                  </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-4 col-lg-4">
                         <b>Expected Time: </b><p class="mb-1" id="pmExpectedTime">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-4 col-lg-4">
                         <b>Time Remaining: </b><p class="mb-1" id="pmTimeRemain">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-2">                             
+                    <div class="col-md-4 col-lg-4">                             
                       <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">Loading...</p>
                     </div>
-                    <div class="col-md-4 col-lg-2">
+                    <div class="col-md-4 col-lg-4">
                       <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>                          
                     </div>
                </div>
-                <div class="row text-center">
-
-                </div>
-           </div>  
+           </div>   
         <div id="fileThumbnail" class="${thumbnailClass}">
            <h5>Thumbnail</h5><hr>
             ${thumbnailElement}
-            </div>   
-        <div class="${temperatureClass} text-center">
-           <h5>Temperature</h5><hr>
-           <div id="temperatureChart">
-           
-           </div>
-        </div>
+        </div>  
         <div class="col-12 text-center d-none" id="dlpPluginDataTitle">
               <h5>Additional Information</h5><hr>               
               <div class="row">
@@ -380,9 +377,9 @@ const loadPrintersJobStatus = (printer) => {
               </div>
         </div> 
         <div class="col-lg-12 text-center">
-                 <h5>Expected Costs</h5><hr> 
+                 <h5>Costs (Estimated Usage / Total)</h5><hr> 
         </div>   
-          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
+          <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Materials: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>  
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Electricity: </b><br><p class="tag mb-1" id="pmExpectedElectricity">Loading...</p></div>
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Maintainance: </b><br><p class="tag mb-1" id="pmExpectedMaintainance">Loading...</p></div>
@@ -398,8 +395,6 @@ const updateCurrentJobStatus = (printer, elements) => {
     if(closePrinterManagerModalIfOffline(printer)){
         return
     }
-
-    updateConnectButtonState(printer, elements.status, elements.connectButton, elements.printerPortDrop, elements.printerBaudDrop, elements.printerProfileDrop)
 
     let dateComplete;
     if (
@@ -426,7 +421,6 @@ const updateCurrentJobStatus = (printer, elements) => {
     }
 
     elements.expectedCompletionDate.innerHTML = dateComplete;
-
     if (typeof printer.resends !== "undefined" && printer.resends !== null) {
         if (elements.printerResends.classList.contains("d-none")) {
             elements.printerResends.classList.remove("d-none");
@@ -486,19 +480,15 @@ const updateCurrentJobStatus = (printer, elements) => {
     } else {
         elements.fileName.setAttribute("title", printer.currentJob.filePath);
         let fileName = printer.currentJob.fileDisplay;
-        if (fileName.length > 49) {
-            fileName = fileName.substring(0, 49) + "...";
-        }
 
         elements.fileName.innerHTML = fileName;
         let usageDisplay = "";
         let filamentCost = "";
         if (printer.currentJob.expectedTotals !== null) {
-            usageDisplay += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.totalLength.toFixed(
-                2
-            )}m / ${printer.currentJob.expectedTotals.totalWeight.toFixed(2)}g</p>`;
-            elements.expectedTotalCosts.innerHTML =
-                printer.currentJob.expectedTotals.totalCost;
+            if(printer.currentJob.expectedFilamentCosts.length > 1){
+                usageDisplay += `<p class="mb-0"><b>Total: </b>${percentOfDisplay(printer.currentJob.expectedTotals.totalLength, printer.currentJob.progress)}m / ${percentOfDisplay(printer.currentJob.expectedTotals.totalWeight, printer.currentJob.progress)}g</p>`;
+            }
+            elements.expectedTotalCosts.innerHTML = percentOfDisplay(printer.currentJob.expectedTotals.totalCost, printer.currentJob.progress);
         } else {
             usageDisplay = "No File Selected";
             elements.expectedTotalCosts.innerHTML = "No File Selected";
@@ -509,17 +499,16 @@ const updateCurrentJobStatus = (printer, elements) => {
                     const firstKey = Object.keys(unit)[0];
                     let theLength = parseFloat(unit[firstKey].length);
                     let theWeight = parseFloat(unit[firstKey].weight);
-                    usageDisplay += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${theLength.toFixed(
-                        2
-                    )}m / ${theWeight.toFixed(2)}g</p>`;
+                    usageDisplay += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${percentOfDisplay(theLength, printer.currentJob.progress)}m | ${percentOfDisplay(theWeight, printer.currentJob.progress)}g</p>`;
                 });
 
-                filamentCost += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.spoolCost.toFixed(
-                    2
-                )}</p>`;
+                if(printer.currentJob.expectedFilamentCosts.length > 1){
+                    filamentCost += `<p class="mb-0"><b>Total2: </b>${percentOfDisplay(printer.currentJob.expectedTotals.spoolCost, printer.currentJob.progress)}</p>`;
+                }
+
                 printer.currentJob.expectedFilamentCosts.forEach((unit) => {
                     const firstKey = Object.keys(unit)[0];
-                    filamentCost += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${unit[firstKey].cost}</p>`;
+                    filamentCost += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${percentOfDisplay(unit[firstKey].cost, printer.currentJob.progress)}</p>`;
                 });
             } else {
                 filamentCost = "No length estimate";
@@ -532,12 +521,16 @@ const updateCurrentJobStatus = (printer, elements) => {
 
         elements.expectedFilamentCost.innerHTML = filamentCost;
 
-        elements.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts.toFixed(2);
+        elements.expectedPrinterCost.innerHTML = percentOfDisplay(printer.currentJob.expectedPrinterCosts, printer.currentJob.progress);
 
-        elements.expectededMaintainanceCosts.innerHTML = printer.currentJob.expectedMaintenanceCosts.toFixed(2);
+        elements.expectededMaintainanceCosts.innerHTML = percentOfDisplay(printer.currentJob.expectedMaintenanceCosts, printer.currentJob.progress);
 
-        elements.expectededElectricityCosts.innerHTML = printer.currentJob.expectedElectricityCosts.toFixed(2);
+        elements.expectededElectricityCosts.innerHTML = percentOfDisplay(printer.currentJob.expectedElectricityCosts, printer.currentJob.progress);
     }
+}
+
+const percentOfDisplay = (value, percent) => {
+    return `${Calc.percentOf(parseFloat(value), parseFloat(percent))} / ${Calc.toFixed(parseFloat(value), 2)}`;
 }
 
 const applyTemps = (printer, elements) => {

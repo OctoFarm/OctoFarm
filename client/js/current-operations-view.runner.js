@@ -1,5 +1,5 @@
 import Calc from "./utils/calc.js";
-import OctoPrintClient from "./services/octoprint-client.service.js";
+import OctoPrintClient from "./services/octoprint/octoprint-client.service.js";
 import {createClientSSEWorker} from "./services/client-worker.service";
 import {setViewType} from "./pages/monitoring/monitoring-view.state";
 

@@ -4,11 +4,10 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../constants/cleaner.constants");
 const { checkNested, checkNestedIndex } = require("./array.util");
-const { SettingsClean } = require("../services/settings-cleaner.service");
 const Profiles = require("../models/Profiles");
 
 /**
- * Calculate spool weight static (has nothing to do with cleaning state)
+ * Calculate spool weight static
  * @param length
  * @param filament
  * @param completionRatio

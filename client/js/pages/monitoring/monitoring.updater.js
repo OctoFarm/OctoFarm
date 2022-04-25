@@ -9,7 +9,7 @@ import {
     groupInit as actionButtonGroupInit,
     init as actionButtonInit
 } from "../../services/printer-action-buttons.service.js";
-import OctoPrintClient from "../../services/octoprint-client.service.js";
+import OctoPrintClient from "../../services/octoprint/octoprint-client.service.js";
 import {checkTemps} from "../../utils/temperature-check.util.js";
 import doubleClickFullScreen from "../../utils/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
@@ -25,7 +25,7 @@ import {
 import PrinterTerminalManagerService from "./services/printer-terminal-manager.service";
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
-import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands";
+import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands.actions";
 import {printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
 import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";

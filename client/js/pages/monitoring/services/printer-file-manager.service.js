@@ -3,7 +3,6 @@ import Calc from "../../../utils/calc.js";
 import UI from "../../../utils/ui.js";
 import FileManagerService from "../../../services/file-manager.service.js";
 import FileManagerSortingService from "../../../services/file-manager-sorting.service.js";
-import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
 import {allowedFileTypes} from "../../../constants/file-types.constants";
 import "../../../utils/cleanup-modals.util"
@@ -53,9 +52,6 @@ export default class PrinterFileManagerService {
       setupConnectButton(printer);
       //Load tools
       document.getElementById("printerControls").innerHTML = `
-          <div class="row">
-            <div id="customGcodeCommandsArea" class="col-lg-12"></div>
-          </div>
           <div class="row bg-secondary rounded-top">
                 <div class="col-12">
                      <h5 class="float-left  mb-0">
@@ -151,8 +147,6 @@ export default class PrinterFileManagerService {
           </div>
             `;
       await FileManagerSortingService.loadSort(printer._id);
-
-      await CustomGenerator.generateButtons(printer);
     } catch (e) {
       UI.createAlert(
         "error",

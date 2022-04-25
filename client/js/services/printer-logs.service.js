@@ -1,6 +1,6 @@
 import Calc from "../utils/calc.js";
 import OctoFarmClient from "./octofarm-client.service";
-import OctoPrintClient from "./octoprint-client.service.js";
+import OctoPrintClient from "./octoprint/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
 import UI from "../utils/ui"
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
@@ -74,21 +74,13 @@ const options = {
     }
   ],
   xaxis: {
-    //tickAmount: "dataPoints",
+    tickAmount: 10,
     type: "category",
     labels: {
       formatter(value) {
         const date = new Date(value * 1000);
-        var weekday = new Array(7);
-        weekday[0] = "Sun";
-        weekday[1] = "Mon";
-        weekday[2] = "Tue";
-        weekday[3] = "Wed";
-        weekday[4] = "Thu";
-        weekday[5] = "Fri";
-        weekday[6] = "Sat";
         return (
-            weekday[date.getDay()] + " " + date.getDate() + " " + date.toLocaleTimeString()
+           date.toLocaleTimeString("en-gb", { hour12 :false })
         );
       }
     }
@@ -111,7 +103,7 @@ const octoPrintPluginLogsTable = document.getElementById("octoprintLogsRows");
 const octoPrintPluginLogsCount = document.getElementById("octoCount");
 const octoPrintKlipperLogsMenu = document.getElementById("system-octoprint-klipper-list");
 const octoPrintKlipperLogsTable = document.getElementById("klipperLogsTableRows");
-const octoPrintKlipperLogsCount = document.getElementById("octoPrintLogsSelect");
+const octoPrintKlipperLogsCount = document.getElementById("klipperCount");
 const octoPrintTemperatureMenu = document.getElementById("system-temperature-list");
 const octoPrintTemperatureChart = document.getElementById("printerTempChart");
 const octoPrintTemperatureCount = document.getElementById("tempCount");
@@ -200,7 +192,7 @@ export default class PrinterLogsService {
           "beforeend",
           `
             <tr class="${log.state}">
-              <th scope="row">${log.date}</th>
+              <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.message}</td>
             </tr>
       `
@@ -208,7 +200,7 @@ export default class PrinterLogsService {
     })
   }
   //TODO Move to views... make much much much much faster loading tho
-  static loadPrinterTemperatures(printerTemperatures){
+  static async loadPrinterTemperatures(printerTemperatures){
     if(!printerTemperatures || printerTemperatures?.length === 0){
       octoPrintTemperatureMenu.innerHTML = "(0)";
       return;
@@ -217,9 +209,8 @@ export default class PrinterLogsService {
     UI.removeNotYetFromElement(octoPrintTemperatureMenu);
     chart = new ApexCharts(octoPrintTemperatureChart, options);
     chart.render();
-    if(octoPrintTemperatureMenu.classList.contains("active")){
-      this.fillChartData(printerTemperatures);
-    }
+    await UI.delay(1000)
+    this.fillChartData(printerTemperatures);
   }
   static fillChartData(printerTemperatures){
     chart.updateSeries(printerTemperatures);
@@ -270,7 +261,7 @@ export default class PrinterLogsService {
       octoPrintPluginLogsTable.insertAdjacentHTML("beforeend",
           `
             <tr class="${log.state}">
-              <th scope="row">${log.date}</th>
+              <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.pluginDisplay}</td>
               <td>${log.message}</td>
             </tr>
@@ -323,7 +314,7 @@ export default class PrinterLogsService {
     }
   }
   static async getOctoPrintLogsList(printer){
-    const octoPrintLogsCall = await OctoPrintClient.get(printer, "/plugin/logging/logs")
+    const octoPrintLogsCall = await OctoPrintClient.get(printer, "plugin/logging/logs")
 
     if(octoPrintLogsCall?.ok){
       return octoPrintLogsCall.json();
@@ -345,10 +336,10 @@ export default class PrinterLogsService {
     UI.removeNotYetFromElement(octoPrintKlipperLogsMenu);
     octoPrintKlipperLogsCount.innerHTML = `(${klipperLogs.length})`;
     klipperLogs.forEach(log => {
-        octoPrintPluginLogsTable.insertAdjacentHTML("beforeend",
+      octoPrintKlipperLogsTable.insertAdjacentHTML("beforeend",
             `
             <tr class="${log.state}">
-              <th scope="row">${log.date}</th>
+              <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.message}</td>
             </tr>
       `);

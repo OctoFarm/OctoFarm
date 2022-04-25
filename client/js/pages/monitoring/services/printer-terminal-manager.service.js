@@ -1,4 +1,4 @@
-import OctoPrintClient from "../../../services/octoprint-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
 import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
@@ -40,7 +40,7 @@ export default class PrinterTerminalManagerService {
       elements.terminal.terminalWindow.innerHTML = "";
       await PrinterTerminalManagerService.applyState(currentPrinter, elements);
       PrinterTerminalManagerService.applyListeners(elements, currentPrinter);
-      elements.terminal.terminalWindow.scrollTop = elements.terminal.terminalWindow.scrollHeight + 1
+      elements.terminal.terminalWindow.scrollTop = elements.terminal.terminalWindow.scrollHeight;
     } else {
       if (document.getElementById("terminal")) {
         const id = _.findIndex(printers, function (o) {
@@ -63,17 +63,16 @@ export default class PrinterTerminalManagerService {
       //Load tools
       document.getElementById("printerControls").innerHTML = `
           <div class="row">
-                <div class="col-sm-12 col-md-4 col-lg-4 text-center">
+                <div class="col-sm-12 col-md-4 col-lg-3 text-center">
                 <h5>Camera</h5><hr>
                     ${imageOrCamera(printer)}
                </div>
               
-                <div class="col-sm-12 col-md-8 col-lg-8 text-center">
-                        <h5>Custom Gocde Scripts</h5>
-                    <hr>
+                <div class="col-sm-12 col-md-8 col-lg-9 text-center">
+                        <h5>Custom Gocde Scripts</h5><hr>
+                        <div id="customGcodeCommandsArea" class="col-lg-12 text-center"></div>
                 </div>
-              <div id="customGcodeCommandsArea" class="col-lg-12 text-center">
-              </div>
+
           </div>
           <div class="row">
                 <div class="col-12">

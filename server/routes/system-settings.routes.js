@@ -21,7 +21,7 @@ const { isEqual } = require("lodash");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { Logs } = require("../services/server-logs.service.js");
 const { SystemCommands } = require("../services/server-commands.service.js");
-const { fetchUsers } = require("../services/user-service");
+const { fetchUsers } = require("../services/users.service");
 const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny

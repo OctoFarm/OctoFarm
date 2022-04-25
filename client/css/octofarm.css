@@ -146,6 +146,11 @@ li {
   margin: 0 auto;
   max-width: 700px;
 }
+
+.dropdown-menu {
+  z-index: 5000;
+}
+
 /* Colours */
 .textIdle {
   color: #262626;
@@ -267,7 +272,6 @@ a.notyet {
 }
 .dashHeader {
   padding: 5px;
-  z-index:100;
 }
 
 .dashBody {

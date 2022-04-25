@@ -3,7 +3,6 @@ import Calc from "./utils/calc.js";
 import FileManagerService from "./services/file-manager.service.js";
 import {dragAndDropEnable} from "./utils/dragAndDrop.js";
 import {
-  findBigFilamentDropDowns,
   returnBigFilamentSelectorTemplate,
   fillFilamentDropDownList
 } from "./services/printer-filament-selector.service";
@@ -12,9 +11,9 @@ import {allowedFileTypes} from "./constants/file-types.constants"
 
 import {printerIsOnline} from "./utils/octofarm.utils";
 import {printerTemplate} from "./pages/file-manager/file.template";
-import UI from "./utils/ui";
 import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "./exceptions/application-error.handler";
+import "./services/gcode-scripts.service";
 
 
 let lastId = null;
