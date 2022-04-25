@@ -15,11 +15,16 @@ export default class PrinterPowerService {
 
   static async printerIsPoweredOn(printer) {
     let powerStatus = false;
-    powerStatus = await OctoPrintClient.getPowerStatus(
+    const powerReturn = await OctoPrintClient.getPowerStatus(
         printer,
         printer.powerSettings.powerStatusURL,
         printer.powerSettings.powerStatusCommand
     );
+
+    if(!!powerReturn){
+      powerStatus = powerReturn[Object.keys(powerReturn)[0]]
+    }
+
     return powerStatus;
   }
 
@@ -124,16 +129,20 @@ export default class PrinterPowerService {
       UI.createAlert(status, message, 3000, "Clicked")
       e.target.disabled = false;
     })
-    document.getElementById(`printerPowerOff-${printer._id}`).addEventListener("click", async (e) => {
+    document.getElementById(`printerPowerOff-${printer._id}`).addEventListener("click", (e) => {
       e.target.disabled = true;
-      const {status, message} = await this.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOffURL, printer.powerSettings.powerOffCommand, "power off")
-      UI.createAlert(status, message, 3000, "Clicked")
-      e.target.disabled = false;
+      bootbox.confirm("Are you sure you'd like to power down your printer?", async function(result){
+        if(result){
+          await PrinterPowerService.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOffURL, printer.powerSettings.powerOffCommand, "power off")
+          e.target.disabled = false;
+        }
+      });
+
+
     })
     document.getElementById(`printerPowerOn-${printer._id}`).addEventListener("click", async (e) => {
       e.target.disabled = true;
-      const {status, message} = await this.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOnURL, printer.powerSettings.powerOnCommand, "power on")
-      UI.createAlert(status, message, 3000, "Clicked")
+      await this.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOnURL, printer.powerSettings.powerOnCommand, "power on")
       e.target.disabled = false;
     })
   }
@@ -167,10 +176,10 @@ export default class PrinterPowerService {
         }
       })
     }
-    if(!!post?.ok){
+    if(!post?.ok){
       UI.createAlert(
           "error",
-          `${printerName}: Failed to complete! ${action}`,
+          `${printerName}: Failed to complete ${action}<br> Status: ${post.statusText}`,
           3000,
           "Clicked"
       )

@@ -23,7 +23,7 @@ export default class CustomGenerator {
       customScripts.forEach((scripts) => {
         let button = CustomGenerator.getButton(scripts);
         area.insertAdjacentHTML("beforeend", button);
-        document.getElementById("gcode-" + scripts._id).addEventListener("click", (e) => {
+        document.getElementById("gcode-" + scripts._id).addEventListener("click", () => {
           let post = CustomGenerator.fireCommand(scripts._id, scripts.gcode, printer);
           if (post.status === 204) {
             UI.createAlert(

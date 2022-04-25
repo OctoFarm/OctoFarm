@@ -26,7 +26,12 @@ import PrinterTerminalManagerService from "./services/printer-terminal-manager.s
 import {groupBy, mapValues} from "lodash";
 import {FileActions} from "../../services/file-manager.service";
 import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands.actions";
-import {printerIsAvailableToView, printerIsOnline} from "../../utils/octofarm.utils";
+import {
+  printerIsAvailableToView,
+  printerIsOnline,
+  printerIsPrinting,
+  printerIsPrintingOrComplete
+} from "../../utils/octofarm.utils";
 import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
 import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
 import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
@@ -565,11 +570,14 @@ async function updateState(printer, clientSettings, view, index) {
   //Printer
   checkQuickConnectState(printer);
   const isOffline = !printerIsOnline(printer);
+  const isPrintingOrComplete = printerIsPrintingOrComplete(printer);
+
+  console.log(isPrintingOrComplete)
 
   elements.control.disabled = isOffline;
   elements.files.disabled = isOffline;
   elements.terminal.disabled = isOffline;
-  elements.job.disabled = isOffline;
+  elements.job.disabled = !isPrintingOrComplete;
 
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 

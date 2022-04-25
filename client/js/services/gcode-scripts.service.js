@@ -80,7 +80,7 @@ createNewScriptBtn.addEventListener("click", async (e) => {
 async function drawScriptTable(scripts) {
   const scriptTable = document.getElementById("gcodeScriptTable");
   const printerList = await OctoFarmClient.listPrinters();
-  const printerSelect = [];
+  const printerSelect = ["<option value=\"99aa99aaa9999a99999999aa\"> Allow all printers </option>"];
   printerList.forEach((printer) => {
     printerSelect.push(`<option value="${printer._id}"> ${printer.printerName} </option>`);
   });
