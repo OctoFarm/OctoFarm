@@ -60,7 +60,7 @@ export default class PrinterPowerService {
       if(!this.timer[printer._id]){
         this.timer[printer._id] = 0;
       }
-      if(this.timer[printer._id] >= 5000){
+      if(this.timer[printer._id] >= 10000){
         this.timer[printer._id] = 0;
         isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer);
       }
@@ -126,15 +126,61 @@ export default class PrinterPowerService {
     })
     document.getElementById(`printerPowerOff-${printer._id}`).addEventListener("click", async (e) => {
       e.target.disabled = true;
-      const {status, message} = await sendPowerCommandToOctoPrint(printer, "shutdown");
+      const {status, message} = await this.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOffURL, printer.powerSettings.powerOffCommand, "power off")
       UI.createAlert(status, message, 3000, "Clicked")
       e.target.disabled = false;
     })
     document.getElementById(`printerPowerOn-${printer._id}`).addEventListener("click", async (e) => {
       e.target.disabled = true;
-      const {status, message} = await sendPowerCommandToOctoPrint(printer, "shutdown");
+      const {status, message} = await this.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOnURL, printer.powerSettings.powerOnCommand, "power on")
       UI.createAlert(status, message, 3000, "Clicked")
       e.target.disabled = false;
     })
+  }
+
+  static async sendPowerCommandForPrinter(printer, url, command, action){
+    const { apikey, printerName } = printer;
+
+    if (url.includes("[PrinterURL]")) {
+      url = url.replace("[PrinterURL]", printer.printerURL);
+    }
+    if (url.includes("[PrinterAPI]")) {
+      url = url.replace("[PrinterAPI]", printer.apikey);
+    }
+
+    let post;
+    if(!!command || command !== ""){
+      post = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": apikey
+        },
+        body: command
+      })
+    }else{
+      post = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey
+        }
+      })
+    }
+    if(!!post?.ok){
+      UI.createAlert(
+          "error",
+          `${printerName}: Failed to complete! ${action}`,
+          3000,
+          "Clicked"
+      )
+    }else{
+      UI.createAlert(
+          "success",
+          `${printerName}: Successfully ${action}!`,
+          3000,
+          "Clicked"
+      )
+    }
   }
 }

@@ -436,7 +436,6 @@ export default class OctoPrintClient {
           }
         });
         let status = false;
-        console.log(post)
         if (post.status === 200 || post.status === 204) {
           status = post.json();
         }

@@ -13,13 +13,13 @@
                         class="fas fa-spinner fa-spin"></i>)</span></a>
         <a class="list-group-item list-group-item-action notyet" id="system-octologs-list"
            data-toggle="list" href="#system-octologs" role="tab" aria-controls="listview"><i class="fa-brands fa-octopus-deploy"></i> OctoPrints Logs <span id="octoPrintCount">(<i
-                        class="fas fa-spinner fa-spin"></i>)</span></adisabled>
+                        class="fas fa-spinner fa-spin"></i>)</span></a>
         <a class="list-group-item list-group-item-action notyet d-none" id="system-octoprint-list"
            data-toggle="list" href="#system-octoprint" role="tab" aria-controls="listview"><i
                     class="fas fa-plug"></i> OctoPrints Plugin Logs <span id="octoCount">(<i
                         class="fas fa-spinner fa-spin"></i>)</span></a>
         <a class="list-group-item list-group-item-action notyet d-none" id="system-octoprint-klipper-list"
-           data-toggle="list" href="#system-octoprint" role="tab" aria-controls="listview"><i class="fa-solid fa-scissors"></i> Klipper Logs <span id="octoCount">(<i
+           data-toggle="list" href="#system-klipperlogs" role="tab" aria-controls="listview"><i class="fa-solid fa-scissors"></i> Klipper Logs <span id="klipperCount">(<i
                         class="fas fa-spinner fa-spin"></i>)</span></a>
         <button disabled class="btn btn-success" id="system-refresh-list" data-toggle="list" role="tab"
                 aria-controls="listview"><i id="refreshButtonIcon" class="fa-solid fa-arrows-rotate"></i> Refresh
@@ -130,7 +130,7 @@
                     <table id="klipperLogsTable" class="table table-dark text-center">
                         <thead>
                         <tr>
-                            <th class=" sticky-table table-dark text-wrap">Date</th>
+                            <th class=" sticky-table table-dark">Date</th>
                             <th scope="col" class=" sticky-table table-dark">Message</th>
                         </tr>
                         </thead>

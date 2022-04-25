@@ -21,7 +21,7 @@ const {
   getCurrentOperations
 } = require("../services/printer-statistics.service");
 const { SystemRunner } = require("../services/system-information.service");
-const { fetchUsers } = require("../services/user-service");
+const { fetchUsers } = require("../services/users.service");
 const { fetchMongoDBConnectionString, fetchClientVersion } = require("../app-env");
 const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");

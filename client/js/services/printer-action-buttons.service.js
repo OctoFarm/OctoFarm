@@ -4,6 +4,7 @@ import OctoPrintClient from "./octoprint/octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
 import {
+  canWeTurnOnThePrinter,
   printerIsDisconnectedOrError,
   printerIsOnline,
   printerIsPrinting
@@ -315,6 +316,15 @@ function addEventListeners(printer) {
           .getElementById("printerQuickConnect-" + printer._id)
           .classList.contains("btn-danger")
       ) {
+        const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
+        //TODO enable quick connect setting for this to be enabled or disabled...
+        if(canPowerOnThePrinter){
+          await PrinterPowerService.sendPowerCommandForPrinter(printer);
+          // Should be long enough for the printer to boot up.
+          // TODO also make customisable
+          await UI.delay(3000)
+        }
+
         let data = {};
         if (typeof printer.connectionOptions !== "undefined") {
           data = {

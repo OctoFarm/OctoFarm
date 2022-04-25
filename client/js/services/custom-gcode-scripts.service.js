@@ -9,7 +9,7 @@ export default class CustomGenerator {
       buttonColour = button.buttonColour;
     }
     return `
-    <button id="gcode-${button._id}" title="${button.description}" type="button" class="btn btn-${buttonColour}">${button.name}</button>
+    <button id="gcode-${button._id}" title="${button.description}" type="button" class="btn btn-${buttonColour} m-1">${button.name}</button>
     `;
   }
   static async generateButtons(printer) {

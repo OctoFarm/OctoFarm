@@ -50,7 +50,7 @@ class PrinterStore {
     return this.#printersList.length;
   }
 
-  listPrintersInformationForPrinterManager(){
+  listPrintersInformationForPrinterManager() {
     const returnList = this.#printersList.map((printer) => {
       return {
         _id: printer._id,
@@ -86,7 +86,7 @@ class PrinterStore {
     return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
   }
 
-  listPrintersInformationForMonitoringViews(){
+  listPrintersInformationForMonitoringViews() {
     const returnList = this.#printersList.map((printer) => {
       return {
         _id: printer._id,
@@ -116,7 +116,8 @@ class PrinterStore {
         flowRate: printer.flowRate,
         stepRate: printer.stepRate,
         terminal: printer.terminal,
-        powerSettings: printer.powerSettings
+        powerSettings: printer.powerSettings,
+        resends: printer.resends
       };
     });
 
@@ -1204,11 +1205,13 @@ class PrinterStore {
     return printer;
   }
 
-  async assignSpoolToPrinters(printerIDs, spoolID) {
+  async assignSpoolToPrinters(printerIDs, spoolID, multiSelectEnabled) {
     const farmPrinters = this.listPrintersInformation(true);
 
     // Unassign existing printers
-    this.deattachSpoolFromAllPrinters(spoolID);
+    if (!multiSelectEnabled) {
+      this.deattachSpoolFromAllPrinters(spoolID);
+    }
 
     // Asign new printer id's;
     for (let id of printerIDs) {
@@ -1255,10 +1258,9 @@ class PrinterStore {
   resetJob = (id) => {
     const printer = this.#findMePrinter(id);
     printer.resetJobInformation();
-  }
+  };
 
   deattachSpoolFromAllPrinters(filamentID) {
-    console.log(filamentID);
     const farmPrinters = this.listPrintersInformation(true);
     const farmPrintersAssigned = farmPrinters.filter(
       (printer) =>

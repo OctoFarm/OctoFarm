@@ -8,7 +8,7 @@ import "../../../utils/cleanup-modals.util";
 import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
 import {
   closePrinterManagerModalIfOffline,
-  imageOrCamera
+  imageOrCamera, printerIsDisconnectedOrError
 } from "../../../utils/octofarm.utils";
 import {
   findBigFilamentDropDowns,
@@ -882,8 +882,7 @@ export default class PrinterControlManagerService {
         }
       }
     } else if (
-      printer.printerState.colour.category === "Offline" ||
-      printer.printerState.colour.category === "Disconnected"
+        printerIsDisconnectedOrError(printer)
     ) {
 
       await PrinterControlManagerService.controls(true);
