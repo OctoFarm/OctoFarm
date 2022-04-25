@@ -16,7 +16,13 @@ function returnActionBtnTemplate(id, webURL) {
            >
               <i class="fas fa-toggle-off"></i>
         </button>
-        <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a title="Open OctoPrint"
+               id="printerWeb-${id}"
+               type="button"
+               class="tag btn btn-info btn-sm"
+               target="_blank"
+               href="${webURL}" role="button"><i class="fas fa-globe-europe "></i> </a>
+        <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
@@ -25,36 +31,27 @@ function returnActionBtnTemplate(id, webURL) {
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerHome-${id}"
              type="button"
-             class="dropdown-item d-none"
-              disabled
+             class="dropdown-item"
           >
-            <i class="fa-solid fa-house-flag"></i> Home
+            <i class="fa-solid fa-house-flag text-success"></i> Home
           </button> 
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerPreHeat-${id}"
              type="button"
              class="dropdown-item d-none"
-              disabled
           >
             <i class="fas fa-fire text-warning"></i> Pre-Heat
           </button> 
           <button
-             title="Uses the values from your selected filament and pre-heats to those values."
-             id="printerHome-${id}"
+             title="Fires an M112 command to the printer!"
+             id="printerEmergency-${id}"
              type="button"
-             class="dropdown-item text-info d-none"
-              disabled
+             class="dropdown-item"
           >
-            <i class="fa-solid fa-ban text-danger"></i> Emmergency Stop
+            <i class="fa-solid fa-ban text-danger"></i> Emergency Stop
           </button> 
           <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
-          <a title="Open OctoPrint"
-               id="printerWeb-${id}"
-               type="button"
-               class="dropdown-item"
-               target="_blank"
-               href="${webURL}" role="button"><i class="fas fa-globe-europe text-info"></i> OctoPrint Web</a>
             <button
                title="Terminate and reconnect OctoPrints Socket connection."
                id="printerSyncButton-${id}"
