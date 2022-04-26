@@ -110,7 +110,6 @@ const returnAlerts = (id, printerURL) => {
 
 function returnPrinterManageDropDown(id, disabled){
     let printerDisabledButton = null;
-    // let disabled = "disabled=true"
     if(!disabled){
         printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
@@ -128,7 +127,7 @@ function returnPrinterManageDropDown(id, disabled){
                  type="button"
                  class="btn dropdown-item"
                 >
-                <i class="fas fa-running"></i> Enable
+                <i class="fas fa-running text-success"></i> Enable
         </button>
         `
     }
@@ -146,14 +145,14 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerEditModal"
                 >
-                <i class="fa-solid fa-pen-to-square"></i> Edit
+                <i class="fa-solid fa-pen-to-square text-warning"></i> Edit
             </button>
             <button  title="ReScan your printers API"
                  id="printerAPIReScan-${id}"
                  type="button"
                  class="btn dropdown-item"
                 >
-                <i class="fab fa-searchengin"></i> Scan API
+                <i class="fab fa-searchengin text-danger"></i> Scan API
                 
             </button>
             ${printerDisabledButton}
@@ -165,7 +164,7 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerSettingsModal"
                 >
-                <i class="fas fa-cog"></i> Settings
+                <i class="fas fa-cog text-info"></i> Settings
             </button>
             <button  title="View logs for your printer"
                  id="printerLog-${id}"
@@ -174,7 +173,7 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerLogsModal"
             >
-                <i class="fas fa-file-alt"></i> Logs
+                <i class="fas fa-file-alt text-primary"></i> Logs
             </button>
             <h6 class="dropdown-header">Other</h6>
              <button title="View individual Printer Statistics"
@@ -184,7 +183,7 @@ function returnPrinterManageDropDown(id, disabled){
                      data-toggle="modal"
                      data-target="#printerStatisticsModal"
                 >
-                <i class="fas fa-chart-pie"></i> Statistics
+                <i class="fas fa-chart-pie text-warning"></i> Statistics
               </button>
                <button  title="Setup and track Maintenance Issues with Printers"
                      id="printerMaintenance-${id}"

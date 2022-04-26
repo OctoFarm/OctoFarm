@@ -327,7 +327,7 @@ export default class UI {
       e.target.title = "Printer is Disabled, click to enable";
       printerCard.classList = "";
     } else if (e.target.innerHTML.includes("wheelchair")) {
-      e.target.innerHTML = "<i class=\"fas fa-running\"></i> Enable";
+      e.target.innerHTML = "<i class=\"fas fa-running text-success\"></i> Enable";
       e.target.title = "Printer is Enabled, click to disable";
       printerCard.classList = "printerDisabled";
     }
