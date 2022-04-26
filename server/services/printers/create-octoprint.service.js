@@ -1186,15 +1186,10 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        console.log("OCTOFARM: ", this.settingsAppearance.name)
-        console.log("OctoPrint: ", appearance.name)
-        if (this.settingsAppearance.name !== appearance.name) {
-          this.settingsAppearance.name = appearance.name;
-        }
-        if (appearance.name.length === 0) {
-          this.settingsAppearance.name = PrinterClean.grabPrinterName(
-              settingsAppearance,
-            this.printerURL
+        if(this.settingsAppearance.name === "Grabbing from OctoPrint..."){
+          this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
+              appearance,
+              this.printerURL
           );
         }
       }
@@ -1221,6 +1216,10 @@ class OctoPrintPrinter {
 
       this.gcodeScripts = PrinterClean.sortGCODE(scripts);
       this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
+      this.printerName = PrinterClean.grabPrinterName(
+          this.settingsAppearance,
+          this.printerURL
+      );
       this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;

@@ -254,10 +254,14 @@ class PrinterCleanerService {
     return temps;
   }
 
+  static grabOctoPrintName(settingsAppearance){
+    return (settingsAppearance?.name.length === 0) ? generateRandomName() : settingsAppearance.name;
+  }
+
   static grabPrinterName(settingsAppearance, printerURL) {
     const randomisedName = generateRandomName();
-    if (settingsAppearance) {
-      return settingsAppearance?.name.length !== 0 ? settingsAppearance.name : randomisedName;
+    if (settingsAppearance?.name) {
+      return settingsAppearance.name;
     } else {
       return randomisedName ? randomisedName : printerURL;
     }
