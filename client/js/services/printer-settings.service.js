@@ -575,7 +575,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerOnCommand"  type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
+                This is usually an json object supplied in the following format <code>{"command":"turnPSUOn"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -590,7 +590,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerOffCommand" type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"turnPSUOff"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -605,7 +605,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"togglePSU"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -621,7 +621,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerStateCommand" type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"state"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"getPSUstate"}</code>
                </small>
             </div>
             <div class="col-8">
