@@ -276,7 +276,7 @@ a.notyet {
 
 .dashBody {
   padding: 5px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .dashBody p {
@@ -293,7 +293,7 @@ a.notyet {
 
 .fileBody {
   padding: 5px;
-  overflow-y: scroll;
+  overflow-y: auto;
   min-height: 60vh;
   height: 60vh;
   max-height: 60vh;
@@ -546,7 +546,7 @@ label {
 
 .modal-body {
   max-height: 80vh;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-wrap: normal;
 }
 
