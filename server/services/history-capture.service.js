@@ -288,20 +288,11 @@ class HistoryCaptureService {
     return filePath;
   }
 
-  /**
-   * @param payload
-   * @param serverSettings
-   * @param files
-   * @param id
-   * @param event
-   * @param printer
-   * @returns {Promise<null>}
-   */
   async thumbnailCheck() {
     try {
       let runCapture = async () => {
         // grab Thumbnail if available.
-        const currentFileIndex = findIndex(this.#files, function (o) {
+        const currentFileIndex = findIndex(this.#files, (o) => {
           return o.name === this.#payload.name;
         });
         let base64Thumbnail = null;
@@ -402,21 +393,13 @@ class HistoryCaptureService {
     return "";
   }
 
-  /**
-   * Grabs the timelapse by downloading it from OctoPrint's API
-   * @param fileName
-   * @param url
-   * @param id
-   * @param printer
-   * @returns {Promise<string>}
-   */
   async grabTimeLapse(fileName, url) {
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.timelapses);
 
     const filePath = `${PATHS.timelapses}/${this.#historyRecordID}-${fileName}`;
 
-    await downloadFromOctoPrint(url, filePath, this.#apikey, async function () {
+    await downloadFromOctoPrint(url, filePath, this.#apikey, async () => {
       const serverSettingsCache = SettingsClean.returnSystemSettings();
       if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
         await sleep(30000);
@@ -458,7 +441,7 @@ class HistoryCaptureService {
   }
 
   async objectCleanforInflux(obj) {
-    for (var propName in obj) {
+    for (const propName in obj) {
       if (obj[propName] === null) {
         delete obj[propName];
       }
@@ -483,7 +466,7 @@ class HistoryCaptureService {
       } else if (workingHistory.state.includes("Failure")) {
         currentState = "Failure";
       }
-      let group = " ";
+      let group;
       if (printer.group === "") {
         group = " ";
       } else {
@@ -719,9 +702,7 @@ class HistoryCaptureService {
       if (!this.#job?.estimatedPrintTime && !this.#job?.lastPrintTime) {
         logger.error(
           "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
-          {
-            job
-          }
+          this.#job
         );
         return;
       }
