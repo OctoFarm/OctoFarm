@@ -1177,10 +1177,10 @@ class OctoPrintPrinter {
       this.settingsWebcam = webcam;
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
+      this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
-        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
         console.log("OCTOFARM: ", this.settingsAppearance.name)
         console.log("OctoPrint: ", appearance.name)
         if (this.settingsAppearance.name !== appearance.name) {

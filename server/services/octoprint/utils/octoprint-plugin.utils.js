@@ -72,7 +72,6 @@ const testAndCollectCostPlugin = (currentSettings, plugins) => {
  * @returns {string}
  */
 const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
-  if (currentSettings === null) {
     if (plugins["psucontrol"]) {
       return {
         powerOnCommand: JSON.stringify({ command: "turnPSUOn" }),
@@ -112,9 +111,6 @@ const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
         }
       };
     }
-  } else {
-    return currentSettings;
-  }
 };
 
 const captureKlipperPluginData = (id, data) => {
