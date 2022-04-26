@@ -8,6 +8,7 @@ const { clonePayloadDataForHistory } = require("../../../utils/mapping.utils");
 const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCollection } = require("../../history-capture.service.js");
 const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
+const { ErrorCaptureService } = require("../../error-capture.service");
 
 const logger = new Logger("OctoFarm-State");
 
@@ -141,19 +142,17 @@ const captureDwelling = (id, data) => {
     });
 };
 const captureError = (id, data) => {
-  const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
-    data,
-    getPrinterStoreCache().getPrinter(id)
-  );
-  getPrinterStoreCache().reRunJobCleaner(id);
-  // Register cancelled print...
-  HistoryCollection.errorLog(payloadData, printer, job, files, resendStats)
-    .then((res) => {
-      logger.info("Successfully captured error", res);
+  const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
+  const errorCaptureService = new ErrorCaptureService(data, currentPrinterInfo);
+  errorCaptureService
+    .createErrorLog()
+    .then(async (res) => {
+      logger.info("Successfully captured error log data", res);
+      await ScriptRunner.check(currentPrinterInfo, "error", res.errorLog._id);
+      getPrinterStoreCache().resetJob(id);
     })
     .catch((e) => {
-      logger.error("Failed to capture error", e);
-      return e;
+      logger.error("Failed to capture error log data", e);
     });
 };
 const captureFileAdded = (id, data) => {
@@ -309,22 +308,14 @@ const capturePrintFailed = (id, data) => {
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, false)
+  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, false);
 };
 const captureFinishedPrint = (id, data, success) => {
   const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
     data,
     getPrinterStoreCache().getPrinter(id)
   );
-  HistoryCollection.capturePrint(
-    payloadData,
-    printer,
-    job,
-    files,
-    resendStats,
-    success
-  )
-
+  HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, success);
 };
 const capturePrintPaused = (id) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "paused", undefined)

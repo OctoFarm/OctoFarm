@@ -1181,12 +1181,14 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+        console.log("OCTOFARM: ", this.settingsAppearance.name)
+        console.log("OctoPrint: ", appearance.name)
         if (this.settingsAppearance.name !== appearance.name) {
           this.settingsAppearance.name = appearance.name;
         }
-        if (this.settingsAppearance.name.length === 0) {
+        if (appearance.name.length === 0) {
           this.settingsAppearance.name = PrinterClean.grabPrinterName(
-            appearance.name,
+              settingsAppearance,
             this.printerURL
           );
         }
