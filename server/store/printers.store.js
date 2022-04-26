@@ -1308,6 +1308,11 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     return printer.getPrinterStatistics();
   }
+
+  updateActiveControlUser(id, activeControlUser) {
+    const printer = this.#findMePrinter(id);
+    printer.activeControlUser = activeControlUser;
+  }
 }
 
 module.exports = PrinterStore;

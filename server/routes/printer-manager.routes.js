@@ -21,6 +21,7 @@ const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { generateRandomName } = require("../services/printer-name-generator.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const { updateUserActionLog } = require("../services/active-user-log.service");
 
 /**
  * @swagger
@@ -526,13 +527,39 @@ router.get(
 );
 
 router.get(
-    "/selectedFilament/:id",
-    ensureAuthenticated,
-    validateParamsMiddleware(M_VALID.MONGO_ID),
-    async (req, res) => {
-        const printerID = req.paramString("id");
-        res.send(getPrinterStoreCache().getSelectedFilament(printerID));
-    }
+  "/selectedFilament/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    res.send(getPrinterStoreCache().getSelectedFilament(printerID));
+  }
+);
+
+router.patch(
+  "updateActiveUser/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const currentUser = req.user.username;
+    const printerID = req.paramString("id");
+    getPrinterManagerCache().updateActiveControlUser(printerID, currentUser);
+    res.sendStatus(204);
+  }
+);
+
+router.post(
+  "logUserPrintAction/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const currentUser = req.user.username;
+    const printerID = req.paramString("id");
+    const data = req.body.opts;
+    const action = req.body.action;
+    updateUserActionLog(printerID, action, data, currentUser);
+    res.sendStatus(204);
+  }
 );
 
 module.exports = router;

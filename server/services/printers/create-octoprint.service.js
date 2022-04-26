@@ -44,11 +44,11 @@ class OctoPrintPrinter {
   multiUserIssue = undefined;
   restartRequired = false;
   enabling = false;
-  coolDownEvent = undefined;
   versionNotSupported = false;
   versionNotChecked = false;
   healthChecksPass = true;
   onboarding = undefined;
+  activeControlUser = "";
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -1060,7 +1060,6 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
-
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
@@ -1177,7 +1176,7 @@ class OctoPrintPrinter {
       this.settingsSystem = system;
       this.settingsWebcam = webcam;
 
-      if(force){
+      if (force) {
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
       }
 
@@ -1186,10 +1185,10 @@ class OctoPrintPrinter {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        if(this.settingsAppearance.name === "Grabbing from OctoPrint..."){
+        if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
           this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
-              appearance,
-              this.printerURL
+            appearance,
+            this.printerURL
           );
         }
       }
@@ -1216,10 +1215,7 @@ class OctoPrintPrinter {
 
       this.gcodeScripts = PrinterClean.sortGCODE(scripts);
       this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
-      this.printerName = PrinterClean.grabPrinterName(
-          this.settingsAppearance,
-          this.printerURL
-      );
+      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
       this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
@@ -1776,6 +1772,7 @@ class OctoPrintPrinter {
   }
 
   resetJobInformation() {
+    this.activeControlUser = "";
     const job = {
       file: {
         name: null,

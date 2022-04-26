@@ -2,22 +2,20 @@ const { findIndex } = require("lodash");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const History = require("../models/History.js");
-const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../handlers/logger.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const Spool = require("../models/Filament.js");
 const {
   filamentManagerReSync
 } = require("../services/octoprint/utils/filament-manager-plugin.utils");
-const { ScriptRunner } = require("./local-scripts.service.js");
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { sleep } = require("../utils/promise.utils");
+const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -45,10 +43,162 @@ function ensureBaseFolderExists() {
   ensureFolderExists(PATHS.base);
 }
 
-class HistoryCollection {
-  static async resyncFilament(printer, octoPrintApiClient) {
+class HistoryCaptureService {
+  // Record Data
+  #printerName = null;
+  #printerID = null;
+  #printerGroup = null;
+  #costSettings = null;
+  #success = null;
+  #reason = null;
+  #fileName = null;
+  #filePath = null;
+  #startDate = null;
+  #endDate = null;
+  #printTime = null;
+  #filamentSelection = null;
+  #job = null;
+  #notes = "";
+  #snapshot = "";
+  #timelapse = "";
+  #thumbnail = "";
+  #resends = null;
+
+  // Additional fields from constructor, required in filament/snapshot/timelapse/thumbnail calls.
+  #historyRecordID = null;
+  #printerAPIConnector = null;
+  #printerURL = null;
+  #apikey = null;
+  #timeout = null;
+  #selectedFilament = null;
+  #payload = null;
+  #files = null;
+  #camURL = null;
+
+  constructor(eventPayload, capturedPrinterData, state) {
+    logger.warning(
+      `${state ? "Completed" : "Failed"} Print triggered - ${capturedPrinterData.printerURL}`
+    );
+    const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+      eventPayload,
+      capturedPrinterData
+    );
+
+    this.#printerName = printer.printerName;
+    this.#printerID = printer._id;
+    this.#printerGroup = printer.group;
+    this.#costSettings = printer.costSettings;
+    this.#success = state;
+    this.#reason = eventPayload.reason;
+    this.#fileName = eventPayload.name;
+    this.#filePath = eventPayload.path;
+
+    const { startDate, endDate } = this.generateStartEndDates(payloadData);
+    this.#startDate = startDate;
+    this.#endDate = endDate;
+    this.#printTime = Math.round(payloadData.time);
+    this.#job = job;
+    this.#resends = resendStats;
+
+    this.#printerURL = printer.printerURL;
+    this.#apikey = printer.apikey;
+    this.#timeout = printer.timeout;
+    this.#selectedFilament = printer.selectedFilament;
+    this.#payload = payloadData;
+    this.#files = files;
+    this.#camURL = printer.camURL;
+
+    this.#printerAPIConnector = new OctoprintApiClientService(
+      printer.printerURL,
+      printer.apikey,
+      printer.timeout
+    );
+  }
+
+  async createHistoryRecord() {
+    // Save the initial history record with constucted values...
+    const printHistory = {
+      printerName: this.#printerName,
+      printerID: this.#printerID,
+      printerGroup: this.#printerGroup,
+      costSettings: this.#costSettings,
+      success: this.#success,
+      reason: this.#reason,
+      fileName: this.#fileName,
+      filePath: this.#filePath,
+      startDate: this.#startDate,
+      endDate: this.#endDate,
+      printTime: this.#printTime,
+      filamentSelection: this.#selectedFilament,
+      job: this.#job,
+      notes: this.#notes,
+      snapshot: this.#snapshot,
+      timelapse: this.#timelapse,
+      thumbnail: this.#thumbnail,
+      resends: this.#resends
+    };
+
+    // Create our history object
+    const saveHistory = new History({
+      printHistory
+    });
+
+    this.#historyRecordID = saveHistory._id.toString();
+    // Save the initial value of the record...
+    await saveHistory.save().catch((e) => {
+      logger.error("Unable to save the history record to database...", e);
+    });
+
+    const serverSettingsCache = SettingsClean.returnSystemSettings();
+    //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
+    if (serverSettingsCache.filamentManager && Array.isArray(this.#selectedFilament)) {
+      this.#filamentSelection = await this.resyncFilament();
+      await History.findOneAndUpdate(
+        { _id: this.#historyRecordID },
+        {
+          printHistory: {
+            filamentSelection: this.#filamentSelection
+          }
+        }
+      )
+        .then(async () => {
+          await getHistoryCache().initCache();
+        })
+        .catch((e) => {
+          logger.error("Unable to update history record with: ", e.toString());
+        });
+    }
+
+    // Save initial history
+    if (this.#success) {
+      await this.checkForAdditionalSuccessProperties();
+    }
+
+    if (!this.#success) {
+      await this.checkForAdditionalFailureProperties();
+    }
+
+    // await this.updateFilamentInfluxDB(
+    //   printer.selectedFilament,
+    //   printHistory,
+    //   printer.selectedFilament,
+    //   printer
+    // );
+
+    //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
+    setTimeout(async () => {
+      // Re-generate history cache...
+      await getHistoryCache().initCache();
+    }, 5000);
+
+    return {
+      saveHistory
+    };
+  }
+
+  async resyncFilament() {
     const returnSpools = [];
-    for (const element of printer.selectedFilament) {
+    for (const element of this.#selectedFilament) {
       if (element !== null) {
         const filamentID = element.spools.fmID;
         if (!filamentID) {
@@ -57,12 +207,11 @@ class HistoryCollection {
             element.spools
           );
         }
-        const response = await octoPrintApiClient.getPluginFilamentManagerFilament(
-          printer,
+        const response = await this.#printerAPIConnector.getPluginFilamentManagerFilament(
           filamentID
         );
 
-        logger.info(`${printer.printerURL}: spools fetched. Status: ${response.status}`);
+        logger.info(`${this.#printerURL}: spools fetched. Status: ${response.status}`);
         const sp = await response.json();
 
         const spoolID = element._id;
@@ -82,7 +231,7 @@ class HistoryCollection {
             tempOffset: sp.spool.temp_offset,
             fmID: sp.spool.id
           };
-          logger.info(`${printer.printerURL}: updating... spool status ${spoolEntity.spools}`);
+          logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity.spools}`);
           spoolEntity.markModified("spools");
           await spoolEntity.save();
           returnSpools.push(spoolEntity);
@@ -97,7 +246,7 @@ class HistoryCollection {
     return returnSpools;
   }
 
-  static async grabThumbnail(url, thumbnail, id, printer) {
+  async grabThumbnail(url, thumbnail) {
     if (!url && !thumbnail) {
       logger.error("Unable to download thumbnail! No URL or thumbnail provided", {
         url,
@@ -108,12 +257,12 @@ class HistoryCollection {
     const thumbParts = thumbnail.split("/");
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
-    const filePath = `${PATHS.thumbnails}/${id}-${splitAgain[0]}`;
+    const filePath = `${PATHS.thumbnails}/${this.#historyRecordID}-${splitAgain[0]}`;
 
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.thumbnails);
 
-    await downloadImage(url, filePath, printer.apikey, () => {
+    await downloadImage(url, filePath, this.#apikey, () => {
       logger.info("Thumbnail downloaded from: ", { url });
       logger.info("Thumbnail saved as: ", { filePath });
     });
@@ -121,7 +270,7 @@ class HistoryCollection {
     return filePath;
   }
 
-  static async snapPictureOfPrinter(url, id, fileDisplay) {
+  async snapPictureOfPrinter() {
     if (!url && url === "") {
       logger.error("Unable to snap picture from camera, url doesn't exist!", {
         url
@@ -130,11 +279,11 @@ class HistoryCollection {
     }
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.snapshots);
-    const decoder = MjpegDecoder.decoderForSnapshot(url);
+    const decoder = MjpegDecoder.decoderForSnapshot(this.#camURL);
     const frame = await decoder.takeSnapshot();
-    const filePath = `${PATHS.snapshots}/${id}-${fileDisplay}.jpg`;
+    const filePath = `${PATHS.snapshots}/${this.#historyRecordID}-${this.#fileName}.jpg`;
     await fs.writeFileSync(filePath, frame);
-    logger.info("Snapshot downloaded as: ", url);
+    logger.info("Snapshot downloaded as: ", this.#camURL);
     logger.info("Snapshot saved as: ", filePath);
     return filePath;
   }
@@ -148,24 +297,22 @@ class HistoryCollection {
    * @param printer
    * @returns {Promise<null>}
    */
-  static async thumbnailCheck(payload, files, id, printer) {
+  async thumbnailCheck() {
     try {
       let runCapture = async () => {
         // grab Thumbnail if available.
-        const currentFileIndex = findIndex(files, function (o) {
-          return o.name === payload.name;
+        const currentFileIndex = findIndex(this.#files, function (o) {
+          return o.name === this.#payload.name;
         });
         let base64Thumbnail = null;
         if (currentFileIndex > -1) {
           if (
-            typeof files[currentFileIndex] !== "undefined" &&
-            files[currentFileIndex].thumbnail !== null
+            typeof this.#files[currentFileIndex] !== "undefined" &&
+            this.#files[currentFileIndex].thumbnail !== null
           ) {
-            base64Thumbnail = await HistoryCollection.grabThumbnail(
-              `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
-              files[currentFileIndex].thumbnail,
-              id,
-              printer
+            base64Thumbnail = await this.grabThumbnail(
+              `${this.#printerURL}/${this.#files[currentFileIndex].thumbnail}`,
+              this.#files[currentFileIndex].thumbnail
             );
           }
         }
@@ -178,22 +325,24 @@ class HistoryCollection {
     }
   }
 
-  static async snapshotCheck(printer, id, payload) {
+  async snapshotCheck() {
     // Use default settings if not present
     try {
-      return HistoryCollection.snapPictureOfPrinter(printer.camURL, id, payload.name);
+      return this.snapPictureOfPrinter();
     } catch (e) {
       logger.error("Couldn't capture webcam snapshot as requested!", e);
     }
   }
 
-  static async timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient) {
-    if (printTime <= 10) {
-      logger.warning("Print time too short, skipping timelapse grab...", { printTime });
+  async timelapseCheck() {
+    if (this.#payload?.time <= 10) {
+      logger.warning("Print time too short, skipping timelapse grab...", {
+        time: this.#payload?.time
+      });
       return "";
     }
 
-    const timeLapseCall = await octoPrintApiClient.getTimelapses(true);
+    const timeLapseCall = await this.#printerAPIConnector.getTimelapses(true);
 
     if (!timeLapseCall.ok) {
       logger.error("Time lapse call failed to contact OctoPrint... skipping timelapse grab...", {
@@ -202,15 +351,15 @@ class HistoryCollection {
       return "";
     }
 
-    logger.info("Checking for timelapse...", fileName);
+    logger.info("Checking for timelapse...", this.#fileName);
 
     const timelapseResponse = await timeLapseCall.json();
 
     logger.info("Timelapse call: ", timelapseResponse);
 
     //is it unrendered?
-    let cleanFileName = JSON.parse(JSON.stringify(fileName));
-    if (fileName.includes(".gcode")) {
+    let cleanFileName = JSON.parse(JSON.stringify(this.#fileName));
+    if (this.#fileName.includes(".gcode")) {
       cleanFileName = cleanFileName.replace(".gcode", "");
     }
 
@@ -227,11 +376,11 @@ class HistoryCollection {
         unrenderedTimelapseIndex
       });
       await sleep(10000);
-      await this.timelapseCheck(printer, fileName, printTime, id, octoPrintApiClient);
+      await this.timelapseCheck();
     }
 
     await sleep(10000);
-    
+
     const lastTimelapseIndex = timelapseResponse.files.findIndex((o) =>
       o.name.includes(cleanFileName)
     );
@@ -240,11 +389,9 @@ class HistoryCollection {
       renderedList: timelapseResponse.files
     });
     if (lastTimelapseIndex > -1) {
-      return HistoryCollection.grabTimeLapse(
+      return this.grabTimeLapse(
         timelapseResponse.files[lastTimelapseIndex].name,
-        printer.printerURL + timelapseResponse.files[lastTimelapseIndex].url,
-        id,
-        printer
+        this.#printerURL + timelapseResponse.files[lastTimelapseIndex].url
       );
     }
 
@@ -263,18 +410,18 @@ class HistoryCollection {
    * @param printer
    * @returns {Promise<string>}
    */
-  static async grabTimeLapse(fileName, url, id, printer) {
+  async grabTimeLapse(fileName, url) {
     ensureBaseFolderExists();
     ensureFolderExists(PATHS.timelapses);
 
-    const filePath = `${PATHS.timelapses}/${id}-${fileName}`;
+    const filePath = `${PATHS.timelapses}/${this.#historyRecordID}-${fileName}`;
 
-    await downloadFromOctoPrint(url, filePath, printer.apikey, async function () {
+    await downloadFromOctoPrint(url, filePath, this.#apikey, async function () {
       const serverSettingsCache = SettingsClean.returnSystemSettings();
       if (serverSettingsCache?.history?.timelapse?.deleteAfter) {
         await sleep(30000);
         logger.info("Deleting time lapse from OctoPrint...", { url, filePath });
-        await HistoryCollection.deleteTimeLapse(printer, fileName);
+        await this.deleteTimeLapse(fileName);
         logger.info("Deleted timelapse from OctoPrint", { fileName });
       }
     });
@@ -282,29 +429,35 @@ class HistoryCollection {
     logger.info("Downloaded timelapse from: ", { url });
     logger.info("Saved timelapse to: ", { filePath });
 
-    const historyRecord = await History.findById(id);
-
-    historyRecord.printHistory.timelapse = filePath;
-
-    await historyRecord.save().then(async () => {
-      logger.info("Successfully updated history record with timelapse url... re-running cache...");
-      await getHistoryCache().initCache();
-    });
+    await History.findOneAndUpdate(
+      { _id: this.#historyRecordID },
+      {
+        printHistory: {
+          timelapse: filePath
+        }
+      }
+    )
+      .then(async () => {
+        await getHistoryCache().initCache();
+      })
+      .catch((e) => {
+        logger.error("Unable to update history record with ", e.toString());
+      });
 
     return filePath;
   }
 
-  static async deleteTimeLapse(printer, fileName) {
-    return fetch(`${printer.printerURL}/api/timelapse/${fileName}`, {
+  async deleteTimeLapse(fileName) {
+    return fetch(`${this.#printerURL}/api/timelapse/${fileName}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
+        "X-Api-Key": this.#apikey
       }
     });
   }
 
-  static async objectCleanforInflux(obj) {
+  async objectCleanforInflux(obj) {
     for (var propName in obj) {
       if (obj[propName] === null) {
         delete obj[propName];
@@ -312,7 +465,7 @@ class HistoryCollection {
     }
   }
 
-  static async updateInfluxDB(historyID, measurement, printer) {
+  async updateInfluxDB(historyID, measurement, printer) {
     try {
       let historyArchive = getHistoryCache().historyClean;
       let currentArchive = findIndex(historyArchive, function (o) {
@@ -387,7 +540,7 @@ class HistoryCollection {
     }
   }
 
-  static async updateFilamentInfluxDB(selectedFilament, history, printer) {
+  async updateFilamentInfluxDB(selectedFilament, history, printer) {
     for (let i = 0; i < selectedFilament.length; i++) {
       if (selectedFilament[i] !== null) {
         let currentState = " ";
@@ -434,7 +587,7 @@ class HistoryCollection {
     }
   }
 
-  static generateStartEndDates(payload) {
+  generateStartEndDates(payload) {
     const today = new Date();
     const printTime = new Date(payload.time * 1000);
     let startDate = today.getTime() - printTime.getTime();
@@ -445,7 +598,7 @@ class HistoryCollection {
   }
 
   // repeated... could have imported I suppose...
-  static generateWeightOfJobForASpool(length, filament, completionRatio) {
+  generateWeightOfJobForASpool(length, filament, completionRatio) {
     if (!length) {
       return length === 0 ? 0 : length;
     }
@@ -460,28 +613,29 @@ class HistoryCollection {
     const volume = length * Math.PI * radius * radius; // Repeated 4x across server
     return (completionRatio * volume * density).toFixed(2);
   }
-  static async downDateWeight(payload, job, filament, success) {
+
+  async downDateWeight() {
     let printTime = 0;
-    if (job?.lastPrintTime) {
+    if (this.#job?.lastPrintTime) {
       // Last print time available, use this as it's more accurate
-      printTime = job.lastPrintTime;
+      printTime = this.#job.lastPrintTime;
     } else {
-      printTime = job.estimatedPrintTime;
+      printTime = this.#job.estimatedPrintTime;
     }
 
     let printPercentage = 0;
 
-    if (!success) {
-      printPercentage = (payload.time / printTime) * 100;
+    if (!this.#success) {
+      printPercentage = (this.#payload.time / printTime) * 100;
     }
 
-    let completionRatio = success ? 1.0 : printPercentage / 100;
+    let completionRatio = this.#success ? 1.0 : printPercentage / 100;
 
-    for (let s = 0; s < filament.length; s++) {
-      const currentSpool = filament[s];
-      if (job?.filament["tool" + s]?.length) {
+    for (let s = 0; s < this.#filamentSelection.length; s++) {
+      const currentSpool = this.#filamentSelection[s];
+      if (this.#job?.filament["tool" + s]?.length) {
         const currentGram = this.generateWeightOfJobForASpool(
-          job.filament["tool" + s].length / 1000,
+          this.#job.filament["tool" + s].length / 1000,
           currentSpool,
           completionRatio
         );
@@ -495,89 +649,74 @@ class HistoryCollection {
     }
   }
 
-  static async checkForAdditionalSuccessProperties(
-    payload,
-    job,
-    currentFilament,
-    state,
-    printer,
-    saveHistory,
-    printerAPIConnector,
-    files
-  ) {
+  async checkForAdditionalSuccessProperties() {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
 
     if (serverSettingsCache.filament.downDateSuccess && !serverSettingsCache.filamentManager) {
       // Capture success amount
-      await this.downDateWeight(payload, job, currentFilament, state);
+      await this.downDateWeight();
     }
 
     if (serverSettingsCache.history.thumbnails.onComplete) {
-      saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
-        payload,
-        files,
-        saveHistory._id,
-        printer
-      );
+      this.#thumbnail = await this.thumbnailCheck();
     }
 
     if (serverSettingsCache.history.snapshot.onComplete) {
-      saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
-        printer,
-        saveHistory._id,
-        payload
-      );
+      this.#snapshot = await this.snapshotCheck();
     }
-    // This should use the websocket events..
+
+    await History.findOneAndUpdate(
+      { _id: this.#historyRecordID },
+      {
+        printHistory: {
+          snapshot: this.#snapshot,
+          thumbnail: this.#thumbnail
+        }
+      }
+    )
+      .then(async () => {
+        await getHistoryCache().initCache();
+      })
+      .catch((e) => {
+        logger.error("Unable to update history record with: ", e.toString());
+      });
+
     if (serverSettingsCache.history.timelapse.onComplete) {
-      await HistoryCollection.timelapseCheck(
-        printer,
-        payload.name,
-        payload.time,
-        saveHistory._id,
-        printerAPIConnector
-      );
+      await this.timelapseCheck();
     }
   }
 
-  static async checkForAdditionalFailureProperties(
-    payload,
-    job,
-    currentFilament,
-    state,
-    printer,
-    saveHistory,
-    printerAPIConnector,
-    files
-  ) {
+  async checkForAdditionalFailureProperties() {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
     if (serverSettingsCache.history.thumbnails.onFailure) {
-      saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
-        payload,
-        files,
-        saveHistory._id,
-        printer
-      );
+      this.#thumbnail = await this.thumbnailCheck();
     }
     if (serverSettingsCache.history.snapshot.onFailure) {
-      saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
-        printer,
-        saveHistory._id,
-        payload
-      );
+      this.#snapshot = await this.snapshotCheck();
     }
+
+    await History.findOneAndUpdate(
+      { _id: this.#historyRecordID },
+      {
+        printHistory: {
+          snapshot: this.#snapshot,
+          thumbnail: this.#thumbnail
+        }
+      }
+    )
+      .then(async () => {
+        await getHistoryCache().initCache();
+      })
+      .catch((e) => {
+        logger.error("Unable to update history record with ", e.toString());
+      });
+
     if (serverSettingsCache.history.timelapse.onFailure) {
-      await HistoryCollection.timelapseCheck(
-        printer,
-        payload.name,
-        payload.time,
-        saveHistory._id,
-        printerAPIConnector
-      );
+      await this.timelapseCheck();
     }
     if (serverSettingsCache.filament.downDateFailed && !serverSettingsCache.filamentManager) {
       // No point even trying to down date failed without these...
-      if (!job?.estimatedPrintTime && !job?.lastPrintTime) {
+      if (!this.#job?.estimatedPrintTime && !this.#job?.lastPrintTime) {
         logger.error(
           "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
           {
@@ -587,186 +726,11 @@ class HistoryCollection {
         return;
       }
       // Capture failed amount
-      await this.downDateWeight(payload, job, currentFilament, state);
-    }
-  }
-
-  static async capturePrint(payload, printer, job, files, resends, state) {
-    try {
-      logger.warning(`${state ? "Completed" : "Failed"} Print triggered - ${printer.printerURL}`);
-      const serverSettingsCache = SettingsClean.returnSystemSettings();
-
-      const printerAPIConnector = new OctoprintApiClientService(
-        printer.printerURL,
-        printer.apikey,
-        printer.timeout
-      );
-
-      const { startDate, endDate } = this.generateStartEndDates(payload);
-
-      //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
-      if (serverSettingsCache.filamentManager && Array.isArray(printer.selectedFilament)) {
-        printer.selectedFilament = await HistoryCollection.resyncFilament(
-          printer,
-          printerAPIConnector
-        );
-        logger.info("Grabbed latest filament values", printer.selectedFilament);
-      }
-
-      //If we're not using filament manager plugin... we need to check if the user has enabled automated spool updating.
-      const printHistory = {
-        printerName: printer.printerName,
-        printerID: printer._id,
-        printerGroup: printer.group,
-        costSettings: printer.costSettings,
-        success: state,
-        reason: payload?.reason,
-        fileName: payload.name,
-        filePath: payload.path,
-        startDate,
-        endDate,
-        printTime: Math.round(payload.time),
-        filamentSelection: printer.selectedFilament,
-        job,
-        notes: "",
-        snapshot: "",
-        timelapse: "",
-        thumbnail: "",
-        resends: resends
-      };
-      // Create our history object
-      const saveHistory = new History({
-        printHistory
-      });
-
-      // Save initial history
-      if (state) {
-        await this.checkForAdditionalSuccessProperties(
-          payload,
-          job,
-          printer.selectedFilament,
-          state,
-          printer,
-          saveHistory,
-          printerAPIConnector,
-          files
-        );
-      }
-
-      if (!state) {
-        await this.checkForAdditionalFailureProperties(
-          payload,
-          job,
-          printer.selectedFilament,
-          state,
-          printer,
-          saveHistory,
-          printerAPIConnector,
-          files
-        );
-      }
-
-      // await this.updateFilamentInfluxDB(
-      //   printer.selectedFilament,
-      //   printHistory,
-      //   printer.selectedFilament,
-      //   printer
-      // );
-
-      //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
-      await saveHistory
-        .save()
-        .then(async (res) => {
-          logger.info("Successfully captured print!", res);
-        })
-        .catch((e) => {
-          logger.error("Failed to capture print!", e.toString());
-        });
-      if (!state) {
-        ScriptRunner.check(
-          getPrinterStoreCache().getPrinter(printer._id),
-          "failed",
-          saveHistory._id
-        )
-          .then((resScript) => {
-            logger.info("Successfully checked failed script", resScript);
-          })
-          .catch((e) => {
-            logger.error("Failed to check cancelled script", e);
-          });
-      }
-      if (state) {
-        ScriptRunner.check(getPrinterStoreCache().getPrinter(printer._id), "done", saveHistory._id)
-          .then((resScript) => {
-            logger.info("Successfully print finished script", resScript);
-          })
-          .catch((e) => {
-            logger.error("Failed to check print finished script", e);
-          });
-      }
-      setTimeout(async () => {
-        // Re-generate history cache...
-        await getHistoryCache().initCache();
-      }, 5000);
-    } catch (e) {
-      console.error(e);
-      logger.error("Failed to generate history data!", e.toString());
-    }
-  }
-
-  static async errorLog(payload, printer, job) {
-    try {
-      let name = null;
-      if (typeof printer.settingsAppearance !== "undefined") {
-        if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsAppearance.name;
-        }
-      } else {
-        name = printer.printerURL;
-      }
-      logger.info("Error Log Collection Triggered", payload + printer.printerURL);
-      const today = new Date();
-      const printTime = new Date(payload.time * 1000);
-      let startDate = today.getTime() - printTime.getTime();
-      startDate = new Date(startDate);
-
-      const endDate = new Date();
-
-      const errorLog = {
-        printerIndex: printer.index,
-        printerID: printer._id,
-        costSettings: printer.costSettings,
-        printerName: name,
-        success: false,
-        reason: payload.error,
-        startDate,
-        endDate,
-        printTime: Math.round(payload.time),
-        job: job,
-        notes: ""
-      };
-      const saveError = new ErrorLog({
-        errorLog
-      });
-      await saveError
-        .save()
-        .then((res) => {
-          logger.info("Successfully saved error log!", res);
-        })
-        .catch((e) => {
-          logger.error("Failed to save error log!", e.toString());
-        });
-      await getHistoryCache().initCache();
-      await ScriptRunner.check(printer, "error", saveError._id);
-      logger.info("Error captured ", payload + printer.printerURL);
-    } catch (e) {
-      logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);
+      await this.downDateWeight();
     }
   }
 }
 
 module.exports = {
-  HistoryCollection
+  HistoryCaptureService
 };

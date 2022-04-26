@@ -1,26 +1,9 @@
-const { findIndex } = require("lodash");
-const fetch = require("node-fetch");
 const fs = require("fs");
-const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../handlers/logger.js");
-const { SettingsClean } = require("./settings-cleaner.service");
-const Spool = require("../models/Filament.js");
-const {
-  filamentManagerReSync
-} = require("../services/octoprint/utils/filament-manager-plugin.utils");
-const { ScriptRunner } = require("./local-scripts.service.js");
-const MjpegDecoder = require("mjpeg-decoder");
-const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
-const { getHistoryCache } = require("../cache/history.cache");
-const { writePoints } = require("./influx-export.service.js");
-const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
-const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { sleep } = require("../utils/promise.utils");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
-const { HistoryCollection } = require("./history-capture.service");
-
 const logger = new Logger("OctoFarm-HistoryCollection");
 
 const routeBase = "../images/historyCollection";
@@ -92,8 +75,8 @@ class ErrorCaptureService {
       }
     });
 
-    await newErrorLog.save().catch(e => {
-      logger.error("Couldn't save error log to database: ", e)
+    await newErrorLog.save().catch((e) => {
+      logger.error("Couldn't save error log to database: ", e);
     });
 
     return {
