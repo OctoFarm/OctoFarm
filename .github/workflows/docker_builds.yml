@@ -9,8 +9,8 @@ on:
       - 'development'
 jobs:
   docker:
-    runs-on: ubuntu-latest
     name: "Docker build"
+    runs-on: ubuntu-latest
     steps:
       - name: "Decide tags to use"
         run: |

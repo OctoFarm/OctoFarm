@@ -45,4 +45,5 @@ USER octofarm
 WORKDIR /app
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
-CMD [ "./docker/entrypoint.sh" ]
+RUN ["chmod", "+x", "./docker/entrypoint.sh"]
+CMD [ "bash", "./docker/entrypoint.sh" ]
