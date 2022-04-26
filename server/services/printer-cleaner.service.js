@@ -51,6 +51,7 @@ class PrinterCleanerService {
     for (let e = 0; e < 300; e++) {
       if(!!printerErrorLogs[e]){
         let errorFormat = {
+          id: printerErrorLogs[e]._id,
           date: printerErrorLogs[e].errorLog.endDate,
           message: printerErrorLogs[e].errorLog.reason,
           printer: farmPrinter.printerURL,

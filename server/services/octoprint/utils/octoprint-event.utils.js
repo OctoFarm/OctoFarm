@@ -148,11 +148,11 @@ const captureError = (id, data) => {
     .createErrorLog()
     .then(async (res) => {
       logger.info("Successfully captured error log data", res);
-      await ScriptRunner.check(currentPrinterInfo, "error", res.errorLog._id);
+      await ScriptRunner.check(currentPrinterInfo, "error", res._id);
       getPrinterStoreCache().resetJob(id);
     })
     .catch((e) => {
-      logger.error("Failed to capture error log data", e);
+      logger.error("Failed to capture error log data", e.toString());
     });
 };
 const captureFileAdded = (id, data) => {

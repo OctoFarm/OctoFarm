@@ -8,8 +8,7 @@ import {ApplicationError} from "../exceptions/application-error.handler";
 
 let chart = null;
 let eventListener = false;
-
-let currentPrinter = null;
+let updatedSeries = false;
 
 const options = {
   chart: {
@@ -141,6 +140,7 @@ export default class PrinterLogsService {
     octoPrintKlipperLogsTable.innerHTML = "";
     refreshMenuButton.disabled = true;
     UI.addFaSpinToElement(refreshMenuIcon)
+    updatedSeries = false;
   }
 
   static loadOctoFarmLogs(octofarmLogs) {
@@ -188,18 +188,52 @@ export default class PrinterLogsService {
     printerErrorsCount.innerHTML = `(${errorLogs.length})`;
 
     errorLogs.forEach(log => {
+      const resendsFormat = (!!log?.resendStats ? `Count: ${log.resendStats.count} / Transmitted: ${log.resendStats.transmitted} (${log.resendStats.ratio}%)` : "No resend stats")
+
+      let logsFormat = "No terminal logs"
+      if(!!log.terminal){
+        let prettyTerminal = "";
+
+        log.terminal.forEach((terminal, index) => {
+          prettyTerminal += `<code><b>${index + 1}: </b>${terminal} <br></code>`
+        })
+
+        logsFormat = `
+
+        <div class="accordion" id="accordionExample-${log.id}">
+          <div class="card">
+            <div class="card-header" id="collapseOne">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left btn-sm" type="button" data-toggle="collapse" data-target="#collapseOne-${log.id}" aria-expanded="true" aria-controls="collapseOne-${log.id}">
+                  Last ${log.terminal.length} terminal lines
+                </button>
+              </h2>
+            </div>
+        
+            <div id="collapseOne-${log.id}" class="collapse" aria-labelledby="${log.id}-accordian-heading" data-parent="#accordionExample-${log.id}">
+              <div class="card-body">
+                ${ prettyTerminal }
+              </div>
+            </div>
+          </div>
+      `
+      }
+
+
+
       printerErrorsTable.insertAdjacentHTML(
           "beforeend",
           `
             <tr class="${log.state}">
-              <th scope="row">${Calc.dateClean(log.date)}</th>
-              <td>${log.message}</td>
+              <th class="text-wrap" scope="row">${Calc.dateClean(log.date)}</th>
+              <td class="text-wrap" >${log.message}</td>
+              <td class="text-wrap" >${resendsFormat}</td>
+              <td> ${logsFormat} </td>
             </tr>
       `
       );
     })
   }
-  //TODO Move to views... make much much much much faster loading tho
   static async loadPrinterTemperatures(printerTemperatures){
     if(!printerTemperatures || printerTemperatures?.length === 0){
       octoPrintTemperatureMenu.innerHTML = "(0)";
@@ -210,7 +244,10 @@ export default class PrinterLogsService {
     chart = new ApexCharts(octoPrintTemperatureChart, options);
     chart.render();
     await UI.delay(1000)
-    this.fillChartData(printerTemperatures);
+    if(!updatedSeries){
+      chart.updateSeries(printerTemperatures);
+    }
+
   }
   static fillChartData(printerTemperatures){
     chart.updateSeries(printerTemperatures);
@@ -367,7 +404,11 @@ export default class PrinterLogsService {
     })
 
     octoPrintTemperatureMenu.addEventListener("click", async () => {
-      this.fillChartData(printerTemperatures);
+      if(!updatedSeries){
+        this.fillChartData(printerTemperatures);
+        updatedSeries = true;
+      }
+
     })
 
     eventListener = true;
