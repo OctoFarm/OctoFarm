@@ -43,7 +43,7 @@ const addOctoPrintIssueWrapper = (id, message, state) => {
  * @returns {string}
  */
 const testAndCollectCostPlugin = (currentSettings, plugins) => {
-  if (currentSettings === null) {
+  if (currentSettings?.default === true) {
     if (plugins["costestimation"]) {
       return {
         powerConsumption: plugins["costestimation"].powerConsumption,

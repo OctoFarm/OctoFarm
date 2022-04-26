@@ -118,6 +118,7 @@ class OctoPrintPrinter {
   octoPi = undefined;
   octoResourceMonitor = undefined;
   costSettings = {
+    default: true,
     powerConsumption: 0.5,
     electricityCosts: 0.15,
     purchasePrice: 500,
@@ -1176,11 +1177,15 @@ class OctoPrintPrinter {
       this.settingsSystem = system;
       this.settingsWebcam = webcam;
 
+      if(force){
+        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+      }
+
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
-      this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
+        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
         console.log("OCTOFARM: ", this.settingsAppearance.name)
         console.log("OctoPrint: ", appearance.name)
         if (this.settingsAppearance.name !== appearance.name) {
