@@ -48,8 +48,9 @@ const clonePayloadDataForHistory = function (payload, farmPrinter) {
   const job = cloneDeep(farmPrinter.job);
   const files = cloneDeep(farmPrinter.fileList.fileList);
   const resendStats = cloneDeep(farmPrinter.resends);
+  const terminal = cloneDeep(farmPrinter.terminal);
 
-  return { payloadData, printer, job, files, resendStats };
+  return { payloadData, printer, job, files, resendStats, terminal };
 };
 
 module.exports = {

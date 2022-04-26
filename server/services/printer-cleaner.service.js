@@ -49,15 +49,15 @@ class PrinterCleanerService {
     let currentPluginManagerLogs = [];
     let currentKlipperLogs = [];
     for (let e = 0; e < 300; e++) {
-      if (
-        !!printerErrorLogs[e]?.errorLog?.printerID &&
-        printerErrorLogs[e].errorLog.printerID === farmPrinter._id
-      ) {
+      if(!!printerErrorLogs[e]){
         let errorFormat = {
+          id: printerErrorLogs[e]._id,
           date: printerErrorLogs[e].errorLog.endDate,
           message: printerErrorLogs[e].errorLog.reason,
           printer: farmPrinter.printerURL,
-          state: "Offline"
+          state: "Offline",
+          terminal: printerErrorLogs[e]?.errorLog?.terminal,
+          resendStats: printerErrorLogs[e]?.errorLog?.resendStats
         };
         currentErrorLogs.push(errorFormat);
       }
@@ -156,10 +156,10 @@ class PrinterCleanerService {
                   return e.name;
                 })
                 .indexOf(keys[k] + "-actual");
-              if (currentTempLogs[arrayTarget].data.length <= tempHistory.length) {
+              if (currentTempLogs[arrayTarget]?.data.length <= tempHistory.length) {
                 currentTempLogs[arrayTarget].data.push(target);
               }
-              if (currentTempLogs[arrayActual].data.length <= tempHistory.length) {
+              if (currentTempLogs[arrayActual]?.data.length <= tempHistory.length) {
                 currentTempLogs[arrayActual].data.push(actual);
               }
             }
@@ -254,10 +254,14 @@ class PrinterCleanerService {
     return temps;
   }
 
+  static grabOctoPrintName(settingsAppearance){
+    return (settingsAppearance?.name.length === 0) ? generateRandomName() : settingsAppearance.name;
+  }
+
   static grabPrinterName(settingsAppearance, printerURL) {
     const randomisedName = generateRandomName();
-    if (settingsAppearance) {
-      return settingsAppearance?.name.length !== 0 ? settingsAppearance.name : randomisedName;
+    if (settingsAppearance?.name) {
+      return settingsAppearance.name;
     } else {
       return randomisedName ? randomisedName : printerURL;
     }

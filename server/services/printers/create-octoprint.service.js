@@ -44,11 +44,11 @@ class OctoPrintPrinter {
   multiUserIssue = undefined;
   restartRequired = false;
   enabling = false;
-  coolDownEvent = undefined;
   versionNotSupported = false;
   versionNotChecked = false;
   healthChecksPass = true;
   onboarding = undefined;
+  activeControlUser = "";
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -118,6 +118,7 @@ class OctoPrintPrinter {
   octoPi = undefined;
   octoResourceMonitor = undefined;
   costSettings = {
+    default: true,
     powerConsumption: 0.5,
     electricityCosts: 0.15,
     purchasePrice: 500,
@@ -1059,7 +1060,6 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
-
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
@@ -1176,17 +1176,18 @@ class OctoPrintPrinter {
       this.settingsSystem = system;
       this.settingsWebcam = webcam;
 
+      if (force) {
+        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+      }
+
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        if (this.settingsAppearance.name !== appearance.name) {
-          this.settingsAppearance.name = appearance.name;
-        }
-        if (this.settingsAppearance.name.length === 0) {
-          this.settingsAppearance.name = PrinterClean.grabPrinterName(
-            appearance.name,
+        if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
+          this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
+            appearance,
             this.printerURL
           );
         }
@@ -1214,6 +1215,7 @@ class OctoPrintPrinter {
 
       this.gcodeScripts = PrinterClean.sortGCODE(scripts);
       this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
+      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
       this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
@@ -1770,6 +1772,7 @@ class OctoPrintPrinter {
   }
 
   resetJobInformation() {
+    this.activeControlUser = "";
     const job = {
       file: {
         name: null,

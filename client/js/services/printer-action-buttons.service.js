@@ -32,7 +32,7 @@ function returnActionBtnTemplate(id, webURL) {
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-          <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i> Printer</h6>
+          <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i> Commands</h6>
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
              id="printerHome-${id}"
@@ -57,17 +57,7 @@ function returnActionBtnTemplate(id, webURL) {
           >
             <i class="fa-solid fa-ban text-danger"></i> Emergency Stop
           </button> 
-          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
-          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
-          <h6 class="dropdown-header"><i class="fas fa-cogs"></i> Manage</h6>
-          <button
-             title="Terminate and reconnect OctoPrints Socket connection."
-             id="printerSyncButton-${id}"
-             type="button"
-             class="dropdown-item"
-          >
-              <i class="fas fa-sync text-warning"></i> Re-Connect Socket
-          </button> 
+          <h6 class="dropdown-header d-none"><i class="fa-solid fa-compress"></i> Actions</h6>
           <button  
            title="Runs a pre-configured gcode sequence so you can detect which printer this is."
            id="printerFindMe-${id}"
@@ -78,11 +68,20 @@ function returnActionBtnTemplate(id, webURL) {
             <i class="fas fa-search text-info"></i> Find Printer!
           </button> 
           <h6 id="octoPrintHeader-${id}" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint</h6>
+          <button
+             title="Terminate and reconnect OctoPrints Socket connection."
+             id="printerSyncButton-${id}"
+             type="button"
+             class="dropdown-item"
+          >
+              <i class="fas fa-sync text-warning"></i> Re-Connect Socket
+          </button>   
+          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
           <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
           <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
           <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
           <button id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Shutdown Host</button>
-
         </div>
       </div>
   `;

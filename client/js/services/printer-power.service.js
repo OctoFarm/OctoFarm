@@ -59,25 +59,27 @@ export default class PrinterPowerService {
     const shutdownPrinterButton = document.getElementById("printerPowerOff-"+printer._id);
     const turnOnThePrinterButton = document.getElementById("printerPowerOn-"+printer._id);
     const powerBadge = document.getElementById(`powerState-${printer._id}`)
-    let isPoweredOn = false;
 
     if(canDetectPowerState){
       if(!this.timer[printer._id]){
-        this.timer[printer._id] = 0;
+        this.timer[printer._id] = {
+          isPoweredOn: false,
+          checkTime: 10000
+        };
       }
-      if(this.timer[printer._id] >= 10000){
-        this.timer[printer._id] = 0;
-        isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer);
+      if(this.timer[printer._id].checkTime >= 10000){
+        this.timer[printer._id].checkTime = 0;
+        this.timer[printer._id].isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer);
       }
-      this.timer[printer._id] = this.timer[printer._id] + 500;
+      this.timer[printer._id].checkTime = this.timer[printer._id] + 500;
       UI.removeDisplayNoneFromElement(powerBadge);
-      if(!isPoweredOn){
+      if(!this.timer[printer._id].isPoweredOn){
         if(!powerBadge.classList.contains("text-danger")){
           powerBadge.classList.add("text-danger");
           powerBadge.classList.remove("text-success");
         }
       }
-      if(isPoweredOn){
+      if(this.timer[printer._id].isPoweredOn){
         if(!powerBadge.classList.contains("text-success")){
           powerBadge.classList.add("text-success");
           powerBadge.classList.remove("text-danger")
@@ -89,7 +91,7 @@ export default class PrinterPowerService {
       if(!canDetectPowerState){
         shutdownPrinterButton.disabled = isPrinting || canDetectPowerState
       }else{
-        shutdownPrinterButton.disabled = isPrinting || !isPoweredOn;
+        shutdownPrinterButton.disabled = isPrinting || !this.timer[printer._id].isPoweredOn;
       }
 
 
@@ -100,7 +102,7 @@ export default class PrinterPowerService {
       if(!canDetectPowerState){
         turnOnThePrinterButton.disabled = isPrinting || canDetectPowerState
       }else{
-        turnOnThePrinterButton.disabled = isPrinting || isPoweredOn;
+        turnOnThePrinterButton.disabled = isPrinting || this.timer[printer._id].isPoweredOn;
       }
 
       UI.removeDisplayNoneFromElement(turnOnThePrinterButton)
@@ -191,5 +193,7 @@ export default class PrinterPowerService {
           "Clicked"
       )
     }
+    await UI.delay(2000);
+    this.timer[printer._id].isPoweredOn = await this.printerIsPoweredOn(printer)
   }
 }

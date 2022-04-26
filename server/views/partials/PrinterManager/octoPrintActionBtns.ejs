@@ -26,7 +26,7 @@
                     class="dropdown-item"
                     href="#"
             >
-                <i class="fab fa-raspberry-pi"></i> Update Clients <%= disable_btn_air_gapped %>
+                <i class="fab fa-raspberry-pi text-success"></i> Update Clients <%= disable_btn_air_gapped %>
             </button>
             <button
                     title="Install multiple plugins at once."
@@ -38,7 +38,7 @@
                     data-toggle="modal" data-target="#printerSelectModal"
                     disabled
             >
-                <i class="fas fa-plug"></i> Backup Clients
+                <i class="fas fa-plug text-info"></i> Backup Clients
             </button>
             <button
                     title="Install multiple plugins at once."
@@ -50,7 +50,7 @@
                     data-toggle="modal" data-target="#printerSelectModal"
                     disabled
             >
-                <i class="fas fa-plug"></i> Restore Client
+                <i class="fas fa-plug text-success"></i> Restore Client
             </button>
         <h6 class="dropdown-header">Plugins</h6>
         <button
@@ -62,7 +62,7 @@
                 aria-expanded="false"
                 data-toggle="modal" data-target="#printerSelectModal" <%= disable_btn_air_gapped %>
         >
-            <i class="fas fa-download"></i> Install Plugins
+            <i class="fas fa-download text-info"></i> Install Plugins
         </button>
         <button
                 title="Uninstall multiple plugins at once."
@@ -75,7 +75,7 @@
         >
 
 
-            <i class="fas fa-trash"></i> Uninstall Plugins
+            <i class="fas fa-trash text-danger"></i> Uninstall Plugins
         </button>
         <button
                 title="Enable multiple plugins at once"
@@ -86,7 +86,7 @@
                 aria-expanded="false"
                 data-toggle="modal" data-target="#printerSelectModal"
         >
-            <i class="fas fa-toggle-on"></i> Enable Plugin
+            <i class="fas fa-toggle-on text-info"></i> Enable Plugin
         </button>
         <button
                 title="Disable multiple plugins at once"
@@ -97,7 +97,7 @@
                 aria-expanded="false"
                 data-toggle="modal" data-target="#printerSelectModal"
         >
-            <i class="fas fa-toggle-off"></i> Disable Plugin
+            <i class="fas fa-toggle-off text-warning"></i> Disable Plugin
         </button>
         <button
                 title="Update multiple OctoPrint Plugins at once."
@@ -106,7 +106,7 @@
                 class="dropdown-item"
                 href="#"
         >
-            <i class="fas fa-sync"></i> Update Plugins <%= disable_btn_air_gapped %>
+            <i class="fas fa-sync text-success"></i> Update Plugins <%= disable_btn_air_gapped %>
         </button>
         </div>
     </div>

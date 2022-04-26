@@ -75,8 +75,10 @@ export default class OctoFarmClient {
   static printerRoute = "/printers";
   static disablePrinterRoute = this.printerRoute + "/disable";
   static enablePrinterRoute = this.printerRoute + "/enable";
-  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
-  static printerStepChange = this.printerRoute + "/stepChange";
+  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name";
+  static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
+  static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
+  static printerStepChangeRoute = this.printerRoute + "/stepChange";
   static serverSettingsRoute = "/settings/server";
   static clientSettingsRoute = "/settings/client";
   static filamentRoute = `/filament`;
@@ -260,6 +262,14 @@ export default class OctoFarmClient {
 
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });
+  }
+
+  static updateActiveControlUser(id){
+    return this.patch(`${this.updateActiveUserRoute}/${id}`)
+  }
+
+  static updateUserActionsLog(id, body){
+    return this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
   }
 
   static async get(path) {
