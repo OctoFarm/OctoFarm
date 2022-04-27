@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
+const { ensureCurrentUserAndGroup } = require("../middleware/users");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -539,11 +540,12 @@ router.get(
 router.patch(
   "/updateActiveUser/:id",
   ensureAuthenticated,
+  ensureCurrentUserAndGroup,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
     const currentUser = req.user.username;
     const printerID = req.paramString("id");
-    getPrinterManagerCache().updateActiveControlUser(printerID, currentUser);
+    getPrinterStoreCache().updateActiveControlUser(printerID, currentUser);
     res.sendStatus(204);
   }
 );
@@ -551,6 +553,7 @@ router.patch(
 router.post(
   "/logUserPrintAction/:id",
   ensureAuthenticated,
+  ensureCurrentUserAndGroup,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
     const currentUser = req.user.username;

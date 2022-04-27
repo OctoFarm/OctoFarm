@@ -12,7 +12,6 @@ const { AppConstants } = require("../constants/app.constants");
 const { getDefaultDashboardSettings } = require("../constants/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
-const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { TaskManager } = require("../services/task-manager.service");
