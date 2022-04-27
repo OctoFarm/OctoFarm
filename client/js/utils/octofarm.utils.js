@@ -181,7 +181,7 @@ export function printerIsPrintingOrComplete(printer){
 
     const {printerState: {colour: {category}}} = printer;
 
-    return !(disabled || category !== "Active");
+    return (!disabled && category === "Active" || category === "Complete");
 }
 
 export function printerIsPrinting(printer){
