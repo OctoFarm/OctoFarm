@@ -222,7 +222,7 @@ export function closePrinterManagerModalIfDisconnected(printer){
     if(isPrinterDisconnected(printer)){
         $("#printerManagerModal").modal("hide");
     }
-    return isPrinterDisconnected()
+    return isPrinterDisconnected(printer)
 }
 
 export function canWeRestartOctoPrint(printer){
