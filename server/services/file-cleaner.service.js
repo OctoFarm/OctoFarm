@@ -2,7 +2,7 @@
 
 const { uniqBy, cloneDeep } = require("lodash");
 const Logger = require("../handlers/logger.js");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { getMaintenanceCosts, getElectricityCosts } = require("../utils/print-cost.util");
 
 const { getDefaultFileCleanStatistics } = require("../constants/cleaner.constants");
 
@@ -101,10 +101,12 @@ class FileCleanerService {
       return;
     }
 
-    const printCost = costSettings;
     const sortedFileList = [];
     if (!!fileList?.fileList) {
       for (let file of fileList.fileList) {
+        const electricityCosts = getElectricityCosts(file.time, costSettings);
+        const maintenanceCosts = getMaintenanceCosts(file.time, costSettings);
+        const printCost = electricityCosts + maintenanceCosts;
         const sortedFile = {
           path: file.path,
           fullPath: file.fullPath,
@@ -120,7 +122,9 @@ class FileCleanerService {
           last: file.last,
           expectedPrintTime: file.time,
           filamentLength: file.length,
-          printCost: getPrintCostNumeric(file.time, printCost)
+          printCost,
+          electricityCosts,
+          maintenanceCosts
         };
         sortedFile.toolUnits = FileCleanerService.getUnits(
           selectedFilament,
@@ -144,6 +148,10 @@ class FileCleanerService {
       return;
     }
 
+    const electricityCosts = getElectricityCosts(file.time, costSettings);
+    const maintenanceCosts = getMaintenanceCosts(file.time, costSettings);
+    const printCost = electricityCosts + maintenanceCosts;
+
     const sortedFile = {
       path: file.path,
       fullPath: file.fullPath,
@@ -159,12 +167,11 @@ class FileCleanerService {
       last: file.last,
       expectedPrintTime: file.time,
       filamentLength: file.length,
-      printCost: getPrintCostNumeric(file.time, costSettings)
+      printCost,
+      electricityCosts,
+      maintenanceCosts
     };
-    sortedFile.toolUnits = FileCleanerService.getUnits(
-        selectedFilament,
-        sortedFile.filamentLength
-    );
+    sortedFile.toolUnits = FileCleanerService.getUnits(selectedFilament, sortedFile.filamentLength);
     sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
 
     return sortedFile;

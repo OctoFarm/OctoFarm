@@ -15,12 +15,13 @@ const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
+const clientLogger = new Logger("OctoFarm-Client");
 const multer = require("multer");
 const { isEqual } = require("lodash");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { Logs } = require("../services/server-logs.service.js");
 const { SystemCommands } = require("../services/server-commands.service.js");
-const { fetchUsers } = require("../services/user-service");
+const { fetchUsers } = require("../services/users.service");
 const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
@@ -35,6 +36,8 @@ const { databaseNamesList } = require("../constants/database.constants");
 const { TaskManager } = require("../services/task-manager.service");
 const { SystemRunner } = require("../services/system-information.service");
 const { listActiveClients } = require("../services/server-side-events.service");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { FilamentClean } = require("../services/filament-cleaner.service");
 
 module.exports = router;
 
@@ -95,7 +98,6 @@ router.delete("/server/logs/:name", ensureAuthenticated, ensureAdministrator, as
 router.get("/server/logs/:name", ensureAuthenticated, ensureAdministrator, (req, res) => {
   const download = req.paramString("name");
   const file = `${getLogsPath()}/${download}`;
-  console.log(file);
   res.download(file, download); // Set disposition and send it.
 });
 router.post(
@@ -131,7 +133,7 @@ router.get(
   validateParamsMiddleware(S_VALID.DATABASE_NAME),
   async (req, res) => {
     const databaseName = req.paramString("databaseName");
-    await getPrinterManagerCache().killAllConnections();
+    getPrinterManagerCache().killAllConnections();
     if (databaseName === "EverythingDB") {
       await ServerSettingsDB.deleteMany({});
       await ClientSettingsDB.deleteMany({});
@@ -288,9 +290,6 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
-    const influxExport = isEqual(actualOnline.influxExport, sentOnline.influxExport);
-
-    console.log(serverChanges, timeoutChanges, influxExport)
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -299,10 +298,16 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].influxExport = sentOnline.influxExport;
     checked[0].monitoringViews = sentOnline.monitoringViews;
 
-    if (
-      [serverChanges, timeoutChanges, influxExport].includes(false)
-    ) {
+    if ([serverChanges, timeoutChanges].includes(false)) {
       restartRequired = true;
+    }
+
+    if (checked[0].filament.allowMultiSelect === false) {
+      const spoolList = FilamentClean.getSpools();
+      spoolList.forEach((spool) => {
+        getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
+      });
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
     //Check the influx export to see if all information exists... disable if not...
@@ -395,7 +400,10 @@ router.get(
     const all = await GcodeDB.find();
     const returnCode = [];
     all.forEach((script) => {
-      if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
+      if (
+        script.printerIds.includes(printerId) ||
+        script.printerIds.includes("99aa99aaa9999a99999999aa")
+      ) {
         returnCode.push(script);
       }
     });
@@ -419,5 +427,21 @@ router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req
 });
 
 router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
+
+router.post("/client/logs", ensureAuthenticated, async (req, res) => {
+  const { code, message, name, statusCode, type, color, developerMessage } = req.body;
+  const loggingMessage = `${code ? code : "No Code"}: ${message ? message : "No Message"}`;
+  const errorObject = {
+    name,
+    statusCode,
+    type
+  };
+  if (color !== "danger") {
+    clientLogger.warning(loggingMessage, errorObject);
+  } else {
+    clientLogger.error(loggingMessage, errorObject);
+    clientLogger.info("Developer Message: ", developerMessage)
+  }
+});
 
 module.exports = router;

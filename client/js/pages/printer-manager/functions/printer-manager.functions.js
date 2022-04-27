@@ -2,15 +2,14 @@ import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
-import PrinterPowerService from "../../../services/printer-power-service";
-import PrinterControlManagerService from "../../../services/printer-control-manager.service";
+import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
 import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
 import Validate from "../../../utils/validate";
 import {PrintersManagement} from "../printer-constructor";
 import PrinterSelectionService from "../../../services/printer-selection.service";
 import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
-import PrinterFileManagerService from "../../../services/printer-file-manager.service";
+import PrinterFileManagerService from "../../monitoring/services/printer-file-manager.service";
 import {
   addHealthCheckListeners,
   returnFarmOverviewTableRow,
@@ -18,36 +17,42 @@ import {
 } from "../templates/health-checks-table-row.templates";
 import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
 import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates"
-import PrinterTerminalManagerService from "../../../services/printer-terminal-manager.service";
+import PrinterTerminalManagerService from "../../monitoring/services/printer-terminal-manager.service";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
-let powerTimer = 5000;
+//TODO update with the printer ticker fixes
+function updateUserActionsLog (list){
+  document.getElementById("printerManagementUserActionsStatus").innerHTML = list.length;
+  const userActionsMessageBox = document.getElementById("userActionsLogTable")
+  list.forEach((e) => {
+    if (!document.getElementById(e.id)) {
+      const date = new Date(e.date).toLocaleString();
+      userActionsMessageBox.insertAdjacentHTML(
+          "afterbegin",
+          `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.currentUser} | ${e.printerName.slice(0, 6)}... | ${e.action}</div>`
+      );
+    }
+  });
+}
 
 export function workerEventFunction(data) {
   if (data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
+      console.log(data.currentActionList)
       if (data.currentTickerList.length > 0) {
         checkIfLoaderExistsAndRemove();
         checkIfAlertsLoaderExistsAndRemove();
         updateConnectionLog(data.currentTickerList);
+        updateUserActionsLog(data.currentActionList)
       } else {
         checkIfAlertsLoaderExistsAndRemove(true);
         checkIfLoaderExistsAndRemove(true);
       }
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
-      }
-      // REFACTOR clean up power buttons wants to be in printer-data.js
-      if (powerTimer >= 5000) {
-        data.printersInformation.forEach((printer) => {
-          PrinterPowerService.applyBtn(printer);
-        });
-        powerTimer = 0;
-      } else {
-        powerTimer += 500;
       }
     } else {
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {
@@ -98,7 +103,6 @@ export async function loadPrintersRegisteredEvents(id){
 export async function scanNetworkForDevices(e) {
   e.target.disabled = true;
   UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
-  try {
     const scannedPrinters = await OctoFarmClient.get("printers/scanNetwork");
     for (const scannedPrinter of scannedPrinters) {
       const printer = {
@@ -123,15 +127,6 @@ export async function scanNetworkForDevices(e) {
       3000,
       "Clicked"
     );
-  } catch (error) {
-    console.error(error);
-    UI.createAlert(
-      "error",
-      "There we're issues scanning your network for devices... please check the logs",
-      0,
-      "clicked"
-    );
-  }
   e.target.disabled = false;
 }
 
@@ -144,15 +139,10 @@ export async function reSyncAPI(force = false, id = null) {
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Scanning APIs...";
-  try {
     await OctoFarmClient.post("printers/reSyncAPI", {
       id: id,
       force: force
     });
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
-  }
   alert.close();
   UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
   reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i> ReScan All API's";
@@ -167,14 +157,9 @@ export async function reSyncWebsockets() {
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   reSyncSocketsBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Syncing Sockets...";
-  try {
     await OctoFarmClient.post("printers/reSyncSockets", {
       id: null
     });
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
-  }
   alert.close();
   UI.createAlert("success", "Background sync started successfully!", 3000, "clicked");
   reSyncSocketsBtn.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i> Reconnect All Sockets";
@@ -232,7 +217,6 @@ export async function bulkEditPrinters() {
   }
 
   if (editedPrinters.length > 0) {
-    try {
       editedPrinters = await OctoFarmClient.post("printers/update", { infoList: editedPrinters });
       const printersAdded = editedPrinters.printersAdded;
       printersAdded.forEach((printer) => {
@@ -243,10 +227,6 @@ export async function bulkEditPrinters() {
           "Clicked"
         );
       });
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("error", "Something went wrong updating the Server...", 3000, "Clicked");
-    }
   }
 }
 
@@ -262,7 +242,6 @@ export async function bulkDeletePrinters() {
 }
 
 export async function exportPrintersToJson() {
-  try {
     const printers = await OctoFarmClient.listPrinters();
     const printersExport = [];
     for (const currentPrinter of  printers) {
@@ -276,10 +255,6 @@ export async function exportPrintersToJson() {
       printersExport.push(printer);
     }
     FileOperations.download("printers.json", JSON.stringify(printersExport));
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", `Error exporting printers, please check logs: ${e}`, 3000, "clicked");
-  }
 }
 export async function importPrintersFromJsonFile(file) {
   const Afile = file;

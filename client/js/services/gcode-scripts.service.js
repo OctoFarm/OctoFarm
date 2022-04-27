@@ -45,11 +45,11 @@ async function newGcodeScript(newScript) {
       }
     });
     if (newScript.id) {
-      const post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
-      console.log(post);
+      //TODO needs error checking on server side
+      await OctoFarmClient.post("settings/customGcode/edit", newScript);
     } else {
       const post = await OctoFarmClient.post("settings/customGcode", newScript);
-      console.log(post);
+      await drawScriptTable(post);
     }
   }
   return true;
@@ -65,18 +65,22 @@ createNewScriptBtn.addEventListener("click", async (e) => {
       (v) => v.value
     )
   };
-  await newGcodeScript(newScript);
-  document.getElementById("gcodeScriptName").value = "";
-  document.getElementById("gcodeScriptDescription").value = "";
-  document.getElementById("gcodeScriptScript").value = "";
-  document.getElementById("gcodeScriptBtnColour").value = "";
-  document.getElementById("gcodeScriptPrinters").value = "";
+  const scriptSuccess = await newGcodeScript(newScript);
+  if(!!scriptSuccess){
+    document.getElementById("gcodeScriptName").value = "";
+    document.getElementById("gcodeScriptDescription").value = "";
+    document.getElementById("gcodeScriptScript").value = "";
+    document.getElementById("gcodeScriptBtnColour").value = "";
+    document.getElementById("gcodeScriptPrinters").value = "";
+    UI.createAlert("success", "Successfully created your new script!", 3000, "Clicked");
+  }
+
 });
 
 async function drawScriptTable(scripts) {
   const scriptTable = document.getElementById("gcodeScriptTable");
   const printerList = await OctoFarmClient.listPrinters();
-  const printerSelect = [];
+  const printerSelect = ["<option value=\"99aa99aaa9999a99999999aa\"> Allow all printers </option>"];
   printerList.forEach((printer) => {
     printerSelect.push(`<option value="${printer._id}"> ${printer.printerName} </option>`);
   });
@@ -153,7 +157,7 @@ async function drawScriptTable(scripts) {
 
   document.getElementById("deleteScript-" + scripts._id).addEventListener("click", async (e) => {
     const delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
-    if (delt.status === 200) {
+    if (!!delt) {
       UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked");
       document.getElementById("scriptRow-" + scripts._id).remove();
     } else {

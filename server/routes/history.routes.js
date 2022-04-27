@@ -18,9 +18,10 @@ const M_VALID = require("../constants/validate-mongo.constants");
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const note = req.bodyString("note");
-  const filamentId = req.bodyString("filamentId");
-  const history = await HistoryRoutes.findOne({ _id: latest.id });
-  if (history.printHistory.notes != note) {
+  const filamentId = req.body.filamentId;
+  const id = req.bodyString("id");
+  const history = await HistoryRoutes.findById(id);
+  if (history.printHistory.notes !== note) {
     history.printHistory.notes = note;
   }
   for (let f = 0; f < filamentId.length; f++) {
@@ -28,26 +29,15 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
       if (
         typeof history.printHistory.filamentSelection[f] !== "undefined" &&
         history.printHistory.filamentSelection[f] !== null &&
-        history.printHistory.filamentSelection[f]._id == filamentId
+        history.printHistory.filamentSelection[f]._id === filamentId
       ) {
         //Skip da save
       } else {
-        if (filamentId[f] != 0) {
-          const serverSettings = await ServerSettings.find({});
+        if (filamentId[f] !== 0) {
           const spool = await Spools.findById(filamentId[f]);
-
-          if (serverSettings[0].filamentManager) {
-            const profiles = await Profiles.find({});
-            const profileIndex = _.findIndex(profiles, function (o) {
-              return o.profile.index == spool.spools.profile;
-            });
-            spool.spools.profile = profiles[profileIndex].profile;
-            history.printHistory.filamentSelection[f] = spool;
-          } else {
-            const profile = await Profiles.findById(spool.spools.profile);
-            spool.spools.profile = profile.profile;
-            history.printHistory.filamentSelection[f] = spool;
-          }
+          const profile = await Profiles.findById(spool.spools.profile);
+          spool.spools.profile = profile.profile;
+          history.printHistory.filamentSelection[f] = spool;
         } else {
           filamentId.forEach((id, index) => {
             history.printHistory.filamentSelection[index] = null;
@@ -62,28 +52,13 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
         //Skip da save
       } else {
         history.printHistory.filamentSelection = [];
-        if (filamentId[f] != 0) {
-          const serverSettings = await ServerSettings.find({});
+        if (filamentId[f] !== 0) {
           const spool = await Spools.findById(filamentId[f]);
-
-          if (serverSettings[0].filamentManager) {
-            const profiles = await Profiles.find({});
-            const profileIndex = _.findIndex(profiles, function (o) {
-              return o.profile.index == spool.spools.profile;
-            });
-            spool.spools.profile = profiles[profileIndex].profile;
-            history.printHistory.filamentSelection[f] = spool;
-          } else {
             const profile = await Profiles.findById(spool.spools.profile);
             spool.spools.profile = profile.profile;
             history.printHistory.filamentSelection[f] = spool;
-          }
-        } else {
-          filamentId.forEach((id, index) => {
-            history.printHistory.filamentSelection[index] = null;
-          });
         }
-      }
+        }
     }
   }
   history.markModified("printHistory");

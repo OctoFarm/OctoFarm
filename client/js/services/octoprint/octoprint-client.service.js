@@ -1,5 +1,8 @@
-import UI from "../utils/ui.js";
-import OctoFarmClient from "./octofarm-client.service";
+import UI from "../../utils/ui.js";
+import OctoFarmClient from "../octofarm-client.service";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
+import { printActionStatusResponse } from "./octoprint.helpers-commands.actions"
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -21,7 +24,8 @@ export default class OctoPrintClient {
         "X-Api-Key": printer.apikey
       }
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
+      return e;
     });
   }
 
@@ -36,7 +40,8 @@ export default class OctoPrintClient {
       },
       body: JSON.stringify(data)
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
+      return e;
     });
   }
 
@@ -51,7 +56,8 @@ export default class OctoPrintClient {
       },
       body: JSON.stringify(data)
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
+      return e;
     });
   }
 
@@ -65,7 +71,8 @@ export default class OctoPrintClient {
       },
       body: data
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
+      return e;
     });
   }
 
@@ -79,7 +86,8 @@ export default class OctoPrintClient {
         "X-Api-Key": printer.apikey
       }
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
+      return e;
     });
   }
 
@@ -88,13 +96,21 @@ export default class OctoPrintClient {
       command: "select",
       tool
     };
+
+    try{
+      const body = {
+        action: `Print Action: ${action}`,
+        opt
+      }
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
+    }catch(e){
+      console.error("Unable to update octofarm server log... ", e)
+    }
+
+
     const post = await OctoPrintClient.post(printer, "printer/tool", opt);
 
-    if (post.status === 204) {
-      return true;
-    } else {
-      return false;
-    }
+    return post.status === 204;
   }
 
   static async system(printer, action) {
@@ -114,6 +130,17 @@ export default class OctoPrintClient {
           const post = await OctoPrintClient.post(printer, url).catch((e) => {
             UI.createAlert("danger", e, 4000, "Clicked");
           });
+
+          try{
+            const body = {
+              action: `Print Action: ${action}`,
+              command: url
+            }
+            await OctoFarmClient.updateUserActionsLog(printer._id, body)
+          }catch(e){
+            console.error("Unable to update octofarm server log... ", e)
+          }
+
 
           if (post.status === 204) {
             UI.createAlert(
@@ -137,7 +164,7 @@ export default class OctoPrintClient {
 
   static async systemNoConfirm(printer, action) {
     const url = "system/commands/core/" + action;
-    return await OctoPrintClient.post(printer, url);
+    return OctoPrintClient.post(printer, url);
   }
 
   static async move(element, printer, action, axis, dir) {
@@ -155,7 +182,7 @@ export default class OctoPrintClient {
         axes: axis
       };
     } else if (action === "jog") {
-      if (dir != undefined) {
+      if (typeof dir !== "undefined") {
         amount = Number(dir + amount);
       } else {
         amount = Number(amount);
@@ -170,6 +197,18 @@ export default class OctoPrintClient {
         factor: amount
       };
     }
+
+    try{
+      const body = {
+        action: `Print Action: ${action}`,
+        opt
+      }
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
+    }catch(e){
+      console.error("Unable to update octofarm server log... ", e)
+    }
+
+
     post = await OctoPrintClient.post(printer, url, opt);
     if (post.status === 204) {
       element.target.classList = "btn btn-success";
@@ -197,6 +236,23 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
+
+      try{
+        const body = {
+          action: `File Action: ${action}`,
+          opt
+        }
+        await OctoFarmClient.updateUserActionsLog(printer._id, body)
+      }catch(e){
+        console.error("Unable to update octofarm server log... ", e)
+      }
+
+
       return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "print") {
       const opt = {
@@ -206,8 +262,36 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
+
+      try{
+        const body = {
+          action: `File Action: ${action}`,
+          opt
+        }
+        await OctoFarmClient.updateUserActionsLog(printer._id, body)
+      }catch(e){
+        console.error("Unable to update octofarm server log... ", e)
+      }
+
+
       return OctoPrintClient.post(printer, encodeURIComponent(url), opt);
     } else if (action === "delete") {
+
+      try{
+        const body = {
+          action: `File Action: ${action}`
+        }
+        await OctoFarmClient.updateUserActionsLog(printer._id, body)
+      }catch(e){
+        console.error("Unable to update octofarm server log... ", e)
+      }
+
+
       return OctoPrintClient.delete(printer, encodeURIComponent(url));
     }
   }
@@ -217,11 +301,13 @@ export default class OctoPrintClient {
       command: "flowrate",
       factor: parseInt(printer.flowRate)
     };
+
     await OctoPrintClient.post(printer, "printer/tool", flow);
     const feed = {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
+
     await OctoPrintClient.post(printer, "printer/printhead", feed);
   }
 
@@ -261,16 +347,14 @@ export default class OctoPrintClient {
     if (typeof checkSettings.filament !== "undefined") {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
+
     let printerCheck = false;
     if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-      if(printer.selectedFilament.length === 0){
-        printerCheck = true;
-      }
       printerCheck = printer.selectedFilament.some(function (e) {
-        console.log(e)
-        return e === null
+        return e !== null
       });
     }
+
 
     if (opts.command === "start") {
       await OctoPrintClient.updateFeedAndFlow(printer);
@@ -294,11 +378,40 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            return OctoPrintClient.post(printer, "job", opts);
+            try{
+              const body = {
+                action: `Print Action: ${opts.command}`,
+                opts
+              }
+              await OctoFarmClient.updateUserActionsLog(printer._id, body)
+            }catch(e){
+              console.error("Unable to update octofarm server log... ", e)
+            }
+            try{
+              await OctoFarmClient.updateActiveControlUser(printer._id);
+            }catch(e){
+              console.error("Unable to update octofarm server current user... ", e)
+            }
+            const { status } = await OctoPrintClient.post(printer, "job", opts);
+            printActionStatusResponse(status)
           }
         }
       });
     } else {
+      try{
+        const body = {
+          action: `Print Action: ${opts.command}`,
+          opts
+        }
+        await OctoFarmClient.updateUserActionsLog(printer._id, body)
+      }catch(e){
+        console.error("Unable to update octofarm server log... ", e)
+      }
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
       return OctoPrintClient.post(printer, "job", opts);
     }
     if (element) {
@@ -320,6 +433,16 @@ export default class OctoPrintClient {
       opts = {
         command: "disconnect"
       };
+    }
+
+    try{
+      const body = {
+        action: `Print Action: ${opts.command}`,
+        opts
+      }
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
+    }catch(e){
+      console.error("Unable to update octofarm server log... ", e)
     }
 
     const post = await OctoPrintClient.post(printer, "connection", opts);
@@ -354,6 +477,17 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
+
+    try{
+      const body = {
+        action: `Printer Power Action: ${action}`,
+        command
+      }
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
+    }catch(e){
+      console.error("Unable to update octofarm server log... ", e)
+    }
+
     if (typeof command === "undefined" || command.length === 0) {
       try {
         const post = await fetch(url, {
@@ -378,6 +512,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     } else {
       try {
@@ -404,6 +541,9 @@ export default class OctoPrintClient {
           `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Bulk Commands - ${e}`
+        throw new ApplicationError(errorObject)
       }
     }
     return "done";
@@ -416,22 +556,27 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
-    if (typeof command === "undefined" || command === "" || command === null) {
-      let post = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey
+    if (!!command || command === "") {
+      try{
+        let post = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Api-Key": printer.apikey
+          }
+        });
+        let status = false;
+        if (post.status === 200 || post.status === 204) {
+          status = post.json();
         }
-      });
-      if (post.status !== 200 || post.status !== 204) {
-        return "No Status";
-      } else {
-        post = await post.json();
-        return post;
+        return status;
+      }catch(e){
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Power Status - ${e}`
+        throw new ApplicationError(errorObject)
       }
     } else {
-      try {
+      try{
         const post = await fetch(url, {
           method: "POST",
           headers: {
@@ -440,23 +585,15 @@ export default class OctoPrintClient {
           },
           body: command
         });
-        let status = "No Status";
+        let status = false;
         if (post.status === 200 || post.status === 204) {
-          status = await post.json();
+          status = post.json();
         }
-
-        const powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
-        if (powerStatusPrinter) {
-          if (status === "No Status") {
-            powerStatusPrinter.style.color = "black";
-          } else if (status[Object.keys(status)[0]]) {
-            powerStatusPrinter.style.color = "green";
-          } else {
-            powerStatusPrinter.style.color = "red";
-          }
-        }
-      } catch (e) {
-        console.log("Printer Power Check failed... classing offline:", e);
+        return status;
+      }catch(e){
+        const errorObject = ClientErrors.SILENT_ERROR;
+        errorObject.message =  `Power Status - ${e}`
+        throw new ApplicationError(errorObject)
       }
     }
   }

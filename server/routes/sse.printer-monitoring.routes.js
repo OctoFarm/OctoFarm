@@ -5,9 +5,7 @@ const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
 const {
-  getDashboardStatistics,
-  getCurrentOperations,
-  generateDashboardStatistics
+  getCurrentOperations
 } = require("../services/printer-statistics.service");
 
 const logger = new Logger("OctoFarm-API");
@@ -25,7 +23,7 @@ const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 
-let influxCounter = 2000;
+let influxCounter = 5000;
 
 const sortMe = function (printers) {
   const sortBy = getSorting();
@@ -79,9 +77,9 @@ const filterMe = function (printers) {
   } else {
     //Check groups...
     let current = null;
-    for (let i = 0; i < currentGroups.length; i++) {
-      if (filterBy === currentGroups[i]) {
-        current = currentGroups[i];
+    for (const element of currentGroups) {
+      if (filterBy === element) {
+        current = element;
       }
     }
     if (current !== null) {
@@ -101,7 +99,7 @@ const filterMe = function (printers) {
 async function sendData() {
   const currentOperations = getCurrentOperations();
 
-  let printersInformation = getPrinterStoreCache().listPrintersInformation();
+  let printersInformation = getPrinterStoreCache().listPrintersInformationForMonitoringViews();
 
   printersInformation = await filterMe(printersInformation);
   printersInformation = sortMe(printersInformation);
@@ -112,8 +110,9 @@ async function sendData() {
     await SettingsClean.start();
     serverSettings = SettingsClean.returnSystemSettings();
   }
+
   if (!!serverSettings.influxExport?.active) {
-    if (influxCounter >= 2000) {
+    if (influxCounter >= 5000) {
       sendToInflux(printersInformation);
       influxCounter = 0;
     } else {

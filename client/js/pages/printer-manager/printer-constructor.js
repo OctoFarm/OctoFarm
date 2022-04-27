@@ -1,6 +1,8 @@
 import Validate from "../../utils/validate";
 import UI from "../../utils/ui";
 import OctoFarmClient from "../../services/octofarm-client.service.js";
+import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../exceptions/application-error.handler";
 
 let newPrintersIndex = 0;
 
@@ -172,7 +174,6 @@ export class PrintersManagement {
         0
     );
     if (deletedPrinters.length > 0) {
-      try {
         const printersToRemove = await OctoFarmClient.post("printers/remove", { idList: deletedPrinters });
         const { printersRemoved } = printersToRemove;
         deletingAlert.close();
@@ -185,16 +186,6 @@ export class PrintersManagement {
           );
           document.getElementById(`printerCard-${printer.printerId}`).remove();
         });
-      } catch (e) {
-        console.error(e);
-        deletingAlert.close();
-        UI.createAlert(
-          "error",
-          "Something went wrong updating the server, please check your logs",
-          3000,
-          "clicked"
-        );
-      }
     } else {
       deletingAlert.close();
       UI.createAlert(

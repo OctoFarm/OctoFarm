@@ -1,4 +1,4 @@
-import OctoPrintClient from "./octoprint-client.service";
+import OctoPrintClient from "./octoprint/octoprint-client.service";
 import UI from "../utils/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 
@@ -9,7 +9,7 @@ export default class CustomGenerator {
       buttonColour = button.buttonColour;
     }
     return `
-    <button id="gcode-${button._id}" title="${button.description}" type="button" class="btn btn-${buttonColour}">${button.name}</button>
+    <button id="gcode-${button._id}" title="${button.description}" type="button" class="btn btn-${buttonColour} m-1">${button.name}</button>
     `;
   }
   static async generateButtons(printer) {
@@ -23,7 +23,7 @@ export default class CustomGenerator {
       customScripts.forEach((scripts) => {
         let button = CustomGenerator.getButton(scripts);
         area.insertAdjacentHTML("beforeend", button);
-        document.getElementById("gcode-" + scripts._id).addEventListener("click", (e) => {
+        document.getElementById("gcode-" + scripts._id).addEventListener("click", () => {
           let post = CustomGenerator.fireCommand(scripts._id, scripts.gcode, printer);
           if (post.status === 204) {
             UI.createAlert(

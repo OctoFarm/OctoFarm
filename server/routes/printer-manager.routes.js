@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
+const { ensureCurrentUserAndGroup } = require("../middleware/users");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
@@ -21,6 +22,7 @@ const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { generateRandomName } = require("../services/printer-name-generator.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const { updateUserActionLog } = require("../services/user-actions-log.service");
 
 /**
  * @swagger
@@ -522,6 +524,44 @@ router.get(
   async (req, res) => {
     const printerID = req.paramString("id");
     res.send(getEventEmitterCache().get(printerID));
+  }
+);
+
+router.get(
+  "/selectedFilament/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    res.send(getPrinterStoreCache().getSelectedFilament(printerID));
+  }
+);
+
+router.patch(
+  "/updateActiveUser/:id",
+  ensureAuthenticated,
+  ensureCurrentUserAndGroup,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const currentUser = req.user.username;
+    const printerID = req.paramString("id");
+    getPrinterStoreCache().updateActiveControlUser(printerID, currentUser);
+    res.sendStatus(204);
+  }
+);
+
+router.post(
+  "/logUserPrintAction/:id",
+  ensureAuthenticated,
+  ensureCurrentUserAndGroup,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const currentUser = req.user.username;
+    const printerID = req.paramString("id");
+    const data = req.body.opts;
+    const action = req.body.action;
+    updateUserActionLog(printerID, action, data, currentUser);
+    res.sendStatus(204);
   }
 );
 

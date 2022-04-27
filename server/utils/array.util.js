@@ -56,9 +56,16 @@ const sumValuesGroupByDate = (input) => {
   }));
 };
 
+const shiftOverItems = (value, itemLimit) => {
+  if (value.length > itemLimit) {
+    value.shift();
+  }
+};
+
 module.exports = {
   checkNested,
   checkNestedIndex,
   arrayCounts,
-  sumValuesGroupByDate
+  sumValuesGroupByDate,
+  shiftOverItems
 };

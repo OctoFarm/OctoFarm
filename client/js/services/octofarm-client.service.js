@@ -75,17 +75,24 @@ export default class OctoFarmClient {
   static printerRoute = "/printers";
   static disablePrinterRoute = this.printerRoute + "/disable";
   static enablePrinterRoute = this.printerRoute + "/enable";
-  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name"
-  static printerStepChange = this.printerRoute + "/stepChange";
+  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name";
+  static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
+  static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
+  static printerStepChangeRoute = this.printerRoute + "/stepChange";
   static serverSettingsRoute = "/settings/server";
+  static clientSettingsRoute = "/settings/client";
   static filamentRoute = `/filament`;
   static filamentStatistics = `${this.filamentRoute}/get/statistics`;
+  static filamentProfiles = `${this.filamentRoute}/get/profile`;
+  static filamentSpools = `${this.filamentRoute}/get/filament`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`
   static userRoute = `/users/users`;
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
   static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
   static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
+  static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -169,6 +176,10 @@ export default class OctoFarmClient {
     return this.get(`${this.serverSettingsRoute}/get`);
   }
 
+  static async getSelectedFilament(id){
+    return this.get(`${this.selectedFilamentRoute}/${id}`);
+  }
+
   static async setPrinterSteps(id, newSteps) {
     return this.post("printers/stepChange", {
       printer: id,
@@ -198,6 +209,14 @@ export default class OctoFarmClient {
 
   static async getFilamentStatistics() {
     return this.get(this.filamentStatistics);
+  }
+
+  static async getFilamentSpools(){
+    return this.get(this.filamentSpools)
+  }
+
+  static async getFilamentProfiles(){
+    return this.get(this.filamentProfiles)
   }
 
   static async updateServerSettings(settingsObject) {
@@ -236,10 +255,21 @@ export default class OctoFarmClient {
   static getConnectionOverview() {
     return this.get(this.connectionOverviewRoute);
   }
+  static sendError(error){
+    return this.post(this.fireLogToServerRoute, error)
+  }
 
 
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });
+  }
+
+  static updateActiveControlUser(id){
+    return this.patch(`${this.updateActiveUserRoute}/${id}`)
+  }
+
+  static updateUserActionsLog(id, body){
+    return this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
   }
 
   static async get(path) {

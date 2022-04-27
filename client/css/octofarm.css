@@ -3,10 +3,6 @@ html {
   height: 100%;
 }
 
-.dropdown-menu {
-  z-index: 9999;
-}
-
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;
@@ -150,6 +146,11 @@ li {
   margin: 0 auto;
   max-width: 700px;
 }
+
+.dropdown-menu {
+  z-index: 5000;
+}
+
 /* Colours */
 .textIdle {
   color: #262626;
@@ -271,12 +272,11 @@ a.notyet {
 }
 .dashHeader {
   padding: 5px;
-  z-index:100;
 }
 
 .dashBody {
   padding: 5px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .dashBody p {
@@ -293,7 +293,7 @@ a.notyet {
 
 .fileBody {
   padding: 5px;
-  overflow-y: scroll;
+  overflow-y: auto;
   min-height: 60vh;
   height: 60vh;
   max-height: 60vh;
@@ -306,8 +306,6 @@ a.notyet {
 }
 .printerDisabled {
   border-left: #e74c3c 4px solid;
-  background-color: transparent;
-  opacity: 0.8;
 }
 .printerEnabled {
   border-left: green 4px solid;
@@ -548,7 +546,8 @@ label {
 
 .modal-body {
   max-height: 80vh;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-wrap: normal;
 }
 
 .sortableList {
@@ -620,7 +619,6 @@ label {
   position: -webkit-sticky;
   position: sticky;
   top: 60px;
-  z-index: 1020;
 }
 
 .userpic {

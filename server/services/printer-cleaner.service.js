@@ -3,6 +3,7 @@ const { orderBy } = require("lodash");
 
 const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
+const PluginLogs = require("../models/PluginLogs.js");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
@@ -22,29 +23,48 @@ class PrinterCleanerService {
   }
 
   static async generateConnectionLogs(farmPrinter) {
-    let printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id });
+    const printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id })
+      .sort({ _id: -1 })
+      .limit(1000);
+    const tempHistory = await TempHistory.find({ printer_id: farmPrinter._id })
+      .sort({ _id: -1 })
+      .limit(720);
+    const pluginManagerLogs = await PluginLogs.find({
+      printerID: farmPrinter._id,
+      pluginDisplay: "Plugin Manager"
+    })
+      .sort({ _id: -1 })
+      .limit(1000);
+
+    const klipperLogs = await PluginLogs.find({
+      printerID: farmPrinter._id,
+      pluginDisplay: "OctoKlipper"
+    })
+      .sort({ _id: -1 })
+      .limit(1000);
 
     let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
     let currentTempLogs = [];
-    let currentOctoPrintLogs = [];
-    for (let e = 0; e < printerErrorLogs.length; e++) {
-      if (
-        typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
-        JSON.stringify(printerErrorLogs[e].errorLog.printerID) === JSON.stringify(farmPrinter._id)
-      ) {
+    let currentPluginManagerLogs = [];
+    let currentKlipperLogs = [];
+    for (let e = 0; e < 300; e++) {
+      if(!!printerErrorLogs[e]){
         let errorFormat = {
+          id: printerErrorLogs[e]._id,
           date: printerErrorLogs[e].errorLog.endDate,
           message: printerErrorLogs[e].errorLog.reason,
           printer: farmPrinter.printerURL,
-          state: "Offline"
+          state: "Offline",
+          terminal: printerErrorLogs[e]?.errorLog?.terminal,
+          resendStats: printerErrorLogs[e]?.errorLog?.resendStats
         };
         currentErrorLogs.push(errorFormat);
       }
     }
     let currentIssues = PrinterTicker.returnIssue();
-    for (let i = 0; i < currentIssues.length; i++) {
-      if (JSON.stringify(currentIssues[i].printerID) === JSON.stringify(farmPrinter._id)) {
+    for (let i = 0; i < 300; i++) {
+      if (!!currentIssues[i] && currentIssues[i].printerID === farmPrinter._id) {
         let errorFormat = {
           date: currentIssues[i].date,
           message: currentIssues[i].message,
@@ -54,29 +74,35 @@ class PrinterCleanerService {
         currentOctoFarmLogs.push(errorFormat);
       }
     }
-
-    let octoprintLogs = PrinterTicker.returnOctoPrintLogs();
-    for (let i = 0; i < octoprintLogs.length; i++) {
-      if (JSON.stringify(octoprintLogs[i].printerID) === JSON.stringify(farmPrinter._id)) {
+    for (let i = 0; i < 300; i++) {
+      if (!!pluginManagerLogs[i]) {
         let octoFormat = {
-          date: octoprintLogs[i].date,
-          message: octoprintLogs[i].message,
-          printer: octoprintLogs[i].printer,
-          pluginDisplay: octoprintLogs[i].pluginDisplay,
-          state: octoprintLogs[i].state
+          date: pluginManagerLogs[i].date,
+          message: pluginManagerLogs[i].message,
+          printer: pluginManagerLogs[i].printer,
+          pluginDisplay: pluginManagerLogs[i].pluginDisplay,
+          state: pluginManagerLogs[i].state
         };
-        currentOctoPrintLogs.push(octoFormat);
+        currentPluginManagerLogs.push(octoFormat);
       }
     }
 
-    let tempHistory = await TempHistory.find({
-      printer_id: farmPrinter._id
-    })
-      .sort({ _id: -1 })
-      .limit(500);
+    for (let i = 0; i < 300; i++) {
+      if (!!klipperLogs[i]) {
+        let octoFormat = {
+          date: klipperLogs[i].date,
+          message: klipperLogs[i].message,
+          printer: klipperLogs[i].printer,
+          pluginDisplay: klipperLogs[i].pluginDisplay,
+          state: klipperLogs[i].state
+        };
+        currentKlipperLogs.push(octoFormat);
+      }
+    }
+
     if (typeof tempHistory !== "undefined") {
-      for (let h = 0; h < tempHistory.length; h++) {
-        let hist = tempHistory[h].currentTemp;
+      for (const element of tempHistory) {
+        let hist = element.currentTemp;
         const reFormatTempHistory = async function (tempHistory) {
           // create a new object to store full name.
           let keys = Object.keys(tempHistory);
@@ -130,10 +156,10 @@ class PrinterCleanerService {
                   return e.name;
                 })
                 .indexOf(keys[k] + "-actual");
-              if (currentTempLogs[arrayTarget].data.length <= tempHistory.length) {
+              if (currentTempLogs[arrayTarget]?.data.length <= tempHistory.length) {
                 currentTempLogs[arrayTarget].data.push(target);
               }
-              if (currentTempLogs[arrayActual].data.length <= tempHistory.length) {
+              if (currentTempLogs[arrayActual]?.data.length <= tempHistory.length) {
                 currentTempLogs[arrayActual].data.push(actual);
               }
             }
@@ -145,13 +171,15 @@ class PrinterCleanerService {
     currentErrorLogs = orderBy(currentErrorLogs, ["date"], ["desc"]);
     currentOctoFarmLogs = orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
     currentTempLogs = orderBy(currentTempLogs, ["date"], ["desc"]);
-    currentOctoPrintLogs = orderBy(currentOctoPrintLogs, ["date"], ["desc"]);
+    currentPluginManagerLogs = orderBy(currentPluginManagerLogs, ["date"], ["desc"]);
+    currentKlipperLogs = orderBy(currentKlipperLogs, ["date"], ["desc"]);
 
     return {
       currentErrorLogs,
       currentOctoFarmLogs,
       currentTempLogs,
-      currentOctoPrintLogs
+      currentPluginManagerLogs,
+      currentKlipperLogs
     };
   }
 
@@ -226,10 +254,14 @@ class PrinterCleanerService {
     return temps;
   }
 
+  static grabOctoPrintName(settingsAppearance){
+    return (settingsAppearance?.name.length === 0) ? generateRandomName() : settingsAppearance.name;
+  }
+
   static grabPrinterName(settingsAppearance, printerURL) {
     const randomisedName = generateRandomName();
-    if (!!settingsAppearance) {
-      return settingsAppearance?.name !== "" ? settingsAppearance.name : randomisedName;
+    if (settingsAppearance?.name) {
+      return settingsAppearance.name;
     } else {
       return randomisedName ? randomisedName : printerURL;
     }

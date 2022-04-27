@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const request = require("request");
 
-const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
+const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
   const res = await fetch(url, {
     method: "GET",
     headers: {
@@ -14,7 +14,12 @@ const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
   await new Promise((resolve, reject) => {
     res.body.pipe(fileStream);
     res.body.on("error", reject);
-    fileStream.on("finish", callback);
+    fileStream.on("close", async () => {
+      resolve()
+      if(!!deleteTimelapse){
+        deleteTimelapse();
+      }
+    });
   });
 };
 

@@ -1,6 +1,9 @@
 import Calc from "./utils/calc.js";
 import UI from "./utils/ui.js";
-import {returnDropDown} from "./services/filament-manager-plugin.service";
+import {
+  returnBigFilamentSelectorTemplate,
+  drawHistoryDropDown, findBigFilamentDropDowns
+} from "./services/printer-filament-selector.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
 import {ELEMENTS, HISTORY_CONSTANTS, SORT_CONSTANTS} from "./constants/history.constants";
@@ -1050,6 +1053,8 @@ class History {
       const jobCosting = document.getElementById("jobCosting");
       const jobHourlyCost = document.getElementById("jobHourlyCost");
       const resendStats = document.getElementById("resendStats");
+      const jobElectricityCost = document.getElementById("jobElectricityCost");
+      const jobMaintenanceCost = document.getElementById("jobMaintenanceCost");
 
       viewTable.innerHTML = "";
       printerName.innerHTML = " - ";
@@ -1071,6 +1076,8 @@ class History {
       jobCosting.placeholder = " - ";
       jobHourlyCost.placeholder = " - ";
       resendStats.placeholder = " - ";
+      jobElectricityCost.placeholder = " - ";
+      jobMaintenanceCost.placeholder = " - ";
 
       const thumbnail = document.getElementById("thumbnails");
       const thumbnailIndicators = document.getElementById("thumbnails-indicators");
@@ -1083,6 +1090,8 @@ class History {
       const current = this.historyList[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
+      jobElectricityCost.value = current?.electricityCosts ? current.electricityCosts.toFixed(2) : "";
+      jobMaintenanceCost.value = current?.maintenanceCosts ? current.maintenanceCosts.toFixed(2) : "";
       if (typeof current.resend !== "undefined" && current.resend !== null) {
         resendStats.placeholder = `${current.resend.count} / ${
           current.resend.transmitted / 1000
@@ -1099,6 +1108,8 @@ class History {
       let thbs = false;
       let counter = 0;
       let active = "active";
+
+      console.log(current)
 
       if (
         typeof current.snapshot !== "undefined" &&
@@ -1129,7 +1140,7 @@ class History {
       if (
         typeof current.thumbnail !== "undefined" &&
         current.thumbnail != null &&
-        current.thumbnail != ""
+        current.thumbnail !== ""
       ) {
         thumbnailIndicators.insertAdjacentHTML(
           "beforeend",
@@ -1210,21 +1221,16 @@ class History {
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
-      current.spools.forEach((spool) => {
+      for(const [i, spool] of current.spools.entries()){
         const sp = Object.keys(spool)[0];
+        const spoolSelector = returnBigFilamentSelectorTemplate(i);
         toolsArray.push(sp);
         viewTable.insertAdjacentHTML(
-          "beforeend",
-          `
+            "beforeend",
+            `
           <tr>
-            <td>
-              <b>${spool[sp].toolName}</b>
-              </td>
               <td>
-              <div class="input-group mb-3">
-                  <select id="filament-${sp}" class="custom-select">
-                  </select>
-                  </div>
+                ${spoolSelector}
               </td>
               <td>
               ${spool[sp].volume}m3
@@ -1242,41 +1248,14 @@ class History {
           </tr>
         `
         );
-      });
-      for (let i = 0; i < toolsArray.length; i++) {
-        const currentToolDropDown = document.getElementById(`filament-${toolsArray[i]}`);
-        const filamentList = await returnDropDown();
-        filamentList.forEach((list) => {
-          currentToolDropDown.insertAdjacentHTML("beforeend", list);
-        });
-        if (current.spools[i][toolsArray[i]].spoolId !== null) {
-          if (SelectHasValue(currentToolDropDown.id, current.spools[i][toolsArray[i]].spoolId)) {
-            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
-          } else {
-            currentToolDropDown.insertAdjacentHTML(
-              "afterbegin",
-              `
-              <option value="${current.spools[i][toolsArray[i]].spoolId}">${
-                current.spools[i][toolsArray[i]].spoolName
-              }</option>
-          `
-            );
-            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
-          }
-        } else {
-          currentToolDropDown.value = 0;
-        }
+        await drawHistoryDropDown(document.getElementById(`tool-${i}-bigFilamentSelect`), spool[sp].spoolId);
       }
-
       viewTable.insertAdjacentHTML(
         "beforeend",
         `
         <tr style="background-color:#303030;">
         <td>
         Totals
-        </td>
-        <td>
-
         </td>
         <td>
         ${current.totalVolume.toFixed(2)}m3
@@ -1320,7 +1299,7 @@ class History {
   }
 
   static async save(id) {
-    const filamentDrops = document.querySelectorAll("[id^='filament-tool']");
+    const filamentDrops = findBigFilamentDropDowns()
     const filamentID = [];
     filamentDrops.forEach((drop) => {
       filamentID.push(drop.value);

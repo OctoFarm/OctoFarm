@@ -31,6 +31,7 @@ const Logger = require("../../handlers/logger");
 const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
+const { JobClean } = require("../job-cleaner.service");
 const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 
 const logger = new Logger("OctoFarm-State");
@@ -43,11 +44,11 @@ class OctoPrintPrinter {
   multiUserIssue = undefined;
   restartRequired = false;
   enabling = false;
-  coolDownEvent = undefined;
   versionNotSupported = false;
   versionNotChecked = false;
   healthChecksPass = true;
   onboarding = undefined;
+  activeControlUser = null;
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -88,8 +89,14 @@ class OctoPrintPrinter {
   printerName = undefined;
   //Live printer state data
   layerData = undefined;
+  progress = {
+    completion: null,
+    filepos: null,
+    printTime: null,
+    printTimeLeft: null
+  };
   resends = undefined;
-  tools = undefined;
+  tools = null;
   currentJob = undefined;
   job = undefined;
   currentZ = undefined;
@@ -109,7 +116,9 @@ class OctoPrintPrinter {
   };
   //Updated by API / database
   octoPi = undefined;
+  octoResourceMonitor = undefined;
   costSettings = {
+    default: true,
     powerConsumption: 0.5,
     electricityCosts: 0.15,
     purchasePrice: 500,
@@ -134,13 +143,12 @@ class OctoPrintPrinter {
       MAC: ""
     }
   };
-  klipperFirmwareVersion = undefined;
   printerFirmware = undefined;
   octoPrintVersion = undefined;
   current = undefined;
   options = undefined;
   profiles = undefined;
-  pluginListEnabled = undefined;
+  pluginsListEnabled = undefined;
   pluginsListDisabled = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
@@ -227,7 +235,6 @@ class OctoPrintPrinter {
       group,
       costSettings,
       powerSettings,
-      klipperFirmwareVersion,
       storage,
       fileList,
       current,
@@ -283,6 +290,7 @@ class OctoPrintPrinter {
     if (!!octoPrintVersion) {
       this.octoPrintVersion = octoPrintVersion;
     }
+
     if (!!tempTriggers) {
       this.tempTriggers = tempTriggers;
     }
@@ -300,9 +308,6 @@ class OctoPrintPrinter {
     }
     if (!!powerSettings) {
       this.powerSettings = powerSettings;
-    }
-    if (!!klipperFirmwareVersion) {
-      this.klipperFirmwareVersion = klipperFirmwareVersion;
     }
     if (!!storage) {
       this.storage = storage;
@@ -405,17 +410,19 @@ class OctoPrintPrinter {
       this.gcodeScripts = PrinterClean.sortGCODE(settingsScripts);
     }
 
-    if (!!tempTriggers && !!settingsWebcam && !!settingsServer) {
+    if (!!this.tempTriggers || !!this.settingsWebcam || !!this.settingsServer) {
       this.otherSettings = PrinterClean.sortOtherSettings(
-        tempTriggers,
-        settingsWebcam,
-        settingsServer
+        this.tempTriggers,
+        this.settingsWebcam,
+        this.settingsServer
       );
     }
 
     if (!!settingsAppearance) {
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
     }
+
+    this.resetJobInformation();
   }
 
   /*
@@ -483,6 +490,7 @@ class OctoPrintPrinter {
   }
 
   reConnectWebsocket() {
+    this.resetJobInformation();
     if (!!this?.#ws) {
       this.#ws.terminate();
       return "Successfully terminated websocket! Please wait for reconnect.";
@@ -852,13 +860,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintUsersList(force = true) {
+    this.#apiPrinterTickerWrap("Acquiring User List", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
+
     if (this.onboarding.userApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring User List", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "warning");
 
     let usersCheck = await this.#api.getUsers(true).catch((e) => {
       logger.http("Failed to acquire user list", e);
@@ -1004,7 +1012,7 @@ class OctoPrintPrinter {
         this.#db.update({
           octoPi: this.octoPi
         });
-        logger.http("Failed to acquire raspberry pi data..." + piPluginCheck);
+        logger.http("Failed to acquire raspberry pi data...", piPluginCheck);
         this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline", piPluginCheck);
         return globalStatusCode;
       }
@@ -1016,13 +1024,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSystemData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring system data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
+
     if (this.onboarding.systemApi && !force) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring system data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM, "warning");
 
     let systemCheck = await this.#api.getSystemCommands(true).catch((e) => {
       logger.http("Failed Aquire system data", e);
@@ -1052,13 +1060,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintProfileData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
+
     if (!force && this.onboarding.profileApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
     let profileCheck = await this.#api.getPrinterProfiles(true).catch((e) => {
       logger.http("Failed Aquire profile data", e);
@@ -1089,13 +1097,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintStateData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
+
     if (!force && this.onboarding.stateApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "success", true);
       return false;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring state data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
 
     let stateCheck = await this.#api.getConnection(true).catch((e) => {
       logger.http("Failed Aquire state data", e);
@@ -1139,13 +1147,13 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintSettingsData(force = false) {
+    this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
+    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
+
     if (!force && this.onboarding.settingsApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       return true;
     }
-
-    this.#apiPrinterTickerWrap("Acquiring settings data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "warning");
 
     let settingsCheck = await this.#api.getSettings(true).catch((e) => {
       logger.http("Failed Aquire settings data", e);
@@ -1171,17 +1179,19 @@ class OctoPrintPrinter {
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
-        this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
-        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-        if (this.settingsAppearance.name === "") {
-          this.printerName = PrinterClean.grabPrinterName(appearance, this.printerURL);
-        } else {
-          this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+        this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
+        this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
+        if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
+          this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
+            appearance,
+            this.printerURL
+          );
         }
       }
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
       }
+
       this.#db.update({
         camURL: this.camURL,
         settingsAppearance: this.settingsAppearance,
@@ -1201,6 +1211,7 @@ class OctoPrintPrinter {
 
       this.gcodeScripts = PrinterClean.sortGCODE(scripts);
       this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
+      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
       this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
@@ -1384,7 +1395,7 @@ class OctoPrintPrinter {
     }
   }
 
-  async acquireOctoPrintFileData(fullPath, generate = false) {
+  async acquireOctoPrintFileData(fullPath) {
     const filesCheck = await this.#api.getFile(fullPath, true).catch((e) => {
       logger.http("Failed Aquire file data", e);
       return false;
@@ -1565,6 +1576,11 @@ class OctoPrintPrinter {
     logger.silly("Updating live printer data", object);
   }
 
+  pushUpdatePrinterDatabase(key, data) {
+    logger.silly("Push updating printer database", { key, data });
+    this?.#db?.pushAndUpdate(this._id, key, data);
+  }
+
   updatePrinterData(data) {
     logger.silly("Updating printer database: ", data);
     this.#db.update(data);
@@ -1673,6 +1689,18 @@ class OctoPrintPrinter {
     return this.#db.delete();
   }
 
+  async secondaryFileInformationUpdate(fullPath) {
+    const fileInformation = await this.acquireOctoPrintFileData(fullPath);
+    const fileIndex = findIndex(this.fileList.fileList, function (o) {
+      return o.fullPath === fullPath;
+    });
+    if (fileIndex > -1 && !!fileInformation) {
+      this.notifySubscribersOfFileInformationChange(fullPath, fileIndex, {
+        printerURL: this.printerURL
+      });
+    }
+  }
+
   async updateFileInformation(data) {
     const { result, path: fullPath } = data;
     const fileIndex = findIndex(this.fileList.fileList, function (o) {
@@ -1697,17 +1725,26 @@ class OctoPrintPrinter {
 
       this.#db.update({ fileList: this.fileList });
 
-      notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
-        key: "fileInformationUpdated",
-        value: FileClean.generateSingle(
-          JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
-          this.selectedFilament,
-          this.costSettings
-        )
-      });
+      this.notifySubscribersOfFileInformationChange(fullPath, fileIndex);
+      //Grab api once more after this for full update of file... including thumbnail
+      setTimeout(async () => {
+        await this.secondaryFileInformationUpdate(fullPath);
+      }, 2000);
     } else {
       logger.error("updateFileInformation: Couldn't find file index to update!", fullPath);
     }
+  }
+
+  notifySubscribersOfFileInformationChange(fullPath, fileIndex, additionalInformation = undefined) {
+    notifySubscribers(fullPath, MESSAGE_TYPES.FILE_UPDATE, {
+      key: "fileInformationUpdated",
+      value: FileClean.generateSingle(
+        JSON.parse(JSON.stringify(this.fileList.fileList[fileIndex])),
+        this.selectedFilament,
+        this.costSettings
+      ),
+      additionalInformation
+    });
   }
 
   updatePrinterStatistics(statistics) {
@@ -1730,6 +1767,42 @@ class OctoPrintPrinter {
     }
   }
 
+  resetJobInformation() {
+    this.activeControlUser = "";
+    const job = {
+      file: {
+        name: null,
+        path: null,
+        display: null,
+        origin: null,
+        size: null,
+        date: null
+      },
+      estimatedPrintTime: null,
+      averagePrintTime: null,
+      lastPrintTime: null,
+      filament: null,
+      user: null
+    };
+
+    const progress = {
+      completion: null,
+      filepos: null,
+      printTime: null,
+      printTimeLeft: null,
+      printTimeLeftOrigin: null
+    };
+
+    this.currentJob = JobClean.generate(
+      job,
+      this.selectedFilament,
+      this.fileList,
+      0,
+      this.costSettings,
+      progress
+    );
+  }
+
   cleanPrintersInformation() {
     this.otherSettings = PrinterClean.sortOtherSettings(
       this.tempTriggers,
@@ -1747,6 +1820,15 @@ class OctoPrintPrinter {
     this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
 
     this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+
+    this.currentJob = JobClean.generate(
+      this.job,
+      this.selectedFilament,
+      this.fileList,
+      this.currentZ,
+      this.costSettings,
+      this.progress
+    );
   }
 
   async deleteAllFilesAndFolders() {

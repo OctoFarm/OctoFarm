@@ -1,3 +1,4 @@
+import { getPrinterNameBadge } from "../../../templates/printer.templates";
 const returnAlerts = (id, printerURL) => {
   return `
     <button title="No OctoPrint updates available!" id="octoprintUpdate-${id}"
@@ -97,12 +98,18 @@ const returnAlerts = (id, printerURL) => {
         >
        <i class="fa-solid fa-toilet"></i> <span id="printerConnectionThrottledCount-${id}"></span>
     </button>
+    <button title="OctoPrints CPU Usage | OctoPrint System CPU Usage | OctoPrints System Memory Usage"
+            id="octoPrintsUsage-${id}"
+            type="button"
+            class="tag btn btn-outline-info btn-sm d-none"
+    >
+        <i class="fab fa-octopus-deploy"></i> <span id="octoprintsCpuUsagePercent-${id}"></span>% | <i class="fa-solid fa-microchip"></i> <span id="octoprintCpuUsagePercent-${id}"></span>% | <i class="fa-solid fa-memory"></i> <span id="octoprintMemoryUsagePercent-${id}"></span>%
+    </button>
    `;
 };
 
 function returnPrinterManageDropDown(id, disabled){
     let printerDisabledButton = null;
-    // let disabled = "disabled=true"
     if(!disabled){
         printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
@@ -120,7 +127,7 @@ function returnPrinterManageDropDown(id, disabled){
                  type="button"
                  class="btn dropdown-item"
                 >
-                <i class="fas fa-running"></i> Enable
+                <i class="fas fa-running text-success"></i> Enable
         </button>
         `
     }
@@ -138,14 +145,14 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerEditModal"
                 >
-                <i class="fa-solid fa-pen-to-square"></i> Edit
+                <i class="fa-solid fa-pen-to-square text-warning"></i> Edit
             </button>
             <button  title="ReScan your printers API"
                  id="printerAPIReScan-${id}"
                  type="button"
                  class="btn dropdown-item"
                 >
-                <i class="fab fa-searchengin"></i> Scan API
+                <i class="fab fa-searchengin text-danger"></i> Scan API
                 
             </button>
             ${printerDisabledButton}
@@ -157,7 +164,7 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerSettingsModal"
                 >
-                <i class="fas fa-cog"></i> Settings
+                <i class="fas fa-cog text-info"></i> Settings
             </button>
             <button  title="View logs for your printer"
                  id="printerLog-${id}"
@@ -166,7 +173,7 @@ function returnPrinterManageDropDown(id, disabled){
                  data-toggle="modal"
                  data-target="#printerLogsModal"
             >
-                <i class="fas fa-file-alt"></i> Logs
+                <i class="fas fa-file-alt text-primary"></i> Logs
             </button>
             <h6 class="dropdown-header">Other</h6>
              <button title="View individual Printer Statistics"
@@ -176,7 +183,7 @@ function returnPrinterManageDropDown(id, disabled){
                      data-toggle="modal"
                      data-target="#printerStatisticsModal"
                 >
-                <i class="fas fa-chart-pie"></i> Statistics
+                <i class="fas fa-chart-pie text-warning"></i> Statistics
               </button>
                <button  title="Setup and track Maintenance Issues with Printers"
                      id="printerMaintenance-${id}"
@@ -204,10 +211,7 @@ export function returnPrinterTableRow(printer) {
             </span>
         </td>
         <td class="align-middle">
-            <span><i class="fas fa-print" style="color:${
-              printer.settingsAppearance.color
-            };"></i></span>
-            <span id="printerName-${printer._id}"></span>
+             ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
         </td>
         <td class="align-middle">
             <span id="printerURL-${printer._id}"></span>

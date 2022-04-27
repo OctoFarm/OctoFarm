@@ -4,11 +4,10 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../constants/cleaner.constants");
 const { checkNested, checkNestedIndex } = require("./array.util");
-const { SettingsClean } = require("../services/settings-cleaner.service");
 const Profiles = require("../models/Profiles");
 
 /**
- * Calculate spool weight static (has nothing to do with cleaning state)
+ * Calculate spool weight static
  * @param length
  * @param filament
  * @param completionRatio
@@ -290,13 +289,7 @@ function getCost(filamentSelection, units) {
 
 const attachProfileToSpool = async (spool) => {
   let profile = null;
-  if (SettingsClean.returnFilamentManagerSettings()) {
-    profile = await Profiles.findOne({
-      "profile.index": spool.spools.profile
-    });
-  } else {
-    profile = await Profiles.findById(spool.spools.profile);
-  }
+  profile = await Profiles.findById(spool.spools.profile);
   spool.spools.profile = profile.profile;
   return spool;
 };

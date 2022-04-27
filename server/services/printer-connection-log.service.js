@@ -1,30 +1,8 @@
 const currentIssues = [];
-const octoprintLogs = [];
+
+const loggerAmmount = 5000;
 
 class PrinterConnectionLogService {
-  static addOctoPrintLog(printer, message, state, plugin) {
-    let id = null;
-    if (octoprintLogs.length === 0) {
-      //first issue
-      id = 0;
-    } else {
-      id = octoprintLogs[octoprintLogs.length - 1].id + 1;
-    }
-    const newLog = {
-      id: id,
-      date: new Date(),
-      message: message,
-      printerID: printer._id,
-      printer: printer.printerURL,
-      state: state,
-      pluginDisplay: plugin
-    };
-    octoprintLogs.push(newLog);
-    if (octoprintLogs.length >= 1001) {
-      octoprintLogs.shift();
-    }
-  }
-
   static addIssue(date, printer, message, state, printerID) {
     let id = null;
     if (currentIssues.length === 0) {
@@ -42,7 +20,7 @@ class PrinterConnectionLogService {
       state: state
     };
     currentIssues.push(newIssue);
-    const loggerAmmount = 5000;
+
     if (currentIssues.length >= loggerAmmount) {
       currentIssues.shift();
     }
@@ -53,10 +31,6 @@ class PrinterConnectionLogService {
       return o.id == id;
     });
     currentIssues.splice(index, 1);
-  }
-
-  static returnOctoPrintLogs() {
-    return octoprintLogs;
   }
 
   static returnIssue() {

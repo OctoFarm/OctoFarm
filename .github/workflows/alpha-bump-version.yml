@@ -50,7 +50,7 @@ jobs:
         run: npm version prerelease --preid=alpha
         working-directory: ./server
 
-        # Up revision the rc version for development
+      # Up revision the rc version for development
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
         run: npm version prerelease --preid=alpha
@@ -75,7 +75,7 @@ jobs:
       # Grab the client package version into a variable.
       - name: get-client-current-version
         id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@master
+        uses: martinbeentjes/npm-get-version-action@main
         with:
           path: client
 
@@ -94,7 +94,7 @@ jobs:
       # Commit changes to the current development repository
       - name: get-server-current-version
         id: server-package-version
-        uses: martinbeentjes/npm-get-version-action@master
+        uses: martinbeentjes/npm-get-version-action@main
         with:
           path: server
 

@@ -4,6 +4,7 @@ import Calc from "../utils/calc.js";
 import Script from "./octofarm-scripts.service.js";
 import {ApplicationError} from "../exceptions/application-error.handler";
 import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import "../utils/cleanup-modals.util"
 
 let currentPrinterIndex;
 let printerOnline;
@@ -11,13 +12,6 @@ let currentPrinter;
 let pageElements;
 let currentPrintersInformation;
 const NO_PREFERENCE = "<option value=\"0\">No Preference</option>"
-
-// Close modal event listeners...
-$("#connectionModal").on("hidden.bs.modal", function (e) {
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
 
 export async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements
@@ -524,17 +518,17 @@ class PrinterSettingsService {
             Usually your OctoPrint hosts system shutdown command. i.e: <code>sudo shutdown -h now</code>
           </small>
         </div>
-        <h5><u>Wake On Lan</u></h5>
-        <small>Enable and setup the ability for OctoFarm to fire a wake on lan packet to your client. Client MUST support wake on lan for this to work.</small>
+        <h5 class="d-none"><u>Wake On Lan</u></h5>
+        <small class="d-none">Enable and setup the ability for OctoFarm to fire a wake on lan packet to your client. Client MUST support wake on lan for this to work.</small>
       <form class="was-validated">
-        <div class="custom-control custom-checkbox mb-3">
+        <div class="d-none  custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="psWolEnable" required>
             <label class="custom-control-label" for="wolEnable">Enable wake on lan</label>
             <div class="invalid-feedback">Wake on Lan support disabled</div>
             <div class="valid-feedback">Wake on Lan support enabled</div>
         </div>
       </form>
-       <div class="form-row">
+       <div class="form-row d-none">
           <div class="col-2">
             <input id="psWolMAC"  type="text" class="form-control" placeholder="${wolMAC}" value="">
              <small class="form-text text-muted">
@@ -581,7 +575,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerOnCommand"  type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
+                This is usually an json object supplied in the following format <code>{"command":"turnPSUOn"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -596,7 +590,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerOffCommand" type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"turnPSUOff"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -611,7 +605,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"togglePSU"}</code>
                </small>
             </div>
             <div class="col-8">
@@ -627,7 +621,7 @@ class PrinterSettingsService {
             <div class="col-4">
               <input id="psPowerStateCommand" type="text" class="form-control" placeholder="Command">
                <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"state"}</code>
+                 This is usually an json object supplied in the following format <code>{"command":"getPSUstate"}</code>
                </small>
             </div>
             <div class="col-8">

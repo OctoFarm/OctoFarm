@@ -46,6 +46,19 @@ class PrinterDatabaseService {
         logger.error(err);
       });
   };
+
+  pushAndUpdate = (id, pushKey, obj) => {
+    return printerModel
+      .findOneAndUpdate({ _id: id }, { $push: { [pushKey]: obj } }, { new: true })
+      .then((res) => {
+        logger.debug("Successfully updated printer database! Key Push: " + pushKey, obj);
+        return res;
+      })
+      .catch((e) => {
+        logger.error("Failed to update printer database!! Key Push: " + pushKey, e);
+        return e;
+      });
+  };
 }
 
 module.exports = PrinterDatabaseService;

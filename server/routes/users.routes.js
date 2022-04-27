@@ -16,7 +16,7 @@ const {
   deleteUser,
   resetPassword,
   editUser
-} = require("../services/user-service");
+} = require("../services/users.service");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 

@@ -2,9 +2,11 @@
 
 const { findIndex } = require("lodash");
 const { DateTime } = require("luxon");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { getElectricityCosts, getMaintenanceCosts } = require("../utils/print-cost.util");
 const { HistoryClean } = require("./history-cleaner.service.js");
 const { floatOrZero } = require("../utils/number.util");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-InformationCleaning");
 
 const cleanJobs = [];
 
@@ -30,7 +32,7 @@ class JobCleanerService {
    * @param currentZ
    * @param costSettings
    * @param printerProgress
-   * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: null, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
+   * @returns {{fileName: string, thumbnail: null, filePath: string, currentZ: number, expectedPrintTime: null, printTimeRemaining: null, printTimeElapsed: null, expectedFilamentCosts: null, expectedTotals: null, lastPrintTime: null, fileDisplay: string, averagePrintTime: null, progress: number, expectedCompletionDate: null, expectedPrinterCosts: null}}
    */
   static generate(printerJob, selectedFilament, printer, currentZ, costSettings, printerProgress) {
     const currentJob = {
@@ -43,7 +45,9 @@ class JobCleanerService {
       expectedFilamentCosts: null,
       expectedPrinterCosts: null,
       expectedTotals: null,
-      currentZ: null,
+      expectedMaintenanceCosts: null,
+      expectedElectricityCosts: null,
+      currentZ: 0,
       printTimeElapsed: null,
       printTimeRemaining: null,
       averagePrintTime: null,
@@ -53,7 +57,7 @@ class JobCleanerService {
 
     if (!!printerJob) {
       if (!!printerJob?.file?.name) {
-        currentJob.fileName = printerJob.file.name;
+        currentJob.fileName = printerJob.file.name;        
         const fileIndex = findIndex(printer?.fileList.fileList, (o) => {
           return o.fullPath === printerJob.file.path;
         });
@@ -71,11 +75,16 @@ class JobCleanerService {
       if (!!currentZ) {
         currentJob.currentZ = currentZ;
       }
-
-      currentJob.expectedPrinterCosts = getPrintCostNumeric(
+      currentJob.expectedElectricityCosts = getElectricityCosts(
         printerJob.estimatedPrintTime,
         costSettings
-      )?.toFixed(2);
+      );
+      currentJob.expectedMaintenanceCosts = getMaintenanceCosts(
+        printerJob.estimatedPrintTime,
+        costSettings
+      );
+      currentJob.expectedPrinterCosts =
+        currentJob.expectedElectricityCosts + currentJob.expectedMaintenanceCosts;
 
       currentJob.expectedFilamentCosts = HistoryClean.getSpool(
         selectedFilament,
@@ -121,7 +130,7 @@ class JobCleanerService {
         printerProgress.completion
       );
     }
-
+    logger.debug("Job information cleaned and ready for consumption", currentJob);
     return currentJob;
   }
 }

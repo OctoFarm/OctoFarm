@@ -1,12 +1,22 @@
-import OctoPrintClient from "./octoprint-client.service";
-import OctoFarmClient from "./octofarm-client.service";
-import Calc from "../utils/calc.js";
-import UI from "../utils/ui.js";
-import {createFilamentSelector} from "./filament-manager-plugin.service";
-import CustomGenerator from "./custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "./modal-printer-select.service";
-import {fileActionStatusResponse} from "../pages/file-manager/file-manager.helpers";
-import {printActionStatusResponse} from "./octoprint/octoprint.helpers-commands";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import UI from "../../../utils/ui.js";
+import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
+import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
+import {printActionStatusResponse} from "../../../services/octoprint/octoprint.helpers-commands.actions";
+import "../../../utils/cleanup-modals.util";
+import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
+import {
+  closePrinterManagerModalIfOffline,
+  imageOrCamera, printerIsDisconnectedOrError
+} from "../../../utils/octofarm.utils";
+import {
+  findBigFilamentDropDowns,
+  returnBigFilamentSelectorTemplate,
+  fillFilamentDropDownList
+} from "../../../services/printer-filament-selector.service";
+import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../../exceptions/application-error.handler";
 
 let currentIndex = 0;
 
@@ -14,21 +24,10 @@ let currentPrinter = null;
 
 let filamentManager = false;
 
-$("#connectionModal").on("hidden.bs.modal", function () {
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
-
 export default class PrinterControlManagerService {
-  static async init(index, printers, printerControlList) {
-    try {
+  static async init(index, printers, printerControlList) {try {
       //clear camera
       if (index !== "") {
-        if (document.getElementById("printerControlCamera")) {
-          document.getElementById("printerControlCamera").src = "";
-        }
-
         currentIndex = index;
         const id = _.findIndex(printers, function (o) {
           return o._id === index;
@@ -57,12 +56,10 @@ export default class PrinterControlManagerService {
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     } catch (e) {
-      UI.createAlert(
-        "danger",
-        "The volatility of this is astounding... Error:" + JSON.stringify(e),
-        0,
-        "Clicked"
-      );
+      console.error(e)
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer Control - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 
@@ -70,115 +67,22 @@ export default class PrinterControlManagerService {
     //Load Connection Panel
 
     try {
-      const printerPort = document.getElementById("printerPortDrop");
-      const printerBaud = document.getElementById("printerBaudDrop");
-      const printerProfile = document.getElementById("printerProfileDrop");
-      const printerConnect = document.getElementById("printerConnect");
-
-      printerPort.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
-    `;
-      printerBaud.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
-    `;
-      printerProfile.innerHTML = `
-    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
-    `;
-      printer.connectionOptions.baudrates.forEach((baud) => {
-        if (baud !== 0) {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">${baud}</option>`);
-        } else {
-          document
-            .getElementById("pmBaudrate")
-            .insertAdjacentHTML("beforeend", `<option value="${baud}">AUTO</option>`);
-        }
-      });
-      if (printer.connectionOptions.baudratePreference != null) {
-        document.getElementById("pmBaudrate").value = printer.connectionOptions.baudratePreference;
-      }
-      printer.connectionOptions.ports.forEach((port) => {
-        document
-          .getElementById("pmSerialPort")
-          .insertAdjacentHTML("beforeend", `<option value="${port}">${port}</option>`);
-      });
-      if (printer.connectionOptions.portPreference != null) {
-        document.getElementById("pmSerialPort").value = printer.connectionOptions.portPreference;
-      }
-      printer.connectionOptions.printerProfiles.forEach((profile) => {
-        document
-          .getElementById("pmProfile")
-          .insertAdjacentHTML(
-            "beforeend",
-            `<option value="${profile.id}">${profile.name}</option>`
-          );
-      });
-      if (printer.connectionOptions.printerProfilePreference != null) {
-        document.getElementById("pmProfile").value =
-          printer.connectionOptions.printerProfilePreference;
-      }
-      if (
-        printer.printerState.state === "Disconnected" ||
-        printer.printerState.state === "Error!"
-      ) {
-        printerConnect.innerHTML =
-          "<button id=\"pmConnect\" class=\"btn btn-success inline text-center\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div>";
-        document.getElementById("pmSerialPort").disabled = false;
-        document.getElementById("pmBaudrate").disabled = false;
-        document.getElementById("pmProfile").disabled = false;
-      } else {
-        printerConnect.innerHTML =
-          "<button id=\"pmConnect\" class=\"btn btn-danger text-center inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
-          printer.printerURL +
-          "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
-          printer._id +
-          "\" class=\"btn-group ml-1\"></div>";
-        document.getElementById("pmSerialPort").disabled = true;
-        document.getElementById("pmBaudrate").disabled = true;
-        document.getElementById("pmProfile").disabled = true;
-      }
+      setupConnectButton(printer);
       //setup power btn
       // await PrinterPowerService.applyBtn(printer, "pmPowerBtn-");
 
-      let flipH = "";
-      let flipV = "";
-      let rotate90 = "";
-      if (printer.otherSettings !== null) {
-        if (printer.otherSettings.webCamSettings.flipH) {
-          flipH = "rotateY(180deg)";
-        }
-        if (printer.otherSettings.webCamSettings.flipV) {
-          flipV = "rotateX(180deg)";
-        }
-        if (printer.otherSettings.webCamSettings.rotate90) {
-          rotate90 = "rotate(90deg)";
-        }
-      }
-
       let serverSettings = await OctoFarmClient.getServerSettings();
       filamentManager = serverSettings.filamentManager;
-
-      let thumbnailClass = "d-none";
-      if (!!printer?.currentJob?.thumbnail) {
-        thumbnailClass = "col-md-12 col-lg-4";
-      }
-
       //Load tools
-
       document.getElementById("printerControls").innerHTML = `
-            <div class="row">
-                <!-- Camera -->
+            <div class="row">                
+                <!-- Camera --> 
                 <div class="col-md-4 col-lg-3 text-center">
                   <span id="cameraRow">  
                     <h5>Camera</h5><hr>
                     <div class="row">
                        <div class="col-12">
-                          <img alt="printer camera" style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
+                          ${imageOrCamera(printer)}
                         </div>
                     </div>
                   </span>
@@ -188,102 +92,10 @@ export default class PrinterControlManagerService {
                   <button id="pmPrintRestart" type="button" class="btn btn-danger" role="button"><i class="fas fa-undo"></i> Restart</button>
                   <button id="pmPrintResume" type="button" class="btn btn-success" role="button"><i class="fas fa-redo"></i> Resume</button>
                   <button id="pmPrintStop" type="button" class="btn btn-danger" disabled><i class="fas fa-square"></i> Cancel</button>
-                  <span id="customGcodeCommandsArea" class="d-none">
-                     <h5 class="mt-2">Custom Gcode</h5><hr>
-                  </span>
-                </div>
-                <!-- Print Status -->
-                <div class="col-md-4 col-lg-6 text-center">
-                    <h5>Print Status</h5><hr>                               
-                    <div class="row">
-                       <div class="col-12">       
-                           <div class="progress mb-2">
-                             <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:100%" aria-valuenow="100%" aria-valuemin="0" aria-valuemax="100">Loading... </div>
-                           </div>
-                           <div class="row">
-                             <div class="col-md-6 col-lg-8">
-                                 <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
-                             </div>
-                             <div class="col-md-6 col-lg-4">
-                                <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
-                             </div>
-                           </div>
-                  
-                       </div>    
-                    </div>
-                    <div class="row">
-                        <div id="fileThumbnail" class="${thumbnailClass}">
-  
-                        </div>
-                        <div class="col">
-                            <div class="row">
-                                <div class="col-md-4 col-lg-4">
-                                    <b>Expected Time: </b><p class="mb-1" id="pmExpectedTime">Loading...</p>
-                                </div>
-                                <div class="col-md-4 col-lg-4">
-                                    <b>Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">Loading...</p>
-                                </div>
-                                <div class="col-md-4 col-lg-4">
-                                    <b>Time Remaining: </b><p class="mb-1" id="pmTimeRemain">Loading...</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-4 col-lg-4">                             
-                                  <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">Loading...</p>
-                                </div>
-                                <div class="col-md-4 col-lg-4">
-                                  <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>                          
-                                </div>
-                                <div class="col-md-4 col-lg-4">                    
-                                  <b id="dlpPluginDataTitle" class="mb-1 d-none">Layer Progress: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="dlpPluginDataData">Loading...</p>            
-                                </div>
-                            </div>
-                        </div>
-                    </div>    
-                    <h5>Expected Costs</h5><hr>        
-                    <div class="row">
-                      <div class="col-md-2 col-lg-3">
-                        <b>Job Cost: </b><p class="mb-1" id="pmJobCosts">Loading...</p></center>          
-                      </div>
-                      <div class="col-md-4 col-lg-3"><b class="mb-1">Units Consumed: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
-                      <div class="col-md-2 col-lg-3"><b class="mb-1">Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p></div>
-                      <div class="col-md-3 col-lg-3"><b class="mb-1">Material Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>
-                    </div> 
-                </div>
-                <!-- Tools -->
-                <div class="col-md-4 col-lg-3 text-center">
-                    <h5>Tools</h5><hr>
-                    <div class="row">
-                      <div class="col-12">
-                          <button id="pmTempTime" type="button" class="btn btn-secondary btn-sm float-right" disabled>Updated: <i class="far fa-clock"></i> Never</button>
-                      </div>
-                      </div>
-                    <div class="row" id="pmToolTemps">
-      
-                    </div>
-                    <div class="row" id="pmOtherTemps">
-                    </div>
-                    <h5>Extrusion</h5><hr>
-                    <div class="row">
-                    <div class="col-4">
-                            <div class="input-group">
-                                <input id="pcExtruder" type="number" class="form-control" placeholder="0" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                    <span class="input-group-text" id="basic-addon2">mm</span>
-                                </div>
-                            </div>
-                    </div>
-                     <div class="col-8">
-                      <div class="btn-group" role="group" aria-label="Basic example">
-                        <button id="pcExtrude" class="btn btn-light"><i class="fas fa-redo"></i> Extrude</button> 
-                        <button id="pcRetract" class="btn btn-light"><i class="fas fa-undo"></i> Retract</button>
-                      </div>
-            </div>
-            </div>
                 </div>
                 <!-- Control -->
-                <div class="col-md-4 col-lg-4 text-center">
-                    <h5>Control</h5><hr>    
+                <div class="col-md-4 col-lg-6 text-center">
+                    <h5>Jog</h5><hr>    
                     <div class="row">
                         <div class="col-3"></div>
                         <div class="col-3 text-center">
@@ -328,7 +140,30 @@ export default class PrinterControlManagerService {
                                 </div>
                         </div>
                     </div>
+                    <h5>Extrusion</h5><hr>
+                      <div class="input-group">
+                          <input id="pcExtruder" type="number" class="form-control" placeholder="0" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                          <div class="input-group-append">
+                              <span class="input-group-text" id="basic-addon2">mm</span>
+                                  <button id="pcExtrude" class="btn btn-light"><i class="fas fa-redo"></i> Extrude</button> 
+                                  <button id="pcRetract" class="btn btn-light"><i class="fas fa-undo"></i> Retract</button>
+                          </div>
+                      </div>
                   </div>
+               <!-- Tools -->
+                <div class="col-md-4 col-lg-3 text-center">
+                    <h5>Tools</h5><hr>
+                    <div class="row">
+                      <div class="col-12">
+                          <button id="pmTempTime" type="button" class="btn btn-secondary btn-sm float-right" disabled>Updated: <i class="far fa-clock"></i> Never</button>
+                      </div>
+                      </div>
+                    <div class="row" id="pmToolTemps">
+      
+                    </div>
+                    <div class="row" id="pmOtherTemps">
+                    </div>
+                </div>  
                 <!-- Feed/Flow -->
                 <div class="col-md-4 col-lg-4 text-center">
                   <h5>Feed/Flow Rate</h5><hr>
@@ -367,65 +202,46 @@ export default class PrinterControlManagerService {
                     </div>
                 </div>
                </div>
-
+               <!-- CustomGcode -->
+                <div class="col-md-4 col-lg-4 text-center">
+                  <h5>Custom Gcode</h5><hr>
+                  <span id="customGcodeCommandsArea" class="d-none">
+                  </span>
+                </div>  
             </div>
-            `;
+      `;
 
-      let camURL;
-      if (typeof printer.camURL !== "undefined" && printer.camURL.includes("http")) {
-        camURL = printer.camURL;
-      } else {
-        camURL = "../../../images/noCamera.jpg";
-      }
-      //Load camera
-      const camTitle = document.getElementById("cameraRow");
-      if (printer.otherSettings.webCamSettings.webcamEnabled) {
-        document.getElementById("printerControlCamera").src = camURL;
-        if (camTitle.classList.contains("d-none")) {
-          camTitle.classList.remove("d-none");
-        }
-      } else {
-        if (!camTitle.classList.contains("d-none")) {
-          camTitle.classList.add("d-none");
-        }
-      }
       const printerToolTemps = document.getElementById("pmToolTemps");
       document.getElementById("pmOtherTemps").innerHTML = "";
       printerToolTemps.innerHTML = "";
 
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         const keys = Object.keys(printer.currentProfile);
-        for (let t = 0; t < keys.length; t++) {
-          if (keys[t].includes("extruder")) {
-            for (let i = 0; i < printer.currentProfile[keys[t]].count; i++) {
+        for (const element of keys) {
+          if (element.includes("extruder")) {
+            for (let i = 0; i < printer.currentProfile[element].count; i++) {
               printerToolTemps.insertAdjacentHTML(
-                "beforeend",
-                `
-                                <div class="col-8">
-                                   <div class="md-form input-group mb-3">
-       
-                                      <div title="Actual Tool temperature" class="input-group-prepend">
-                                          <span class="input-group-text"><span>${i}: </span><span id="tool${i}Actual"> 0°C</span></span>
-                                      </div>
-                                      <input title="Set your target Tool temperature" id="tool${i}Target" type="number" class="form-control col" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                                      <div class="input-group-append">
-                                          <button class="btn btn-md btn-light m-0 p-1" type="button" id="tool${i}Set">Set</button>
-                                      </div>
-                                  </div>
-                                </div>
-                                <div class="col-4">
-                                 <div class="input-group mb-1"> <select class="custom-select bg-secondary text-light" id="tool${i}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
-                                </div>
-                                `
+                  "beforeend",
+                  `
+                <div class="md-form input-group mb-3">
+                    <div title="Actual Tool temperature" class="input-group-prepend">
+                        <span class="input-group-text"><span>${i}: </span><span id="tool${i}Actual"> 0°C</span></span>
+                    </div>
+                    <input title="Set your target Tool temperature" id="tool${i}Target" type="number" class="form-control col" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-md btn-light m-0 p-1" type="button" id="tool${i}Set">Set</button>
+                    </div>
+                </div>
+                ${returnBigFilamentSelectorTemplate(i)}
+              `
               );
-              const pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
-              await createFilamentSelector(pmFilamentDrop, printer, i);
+              await fillFilamentDropDownList(document.getElementById(`tool-${i}-bigFilamentSelect`), printer, i);
             }
-          } else if (keys[t].includes("heatedBed")) {
-            if (printer.currentProfile[keys[t]]) {
+          } else if (element.includes("heatedBed")) {
+            if (printer.currentProfile[element]) {
               document.getElementById("pmOtherTemps").insertAdjacentHTML(
-                "beforeend",
-                `
+                  "beforeend",
+                  `
                            <div class="col text-center">
                               <h5>Bed</h5>
                           <hr>
@@ -442,8 +258,8 @@ export default class PrinterControlManagerService {
                          `
               );
             }
-          } else if (keys[t].includes("heatedChamber")) {
-            if (printer.currentProfile[keys[t]]) {
+          } else if (element.includes("heatedChamber")) {
+            if (printer.currentProfile[element]) {
               document.getElementById("pmOtherTemps").insertAdjacentHTML(
                 "beforeend",
                 `
@@ -479,6 +295,9 @@ export default class PrinterControlManagerService {
         "clicked"
       );
       console.error(e);
+      const errorObject = ClientErrors.SILENT_ERROR;
+      errorObject.message =  `Printer Control - ${e}`
+      throw new ApplicationError(errorObject)
     }
   }
 
@@ -489,12 +308,8 @@ export default class PrinterControlManagerService {
         e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
       });
     });
-    if (currentPrinter.state !== "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", async () => {
-        elements.connectPage.connectButton.disabled = true;
-       await OctoPrintClient.connect(elements.connectPage.connectButton.value, currentPrinter);
-      });
-    }
+
+    setupConnectButtonListeners(currentPrinter, elements.connectPage.connectButton)
 
     //Control Listeners... There's a lot!
     elements.printerControls.xPlus.addEventListener("click", async (e) => {
@@ -564,15 +379,15 @@ export default class PrinterControlManagerService {
 
     if (currentPrinter.currentProfile !== null) {
       const keys = Object.keys(currentPrinter.currentProfile);
-      for (let t = 0; t < keys.length; t++) {
-        if (keys[t].includes("extruder")) {
-          for (let i = 0; i < currentPrinter.currentProfile[keys[t]].count; i++) {
+      for (const element of keys) {
+        if (element.includes("extruder")) {
+          for (let i = 0; i < currentPrinter.currentProfile[element].count; i++) {
             const toolSet = async function () {
               const flashReturn = function () {
                 document.getElementById("tool" + i + "Set").className =
-                  "btn btn-md btn-light m-0 p-1";
+                    "btn btn-md btn-light m-0 p-1";
               };
-              let { value } = document.getElementById("tool" + i + "Target");
+              let {value} = document.getElementById("tool" + i + "Target");
               document.getElementById("tool" + i + "Target").value = "";
               if (value === "Off") {
                 value = 0;
@@ -584,14 +399,14 @@ export default class PrinterControlManagerService {
                 }
               };
               const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
-              const { status } = post;
+              const {status} = post;
               if (status === 204) {
                 document.getElementById("tool" + i + "Set").className =
-                  "btn btn-md btn-success m-0 p-1";
+                    "btn btn-md btn-success m-0 p-1";
                 setTimeout(flashReturn, 500);
               } else {
                 document.getElementById("tool" + i + "Set").className =
-                  "btn btn-md btn-danger m-0 p-1";
+                    "btn btn-md btn-danger m-0 p-1";
                 setTimeout(flashReturn, 500);
               }
             };
@@ -601,23 +416,23 @@ export default class PrinterControlManagerService {
               }
             });
             document
-              .getElementById("tool" + i + "Target")
-              .addEventListener("keypress", async (e) => {
-                if (e.key === "Enter") {
-                  await toolSet(e);
-                }
-              });
+                .getElementById("tool" + i + "Target")
+                .addEventListener("keypress", async (e) => {
+                  if (e.key === "Enter") {
+                    await toolSet();
+                  }
+                });
             document.getElementById("tool" + i + "Set").addEventListener("click", async (e) => {
-             await toolSet(e);
+              await toolSet();
             });
           }
-        } else if (keys[t].includes("heatedBed")) {
-          if (currentPrinter.currentProfile[keys[t]]) {
+        } else if (element.includes("heatedBed")) {
+          if (currentPrinter.currentProfile[element]) {
             const bedSet = async function () {
               const flashReturn = function () {
                 elements.temperatures.bed[2].classList = "btn btn-md btn-light m-0 p-1";
               };
-              let { value } = elements.temperatures.bed[1];
+              let {value} = elements.temperatures.bed[1];
 
               elements.temperatures.bed[1].value = "";
               if (value === "Off") {
@@ -649,7 +464,7 @@ export default class PrinterControlManagerService {
                 if (node) {
                   node.addEventListener("keypress", async (e) => {
                     if (e.key === "Enter") {
-                      await bedSet(e);
+                      await bedSet();
                     }
                   });
                 }
@@ -657,14 +472,14 @@ export default class PrinterControlManagerService {
               if (node.id.includes("Set")) {
                 if (node) {
                   node.addEventListener("click", async (e) => {
-                    await bedSet(e);
+                    await bedSet();
                   });
                 }
               }
             });
           }
-        } else if (keys[t].includes("heatedChamber")) {
-          if (currentPrinter.currentProfile[keys[t]]) {
+        } else if (element.includes("heatedChamber")) {
+          if (currentPrinter.currentProfile[element]) {
             const chamberSet = async function () {
               const flashReturn = function () {
                 elements.temperatures.chamber[2].classList = "btn btn-md btn-light m-0 p-1";
@@ -952,23 +767,6 @@ export default class PrinterControlManagerService {
         title: document.getElementById("printerSelection"),
         status: document.getElementById("pmStatus")
       },
-      jobStatus: {
-        expectedCompletionDate: document.getElementById("pmExpectedCompletionDate"),
-        expectedTime: document.getElementById("pmExpectedTime"),
-        remainingTime: document.getElementById("pmTimeRemain"),
-        elapsedTime: document.getElementById("pmTimeElapsed"),
-        currentZ: document.getElementById("pmCurrentZ"),
-        fileName: document.getElementById("pmFileName"),
-        progressBar: document.getElementById("pmProgress"),
-        expectedWeight: document.getElementById("pmExpectedWeight"),
-        expectedPrinterCost: document.getElementById("pmExpectedPrinterCost"),
-        expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
-        expectedTotalCosts: document.getElementById("pmJobCosts"),
-        printerResends: document.getElementById("printerResends"),
-        resendTitle: document.getElementById("resentTitle"),
-        dlpPluginDataTitle: document.getElementById("dlpPluginDataTitle"),
-        dlpPluginDataData: document.getElementById("dlpPluginDataData")
-      },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
         printerBaud: document.getElementById("printerBaudDrop"),
@@ -980,7 +778,7 @@ export default class PrinterControlManagerService {
         profileDropDown: document.getElementById("pmProfile")
       },
       printerControls: {
-        filamentDrop: document.getElementById("filamentManagerFolderSelect"),
+        filamentDrop: document.getElementById("FilamentSelect"),
         fileUpload: document.getElementById("printerManagerUploadBtn"),
         xPlus: document.getElementById("pcXpos"),
         xMinus: document.getElementById("pcXneg"),
@@ -1018,149 +816,16 @@ export default class PrinterControlManagerService {
         chamber: document.querySelectorAll("[id^='chamber']"),
         tools: document.querySelectorAll("[id^='tool']")
       },
-      filamentDrops: document.querySelectorAll("[id$=FilamentManagerFolderSelect]")
+      filamentDrops: findBigFilamentDropDowns()
     };
   }
 
   static async applyState(printer, elements) {
-    //Garbage collection for terminal
-    elements.mainPage.status.innerHTML = printer.printerState.state;
-    elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
-    let dateComplete;
-    const camField = document.getElementById("fileThumbnail");
-    if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
-      if (
-        camField.innerHTML !==
-        `<img alt="Gcode Thumbnail" width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
-      ) {
-        camField.innerHTML = `<img alt="Gcode Thumbnail" width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`;
-      }
-    } else {
-      if (camField.innerHTML !== "") {
-        camField.innerHTML = "";
-      }
-    }
-    if (
-      typeof printer.currentJob !== "undefined" &&
-      printer.currentJob.printTimeRemaining !== null
-    ) {
-      let currentDate = new Date();
-
-      if (printer.currentJob.progress === 100) {
-        dateComplete = "Print Ready for Harvest";
-      } else {
-        currentDate = currentDate.getTime();
-        const futureDateString = new Date(
-          currentDate + printer.currentJob.printTimeRemaining * 1000
-        ).toDateString();
-        let futureTimeString = new Date(
-          currentDate + printer.currentJob.printTimeRemaining * 1000
-        ).toTimeString();
-        futureTimeString = futureTimeString.substring(0, 8);
-        dateComplete = futureDateString + ": " + futureTimeString;
-      }
-    } else {
-      dateComplete = "No Active Print";
+    if(closePrinterManagerModalIfOffline(printer)){
+      return
     }
 
-    elements.jobStatus.expectedCompletionDate.innerHTML = dateComplete;
-
-    if (typeof printer.resends !== "undefined" && printer.resends !== null) {
-      if (elements.jobStatus.printerResends.classList.contains("d-none")) {
-        elements.jobStatus.printerResends.classList.remove("d-none");
-        elements.jobStatus.resendTitle.classList.remove("d-none");
-      }
-      elements.jobStatus.printerResends.innerHTML = `
-      ${printer.resends.count} / ${
-        printer.resends.transmitted / 1000
-      }K (${printer.resends.ratio.toFixed(0)})
-      `;
-    }
-
-    if (printer?.layerData) {
-      if (elements.jobStatus.dlpPluginDataTitle.classList.contains("d-none")) {
-        elements.jobStatus.dlpPluginDataTitle.classList.remove("d-none");
-        elements.jobStatus.dlpPluginDataData.classList.remove("d-none");
-      }
-      elements.jobStatus.dlpPluginDataData.innerHTML = `${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
-    }
-
-    if (typeof printer.currentJob !== "undefined" && printer.currentJob.progress !== null) {
-      elements.jobStatus.progressBar.innerHTML = printer.currentJob.progress.toFixed(0) + "%";
-      elements.jobStatus.progressBar.style.width = printer.currentJob.progress.toFixed(2) + "%";
-    } else {
-      elements.jobStatus.progressBar.innerHTML = 0 + "%";
-      elements.jobStatus.progressBar.style.width = 0 + "%";
-    }
-    elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
-      printer.currentJob.expectedPrintTime
-    );
-    elements.jobStatus.remainingTime.innerHTML = Calc.generateTime(
-      printer.currentJob.printTimeRemaining
-    );
-    elements.jobStatus.elapsedTime.innerHTML = Calc.generateTime(
-      printer.currentJob.printTimeElapsed
-    );
-    if (printer.currentJob.currentZ === null) {
-      elements.jobStatus.currentZ.innerHTML = "No Active Print";
-    } else {
-      elements.jobStatus.currentZ.innerHTML = printer.currentJob.currentZ + "mm";
-    }
-
-    if (typeof printer.currentJob === "undefined") {
-      elements.jobStatus.fileName.setAttribute("title", "No File Selected");
-      elements.jobStatus.fileName.innerHTML = "No File Selected";
-    } else {
-      elements.jobStatus.fileName.setAttribute("title", printer.currentJob.filePath);
-      let fileName = printer.currentJob.fileDisplay;
-      if (fileName.length > 49) {
-        fileName = fileName.substring(0, 49) + "...";
-      }
-
-      elements.jobStatus.fileName.innerHTML = fileName;
-      let usageDisplay = "";
-      let filamentCost = "";
-      if (printer.currentJob.expectedTotals !== null) {
-        usageDisplay += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.totalLength.toFixed(
-          2
-        )}m / ${printer.currentJob.expectedTotals.totalWeight.toFixed(2)}g</p>`;
-        elements.jobStatus.expectedTotalCosts.innerHTML =
-          printer.currentJob.expectedTotals.totalCost;
-      } else {
-        usageDisplay = "No File Selected";
-        elements.jobStatus.expectedTotalCosts.innerHTML = "No File Selected";
-      }
-      if (typeof printer.currentJob.expectedFilamentCosts === "object") {
-        if (printer.currentJob.expectedFilamentCosts !== null) {
-          printer.currentJob.expectedFilamentCosts.forEach((unit) => {
-            const firstKey = Object.keys(unit)[0];
-            let theLength = parseFloat(unit[firstKey].length);
-            let theWeight = parseFloat(unit[firstKey].weight);
-            usageDisplay += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${theLength.toFixed(
-              2
-            )}m / ${theWeight.toFixed(2)}g</p>`;
-          });
-
-          filamentCost += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.spoolCost.toFixed(
-            2
-          )}</p>`;
-          printer.currentJob.expectedFilamentCosts.forEach((unit) => {
-            const firstKey = Object.keys(unit)[0];
-            filamentCost += `<p class="mb-0"><b>${unit[firstKey].toolName}: </b>${unit[firstKey].cost}</p>`;
-          });
-        } else {
-          filamentCost = "No length estimate";
-        }
-      } else {
-        filamentCost = "No File Selected";
-      }
-
-      elements.jobStatus.expectedWeight.innerHTML = usageDisplay;
-
-      elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
-
-      elements.jobStatus.expectedPrinterCost.innerHTML = printer.currentJob.expectedPrinterCosts;
-    }
+    updateConnectButtonState(printer, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
 
     if (printer.printerState.colour.category === "Active") {
       await PrinterControlManagerService.controls(true, true);
@@ -1179,14 +844,7 @@ export default class PrinterControlManagerService {
       printer.printerState.colour.category === "Complete"
     ) {
       await PrinterControlManagerService.controls(false);
-      elements.connectPage.connectButton.value = "disconnect";
-      elements.connectPage.connectButton.innerHTML = "Disconnect";
-      elements.connectPage.connectButton.classList = "btn btn-danger inline";
-      elements.connectPage.connectButton.disabled = false;
-      elements.connectPage.printerPort.disabled = true;
-      elements.connectPage.printerBaud.disabled = true;
-      elements.connectPage.printerProfile.disabled = true;
-      if (typeof printer.job !== "undefined" && printer.job.filename === "No File Selected") {
+      if (typeof printer.job !== "undefined" && printer.currentJob.fileName === "No File Selected") {
         elements.printerControls.printStart.disabled = true;
         elements.printerControls.printStart.style.display = "inline-block";
         elements.printerControls.printPause.disabled = true;
@@ -1224,18 +882,9 @@ export default class PrinterControlManagerService {
         }
       }
     } else if (
-      printer.printerState.colour.category === "Offline" ||
-      printer.printerState.colour.category === "Disconnected"
+        printerIsDisconnectedOrError(printer)
     ) {
-      if (printer.printerState.state === "Error!") {
-        document.getElementById("pmSerialPort").disabled = false;
-        document.getElementById("pmBaudrate").disabled = false;
-        document.getElementById("pmProfile").disabled = false;
-      }
-      elements.connectPage.connectButton.value = "connect";
-      elements.connectPage.connectButton.innerHTML = "Connect";
-      elements.connectPage.connectButton.classList = "btn btn-success inline";
-      elements.connectPage.connectButton.disabled = false;
+
       await PrinterControlManagerService.controls(true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
@@ -1247,13 +896,6 @@ export default class PrinterControlManagerService {
       elements.printerControls.printRestart.style.display = "none";
       elements.printerControls.printResume.disabled = true;
       elements.printerControls.printResume.style.display = "none";
-      if (
-        printer.printerState.state.category === "Offline" ||
-        printer.state === "Shutdown" ||
-        printer.state === "Searching..."
-      ) {
-        $("#printerManagerModal").modal("hide");
-      }
     }
   }
 
@@ -1292,44 +934,45 @@ export default class PrinterControlManagerService {
   static async controls(enable, printing) {
     let elements = PrinterControlManagerService.grabPage();
     const { filamentDrops } = elements;
-    elements = elements.printerControls;
+    const { printerControls } = elements
+
     let spool = true;
     if (!filamentManager) {
       spool = false;
     }
 
     if (typeof printing !== "undefined" && printing) {
-      elements.feedRate.disabled = !printing;
-      elements.flowRate.disabled = !printing;
-      elements.fansOn.disabled = !printing;
-      elements.fansOff.disabled = !printing;
+      printerControls.feedRate.disabled = !printing;
+      printerControls.flowRate.disabled = !printing;
+      printerControls.fansOn.disabled = !printing;
+      printerControls.fansOff.disabled = !printing;
       filamentDrops.forEach((drop) => {
         drop.disabled = spool;
       });
     } else {
-      elements.feedRate.disabled = enable;
-      elements.flowRate.disabled = enable;
-      elements.fansOn.disabled = enable;
-      elements.fansOff.disabled = enable;
+      printerControls.feedRate.disabled = enable;
+      printerControls.flowRate.disabled = enable;
+      printerControls.fansOn.disabled = enable;
+      printerControls.fansOff.disabled = enable;
       filamentDrops.forEach((drop) => {
         drop.disabled = enable;
       });
     }
-    elements.xPlus.disabled = enable;
-    elements.xMinus.disabled = enable;
-    elements.yPlus.disabled = enable;
-    elements.yMinus.disabled = enable;
-    elements.xyHome.disabled = enable;
-    elements.zPlus.disabled = enable;
-    elements.zMinus.disabled = enable;
-    elements.zHome.disabled = enable;
-    elements.step01.disabled = enable;
-    elements.step1.disabled = enable;
-    elements.step10.disabled = enable;
-    elements.step100.disabled = enable;
+    printerControls.xPlus.disabled = enable;
+    printerControls.xMinus.disabled = enable;
+    printerControls.yPlus.disabled = enable;
+    printerControls.yMinus.disabled = enable;
+    printerControls.xyHome.disabled = enable;
+    printerControls.zPlus.disabled = enable;
+    printerControls.zMinus.disabled = enable;
+    printerControls.zHome.disabled = enable;
+    printerControls.step01.disabled = enable;
+    printerControls.step1.disabled = enable;
+    printerControls.step10.disabled = enable;
+    printerControls.step100.disabled = enable;
 
-    elements.motorsOff.disabled = enable;
-    elements.extrude.disabled = enable;
-    elements.retract.disabled = enable;
+    printerControls.motorsOff.disabled = enable;
+    printerControls.extrude.disabled = enable;
+    printerControls.retract.disabled = enable;
   }
 }

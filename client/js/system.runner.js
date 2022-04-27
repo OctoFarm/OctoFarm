@@ -83,7 +83,7 @@ if(serverActionsElements.CLEAR_OLD_LOGS){
 
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
   serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
-    bootbox.confirm(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
+    bootbox.dialog(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
   });
 }
 

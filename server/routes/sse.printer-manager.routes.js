@@ -13,6 +13,7 @@ const { PrinterTicker } = printerTicker;
 
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
+const { returnLast100Actions } = require("../services/user-actions-log.service");
 
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
@@ -43,18 +44,20 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, function (re
 
 if (interval === false) {
   interval = setInterval(async function () {
-    let printersInformation = getPrinterStoreCache().listPrintersInformation(true);
+    let printersInformation = getPrinterStoreCache().listPrintersInformationForPrinterManager();
     printersInformation = printersInformation.map((p) => {
       p.registeredEvents = getEventEmitterCache().get(p._id);
       return p;
     });
     const printerControlList = getPrinterManagerCache().getPrinterControlList();
     const currentTickerList = PrinterTicker.returnIssue();
+    const currentActionList = returnLast100Actions();
 
     const infoDrop = {
       printersInformation: printersInformation,
       printerControlList: printerControlList,
-      currentTickerList: currentTickerList
+      currentTickerList: currentTickerList,
+      currentActionList: currentActionList
     };
     clientInformation = stringify(infoDrop);
     for (clientId in clients) {

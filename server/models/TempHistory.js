@@ -11,7 +11,7 @@ const TempHistorySchema = new mongoose.Schema(
       required: true
     }
   },
-  { capped: true, size: 10000, max: 1000000 }
+  { capped: true, size: 10000, max: 1000000, autoIndexId: true }
 );
 
 const TempHistory = mongoose.model("TempHistory", TempHistorySchema);

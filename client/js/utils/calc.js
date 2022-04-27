@@ -11,6 +11,10 @@ export default class Calculate {
     return amount?.toFixed(fractional) || 0;
   }
 
+  static percentOf(amount, percent){
+    return this.toFixed((percent / 100) * amount, 2);
+  }
+
   // Convert miliseconds to Days, Hours, Minutes
   static generateTime(seconds) {
     let string;

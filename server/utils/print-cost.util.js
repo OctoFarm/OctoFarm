@@ -6,29 +6,38 @@ const noCostSettingsMessage = "No cost settings to calculate from";
  * @param costSettings
  * @returns {number|null}
  */
-function getPrintCostNumeric(printTime, costSettings) {
+function getMaintenanceCosts(printTime, costSettings) {
   if (!costSettings) {
     // Attempt to update cost settings in history...
-    return null;
+    return noCostSettingsMessage;
   }
-  // calculating electricity cost
-  const powerConsumption = parseFloat(costSettings.powerConsumption);
-  const costOfElectricity = parseFloat(costSettings.electricityCosts);
-  const costPerHour = powerConsumption * costOfElectricity;
-  const estimatedPrintTime = printTime / 3600; // h
-  const electricityCost = costPerHour * estimatedPrintTime;
-
   // calculating printer cost
   const purchasePrice = parseFloat(costSettings.purchasePrice);
   const lifespan = parseFloat(costSettings.estimateLifespan);
   const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
   const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-  const printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+  const estimatedPrintTime = getEstimatedPrintTime(printTime);
   // assembling string
-  return electricityCost + printerCost;
+  return (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+}
+
+function getEstimatedPrintTime(printTime) {
+  return printTime / 3600;
+}
+
+function getElectricityCosts(printTime, costSettings) {
+  if (!costSettings) {
+    return noCostSettingsMessage;
+  }
+  const powerConsumption = parseFloat(costSettings.powerConsumption);
+  const costOfElectricity = parseFloat(costSettings.electricityCosts);
+  const costPerHour = powerConsumption * costOfElectricity;
+  const estimatedPrintTime = getEstimatedPrintTime(printTime); // h
+  return costPerHour * estimatedPrintTime;
 }
 
 module.exports = {
   noCostSettingsMessage,
-  getPrintCostNumeric
+  getMaintenanceCosts,
+  getElectricityCosts
 };

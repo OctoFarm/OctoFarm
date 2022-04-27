@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint-client.service.js";
+import OctoPrintClient from "./octoprint-client.service.js";
 import OctoFarmClient from "../octofarm-client.service.js";
 import UI from "../../utils/ui";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
@@ -7,7 +7,6 @@ const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
 
 async function updateBtnOnClick(printerID) {
-  try {
     let data = {
       i: printerID
     };
@@ -42,10 +41,6 @@ async function updateBtnOnClick(printerID) {
         "Please rescan your device as there's no plugins actually available..."
       );
     }
-  } catch (e) {
-    console.error(e);
-    UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
-  }
 }
 
 export function setupUpdateOctoPrintPluginsBtn(printer) {

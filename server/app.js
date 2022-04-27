@@ -56,7 +56,7 @@ if (!!majorVersion && majorVersion < 14) {
 
       const app = await serveOctoFarmNormally(octoFarmServer);
 
-      const { onShutdown } = require("./services/shutdown-service");
+      const { onShutdown } = require("./services/system-service-control.service");
 
       const applicationServer = app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);

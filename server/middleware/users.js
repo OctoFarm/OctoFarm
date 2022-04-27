@@ -1,4 +1,5 @@
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
+const { fetchFirstAdministrator } = require("../services/users.service");
 
 module.exports = {
   async ensureCurrentUserAndGroup(req, res, next) {
@@ -10,9 +11,11 @@ module.exports = {
 
     // If login is not required, set default user and admin otherwise pass current user/group.
     if (!serverSettings?.server?.loginRequired) {
+      const firstAdministrator = await fetchFirstAdministrator();
       req.user = {
-        _id: null,
-        name: "",
+        _id: firstAdministrator._id,
+        name: firstAdministrator.name,
+        username: firstAdministrator.username,
         group: "Administrator",
         clientSettings: clientSettings
       };

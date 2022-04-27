@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint-client.service";
+import OctoPrintClient from "./octoprint-client.service";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 
 export async function printerPreHeatChamber(printer, chamberTemp) {
@@ -167,6 +167,42 @@ export async function printerSendGcode(printer, result) {
     return {
       status: bulkActionsStates.ERROR,
       message: "Failed to send your gcode script to the client!"
+    };
+  }
+}
+
+export async function printerEmergencyStop(printer) {
+  const opt = {
+    commands: ["M112"]
+  };
+  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  if (status === 204) {
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: "Emergency stop has successfully been actioned!"
+    };
+  } else {
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Emergency stop failed to send!"
+    };
+  }
+}
+
+export async function printerHomeAllAxis(printer) {
+  const opt = {
+    commands: ["G28"]
+  };
+  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  if (status === 204) {
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: "Home printer command has successfully been actioned!"
+    };
+  } else {
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Home printer command failed to send!"
     };
   }
 }

@@ -1,4 +1,4 @@
-import OctoPrintClient from "./octoprint-client.service";
+import OctoPrintClient from "./octoprint/octoprint-client.service";
 import Queue from "./file-manager-queue.service.js";
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
@@ -23,6 +23,8 @@ import {
   generatePathList,
   getFileListElement,
 } from "../pages/file-manager/file-manager.helpers";
+import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../exceptions/application-error.handler";
 
 const fileUploads = new Queue();
 
@@ -1136,7 +1138,7 @@ export class FileActions {
       } else {
         // Add status folder creation great failure
         return {
-          status: "danger",
+          status: "error",
           message: "Successfully created your missing folder!",
         };
       }
@@ -1177,28 +1179,31 @@ export class FileActions {
     };
     await OctoPrintClient.file(printer, filePath, "load", false);
     const ret = await OctoPrintClient.jobAction(printer, opts);
-    if (ret?.status === 200 || ret?.status === 201 || ret?.status === 204) {
-      UI.createAlert(
-        "success",
-        `${printer.printerName}: Successfully started printing ${filePath}`,
-          3000,
-          "Clicked"
-      );
-    } else if (ret?.status === 409) {
-      UI.createAlert(
-        "warning",
-        `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`,
-          3000,
-          "Clicked"
-      );
-    } else {
-      UI.createAlert(
-        "danger",
-        `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`,
-          3000,
-          "Clicked"
-      );
+    if(!!ret?.status){
+      if (ret?.status === 200 || ret?.status === 201 || ret?.status === 204) {
+        UI.createAlert(
+            "success",
+            `${printer.printerName}: Successfully started printing ${filePath}`,
+            3000,
+            "Clicked"
+        );
+      } else if (ret?.status === 409) {
+        UI.createAlert(
+            "warning",
+            `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`,
+            3000,
+            "Clicked"
+        );
+      } else {
+        UI.createAlert(
+            "error",
+            `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`,
+            3000,
+            "Clicked"
+        );
+      }
     }
+
   }
 
   static async selectFile(printer, filePath) {
@@ -1444,11 +1449,14 @@ export class FileActions {
               );
             } catch (e) {
               UI.createAlert(
-                "danger",
+                "error",
                 `Unable to move your file! Error ${e}`,
                 0,
                 "Clicked"
               );
+              const errorObject = ClientErrors.SILENT_ERROR;
+              errorObject.message =  `Bulk Commands - ${e}`
+              throw new ApplicationError(errorObject)
             }
           }
         }

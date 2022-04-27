@@ -12,10 +12,15 @@ async function fetchUsers(force = false) {
   return Object.freeze(currentUsers);
 }
 
+async function fetchFirstAdministrator() {
+  const currentUserList = await fetchUsers();
+  return currentUserList[0];
+}
+
 async function checkLastAdministrator() {
   const currentUserList = await fetchUsers();
   const userIndex = findIndex(currentUserList, function (o) {
-    return o.group == "Administrator";
+    return o.group === "Administrator";
   });
 
   return userIndex === -1;
@@ -224,5 +229,6 @@ module.exports = {
   createUser,
   deleteUser,
   resetPassword,
-  editUser
+  editUser,
+  fetchFirstAdministrator
 };

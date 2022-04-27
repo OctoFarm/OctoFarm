@@ -1011,7 +1011,7 @@
   <div class="row mt-5">
     <div class="col-md-6 m-auto">
       <div class="card card-body text-center">
-        <h1>No HistoryRoutes yet</h1>
+        <h1>No History captured yet</h1>
         <p>
           Come back here when you've completed some prints.
         </p>
@@ -1106,6 +1106,16 @@
                         </div>
                         <input id="jobHourlyCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
                       </div>
+                      <div class="input-group mb-1 input-group-sm">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Electricity Cost</span>
+                        </div>
+                        <input id="jobElectricityCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Maintenance Cost</span>
+                        </div>
+                        <input id="jobMaintenanceCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                      </div>
                     </div>
 
                   </div>
@@ -1176,14 +1186,13 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-lg-6">
+          <div class="col-lg-8">
             <div class="row  table-responsive">
               <div class="col-lg-12"><h5 class="mb-1 text-left">Tools</h5><hr></div>
               <div class="col-lg-12">
                 <table class="table-hover table table-dark text-center">
                   <thead>
                   <tr>
-                    <th class="table-dark sticky-table table-dark" scope="col">Tool</th>
                     <th class="table-dark sticky-table tabl-dark" scope="col">Spool</th>
                     <th class="table-dark sticky-table table-dark" scope="col">Volume</th>
                     <th class="table-dark sticky-table table-dark" scope="col">Length</th>
@@ -1199,7 +1208,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-6">
+          <div class="col-lg-4">
             <h5 class="mb-1 text-left">Notes</h5>
             <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 220px;"></textarea>
           </div>

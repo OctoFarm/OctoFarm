@@ -1,6 +1,7 @@
 const express = require("express");
 const flash = require("connect-flash");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const { octofarmGlobalLimits, printerActionLimits } = require("./middleware/rate-limiting");
@@ -75,7 +76,12 @@ function setupExpressServer() {
     session({
       secret: fetchSuperSecretKey(),
       resave: false,
-      saveUninitialized: true
+      saveUninitialized: true,
+      store: new MongoStore({
+        mongoUrl: process.env[AppConstants.MONGO_KEY],
+        ttl: 14 * 24 * 60 * 60,
+        autoRemove: "native"
+      })
     })
   );
   app.use(passport.initialize());

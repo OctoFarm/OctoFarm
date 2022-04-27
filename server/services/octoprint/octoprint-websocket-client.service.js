@@ -46,9 +46,10 @@ class WebSocketClient {
   reconnectingIn = 0;
   currentThrottleRate = 1;
   throttleRateMeasurements = [];
-  throttleRateMeasurementsSize = 20;
+  throttleRateMeasurementsSize = 10;
   throttleBase = 500;
-  throttleMargin = 150;
+  upperThrottleHysteresis = 250;
+  lowerThrottleHysteresis = 450;
 
   constructor(
     webSocketURL = undefined,
@@ -78,6 +79,9 @@ class WebSocketClient {
   }
 
   open() {
+    getPrinterStoreCache().updatePrinterLiveValue(this.id, {
+      restartRequired: false
+    });
     logger.debug(`${this.url}: Opening websocket connection...`);
     PrinterTicker.addIssue(
       new Date(),
@@ -327,44 +331,39 @@ class WebSocketClient {
       this.throttleRateMeasurements.shift();
     }
     this.throttleRateMeasurements.push(ms);
-    const currentAverage = averageMeanOfArray(this.throttleRateMeasurements);
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
-
-    if (ms > throttleLimit + (this.throttleBase - this.throttleMargin)) {
+    if (ms > throttleLimit + (this.throttleBase + this.upperThrottleHysteresis)) {
       logger.warning(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
-      this.increaseMessageThrottle();
+      this.increaseMessageThrottle(ms);
     } else if (this.currentThrottleRate > 1) {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
       const lowerProcessingLimit =
-        (this.currentThrottleRate - 1) * (currentAverage + this.throttleMargin);
+        (this.currentThrottleRate - 1) * (this.throttleBase + this.lowerThrottleHysteresis);
       if (maxProcessingLimit < lowerProcessingLimit) {
-        logger.warning(`Messages speed normalising at: ${ms}ms throttling connection speed...`);
-        this.decreaseMessageThrottle();
+        this.decreaseMessageThrottle(ms);
       }
     }
   }
 
-  increaseMessageThrottle() {
+  increaseMessageThrottle(ms) {
     this.currentThrottleRate++;
     this.sendThrottle();
-    logger.warning(this.id + "Increasing websocket throttle time...", {
-      throttleRate: this.currentThrottleRate / 2
-    });
+    logger.warning(
+      `Messages speed normalising at: ${ms}ms throttling connection speed to ${this.currentThrottleRate}`
+    );
   }
 
-  decreaseMessageThrottle() {
+  decreaseMessageThrottle(ms) {
     this.currentThrottleRate--;
     this.sendThrottle();
-    logger.warning(this.id + " Decreasing websocket throttle time...", {
-      throttleRate: this.currentThrottleRate / 2
-    });
+    logger.warning(
+      `Messages speed normalising at: ${ms}ms de-throttling connection speed to ${this.currentThrottleRate}`
+    );
   }
 
   sendThrottle() {
-    logger.silly(
-      "Throttling websocket connection to: " + this.currentThrottleRate / 2 + " seconds"
-    );
+    logger.silly("Throttling websocket connection to: " + this.currentThrottleRate);
     getPrinterStoreCache().updatePrinterLiveValue(this.id, {
       websocket_throttle: this.currentThrottleRate
     });
@@ -384,6 +383,7 @@ class WebSocketClient {
   }
 
   reconnect(e) {
+    getPrinterStoreCache().resetJob(this.id);
     if (this.#retryNumber < 1) {
       PrinterTicker.addIssue(
         new Date(),

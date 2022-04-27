@@ -25,6 +25,10 @@ class SettingsCleanerService {
     return systemClean.filamentManager;
   }
 
+  static isMultipleSelectEnabled(){
+    return systemClean.filament.allowMultiSelect;
+  }
+
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {

@@ -5,7 +5,7 @@
 
 <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
 <div class="row">
-    <div class="col-sm-12 col-md-6 col-lg-8">
+    <div class="col-sm-12 col-md-4 col-lg-6">
         <%- include(card, {
         tile:{
         id:"printerManagmentConnectionLog",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
@@ -19,7 +19,21 @@
         })
         %>
     </div>
-    <div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="col-sm-12 col-md-4 col-lg-3">
+        <%- include(card, {
+        tile:{
+        id:"userActionsLog",i:"fa-user-tag",title:"User Actions Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
+        },
+        status: {
+        id: "printerManagementUserActionsStatus",
+        icon: "fa-location",
+        title: "Log Lines: "
+        },
+        bodyFile:'./PrinterManager/printerActionsLog.ejs'
+        })
+        %>
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-3">
         <%- include(card, {
         tile:{
         id:"printerManagementAlertsLog",i:"fa-bell",title:"Recent Alerts",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
@@ -60,16 +74,16 @@
     <%- include(table, {
     table:{
     id:"printerTable", contentId:"printerList", headers: [
-    { title:"Sort Index" ,style:"min-width:100px;" },
+    { title:"Sort <br>Index", style:"max-width:25px;" },
     { title:"Name" ,style:"", wrap:" text-wrap" },
-    { title:"Printer URL" ,style:"", wrap:" text-wrap" },
-    { title:"OctoPrint API" ,style:"min-width:50px;" },
-    { title:"Printer State" ,style:"min-width:50px;" },
-    { title:"OctoPrint WebSocket" ,style:"min-width:50px;" },
+    { title:"Printer <br>URL" ,style:"", wrap:" text-wrap" },
+    { title:"OctoPrint <br>API" ,style:"max-width:50px;" },
+    { title:"Printer <br>State" ,style:"max-width:50px;" },
+    { title:"OctoPrint <br>WebSocket" ,style:"max-width:50px;" },
     { title:"Group" ,style:"min-width:10px;" },
-    { title:"Quick Actions" ,style:"width:150px;" },
+    { title:"Quick<br>Actions" ,style:"min-width:150px;" },
     { title:"Manage" ,style:"min-width:100px;" },
-    { title:"Alerts" ,style:"min-width:200px;" },
+    { title:"Alerts" ,style:"min-width:300px;" },
     ]
     }
     })

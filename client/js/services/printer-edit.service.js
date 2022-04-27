@@ -53,8 +53,11 @@ export default class PrinterEditService {
         }
 
         const printerNameElement = document.getElementById("psPrinterName");
+        printerNameElement.value = "";
         printerNameElement.placeholder = currentPrinter.printerName;
-        document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
+        const printerURLElement = document.getElementById("psPrinterURL");
+        printerURLElement.value = "";
+        printerURLElement.placeholder = currentPrinter.printerURL;
 
 
 
@@ -85,8 +88,12 @@ export default class PrinterEditService {
         const webSocketURL = new URL(currentPrinter.webSocketURL);
         // Grab out the protocol and select it on the select box.
         document.getElementById("psWebSocketProtocol").value = webSocketURL.protocol + "//";
-        document.getElementById("psCamURL").placeholder = currentPrinter.camURL;
-        document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
+        const printerCamURLElement = document.getElementById("psCamURL");
+        printerCamURLElement.value = "";
+        printerCamURLElement.placeholder = currentPrinter.camURL;
+        const printerAPIKEYElement = document.getElementById("psAPIKEY");
+        printerAPIKEYElement.value = "";
+        printerAPIKEYElement.placeholder = currentPrinter.apikey;
     }
     static grabPageElements() {
         if (!PrinterEditService.pageElements) {
