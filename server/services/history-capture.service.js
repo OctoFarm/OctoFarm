@@ -76,9 +76,6 @@ class HistoryCaptureService {
   #camURL = null;
 
   constructor(eventPayload, capturedPrinterData, state) {
-    logger.warning(
-      `${state ? "Completed" : "Failed"} Print triggered - ${capturedPrinterData.printerURL}`
-    );
     const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
       eventPayload,
       capturedPrinterData
@@ -99,14 +96,14 @@ class HistoryCaptureService {
     this.#printTime = Math.round(payloadData.time);
     this.#job = job;
     this.#resends = resendStats;
-
     this.#printerURL = printer.printerURL;
     this.#apikey = printer.apikey;
     this.#timeout = printer.timeout;
-    this.#selectedFilament = printer.selectedFilament;
+    this.#filamentSelection = printer.selectedFilament;
     this.#payload = payloadData;
     this.#files = files;
     this.#camURL = printer.camURL;
+    this.#selectedFilament = printer.selectedFilament;
 
     this.#printerAPIConnector = new OctoprintApiClientService(
       printer.printerURL,
@@ -129,7 +126,7 @@ class HistoryCaptureService {
       startDate: this.#startDate,
       endDate: this.#endDate,
       printTime: this.#printTime,
-      filamentSelection: this.#selectedFilament,
+      filamentSelection: this.#filamentSelection,
       job: this.#job,
       notes: this.#notes,
       snapshot: this.#snapshot,
@@ -137,6 +134,8 @@ class HistoryCaptureService {
       thumbnail: this.#thumbnail,
       resends: this.#resends
     };
+
+    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${printHistory}`);
 
     // Create our history object
     const saveHistory = new History({
@@ -153,19 +152,14 @@ class HistoryCaptureService {
     //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
     if (serverSettingsCache.filamentManager && Array.isArray(this.#selectedFilament)) {
       this.#filamentSelection = await this.resyncFilament();
-      await History.findOneAndUpdate(
-        { _id: this.#historyRecordID },
-        {
-          printHistory: {
-            filamentSelection: this.#filamentSelection
-          }
-        }
-      )
+      await History.findByIdAndUpdate(this.#historyRecordID, {
+        $set: { "printHistory.filamentSelection": this.#filamentSelection }
+      })
         .then(async () => {
           await getHistoryCache().initCache();
         })
         .catch((e) => {
-          logger.error("Unable to update history record with: ", e.toString());
+          logger.error("Unable to update history filament record: ", e.toString());
         });
     }
 
@@ -271,9 +265,9 @@ class HistoryCaptureService {
   }
 
   async snapPictureOfPrinter() {
-    if (!url && url === "") {
+    if (!this.#camURL && this.#camURL === "") {
       logger.error("Unable to snap picture from camera, url doesn't exist!", {
-        url
+        cameraURL: this.#camURL
       });
       return "";
     }
@@ -411,20 +405,14 @@ class HistoryCaptureService {
 
     logger.info("Downloaded timelapse from: ", { url });
     logger.info("Saved timelapse to: ", { filePath });
-
-    await History.findOneAndUpdate(
-      { _id: this.#historyRecordID },
-      {
-        printHistory: {
-          timelapse: filePath
-        }
-      }
-    )
+    await History.findByIdAndUpdate(this.#historyRecordID, {
+      $set: { "printHistory.timelapse": filePath }
+    })
       .then(async () => {
         await getHistoryCache().initCache();
       })
       .catch((e) => {
-        logger.error("Unable to update history record with ", e.toString());
+        logger.error("Unable to update history timelapse record: ", e.toString());
       });
 
     return filePath;
@@ -582,6 +570,7 @@ class HistoryCaptureService {
 
   // repeated... could have imported I suppose...
   generateWeightOfJobForASpool(length, filament, completionRatio) {
+
     if (!length) {
       return length === 0 ? 0 : length;
     }
@@ -594,7 +583,7 @@ class HistoryCaptureService {
     }
 
     const volume = length * Math.PI * radius * radius; // Repeated 4x across server
-    return (completionRatio * volume * density).toFixed(2);
+    return completionRatio * volume * density;
   }
 
   async downDateWeight() {
@@ -615,8 +604,10 @@ class HistoryCaptureService {
     let completionRatio = this.#success ? 1.0 : printPercentage / 100;
 
     for (let s = 0; s < this.#filamentSelection.length; s++) {
+
       const currentSpool = this.#filamentSelection[s];
-      if (this.#job?.filament["tool" + s]?.length) {
+      if (!!currentSpool || this.#job?.filament["tool" + s]) {
+
         const currentGram = this.generateWeightOfJobForASpool(
           this.#job.filament["tool" + s].length / 1000,
           currentSpool,
@@ -624,10 +615,19 @@ class HistoryCaptureService {
         );
         await Spool.findById(currentSpool._id).then((spool) => {
           const currentUsed = parseFloat(spool.spools.used);
-          spool.spools.used = (currentUsed + parseFloat(currentGram)).toFixed(2);
+          spool.spools.used = currentUsed + parseFloat(currentGram);
           spool.markModified("spools.used");
-          spool.save();
+          spool
+            .save()
+            .then((res) => {
+              logger.info("Successfully downdated spool data!", res);
+            })
+            .catch((e) => {
+              logger.error("Unable to update spool data!", e);
+            });
         });
+      } else {
+        logger.error("Unable to downdate spool weight, non selected...");
       }
     }
   }
@@ -642,27 +642,29 @@ class HistoryCaptureService {
 
     if (serverSettingsCache.history.thumbnails.onComplete) {
       this.#thumbnail = await this.thumbnailCheck();
+      await History.findByIdAndUpdate(this.#historyRecordID, {
+        $set: { "printHistory.thumbnail": this.#thumbnail }
+      })
+        .then(async () => {
+          await getHistoryCache().initCache();
+        })
+        .catch((e) => {
+          logger.error("Unable to update history filament record: ", e.toString());
+        });
     }
 
     if (serverSettingsCache.history.snapshot.onComplete) {
       this.#snapshot = await this.snapshotCheck();
-    }
-
-    await History.findOneAndUpdate(
-      { _id: this.#historyRecordID },
-      {
-        printHistory: {
-          snapshot: this.#snapshot,
-          thumbnail: this.#thumbnail
-        }
-      }
-    )
-      .then(async () => {
-        await getHistoryCache().initCache();
+      await History.findByIdAndUpdate(this.#historyRecordID, {
+        $set: { "printHistory.snapshot": this.#snapshot }
       })
-      .catch((e) => {
-        logger.error("Unable to update history record with: ", e.toString());
-      });
+        .then(async () => {
+          await getHistoryCache().initCache();
+        })
+        .catch((e) => {
+          logger.error("Unable to update history filament record: ", e.toString());
+        });
+    }
 
     if (serverSettingsCache.history.timelapse.onComplete) {
       await this.timelapseCheck();
@@ -671,43 +673,47 @@ class HistoryCaptureService {
 
   async checkForAdditionalFailureProperties() {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
-    if (serverSettingsCache.history.thumbnails.onFailure) {
-      this.#thumbnail = await this.thumbnailCheck();
-    }
-    if (serverSettingsCache.history.snapshot.onFailure) {
-      this.#snapshot = await this.snapshotCheck();
-    }
 
-    await History.findOneAndUpdate(
-      { _id: this.#historyRecordID },
-      {
-        printHistory: {
-          snapshot: this.#snapshot,
-          thumbnail: this.#thumbnail
-        }
-      }
-    )
-      .then(async () => {
-        await getHistoryCache().initCache();
-      })
-      .catch((e) => {
-        logger.error("Unable to update history record with ", e.toString());
-      });
-
-    if (serverSettingsCache.history.timelapse.onFailure) {
-      await this.timelapseCheck();
-    }
     if (serverSettingsCache.filament.downDateFailed && !serverSettingsCache.filamentManager) {
       // No point even trying to down date failed without these...
       if (!this.#job?.estimatedPrintTime && !this.#job?.lastPrintTime) {
         logger.error(
-          "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
-          this.#job
+            "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
+            this.#job
         );
         return;
       }
       // Capture failed amount
       await this.downDateWeight();
+    }
+
+    if (serverSettingsCache.history.thumbnails.onFailure) {
+      this.#thumbnail = await this.thumbnailCheck();
+      await History.findByIdAndUpdate(this.#historyRecordID, {
+        $set: { "printHistory.thumbnail": this.#thumbnail }
+      })
+        .then(async () => {
+          await getHistoryCache().initCache();
+        })
+        .catch((e) => {
+          logger.error("Unable to update history filament record: ", e.toString());
+        });
+    }
+    if (serverSettingsCache.history.snapshot.onFailure) {
+      this.#snapshot = await this.snapshotCheck();
+      await History.findByIdAndUpdate(this.#historyRecordID, {
+        $set: { "printHistory.snapshot": this.#snapshot }
+      })
+        .then(async () => {
+          await getHistoryCache().initCache();
+        })
+        .catch((e) => {
+          logger.error("Unable to update history filament record: ", e.toString());
+        });
+    }
+
+    if (serverSettingsCache.history.timelapse.onFailure) {
+      await this.timelapseCheck();
     }
   }
 }

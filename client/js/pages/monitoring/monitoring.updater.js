@@ -29,7 +29,6 @@ import {printActionStatusResponse} from "../../services/octoprint/octoprint.help
 import {
   printerIsAvailableToView,
   printerIsOnline,
-  printerIsPrinting,
   printerIsPrintingOrComplete
 } from "../../utils/octofarm.utils";
 import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
@@ -571,8 +570,6 @@ async function updateState(printer, clientSettings, view, index) {
   checkQuickConnectState(printer);
   const isOffline = !printerIsOnline(printer);
   const isPrintingOrComplete = printerIsPrintingOrComplete(printer);
-
-  console.log(isPrintingOrComplete)
 
   elements.control.disabled = isOffline;
   elements.files.disabled = isOffline;

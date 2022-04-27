@@ -134,6 +134,7 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
   const serverSettings = SettingsClean.returnSystemSettings();
 
   const historyCache = getHistoryCache();
+
   const { historyClean, statisticsClean, pagination } = historyCache;
 
   res.render("history", {

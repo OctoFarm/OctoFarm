@@ -773,6 +773,7 @@ class HistoryCleanerService {
 
     const { itemList, pagination } = await this.historyService.find(findOptions, paginationOptions);
     const historyEntities = itemList ?? [];
+    console.log(historyEntities)
     if (!historyEntities?.length) {
       return itemList;
     }

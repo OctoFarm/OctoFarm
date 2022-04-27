@@ -306,16 +306,19 @@ const capturePrintCancelling = (id, data) => {
 const printCaptureHelper = (id, data, state) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
   const errorCaptureService = new HistoryCaptureService(data, currentPrinterInfo, state);
+  const scriptCheckTrigger = state ? "done" : "failed";
   errorCaptureService
     .createHistoryRecord()
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
-      const scriptCheckTrigger = state ? "done" : "failed";
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
       getPrinterStoreCache().resetJob(id);
     })
     .catch((e) => {
-      logger.error("Failed to capture error log data", e.toString());
+      logger.error(
+        "Failed to capture finished print data, print " + scriptCheckTrigger,
+        e.toString()
+      );
     });
 };
 
