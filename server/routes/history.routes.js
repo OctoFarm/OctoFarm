@@ -34,11 +34,8 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
         //Skip da save
       } else {
         if (filamentId[f] !== 0) {
-          console.log(filamentId[f])
           const spool = await Spools.findById(filamentId[f]);
-          console.log(spool)
           const profile = await Profiles.findById(spool.spools.profile);
-          console.log(profile)
           spool.spools.profile = profile.profile;
           history.printHistory.filamentSelection[f] = spool;
         } else {
