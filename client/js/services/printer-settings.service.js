@@ -518,10 +518,10 @@ class PrinterSettingsService {
             Usually your OctoPrint hosts system shutdown command. i.e: <code>sudo shutdown -h now</code>
           </small>
         </div>
-        <h5><u>Wake On Lan</u></h5>
-        <small>Enable and setup the ability for OctoFarm to fire a wake on lan packet to your client. Client MUST support wake on lan for this to work.</small>
+        <h5 class="d-none"><u>Wake On Lan</u></h5>
+        <small class="d-none">Enable and setup the ability for OctoFarm to fire a wake on lan packet to your client. Client MUST support wake on lan for this to work.</small>
       <form class="was-validated">
-        <div class="custom-control custom-checkbox mb-3">
+        <div class="d-none  custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="psWolEnable" required>
             <label class="custom-control-label" for="wolEnable">Enable wake on lan</label>
             <div class="invalid-feedback">Wake on Lan support disabled</div>
