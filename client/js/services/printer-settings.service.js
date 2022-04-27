@@ -528,7 +528,7 @@ class PrinterSettingsService {
             <div class="valid-feedback">Wake on Lan support enabled</div>
         </div>
       </form>
-       <div class="form-row">
+       <div class="form-row d-none">
           <div class="col-2">
             <input id="psWolMAC"  type="text" class="form-control" placeholder="${wolMAC}" value="">
              <small class="form-text text-muted">
