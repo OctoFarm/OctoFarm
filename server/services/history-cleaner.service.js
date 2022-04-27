@@ -2,7 +2,6 @@
 
 const { arrayCounts, checkNested, checkNestedIndex } = require("../utils/array.util");
 const {
-  getPrintCostNumeric,
   getElectricityCosts,
   getMaintenanceCosts
 } = require("../utils/print-cost.util");
@@ -14,7 +13,6 @@ const {
 } = require("../constants/cleaner.constants");
 const historyService = require("./history.service");
 const Logger = require("../handlers/logger.js");
-const { noCostSettingsMessage } = require("../utils/print-cost.util");
 const { stateToHtml } = require("../utils/html.util");
 const { toDefinedKeyValue } = require("../utils/property.util");
 const { floatOrZero } = require("../utils/number.util");
@@ -772,12 +770,18 @@ class HistoryCleanerService {
     }
 
     const { itemList, pagination } = await this.historyService.find(findOptions, paginationOptions);
+
     const historyEntities = itemList ?? [];
+
     if (!historyEntities?.length) {
       return itemList;
     }
 
     const historyArray = this.generateDataSummary(itemList);
+
+    this.historyClean = historyArray;
+    this.statisticsClean = this.generateStatistics(historyArray);
+    this.pagination = pagination;
 
     if (returnData) {
       return {
@@ -785,10 +789,6 @@ class HistoryCleanerService {
         statisticsClean: this.generateStatistics(historyArray),
         pagination
       };
-    } else {
-      this.historyClean = historyArray;
-      this.statisticsClean = this.generateStatistics();
-      this.pagination = pagination;
     }
   }
 }

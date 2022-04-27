@@ -48,7 +48,7 @@ class OctoPrintPrinter {
   versionNotChecked = false;
   healthChecksPass = true;
   onboarding = undefined;
-  activeControlUser = "";
+  activeControlUser = null;
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -1176,15 +1176,11 @@ class OctoPrintPrinter {
       this.settingsSystem = system;
       this.settingsWebcam = webcam;
 
-      if (force) {
-        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
-      }
-
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
-        this.costSettings = testAndCollectCostPlugin(this.costSettings, plugins);
-        this.powerSettings = testAndCollectPSUControlPlugin(this.powerSettings, plugins);
+        this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
+        this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
         if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
           this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
             appearance,

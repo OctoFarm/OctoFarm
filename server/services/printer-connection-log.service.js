@@ -1,5 +1,7 @@
 const currentIssues = [];
 
+const loggerAmmount = 5000;
+
 class PrinterConnectionLogService {
   static addIssue(date, printer, message, state, printerID) {
     let id = null;
@@ -18,7 +20,7 @@ class PrinterConnectionLogService {
       state: state
     };
     currentIssues.push(newIssue);
-    const loggerAmmount = 5000;
+
     if (currentIssues.length >= loggerAmmount) {
       currentIssues.shift();
     }

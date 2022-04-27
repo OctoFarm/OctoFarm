@@ -142,6 +142,7 @@ const captureDwelling = (id, data) => {
 };
 const captureError = (id, data) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
+  getPrinterStoreCache().resetActiveControlUser(id);
   const errorCaptureService = new ErrorCaptureService(data, currentPrinterInfo);
   errorCaptureService
     .createErrorLog()
@@ -283,6 +284,7 @@ const capturePositionUpdate = (id, data) => {
     });
 };
 const capturePrintCancelled = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "cancelled", undefined)
     .then((res) => {
       logger.info("Successfully checked cancelled script", res);
@@ -306,23 +308,28 @@ const capturePrintCancelling = (id, data) => {
 const printCaptureHelper = (id, data, state) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
   const errorCaptureService = new HistoryCaptureService(data, currentPrinterInfo, state);
+  const scriptCheckTrigger = state ? "done" : "failed";
   errorCaptureService
     .createHistoryRecord()
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
-      const scriptCheckTrigger = state ? "done" : "failed";
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
       getPrinterStoreCache().resetJob(id);
     })
     .catch((e) => {
-      logger.error("Failed to capture error log data", e.toString());
+      logger.error(
+        "Failed to capture finished print data, print " + scriptCheckTrigger,
+        e.toString()
+      );
     });
 };
 
 const capturePrintFailed = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, false);
 };
 const captureFinishedPrint = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, true);
 };
 const capturePrintPaused = (id) => {

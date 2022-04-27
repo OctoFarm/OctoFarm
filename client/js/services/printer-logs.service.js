@@ -236,7 +236,7 @@ export default class PrinterLogsService {
   }
   static async loadPrinterTemperatures(printerTemperatures){
     if(!printerTemperatures || printerTemperatures?.length === 0){
-      octoPrintTemperatureMenu.innerHTML = "(0)";
+      octoPrintTemperatureCount.innerHTML = "(0)";
       return;
     }
     octoPrintTemperatureCount.innerHTML = `(${printerTemperatures[0].data.length})`;

@@ -36,22 +36,24 @@ const addOctoPrintIssueWrapper = (id, message, state) => {
   PrinterTicker.addIssue(new Date(), getPrinterStoreCache().getPrinterURL(id), message, state, id);
 };
 
-/**
- * One time function run on first scan to get plugin data.
- * @params currentSettings
- * @params plugins
- * @returns {string}
- */
-const testAndCollectCostPlugin = (currentSettings, plugins) => {
+const testAndCollectCostPlugin = (id, currentSettings, plugins) => {
   if (currentSettings?.default === true) {
     if (plugins["costestimation"]) {
-      return {
+      const costSettings = {
         powerConsumption: plugins["costestimation"].powerConsumption,
         electricityCosts: plugins["costestimation"].costOfElectricity,
         purchasePrice: plugins["costestimation"].priceOfPrinter,
         estimateLifespan: plugins["costestimation"].lifespanOfPrinter,
         maintenanceCosts: plugins["costestimation"].maintenanceCosts
-      };
+      }
+      const pluginData = JSON.stringify(costSettings)
+      addOctoPrintLogWrapper(
+        id,
+        "Cost estimation settings found and saved: " + pluginData,
+        "Success",
+        "Cost Estimation"
+      );
+      return costSettings;
     } else {
       return {
         powerConsumption: 0.5,
@@ -65,52 +67,61 @@ const testAndCollectCostPlugin = (currentSettings, plugins) => {
     return currentSettings;
   }
 };
-/**
- * One time function run on first scan to get plugin data.
- * @params currentSettings
- * @params plugins
- * @returns {string}
- */
-const testAndCollectPSUControlPlugin = (currentSettings, plugins) => {
-    if (plugins["psucontrol"]) {
-      return {
-        powerOnCommand: JSON.stringify({ command: "turnPSUOn" }),
-        powerOnURL: "[PrinterURL]/api/plugin/control",
-        powerOffCommand: JSON.stringify({ command: "turnPSUOff" }),
-        powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerToggleCommand: JSON.stringify({ command: "togglePSU" }),
-        powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-        powerStatusCommand: JSON.stringify({ command: "getPSUState" }),
-        powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
-        wol: {
-          enabled: false,
-          ip: defaultWOLSubnetMask,
-          packets: "3",
-          port: "9",
-          interval: "100",
-          MAC: ""
-        }
-      };
-    } else {
-      return {
-        powerOnCommand: "",
-        powerOnURL: "",
-        powerOffCommand: "",
-        powerOffURL: "",
-        powerToggleCommand: "",
-        powerToggleURL: "",
-        powerStatusCommand: "",
-        powerStatusURL: "",
-        wol: {
-          enabled: false,
-          ip: defaultWOLSubnetMask,
-          packets: "3",
-          port: "9",
-          interval: "100",
-          MAC: ""
-        }
-      };
+
+const testAndCollectPSUControlPlugin = (id, currentSettings, plugins) => {
+  if (plugins["psucontrol"]) {
+    const costSettings = {
+      powerConsumption: plugins["costestimation"].powerConsumption,
+      electricityCosts: plugins["costestimation"].costOfElectricity,
+      purchasePrice: plugins["costestimation"].priceOfPrinter,
+      estimateLifespan: plugins["costestimation"].lifespanOfPrinter,
+      maintenanceCosts: plugins["costestimation"].maintenanceCosts
     }
+    const pluginData = JSON.stringify(costSettings)
+    addOctoPrintLogWrapper(
+        id,
+        "PSU Control plugin found and settings applied: " + pluginData,
+        "Success",
+        "PSU Control"
+    );
+    return {
+      powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+      powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
+      powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+      powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
+      powerToggleCommand: "{\"command\":\"togglePSU\"}",
+      powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
+      powerStatusCommand: "{\"command\":\"getPSUState\"}",
+      powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+      wol: {
+        enabled: false,
+        ip: defaultWOLSubnetMask,
+        packets: "3",
+        port: "9",
+        interval: "100",
+        MAC: ""
+      }
+    };
+  } else {
+    return {
+      powerOnCommand: "",
+      powerOnURL: "",
+      powerOffCommand: "",
+      powerOffURL: "",
+      powerToggleCommand: "",
+      powerToggleURL: "",
+      powerStatusCommand: "",
+      powerStatusURL: "",
+      wol: {
+        enabled: false,
+        ip: defaultWOLSubnetMask,
+        packets: "3",
+        port: "9",
+        interval: "100",
+        MAC: ""
+      }
+    };
+  }
 };
 
 const captureKlipperPluginData = (id, data) => {

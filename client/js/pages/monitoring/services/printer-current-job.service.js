@@ -6,17 +6,12 @@ import {
 import "../../../utils/cleanup-modals.util"
 import {
     closePrinterManagerModalIfOffline,
+    closePrinterManagerModalIfDisconnected,
     imageOrCamera
 } from "../../../utils/octofarm.utils";
 import ApexCharts from "apexcharts";
 import UI from "../../../utils/ui"
 
-$("#printerManagerModal").on("hidden.bs.modal", function () {
-    const tempChart = document.getElementById("temperatureChart")
-    if (tempChart) {
-        resetChartData(tempChart);
-    }
-});
 
 
 let chart = null;
@@ -276,7 +271,8 @@ const returnPageElements = () => {
             printerBaudDrop: document.getElementById("printerBaudDrop"),
             printerProfileDrop: document.getElementById("printerProfileDrop"),
             status: document.getElementById("pmStatus"),
-            temperatureChart: document.getElementById("temperatureChart")
+            temperatureChart: document.getElementById("temperatureChart"),
+            pmUserPrinting: document.getElementById("pmUserPrinting")
     }
 }
 
@@ -285,34 +281,42 @@ const loadPrintersJobStatus = (printer) => {
     let hideCamera = false;
     let hideCameraDisplay = "";
     let thumbnailElement = "";
-    let printStatusClass = "col-md-4 col-lg-6 text-center";
+    let printStatusClass = "col-lg-6 text-center";
+    let cameraClass = "col-md-12 col-lg-12";
     // let temperatureClass = "col-md-8 text-center";
     if (printer?.currentJob?.thumbnail !== null) {
-        printStatusClass = "col-6 text-center";
-        thumbnailClass = "col-md-4 col-lg-2 text-center";
+        printStatusClass = "col-lg-6 text-center";
+        thumbnailClass = "col-lg-2 text-center";
         // temperatureClass = "col-md-9 text-center";
         thumbnailElement = `<img width="100%" src="${printer.printerURL}/${printer.currentJob.thumbnail}">`
+        cameraClass = "col-lg-4";
     }else{
-        printStatusClass = "col-8 text-center";
+        printStatusClass = "col-lg-8 text-center";
+        cameraClass = "col-lg-4";
     }
     if(printer.camURL === ""){
-        printStatusClass = "col-8 text-center";
-        thumbnailClass = "col-md-4 col-lg-4 text-center";
+        printStatusClass = "col-lg-4 text-center";
+        thumbnailClass = "col-lg-4 text-center";
         hideCamera = true;
         hideCameraDisplay = "d-none"
     }
 
     document.getElementById("printerControls").innerHTML = `
         <div class="row">
-            <div class="col-12 text-center">
+            <div class="col-lg-10 text-center">
                <h5>File</h5><hr>
-               <p title="Loading..." id="pmFileName" class="mb-0">Loading...</p>
+               <p title="Loading..." id="pmFileName" class="mb-0 text-wrap">Loading...</p>
+   
+            </div>
+            <div class="col-lg-2 text-center">
+               <h5>User Printing</h5><hr>
+               <p title="Loading..." id="pmUserPrinting" class="mb-0 text-wrap">Loading...</p>
    
             </div>
         </div>
         <div class="row">
         <!-- Camera --> 
-        <div class="col-md-4 col-lg-4 text-center ${hideCameraDisplay}">
+        <div class="${cameraClass} text-center ${hideCameraDisplay}">
           <h5>Camera</h5><hr>
           <span id="cameraRow">  
             <div class="row">
@@ -392,7 +396,7 @@ const loadPrintersJobStatus = (printer) => {
 }
 
 const updateCurrentJobStatus = (printer, elements) => {
-    if(closePrinterManagerModalIfOffline(printer)){
+    if(closePrinterManagerModalIfOffline(printer) || closePrinterManagerModalIfDisconnected(printer)){
         return
     }
 
@@ -455,6 +459,16 @@ const updateCurrentJobStatus = (printer, elements) => {
     if (typeof printer.currentJob !== "undefined" && printer.currentJob.progress !== null) {
         elements.progressBar.innerHTML = printer.currentJob.progress.toFixed(0) + "%";
         elements.progressBar.style.width = printer.currentJob.progress.toFixed(2) + "%";
+        if(!elements.progressBar.classList.contains("bg-warning") && printer.currentJob.progress < 100){
+            elements.progressBar.classList.add("bg-warning")
+            elements.progressBar.classList.add("text-dark")
+            if(elements.progressBar.classList.contains("bg-success")){
+                elements.progressBar.classList.remove("bg-success")
+            }
+        }
+        if(!elements.progressBar.classList.contains("bg-success")){
+            elements.progressBar.classList.add("bg-success");
+        }
     } else {
         elements.progressBar.innerHTML = 0 + "%";
         elements.progressBar.style.width = 0 + "%";
@@ -473,6 +487,8 @@ const updateCurrentJobStatus = (printer, elements) => {
     } else {
         elements.currentZ.innerHTML = printer.currentJob.currentZ + "mm";
     }
+
+    elements.pmUserPrinting.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${printer?.activeControlUser ? printer.activeControlUser : "No user registered"}`
 
     if (typeof printer.currentJob === "undefined") {
         elements.fileName.setAttribute("title", "No File Selected");

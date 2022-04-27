@@ -5,7 +5,7 @@
 
 <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
 <div class="row">
-    <div class="col-sm-12 col-md-6 col-lg-8">
+    <div class="col-sm-12 col-md-4 col-lg-6">
         <%- include(card, {
         tile:{
         id:"printerManagmentConnectionLog",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
@@ -19,7 +19,21 @@
         })
         %>
     </div>
-    <div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="col-sm-12 col-md-4 col-lg-3">
+        <%- include(card, {
+        tile:{
+        id:"userActionsLog",i:"fa-user-tag",title:"User Actions Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
+        },
+        status: {
+        id: "printerManagementUserActionsStatus",
+        icon: "fa-location",
+        title: "Log Lines: "
+        },
+        bodyFile:'./PrinterManager/printerActionsLog.ejs'
+        })
+        %>
+    </div>
+    <div class="col-sm-12 col-md-4 col-lg-3">
         <%- include(card, {
         tile:{
         id:"printerManagementAlertsLog",i:"fa-bell",title:"Recent Alerts",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
