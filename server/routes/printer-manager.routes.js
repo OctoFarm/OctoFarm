@@ -537,7 +537,7 @@ router.get(
 );
 
 router.patch(
-  "updateActiveUser/:id",
+  "/updateActiveUser/:id",
   ensureAuthenticated,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
@@ -549,7 +549,7 @@ router.patch(
 );
 
 router.post(
-  "logUserPrintAction/:id",
+  "/logUserPrintAction/:id",
   ensureAuthenticated,
   validateParamsMiddleware(M_VALID.MONGO_ID),
   async (req, res) => {
