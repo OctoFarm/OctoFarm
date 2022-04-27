@@ -20,7 +20,6 @@ const userActionSchema = new mongoose.Schema({
   },
   currentUser: {
     type: String,
-    ref: "User",
     required: true
   }
 });
