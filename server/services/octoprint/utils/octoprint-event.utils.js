@@ -142,6 +142,7 @@ const captureDwelling = (id, data) => {
 };
 const captureError = (id, data) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
+  getPrinterStoreCache().resetActiveControlUser(id);
   const errorCaptureService = new ErrorCaptureService(data, currentPrinterInfo);
   errorCaptureService
     .createErrorLog()
@@ -283,6 +284,7 @@ const capturePositionUpdate = (id, data) => {
     });
 };
 const capturePrintCancelled = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "cancelled", undefined)
     .then((res) => {
       logger.info("Successfully checked cancelled script", res);
@@ -323,9 +325,11 @@ const printCaptureHelper = (id, data, state) => {
 };
 
 const capturePrintFailed = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, false);
 };
 const captureFinishedPrint = (id, data) => {
+  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, true);
 };
 const capturePrintPaused = (id) => {

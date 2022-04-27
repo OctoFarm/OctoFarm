@@ -271,7 +271,8 @@ const returnPageElements = () => {
             printerBaudDrop: document.getElementById("printerBaudDrop"),
             printerProfileDrop: document.getElementById("printerProfileDrop"),
             status: document.getElementById("pmStatus"),
-            temperatureChart: document.getElementById("temperatureChart")
+            temperatureChart: document.getElementById("temperatureChart"),
+            pmUserPrinting: document.getElementById("pmUserPrinting")
     }
 }
 
@@ -302,9 +303,14 @@ const loadPrintersJobStatus = (printer) => {
 
     document.getElementById("printerControls").innerHTML = `
         <div class="row">
-            <div class="col-12 text-center">
+            <div class="col-lg-10 text-center">
                <h5>File</h5><hr>
                <p title="Loading..." id="pmFileName" class="mb-0 text-wrap">Loading...</p>
+   
+            </div>
+            <div class="col-lg-2 text-center">
+               <h5>User Printing</h5><hr>
+               <p title="Loading..." id="pmUserPrinting" class="mb-0 text-wrap">Loading...</p>
    
             </div>
         </div>
@@ -481,6 +487,8 @@ const updateCurrentJobStatus = (printer, elements) => {
     } else {
         elements.currentZ.innerHTML = printer.currentJob.currentZ + "mm";
     }
+
+    elements.pmUserPrinting.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${printer?.activeControlUser ? printer.activeControlUser : "No user registered"}`
 
     if (typeof printer.currentJob === "undefined") {
         elements.fileName.setAttribute("title", "No File Selected");

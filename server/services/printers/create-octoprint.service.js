@@ -48,7 +48,7 @@ class OctoPrintPrinter {
   versionNotChecked = false;
   healthChecksPass = true;
   onboarding = undefined;
-  activeControlUser = "";
+  activeControlUser = null;
   //Communications
   #api = undefined;
   #ws = undefined;
@@ -1177,7 +1177,6 @@ class OctoPrintPrinter {
       this.settingsWebcam = webcam;
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
-      console.log(!force)
       if (!force) {
         this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);

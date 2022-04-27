@@ -79,7 +79,8 @@ class PrinterStore {
         octoPrintPluginUpdates: printer.octoPrintPluginUpdates,
         systemChecks: printer.systemChecks,
         connectionOptions: printer.connectionOptions,
-        powerSettings: printer.powerSettings
+        powerSettings: printer.powerSettings,
+        activeControlUser: printer.activeControlUser
       };
     });
 
@@ -117,7 +118,8 @@ class PrinterStore {
         stepRate: printer.stepRate,
         terminal: printer.terminal,
         powerSettings: printer.powerSettings,
-        resends: printer.resends
+        resends: printer.resends,
+        activeControlUser: printer.activeControlUser
       };
     });
 
@@ -1312,6 +1314,11 @@ class PrinterStore {
   updateActiveControlUser(id, activeControlUser) {
     const printer = this.#findMePrinter(id);
     printer.activeControlUser = activeControlUser;
+  }
+
+  resetActiveControlUser(id){
+    const printer = this.#findMePrinter(id);
+    printer.activeControlUser = null;
   }
 }
 

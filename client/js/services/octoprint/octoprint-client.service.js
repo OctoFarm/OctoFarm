@@ -24,7 +24,7 @@ export default class OctoPrintClient {
         "X-Api-Key": printer.apikey
       }
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       return e;
     });
   }
@@ -40,7 +40,7 @@ export default class OctoPrintClient {
       },
       body: JSON.stringify(data)
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       return e;
     });
   }
@@ -56,7 +56,7 @@ export default class OctoPrintClient {
       },
       body: JSON.stringify(data)
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       return e;
     });
   }
@@ -71,7 +71,7 @@ export default class OctoPrintClient {
       },
       body: data
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       return e;
     });
   }
@@ -86,7 +86,7 @@ export default class OctoPrintClient {
         "X-Api-Key": printer.apikey
       }
     }).catch((e) => {
-      console.log(e);
+      console.error(e);
       return e;
     });
   }
@@ -236,6 +236,11 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
 
       try{
         const body = {
@@ -257,6 +262,11 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
 
       try{
         const body = {
@@ -350,21 +360,6 @@ export default class OctoPrintClient {
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
       await OctoPrintClient.updateBedOffsets(printer);
-      try{
-        await OctoFarmClient.updateActiveControlUser(printer._id);
-      }catch(e){
-        console.error("Unable to update octofarm server current user... ", e)
-      }
-    }
-
-    try{
-      const body = {
-        action: `Print Action: ${opts.command}`,
-        opts
-      }
-      await OctoFarmClient.updateUserActionsLog(printer._id, body)
-    }catch(e){
-      console.error("Unable to update octofarm server log... ", e)
     }
 
     if (filamentCheck && !printerCheck && opts.command === "start") {
@@ -383,12 +378,40 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
+            try{
+              const body = {
+                action: `Print Action: ${opts.command}`,
+                opts
+              }
+              await OctoFarmClient.updateUserActionsLog(printer._id, body)
+            }catch(e){
+              console.error("Unable to update octofarm server log... ", e)
+            }
+            try{
+              await OctoFarmClient.updateActiveControlUser(printer._id);
+            }catch(e){
+              console.error("Unable to update octofarm server current user... ", e)
+            }
             const { status } = await OctoPrintClient.post(printer, "job", opts);
             printActionStatusResponse(status)
           }
         }
       });
     } else {
+      try{
+        const body = {
+          action: `Print Action: ${opts.command}`,
+          opts
+        }
+        await OctoFarmClient.updateUserActionsLog(printer._id, body)
+      }catch(e){
+        console.error("Unable to update octofarm server log... ", e)
+      }
+      try{
+        await OctoFarmClient.updateActiveControlUser(printer._id);
+      }catch(e){
+        console.error("Unable to update octofarm server current user... ", e)
+      }
       return OctoPrintClient.post(printer, "job", opts);
     }
     if (element) {
