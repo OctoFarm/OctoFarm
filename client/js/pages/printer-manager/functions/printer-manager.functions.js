@@ -21,15 +21,32 @@ import PrinterTerminalManagerService from "../../monitoring/services/printer-ter
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
+//TODO update with the printer ticker fixes
+function updateUserActionsLog (list){
+  document.getElementById("printerManagementUserActionsStatus").innerHTML = list.length;
+  const userActionsMessageBox = document.getElementById("userActionsLogTable")
+  list.forEach((e) => {
+    if (!document.getElementById(e.id)) {
+      const date = new Date(e.date).toLocaleString();
+      userActionsMessageBox.insertAdjacentHTML(
+          "afterbegin",
+          `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.currentUser} | ${e.printerName.slice(0, 6)}... | ${e.action}</div>`
+      );
+    }
+  });
+}
+
 export function workerEventFunction(data) {
   if (data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
+      console.log(data.currentActionList)
       if (data.currentTickerList.length > 0) {
         checkIfLoaderExistsAndRemove();
         checkIfAlertsLoaderExistsAndRemove();
         updateConnectionLog(data.currentTickerList);
+        updateUserActionsLog(data.currentActionList)
       } else {
         checkIfAlertsLoaderExistsAndRemove(true);
         checkIfLoaderExistsAndRemove(true);

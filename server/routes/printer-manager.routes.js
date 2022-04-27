@@ -22,7 +22,7 @@ const { sortBy } = require("lodash");
 const ConnectionMonitorService = require("../services/connection-monitor.service");
 const { generateRandomName } = require("../services/printer-name-generator.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
-const { updateUserActionLog } = require("../services/active-user-log.service");
+const { updateUserActionLog } = require("../services/user-actions-log.service");
 
 /**
  * @swagger

@@ -295,6 +295,11 @@ class PrinterStore {
     return printer.printerURL;
   }
 
+  getPrinterName(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.printerName;
+  }
+
   getPrinterInformation(id) {
     const printer = this.#findMePrinter(id);
     const newPrinter = JSON.parse(JSON.stringify(printer));
