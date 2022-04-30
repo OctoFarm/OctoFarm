@@ -9,7 +9,7 @@ import {
   printerIsOnline,
   printerIsPrinting
 } from "../utils/octofarm.utils";
-import {printerEmergencyStop, printerHomeAllAxis} from "./octoprint/octoprint-printer-commands.actions";
+import {printerEmergencyStop, printerHomeAllAxis, printerTurnOffHeaters} from "./octoprint/octoprint-printer-commands.actions";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -40,6 +40,14 @@ function returnActionBtnTemplate(id, webURL) {
              class="dropdown-item"
           >
             <i class="fa-solid fa-house-flag text-success"></i> Home
+          </button> 
+          <button
+             title="Sets all heater targets to 0"
+             id="printerHeatersOff-${id}"
+             type="button"
+             class="dropdown-item"
+          >
+            <i class="fa-solid fa-temperature-arrow-down text-info"></i> Turn Off Heaters
           </button> 
           <button
              title="Uses the values from your selected filament and pre-heats to those values."
@@ -454,6 +462,14 @@ function addEventListeners(printer) {
     UI.createAlert(status, message, 3000, "Clicked")
     e.target.disabled = false;
   })
+
+  document.getElementById(`printerHeatersOff-${printer._id}`).addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    const {status, message} = await printerTurnOffHeaters(printer);
+    UI.createAlert(status, message, 3000, "Clicked")
+    e.target.disabled = false;
+  })
+
   PrinterPowerService.setupEventListeners(printer);
 }
 
@@ -466,6 +482,7 @@ function checkQuickConnectState(printer) {
   document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
   document.getElementById("printerHome-"+printer._id).disabled = isPrinting || isDisconnectedOrError;
   document.getElementById("printerEmergency-"+printer._id).disabled = !isPrinting;
+  document.getElementById("printerHeatersOff-"+printer._id).disabled = isPrinting;
 
   PrinterPowerService.revealPowerButtons(printer).catch(e => {
     console.error(e)
