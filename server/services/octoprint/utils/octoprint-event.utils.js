@@ -284,7 +284,6 @@ const capturePositionUpdate = (id, data) => {
     });
 };
 const capturePrintCancelled = (id, data) => {
-  getPrinterStoreCache().resetActiveControlUser(id);
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "cancelled", undefined)
     .then((res) => {
       logger.info("Successfully checked cancelled script", res);
@@ -314,7 +313,9 @@ const printCaptureHelper = (id, data, state) => {
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
-      //getPrinterStoreCache().resetActiveControlUser(id);
+      if(!state){
+        getPrinterStoreCache().resetActiveControlUser(id);
+      }
     })
     .catch((e) => {
       logger.error(

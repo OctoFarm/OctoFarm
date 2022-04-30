@@ -1317,13 +1317,11 @@ class PrinterStore {
   }
 
   updateActiveControlUser(id, activeControlUser) {
-    const printer = this.#findMePrinter(id);
-    printer.activeControlUser = activeControlUser;
+    this.updatePrinterDatabase(id, { activeControlUser });
   }
 
   resetActiveControlUser(id){
-    const printer = this.#findMePrinter(id);
-    printer.activeControlUser = null;
+    this.updatePrinterDatabase(id, { activeControlUser: "" });
   }
 }
 

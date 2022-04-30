@@ -732,7 +732,8 @@ class HistoryCleanerService {
         totalWeight: 0,
         ...toDefinedKeyValue(printHistory.resends, "resend"),
         ...toDefinedKeyValue(printHistory.snapshot, "snapshot"),
-        ...toDefinedKeyValue(printHistory.timelapse, "timelapse")
+        ...toDefinedKeyValue(printHistory.timelapse, "timelapse"),
+        activeControlUser: printHistory.activeControlUser
       };
 
       if (!!printSummary.spools) {

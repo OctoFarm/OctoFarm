@@ -409,7 +409,7 @@ export default class OctoPrintClient {
     const post = await OctoPrintClient.post(printer, "connection", opts);
 
     const body = {
-      action: `Print Action: ${opts.command}`,
+      action: `Printer: ${opts.command}`,
       opts
     }
     await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)

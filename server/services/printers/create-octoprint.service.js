@@ -256,7 +256,8 @@ class OctoPrintPrinter {
       settingsWebcam,
       core,
       octoPrintSystemInfo,
-      printerFirmware
+      printerFirmware,
+      activeControlUser
     } = printer;
     this._id = _id.toString();
     //Only update the below if received from database, otherwise is required from scans.
@@ -420,6 +421,10 @@ class OctoPrintPrinter {
 
     if (!!settingsAppearance) {
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
+    }
+
+    if (!!activeControlUser) {
+      this.activeControlUser = activeControlUser;
     }
 
     this.resetJobInformation();
@@ -1768,7 +1773,6 @@ class OctoPrintPrinter {
   }
 
   resetJobInformation() {
-    this.activeControlUser = "";
     const job = {
       file: {
         name: null,
