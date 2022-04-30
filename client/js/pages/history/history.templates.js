@@ -27,6 +27,9 @@ export const returnHistoryTableRow = function (record) {
           <td>
             ${record.printer}
           </td>
+          <td>
+            ${record?.activeControlUser ? record.activeControlUser : "No user logged"}
+          </td>
           <td title="${record.file.path.replace(/_/g, " ")}">
             ${record.file.name.replace(/_/g, " ")}
           </td>
