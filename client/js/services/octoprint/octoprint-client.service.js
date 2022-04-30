@@ -100,10 +100,11 @@ export default class OctoPrintClient {
     const post = await OctoPrintClient.post(printer, "printer/tool", opt);
 
     const body = {
-      action: "Printer: tool",
-      opt
+      action: "Printer: tool select",
+      opts: opt,
+      status: post.status
     }
-    await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+    await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
     return post.status === 204;
   }
@@ -128,9 +129,10 @@ export default class OctoPrintClient {
 
 
           const body = {
-            action: `OctoPrint: ${action}`
+            action: `OctoPrint: ${action}`,
+            status: post.status
           }
-          await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+          await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
           if (post.status === 204) {
             UI.createAlert(
@@ -158,10 +160,11 @@ export default class OctoPrintClient {
     const post = OctoPrintClient.post(printer, url);
 
     const body = {
-      action: `OctoPrint: ${action}`
+      action: `OctoPrint: ${action}`,
+      status: post.status
     }
 
-    await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+    await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
     return post;
   }
@@ -201,9 +204,10 @@ export default class OctoPrintClient {
 
     const body = {
       action: `Printer: ${action}`,
-      opt
+      opts: opt,
+      status: post.status
     }
-    await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+    await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
     if (post.status === 204) {
       element.target.classList = "btn btn-success";
@@ -237,10 +241,11 @@ export default class OctoPrintClient {
 
       const body = {
         action: `File: ${action}`,
-        opt,
-        fullPath: fullPath
+        opts: opt,
+        fullPath: fullPath,
+        status: post.status
       }
-      await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
       return post;
     } else if (action === "print") {
@@ -257,11 +262,12 @@ export default class OctoPrintClient {
 
       const body = {
         action: `File: ${action}`,
-        opt,
-        fullPath: fullPath
+        opts: opt,
+        fullPath: fullPath,
+        status: post.status
       }
 
-      await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
       return post;
     } else if (action === "delete") {
@@ -270,10 +276,11 @@ export default class OctoPrintClient {
 
       const body = {
         action: `File: ${action}`,
-        fullPath: fullPath
+        fullPath: fullPath,
+        status: post.status
       }
 
-      await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
       return post;
     }
@@ -365,9 +372,10 @@ export default class OctoPrintClient {
             const { status } = await OctoPrintClient.post(printer, "job", opts);
             const body = {
               action: `Print: ${opts.command}`,
-              opts
+              opts,
+              status: status
             }
-            await OctoFarmClient.updateUserActionsLog(printer._id, body, status)
+            await OctoFarmClient.updateUserActionsLog(printer._id, body)
             printActionStatusResponse(status)
           }
         }
@@ -377,9 +385,10 @@ export default class OctoPrintClient {
 
       const body = {
         action: `Print: ${opts.command}`,
-        opts
+        opts,
+        status: post.status
       }
-      await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
       await OctoFarmClient.updateActiveControlUser(printer._id);
 
@@ -410,9 +419,10 @@ export default class OctoPrintClient {
 
     const body = {
       action: `Printer: ${opts.command}`,
-      opts
+      opts,
+      status: post.status
     }
-    await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status)
+    await OctoFarmClient.updateUserActionsLog(printer._id, body)
 
     if (typeof post !== "undefined" && post.status === 204) {
       UI.createAlert(
@@ -461,7 +471,9 @@ export default class OctoPrintClient {
           }
         });
 
-        await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status);
+        body.status = post.status
+
+        await OctoFarmClient.updateUserActionsLog(printer._id, body);
 
         if (post.status !== 200 || post.status !== 204) {
           UI.createAlert("error", `${printer.printerName}: Could not complete ${action}`, 3000);
@@ -492,8 +504,8 @@ export default class OctoPrintClient {
           },
           body: command
         });
-
-        await OctoFarmClient.updateUserActionsLog(printer._id, body, post.status);
+        body.status = post.status
+        await OctoFarmClient.updateUserActionsLog(printer._id, body);
 
         if (post.status !== 200 || post.status !== 204) {
           UI.createAlert("error", `${printer.printerName}: Could not complete ${action}`, 3000);

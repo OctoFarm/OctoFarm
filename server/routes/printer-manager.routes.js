@@ -561,7 +561,8 @@ router.post(
     const data = req.body.opts;
     const status = req.body.status;
     const action = req.body.action;
-    updateUserActionLog(printerID, action, data, currentUser, status);
+    const fullPath = req.body.fullPath;
+    updateUserActionLog(printerID, action, data, currentUser, status, fullPath);
     res.sendStatus(204);
   }
 );

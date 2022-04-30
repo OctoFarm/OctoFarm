@@ -104,7 +104,7 @@ function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
   if (printer?.healthChecksPass === false) {
     UI.removeDisplayNoneFromElement(healthAlert);
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("healthCheck-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "healthCheck-" + printer._id,
       name: "Failed health check!",
       printerName: printer.printerName,
@@ -120,7 +120,7 @@ function checkIfPrinterHasEvents(printer){
   const eventsAlerts = document.getElementById(`printerEventsAlert-${printer._id}`);
   const printerEventsCount = document.getElementById(`printerEventsCount-${printer._id}`);
   if(printer?.registeredEvents.length > 0){
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("printerEvents-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "printerEvents-" + printer._id,
       name: "Printer events are registered!",
       printerName: printer.printerName,
@@ -163,7 +163,7 @@ function checkIfPrinterConnectionThrottled(printer){
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("corsCheck-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "corsCheck-" + printer._id,
       name: "Cors is not enabled!",
       printerName: printer.printerName,
@@ -242,7 +242,7 @@ function checkForOctoPrintUpdate(printer) {
 
   if (printer?.octoPrintUpdate?.updateAvailable) {
     UI.removeDisplayNoneFromElement(updateButton);
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("opUpdate-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "opUpdate-" + printer._id,
       name: "OctoPrint update available!",
       printerName: printer.printerName,
@@ -269,7 +269,7 @@ function checkForOctoPrintPluginUpdates(printer) {
     printer.octoPrintPluginUpdates.length > 0
   ) {
     UI.removeDisplayNoneFromElement(updatePluginButton);
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("pluginUpdate-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "pluginUpdate-" + printer._id,
       name: "OctoPrint plugin update(s) available!",
       printerName: printer.printerName,
@@ -288,7 +288,7 @@ function checkIfRestartRequired(printer) {
     `restartRequired-${printer._id}`
   );
   if (restartRequiredTag && printer?.restartRequired) {
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("restartWaiting-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "restartWaiting-" + printer._id,
       name: "Waiting for OctoPrint restart",
       printerName: printer.printerName,
@@ -306,7 +306,7 @@ function checkIfMultiUserIssueFlagged(printer) {
     "multiUserIssue-" + printer._id
   );
   if (printer?.multiUserIssue) {
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("userIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "userIssue-" + printer._id,
       name: "Couldn't determine which user to use!",
       printerName: printer.printerName,
@@ -330,7 +330,7 @@ function checkIfUnderVoltagedPi(printer) {
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_undervoltage) {
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("underVoltageIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "underVoltageIssue-" + printer._id,
       name: "Pi is reporting been undervoltaged!",
       printerName: printer.printerName,
@@ -354,7 +354,7 @@ function checkIfOverheatingPi(printer) {
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_overheat) {
-    updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+    updateLogLine("overheatingIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
       id: "overheatingIssue-" + printer._id,
       name: "Pi is reporting it is overheating!",
       printerName: printer.printerName,
@@ -395,7 +395,7 @@ function checkForApiErrors(printer) {
         UI.removeDisplayNoneFromElement(apiErrorTag);
       }
     } else {
-      updateLogLine(printer._id, alertsLogMesssageBox, createAlertsLogString({
+      updateLogLine("apiIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
         id: "apiIssue-" + printer._id,
         name: "API Scan has issues!",
         printerName: printer.printerName,

@@ -8,7 +8,6 @@ export function clearConnectionLoader(loader, messageBox, count) {
   if (loader) {
     loader.remove();
     if (count === 0) {
-      console.log(count)
       messageBox.innerText = "No logs received ❌";
     } else {
       if(messageBox.innerText.includes("No logs")){
@@ -85,7 +84,7 @@ export function createConnectionLogString(data){
 
 export function createActionsLogString(data){
   const date = new Date(data.date).toLocaleString();
-  return `<div title="See printer logs for more information!" id="${data.id}" style="width: 100%; font-size:11px;" class="text-left ${data.state} text-wrap ${data?.colour}"> ${date} | ${data.currentUser} | ${data.printerName.slice(0, 6)}... | ${data.action}</div>`
+  return `<div title="See printer logs for more information!" id="${data.id}" style="width: 100%; font-size:11px;" class="text-left ${data.state} text-wrap ${data?.status}"> ${date} | ${data.currentUser} | ${data.printerName.slice(0, 6)}... | ${data.action}</div>`
 }
 
 export function createAlertsLogString(data){

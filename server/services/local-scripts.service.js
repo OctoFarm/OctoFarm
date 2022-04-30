@@ -72,12 +72,12 @@ class ScriptRunner {
 
   static async test(scriptLocation, message) {
     logger.info("Testing Alerts: " + scriptLocation + " " + message);
-    return await Script.fire(scriptLocation, JSON.stringify(message));
+    return Script.fire(scriptLocation, JSON.stringify(message));
   }
 
   static async fire(scriptLocation, message) {
     logger.warning("Alert Fire: " + scriptLocation + " " + message);
-    return await Script.fire(scriptLocation, message);
+    return Script.fire(scriptLocation, message);
   }
 
   static async convertMessage(printer, message, historyID) {

@@ -277,13 +277,8 @@ export default class OctoFarmClient {
 
   }
 
-  static async updateUserActionsLog(id, body, status){
+  static async updateUserActionsLog(id, body){
     try {
-
-      if(typeof status === "number"){
-        body.status = status;
-      }
-
       await this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
     } catch (e) {
       console.error("Unable to update user actions log!", e.toString())

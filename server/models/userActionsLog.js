@@ -25,6 +25,10 @@ const userActionSchema = new mongoose.Schema({
   status: {
     type: String,
     required: false
+  },
+  fullPath: {
+    type: String,
+    required: false
   }
 });
 
