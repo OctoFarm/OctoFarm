@@ -134,6 +134,10 @@ const PING_PONG_CHECK = async () => {
   await getPrinterManagerCache().websocketKeepAlive();
 };
 
+const GET_LAST_100_ACTIONS = async () => {
+  await getLast100ActionsFromDatabase();
+}
+
 /**
  * @param task
  * @param preset

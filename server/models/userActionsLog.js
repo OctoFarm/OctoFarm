@@ -21,6 +21,10 @@ const userActionSchema = new mongoose.Schema({
   currentUser: {
     type: String,
     required: true
+  },
+  status: {
+    type: String,
+    required: false
   }
 });
 

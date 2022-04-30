@@ -758,7 +758,7 @@ class PrinterStore {
       const newPowerSettings = {
         ...(!!powerOnCommand
           ? { powerOnCommand }
-          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
+          : { powerOnCommand: JSON.parse(originalPrinter.powerSettings.powerOnCommand) }),
         ...(!!powerOnURL
           ? { powerOnURL }
           : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
@@ -767,16 +767,16 @@ class PrinterStore {
           : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
         ...(!!powerOffCommand
           ? { powerOffCommand }
-          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
+          : { powerOffCommand: JSON.parse(originalPrinter.powerSettings.powerOffCommand) }),
         ...(!!powerToggleCommand
           ? { powerToggleCommand }
-          : { powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand }),
+          : { powerToggleCommand: JSON.parse(originalPrinter.powerSettings.powerToggleCommand) }),
         ...(!!powerToggleURL
           ? { powerToggleURL }
           : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
         ...(!!powerStatusCommand
           ? { powerStatusCommand }
-          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
+          : { powerStatusCommand: JSON.parse(originalPrinter.powerSettings.powerStatusCommand) }),
         ...(!!powerStatusURL
           ? { powerStatusURL }
           : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),

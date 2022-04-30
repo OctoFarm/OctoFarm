@@ -255,8 +255,12 @@ export default class OctoFarmClient {
   static getConnectionOverview() {
     return this.get(this.connectionOverviewRoute);
   }
-  static sendError(error){
-    return this.post(this.fireLogToServerRoute, error)
+  static async sendError(error){
+    try {
+      await  this.post(this.fireLogToServerRoute, error)
+    } catch (e) {
+      console.error(e.toString());
+    }
   }
 
 
@@ -264,12 +268,26 @@ export default class OctoFarmClient {
     return this.post("client/currentOpSorting", { iterie, order });
   }
 
-  static updateActiveControlUser(id){
-    return this.patch(`${this.updateActiveUserRoute}/${id}`)
+  static async updateActiveControlUser(id){
+    try {
+      await this.patch(`${this.updateActiveUserRoute}/${id}`)
+    }catch (e){
+      console.error("Unable to update active control user!", e.toString())
+    }
+
   }
 
-  static updateUserActionsLog(id, body){
-    return this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
+  static async updateUserActionsLog(id, body, status){
+    try {
+
+      if(typeof status === "number"){
+        body.status = status;
+      }
+
+      await this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
+    } catch (e) {
+      console.error("Unable to update user actions log!", e.toString())
+    }
   }
 
   static async get(path) {

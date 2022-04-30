@@ -559,8 +559,9 @@ router.post(
     const currentUser = req.user.username;
     const printerID = req.paramString("id");
     const data = req.body.opts;
+    const status = req.body.status;
     const action = req.body.action;
-    updateUserActionLog(printerID, action, data, currentUser);
+    updateUserActionLog(printerID, action, data, currentUser, status);
     res.sendStatus(204);
   }
 );

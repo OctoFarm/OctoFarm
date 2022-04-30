@@ -39,7 +39,6 @@ async function generateSystemInformationContents() {
   const docker = "Are we in a docker container?\n";
   const loginRequires = "Is login required on the server?\n";
   const registration = "Is registration turned on the server?\n";
-  const apiTimeout = "What are the API timeout settings?\n";
   const filamentManagerPlugin = "Is the filament manager plugin enabled?\n";
   const historySnapshot = "What are the history snapshot settings?\n";
   const influxDB = "What are the influxDB database settings? \n";

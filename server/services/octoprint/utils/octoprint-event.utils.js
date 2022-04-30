@@ -142,7 +142,6 @@ const captureDwelling = (id, data) => {
 };
 const captureError = (id, data) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
-  getPrinterStoreCache().resetActiveControlUser(id);
   const errorCaptureService = new ErrorCaptureService(data, currentPrinterInfo);
   errorCaptureService
     .createErrorLog()
@@ -153,6 +152,7 @@ const captureError = (id, data) => {
     })
     .catch((e) => {
       logger.error("Failed to capture error log data", e.toString());
+      getPrinterStoreCache().resetJob(id);
     });
 };
 const captureFileAdded = (id, data) => {
@@ -314,22 +314,21 @@ const printCaptureHelper = (id, data, state) => {
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
-      getPrinterStoreCache().resetJob(id);
+      //getPrinterStoreCache().resetActiveControlUser(id);
     })
     .catch((e) => {
       logger.error(
         "Failed to capture finished print data, print " + scriptCheckTrigger,
         e.toString()
       );
+      getPrinterStoreCache().resetActiveControlUser(id);
     });
 };
 
 const capturePrintFailed = (id, data) => {
-  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, false);
 };
 const captureFinishedPrint = (id, data) => {
-  getPrinterStoreCache().resetActiveControlUser(id);
   printCaptureHelper(id, data, true);
 };
 const capturePrintPaused = (id) => {
