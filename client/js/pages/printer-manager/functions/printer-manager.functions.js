@@ -95,7 +95,7 @@ export async function scanNetworkForDevices(e) {
     for (const scannedPrinter of scannedPrinters) {
       const printer = {
         printerURL: "",
-        cameraURL: "",
+        camURL: "",
         name: "",
         group: "",
         apikey: ""
