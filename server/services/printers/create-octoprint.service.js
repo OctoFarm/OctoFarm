@@ -1018,7 +1018,7 @@ class OctoPrintPrinter {
           octoPi: this.octoPi
         });
         logger.http("Failed to acquire raspberry pi data...", piPluginCheck);
-        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline", piPluginCheck);
+        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline");
         return globalStatusCode;
       }
     } else {
@@ -1038,7 +1038,7 @@ class OctoPrintPrinter {
     }
 
     let systemCheck = await this.#api.getSystemCommands(true).catch((e) => {
-      logger.http("Failed Aquire system data", e);
+      logger.http("Failed Aquire system data", e.toString());
       return false;
     });
 
