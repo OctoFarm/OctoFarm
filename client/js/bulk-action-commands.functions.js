@@ -1,4 +1,4 @@
-import PrinterSelectionService from "./services/printer-selection.service";
+import PrinterSelectionService from "./pages/printer-manager/services/printer-selection.service";
 import {
     bulkConnectPrinters,
     bulkDisconnectPrinters,

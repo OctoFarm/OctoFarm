@@ -41,7 +41,7 @@ export const setupConnectButton = (printer) => {
             .insertAdjacentHTML("beforeend", `<option value="${port}">${port}</option>`);
     });
     if (portPreference !== null) {
-        document.getElementById("pmSerialPort").value = printer.connectionOptions.portPreference;
+        document.getElementById("pmSerialPort").value = printer?.connectionOptions?.portPreference;
     }
     printerProfiles.forEach((profile) => {
         document

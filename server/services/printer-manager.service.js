@@ -364,38 +364,26 @@ class PrinterManagerService {
   }
 
   async checkForOctoPrintUpdates() {
-    const printerList = getPrinterStoreCache().listPrinters();
+    const printerList = getPrinterStoreCache().listPrintersInformation();
     logger.debug(printerList.length + " checking for any octoprint updates");
     for (let printer of printerList) {
-      await printer.acquireOctoPrintUpdatesData(true);
-      await printer.acquireOctoPrintPluginsListData(true);
-      if(Object.keys(printer.octoPi).length !== 0){
-        await printer.acquireOctoPrintPiPluginData(true);
+      if (printer.printerState.colour.category !== CATEGORIES.OFFLINE) {
+        await getPrinterStoreCache().checkOctoPrintForUpdates(printer._id);
       }
-
     }
   }
 
   async generatePrintersControlDropList() {
     const printersInformation = getPrinterStoreCache().listPrintersInformation();
+    const printerControlList = [];
     printersInformation.forEach((sortedPrinter) => {
-      const printerIndex = findIndex(this.#printerControlList, function (o) {
-        return o.printerName === sortedPrinter.printerName;
+      printerControlList.push({
+        printerName: sortedPrinter.printerName,
+        printerID: sortedPrinter._id,
+        state: sortedPrinter.printerState.colour
       });
-      if (printerIndex !== -1) {
-        this.#printerControlList[printerIndex] = {
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        };
-      } else {
-        this.#printerControlList.push({
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        });
-      }
     });
+    this.#printerControlList = printerControlList;
   }
 
   getPrinterControlList() {

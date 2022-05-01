@@ -31,7 +31,7 @@ class WebSocketClient {
   #retryNumber = 0;
   #lastMessage = Date.now();
   #instance = undefined;
-  #pingPongTimer = 60000;
+  #pingPongTimer = 10000;
   #heartbeatTerminate = undefined;
   #heartbeatPing = undefined;
   #onMessage = undefined;
@@ -122,8 +122,8 @@ class WebSocketClient {
         );
         this.terminate();
         // consider a minute without response a dead connection! Should cover WiFi devices better.
-      }, this.#pingPongTimer + 10000);
-      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 10000);
+      }, this.#pingPongTimer + 5000);
+      logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
     });
 
     this.#instance.on("unexpected-response", (err) => {

@@ -15,7 +15,7 @@ export const returnHistoryTableRow = function (record) {
   spoolType.forEach((spool) => {
     spoolString.push(spool + "<br>");
   });
-
+    console.log(record)
   return `
        <tr>
           <td class="d-none">
@@ -26,6 +26,9 @@ export const returnHistoryTableRow = function (record) {
           </td>
           <td>
             ${record.printer}
+          </td>
+          <td>
+            ${record?.activeControlUser ? record.activeControlUser : "No user logged"}
           </td>
           <td title="${record.file.path.replace(/_/g, " ")}">
             ${record.file.name.replace(/_/g, " ")}

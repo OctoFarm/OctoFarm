@@ -75,45 +75,7 @@ export default class Calculate {
   }
 
   static dateClean(date) {
-    date = new Date(date);
-
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ];
-
-    let hrs = date.getHours();
-
-    let mnts = date.getMinutes();
-
-    let seconds = date.getSeconds();
-
-    if(mnts < 10){
-      mnts = `0${mnts}`
-    }
-
-    if(hrs < 10){
-      hrs = `0${hrs}`
-    }
-
-    if(seconds < 10){
-      seconds = `0${seconds}`
-    }
-
-    return `${days[date.getDay()]} ${
-      months[date.getMonth()]
-    } ${date.getFullYear()} - ${hrs}:${mnts}:${seconds}`;
+    return new Date(date).toLocaleString();
   }
 
   static timeSince(date) {

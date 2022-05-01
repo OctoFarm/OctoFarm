@@ -47,7 +47,7 @@ if (!!majorVersion && majorVersion < 14) {
     .then(async (mg) => {
       await runMigrations(mg.connection.db, mg.connection.getClient());
     })
-    .then(async () => await ensureSystemSettingsInitiated())
+    .then(async () => ensureSystemSettingsInitiated())
     .then(async () => {
       const port = fetchOctoFarmPort();
       if (!port || Number.isNaN(parseInt(port))) {

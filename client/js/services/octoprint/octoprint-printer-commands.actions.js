@@ -206,3 +206,21 @@ export async function printerHomeAllAxis(printer) {
     };
   }
 }
+
+export async function printerTurnOffHeaters(printer){
+  const opt = {
+    commands: ["M104 S0", "M140 S0"]
+  }
+  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  if (status === 204) {
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: "Turn off printers heaters command has successfully been actioned!"
+    };
+  } else {
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Turn off printers heaters command failed to send!"
+    };
+  }
+}

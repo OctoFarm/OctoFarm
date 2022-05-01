@@ -4,6 +4,8 @@ const { orderBy } = require("lodash");
 const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
 const PluginLogs = require("../models/PluginLogs.js");
+const UserActions = require("../models/userActionsLog");
+const Printer = require("../models/Printer");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
@@ -23,6 +25,7 @@ class PrinterCleanerService {
   }
 
   static async generateConnectionLogs(farmPrinter) {
+    const currentPrinter = Printer.findById(farmPrinter._id);
     const printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id })
       .sort({ _id: -1 })
       .limit(1000);
@@ -33,7 +36,7 @@ class PrinterCleanerService {
       printerID: farmPrinter._id,
       pluginDisplay: "Plugin Manager"
     })
-      .sort({ _id: -1 })
+      .sort({ _id: 1 })
       .limit(1000);
 
     const klipperLogs = await PluginLogs.find({
@@ -43,27 +46,50 @@ class PrinterCleanerService {
       .sort({ _id: -1 })
       .limit(1000);
 
+    const userActionLogs = await UserActions.find({
+      printerID: farmPrinter._id
+    })
+      .sort({ _id: -1 })
+      .limit(1000);
+
     let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
     let currentTempLogs = [];
     let currentPluginManagerLogs = [];
     let currentKlipperLogs = [];
-    for (let e = 0; e < 300; e++) {
-      if(!!printerErrorLogs[e]){
+    let currentUserActionLogs = [];
+
+    for (const element of userActionLogs) {
+      if (!!element) {
+        const userActionLog = {
+          id: element.id,
+          date: element.date,
+          currentUser: element.currentUser,
+          data: element.data,
+          status: element?.status,
+          fullPath: element?.fullPath,
+          action: element.action
+        };
+        currentUserActionLogs.push(userActionLog)
+      }
+    }
+
+    for (const element of printerErrorLogs) {
+      if (!!element) {
         let errorFormat = {
-          id: printerErrorLogs[e]._id,
-          date: printerErrorLogs[e].errorLog.endDate,
-          message: printerErrorLogs[e].errorLog.reason,
+          id: element._id,
+          date: element.errorLog.endDate,
+          message: element.errorLog.reason,
           printer: farmPrinter.printerURL,
           state: "Offline",
-          terminal: printerErrorLogs[e]?.errorLog?.terminal,
-          resendStats: printerErrorLogs[e]?.errorLog?.resendStats
+          terminal: element?.errorLog?.terminal,
+          resendStats: element?.errorLog?.resendStats
         };
         currentErrorLogs.push(errorFormat);
       }
     }
     let currentIssues = PrinterTicker.returnIssue();
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < currentIssues.length; i++) {
       if (!!currentIssues[i] && currentIssues[i].printerID === farmPrinter._id) {
         let errorFormat = {
           date: currentIssues[i].date,
@@ -74,27 +100,27 @@ class PrinterCleanerService {
         currentOctoFarmLogs.push(errorFormat);
       }
     }
-    for (let i = 0; i < 300; i++) {
-      if (!!pluginManagerLogs[i]) {
+    for (const element of pluginManagerLogs) {
+      if (!!element) {
         let octoFormat = {
-          date: pluginManagerLogs[i].date,
-          message: pluginManagerLogs[i].message,
-          printer: pluginManagerLogs[i].printer,
-          pluginDisplay: pluginManagerLogs[i].pluginDisplay,
-          state: pluginManagerLogs[i].state
+          date: element.date,
+          message: element.message,
+          printer: element.printer,
+          pluginDisplay: element.pluginDisplay,
+          state: element.state
         };
         currentPluginManagerLogs.push(octoFormat);
       }
     }
 
-    for (let i = 0; i < 300; i++) {
-      if (!!klipperLogs[i]) {
+    for (const element of klipperLogs) {
+      if (!!element) {
         let octoFormat = {
-          date: klipperLogs[i].date,
-          message: klipperLogs[i].message,
-          printer: klipperLogs[i].printer,
-          pluginDisplay: klipperLogs[i].pluginDisplay,
-          state: klipperLogs[i].state
+          date: element.date,
+          message: element.message,
+          printer: element.printer,
+          pluginDisplay: element.pluginDisplay,
+          state: element.state
         };
         currentKlipperLogs.push(octoFormat);
       }
@@ -173,13 +199,15 @@ class PrinterCleanerService {
     currentTempLogs = orderBy(currentTempLogs, ["date"], ["desc"]);
     currentPluginManagerLogs = orderBy(currentPluginManagerLogs, ["date"], ["desc"]);
     currentKlipperLogs = orderBy(currentKlipperLogs, ["date"], ["desc"]);
+    currentUserActionLogs = orderBy(currentUserActionLogs, ["date"], ["desc"]);
 
     return {
       currentErrorLogs,
       currentOctoFarmLogs,
       currentTempLogs,
       currentPluginManagerLogs,
-      currentKlipperLogs
+      currentKlipperLogs,
+      currentUserActionLogs
     };
   }
 
@@ -254,8 +282,8 @@ class PrinterCleanerService {
     return temps;
   }
 
-  static grabOctoPrintName(settingsAppearance){
-    return (settingsAppearance?.name.length === 0) ? generateRandomName() : settingsAppearance.name;
+  static grabOctoPrintName(settingsAppearance) {
+    return settingsAppearance?.name.length === 0 ? generateRandomName() : settingsAppearance.name;
   }
 
   static grabPrinterName(settingsAppearance, printerURL) {

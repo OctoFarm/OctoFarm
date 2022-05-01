@@ -1,12 +1,14 @@
 import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
-import {checkIfLoaderExistsAndRemove, updateConnectionLog} from "../connection-log";
+import {
+  updateActionLog, updateConnectionLog, updateAlertsLog
+} from "../log-tickers.functions";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
 import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
-import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
+import {updatePrinterSettingsModal} from "../services/printer-settings.service";
 import Validate from "../../../utils/validate";
 import {PrintersManagement} from "../printer-constructor";
-import PrinterSelectionService from "../../../services/printer-selection.service";
+import PrinterSelectionService from "../services/printer-selection.service";
 import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
 import PrinterFileManagerService from "../../monitoring/services/printer-file-manager.service";
@@ -15,42 +17,28 @@ import {
   returnFarmOverviewTableRow,
   returnHealthCheckRow
 } from "../templates/health-checks-table-row.templates";
-import {checkIfAlertsLoaderExistsAndRemove} from "../alerts-log";
-import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates"
+import {collapsableContent, collapsableRow} from "../templates/connection-overview.templates";
 import PrinterTerminalManagerService from "../../monitoring/services/printer-terminal-manager.service";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
-
-//TODO update with the printer ticker fixes
-function updateUserActionsLog (list){
-  document.getElementById("printerManagementUserActionsStatus").innerHTML = list.length;
-  const userActionsMessageBox = document.getElementById("userActionsLogTable")
-  list.forEach((e) => {
-    if (!document.getElementById(e.id)) {
-      const date = new Date(e.date).toLocaleString();
-      userActionsMessageBox.insertAdjacentHTML(
-          "afterbegin",
-          `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.currentUser} | ${e.printerName.slice(0, 6)}... | ${e.action}</div>`
-      );
-    }
-  });
-}
+const connectionLogMessageBox = document.getElementById("printerTickerMessageBox");
+const connectionLogMessageCount = document.getElementById("printerManagementConnectionLogStatus");
+const connectionLogLoader = document.getElementById("printerTickerLoader");
+const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
+const alertsLogMessageCount = document.getElementById("printerManagementAlertsLogStatus");
+const alertsLogMessageLoader = document.getElementById("printerAlertsLoader");
+const userActionsLogMessageBox = document.getElementById("userActionsLogTable");
+const userActionsLogMessageCount = document.getElementById("printerManagementUserActionsStatus");
+const userActionsLogMessageLoader = document.getElementById("printerActionsLoader");
 
 export function workerEventFunction(data) {
   if (data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
-      console.log(data.currentActionList)
-      if (data.currentTickerList.length > 0) {
-        checkIfLoaderExistsAndRemove();
-        checkIfAlertsLoaderExistsAndRemove();
-        updateConnectionLog(data.currentTickerList);
-        updateUserActionsLog(data.currentActionList)
-      } else {
-        checkIfAlertsLoaderExistsAndRemove(true);
-        checkIfLoaderExistsAndRemove(true);
-      }
+      updateActionLog(data.currentActionList, userActionsLogMessageBox, userActionsLogMessageCount, userActionsLogMessageLoader);
+      updateConnectionLog(data.currentTickerList, connectionLogMessageBox, connectionLogMessageCount, connectionLogLoader);
+      updateAlertsLog(alertsLogMesssageBox, alertsLogMessageCount, alertsLogMessageLoader);
       if (data.printersInformation.length > 0) {
         createOrUpdatePrinterTableRow(data.printersInformation, data.printerControlList);
       }
@@ -107,7 +95,7 @@ export async function scanNetworkForDevices(e) {
     for (const scannedPrinter of scannedPrinters) {
       const printer = {
         printerURL: "",
-        cameraURL: "",
+        camURL: "",
         name: "",
         group: "",
         apikey: ""

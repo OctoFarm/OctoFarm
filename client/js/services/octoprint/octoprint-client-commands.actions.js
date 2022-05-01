@@ -44,6 +44,16 @@ export async function updateOctoPrintClient(printer) {
     "plugin/softwareupdate/update",
     data
   );
+
+  const body = {
+    action: "OctoPrint: Update Client",
+    opts: data,
+    status: updateRequest.status
+  }
+
+  await OctoFarmClient.updateUserActionsLog(printer._id, body)
+
+
   if (updateRequest.status === 200) {
     UI.createAlert("success", "Update command fired!", 3000, "clicked");
     return {
@@ -74,9 +84,9 @@ export async function quickConnectPrinterToOctoPrint(printer) {
   if (printer.connectionOptions) {
     data = {
       command: "connect",
-      port: printer.connectionOptions.portPreference,
-      baudrate: printer.connectionOptions.baudratePreference,
-      printerProfile: printer.connectionOptions.printerProfilePreference,
+      port: printer?.connectionOptions?.portPreference,
+      baudrate: printer?.connectionOptions?.baudratePreference,
+      printerProfile: printer?.connectionOptions?.printerProfilePreference,
       save: true
     };
   } else {

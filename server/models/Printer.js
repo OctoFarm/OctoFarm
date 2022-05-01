@@ -229,6 +229,10 @@ const PrinterSchema = new mongoose.Schema({
   core: {
     type: Array,
     required: false
+  },
+  activeControlUser: {
+    type: String,
+    required: false
   }
 });
 

@@ -1,10 +1,10 @@
-import OctoFarmClient from "./octofarm-client.service.js";
-import UI from "../utils/ui.js";
-import Calc from "../utils/calc.js";
-import Script from "./octofarm-scripts.service.js";
-import {ApplicationError} from "../exceptions/application-error.handler";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import "../utils/cleanup-modals.util"
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
+import UI from "../../../utils/ui.js";
+import Calc from "../../../utils/calc.js";
+import Script from "../../../services/octofarm-scripts.service.js";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import "../../../utils/cleanup-modals.util"
 
 let currentPrinterIndex;
 let printerOnline;
@@ -139,11 +139,11 @@ class PrinterSettingsService {
         );
       }
       const portAvailable = this.checkPortIsAvailable(
-        currentPrinter.connectionOptions.ports,
-        currentPrinter.connectionOptions.portPreference
+        currentPrinter?.connectionOptions?.ports,
+        currentPrinter?.connectionOptions?.portPreference
       );
 
-      currentPrinter.connectionOptions.ports.forEach((port) => {
+      currentPrinter?.connectionOptions?.ports.forEach((port) => {
         serialPortDropDown.insertAdjacentHTML(
           "beforeend",
           `<option value="${port}">${port}</option>`
@@ -154,16 +154,16 @@ class PrinterSettingsService {
         this.setPortAvailability(serialPortDropDown, portAvailable);
         serialPortDropDown.insertAdjacentHTML(
           "beforeend",
-          `<option value="${currentPrinter.connectionOptions.portPreference}">${currentPrinter.connectionOptions.portPreference}</option>`
+          `<option value="${currentPrinter?.connectionOptions?.portPreference}">${currentPrinter.connectionOptions.portPreference}</option>`
         );
       }
-      if (currentPrinter.connectionOptions.portPreference === null) {
+      if (currentPrinter?.connectionOptions?.portPreference === null) {
         serialPortDropDown.insertAdjacentHTML(
           "afterbegin",
             NO_PREFERENCE
         );
       }
-      currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
+      currentPrinter?.connectionOptions?.printerProfiles.forEach((profile) => {
         profileDropDown.insertAdjacentHTML(
           "beforeend",
           `<option value="${profile.id}">${profile.name}</option>`
@@ -180,7 +180,7 @@ class PrinterSettingsService {
       } else {
         baudrateDropdown.value = 0;
       }
-      if (!!currentPrinter.connectionOptions.portPreference) {
+      if (!!currentPrinter?.connectionOptions?.portPreference) {
         serialPortDropDown.value = currentPrinter.connectionOptions.portPreference;
       } else {
         serialPortDropDown.value = 0;

@@ -559,8 +559,22 @@ router.post(
     const currentUser = req.user.username;
     const printerID = req.paramString("id");
     const data = req.body.opts;
+    const status = req.body.status;
     const action = req.body.action;
-    updateUserActionLog(printerID, action, data, currentUser);
+    const fullPath = req.body.fullPath;
+    updateUserActionLog(printerID, action, data, currentUser, status, fullPath);
+    res.sendStatus(204);
+  }
+);
+
+router.post(
+  "/rescanOctoPrintUpdates/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    await getPrinterStoreCache().checkOctoPrintForUpdates(printerID);
     res.sendStatus(204);
   }
 );

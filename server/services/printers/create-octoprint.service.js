@@ -256,7 +256,8 @@ class OctoPrintPrinter {
       settingsWebcam,
       core,
       octoPrintSystemInfo,
-      printerFirmware
+      printerFirmware,
+      activeControlUser
     } = printer;
     this._id = _id.toString();
     //Only update the below if received from database, otherwise is required from scans.
@@ -420,6 +421,10 @@ class OctoPrintPrinter {
 
     if (!!settingsAppearance) {
       this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
+    }
+
+    if (!!activeControlUser) {
+      this.activeControlUser = activeControlUser;
     }
 
     this.resetJobInformation();
@@ -832,8 +837,8 @@ class OctoPrintPrinter {
       }
     } else {
       // Hard failure as can't setup websocket
-      logger.error("API key is global... cannot connect...");
-      this.#apiPrinterTickerWrap("API key is global API key", "Offline");
+      logger.error("Failed to detect API key for global check! Failing as offline");
+      this.#apiPrinterTickerWrap("Failed to detect API key for global check! Failing as offline", "Offline");
       return false;
     }
   }
@@ -1013,7 +1018,7 @@ class OctoPrintPrinter {
           octoPi: this.octoPi
         });
         logger.http("Failed to acquire raspberry pi data...", piPluginCheck);
-        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline", piPluginCheck);
+        this.#apiPrinterTickerWrap("Couldn't detect RaspberryPi", "Offline");
         return globalStatusCode;
       }
     } else {
@@ -1033,7 +1038,7 @@ class OctoPrintPrinter {
     }
 
     let systemCheck = await this.#api.getSystemCommands(true).catch((e) => {
-      logger.http("Failed Aquire system data", e);
+      logger.http("Failed Aquire system data", e.toString());
       return false;
     });
 
@@ -1322,10 +1327,11 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring OctoPrint updates data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "warning");
     if (
+      force ||
       !this?.octoPrintUpdate ||
       !this?.octoPrintPluginUpdates ||
-      this?.octoPrintPluginUpdates.length === 0 ||
-      force
+      this?.octoPrintPluginUpdates.length === 0
+
     ) {
       const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch((e) => {
         logger.http("Failed Aquire updates data", e);
@@ -1768,7 +1774,6 @@ class OctoPrintPrinter {
   }
 
   resetJobInformation() {
-    this.activeControlUser = "";
     const job = {
       file: {
         name: null,

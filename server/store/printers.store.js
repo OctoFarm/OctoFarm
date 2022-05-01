@@ -172,6 +172,15 @@ class PrinterStore {
     return this.#printersList.push(printer);
   }
 
+  async checkOctoPrintForUpdates(id) {
+    const printer = this.#findMePrinter(id);
+    await printer.acquireOctoPrintUpdatesData(true);
+    await printer.acquireOctoPrintPluginsListData(true);
+    if (Object.keys(printer.octoPi).length !== 0) {
+      await printer.acquireOctoPrintPiPluginData(true);
+    }
+  }
+
   async updateLatestOctoPrintSettings(id, force = false) {
     const printer = this.#findMePrinter(id);
     if (!printer.disabled && printer.printerState.state !== "Offline") {
@@ -551,7 +560,7 @@ class PrinterStore {
 
   async editPrinterConnectionSettings(settings) {
     const { printer } = settings;
-    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index, group } = printer;
 
     const originalPrinter = this.#findMePrinter(index);
 
@@ -562,15 +571,16 @@ class PrinterStore {
       this.resetConnectionInformation([index]);
     }
 
+    const newPrinterName = { name: printerName };
+
     // Deal with OctoFarm connection information updates
     const octoFarmConnectionSettings = {
       _id: index,
-      settingsAppearance: {
-        name: printerName
-      },
+      settingsAppearance: { ...newPrinterName },
       printerURL: printerURL,
       camURL: cameraURL,
-      apikey: apikey
+      apikey: apikey,
+      group: group
     };
 
     // Update OctoFarms data
@@ -758,7 +768,7 @@ class PrinterStore {
       const newPowerSettings = {
         ...(!!powerOnCommand
           ? { powerOnCommand }
-          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
+          : { powerOnCommand: JSON.parse(originalPrinter.powerSettings.powerOnCommand) }),
         ...(!!powerOnURL
           ? { powerOnURL }
           : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
@@ -767,16 +777,16 @@ class PrinterStore {
           : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
         ...(!!powerOffCommand
           ? { powerOffCommand }
-          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
+          : { powerOffCommand: JSON.parse(originalPrinter.powerSettings.powerOffCommand) }),
         ...(!!powerToggleCommand
           ? { powerToggleCommand }
-          : { powerToggleCommand: originalPrinter.powerSettings.powerToggleCommand }),
+          : { powerToggleCommand: JSON.parse(originalPrinter.powerSettings.powerToggleCommand) }),
         ...(!!powerToggleURL
           ? { powerToggleURL }
           : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
         ...(!!powerStatusCommand
           ? { powerStatusCommand }
-          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
+          : { powerStatusCommand: JSON.parse(originalPrinter.powerSettings.powerStatusCommand) }),
         ...(!!powerStatusURL
           ? { powerStatusURL }
           : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),
@@ -1032,7 +1042,9 @@ class PrinterStore {
 
   async getNewSessionKey(id) {
     const printer = this.#findMePrinter(id);
-    return printer.getSessionkey();
+    const sessionKey = await printer.getSessionkey();
+    await printer.acquireOctoPrintUpdatesData(true);
+    return sessionKey;
   }
 
   getOctoPrintResourceMonitorValues(id) {
@@ -1317,13 +1329,11 @@ class PrinterStore {
   }
 
   updateActiveControlUser(id, activeControlUser) {
-    const printer = this.#findMePrinter(id);
-    printer.activeControlUser = activeControlUser;
+    this.updatePrinterDatabase(id, { activeControlUser });
   }
 
-  resetActiveControlUser(id){
-    const printer = this.#findMePrinter(id);
-    printer.activeControlUser = null;
+  resetActiveControlUser(id) {
+    this.updatePrinterDatabase(id, { activeControlUser: "" });
   }
 }
 

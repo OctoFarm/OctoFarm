@@ -7,7 +7,6 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const Printers = require("../models/Printer.js");
 const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
-const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { sortOptions } = require("../constants/history-sort.constants");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");

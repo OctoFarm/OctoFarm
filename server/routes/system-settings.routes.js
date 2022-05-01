@@ -364,7 +364,7 @@ router.get(
 );
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
   const script = await GcodeDB.findById(req.bodyString("id"));
-  script.gcode = req.bodyString("gcode");
+  script.gcode = req.body.gcode;
   script.name = req.bodyString("name");
   script.description = req.bodyString("description");
   const printerIDList = [];

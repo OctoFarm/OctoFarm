@@ -1,10 +1,10 @@
-import Calc from "../utils/calc.js";
-import OctoFarmClient from "./octofarm-client.service";
-import OctoPrintClient from "./octoprint/octoprint-client.service.js";
+import Calc from "../../../utils/calc.js";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
-import UI from "../utils/ui"
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
+import UI from "../../../utils/ui"
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
 
 let chart = null;
 let eventListener = false;
@@ -106,6 +106,9 @@ const octoPrintKlipperLogsCount = document.getElementById("klipperCount");
 const octoPrintTemperatureMenu = document.getElementById("system-temperature-list");
 const octoPrintTemperatureChart = document.getElementById("printerTempChart");
 const octoPrintTemperatureCount = document.getElementById("tempCount");
+const userActionLogsMenu = document.getElementById("system-action-list");
+const userActionLogsTable = document.getElementById("actionLogsTableRow");
+const userActionLogsCount = document.getElementById("actionCount")
 const refreshMenuButton = document.getElementById("system-refresh-list");
 const refreshMenuIcon = document.getElementById("refreshButtonIcon");
 
@@ -122,6 +125,9 @@ export default class PrinterLogsService {
     UI.addNotYetToElement(octoPrintLogsMenu);
     octoPrintLogsTable.innerHTML = "";
     octoPrintLogsSelect.innerHTML = "";
+    UI.addLoaderToElementsInnerHTML(userActionLogsCount);
+    UI.addNotYetToElement(userActionLogsMenu);
+    userActionLogsTable.innerHTML = "";
     UI.addDisplayNoneToElement(octoPrintPluginLogsMenu);
     UI.addLoaderToElementsInnerHTML(octoPrintPluginLogsCount);
     UI.addNotYetToElement(octoPrintPluginLogsMenu);
@@ -159,6 +165,36 @@ export default class PrinterLogsService {
             <tr class="${log.state}">
               <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.message}</td>
+            </tr>
+        `
+      );
+    })
+  }
+
+  static loadUserActionLogs(userActionLogs) {
+    if (!userActionLogs || userActionLogs.length === 0) {
+      userActionLogsCount.innerHTML = "(0)";
+      return;
+    }
+    userActionLogsCount.innerHTML = `(${userActionLogs.length})`;
+    UI.removeLoaderFromElementInnerHTML(userActionLogsCount);
+    UI.removeNotYetFromElement(userActionLogsMenu);
+
+    userActionLogs.forEach(log => {
+      let prettyData = "";
+      for(const key in log?.data){
+        prettyData += `${key}: ${log.data[key]}<br>`
+      }
+
+      userActionLogsTable.insertAdjacentHTML(
+          "beforeend",
+          `
+            <tr class="${log?.status}">
+              <th scope="row">${Calc.dateClean(log.date)}</th>
+              <td>${log.currentUser}</td>
+              <td>${log.action}</td>
+              <td><code>${prettyData}</code></td>
+              <td>${log?.fullPath ? log.fullPath : ""}</td>
             </tr>
         `
       );
@@ -242,10 +278,10 @@ export default class PrinterLogsService {
     octoPrintTemperatureCount.innerHTML = `(${printerTemperatures[0].data.length})`;
     UI.removeNotYetFromElement(octoPrintTemperatureMenu);
     chart = new ApexCharts(octoPrintTemperatureChart, options);
-    chart.render();
+    await chart.render();
     await UI.delay(1000)
     if(!updatedSeries){
-      chart.updateSeries(printerTemperatures);
+      await chart.updateSeries(printerTemperatures);
     }
 
   }
@@ -415,12 +451,13 @@ export default class PrinterLogsService {
   }
 
   static async initialise(printer, connectionLogs) {
-
     this.setPageToLoading(printer.printerName);
 
-    const { currentErrorLogs, currentKlipperLogs, currentOctoFarmLogs, currentPluginManagerLogs, currentTempLogs } = connectionLogs;
+    const { currentErrorLogs, currentKlipperLogs, currentOctoFarmLogs, currentPluginManagerLogs, currentTempLogs, currentUserActionLogs } = connectionLogs;
 
     this.loadOctoFarmLogs(currentOctoFarmLogs);
+
+    this.loadUserActionLogs(currentUserActionLogs);
 
     this.loadPrinterErrors(currentErrorLogs);
 

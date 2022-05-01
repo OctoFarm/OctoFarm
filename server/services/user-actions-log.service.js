@@ -1,23 +1,32 @@
 const UserAction = require("../models/userActionsLog");
 const Logger = require("../handlers/logger");
-const {getPrinterStoreCache} = require("../cache/printer-store.cache");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { cloneObject, convertStatusToColour } = require("../utils/mapping.utils");
 
 const logger = new Logger("OctoFarm-UserActions");
 
 const last100Actions = [];
 
-const updateUserActionLog = (printerID, action, data, currentUser) => {
+const updateUserActionLog = (
+  printerID,
+  action,
+  data,
+  currentUser,
+  status,
+  fullPath = undefined
+) => {
   if (!printerID && !action && !currentUser) {
     return;
   }
   const today = new Date();
-
   const formatAction = {
     printerID,
     action,
     data,
     currentUser,
-    date: today
+    date: today,
+    fullPath,
+    status: convertStatusToColour(status)
   };
 
   const newUserAction = new UserAction(formatAction);
@@ -37,21 +46,44 @@ const updateUserActionLog = (printerID, action, data, currentUser) => {
 const updateUserActionTicker = (action) => {
   const tickerAction = action;
   tickerAction.id = `${tickerAction.printerID}-${new Date(tickerAction.date).getTime()}`;
-
   tickerAction.printerName = getPrinterStoreCache().getPrinterName(tickerAction.printerID);
-
-  if (last100Actions.length <= 100) {
+  if (last100Actions.length <= 500) {
     last100Actions.push(tickerAction);
   } else {
     last100Actions.shift();
   }
+
+  return tickerAction;
 };
 
 const returnLast100Actions = () => {
+  if(last100Actions.length === 0){
+    getLast100ActionsFromDatabase().catch(e => {
+      logger.error("Error returning last 100 actions", e.toString());
+    })
+  }
   return last100Actions;
+};
+
+const getLast100ActionsFromDatabase = async () => {
+  const last100Database = await UserAction.find({})
+    .sort({ _id: 1 })
+    .limit(100)
+    .then((res) => {
+      logger.debug("Successfully grabbed last 100 records from user actions database", res);
+      return res;
+    })
+    .catch((e) => {
+      logger.error("Failed to grab last 100 records from user actions database", e);
+      return [];
+    });
+  for (const action of last100Database) {
+    last100Actions.push(updateUserActionTicker(cloneObject(action)));
+  }
+  return last100Database.length;
 };
 
 module.exports = {
   updateUserActionLog,
-  returnLast100Actions
+  returnLast100Actions,
 };

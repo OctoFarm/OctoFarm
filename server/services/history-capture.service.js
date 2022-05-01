@@ -47,6 +47,7 @@ class HistoryCaptureService {
   // Record Data
   #printerName = null;
   #printerID = null;
+  #activeControlUser = null;
   #printerGroup = null;
   #costSettings = null;
   #success = null;
@@ -76,7 +77,7 @@ class HistoryCaptureService {
   #camURL = null;
 
   constructor(eventPayload, capturedPrinterData, state) {
-    const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+    const { payloadData, printer, job, files, resendStats, activeControlUser } = clonePayloadDataForHistory(
       eventPayload,
       capturedPrinterData
     );
@@ -89,6 +90,7 @@ class HistoryCaptureService {
     this.#reason = eventPayload.reason;
     this.#fileName = eventPayload.name;
     this.#filePath = eventPayload.path;
+    this.#activeControlUser = activeControlUser;
 
     const { startDate, endDate } = this.generateStartEndDates(payloadData);
     this.#startDate = startDate;
@@ -132,10 +134,11 @@ class HistoryCaptureService {
       snapshot: this.#snapshot,
       timelapse: this.#timelapse,
       thumbnail: this.#thumbnail,
-      resends: this.#resends
+      resends: this.#resends,
+      activeControlUser: this.#activeControlUser
     };
 
-    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${printHistory}`);
+    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${JSON.stringify(printHistory)}`);
 
     // Create our history object
     const saveHistory = new History({

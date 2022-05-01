@@ -19,12 +19,10 @@
                     <small>Note: <code>This is not saved back to OctoPrint!</code></small>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label for="psOctoPrintUser">OctoPrint User:</label>
-                    <select id="psOctoPrintUser" class="custom-select">
-
-                    </select>
-                    <small class="form-text text-muted">Current OctoPrint User that
-                        OctoFarm is using to connect with.</small>
+                    <label for="psPrinterGroup">Printer Group:</label>
+                    <input id="psPrinterGroup" type="text" class="form-control"
+                           placeholder="Printer Name">
+                    <small class="form-text text-muted">Group the printer belongs too.</small>
                 </div>
             </div>
             <div class="row pb-1">
@@ -36,18 +34,7 @@
                         Defaults to "http://" if not specified.</small>
                     <small>Example: <code>http://192.168.1.5:81</code></small>
                 </div>
-                <div class="col-12 col-md-6">
-                    <label for="psWebSocketProtocol">Printer WebSocket Protocol:</label>
-                    <select id="psWebSocketProtocol" class="custom-select" disabled>
-                        <option value="ws://">ws://</option>
-                        <option value="wss://">wss://</option>
-                    </select>
-                    <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on http/https value in Printer URL. (disabled)</small>
-                    <small>Example: <code>"ws:// (http) " or "wss:// (https)" </code></small>
-                </div>
-            </div>
-            <div class="row pb-2">
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-4">
                     <label for="psAPIKEY">API Key:</label>
                     <input id="psAPIKEY" type="text" class="form-control"
                            placeholder="API Key">
@@ -55,7 +42,18 @@
                         recquired to use the User/Application API Key for OctoPrint
                         version 1.4.1+.</small>
                 </div>
-                <div class="col-12 col-md-6">
+                <div class="col-12 col-md-2">
+                    <label for="psOctoPrintUser">OctoPrint User:</label>
+                    <select id="psOctoPrintUser" class="custom-select">
+
+                    </select>
+                    <small class="form-text text-muted">Current OctoPrint User that
+                        OctoFarm is using to connect with.</small>
+                </div>
+
+            </div>
+            <div class="row pb-2">
+                <div class="col-12 col-md-8">
                     <label for="psCamURL">Camera URL:</label>
                     <input id="psCamURL" type="text" class="form-control"
                            placeholder="Camera URL">
@@ -63,6 +61,15 @@
                         Defaults to "http://" if not specified.</small>
                     <small>Example:
                         <code>http://192.168.1.5/webcam/?action=stream</code></small>
+                </div>
+                <div class="col-12 col-md-4">
+                    <label for="psWebSocketProtocol">Printer WebSocket Protocol:</label>
+                    <select id="psWebSocketProtocol" class="custom-select" disabled>
+                        <option value="ws://">ws://</option>
+                        <option value="wss://">wss://</option>
+                    </select>
+                    <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on http/https value in Printer URL. (disabled)</small>
+                    <small>Example: <code>"ws:// (http) " or "wss:// (https)" </code></small>
                 </div>
             </div>
         </form>
