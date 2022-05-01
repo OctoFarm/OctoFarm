@@ -138,7 +138,7 @@ class HistoryCaptureService {
       activeControlUser: this.#activeControlUser
     };
 
-    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${printHistory}`);
+    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${JSON.stringify(printHistory)}`);
 
     // Create our history object
     const saveHistory = new History({
