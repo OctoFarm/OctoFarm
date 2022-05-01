@@ -84,9 +84,9 @@ export async function quickConnectPrinterToOctoPrint(printer) {
   if (printer.connectionOptions) {
     data = {
       command: "connect",
-      port: printer.connectionOptions.portPreference,
-      baudrate: printer.connectionOptions.baudratePreference,
-      printerProfile: printer.connectionOptions.printerProfilePreference,
+      port: printer?.connectionOptions?.portPreference,
+      baudrate: printer?.connectionOptions?.baudratePreference,
+      printerProfile: printer?.connectionOptions?.printerProfilePreference,
       save: true
     };
   } else {

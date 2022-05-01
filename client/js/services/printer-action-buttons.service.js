@@ -163,12 +163,12 @@ function addGroupEventListeners(printers) {
                 if (typeof printer.connectionOptions !== "undefined") {
                   data = {
                     command: "connect",
-                    port: printer.connectionOptions.portPreference,
+                    port: printer.connectionOptions?.portPreference,
                     baudrate: parseInt(
-                      printer.connectionOptions.baudratePreference
+                      printer.connectionOptions?.baudratePreference
                     ),
                     printerProfile:
-                      printer.connectionOptions.printerProfilePreference,
+                      printer.connectionOptions?.printerProfilePreference,
                   };
                 } else {
                   UI.createAlert(
@@ -336,9 +336,9 @@ function addEventListeners(printer) {
         if (typeof printer.connectionOptions !== "undefined") {
           data = {
             command: "connect",
-            port: printer.connectionOptions.portPreference,
-            baudrate: parseInt(printer.connectionOptions.baudratePreference),
-            printerProfile: printer.connectionOptions.printerProfilePreference,
+            port: printer?.connectionOptions?.portPreference,
+            baudrate: parseInt(printer.connectionOptions?.baudratePreference),
+            printerProfile: printer.connectionOptions?.printerProfilePreference,
           };
         } else {
           UI.createAlert(
@@ -490,9 +490,9 @@ function checkQuickConnectState(printer) {
 
   if (typeof printer.connectionOptions !== "undefined") {
     if (
-      printer.connectionOptions.portPreference === null ||
-      printer.connectionOptions.baudratePreference === null ||
-      printer.connectionOptions.printerProfilePreference === null
+      printer.connectionOptions?.portPreference === null ||
+      printer.connectionOptions?.baudratePreference === null ||
+      printer.connectionOptions?.printerProfilePreference === null
     ) {
       document.getElementById(
         "printerQuickConnect-" + printer._id
