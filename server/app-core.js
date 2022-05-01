@@ -58,6 +58,8 @@ function setupExpressServer() {
 
   const viewsPath = getViewsPath();
 
+  //TODO move this back to local builds... no point adding remote dependency for client...
+
   if (process.env.NODE_ENV === "production") {
     const { getOctoFarmUiPath } = require("@notexpectedyet/octofarm-client");
     const bundlePath = getOctoFarmUiPath();
@@ -171,7 +173,11 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS) {
       TaskManager.registerJobOrTask(task);
     }
-    await optionalInfluxDatabaseSetup();
+    try {
+      await optionalInfluxDatabaseSetup();
+    } catch (e) {
+      logger.error("Couldn't setup influx database connection...", e.toString());
+    }
   }
 
   serveOctoFarmRoutes(app);
