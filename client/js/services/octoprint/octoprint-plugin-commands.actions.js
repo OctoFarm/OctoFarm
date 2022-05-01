@@ -117,8 +117,6 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
 }
 
 export async function octoPrintPluginInstallAction(printer, plugin, action) {
-  let cleanAction = JSON.stringify(action.charAt(0).toUpperCase() + action.slice(1));
-
   if (printer.printerState.colour.category !== "Active") {
       let postData = {};
       if (action === "install") {
@@ -135,6 +133,14 @@ export async function octoPrintPluginInstallAction(printer, plugin, action) {
       }
 
       const post = await OctoPrintClient.post(printer, "plugin/pluginmanager", postData);
+
+      const body = {
+        action: `OctoPrint: ${postData.command}`,
+        opts: postData,
+        status: post.status
+      }
+      await OctoFarmClient.updateUserActionsLog(printer._id, body)
+
       if (post.status === 409) {
         return {
           status: bulkActionsStates.ERROR,

@@ -367,10 +367,9 @@ class PrinterManagerService {
     const printerList = getPrinterStoreCache().listPrintersInformation();
     logger.debug(printerList.length + " checking for any octoprint updates");
     for (let printer of printerList) {
-      if(printer.printerState.colour.category !== CATEGORIES.OFFLINE){
+      if (printer.printerState.colour.category !== CATEGORIES.OFFLINE) {
         await getPrinterStoreCache().checkOctoPrintForUpdates(printer._id);
       }
-
     }
   }
 
