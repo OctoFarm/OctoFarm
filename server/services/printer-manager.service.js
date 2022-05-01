@@ -131,7 +131,11 @@ class PrinterManagerService {
     for (const printer of printersList) {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
-      if (!disabled && category !== "Offline" && category !== "Searching...") {
+      if (
+        !disabled &&
+        category !== "Offline" &&
+        category !== "Searching..."
+      ) {
         printer.ping();
       }
     }
@@ -378,24 +382,15 @@ class PrinterManagerService {
 
   async generatePrintersControlDropList() {
     const printersInformation = getPrinterStoreCache().listPrintersInformation();
+    const printerControlList = [];
     printersInformation.forEach((sortedPrinter) => {
-      const printerIndex = findIndex(this.#printerControlList, function (o) {
-        return o.printerName === sortedPrinter.printerName;
+      printerControlList.push({
+        printerName: sortedPrinter.printerName,
+        printerID: sortedPrinter._id,
+        state: sortedPrinter.printerState.colour
       });
-      if (printerIndex !== -1) {
-        this.#printerControlList[printerIndex] = {
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        };
-      } else {
-        this.#printerControlList.push({
-          printerName: sortedPrinter.printerName,
-          printerID: sortedPrinter._id,
-          state: sortedPrinter.printerState.colour
-        });
-      }
     });
+    this.#printerControlList = printerControlList;
   }
 
   getPrinterControlList() {

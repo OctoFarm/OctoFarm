@@ -134,10 +134,6 @@ const PING_PONG_CHECK = async () => {
   await getPrinterManagerCache().websocketKeepAlive();
 };
 
-const GET_LAST_100_ACTIONS = async () => {
-  await getLast100ActionsFromDatabase();
-}
-
 /**
  * @param task
  * @param preset
@@ -179,7 +175,7 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(START_PRINTER_ADD_QUEUE, TaskPresets.RUNONCE),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
-    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_60000MS)
+    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS)
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }

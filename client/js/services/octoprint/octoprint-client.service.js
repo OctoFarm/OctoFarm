@@ -234,7 +234,7 @@ export default class OctoPrintClient {
         print: false
       };
 
-      await printStartSequence(printer._id);
+      await printStartSequence(printer);
 
       const post = await OctoPrintClient.post(printer, encodeURIComponent(url), opt);
 
@@ -252,7 +252,7 @@ export default class OctoPrintClient {
         command: "select",
         print: true
       };
-      await printStartSequence(printer._id);
+      await printStartSequence(printer);
 
       const post = await OctoPrintClient.post(printer, encodeURIComponent(url), opt);
 
@@ -334,14 +334,16 @@ export default class OctoPrintClient {
       filamentCheck = checkSettings.filament.filamentCheck;
     }
 
-    let printerCheck = false;
+    let printerSpoolCheck = false;
     if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-      printerCheck = printer.selectedFilament.some(function (e) {
-        return e !== null
-      });
+      for(const element of printer.selectedFilament) {
+        if (element === null){
+          printerSpoolCheck = true;
+        }
+      }
     }
 
-    if (filamentCheck && !printerCheck && opts.command === "start") {
+    if (filamentCheck && printerSpoolCheck && opts.command === "start") {
       bootbox.confirm({
         message:
           "You have spools in the inventory, but none selected. Would you like to select a spool?",
@@ -357,7 +359,7 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            await printStartSequence(printer._id);
+            await printStartSequence(printer);
             const { status } = await OctoPrintClient.post(printer, "job", opts);
             const body = {
               action: `Print: ${opts.command}`,
@@ -370,7 +372,7 @@ export default class OctoPrintClient {
         }
       });
     } else {
-      await printStartSequence(printer._id);
+      await printStartSequence(printer);
       const post = await OctoPrintClient.post(printer, "job", opts);
 
       const body = {

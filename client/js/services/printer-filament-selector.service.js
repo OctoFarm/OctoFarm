@@ -63,15 +63,15 @@ export async function returnDropDownList() {
 }
 
 export async function fillMiniFilamentDropDownList(element, printer, toolIndex) {
-    await redrawMiniFilamentDropDownList(element, printer)
+    await redrawMiniFilamentDropDownList(element, printer, toolIndex)
     element.addEventListener("change", async (event) => {
         await selectFilament([`${printer._id}-${toolIndex}`], event.target.value);
-        await redrawMiniFilamentDropDownList(element, printer)
+        await redrawMiniFilamentDropDownList(element, printer, toolIndex)
 
     });
 }
 
-async function redrawMiniFilamentDropDownList (element, printer){
+async function redrawMiniFilamentDropDownList (element, printer, toolIndex){
     element.innerHTML = "";
     const filamentDropDown = await returnDropDownList();
     const { allowMultiSelectIsEnabled } = await isFilamentManagerPluginSyncEnabled();
@@ -83,15 +83,13 @@ async function redrawMiniFilamentDropDownList (element, printer){
     const { _id: printerID } = printer;
     const selectedFilament = await OctoFarmClient.getSelectedFilament(printerID);
     if (Array.isArray(selectedFilament) && selectedFilament.length !== 0) {
-        for (const spool of selectedFilament) {
-            if (!!spool) {
-                element.value = spool._id;
-            }
+        if(!!selectedFilament[toolIndex]){
+            element.value = selectedFilament[toolIndex]._id
         }
     }
 }
 
-async function redrawFilamentDropDownList (element, printer){
+async function redrawFilamentDropDownList (element, printer, toolIndex){
     element.innerHTML = "";
     const filamentDropDown = await returnDropDownList();
     const { allowMultiSelectIsEnabled } = await isFilamentManagerPluginSyncEnabled();
@@ -103,10 +101,8 @@ async function redrawFilamentDropDownList (element, printer){
     const { _id: printerID } = printer;
     const selectedFilament = await OctoFarmClient.getSelectedFilament(printerID);
     if (Array.isArray(selectedFilament) && selectedFilament.length !== 0) {
-        for (const spool of selectedFilament) {
-            if (!!spool) {
-                element.value = spool._id;
-            }
+        if(!!selectedFilament[toolIndex]){
+            element.value = selectedFilament[toolIndex]._id
         }
     }
 }
@@ -127,9 +123,9 @@ export async function drawHistoryDropDown (element, selectedID){
 }
 
 export async function fillFilamentDropDownList(element, printer, toolIndex) {
-    await redrawFilamentDropDownList(element, printer)
+    await redrawFilamentDropDownList(element, printer, toolIndex)
     element.addEventListener("change", async (event) => {
         await selectFilament([`${printer._id}-${toolIndex}`], event.target.value);
-        await redrawFilamentDropDownList(element, printer)
+        await redrawFilamentDropDownList(element, printer, toolIndex)
     });
 }
