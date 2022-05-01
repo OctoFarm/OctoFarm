@@ -131,11 +131,7 @@ class PrinterManagerService {
     for (const printer of printersList) {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
-      if (
-        !disabled &&
-        category !== "Offline" &&
-        category !== "Searching..."
-      ) {
+      if (!disabled && category !== "Offline" && category !== "Searching...") {
         printer.ping();
       }
     }
@@ -368,13 +364,11 @@ class PrinterManagerService {
   }
 
   async checkForOctoPrintUpdates() {
-    const printerList = getPrinterStoreCache().listPrinters();
+    const printerList = getPrinterStoreCache().listPrintersInformation();
     logger.debug(printerList.length + " checking for any octoprint updates");
     for (let printer of printerList) {
-      await printer.acquireOctoPrintUpdatesData(true);
-      await printer.acquireOctoPrintPluginsListData(true);
-      if(Object.keys(printer.octoPi).length !== 0){
-        await printer.acquireOctoPrintPiPluginData(true);
+      if(printer.printerState.colour.category !== CATEGORIES.OFFLINE){
+        await getPrinterStoreCache().checkOctoPrintForUpdates(printer._id);
       }
 
     }

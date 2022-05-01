@@ -567,4 +567,16 @@ router.post(
   }
 );
 
+router.post(
+  "/rescanOctoPrintUpdates/:id",
+  ensureAuthenticated,
+  ensureAdministrator,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    await getPrinterStoreCache().checkOctoPrintForUpdates(printerID);
+    res.sendStatus(204);
+  }
+);
+
 module.exports = router;

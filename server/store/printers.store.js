@@ -172,6 +172,15 @@ class PrinterStore {
     return this.#printersList.push(printer);
   }
 
+  async checkOctoPrintForUpdates(id) {
+    const printer = this.#findMePrinter(id);
+    await printer.acquireOctoPrintUpdatesData(true);
+    await printer.acquireOctoPrintPluginsListData(true);
+    if (Object.keys(printer.octoPi).length !== 0) {
+      await printer.acquireOctoPrintPiPluginData(true);
+    }
+  }
+
   async updateLatestOctoPrintSettings(id, force = false) {
     const printer = this.#findMePrinter(id);
     if (!printer.disabled && printer.printerState.state !== "Offline") {
@@ -1321,7 +1330,7 @@ class PrinterStore {
     this.updatePrinterDatabase(id, { activeControlUser });
   }
 
-  resetActiveControlUser(id){
+  resetActiveControlUser(id) {
     this.updatePrinterDatabase(id, { activeControlUser: "" });
   }
 }

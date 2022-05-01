@@ -116,18 +116,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
   }
 }
 
-export async function octoPrintPluginInstallAction(printer, pluginList, action) {
+export async function octoPrintPluginInstallAction(printer, plugin, action) {
   let cleanAction = JSON.stringify(action.charAt(0).toUpperCase() + action.slice(1));
-  if (action === "install") {
-    cleanAction = cleanAction + "ing";
-  }
 
   if (printer.printerState.colour.category !== "Active") {
-    for (const plugin of pluginList) {
-      let alert = UI.createAlert(
-        "warning",
-        `${printer.printerName}: ${cleanAction} - ${plugin}<br>Do not navigate away from this screen!`
-      );
       let postData = {};
       if (action === "install") {
         postData = {
@@ -143,13 +135,17 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
       }
 
       const post = await OctoPrintClient.post(printer, "plugin/pluginmanager", postData);
-      alert.close();
       if (post.status === 409) {
         return {
           status: bulkActionsStates.ERROR,
           message: "OctoPrint reported a conflict when dealing with the request! are you printing?"
         };
-      } else if (post.status === 400) {
+      } else if (post.status === 404) {
+        return {
+          status: bulkActionsStates.ERROR,
+          message: `OctoPrint did not ${action} the ${plugin}, could not find plugin...`
+        };
+      }  else if (post.status === 400) {
         return {
           status: bulkActionsStates.ERROR,
           message: `OctoPrint did not action the request, please open an issue! Error in data: ${postData}`
@@ -160,21 +156,20 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
         if (response.needs_restart || response.needs_refresh) {
           return {
             status: bulkActionsStates.WARNING,
-            message: "Your plugins we're installed successfully! Restart is required!"
+            message: `Your ${action} of ${ plugin } was successful! Restart is required!`
           };
         } else if (response.in_progress) {
           return {
             status: bulkActionsStates.SUCCESS,
-            message: "Your install was actioned, please check the connection log for status!"
+            message: `Your ${action} of ${ plugin } was actioned, please check the connection log for status!`
           };
         } else {
           return {
             status: bulkActionsStates.SUCCESS,
-            message: "Your plugins we're installed successfully! No restart required."
+            message: `Your ${ action } of ${ plugin } was successful! No restart required.`
           };
         }
       }
-    }
   } else {
     return {
       status: bulkActionsStates.SKIPPED,

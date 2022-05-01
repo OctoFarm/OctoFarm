@@ -1075,7 +1075,7 @@ export async function bulkOctoPrintGcodeCommand() {
 export async function bulkOctoPrintPluginAction(action) {
   const printersForPluginAction = await getCurrentlySelectedPrinterList();
   try {
-    let pluginList = [];
+    const pluginList = [];
     if (action === "install") {
       const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
       pluginRepositoryList.forEach((plugin) => {
@@ -1119,18 +1119,18 @@ export async function bulkOctoPrintPluginAction(action) {
       }
     }
 
-    pluginList = _.sortBy(pluginList, [
+    const sortedPluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
       }
     ]);
 
-    pluginList = _.uniqBy(pluginList, function (e) {
+    const uniquePluginList = _.uniqBy(sortedPluginList, function (e) {
       return e.text;
     });
 
     //Install Promt
-    if(pluginList.length === 0){
+    if(uniquePluginList.length === 0){
       UI.createAlert("info", `You don't have any plugins to ${action}`, "clicked", 4000)
     }else{
       bootbox.prompt({
@@ -1145,27 +1145,34 @@ export async function bulkOctoPrintPluginAction(action) {
                 </form>`,
         inputType: "checkbox",
         multiple: true,
-        inputOptions: pluginList,
+        inputOptions: uniquePluginList,
         scrollable: true,
         onShow: function (e) {
           setupPluginSearch();
         },
         callback: async function (result) {
-          if (result) {
+          if (!!result && result.length !== 0) {
             const pluginAmount = result.length * printersForPluginAction.length;
             showBulkActionsModal();
             updateBulkActionsProgress(0, pluginAmount);
             generateTableRows(printersForPluginAction);
-            for (let p = 0; p < printersForPluginAction.length; p++) {
-              const response = await octoPrintPluginInstallAction(
-                  printersForPluginAction[p],
-                  result,
-                  action
-              );
-              updateTableRow(printersForPluginAction[p]._id, response.status, response.message);
-              updateBulkActionsProgress(p, pluginAmount);
+            let count = 0;
+            for (const printer of printersForPluginAction) {
+              for(const plugin of result) {
+                const response = await octoPrintPluginInstallAction(
+                    printer,
+                    plugin,
+                    action
+                );
+                updateTableRow(printer._id, response.status, response.message);
+                updateBulkActionsProgress(count, pluginAmount);
+                count++
+              }
+              await OctoFarmClient.post("printers/rescanOctoPrintUpdates/"+printer._id);
             }
-            updateBulkActionsProgress(printersForPluginAction.length, pluginAmount);
+            updateBulkActionsProgress(pluginAmount, pluginAmount);
+          }else{
+            UI.createAlert("warning", "No plugins we're selected to install... please select some plugins", 3000, "Clicked")
           }
         }
       });
