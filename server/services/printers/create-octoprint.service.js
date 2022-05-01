@@ -837,8 +837,8 @@ class OctoPrintPrinter {
       }
     } else {
       // Hard failure as can't setup websocket
-      logger.error("API key is global... cannot connect...");
-      this.#apiPrinterTickerWrap("API key is global API key", "Offline");
+      logger.error("Failed to detect API key for global check! Failing as offline");
+      this.#apiPrinterTickerWrap("Failed to detect API key for global check! Failing as offline", "Offline");
       return false;
     }
   }

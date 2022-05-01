@@ -17,6 +17,9 @@ ssdp.on("DeviceFound", (res) => {
     })
       .then((response) => response.text())
       .then((data) => {
+        if(data === "status=ok"){
+          return;
+        }
         parseString(data, function (err, result) {
           if (err) {
             logger.error(err);
@@ -36,6 +39,7 @@ ssdp.on("DeviceFound", (res) => {
                 let url = result.root.device[0].presentationURL[0];
                 url = url.substring(0, url.length - 1);
                 let name = result.root.device[0].friendlyName[0];
+
                 if (!name.includes("on")) {
                   name = name.match(/(?:"[^"]*"|^[^"]*$)/)[0].replace(/"/g, "");
                 } else {
