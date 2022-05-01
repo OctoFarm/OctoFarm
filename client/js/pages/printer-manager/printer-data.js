@@ -445,7 +445,8 @@ function updatePrinterRow(printer) {
 
       corsWarningCheck(printer);
 
-      checkIfPrinterHasEvents(printer);
+      //TODO make this work with ALL registered events, and only when the even is registered...
+      //checkIfPrinterHasEvents(printer);
 
       checkIfUnderVoltagedPi(printer);
 
