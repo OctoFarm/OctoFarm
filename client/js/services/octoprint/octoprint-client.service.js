@@ -3,6 +3,7 @@ import OctoFarmClient from "../octofarm-client.service";
 import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
 import {ApplicationError} from "../../exceptions/application-error.handler";
 import { printActionStatusResponse } from "./octoprint.helpers-commands.actions"
+import {printStartSequence} from "./octoprint-helpers.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -232,10 +233,8 @@ export default class OctoPrintClient {
         command: "select",
         print: false
       };
-      await OctoPrintClient.updateFeedAndFlow(printer);
-      await OctoPrintClient.updateFilamentOffsets(printer);
-      await OctoPrintClient.updateBedOffsets(printer);
-      await OctoFarmClient.updateActiveControlUser(printer._id);
+
+      await printStartSequence(printer._id);
 
       const post = await OctoPrintClient.post(printer, encodeURIComponent(url), opt);
 
@@ -253,10 +252,7 @@ export default class OctoPrintClient {
         command: "select",
         print: true
       };
-      await OctoPrintClient.updateFeedAndFlow(printer);
-      await OctoPrintClient.updateFilamentOffsets(printer);
-      await OctoPrintClient.updateBedOffsets(printer);
-      await OctoFarmClient.updateActiveControlUser(printer._id);
+      await printStartSequence(printer._id);
 
       const post = await OctoPrintClient.post(printer, encodeURIComponent(url), opt);
 
@@ -345,13 +341,6 @@ export default class OctoPrintClient {
       });
     }
 
-
-    if (opts.command === "start") {
-      await OctoPrintClient.updateFeedAndFlow(printer);
-      await OctoPrintClient.updateFilamentOffsets(printer);
-      await OctoPrintClient.updateBedOffsets(printer);
-    }
-
     if (filamentCheck && !printerCheck && opts.command === "start") {
       bootbox.confirm({
         message:
@@ -368,7 +357,7 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            await OctoFarmClient.updateActiveControlUser(printer._id);
+            await printStartSequence(printer._id);
             const { status } = await OctoPrintClient.post(printer, "job", opts);
             const body = {
               action: `Print: ${opts.command}`,
@@ -381,6 +370,7 @@ export default class OctoPrintClient {
         }
       });
     } else {
+      await printStartSequence(printer._id);
       const post = await OctoPrintClient.post(printer, "job", opts);
 
       const body = {
@@ -389,8 +379,6 @@ export default class OctoPrintClient {
         status: post.status
       }
       await OctoFarmClient.updateUserActionsLog(printer._id, body)
-
-      await OctoFarmClient.updateActiveControlUser(printer._id);
 
       return post;
     }
