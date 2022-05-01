@@ -203,12 +203,11 @@ export async function bulkDisablePrinters() {
   generateTableRows(printersToControl);
   for (let p = 0; p < printersToControl.length; p++) {
     await OctoFarmClient.disablePrinter([printersToControl[p]._id]);
-    const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
     const disableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
-    printerCard.classList = "printerDisabled";
-    disableButton.classList = "btn btn-outline-light btn-sm";
-    disableButton.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disabled";
-    disableButton.title = "Printer is Disabled, click to enable";
+    const e = {
+      target: disableButton
+    }
+    UI.togglePrinterDisableState(e)
     updateTableRow(printersToControl[p]._id, "success", "Successfully Disabled your printer!");
     updateBulkActionsProgress(p, printersToControl.length);
   }
@@ -222,12 +221,11 @@ export async function bulkEnablePrinters(disabled) {
     generateTableRows(printersToControl);
     for (let p = 0; p < printersToControl.length; p++) {
       await OctoFarmClient.enablePrinter([printersToControl[p]._id]);
-      const printerCard = document.getElementById(`printerCard-${printersToControl[p]._id}`);
       const enableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
-      enableButton.classList = "btn btn-outline-success btn-sm";
-      enableButton.innerHTML = "<i class=\"fas fa-running\"></i> Enabled";
-      enableButton.title = "Printer is Enabled, click to disable";
-      printerCard.classList = "";
+      const e = {
+        target: enableButton
+      }
+      UI.togglePrinterDisableState(e)
       updateTableRow(printersToControl[p]._id, "success", "Successfully Enabled your printer!");
       updateBulkActionsProgress(p, printersToControl.length);
     }
