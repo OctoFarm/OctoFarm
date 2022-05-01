@@ -1,10 +1,10 @@
-import Calc from "../utils/calc.js";
-import OctoFarmClient from "./octofarm-client.service";
-import OctoPrintClient from "./octoprint/octoprint-client.service.js";
+import Calc from "../../../utils/calc.js";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import OctoPrintClient from "../../../services/octoprint/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
-import UI from "../utils/ui"
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
+import UI from "../../../utils/ui"
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
 
 let chart = null;
 let eventListener = false;

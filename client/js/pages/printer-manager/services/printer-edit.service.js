@@ -1,5 +1,5 @@
-import UI from "../utils/ui";
-import OctoFarmClient from "./octofarm-client.service";
+import UI from "../../../utils/ui";
+import OctoFarmClient from "../../../services/octofarm-client.service";
 
 export default class PrinterEditService {
     static pageElements;
@@ -94,6 +94,12 @@ export default class PrinterEditService {
         const printerAPIKEYElement = document.getElementById("psAPIKEY");
         printerAPIKEYElement.value = "";
         printerAPIKEYElement.placeholder = currentPrinter.apikey;
+
+        const printerGroupElement = document.getElementById("psPrinterGroup");
+        printerGroupElement.value = "";
+        printerGroupElement.placeholder = currentPrinter.group;
+
+        UI.addSelectListeners("ps");
     }
     static grabPageElements() {
         if (!PrinterEditService.pageElements) {
@@ -127,13 +133,14 @@ export default class PrinterEditService {
     }
     static getPageValues(){
         return {
-            printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
+                printerName: UI.getValueOrPlaceHolder(document.getElementById("psPrinterName")),
                 printerURL: UI.getValueOrPlaceHolder(document.getElementById("psPrinterURL")),
                 webSocketProtocol: UI.getValueOrPlaceHolder(document.getElementById("psWebSocketProtocol")),
                 index: PrinterEditService.currentPrinter._id,
                 cameraURL: UI.getValueOrPlaceHolder(document.getElementById("psCamURL")),
                 apikey: UI.getValueOrPlaceHolder(document.getElementById("psAPIKEY")),
-                currentUser: UI.getValueOrPlaceHolder(document.getElementById("psOctoPrintUser"))
+                currentUser: UI.getValueOrPlaceHolder(document.getElementById("psOctoPrintUser")),
+                group: UI.getValueOrPlaceHolder(document.getElementById("psPrinterGroup"))
         }
     }
 }

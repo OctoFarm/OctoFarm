@@ -12,11 +12,11 @@ import {
 } from "../../services/octoprint/octoprint-client-commands.actions";
 import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands.actions";
 import UI from "../../utils/ui.js";
-import PrinterLogsService from "../../services/printer-logs.service.js";
-import PrinterStatisticsService from "../../services/printer-statistics.service"
-import PrinterEditService from "../../services/printer-edit.service";
+import PrinterLogsService from "./services/printer-logs.service.js";
+import PrinterStatisticsService from "./services/printer-statistics.service"
+import PrinterEditService from "./services/printer-edit.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
-import { updatePrinterSettingsModal } from "../../services/printer-settings.service";
+import { updatePrinterSettingsModal } from "./services/printer-settings.service";
 import {
   loadPrinterHealthChecks,
   reSyncAPI,

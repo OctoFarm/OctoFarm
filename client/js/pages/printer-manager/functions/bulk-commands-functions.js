@@ -2,7 +2,7 @@ import {findIndex} from "lodash";
 
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import UI from "../../../utils/ui";
-import PrinterSelectionService from "../../../services/printer-selection.service";
+import PrinterSelectionService from "../services/printer-selection.service";
 import {
   octoPrintPluginInstallAction,
   updateOctoPrintPlugins

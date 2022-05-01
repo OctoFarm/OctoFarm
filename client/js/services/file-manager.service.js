@@ -4,7 +4,7 @@ import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
 import { dragAndDropEnableMultiplePrinters } from "../utils/dragAndDrop.js";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
-import PrinterSelectionService from "./printer-selection.service.js";
+import PrinterSelectionService from "../pages/printer-manager/services/printer-selection.service.js";
 import OctoFarmClient from "./octofarm-client.service";
 import {
   generateTableRows,

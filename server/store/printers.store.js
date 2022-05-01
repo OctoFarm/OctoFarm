@@ -551,7 +551,7 @@ class PrinterStore {
 
   async editPrinterConnectionSettings(settings) {
     const { printer } = settings;
-    const { printerName, printerURL, cameraURL, apikey, currentUser, index } = printer;
+    const { printerName, printerURL, cameraURL, apikey, currentUser, index, group } = printer;
 
     const originalPrinter = this.#findMePrinter(index);
 
@@ -562,15 +562,16 @@ class PrinterStore {
       this.resetConnectionInformation([index]);
     }
 
+    const newPrinterName = { name: printerName };
+
     // Deal with OctoFarm connection information updates
     const octoFarmConnectionSettings = {
       _id: index,
-      settingsAppearance: {
-        name: printerName
-      },
+      settingsAppearance: [...newPrinterName],
       printerURL: printerURL,
       camURL: cameraURL,
-      apikey: apikey
+      apikey: apikey,
+      group: group
     };
 
     // Update OctoFarms data

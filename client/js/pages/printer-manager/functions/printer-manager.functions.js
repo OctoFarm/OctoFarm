@@ -5,10 +5,10 @@ import {
 } from "../log-tickers.functions";
 import {createOrUpdatePrinterTableRow} from "../printer-data";
 import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
-import {updatePrinterSettingsModal} from "../../../services/printer-settings.service";
+import {updatePrinterSettingsModal} from "../services/printer-settings.service";
 import Validate from "../../../utils/validate";
 import {PrintersManagement} from "../printer-constructor";
-import PrinterSelectionService from "../../../services/printer-selection.service";
+import PrinterSelectionService from "../services/printer-selection.service";
 import FileOperations from "../../../utils/file";
 import {createPrinterAddInstructions} from "../templates/printer-add-instructions.template";
 import PrinterFileManagerService from "../../monitoring/services/printer-file-manager.service";

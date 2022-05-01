@@ -1,5 +1,5 @@
-import OctoFarmClient from "./octofarm-client.service";
-import UI from "../utils/ui.js";
+import OctoFarmClient from "../../../services/octofarm-client.service";
+import UI from "../../../utils/ui.js";
 
 const showFullList = ["Edit Printers", "Printer Deletion"]
 

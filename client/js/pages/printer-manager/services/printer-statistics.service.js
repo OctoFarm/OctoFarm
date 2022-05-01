@@ -1,5 +1,5 @@
-import Calc from "../utils/calc";
-import OctoFarmClient from "./octofarm-client.service";
+import Calc from "../../../utils/calc";
+import OctoFarmClient from "../../../services/octofarm-client.service";
 import ApexCharts from "apexcharts";
 
 let historyBarChart = false;

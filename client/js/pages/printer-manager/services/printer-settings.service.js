@@ -1,10 +1,10 @@
-import OctoFarmClient from "./octofarm-client.service.js";
-import UI from "../utils/ui.js";
-import Calc from "../utils/calc.js";
-import Script from "./octofarm-scripts.service.js";
-import {ApplicationError} from "../exceptions/application-error.handler";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import "../utils/cleanup-modals.util"
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
+import UI from "../../../utils/ui.js";
+import Calc from "../../../utils/calc.js";
+import Script from "../../../services/octofarm-scripts.service.js";
+import {ApplicationError} from "../../../exceptions/application-error.handler";
+import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
+import "../../../utils/cleanup-modals.util"
 
 let currentPrinterIndex;
 let printerOnline;
