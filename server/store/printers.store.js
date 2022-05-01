@@ -567,7 +567,7 @@ class PrinterStore {
     // Deal with OctoFarm connection information updates
     const octoFarmConnectionSettings = {
       _id: index,
-      settingsAppearance: [...newPrinterName],
+      settingsAppearance: { ...newPrinterName },
       printerURL: printerURL,
       camURL: cameraURL,
       apikey: apikey,

@@ -99,7 +99,6 @@ class WebSocketClient {
     });
 
     this.#instance.on("pong", () => {
-      console.log("RECEIVED PONG")
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
       logger.debug(this.url + " received pong message from server");
       clearTimeout(this.#heartbeatTerminate);

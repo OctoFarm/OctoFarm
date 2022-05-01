@@ -330,9 +330,9 @@ export default class UI {
   }
 
   static getValueOrPlaceHolder(element) {
-    if (element) {
+    if (!!element) {
       if (element.value === "") {
-        return undefined;
+        return element.placeholder;
       } else {
         return element.value;
       }
