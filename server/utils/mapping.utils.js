@@ -58,10 +58,10 @@ const cloneObject = function (object) {
 };
 
 const convertStatusToColour = function (status) {
-  if (status > 100 && status < 199) return "Info";
-  if (status > 200 && status < 299) return "Complete";
-  if (status > 300 && status < 399) return "Warning";
-  if (status > 400 && status < 599) return "Offline";
+  if (status >= 100 && status <= 199) return "Info";
+  if (status >= 200 && status <= 299) return "Complete";
+  if (status >= 300 && status <= 399) return "Warning";
+  if (status >= 400 && status <= 599) return "Offline";
   return "Offline";
 };
 

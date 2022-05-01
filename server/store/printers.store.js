@@ -1042,7 +1042,9 @@ class PrinterStore {
 
   async getNewSessionKey(id) {
     const printer = this.#findMePrinter(id);
-    return printer.getSessionkey();
+    const sessionKey = await printer.getSessionkey();
+    await printer.acquireOctoPrintUpdatesData(true);
+    return sessionKey;
   }
 
   getOctoPrintResourceMonitorValues(id) {

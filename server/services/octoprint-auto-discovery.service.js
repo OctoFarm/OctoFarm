@@ -69,7 +69,7 @@ let searchForDevicesOnNetwork = async function () {
       }, 20001);
     });
   }
-  return await x();
+  return x();
 };
 
 module.exports = {

@@ -84,17 +84,25 @@ export async function bulkOctoPrintPluginUpdate() {
     let message = "";
     const toUpdate = [];
     const pluginList = [];
+    const displayNameList = [];
+
     for (const currentPrinter of currentPrinterList) {
       if (currentPrinter?.octoPrintPluginUpdates?.length > 0) {
-        message += currentPrinter.printerName + "<br>";
+        message += `<b>${currentPrinter.printerName}</b><br>`;
         toUpdate.push({
           _id: currentPrinter._id,
           printerURL: currentPrinter.printerURL,
           printerName: currentPrinter.printerName,
           apikey: currentPrinter.apikey
         });
+        let count = 0
         for (const plugin of currentPrinter.octoPrintPluginUpdates) {
+          const n = plugin.releaseNotesURL.lastIndexOf('/');
+          const version = plugin.releaseNotesURL.substring(n + 1)
+          message += `<b>${count}.</b> ${plugin.displayName} - Current: ${plugin.displayVersion} - Latest: ${version} <br>`
           pluginList.push(plugin.id);
+          displayNameList.push(plugin.displayName)
+          count++
         }
       }
     }
@@ -113,7 +121,7 @@ export async function bulkOctoPrintPluginUpdate() {
           updateBulkActionsProgress(0, toUpdate.length);
           generateTableRows(toUpdate);
           for (let i = 0; i < toUpdate.length; i++) {
-            const response = await updateOctoPrintPlugins(pluginList, toUpdate[i]);
+            const response = await updateOctoPrintPlugins(pluginList, toUpdate[i], displayNameList);
             updateTableRow(toUpdate[i]._id, response.status, response.message);
             updateBulkActionsProgress(i, toUpdate.length);
           }

@@ -19,7 +19,6 @@ const updateUserActionLog = (
     return;
   }
   const today = new Date();
-
   const formatAction = {
     printerID,
     action,

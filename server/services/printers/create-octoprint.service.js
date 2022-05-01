@@ -1327,10 +1327,11 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring OctoPrint updates data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, "warning");
     if (
+      force ||
       !this?.octoPrintUpdate ||
       !this?.octoPrintPluginUpdates ||
-      this?.octoPrintPluginUpdates.length === 0 ||
-      force
+      this?.octoPrintPluginUpdates.length === 0
+
     ) {
       const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch((e) => {
         logger.http("Failed Aquire updates data", e);

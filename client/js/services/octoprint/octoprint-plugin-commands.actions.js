@@ -15,12 +15,16 @@ async function updateBtnOnClick(printerID) {
 
     let pluginsToUpdate = [];
     let autoSelect = [];
+    const displayNameList = [];
     if (printer.octoPrintPluginUpdates.length > 0) {
       printer.octoPrintPluginUpdates.forEach((plugin) => {
+        const n = plugin.releaseNotesURL.lastIndexOf('/');
+        const version = plugin.releaseNotesURL.substring(n + 1)
         pluginsToUpdate.push({
-          text: `${plugin.displayName} - Version: ${plugin.displayVersion}`,
+          text: `${plugin.displayName} - Update to ${version}`,
           value: plugin.id
         });
+        displayNameList.push(plugin.displayName)
         autoSelect.push(plugin.id);
       });
       bootbox.prompt({
@@ -31,7 +35,15 @@ async function updateBtnOnClick(printerID) {
         inputOptions: pluginsToUpdate,
         callback: async function (result) {
           if (result && result.length > 0) {
-            await updateOctoPrintPlugins(result, printer);
+            const pluginUpdate = await updateOctoPrintPlugins(result, printer, displayNameList);
+            if(pluginUpdate.status === bulkActionsStates.SUCCESS){
+              UI.createAlert("success", "Updates successfully fired! Please check results in Connection Log.", 3000, "Clicked");
+              UI.createAlert("warning", "OctoPrint will restart itself when complete...", 3000, "Clicked")
+
+              await OctoFarmClient.post("printers/rescanOctoPrintUpdates/"+printer._id);
+            }else{
+              UI.createAlert("danger", "Updates failed to fire, manual intervention required!", 3000, "Clicked")
+            }
           }
         }
       });
@@ -54,64 +66,44 @@ export function setupUpdateOctoPrintPluginsBtn(printer) {
   }
 }
 
-export async function updateOctoPrintPlugins(pluginList, printer) {
+export async function updateOctoPrintPlugins(pluginList, printer, displayNameList) {
   const data = {
     targets: pluginList,
-    force: true
   };
+
+  let pluginListMessage = "";
+
   let updateRequest = await OctoPrintClient.postNOAPI(
     printer,
     "plugin/softwareupdate/update",
     data
   );
+
+  const body = {
+    action: "OctoPrint: Update Plugins",
+    opts: data,
+    status: updateRequest.status
+  }
+
+  await OctoFarmClient.updateUserActionsLog(printer._id, body)
+
   if (updateRequest.status === 200) {
-    UI.createAlert(
-      "success",
-      `${printer.printerName}: Successfully updated! your instance will restart now.`,
-      3000,
-      "Clicked"
-    );
-    let post = await OctoPrintClient.systemNoConfirm(printer, "restart");
-    if (typeof post !== "undefined") {
-      if (post.status === 204) {
-        return {
-          status: bulkActionsStates.SUCCESS,
-          message: "Update command fired and instance restart start command sent!"
-        };
-      } else {
-        UI.createAlert(
-          "error",
-          `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
-        return {
-          status: bulkActionsStates.WARNING,
-          message: "Update command fired, but unable to restart instance, please do this manually!"
-        };
-      }
-    } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
-      return {
-        status: bulkActionsStates.ERROR,
-        message: "Could not contact OctoPrint, is it online?"
-      };
-    }
+    displayNameList.forEach(plugin => {
+      pluginListMessage += `<i class="fa-solid fa-plug text-success"></i> ${plugin} <br>`
+    })
+
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: `Plugin updates successfully actioned! <br> ${pluginListMessage}`
+    };
   } else {
-    UI.createAlert(
-      "error",
-      `${printer.printerName}: Failed to update, manual intervention required!`,
-      3000,
-      "Clicked"
-    );
+    displayNameList.forEach(plugin => {
+      pluginListMessage += `<i class="fa-solid fa-plug text-danger"></i> ${plugin} <br>`
+    })
+
     return {
       status: bulkActionsStates.ERROR,
-      message: "Failed to update, manual intervention required!"
+      message: `Failed to update plugins, manual intervention required! <br> ${pluginListMessage}`
     };
   }
 }
