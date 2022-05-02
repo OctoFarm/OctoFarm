@@ -79,6 +79,7 @@ export default class OctoFarmClient {
   static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
   static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
   static printerStepChangeRoute = this.printerRoute + "/stepChange";
+  static forceReconnectRoute = this.printerRoute + "/forceReconnect";
   static serverSettingsRoute = "/settings/server";
   static clientSettingsRoute = "/settings/client";
   static filamentRoute = `/filament`;
@@ -115,6 +116,13 @@ export default class OctoFarmClient {
 
   static async getPrinterName(){
     return this.get(this.generatePrinterNameRoute)
+  }
+
+  static async forceReconnect(id){
+    const data = {
+      id
+    }
+    return this.post(this.forceReconnectRoute, data);
   }
 
   static async listPrinters(disabled = false, showFullList = false) {

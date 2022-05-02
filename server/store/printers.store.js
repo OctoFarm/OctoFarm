@@ -560,6 +560,11 @@ class PrinterStore {
     }
   }
 
+  async forceReconnectPrinter(id){
+    const printer = this.#findMePrinter(id)
+    return printer.forceReconnect();
+  }
+
   async editPrinterConnectionSettings(settings) {
     const { printer } = settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index, group } = printer;

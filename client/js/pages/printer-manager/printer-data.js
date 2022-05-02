@@ -492,6 +492,16 @@ export function createOrUpdatePrinterTableRow(printers) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
+      document.getElementById(`printerAPIScanning-${printer._id}`).addEventListener("click", async () => {
+        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
+      });
+
+      document.getElementById(`printerForceReconnect-${printer._id}`).addEventListener("click", async () => {
+        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
+      });
+
       document
           .getElementById(`printerEdit-${printer._id}`)
           .addEventListener("click", async () => {
