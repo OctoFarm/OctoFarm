@@ -3,7 +3,7 @@
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-OctoPrint-API");
+const logger = new Logger("OctoFarm-State");
 
 const ConnectionMonitorService = require("../connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
@@ -17,6 +17,13 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
       "X-Api-Key": apikey
     },
     body: JSON.stringify(bodyData)
+  }).catch(e => {
+    logger.error("Failed to fetch!", e);
+    logger.error("Fetch data string", e.toString());
+    logger.debug("Fetch connection data", {
+      url, method, apikey, bodyData
+    })
+    return e;
   });
 }
 
@@ -40,7 +47,11 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         return res;
       })
       .catch((e) => {
-        logger.error("Failed to fetch", e);
+        logger.error("Failed to fetch timeout!", e);
+        logger.error("Fetch timeout! data string", e.toString());
+        logger.debug("Fetch timeout! connection data", {
+          url, method, apikey, fetchTimeout, bodyData
+        })
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
