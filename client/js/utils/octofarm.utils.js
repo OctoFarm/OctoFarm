@@ -230,6 +230,12 @@ export function isPrinterFullyScanned(printer) {
 
 
 export function printerIsAvailableToView(printer){
+    if(printerIsDisabled(printer)){
+        return false;
+    }
+    if(printerIsSearching(printer)){
+        return false;
+    }
     return !(!isPrinterFullyScanned(printer));
 }
 export function printerIsDisconnectedOrError(printer){
@@ -262,6 +268,16 @@ export function isPrinterInErrorState(printer){
     const category = getPrinterCategory(printer);
 
     return (category.includes("Error") || category.includes("error"))
+}
+
+export function printerIsIdle(printer){
+    if(!printerIsOnline(printer)){
+        return false;
+    }
+
+    const category = getPrinterCategory(printer);
+
+    return (category === "Idle")
 }
 
 export function closePrinterManagerModalIfOffline(printer){

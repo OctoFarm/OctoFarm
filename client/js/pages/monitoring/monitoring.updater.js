@@ -1386,12 +1386,6 @@ export async function initMonitoring(printers, clientSettings, view) {
                   await updateState(printers[p], clientSettings, view, p);
                 }
               }
-              if (powerTimer >= 20000) {
-                //await PrinterPowerService.applyBtn(printers[p]);
-                powerTimer = 0;
-              } else {
-                powerTimer += 500;
-              }
             }
           }
         }

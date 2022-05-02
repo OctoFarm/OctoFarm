@@ -339,9 +339,9 @@ router.post("/reSyncAPI", ensureAuthenticated, ensureAdministrator, async (req, 
   const id = req.body.id;
   const force = req.body.force;
   logger.info(`Rescan ${id ? id : "All"} OctoPrint Requested. Forced: `, { force: force });
-  await getPrinterManagerCache().reScanAPI(id, force);
+  const reScanApi = await getPrinterManagerCache().reScanAPI(id, force);
   logger.info(`Rescan of ${id ? id : "All"} re-scan completed`);
-  res.send({ msg: "Finished API Rescan..." });
+  res.send({ msg: reScanApi });
 });
 router.post("/reSyncSockets", ensureAuthenticated, async (req, res) => {
   const id = req.body.id;

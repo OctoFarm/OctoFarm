@@ -2,7 +2,8 @@ import Calc from "../../../utils/calc";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import ApexCharts from "apexcharts";
 
-let historyBarChart = false;
+let historyBarChart = null;
+let historyPieChart = null;
 
 export default class PrinterStatisticsService{
     static async returnPrinterStatsTemplate(stats) {
@@ -331,8 +332,9 @@ export default class PrinterStatisticsService{
     `;
     }
     static async loadStatistics(id) {
+        historyBarChart = null;
+        historyPieChart = null;
         let get = await OctoFarmClient.get("history/statistics/" + id);
-        console.log(get);
         //Setup page
         let printerStatsWrapper = document.getElementById("printerStatistics");
         printerStatsWrapper.innerHTML = "";

@@ -282,7 +282,8 @@ class PrinterManagerService {
     if (id === null) {
       //No id, full scan requested..
       const printerList = getPrinterStoreCache().listPrinters();
-      return this.batchReScanAPI(force, printerList, 10);
+      await this.batchReScanAPI(force, printerList, 10);
+      return "Successfully rescanned all APIs, please check connection log";
     } else {
       const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reScanAPI(force);

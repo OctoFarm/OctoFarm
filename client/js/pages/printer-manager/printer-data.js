@@ -23,7 +23,7 @@ import {
   loadPrintersRegisteredEvents
 } from "./functions/printer-manager.functions";
 import {createAlertsLogString, removeLogLine, updateLogLine} from "./log-tickers.functions";
-import {isPrinterFullyScanned, printerIsDisabled, printerIsOnline} from "../../utils/octofarm.utils";
+import {isPrinterFullyScanned, printerIsDisabled} from "../../utils/octofarm.utils";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
 
@@ -71,7 +71,6 @@ function updatePrinterState(printer) {
   );
 }
 function updatePrinterInfo(printer) {
-  console.log(printer)
   const printName = document.getElementById(`name-${printer._id}`);
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);

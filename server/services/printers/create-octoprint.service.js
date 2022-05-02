@@ -509,9 +509,12 @@ class OctoPrintPrinter {
 
   async reScanAPI(force) {
     logger.info(this.printerURL + ": API scan requested! Forced:", { force });
-    if (this.printerState.state !== "Offline") {
+    if (!this.disabled && this.printerState.state !== "Offline") {
       await this.#requiredApiSequence(force);
       await this.#optionalApiSequence(force);
+      return `${this.printerName}: API Rescan was successful!`;
+    } else {
+      return `${this.printerName}: Skipping Re-scan as printer is disabled or offline!`;
     }
   }
 
@@ -533,7 +536,6 @@ class OctoPrintPrinter {
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
 
-    this.reconnectionPlanned = false;
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
       if (testingTheWaters === 408) {
@@ -649,9 +651,9 @@ class OctoPrintPrinter {
     if (typeof session !== "string") {
       // Couldn't setup websocket
       const sessionKeyFail = {
-        state: "Session Fail!",
-        stateDescription:
-          "Failed to acquire session key, please check your API key and try again..."
+        state: "Offline",
+        hostDescription:
+          "Failed to acquire session key, if OctoPrint is online then please check your API key and try again..."
       };
       this.setAllPrinterStates(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
       return false;
@@ -1592,7 +1594,19 @@ class OctoPrintPrinter {
     this.#db.update(data);
   }
 
+  resetApiTimeout() {
+    logger.debug("Clearning API Timeout");
+    clearTimeout(this.#reconnectTimeout);
+    this.#reconnectTimeout = false;
+    const { timeout } = SettingsClean.returnSystemSettings();
+    this.#apiRetry = timeout.apiRetry;
+    this.reconnectingIn = Date.now() + this.#apiRetry;
+    this.#retryNumber = 0;
+  }
+
   resetConnectionInformation() {
+    this.resetApiTimeout();
+    console.log(this.reconnectingIn, this.#reconnectTimeout, this.#apiRetry, this.#retryNumber);
     if (!!this?.#api) {
       this.#api.updateConnectionInformation(this.printerURL, this.apikey);
     }
@@ -1657,13 +1671,7 @@ class OctoPrintPrinter {
       clearTimeout(this.#reconnectTimeout);
       this.#reconnectTimeout = false;
       this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
-      return this.enablePrinter()
-        .then((res) => {
-          return logger.warning(res);
-        })
-        .catch((e) => {
-          return logger.error("Failed starting service", e);
-        });
+      return this.resetSocketConnection();
     }, this.#apiRetry);
   }
 

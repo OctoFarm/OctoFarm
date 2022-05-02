@@ -952,10 +952,7 @@ class PrinterStore {
 
     await Promise.allSettled([
       originalPrinter.acquireOctoPrintProfileData(true),
-      originalPrinter.acquireOctoPrintSettingsData(true),
-      originalPrinter.acquireOctoPrintSystemInfoData(true),
-      originalPrinter.acquireOctoPrintUpdatesData(true),
-      originalPrinter.acquireOctoPrintPluginsListData(true)
+      originalPrinter.acquireOctoPrintSettingsData(true)
     ]);
 
     return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
@@ -1045,7 +1042,10 @@ class PrinterStore {
   async getNewSessionKey(id) {
     const printer = this.#findMePrinter(id);
     const sessionKey = await printer.getSessionkey();
-    await printer.acquireOctoPrintUpdatesData(true);
+    if (!!sessionKey) {
+      await printer.acquireOctoPrintUpdatesData(true);
+    }
+
     return sessionKey;
   }
 

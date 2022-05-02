@@ -5,7 +5,7 @@ import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
 import {
   canWeTurnOnThePrinter,
-  printerIsDisconnectedOrError,
+  printerIsDisconnectedOrError, printerIsIdle,
   printerIsOnline,
   printerIsPrinting
 } from "../utils/octofarm.utils";
@@ -475,16 +475,15 @@ function addEventListeners(printer) {
 
 function checkQuickConnectState(printer) {
   const isOnline = printerIsOnline(printer);
-  const isDisconnectedOrError = printerIsDisconnectedOrError(printer);
   const isPrinting = printerIsPrinting(printer);
 
       //printerActionsHeader
   document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
   document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
   document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
-  document.getElementById("printerHome-"+printer._id).disabled = isPrinting || isDisconnectedOrError;
+  document.getElementById("printerHome-"+printer._id).disabled = !printerIsIdle(printer);
   document.getElementById("printerEmergency-"+printer._id).disabled = !isPrinting;
-  document.getElementById("printerHeatersOff-"+printer._id).disabled = isPrinting;
+  document.getElementById("printerHeatersOff-"+printer._id).disabled = !printerIsIdle(printer);
 
   PrinterPowerService.revealPowerButtons(printer).catch(e => {
     console.error(e)
