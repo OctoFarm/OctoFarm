@@ -23,6 +23,7 @@ import {
   loadPrintersRegisteredEvents
 } from "./functions/printer-manager.functions";
 import {createAlertsLogString, removeLogLine, updateLogLine} from "./log-tickers.functions";
+import {isPrinterFullyScanned, printerIsDisabled} from "../../utils/octofarm.utils";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
 
@@ -415,10 +416,13 @@ function updateButtonState(printer) {
   const printerStatistics = document.getElementById(
     `printerStatistics-${printer._id}`
   );
-  UI.doesElementNeedUpdating(printer.disabled, apiReScan, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerSettings, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerLog, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerStatistics, "disabled");
+
+  const allowedActions = (!isPrinterFullyScanned(printer) || printerIsDisabled(printer));
+
+  UI.doesElementNeedUpdating(allowedActions, apiReScan, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerLog, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerStatistics, "disabled");
 }
 
 function updatePrinterRow(printer) {
@@ -430,6 +434,7 @@ function updatePrinterRow(printer) {
     updatePrinterState(printer);
     checkQuickConnectState(printer);
     updateButtonState(printer);
+
     if (!printer.disabled) {
       checkForOctoPrintUpdate(printer);
 
@@ -486,6 +491,16 @@ export function createOrUpdatePrinterTableRow(printers) {
       // Setup listeners
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
+
+      document.getElementById(`printerAPIScanning-${printer._id}`).addEventListener("click", async () => {
+        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
+      });
+
+      document.getElementById(`printerForceReconnect-${printer._id}`).addEventListener("click", async () => {
+        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
+      });
 
       document
           .getElementById(`printerEdit-${printer._id}`)

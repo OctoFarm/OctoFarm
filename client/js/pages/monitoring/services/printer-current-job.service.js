@@ -381,7 +381,7 @@ const loadPrintersJobStatus = (printer) => {
               </div>
         </div> 
         <div class="col-lg-12 text-center">
-                 <h5>Costs (Estimated Usage / Total)</h5><hr> 
+                 <h5>Estimated Costs (Used / Total)</h5><hr> 
         </div>   
           <div class="col-md-4 col-lg-3 text-center"><b class="mb-1">Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p></div>
           <div class="col-md-4 col-lg-2 text-center"><b class="mb-1">Materials: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p></div>  

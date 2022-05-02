@@ -40,26 +40,26 @@ class OctoprintApiClientService extends OctoprintApiService {
     }
   }
 
-  async postPrinter(route, data, timeout = false) {
-    return super.post(route, data, timeout).catch((e) => {
+  async postPrinter(route, data) {
+    return super.post(route, data).catch((e) => {
       return e;
     });
   }
 
-  async deletePrinter(route, timeout = false) {
-    return super.delete(route, timeout).catch((e) => {
+  async deletePrinter(route) {
+    return super.delete(route).catch((e) => {
       return e;
     });
   }
 
-  async getSettings(retry = false) {
-    return this.get(apiSettingsPart, retry).catch((e) => {
+  async getSettings() {
+    return this.get(apiSettingsPart).catch((e) => {
       return e;
     });
   }
 
-  async getVersion(retry = false) {
-    return this.get(apiVersion, retry).catch((e) => {
+  async getVersion() {
+    return this.get(apiVersion).catch((e) => {
       return e;
     });
   }
@@ -71,8 +71,8 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFiles(recursive = false, retry = false) {
-    return this.get(apiFiles(recursive), retry).catch((e) => {
+  async getFiles(recursive = false) {
+    return this.get(apiFiles(recursive)).catch((e) => {
       return e;
     });
   }
@@ -84,8 +84,8 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFile(path, retry = false) {
-    return this.get(apiFile(path), retry).catch((e) => {
+  async getFile(path) {
+    return this.get(apiFile(path)).catch((e) => {
       return e;
     });
   }
@@ -96,54 +96,54 @@ class OctoprintApiClientService extends OctoprintApiService {
     });
   }
 
-  async getConnection(retry = false) {
-    return this.get(apiConnection, retry).catch((e) => {
+  async getConnection() {
+    return this.get(apiConnection).catch((e) => {
       return e;
     });
   }
 
-  async getPrinterProfiles(retry = false) {
-    return this.get(apiPrinterProfiles, retry).catch((e) => {
+  async getPrinterProfiles() {
+    return this.get(apiPrinterProfiles).catch((e) => {
       return e;
     });
   }
 
-  async getPluginManager(retry = false, octoPrintVersion = undefined) {
+  async getPluginManager(octoPrintVersion = undefined) {
     if (!octoPrintVersion) throw new Error("Version not supplied...");
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
-    return this.get(route, retry).catch((e) => {
+    return this.get(route).catch((e) => {
       return e;
     });
   }
 
-  async getSystemInfo(retry = false) {
-    return this.get(apiSystemInfo, retry).catch((e) => {
+  async getSystemInfo() {
+    return this.get(apiSystemInfo).catch((e) => {
       return e;
     });
   }
 
-  async getSystemCommands(retry = false) {
-    return this.get(apiSystemCommands, retry).catch((e) => {
+  async getSystemCommands() {
+    return this.get(apiSystemCommands).catch((e) => {
       return e;
     });
   }
 
-  async getSoftwareUpdateCheck(force, retry = false) {
-    return this.get(apiSoftwareUpdateCheck(force), retry).catch((e) => {
+  async getSoftwareUpdateCheck(force) {
+    return this.get(apiSoftwareUpdateCheck(force)).catch((e) => {
       return e;
     });
   }
 
-  async getUsers(retry = false) {
-    return this.get(apiUsers, retry).catch((e) => {
+  async getUsers() {
+    return this.get(apiUsers).catch((e) => {
       return e;
     });
   }
 
-  async getPluginPiSupport(retry = false) {
-    return this.get(apiPluginPiSupport, retry).catch((e) => {
+  async getPluginPiSupport(e) {
+    return this.get(apiPluginPiSupport).catch((e) => {
       return e;
     });
   }

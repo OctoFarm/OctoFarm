@@ -127,12 +127,17 @@ export async function reSyncAPI(force = false, id = null) {
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Scanning APIs...";
-    await OctoFarmClient.post("printers/reSyncAPI", {
-      id: id,
-      force: force
-    });
+  const {msg} = await OctoFarmClient.post("printers/reSyncAPI", {
+    id: id,
+    force: force
+  });
   alert.close();
-  UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
+  let success = "success";
+  if(msg.includes("Skipping")){
+    success = "warning";
+  }
+
+  UI.createAlert(success, msg, 3000, "Clicked");
   reSyncAPIBtn.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i> ReScan All API's";
   reSyncAPIBtn.disabled = false;
 }

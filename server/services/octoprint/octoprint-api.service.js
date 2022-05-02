@@ -3,7 +3,7 @@
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-OctoPrint-API");
+const logger = new Logger("OctoFarm-State");
 
 const ConnectionMonitorService = require("../connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
@@ -17,46 +17,21 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
       "X-Api-Key": apikey
     },
     body: JSON.stringify(bodyData)
+  }).catch((e) => {
+    logger.error("Failed to fetch!", e);
+    logger.error("Fetch data string", e.toString());
+    logger.debug("Fetch connection data", {
+      url,
+      method,
+      apikey,
+      bodyData
+    });
+    return e;
   });
 }
 
 async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = undefined) {
   const startTime = ConnectionMonitorService.startTimer();
-  if (!fetchTimeout || method !== "GET") {
-    return fetchApi(url, method, apikey, bodyData)
-      .then((res) => {
-        const endTime = ConnectionMonitorService.stopTimer();
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.LAST_RESPONSE,
-          ConnectionMonitorService.calculateTimer(startTime, endTime)
-        );
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.SUCCESS_RESPONSE
-        );
-        return res;
-      })
-      .catch((e) => {
-        logger.error("Failed to fetch", e);
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.FAILED_RESPONSE
-        );
-        const endTime = ConnectionMonitorService.stopTimer();
-        ConnectionMonitorService.updateOrAddResponse(
-          url,
-          REQUEST_TYPE[method],
-          REQUEST_KEYS.LAST_RESPONSE,
-          ConnectionMonitorService.calculateTimer(startTime, endTime)
-        );
-        return e;
-      });
-  }
-
   return promiseTimeout(fetchTimeout, fetchApi(url, method, apikey, bodyData))
     .then((res) => {
       const endTime = ConnectionMonitorService.stopTimer();
@@ -95,7 +70,7 @@ class OctoprintApiService {
   timeout = undefined;
   printerURL = undefined;
   apikey = undefined;
-  #currentTimeout = 0;
+  #currentTimeout = 2000;
 
   constructor(printerURL, apikey, timeoutSettings) {
     this.timeout = timeoutSettings;
@@ -118,13 +93,7 @@ class OctoprintApiService {
    */
   async post(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "POST",
-      this.apikey,
-      timeout ? this.#currentTimeout : false,
-      data
-    ).catch((e) => {
+    return fetchApiTimeout(url, "POST", this.apikey, this.#currentTimeout, data).catch((e) => {
       return e;
     });
   }
@@ -137,12 +106,7 @@ class OctoprintApiService {
    */
   async delete(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "DELETE",
-      this.apikey,
-      timeout ? this.#currentTimeout : false
-    ).catch((e) => {
+    return fetchApiTimeout(url, "DELETE", this.apikey, this.#currentTimeout).catch((e) => {
       return e;
     });
   }
@@ -155,11 +119,9 @@ class OctoprintApiService {
    */
   async get(route, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, timeout ? this.#currentTimeout : false).catch(
-      (e) => {
-        return e;
-      }
-    );
+    return fetchApiTimeout(url, "GET", this.apikey, this.#currentTimeout).catch((e) => {
+      return e;
+    });
   }
 
   /**
@@ -171,13 +133,7 @@ class OctoprintApiService {
    */
   patch(route, data, timeout = true) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "PATCH",
-      this.apikey,
-      timeout ? this.#currentTimeout : false,
-      data
-    ).catch((e) => {
+    return fetchApiTimeout(url, "PATCH", this.apikey, this.#currentTimeout, data).catch((e) => {
       return e;
     });
   }

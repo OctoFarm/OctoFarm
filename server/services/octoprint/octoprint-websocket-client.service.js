@@ -455,6 +455,7 @@ class WebSocketClient {
 
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = false;
+      this.currentThrottleRate = 1;
       this.sessionKey = await getPrinterStoreCache().getNewSessionKey(this.id);
       if (!this?.sessionKey) {
         this.reconnect("No session key!");

@@ -80,7 +80,8 @@ class PrinterStore {
         systemChecks: printer.systemChecks,
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
-        activeControlUser: printer.activeControlUser
+        activeControlUser: printer.activeControlUser,
+        fullyScanned: printer?.onboarding?.fullyScanned
       };
     });
 
@@ -119,7 +120,8 @@ class PrinterStore {
         terminal: printer.terminal,
         powerSettings: printer.powerSettings,
         resends: printer.resends,
-        activeControlUser: printer.activeControlUser
+        activeControlUser: printer.activeControlUser,
+        fullyScanned: printer?.onboarding?.fullyScanned
       };
     });
 
@@ -558,6 +560,11 @@ class PrinterStore {
     }
   }
 
+  async forceReconnectPrinter(id){
+    const printer = this.#findMePrinter(id)
+    return printer.forceReconnect();
+  }
+
   async editPrinterConnectionSettings(settings) {
     const { printer } = settings;
     const { printerName, printerURL, cameraURL, apikey, currentUser, index, group } = printer;
@@ -950,10 +957,7 @@ class PrinterStore {
 
     await Promise.allSettled([
       originalPrinter.acquireOctoPrintProfileData(true),
-      originalPrinter.acquireOctoPrintSettingsData(true),
-      originalPrinter.acquireOctoPrintSystemInfoData(true),
-      originalPrinter.acquireOctoPrintUpdatesData(true),
-      originalPrinter.acquireOctoPrintPluginsListData(true)
+      originalPrinter.acquireOctoPrintSettingsData(true)
     ]);
 
     return { octofarm: octofarmCheck, profile: profileCheck, settings: settingsCheck };
@@ -1043,7 +1047,10 @@ class PrinterStore {
   async getNewSessionKey(id) {
     const printer = this.#findMePrinter(id);
     const sessionKey = await printer.getSessionkey();
-    await printer.acquireOctoPrintUpdatesData(true);
+    if (!!sessionKey) {
+      await printer.acquireOctoPrintUpdatesData(true);
+    }
+
     return sessionKey;
   }
 

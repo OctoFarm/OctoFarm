@@ -2,7 +2,7 @@ const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
 const PluginLogs = require("../../../models/PluginLogs");
 const Logger = require("../../../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger("OctoFarm-OctoPrint-Messages");
 
 const defaultWOLSubnetMask = "255.255.255.0";
 
@@ -126,6 +126,7 @@ const testAndCollectPSUControlPlugin = (id, currentSettings, plugins) => {
 
 const captureKlipperPluginData = (id, data) => {
   //TODO this needs to output to a klipper log, doesn't need to be in connection on Printer Manager
+  logger.debug("Klipper data", data);
   const { payload, subtype } = data;
 
   let state = subtype === "info" ? "Info" : "Offline";
@@ -154,6 +155,7 @@ const captureKlipperPluginData = (id, data) => {
 };
 
 const capturePluginManagerData = (id, type, data) => {
+  logger.debug("Plugin Manager data", data);
   switch (type) {
     case "loglines":
       const { loglines } = data;
@@ -166,6 +168,7 @@ const capturePluginManagerData = (id, type, data) => {
 };
 
 const captureResultsData = (id, data) => {
+  logger.debug("Results data", data);
   const { action, result, needs_restart } = data;
   getPrinterStoreCache().updatePrinterLiveValue(id, {
     restartRequired: false
@@ -186,6 +189,7 @@ const captureResultsData = (id, data) => {
 };
 
 const captureLogLines = (id, data) => {
+  logger.debug("Log lines data", data);
   if (!!data && data.length > 0) {
     data.forEach((line) => {
       if (line.stream === "call" || line.stream === "message") {
@@ -219,6 +223,7 @@ const captureLogLines = (id, data) => {
 };
 
 const captureThrottlePluginData = (id, data) => {
+  logger.debug("OctoPi data", data);
   const {
     state: { current_undervoltage, current_overheat }
   } = data;
@@ -258,6 +263,7 @@ const captureThrottlePluginData = (id, data) => {
 };
 
 const captureResourceMonitorData = (id, data) => {
+  logger.debug("CPU monitor data", data);
   const {
     cpu: { average, octoprint },
     memory: { percent }
@@ -301,6 +307,7 @@ const captureResourceMonitorData = (id, data) => {
 };
 
 const captureDisplayLayerProgress = (id, data) => {
+  logger.debug("DLP data", data);
   getPrinterStoreCache().updatePrinterLiveValue(id, { layerData: data });
 };
 

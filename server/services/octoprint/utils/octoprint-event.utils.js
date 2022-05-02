@@ -9,7 +9,7 @@ const { HistoryCaptureService } = require("../../history-capture.service.js");
 const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
 const { ErrorCaptureService } = require("../../error-capture.service");
 
-const logger = new Logger("OctoFarm-State");
+const logger = new Logger("OctoFarm-OctoPrint-Messages");
 
 const tickerWrapper = (id, state, message) => {
   PrinterTicker.addIssue(new Date(), getPrinterStoreCache().getPrinterURL(id), message, state, id);
@@ -189,13 +189,18 @@ const captureFileRemoved = (id, data) => {
     });
 };
 const captureFirmwareData = (id, data) => {
+  logger.debug("Firmware data", data);
   const {
     data: { FIRMWARE_NAME, FIRMWARE_VERSION }
   } = data;
   logger.warning("Updating printer firmware version", data);
-  getPrinterStoreCache().updatePrinterDatabase(id, {
-    printerFirmware: `${FIRMWARE_NAME} ${FIRMWARE_VERSION}`
-  });
+  if (!!FIRMWARE_VERSION || !!FIRMWARE_NAME) {
+    getPrinterStoreCache().updatePrinterDatabase(id, {
+      printerFirmware: `${FIRMWARE_NAME ? FIRMWARE_NAME : ""} ${
+        FIRMWARE_VERSION ? FIRMWARE_VERSION : ""
+      }`
+    });
+  }
 };
 const captureFolderAdded = (id, data) => {
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "folderadded", undefined)
@@ -313,7 +318,7 @@ const printCaptureHelper = (id, data, state) => {
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
-      if(!state){
+      if (!state) {
         getPrinterStoreCache().resetActiveControlUser(id);
       }
     })

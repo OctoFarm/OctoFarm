@@ -509,9 +509,12 @@ class OctoPrintPrinter {
 
   async reScanAPI(force) {
     logger.info(this.printerURL + ": API scan requested! Forced:", { force });
-    if (this.printerState.state !== "Offline") {
+    if (!this.disabled && this.printerState.state !== "Offline") {
       await this.#requiredApiSequence(force);
       await this.#optionalApiSequence(force);
+      return `${this.printerName}: API Rescan was successful!`;
+    } else {
+      return `${this.printerName}: Skipping Re-scan as printer is disabled or offline!`;
     }
   }
 
@@ -533,7 +536,6 @@ class OctoPrintPrinter {
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
 
-    this.reconnectionPlanned = false;
     // testing the waters responded with status code, setup for reconnect...
     if (typeof testingTheWaters === "number") {
       if (testingTheWaters === 408) {
@@ -544,7 +546,7 @@ class OctoPrintPrinter {
         };
         this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
         this.reconnectAPI();
-        return "Failed due to timeout!";
+        return "Failed to test the waters! Please check the connection log";
       } else if (testingTheWaters === 503 || testingTheWaters === 502) {
         const unavailable = {
           hostState: "Unavailable!",
@@ -587,6 +589,7 @@ class OctoPrintPrinter {
     const apiCheckFail = initialApiCheck.map((check) => {
       return check.value === 900;
     });
+
     // Global api heck triggered, fail with no reconnect
     if (apiCheckFail[0]) {
       const globalAPICheck = {
@@ -595,6 +598,7 @@ class OctoPrintPrinter {
           "Global api key detected... please use application / user generated key! Please correct to reconnect..."
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
+      logger.error("Unable to fully check API Key...", initialApiCheck);
       return "Failed due to Global API key detection triggering!";
     }
 
@@ -605,6 +609,8 @@ class OctoPrintPrinter {
           "Failed to collect user information! Please check all settings and correct to reconnect..."
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
+      logger.error("Unable to fully grab user data...", initialApiCheck);
+      this.reconnectAPI();
       return "Failed because of inability to collect user information!";
     }
 
@@ -649,9 +655,9 @@ class OctoPrintPrinter {
     if (typeof session !== "string") {
       // Couldn't setup websocket
       const sessionKeyFail = {
-        state: "Session Fail!",
-        stateDescription:
-          "Failed to acquire session key, please check your API key and try again..."
+        state: "Offline",
+        hostDescription:
+          "Failed to acquire session key, if OctoPrint is online then please check your API key and try again..."
       };
       this.setAllPrinterStates(PRINTER_STATES(sessionKeyFail).SHUTDOWN);
       return false;
@@ -816,7 +822,7 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Checking API key doesn't match global API key...", "Active");
     const globalAPIKeyCheck = await this.#api.getSettings(true).catch((e) => {
       logger.http("Failed to check global api key", e);
-      return false;
+      return e;
     });
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
     if (globalStatusCode === 200) {
@@ -824,21 +830,25 @@ class OctoPrintPrinter {
       const { api } = await globalAPIKeyCheck.json();
 
       if (!api) {
-        logger.error(`Settings json does not exist: ${this.printerURL}`);
+        logger.error(`Global Api Check Fail! Settings json does not exist: ${this.printerURL}`);
         return false;
       }
       const keyCheck = api.key !== this.apikey;
       if (keyCheck) {
         this.#apiPrinterTickerWrap("Passed Global API key check", "Complete");
+        logger.info("Passed Global API key check!");
         return keyCheck;
       } else {
         this.#apiPrinterTickerWrap("Failed global API key check", "Offline");
+        logger.error("Failed global api key check", globalAPIKeyCheck.toString());
+        logger.error("Status code", { globalStatusCode });
         return 900; //Global API Key fail
       }
     } else {
-      // Hard failure as can't setup websocket
-      logger.error("Failed to detect API key for global check! Failing as offline");
-      this.#apiPrinterTickerWrap("Failed to detect API key for global check! Failing as offline", "Offline");
+      logger.error(
+        "Failed to detect API key for global check! Failing as offline",
+        globalAPIKeyCheck.toString()
+      );
       return false;
     }
   }
@@ -1285,12 +1295,10 @@ class OctoPrintPrinter {
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, "warning");
     if (!this?.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
-      const pluginList = await this.#api
-        .getPluginManager(true, this.octoPrintVersion)
-        .catch((e) => {
-          logger.http("Failed Aquire plugin lists data", e);
-          return false;
-        });
+      const pluginList = await this.#api.getPluginManager(this.octoPrintVersion).catch((e) => {
+        logger.http("Failed Aquire plugin lists data", e);
+        return false;
+      });
       const globalStatusCode = checkApiStatusResponse(pluginList);
 
       if (globalStatusCode === 200) {
@@ -1331,7 +1339,6 @@ class OctoPrintPrinter {
       !this?.octoPrintUpdate ||
       !this?.octoPrintPluginUpdates ||
       this?.octoPrintPluginUpdates.length === 0
-
     ) {
       const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch((e) => {
         logger.http("Failed Aquire updates data", e);
@@ -1592,7 +1599,23 @@ class OctoPrintPrinter {
     this.#db.update(data);
   }
 
+  resetApiTimeout() {
+    logger.debug("Clearning API Timeout");
+    clearTimeout(this.#reconnectTimeout);
+    this.#reconnectTimeout = false;
+    const { timeout } = SettingsClean.returnSystemSettings();
+    this.#apiRetry = timeout.apiRetry;
+    this.reconnectingIn = Date.now() + this.#apiRetry;
+    this.#retryNumber = 0;
+  }
+
+  async forceReconnect() {
+    this.resetApiTimeout();
+    return this.resetSocketConnection();
+  }
+
   resetConnectionInformation() {
+    this.resetApiTimeout();
     if (!!this?.#api) {
       this.#api.updateConnectionInformation(this.printerURL, this.apikey);
     }
@@ -1607,10 +1630,12 @@ class OctoPrintPrinter {
   async resetSocketConnection() {
     return this.enablePrinter()
       .then((res) => {
-        return logger.debug(res);
+        logger.debug(res);
+        return res;
       })
       .catch((e) => {
-        return logger.error("Failed starting service", e);
+        logger.error("Failed starting service", e);
+        return e;
       });
   }
 
@@ -1657,13 +1682,7 @@ class OctoPrintPrinter {
       clearTimeout(this.#reconnectTimeout);
       this.#reconnectTimeout = false;
       this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
-      return this.enablePrinter()
-        .then((res) => {
-          return logger.warning(res);
-        })
-        .catch((e) => {
-          return logger.error("Failed starting service", e);
-        });
+      return this.resetSocketConnection();
     }, this.#apiRetry);
   }
 

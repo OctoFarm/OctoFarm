@@ -163,52 +163,121 @@ export function checkCameraState(printer) {
     }
 }
 
+export function getPrinterCategory(printer){
+    const {printerState: {colour: {category}}} = printer;
+    return category;
+}
+
+export function printerIsDisabled(printer){
+    const { disabled } = printer;
+
+    return disabled;
+}
+
+export function printerIsOffline(printer){
+    const category = getPrinterCategory(printer);
+    return category === "Offline";
+}
+
+export function printerIsSearching(printer){
+    const category = getPrinterCategory(printer);
+    return category === "Searching..."
+}
+
 /**
  *
  * @param printer
  * @returns {boolean}
  */
 export function printerIsOnline(printer) {
-    const { disabled } = printer;
-
-    const {printerState: {colour: {category}}} = printer;
-
-    return !(disabled || category === "Offline" || category === "Searching...");
+    if(printerIsDisabled(printer)){
+        return false;
+    }
+    if(!isPrinterFullyScanned(printer)){
+        return false;
+    }
+    if(printerIsSearching(printer)){
+        return false;
+    }
+    return !(printerIsOffline(printer));
 }
 
 export function printerIsPrintingOrComplete(printer){
-    const { disabled } = printer;
+    if(!printerIsOnline(printer)){
+        return false;
+    }
 
-    const {printerState: {colour: {category}}} = printer;
+    const category = getPrinterCategory(printer);
 
-    return (!disabled && category === "Active" || category === "Complete");
+    return (category === "Active" || category === "Complete");
 }
 
 export function printerIsPrinting(printer){
-    const { disabled } = printer;
+    if(!printerIsOnline(printer)){
+        return false;
+    }
 
-    const {printerState: {colour: {category}}} = printer;
+    const category = getPrinterCategory(printer);
 
-    return !(disabled || category !== "Active");
+    return category === "Active";
 }
+
+export function isPrinterFullyScanned(printer) {
+    const { fullyScanned } = printer;
+
+    return fullyScanned;
+}
+
 
 export function printerIsAvailableToView(printer){
-    const { disabled } = printer;
-
-    const {printerState: {colour: {category}}} = printer;
-
-    return !(disabled || category === "Searching...");
+    if(printerIsDisabled(printer)){
+        return false;
+    }
+    if(printerIsSearching(printer)){
+        return false;
+    }
+    return !(!isPrinterFullyScanned(printer));
 }
 export function printerIsDisconnectedOrError(printer){
-    const {printerState: {colour: {category}}} = printer;
+    if(!printerIsOnline(printer)){
+        return false;
+    }
 
-    return (category !== "Offline" && category === "Disconnected" || category.includes("Error") || category.includes("error"))
+    if(isPrinterDisconnected(printer)){
+        return true;
+    }
+
+    return isPrinterInErrorState(printer)
 }
 
 export function isPrinterDisconnected(printer){
-    const {printerState: {colour: {category}}} = printer;
+    if(!printerIsOnline(printer)){
+        return false;
+    }
 
-    return (category !== "Offline" && category === "Disconnected")
+    const category = getPrinterCategory(printer);
+
+    return category === "Disconnected";
+}
+
+export function isPrinterInErrorState(printer){
+    if(!printerIsOnline(printer)){
+        return false;
+    }
+
+    const category = getPrinterCategory(printer);
+
+    return (category.includes("Error") || category.includes("error"))
+}
+
+export function printerIsIdle(printer){
+    if(!printerIsOnline(printer)){
+        return false;
+    }
+
+    const category = getPrinterCategory(printer);
+
+    return (category === "Idle")
 }
 
 export function closePrinterManagerModalIfOffline(printer){

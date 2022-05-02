@@ -152,7 +152,15 @@ function returnPrinterManageDropDown(id, disabled){
                  type="button"
                  class="btn dropdown-item"
                 >
-                <i class="fab fa-searchengin text-danger"></i> Scan API
+                <i class="fab fa-searchengin text-warning"></i> Scan API
+                
+            </button>
+            <button title="Forces a complete re-enable of your printer"
+                 id="printerForceReconnect-${id}"
+                 type="button"
+                 class="btn dropdown-item"
+                >
+                <i class="fa-solid fa-gavel text-danger"></i> Force Reconnect
                 
             </button>
             ${printerDisabledButton}
@@ -271,10 +279,7 @@ export function returnDisabledPrinterTableRow(printer) {
             </span>
         </td>
         <td class="align-middle" >
-                 <span><i class="fas fa-print" style="color:${
-                   printer.settingsAppearance.color
-                 };"></i></span>
-            <span id="printerName-${printer._id}"></span>
+            ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
             </td>
                     <td class="align-middle">
             <span id="printerURL-${printer._id}"></span>
