@@ -610,6 +610,7 @@ class OctoPrintPrinter {
       };
       this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
       logger.error("Unable to fully grab user data...", initialApiCheck);
+      this.reconnectAPI();
       return "Failed because of inability to collect user information!";
     }
 
