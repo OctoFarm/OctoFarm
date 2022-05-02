@@ -13,7 +13,7 @@ import {printerEmergencyStop, printerHomeAllAxis, printerTurnOffHeaters} from ".
 
 function returnActionBtnTemplate(id, webURL) {
   return `
-      <div id="printerManageDropDown-${id}" class="btn-group dropright">
+      <div class="btn-group dropright">
          <button  
            title="Quickly bring your printer online! Power -> Connect"
            id="printerQuickConnect-${id}"
@@ -28,7 +28,7 @@ function returnActionBtnTemplate(id, webURL) {
                class="tag btn btn-info btn-sm"
                target="_blank"
                href="${webURL}" role="button"><i class="fas fa-globe-europe "></i> </a>   
-        <button type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button id="printerManageDropDown-${id}" type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
@@ -477,6 +477,8 @@ function checkQuickConnectState(printer) {
   const isOnline = printerIsOnline(printer);
   const isDisconnectedOrError = printerIsDisconnectedOrError(printer);
   const isPrinting = printerIsPrinting(printer);
+
+      //printerActionsHeader
   document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
   document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
   document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;

@@ -80,7 +80,8 @@ class PrinterStore {
         systemChecks: printer.systemChecks,
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
-        activeControlUser: printer.activeControlUser
+        activeControlUser: printer.activeControlUser,
+        fullyScanned: printer?.onboarding?.fullyScanned
       };
     });
 
@@ -119,7 +120,8 @@ class PrinterStore {
         terminal: printer.terminal,
         powerSettings: printer.powerSettings,
         resends: printer.resends,
-        activeControlUser: printer.activeControlUser
+        activeControlUser: printer.activeControlUser,
+        fullyScanned: printer?.onboarding?.fullyScanned
       };
     });
 
