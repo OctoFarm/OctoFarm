@@ -17,12 +17,15 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
       "X-Api-Key": apikey
     },
     body: JSON.stringify(bodyData)
-  }).catch(e => {
+  }).catch((e) => {
     logger.error("Failed to fetch!", e);
     logger.error("Fetch data string", e.toString());
     logger.debug("Fetch connection data", {
-      url, method, apikey, bodyData
-    })
+      url,
+      method,
+      apikey,
+      bodyData
+    });
     return e;
   });
 }
@@ -50,8 +53,12 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
         logger.error("Failed to fetch timeout!", e);
         logger.error("Fetch timeout! data string", e.toString());
         logger.debug("Fetch timeout! connection data", {
-          url, method, apikey, fetchTimeout, bodyData
-        })
+          url,
+          method,
+          apikey,
+          fetchTimeout,
+          bodyData
+        });
         ConnectionMonitorService.updateOrAddResponse(
           url,
           REQUEST_TYPE[method],
