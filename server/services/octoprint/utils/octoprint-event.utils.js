@@ -9,7 +9,7 @@ const { HistoryCaptureService } = require("../../history-capture.service.js");
 const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
 const { ErrorCaptureService } = require("../../error-capture.service");
 
-const logger = new Logger("OctoFarm-State");
+const logger = new Logger("OctoFarm-OctoPrint-Messages");
 
 const tickerWrapper = (id, state, message) => {
   PrinterTicker.addIssue(new Date(), getPrinterStoreCache().getPrinterURL(id), message, state, id);
@@ -189,6 +189,7 @@ const captureFileRemoved = (id, data) => {
     });
 };
 const captureFirmwareData = (id, data) => {
+    logger.debug("Klipper data", data);
   const {
     data: { FIRMWARE_NAME, FIRMWARE_VERSION }
   } = data;

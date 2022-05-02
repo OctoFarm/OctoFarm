@@ -64,7 +64,7 @@ const Logger = require("../../handlers/logger");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
-const logger = new Logger("OctoFarm-State");
+const logger = new Logger("OctoFarm-OctoPrint-Messages");
 
 class OctoprintWebsocketMessageService {
   static parseOctoPrintWebsocketMessage = (message) => {
@@ -300,7 +300,6 @@ class OctoprintWebsocketMessageService {
   }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
-    // console.log("PRINTER PLUGIN DATA", message);
     const { header, data } = OP_EM.parseOctoPrintPluginMessage(message);
 
     const type = OP_EM.parseOctoPrintPluginType(data);
@@ -321,6 +320,9 @@ class OctoprintWebsocketMessageService {
       case OP_WS_PLUGIN_KEYS.display_layer_progress:
         captureDisplayLayerProgress(printerID, data);
         break;
+      default:
+        logger.debug("Unknown plugin detected!", { header, type });
+        logger.debug("Unknown data!", data);
     }
   }
   static handleTimelapseData(printerID, data) {
