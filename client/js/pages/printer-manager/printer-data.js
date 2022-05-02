@@ -23,6 +23,7 @@ import {
   loadPrintersRegisteredEvents
 } from "./functions/printer-manager.functions";
 import {createAlertsLogString, removeLogLine, updateLogLine} from "./log-tickers.functions";
+import {isPrinterFullyScanned, printerIsDisabled, printerIsOnline} from "../../utils/octofarm.utils";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
 
@@ -70,6 +71,7 @@ function updatePrinterState(printer) {
   );
 }
 function updatePrinterInfo(printer) {
+  console.log(printer)
   const printName = document.getElementById(`name-${printer._id}`);
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
@@ -415,10 +417,13 @@ function updateButtonState(printer) {
   const printerStatistics = document.getElementById(
     `printerStatistics-${printer._id}`
   );
-  UI.doesElementNeedUpdating(printer.disabled, apiReScan, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerSettings, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerLog, "disabled");
-  UI.doesElementNeedUpdating(printer.disabled, printerStatistics, "disabled");
+
+  const allowedActions = (!isPrinterFullyScanned(printer) || printerIsDisabled(printer));
+
+  UI.doesElementNeedUpdating(allowedActions, apiReScan, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerLog, "disabled");
+  UI.doesElementNeedUpdating(allowedActions, printerStatistics, "disabled");
 }
 
 function updatePrinterRow(printer) {
@@ -430,6 +435,7 @@ function updatePrinterRow(printer) {
     updatePrinterState(printer);
     checkQuickConnectState(printer);
     updateButtonState(printer);
+
     if (!printer.disabled) {
       checkForOctoPrintUpdate(printer);
 
