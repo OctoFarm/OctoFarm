@@ -60,7 +60,8 @@ export const updateFileThumbnail = (id, thumbnail, printerURL) => {
     }
     if (!!thumbnail && !!printerURL) {
         const fileThumbnail = document.getElementById(`fileThumbnail-${id}`);
-        const thumbnailElement = `<span class="text-center"><img src='${printerURL}/${thumbnail}' width="100%" alt="thumbnail"></span>`;
+        const thumbnailURL = encodeURI(`${printerURL}/${thumbnail}`);
+        const thumbnailElement = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
         UI.doesElementNeedUpdating(thumbnailElement, fileThumbnail, "innerHTML");
     }
 }

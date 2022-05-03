@@ -61,7 +61,8 @@ export const getFileTemplate = (file, printerURL, id) => {
   let thumbnail =
     "<span class=\"text-center\"><i class=\"fas fa-file-code fa-2x\"></i></span>";
   if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
-    thumbnail = `<span class="text-center"><img src='${printerURL}/${file.thumbnail}' width="100%" alt="thumbnail"></span>`;
+      const thumbnailURL = encodeURI(`${printerURL}/${file.thumbnail}`);
+      thumbnail = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
   }
   let fileDate = new Date(file.uploadDate * 1000);
   const dateString = fileDate.toDateString();
@@ -176,7 +177,7 @@ export const getFileTemplate = (file, printerURL, id) => {
       <i class="fas fa-people-carry"></i> Move
           </button>
           <button          title="Download file" onclick="window.open('${printerURL}/downloads/files/local/${
-      encodeURIComponent(file.fullPath)
+      encodeURI(file.fullPath)
   }')" type="button" class="btn btn-dark">
     <i class="fas fa-download"></i> Download
         </button>

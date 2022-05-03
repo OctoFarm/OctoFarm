@@ -14,8 +14,8 @@ const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
-const { sleep } = require("../utils/promise.utils");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
+const { sleep } = require("../utils/promise.utils");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -77,10 +77,8 @@ class HistoryCaptureService {
   #camURL = null;
 
   constructor(eventPayload, capturedPrinterData, state) {
-    const { payloadData, printer, job, files, resendStats, activeControlUser } = clonePayloadDataForHistory(
-      eventPayload,
-      capturedPrinterData
-    );
+    const { payloadData, printer, job, files, resendStats, activeControlUser } =
+      clonePayloadDataForHistory(eventPayload, capturedPrinterData);
 
     this.#printerName = printer.printerName;
     this.#printerID = printer._id;
@@ -138,7 +136,9 @@ class HistoryCaptureService {
       activeControlUser: this.#activeControlUser
     };
 
-    logger.warning(`${this.#success ? "Completed" : "Failed"} Print triggered - ${JSON.stringify(printHistory)}`);
+    logger.warning(
+      `${this.#success ? "Completed" : "Failed"} Print triggered - ${JSON.stringify(printHistory)}`
+    );
 
     // Create our history object
     const saveHistory = new History({
@@ -573,7 +573,6 @@ class HistoryCaptureService {
 
   // repeated... could have imported I suppose...
   generateWeightOfJobForASpool(length, filament, completionRatio) {
-
     if (!length) {
       return length === 0 ? 0 : length;
     }
@@ -607,10 +606,8 @@ class HistoryCaptureService {
     let completionRatio = this.#success ? 1.0 : printPercentage / 100;
 
     for (let s = 0; s < this.#filamentSelection.length; s++) {
-
       const currentSpool = this.#filamentSelection[s];
       if (!!currentSpool || this.#job?.filament["tool" + s]) {
-
         const currentGram = this.generateWeightOfJobForASpool(
           this.#job.filament["tool" + s].length / 1000,
           currentSpool,
@@ -681,8 +678,8 @@ class HistoryCaptureService {
       // No point even trying to down date failed without these...
       if (!this.#job?.estimatedPrintTime && !this.#job?.lastPrintTime) {
         logger.error(
-            "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
-            this.#job
+          "Unable to downdate failed jobs spool, no estimatedPrintTime or lastPrintTime",
+          this.#job
         );
         return;
       }

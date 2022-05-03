@@ -60,8 +60,7 @@ class SystemCommands {
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
       clientResponse.statusTypeForUser = "warning";
-      clientResponse.message =
-        "Not a git repository, user intervention required! You will have to re-download OctoFarm and re-unpack it over this directory. Make sure to backup your images folder!";
+      clientResponse.message = "Not a git repository, user intervention required!";
       return clientResponse;
     }
 
