@@ -25,7 +25,7 @@ class SystemCommands {
 
         if (doesFunctionExist) {
           setTimeout(async () => {
-            await exec("pm2 restart ecosystem.middleware.js");
+            await exec("pm2 restart OctoFarm");
           }, 5000);
 
           checkForNamedService = true;
