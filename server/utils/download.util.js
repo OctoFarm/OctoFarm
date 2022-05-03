@@ -3,8 +3,7 @@ const fs = require("fs");
 const request = require("request");
 
 const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
-  const dlURL = encodeURI(url);
-  const res = await fetch(dlURL, {
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -25,11 +24,10 @@ const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
 };
 
 const downloadImage = async (url, path, apiKey, callback) => {
-  const dlURL = encodeURI(url);
-  return request.head(dlURL, (err, res) => {
+  return request.head(url, (err, res) => {
     res.headers["content-type"] = "image/png";
     res.headers["x-api-key"] = apiKey;
-    request(dlURL).pipe(fs.createWriteStream(path)).on("close", callback);
+    request(url).pipe(fs.createWriteStream(path)).on("close", callback);
   });
 };
 

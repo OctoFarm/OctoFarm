@@ -61,7 +61,7 @@ export const getFileTemplate = (file, printerURL, id) => {
   let thumbnail =
     "<span class=\"text-center\"><i class=\"fas fa-file-code fa-2x\"></i></span>";
   if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
-      const thumbnailURL = encodeURI(`${printerURL}/${file.thumbnail}`);
+      const thumbnailURL = `${printerURL}/${file.thumbnail}`;
       thumbnail = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
   }
   let fileDate = new Date(file.uploadDate * 1000);
