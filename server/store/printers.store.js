@@ -348,6 +348,16 @@ class PrinterStore {
     return printer.tempTriggers;
   }
 
+  isPrinterActive(id) {
+    const printer = this.#findMePrinter(id);
+    const {
+      printerState: {
+        colour: { category }
+      }
+    } = printer;
+    return category === "Active";
+  }
+
   getDisabledPluginsList(id) {
     const printer = this.#findMePrinter(id);
     return printer.pluginsListDisabled;

@@ -16,6 +16,7 @@ const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cle
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 const { sleep } = require("../utils/promise.utils");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -64,6 +65,8 @@ class HistoryCaptureService {
   #timelapse = "";
   #thumbnail = "";
   #resends = null;
+  #maxTimerCheck = 1000 * 3600; // One Hour Timer
+  #currentTimerCheck = 0;
 
   // Additional fields from constructor, required in filament/snapshot/timelapse/thumbnail calls.
   #historyRecordID = null;
@@ -322,10 +325,25 @@ class HistoryCaptureService {
     }
   }
 
+  increaseTimelapseCheckTimer(ms) {
+    //only increase the timeout if printer is ! active. OctoPrint pauses the timelapse generation when it's printing...
+    if (!getPrinterStoreCache().isPrinterActive(this.#printerID)) {
+      this.#currentTimerCheck = this.#currentTimerCheck + ms;
+    }
+  }
+
   async timelapseCheck() {
     if (this.#payload?.time <= 10) {
       logger.warning("Print time too short, skipping timelapse grab...", {
         time: this.#payload?.time
+      });
+      return "";
+    }
+
+    if (this.#currentTimerCheck >= this.#maxTimerCheck) {
+      logger.warning("Timelapse check did not find an timelapse within an our... bailing out!", {
+        currentTimerCheck: this.#currentTimerCheck,
+        maxTimerCheck: this.#maxTimerCheck
       });
       return "";
     }
@@ -345,46 +363,75 @@ class HistoryCaptureService {
 
     logger.info("Timelapse call: ", timelapseResponse);
 
+    //Give time for OP to start generating the file...
+    await sleep(5000);
+    this.increaseTimelapseCheckTimer(5000);
+
+    const { unrendered, files } = timelapseResponse;
+
+    if (unrendered.length === 0 && files.length === 0) {
+      logger.warning("OctoPrint has no timelapses rendering or listed in files...", {
+        unrendered,
+        files
+      });
+      return "";
+    }
+
     //is it unrendered?
     let cleanFileName = JSON.parse(JSON.stringify(this.#fileName));
     if (this.#fileName.includes(".gcode")) {
       cleanFileName = cleanFileName.replace(".gcode", "");
     }
 
-    const unrenderedTimelapseIndex = timelapseResponse.unrendered.findIndex((o) =>
-      o.name.includes(cleanFileName)
-    );
+    const unrenderedTimelapseIndex = unrendered.findIndex((o) => o.name.includes(cleanFileName));
+
     //if unrendered check timelapse again...
     logger.debug("Unrendered Index: ", {
       unrenderedTimelapseIndex,
-      unrenderedList: timelapseResponse.unrendered
+      unrenderedList: unrendered
     });
     if (unrenderedTimelapseIndex > -1) {
-      logger.warning("Timelapse not rendered yet... re-checking... in 5000ms", {
+      logger.warning("Timelapse not rendered yet... re-checking... in 10000ms", {
         unrenderedTimelapseIndex
       });
+      //Give time for OP to finish generating the file...
       await sleep(10000);
+      this.increaseTimelapseCheckTimer(10000);
       await this.timelapseCheck();
     }
 
+    //Give more time for OP to move the file from unrendered to files list
     await sleep(10000);
+    this.increaseTimelapseCheckTimer(10000);
 
-    const lastTimelapseIndex = timelapseResponse.files.findIndex((o) =>
-      o.name.includes(cleanFileName)
+    const lastTimelapseMatchedIndexArray = files.filter((item) =>
+      item.name.includes(cleanFileName)
     );
+
+    const timeDifferencesList = [];
+
+    for (const [i, timelapse] of lastTimelapseMatchedIndexArray.entries()) {
+      logger.debug("Checked times", { octoFarm: this.#endDate, octoprint: timelapse.date });
+      timeDifferencesList[i] = Math.abs(this.#endDate - new Date(timelapse.date));
+    }
+
+    const smallestNumberInTimeDifferences = Math.min(...timeDifferencesList);
+    const indexOfTimelapse = timeDifferencesList.indexOf(smallestNumberInTimeDifferences);
+
     logger.debug("rendered Index: ", {
-      lastTimelapseIndex,
-      renderedList: timelapseResponse.files
+      indexOfTimelapse,
+      renderedList: lastTimelapseMatchedIndexArray
     });
-    if (lastTimelapseIndex > -1) {
+    if (indexOfTimelapse > -1) {
       return this.grabTimeLapse(
-        timelapseResponse.files[lastTimelapseIndex].name,
-        this.#printerURL + timelapseResponse.files[lastTimelapseIndex].url
+        lastTimelapseMatchedIndexArray[indexOfTimelapse].name,
+        this.#printerURL + lastTimelapseMatchedIndexArray[indexOfTimelapse].url
       );
     }
 
     logger.error("Unable to determine correct timelapse file to download... skipped! ", {
-      timelapseFiles: timelapseResponse.files
+      timelapseFiles: lastTimelapseMatchedIndexArray,
+      cleanFileName
     });
 
     return "";
