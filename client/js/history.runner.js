@@ -1109,8 +1109,6 @@ class History {
       let counter = 0;
       let active = "active";
 
-      console.log(current)
-
       if (
         typeof current.snapshot !== "undefined" &&
         current.snapshot !== "" &&
@@ -1125,7 +1123,7 @@ class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${current.snapshot}')">
+              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${encodeURI(current.snapshot)}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Camera Snapshot</h6>
                   </div>
@@ -1151,7 +1149,7 @@ class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${current.thumbnail}')">
+              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${encodeURI(current.thumbnail)}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Slicer Thumbnail</h6>
                   </div>
@@ -1178,7 +1176,7 @@ class History {
           `
             <div class="carousel-item ${active} text-center" style="height:200px;">
                 <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls" style="height:350px;">
-                    <source src='${current.timelapse}'>
+                    <source src='${encodeURI(current.timelapse)}'>
                 </video>
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Timelapse</h6>
@@ -1187,8 +1185,8 @@ class History {
           `
         );
         thbs = true;
-        active = "";
-        counter = counter + 1;
+        // active = "";
+        // counter = counter + 1;
       }
       if (thbs) {
         document.getElementById("galleryElements").style.display = "block";

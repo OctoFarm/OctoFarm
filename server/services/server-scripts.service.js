@@ -9,6 +9,8 @@ class Script {
     logger.info("Script: ", scriptLocation);
     logger.info("Message: ", message);
     try {
+      console.log();
+
       const { stdout, stderr } = await exec(Script.escapeShellArg(`${scriptLocation} ${message}`));
       if (!!stdout) logger.info("stdout:", stdout);
       if (!!stderr) logger.error("stderr:", stderr);
@@ -38,8 +40,8 @@ class Script {
     });
   }
 
-  static escapeShellArg (arg) {
-    return `'${arg.replace(/'/g, `'\\''`)}'`;
+  static escapeShellArg(arg) {
+    return `${arg.replace(/'/g, "'\\''")}`;
   }
 }
 

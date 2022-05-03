@@ -15,8 +15,8 @@ const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
     res.body.pipe(fileStream);
     res.body.on("error", reject);
     fileStream.on("close", async () => {
-      resolve()
-      if(!!deleteTimelapse){
+      resolve();
+      if (!!deleteTimelapse) {
         deleteTimelapse();
       }
     });
@@ -24,7 +24,7 @@ const downloadFromOctoPrint = async (url, path, apiKey, deleteTimelapse) => {
 };
 
 const downloadImage = async (url, path, apiKey, callback) => {
-  return request.head(url, (err, res, body) => {
+  return request.head(url, (err, res) => {
     res.headers["content-type"] = "image/png";
     res.headers["x-api-key"] = apiKey;
     request(url).pipe(fs.createWriteStream(path)).on("close", callback);
