@@ -147,10 +147,10 @@ class PrinterStore {
         }
       });
     }
-
     //CLEAN FILES
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
+        fullyScanned: printer?.onboarding?.fullyScanned,
         fileList: FileClean.generate(
           printer.fileList,
           printer.selectedFilament,
@@ -560,8 +560,8 @@ class PrinterStore {
     }
   }
 
-  async forceReconnectPrinter(id){
-    const printer = this.#findMePrinter(id)
+  async forceReconnectPrinter(id) {
+    const printer = this.#findMePrinter(id);
     return printer.forceReconnect();
   }
 

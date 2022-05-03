@@ -719,7 +719,7 @@ export default class FileManagerService {
       folder.addEventListener("click", async (e) => {
         const updatedPrinter = await OctoFarmClient.getPrinter(printer._id);
         await FileManagerService.openFolder(
-          folder.id,
+          folder?.id,
           e.target,
           updatedPrinter
         );
