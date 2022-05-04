@@ -42,7 +42,7 @@ jobs:
       - name: Use Node
         uses: actions/setup-node@v2
         with:
-          node-version: "14.17.3"
+          node-version: "16.15.0"
 
       # Up revision the rc version for development
       - if: steps.filter.outputs.server == 'true'
