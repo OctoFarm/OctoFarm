@@ -122,12 +122,8 @@ class OctoprintWebsocketMessageService {
       case OP_WS_MSG.plugin:
         OP_EM.handlePluginData(printerID, data);
         break;
-      case OP_WS_MSG.timelapse:
-        OP_EM.handleTimelapseData(printerID, data);
-        break;
-      case OP_WS_MSG.slicingProgress:
-        OP_EM.handleSlicingData(printerID, data);
-        break;
+      default:
+        logger.debug("No case matched... ignoring data", data);
     }
   }
 
