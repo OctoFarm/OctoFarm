@@ -69,7 +69,7 @@
     "request": "^2.88.2",
     "sanitize": "^2.1.0",
     "semver": "^7.3.5",
-    "simple-git": "^3.4.0",
+    "simple-git": "^3.7.1",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0",
     "systeminformation": "^5.11.8",
@@ -79,16 +79,6 @@
     "winston": "^3.6.0",
     "ws": "^8.5.0",
     "xml2js": "^0.4.23"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.17.8",
-    "@babel/eslint-parser": "^7.17.0",
-    "@babel/preset-env": "^7.16.11",
-    "eslint": "^8.11.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "nodemon": "^2.0.15",
-    "prettier": "^2.6.0"
   },
   "engine-strict": true,
   "engines": {
