@@ -641,10 +641,13 @@
                     who would like to get more information from the data stored in
                     OctoFarm.
                 </div>
-                <div class="alert alert-warning text-dark text-dark" role="alert">
+                <div class="alert alert-warning text-dark" role="alert">
                     You must already have influxDB setup and working to be able to
                     use this feature. A restart will be required after saving the
                     settings to correctly enable.
+                </div>
+                <div class="alert alert-info" role="alert">
+                    You can find a sample grafana.json file to import to get you started from here:
                 </div>
                 <div class="alert alert-secondary" role="alert" id="influxParent">
                     <p>This will activate the exporting of the following
@@ -656,7 +659,7 @@
                                 data-target="#collapseExample1"
                                 aria-expanded="false"
                                 aria-controls="collapseExample1">
-                            Printers Information
+                            Live Printer Data
                         </button>
                         <button class="btn btn-primary" type="button"
                                 data-toggle="collapse"
@@ -676,7 +679,7 @@
                     <div class="collapse" id="collapseExample1"
                          data-parent="#influxParent">
                         <div class="alert alert-dark" role="alert">
-                            Printer information is dumped every 2000ms (2 seconds).
+                            Printer information is dumped every 5000ms (5 seconds).
                             This will dump a record for each printer in your farm
                             with the information below.
                         </div>
@@ -693,39 +696,47 @@
                         </code>
                         <h3>Information:</h3>
                         <code>
-                            state: 'Operational',<br>
-                            state_category: 'Idle',<br>
-                            camera_url: 'http://192.168.1.5:5005'<br>
-                            current_idle_time: 21090000,<br>
-                            current_active_time: 0,<br>
-                            current_offline_time: 120000,<br>
-                            date_added: 1606553431625,<br>
-                            storage_free: 27261640704,<br>
-                            storage_total: 41214558208,<br>
-                            timestamp: 1607515805197,<br>
-                            job_resends: '0 / 0.008K (0)',<br>
-                            job_file_name: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
-                            job_file_display: 'Top - 0.32mm - T230-B75.gcode',<br>
-                            job_file_path: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
-                            job_expected_completion_date: 'Wed Dec 09 2020:
-                            12:10',<br>
-                            job_expected_print_time: 22502.662743896966,<br>
-                            job_expected_print_cost: '0.31',<br>
-                            job_average_print_time: 1478.9511556103555,<br>
-                            job_last_print_time: 1454.8682077580597,<br>
-                            job_thumbnail:
-                            'plugin/prusaslicerthumbnails/thumbnail/Top_-_0.32mm_-_T23
-                            0-B75.png?20201112052916',<br>
-                            tool_0_spool_name: 'Spooler',<br>
-                            tool_0_spool_used: '0',<br>
-                            tool_0_spool_weight: '1000',<br>
-                            tool_0_spool_temp_offset: '0',<br>
-                            tool_0_spool_material: 'PETG',<br>
-                            tool0_actual: 21.3,<br>
-                            tool0_target: 0,<br>
-                            bed_actual: 21.3,<br>
-                            bed_target: 0,<br>
-                            chamber_actual: 0,<br>
+                            name: 'Printer Name'<br>
+                            group: 'A group'<br>
+                            url: 'http://10.50.1.175:5000'<br>
+                            state: 'Complete'<br>
+                            host_state: 'Online'<br>
+                            websocket_state: 'success'<br>
+                            octoprint_version: '1.8.0rc5'<br>
+                            state_category: 'Complete'<br>
+                            current_idle_time: 168870000<br>
+                            current_active_time: 13920000<br>
+                            current_offline_time: 0<br>
+                            storage_free: 21702098944<br>
+                            storage_total: 41214558208<br>
+                            timestamp: 1651633430978<br>
+                            job_resends_transmitted: 82776<br>
+                            job_resends_count: 4<br>
+                            job_resends_ratio: 0<br>
+                            job_progress: 100<br>
+                            job_file_name: 'Thumbnail_2%_Checker.gcode'<br>
+                            job_file_display: 'Thumbnail 2% Checker.gcode'<br>
+                            job_file_path: 'Thumbnail_2%_Checker.gcode'<br>
+                            job_expected_print_time: 0<br>
+                            job_expected_print_cost: 0.5432814980499949<br>
+                            job_expected_total_cost: 0.54<br>
+                            job_expected_total_volume: 44.87<br>
+                            job_expected_total_length: 18.66<br>
+                            job_expected_total_weight: 55.64<br>
+                            job_expected_total_spool_cost: 0<br>
+                            job_expected_maintenance_cost: 0.42216309146063397<br>
+                            job_expected_electricity_cost: 0.12111840658936093<br>
+                            job_current_z: 16.04<br>
+                            job_print_time_elapsed: 385<br>
+                            job_print_time_remaining: 0<br>
+                            job_average_print_time: 385.5016649959998<br>
+                            job_last_print_time: 385.5016649959998<br>
+                            job_thumbnail: 'http://10.50.1.175:5000/plugin/prusaslicerthumbnails/thumbnail/Thumbnail_2%_Checker.png?20220503013230'<br>
+                            tool0_actual: 180.94<br>
+                            tool0_target: 0<br>
+                            bed_actual: 21.78<br>
+                            bed_target: 0<br>
+                            chamber_actual: 0<br>
                             chamber_target: 0<br>
                         </code>
                     </div>

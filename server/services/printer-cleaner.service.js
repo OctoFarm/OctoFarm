@@ -5,7 +5,6 @@ const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
 const PluginLogs = require("../models/PluginLogs.js");
 const UserActions = require("../models/userActionsLog");
-const Printer = require("../models/Printer");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
@@ -91,10 +90,10 @@ class PrinterCleanerService {
     for (const issue of currentIssues) {
       if (!!issue && issue.printerID === farmPrinter._id) {
         let errorFormat = {
-          date: currentIssues[i].date,
-          message: currentIssues[i].message,
-          printer: currentIssues[i].printer,
-          state: currentIssues[i].state
+          date: issue.date,
+          message: issue.message,
+          printer: issue.printer,
+          state: issue.state
         };
         currentOctoFarmLogs.push(errorFormat);
       }

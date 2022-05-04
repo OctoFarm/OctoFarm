@@ -9,7 +9,7 @@ export default function initGroupSelect(printers) {
   const uniqueGroups = _.uniq(currentGroups);
   if (uniqueGroups.length !== 1) {
     uniqueGroups.forEach((group) => {
-      if (group != "") {
+      if (group !== "") {
         groupSelectionDropDown.insertAdjacentHTML(
             "beforeend",
             `
