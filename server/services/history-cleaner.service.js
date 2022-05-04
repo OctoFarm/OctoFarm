@@ -1,10 +1,7 @@
 "use strict";
 
 const { arrayCounts, checkNested, checkNestedIndex } = require("../utils/array.util");
-const {
-  getElectricityCosts,
-  getMaintenanceCosts
-} = require("../utils/print-cost.util");
+const { getElectricityCosts, getMaintenanceCosts } = require("../utils/print-cost.util");
 const {
   getDefaultHistoryStatistics,
   ALL_MONTHS,
@@ -345,7 +342,6 @@ class HistoryCleanerService {
 
     const topPrinterList = [];
     const topFilesList = [];
-    const topSpoolsList = [];
 
     let currentHistory = this.historyClean;
 

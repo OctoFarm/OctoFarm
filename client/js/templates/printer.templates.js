@@ -5,11 +5,13 @@
  * @param position
  */
 export const getPrinterNameBadge = (id, colour, position = undefined) => {
-    return `
+  return `
              <button
                 
                 type="button"
-                class="btn mb-0 btn-sm ${position ? "" : "float-left"} btn-block text-truncate text-${position ? position : "left"}"
+                class="btn mb-0 btn-sm ${
+                  position ? "" : "float-left"
+                } btn-block text-truncate text-${position ? position : "left"}"
                 role="button"
                 style="max-width:${position ? 100 : 60}%;"
                 disabled
@@ -19,5 +21,5 @@ export const getPrinterNameBadge = (id, colour, position = undefined) => {
                 <span id="name-${id}"></span>
               </button>
 
-    `
-}
+    `;
+};

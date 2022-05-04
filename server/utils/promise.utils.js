@@ -12,7 +12,7 @@ const promiseTimeout = function (ms, promise) {
 
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
+};
 
 module.exports = {
   promiseTimeout,

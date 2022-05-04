@@ -1,4 +1,3 @@
-
 function isValidHttpUrl(string) {
   let url;
   try {

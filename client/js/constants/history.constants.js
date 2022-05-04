@@ -4,7 +4,7 @@ module.exports = {
     perPage: "limit=",
     sort: "sort=",
     dateBefore: "firstDate=",
-    dateAfter: "lastDate="
+    dateAfter: "lastDate=",
   },
   SORT_CONSTANTS: {
     printerNameAsc: "printer_name_asc",
@@ -16,7 +16,7 @@ module.exports = {
     endDateAsc: "end_date_asc",
     endDateDesc: "end_date_desc",
     durationAsc: "duration_asc",
-    durationDesc: "duration_desc"
+    durationDesc: "duration_desc",
   },
   ELEMENTS: {
     historyTable: document.getElementById("historyTable"),
@@ -38,6 +38,6 @@ module.exports = {
     filamentCostTotal: document.getElementById("totalCost"),
     printerCostTotal: document.getElementById("printerTotalCost"),
     totalCost: document.getElementById("combinedTotalCost"),
-    averageCostPerHour: document.getElementById("averageCostPerHour")
-  }
+    averageCostPerHour: document.getElementById("averageCostPerHour"),
+  },
 };

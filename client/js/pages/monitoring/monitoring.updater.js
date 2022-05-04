@@ -1,42 +1,47 @@
-import {dragAndDropEnable, dragAndDropGroupEnable, dragCheck} from "../../utils/dragAndDrop.js";
+import {
+  dragAndDropEnable,
+  dragAndDropGroupEnable,
+  dragCheck,
+} from "../../utils/dragAndDrop.js";
 import PrinterControlManagerService from "./services/printer-control-manager.service.js";
 import PrinterFileManagerService from "./services/printer-file-manager.service.js";
 import UI from "../../utils/ui.js";
 import Calc from "../../utils/calc.js";
 import {
-    checkGroupQuickConnectState,
-    checkQuickConnectState,
-    groupInit as actionButtonGroupInit,
-    init as actionButtonInit
+  checkGroupQuickConnectState,
+  checkQuickConnectState,
+  groupInit as actionButtonGroupInit,
+  init as actionButtonInit,
 } from "../../services/printer-action-buttons.service.js";
 import OctoPrintClient from "../../services/octoprint/octoprint-client.service.js";
-import {checkTemps} from "../../utils/temperature-check.util.js";
+import { checkTemps } from "../../utils/temperature-check.util.js";
 import doubleClickFullScreen from "../../utils/fullscreen.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
-import {getControlList, getPrinterInfo} from "./monitoring-view.state";
+import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 import {
-    drawCameraView,
-    drawCombinedView,
-    drawGroupViewContainers,
-    drawGroupViewPrinters,
-    drawListView,
-    drawPanelView
+  drawCameraView,
+  drawCombinedView,
+  drawGroupViewContainers,
+  drawGroupViewPrinters,
+  drawListView,
+  drawPanelView,
 } from "./monitoring.templates";
 import PrinterTerminalManagerService from "./services/printer-terminal-manager.service";
-import {groupBy, mapValues} from "lodash";
-import {FileActions} from "../../services/file-manager.service";
-import {printActionStatusResponse} from "../../services/octoprint/octoprint.helpers-commands.actions";
+import { groupBy, mapValues } from "lodash";
+import { FileActions } from "../../services/file-manager.service";
+import { printActionStatusResponse } from "../../services/octoprint/octoprint.helpers-commands.actions";
 import {
   printerIsAvailableToView,
   printerIsOnline,
-  printerIsPrintingOrComplete
+  printerIsPrintingOrComplete,
 } from "../../utils/octofarm.utils";
-import {initialiseCurrentJobPopover} from "./services/printer-current-job.service";
-import {returnMinimalLayerDataDisplay} from "../../services/octoprint/octoprint-display-layer-plugin.service";
-import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../exceptions/application-error.handler";
+import { initialiseCurrentJobPopover } from "./services/printer-current-job.service";
+import { returnMinimalLayerDataDisplay } from "../../services/octoprint/octoprint-display-layer-plugin.service";
+import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../exceptions/application-error.handler";
 import {
-  fillMiniFilamentDropDownList, findMiniFilamentDropDownsSelect
+  fillMiniFilamentDropDownList,
+  findMiniFilamentDropDownsSelect,
 } from "../../services/printer-filament-selector.service";
 
 let elems = [];
@@ -76,31 +81,49 @@ const returnPrinterInfo = (id) => {
 
 async function addListeners(printer) {
   //For now Control has to be seperated
-  document.getElementById(`printerInfoButton-${printer._id}`).addEventListener("click", async () => {
-    currentOpenModal.innerHTML = "Printer Job Status: ";
-    const printerInfo = getPrinterInfo();
-    const controlList = getControlList();
-    await initialiseCurrentJobPopover(printer._id, printerInfo, controlList);
-  });
-  document.getElementById(`printerButton-${printer._id}`).addEventListener("click", async () => {
-    currentOpenModal.innerHTML = "Printer Control: ";
-    const printerInfo = getPrinterInfo();
-    const controlList = getControlList();
-    await PrinterControlManagerService.init(printer._id, printerInfo, controlList);
-  });
-  document.getElementById(`printerFilesBtn-${printer._id}`).addEventListener("click", async () => {
-    currentOpenModal.innerHTML = "Printer Files: ";
-    const printerInfo = getPrinterInfo();
-    const controlList = getControlList();
-    await PrinterFileManagerService.init(printer._id, printerInfo, controlList);
-  });
+  document
+    .getElementById(`printerInfoButton-${printer._id}`)
+    .addEventListener("click", async () => {
+      currentOpenModal.innerHTML = "Printer Job Status: ";
+      const printerInfo = getPrinterInfo();
+      const controlList = getControlList();
+      await initialiseCurrentJobPopover(printer._id, printerInfo, controlList);
+    });
+  document
+    .getElementById(`printerButton-${printer._id}`)
+    .addEventListener("click", async () => {
+      currentOpenModal.innerHTML = "Printer Control: ";
+      const printerInfo = getPrinterInfo();
+      const controlList = getControlList();
+      await PrinterControlManagerService.init(
+        printer._id,
+        printerInfo,
+        controlList
+      );
+    });
+  document
+    .getElementById(`printerFilesBtn-${printer._id}`)
+    .addEventListener("click", async () => {
+      currentOpenModal.innerHTML = "Printer Files: ";
+      const printerInfo = getPrinterInfo();
+      const controlList = getControlList();
+      await PrinterFileManagerService.init(
+        printer._id,
+        printerInfo,
+        controlList
+      );
+    });
   document
     .getElementById(`printerTerminalButton-${printer._id}`)
     .addEventListener("click", async () => {
       currentOpenModal.innerHTML = "Printer Terminal: ";
       const printerInfo = getPrinterInfo();
       const controlList = getControlList();
-      await PrinterTerminalManagerService.init(printer._id, printerInfo, controlList);
+      await PrinterTerminalManagerService.init(
+        printer._id,
+        printerInfo,
+        controlList
+      );
     });
 
   //Play button listeners
@@ -109,12 +132,12 @@ async function addListeners(printer) {
     playBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
-        command: "start"
+        command: "start",
       };
       const print = returnPrinterInfo(printer._id);
       const octoPrintCall = await OctoPrintClient.jobAction(print, opts, e);
-      if(!!octoPrintCall?.status){
-        printActionStatusResponse(octoPrintCall?.status, "print")
+      if (!!octoPrintCall?.status) {
+        printActionStatusResponse(octoPrintCall?.status, "print");
       }
     });
   }
@@ -127,22 +150,22 @@ async function addListeners(printer) {
         message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: "<i class=\"fa fa-times\"></i> Cancel"
+            label: "<i class=\"fa fa-times\"></i> Cancel",
           },
           confirm: {
-            label: "<i class=\"fa fa-check\"></i> Confirm"
-          }
+            label: "<i class=\"fa fa-check\"></i> Confirm",
+          },
         },
         async callback(result) {
           if (result) {
             e.target.disabled = true;
             const opts = {
-              command: "cancel"
+              command: "cancel",
             };
             const { status } = await OctoPrintClient.jobAction(print, opts, e);
-            printActionStatusResponse(status, "cancel")
+            printActionStatusResponse(status, "cancel");
           }
-        }
+        },
       });
     });
   }
@@ -151,11 +174,11 @@ async function addListeners(printer) {
     restartBtn.addEventListener("click", async (e) => {
       e.target.disabled = true;
       const opts = {
-        command: "restart"
+        command: "restart",
       };
       const print = returnPrinterInfo(printer._id);
       const { status } = await OctoPrintClient.jobAction(print, opts, e);
-      printActionStatusResponse(status, "restart")
+      printActionStatusResponse(status, "restart");
     });
   }
   let pauseBtn = document.getElementById("pause-" + printer._id);
@@ -164,11 +187,11 @@ async function addListeners(printer) {
       e.target.disabled = true;
       const opts = {
         command: "pause",
-        action: "pause"
+        action: "pause",
       };
       const print = returnPrinterInfo(printer._id);
       const { status } = await OctoPrintClient.jobAction(print, opts, e);
-      printActionStatusResponse(status, "pause")
+      printActionStatusResponse(status, "pause");
     });
   }
   let resumeBtn = document.getElementById("resume-" + printer._id);
@@ -177,11 +200,11 @@ async function addListeners(printer) {
       e.target.disabled = true;
       const opts = {
         command: "pause",
-        action: "resume"
+        action: "resume",
       };
       const print = returnPrinterInfo(printer._id);
       const { status } = await OctoPrintClient.jobAction(print, opts, e);
-      printActionStatusResponse(status, "resume")
+      printActionStatusResponse(status, "resume");
     });
   }
   let cameraContain = document.getElementById("cameraContain-" + printer._id);
@@ -190,13 +213,19 @@ async function addListeners(printer) {
       doubleClickFullScreen(e.target);
     });
   }
-  if(!!printer?.currentProfile){
-    for(let i = 0; i < printer.currentProfile?.extruder?.count; i++){
-      const miniFilamentDropdownSelect = findMiniFilamentDropDownsSelect(printer._id, i);
-      await fillMiniFilamentDropDownList(miniFilamentDropdownSelect, printer, i);
+  if (!!printer?.currentProfile) {
+    for (let i = 0; i < printer.currentProfile?.extruder?.count; i++) {
+      const miniFilamentDropdownSelect = findMiniFilamentDropDownsSelect(
+        printer._id,
+        i
+      );
+      await fillMiniFilamentDropDownList(
+        miniFilamentDropdownSelect,
+        printer,
+        i
+      );
     }
   }
-
 
   return "done";
 }
@@ -245,8 +274,12 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
           file.toolUnits.forEach((unit, index) => {
             toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
           });
-          let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
-          if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
+          let thumbnail =
+            "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
+          if (
+            typeof file.thumbnail !== "undefined" &&
+            file.thumbnail !== null
+          ) {
             thumbnail = `<center><img src='${printers[0].printerURL}/${file.thumbnail}' width="100%"></center>`;
           }
           let fileDate = new Date(file.uploadDate * 1000);
@@ -301,9 +334,9 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
                 <p class="mb-1 float-left">
                 <i class="fas fa-clock"></i><span id="fileDateClean-${
                   file.fullPath
-                }" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${
-            file.fullPath
-          }"> ${fileDate}</span><br>
+                }" class="date d-none"> ${
+            file.uploadDate
+          }</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
                 <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
                   file.fullPath
                 }"> ${Calc.bytes(file.fileSize)}</span> <br>
@@ -327,7 +360,9 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
           }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
-              <button  title="Select file" id="${currentGroupEncoded._id}*fileActionSelect*${
+              <button  title="Select file" id="${
+                currentGroupEncoded._id
+              }*fileActionSelect*${
             file.fullPath
           }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
@@ -383,11 +418,11 @@ function addGroupListeners(printers) {
           e.target.disabled = true;
           for (const printer of groupedPrinters[key]) {
             const opts = {
-              command: "start"
+              command: "start",
             };
             const print = returnPrinterInfo(printer._id);
             const { status } = await OctoPrintClient.jobAction(print, opts, e);
-            printActionStatusResponse(status, "print")
+            printActionStatusResponse(status, "print");
           }
         });
       }
@@ -398,11 +433,11 @@ function addGroupListeners(printers) {
             message: "Are you sure you want to cancel the ongoing prints?",
             buttons: {
               cancel: {
-                label: "<i class=\"fa fa-times\"></i> Cancel"
+                label: "<i class=\"fa fa-times\"></i> Cancel",
               },
               confirm: {
-                label: "<i class=\"fa fa-check\"></i> Confirm"
-              }
+                label: "<i class=\"fa fa-check\"></i> Confirm",
+              },
             },
             async callback(result) {
               if (result) {
@@ -410,27 +445,33 @@ function addGroupListeners(printers) {
                 for (const printer of groupedPrinters[key]) {
                   const print = returnPrinterInfo(printer._id);
                   const opts = {
-                    command: "cancel"
+                    command: "cancel",
                   };
-                  const { status } = await OctoPrintClient.jobAction(print, opts, e);
-                  printActionStatusResponse(status, "cancel")
+                  const { status } = await OctoPrintClient.jobAction(
+                    print,
+                    opts,
+                    e
+                  );
+                  printActionStatusResponse(status, "cancel");
                 }
               }
-            }
+            },
           });
         });
       }
-      let restartBtn = document.getElementById("restart-" + currentGroupEncoded);
+      let restartBtn = document.getElementById(
+        "restart-" + currentGroupEncoded
+      );
       if (restartBtn) {
         restartBtn.addEventListener("click", async (e) => {
           e.target.disabled = true;
           for (const printer of groupedPrinters[key]) {
             const opts = {
-              command: "restart"
+              command: "restart",
             };
             const print = returnPrinterInfo(printer._id);
             const { status } = await OctoPrintClient.jobAction(print, opts, e);
-            printActionStatusResponse(status, "restart")
+            printActionStatusResponse(status, "restart");
           }
         });
       }
@@ -441,11 +482,11 @@ function addGroupListeners(printers) {
           for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
-              action: "pause"
+              action: "pause",
             };
             const print = returnPrinterInfo(printer._id);
             const { status } = await OctoPrintClient.jobAction(print, opts, e);
-            printActionStatusResponse(status, "pause")
+            printActionStatusResponse(status, "pause");
           }
         });
       }
@@ -456,15 +497,17 @@ function addGroupListeners(printers) {
           for (const printer of groupedPrinters[key]) {
             const opts = {
               command: "pause",
-              action: "resume"
+              action: "resume",
             };
             const print = returnPrinterInfo(printer._id);
             const { status } = await OctoPrintClient.jobAction(print, opts, e);
-            printActionStatusResponse(status, "resume")
+            printActionStatusResponse(status, "resume");
           }
         });
       }
-      let filesBtn = document.getElementById("unifiedFiles-" + currentGroupEncoded);
+      let filesBtn = document.getElementById(
+        "unifiedFiles-" + currentGroupEncoded
+      );
       if (filesBtn) {
         filesBtn.addEventListener("click", async (e) => {
           const idList = [];
@@ -511,7 +554,7 @@ function grabElements(printer) {
       cameraContain: document.getElementById("cameraContain-" + _id),
       progress: document.getElementById("progress-" + _id),
       bed: document.getElementById("badTemp-" + _id),
-      chamber: document.getElementById("chamberTemp-" + _id)
+      chamber: document.getElementById("chamberTemp-" + _id),
     };
     return elems[_id];
   }
@@ -529,7 +572,7 @@ function grabGroupElements(group) {
       resume: document.getElementById("resume-" + group),
       state: document.getElementById("state-" + group),
       progress: document.getElementById("progress-" + group),
-      unifiedFiles: document.getElementById("unifiedFiles-" + group)
+      unifiedFiles: document.getElementById("unifiedFiles-" + group),
     };
     return groupElems[group];
   }
@@ -576,7 +619,11 @@ async function updateState(printer, clientSettings, view, index) {
   elements.terminal.disabled = isOffline;
   elements.job.disabled = !isPrintingOrComplete;
 
-  UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+  UI.doesElementNeedUpdating(
+    printer.printerState.state,
+    elements.state,
+    "innerHTML"
+  );
 
   let stateCategory = printer.printerState.colour.category;
   if (stateCategory === "Error!") {
@@ -630,7 +677,9 @@ async function updateState(printer, clientSettings, view, index) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-clock"></i> ${Calc.generateTime(printer.currentJob.expectedPrintTime)}
+            <i class="fas fa-clock"></i> ${Calc.generateTime(
+              printer.currentJob.expectedPrintTime
+            )}
         </small>
       `;
       let remainingPrintTimeFormat = `
@@ -641,10 +690,16 @@ async function updateState(printer, clientSettings, view, index) {
         </small>
         <br>
         <small title="Estimated Time of Arrival">
-        <i class="fas fa-calendar-alt"></i> ${printer.currentJob.expectedCompletionDate}
+        <i class="fas fa-calendar-alt"></i> ${
+          printer.currentJob.expectedCompletionDate
+        }
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.doesElementNeedUpdating(
+        printTimeElapsedFormat,
+        elements.printTimeElapsed,
+        "innerHTML"
+      );
       UI.doesElementNeedUpdating(
         remainingPrintTimeFormat,
         elements.remainingPrintTime,
@@ -659,7 +714,9 @@ async function updateState(printer, clientSettings, view, index) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-clock"></i> ${Calc.generateTime(printer.currentJob.expectedPrintTime)}
+            <i class="fas fa-clock"></i> ${Calc.generateTime(
+              printer.currentJob.expectedPrintTime
+            )}
         </small>
       `;
       let remainingPrintTimeFormat = `
@@ -671,7 +728,11 @@ async function updateState(printer, clientSettings, view, index) {
         <i class="fas fa-calendar-alt"></i> Complete!
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.doesElementNeedUpdating(
+        printTimeElapsedFormat,
+        elements.printTimeElapsed,
+        "innerHTML"
+      );
       UI.doesElementNeedUpdating(
         remainingPrintTimeFormat,
         elements.remainingPrintTime,
@@ -696,7 +757,11 @@ async function updateState(printer, clientSettings, view, index) {
         <i class="fas fa-calendar-alt"></i> No Active Print
         </small>
       `;
-      UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
+      UI.doesElementNeedUpdating(
+        printTimeElapsedFormat,
+        elements.printTimeElapsed,
+        "innerHTML"
+      );
       UI.doesElementNeedUpdating(
         remainingPrintTimeFormat,
         elements.remainingPrintTime,
@@ -725,52 +790,67 @@ async function updateState(printer, clientSettings, view, index) {
     //No Job reset
     UI.doesElementNeedUpdating(0 + "%", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
-    UI.doesElementNeedUpdating(printTimeElapsedFormat, elements.printTimeElapsed, "innerHTML");
-    UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
+    UI.doesElementNeedUpdating(
+      printTimeElapsedFormat,
+      elements.printTimeElapsed,
+      "innerHTML"
+    );
+    UI.doesElementNeedUpdating(
+      remainingPrintTimeFormat,
+      elements.remainingPrintTime,
+      "innerHTML"
+    );
     elements.currentFile.setAttribute("title", "No File Selected");
-    elements.currentFile.innerHTML = "<i class=\"fas fa-file-code\"></i> " + "No File Selected";
+    elements.currentFile.innerHTML =
+      "<i class=\"fas fa-file-code\"></i> " + "No File Selected";
   }
   if (!!printer?.layerData) {
-    UI.doesElementNeedUpdating(returnMinimalLayerDataDisplay(printer.layerData), elements.layerData, "innerHTML");
+    UI.doesElementNeedUpdating(
+      returnMinimalLayerDataDisplay(printer.layerData),
+      elements.layerData,
+      "innerHTML"
+    );
   }
   if (!!printer.tools) {
     const toolKeys = Object.keys(printer.tools[0]);
     for (const element of toolKeys) {
       if (element.includes("tool")) {
         const toolNumber = element.replace("tool", "");
-        if (document.getElementById(printer._id + "-temperature-" + toolNumber)) {
+        if (
+          document.getElementById(printer._id + "-temperature-" + toolNumber)
+        ) {
           checkTemps(
-              document.getElementById(printer._id + "-temperature-" + toolNumber),
-              printer.tools[0][element].actual,
-              printer.tools[0][element].target,
-              printer.otherSettings.temperatureTriggers,
-              printer.printerState.colour.category
+            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            printer.tools[0][element].actual,
+            printer.tools[0][element].target,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
           );
         } else {
           checkTemps(
-              document.getElementById(printer._id + "-temperature-" + toolNumber),
-              0,
-              0,
-              printer.otherSettings.temperatureTriggers,
-              printer.printerState.colour.category
+            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            0,
+            0,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
           );
         }
       } else if (element.includes("bed")) {
         if (elements.bed) {
           checkTemps(
-              elements.bed,
-              printer.tools[0][element].actual,
-              printer.tools[0][element].target,
-              printer.otherSettings.temperatureTriggers,
-              printer.printerState.colour.category
+            elements.bed,
+            printer.tools[0][element].actual,
+            printer.tools[0][element].target,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
           );
         }
       } else if (element.includes("chamber")) {
         if (elements.chamber) {
           checkTemps(
-              elements.chamber,
-              printer.tools[0][element].actual,
-              printer.tools[0][element].target,
+            elements.chamber,
+            printer.tools[0][element].actual,
+            printer.tools[0][element].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
           );
@@ -819,7 +899,10 @@ async function updateState(printer, clientSettings, view, index) {
       elements.stop.disabled = false;
     }
 
-    if (printer.printerState.state === "Pausing" || printer.printerState.state === "Cancelling") {
+    if (
+      printer.printerState.state === "Pausing" ||
+      printer.printerState.state === "Cancelling"
+    ) {
       if (elements.start) {
         elements.start.classList.remove("hidden");
       }
@@ -882,7 +965,10 @@ async function updateState(printer, clientSettings, view, index) {
     if (elements.row.classList.contains(hideOffline)) {
       elements.row.classList.remove(hideOffline);
     }
-    if (!!printer.currentJob && printer.currentJob.fileName !== "No File Selected") {
+    if (
+      !!printer.currentJob &&
+      printer.currentJob.fileName !== "No File Selected"
+    ) {
       if (elements.start) {
         elements.start.disabled = false;
       }
@@ -954,8 +1040,8 @@ async function updateState(printer, clientSettings, view, index) {
   } else if (printer.printerState.state === "Disconnected") {
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
-    }else{
-      elements.row.classList.remove("hidden")
+    } else {
+      elements.row.classList.remove("hidden");
     }
     if (elements.start) {
       elements.start.disabled = true;
@@ -1073,8 +1159,16 @@ async function updateGroupState(printers, clientSettings, view) {
           elements.row.classList.add(hideOffline);
         }
       }
-      UI.doesElementNeedUpdating(printer.printerName, elements.name, "innerHTML");
-      UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+      UI.doesElementNeedUpdating(
+        printer.printerName,
+        elements.name,
+        "innerHTML"
+      );
+      UI.doesElementNeedUpdating(
+        printer.printerState.state,
+        elements.state,
+        "innerHTML"
+      );
       UI.doesElementNeedUpdating(
         `w-100 badge ${printer.printerState.colour.category}`,
         elements.state,
@@ -1107,7 +1201,9 @@ async function updateGroupState(printers, clientSettings, view) {
           (obj) => obj.printerState.state === "Paused"
         ).length;
         const pausingPrinters = groupedPrinters[key].filter(
-          (obj) => obj.printerState.state === "Pausing" || obj.printerState.state === "Cancelling"
+          (obj) =>
+            obj.printerState.state === "Pausing" ||
+            obj.printerState.state === "Cancelling"
         ).length;
         const filesSelected = groupedPrinters[key].filter(
           (obj) => obj?.currentJob?.fileName !== "No File Selected"
@@ -1118,7 +1214,11 @@ async function updateGroupState(printers, clientSettings, view) {
         }, 0);
 
         const actualProgress = combinedProgress / groupedPrinters[key].length;
-        UI.doesElementNeedUpdating(actualProgress.toFixed(0) + "%", elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating(
+          actualProgress.toFixed(0) + "%",
+          elements.progress,
+          "innerHTML"
+        );
         elements.progress.style.width = actualProgress + "%";
 
         if (actualProgress < 100) {
@@ -1326,15 +1426,22 @@ export async function initMonitoring(printers, clientSettings, view) {
       } else if (currentOpenModal.innerHTML.includes("Control")) {
         await PrinterControlManagerService.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
-        await PrinterTerminalManagerService.init("", printers, getControlList());
-      }else if(currentOpenModal.innerHTML.includes("Job")){
+        await PrinterTerminalManagerService.init(
+          "",
+          printers,
+          getControlList()
+        );
+      } else if (currentOpenModal.innerHTML.includes("Job")) {
         await initialiseCurrentJobPopover("", printers, getControlList());
       }
+      break;
     case false:
       // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
         if (printerIsAvailableToView(printers[p])) {
-          let printerPanel = document.getElementById("panel-" + printers[p]._id);
+          let printerPanel = document.getElementById(
+            "panel-" + printers[p]._id
+          );
           if (!printerPanel) {
             if (view === "panel") {
               let printerHTML = drawPanelView(printers[p], clientSettings);
@@ -1352,17 +1459,25 @@ export async function initMonitoring(printers, clientSettings, view) {
               let printerHTML = drawCombinedView(printers[p], clientSettings);
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
             } else {
-              console.error("printerPanel could not determine view type to update", view);
+              console.error(
+                "printerPanel could not determine view type to update",
+                view
+              );
               const errorObject = ClientErrors.SILENT_ERROR;
-              errorObject.message =  `Monitoring Updater - ${e}`
-              throw new ApplicationError(errorObject)
+              errorObject.message = `Monitoring Updater - ${e}`;
+              throw new ApplicationError(errorObject);
             }
 
             if (view !== "group") {
               //Update the printer panel to the actual one
-              printerPanel = document.getElementById("panel-" + printers[p]._id);
+              printerPanel = document.getElementById(
+                "panel-" + printers[p]._id
+              );
               //Setup Action Buttons
-              await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+              await actionButtonInit(
+                printers[p],
+                `printerActionBtns-${printers[p]._id}`
+              );
               //Add page listeners
               await addListeners(printers[p]);
               //Grab elements

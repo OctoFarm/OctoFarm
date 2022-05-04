@@ -7,5 +7,5 @@ function getOctoFarmUiPath() {
 }
 
 module.exports = {
-  getOctoFarmUiPath
+  getOctoFarmUiPath,
 };

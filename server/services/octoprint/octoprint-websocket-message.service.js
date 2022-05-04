@@ -167,7 +167,6 @@ class OctoprintWebsocketMessageService {
     };
 
     getPrinterStoreCache().updatePrinterState(printerID, currentState);
-    // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static async handleEventData(printerID, data) {
     const { type, payload } = data.event;
@@ -296,7 +295,6 @@ class OctoprintWebsocketMessageService {
         captureZChange(printerID, payload);
         break;
     }
-    //logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
@@ -325,8 +323,5 @@ class OctoprintWebsocketMessageService {
         logger.debug("Unknown data!", data);
     }
   }
-  static handleTimelapseData(printerID, data) {
-  }
-  static handleSlicingData(printerID, data) {}
 }
 module.exports = OctoprintWebsocketMessageService;

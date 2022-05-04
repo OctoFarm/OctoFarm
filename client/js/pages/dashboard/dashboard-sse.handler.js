@@ -1,4 +1,4 @@
-import {DashUpdate} from "./dashboard.updater";
+import { DashUpdate } from "./dashboard.updater";
 import UI from "../../utils/ui";
 import currentOperationsService from "../../services/current-operations.service";
 
@@ -12,7 +12,11 @@ export async function dashboardSSEventHandler(data) {
     const dashboard = data.dashStatistics;
     const dashboardSettings = data.dashboardSettings;
     if (dashboardSettings.farmActivity.currentOperations) {
-      currentOperationsService(currentOperationsData.operations, currentOperationsData.count, printerInfo);
+      currentOperationsService(
+        currentOperationsData.operations,
+        currentOperationsData.count,
+        printerInfo
+      );
     }
 
     DashUpdate.farmInformation(

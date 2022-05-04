@@ -108,10 +108,10 @@ const returnAlerts = (id, printerURL) => {
    `;
 };
 
-function returnPrinterManageDropDown(id, disabled){
-    let printerDisabledButton = null;
-    if(!disabled){
-        printerDisabledButton = `
+function returnPrinterManageDropDown(id, disabled) {
+  let printerDisabledButton = null;
+  if (!disabled) {
+    printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${id}"
                  type="button"
@@ -119,9 +119,9 @@ function returnPrinterManageDropDown(id, disabled){
                 >
                 <i class="fas fa-wheelchair"></i> Disable
         </button>
-        `
-    }else{
-        printerDisabledButton = `
+        `;
+  } else {
+    printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
                  id="printerDisable-${id}"
                  type="button"
@@ -129,9 +129,9 @@ function returnPrinterManageDropDown(id, disabled){
                 >
                 <i class="fas fa-running text-success"></i> Enable
         </button>
-        `
-    }
-    return `
+        `;
+  }
+  return `
     <div class="btn-group">
           <button type="button" class="btn btn-info dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fa-solid fa-bars-progress"></i> Manage
@@ -205,7 +205,7 @@ function returnPrinterManageDropDown(id, disabled){
             </button>
           </div>
         </div>
-    `
+    `;
 }
 
 export function returnPrinterTableRow(printer) {
@@ -219,7 +219,11 @@ export function returnPrinterTableRow(printer) {
             </span>
         </td>
         <td class="align-middle">
-             ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
+             ${getPrinterNameBadge(
+               printer._id,
+               printer.settingsAppearance.color,
+               "center"
+             )}
         </td>
         <td class="align-middle">
             <span id="printerURL-${printer._id}"></span>
@@ -235,18 +239,22 @@ export function returnPrinterTableRow(printer) {
         </td>
         <td class="align-middle">
             <small>
-                <span data-title="${printer.printerState.desc}" id="printerBadge-${
-    printer._id
-  }" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
+                <span data-title="${
+                  printer.printerState.desc
+                }" id="printerBadge-${printer._id}" class="tag badge badge-${
+    printer.printerState.colour.name
+  } badge-pill">
                     ${printer.printerState.state}
                 </span>
             </small>
         </td>
         <td class="align-middle">
             <small>
-                <span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${
-    printer._id
-  }" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
+                <span data-title="${
+                  printer.webSocketState.desc
+                }" id="webSocketIcon-${printer._id}" class="tag badge badge-${
+    printer.webSocketState.colour
+  } badge-pill">
                     <i  class="fas fa-plug"></i>
                 </span>
             </small>
@@ -279,7 +287,11 @@ export function returnDisabledPrinterTableRow(printer) {
             </span>
         </td>
         <td class="align-middle" >
-            ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, "center")}
+            ${getPrinterNameBadge(
+              printer._id,
+              printer.settingsAppearance.color,
+              "center"
+            )}
             </td>
                     <td class="align-middle">
             <span id="printerURL-${printer._id}"></span>
@@ -295,7 +307,9 @@ export function returnDisabledPrinterTableRow(printer) {
         </td>
         <td class="align-middle">
             <small>
-                <span data-title="${printer.printerState.desc}" id="printerBadge-${
+                <span data-title="${
+                  printer.printerState.desc
+                }" id="printerBadge-${
     printer._id
   }" class="tag badge badge-dark badge-pill">
                     ${printer.printerState.state}
@@ -304,9 +318,11 @@ export function returnDisabledPrinterTableRow(printer) {
         </td>
         <td class="align-middle">
             <small>
-                <span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${
-    printer._id
-  }" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
+                <span data-title="${
+                  printer.webSocketState.desc
+                }" id="webSocketIcon-${printer._id}" class="tag badge badge-${
+    printer.webSocketState.colour
+  } badge-pill">
                     <i  class="fas fa-plug"></i>
                 </span>
             </small>

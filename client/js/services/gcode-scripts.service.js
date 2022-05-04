@@ -17,14 +17,23 @@ async function newGcodeScript(newScript) {
   const keys = Object.keys(newScript);
   const errors = [];
   for (const key of keys) {
-    if (newScript["name"] === "" || newScript["gcode"] === "" || newScript["printerIds"].length === 0) {
+    if (
+      newScript["name"] === "" ||
+      newScript["gcode"] === "" ||
+      newScript["printerIds"].length === 0
+    ) {
       errors.push(key);
     }
   }
 
   if (errors.length !== 0) {
     if (errors.includes("printerIds")) {
-      UI.createAlert("error", "You need to select some printers!", 3000, "Clicked");
+      UI.createAlert(
+        "error",
+        "You need to select some printers!",
+        3000,
+        "Clicked"
+      );
     }
     if (errors.includes("gcode") || errors.includes("name")) {
       UI.createAlert(
@@ -61,28 +70,36 @@ createNewScriptBtn.addEventListener("click", async (e) => {
     description: document.getElementById("gcodeScriptDescription").value,
     gcode: document.getElementById("gcodeScriptScript").value,
     buttonColour: document.getElementById("gcodeScriptBtnColour").value,
-    printerIds: Array.from(document.getElementById("gcodeScriptPrinters").selectedOptions).map(
-      (v) => v.value
-    )
+    printerIds: Array.from(
+      document.getElementById("gcodeScriptPrinters").selectedOptions
+    ).map((v) => v.value),
   };
   const scriptSuccess = await newGcodeScript(newScript);
-  if(!!scriptSuccess){
+  if (!!scriptSuccess) {
     document.getElementById("gcodeScriptName").value = "";
     document.getElementById("gcodeScriptDescription").value = "";
     document.getElementById("gcodeScriptScript").value = "";
     document.getElementById("gcodeScriptBtnColour").value = "";
     document.getElementById("gcodeScriptPrinters").value = "";
-    UI.createAlert("success", "Successfully created your new script!", 3000, "Clicked");
+    UI.createAlert(
+      "success",
+      "Successfully created your new script!",
+      3000,
+      "Clicked"
+    );
   }
-
 });
 
 async function drawScriptTable(scripts) {
   const scriptTable = document.getElementById("gcodeScriptTable");
   const printerList = await OctoFarmClient.listPrinters();
-  const printerSelect = ["<option value=\"99aa99aaa9999a99999999aa\"> Allow all printers </option>"];
+  const printerSelect = [
+    '<option value="99aa99aaa9999a99999999aa"> Allow all printers </option>',
+  ];
   printerList.forEach((printer) => {
-    printerSelect.push(`<option value="${printer._id}"> ${printer.printerName} </option>`);
+    printerSelect.push(
+      `<option value="${printer._id}"> ${printer.printerName} </option>`
+    );
   });
   let lines = "";
 
@@ -126,8 +143,12 @@ async function drawScriptTable(scripts) {
             </tr>
       `
   );
-  const scriptButton = document.getElementById(`script_btn_colour_${scripts._id}`);
-  const scriptPrinters = document.getElementById(`script_printer_select_${scripts._id}`);
+  const scriptButton = document.getElementById(
+    `script_btn_colour_${scripts._id}`
+  );
+  const scriptPrinters = document.getElementById(
+    `script_printer_select_${scripts._id}`
+  );
 
   if (!scripts?.buttonColour) {
     scriptButton.value = "success";
@@ -155,30 +176,47 @@ async function drawScriptTable(scripts) {
   const editButton = document.getElementById(`editScript-${scripts._id}`);
   const saveButton = document.getElementById(`saveScript-${scripts._id}`);
 
-  document.getElementById("deleteScript-" + scripts._id).addEventListener("click", async (e) => {
-    const delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
-    if (!!delt) {
-      UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked");
-      document.getElementById("scriptRow-" + scripts._id).remove();
-    } else {
-      UI.createAlert(
-        "error",
-        "Something went wrong, is the OctoFarm server online?",
-        3000,
-        "Clicked"
+  document
+    .getElementById("deleteScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      const delt = await OctoFarmClient.get(
+        "settings/customGcode/delete/" + scripts._id
       );
-    }
-  });
-  document.getElementById("editScript-" + scripts._id).addEventListener("click", async (e) => {
-    UI.enableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+      if (!!delt) {
+        UI.createAlert(
+          "success",
+          "Successfully deleted your script...",
+          3000,
+          "Clicked"
+        );
+        document.getElementById("scriptRow-" + scripts._id).remove();
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong, is the OctoFarm server online?",
+          3000,
+          "Clicked"
+        );
+      }
+    });
+  document
+    .getElementById("editScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      UI.enableElements([
+        scriptName,
+        scriptDesc,
+        scriptButton,
+        scriptPrinters,
+        scriptLines,
+      ]);
 
-    UI.setElementValueFromPlaceholder([scriptName, scriptDesc, scriptLines]);
+      UI.setElementValueFromPlaceholder([scriptName, scriptDesc, scriptLines]);
 
-    scriptLines.rows = "10";
-    scriptPrinters.size = "11";
-    editButton.classList.toggle("d-none");
-    saveButton.classList.toggle("d-none");
-  });
+      scriptLines.rows = "10";
+      scriptPrinters.size = "11";
+      editButton.classList.toggle("d-none");
+      saveButton.classList.toggle("d-none");
+    });
   saveButton.addEventListener("click", async (e) => {
     const newScript = {
       id: scriptID.innerHTML,
@@ -186,13 +224,21 @@ async function drawScriptTable(scripts) {
       description: scriptDesc.value,
       gcode: scriptLines.value,
       buttonColour: scriptButton.value,
-      printerIds: Array.from(scriptPrinters.selectedOptions).map((v) => v.value)
+      printerIds: Array.from(scriptPrinters.selectedOptions).map(
+        (v) => v.value
+      ),
     };
 
     const save = await newGcodeScript(newScript);
     if (save) {
       UI.setElementPlaceholderFromValue([scriptName, scriptDesc, scriptLines]);
-      UI.disableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+      UI.disableElements([
+        scriptName,
+        scriptDesc,
+        scriptButton,
+        scriptPrinters,
+        scriptLines,
+      ]);
       UI.blankElementValue([scriptName, scriptDesc, scriptLines]);
 
       scriptLines.rows = "1";
@@ -204,5 +250,5 @@ async function drawScriptTable(scripts) {
 }
 
 export default {
-  ignore: "ignore"
+  ignore: "ignore",
 };

@@ -2,19 +2,27 @@ import Calc from "./utils/calc.js";
 import UI from "./utils/ui.js";
 import {
   returnBigFilamentSelectorTemplate,
-  drawHistoryDropDown, findBigFilamentDropDowns
+  drawHistoryDropDown,
+  findBigFilamentDropDowns,
 } from "./services/printer-filament-selector.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
-import {ELEMENTS, HISTORY_CONSTANTS, SORT_CONSTANTS} from "./constants/history.constants";
 import {
-    returnHistoryFilterDefaultSelected,
-    returnHistoryPagination,
-    returnHistoryTableRow
+  ELEMENTS,
+  HISTORY_CONSTANTS,
+  SORT_CONSTANTS,
+} from "./constants/history.constants";
+import {
+  returnHistoryFilterDefaultSelected,
+  returnHistoryPagination,
+  returnHistoryTableRow,
 } from "./pages/history/history.templates";
-import {daysBetweenTwoDates, getFirstDayOfLastMonth} from "./utils/date.utils";
+import {
+  daysBetweenTwoDates,
+  getFirstDayOfLastMonth,
+} from "./utils/date.utils";
 import Litepicker from "litepicker";
-import {dashboardOptions} from "./pages/charts/dashboard.options";
+import { dashboardOptions } from "./pages/charts/dashboard.options";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -32,8 +40,6 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historySaveBtn").remove();
   document.getElementById("historyUpdateCostBtn").remove();
 });
-
-// $("#currentStatistics").on("show.bs.modal", function (e) {});
 
 class History {
   static historyList;
@@ -60,7 +66,7 @@ class History {
       hasPrevPage: false,
       hasNextPage: false,
       prev: null,
-      next: null
+      next: null,
     };
     if (paginationZero) {
       ELEMENTS.historyPagination.insertAdjacentHTML(
@@ -87,16 +93,22 @@ class History {
       HISTORY_CONSTANTS.perPage
     }${ELEMENTS.itemsPerPage.value}&${HISTORY_CONSTANTS.sort}${
       SORT_CONSTANTS[ELEMENTS.sort.value]
-    }&${HISTORY_CONSTANTS.dateBefore}${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+    }&${HISTORY_CONSTANTS.dateBefore}${lastDay}&${
+      HISTORY_CONSTANTS.dateAfter
+    }${firstDay}`;
 
     if (ELEMENTS.printerNamesFilter.value !== "Filter") {
-      url += "&printerNameFilter=" + ELEMENTS.printerNamesFilter.value.replace(/ /g, "-");
+      url +=
+        "&printerNameFilter=" +
+        ELEMENTS.printerNamesFilter.value.replace(/ /g, "-");
     }
 
     if (ELEMENTS.printerGroupsFilter.value !== "Filter") {
       url +=
         "&printerGroupFilter=" +
-        ELEMENTS.printerGroupsFilter.value.replace(/[^\w\-]+/g, "-").toLowerCase();
+        ELEMENTS.printerGroupsFilter.value
+          .replace(/[^\w\-]+/g, "-")
+          .toLowerCase();
     }
 
     if (ELEMENTS.fileFilter.value !== "Filter") {
@@ -108,11 +120,13 @@ class History {
     }
 
     if (ELEMENTS.spoolManuFilter.value !== "Filter") {
-      url += "&spoolManuFilter=" + ELEMENTS.spoolManuFilter.value.replace(/ /g, "-");
+      url +=
+        "&spoolManuFilter=" + ELEMENTS.spoolManuFilter.value.replace(/ /g, "-");
     }
 
     if (ELEMENTS.spoolMatFilter.value !== "Filter") {
-      url += "&spoolMatFilter=" + ELEMENTS.spoolMatFilter.value.replace(/ /g, "-");
+      url +=
+        "&spoolMatFilter=" + ELEMENTS.spoolMatFilter.value.replace(/ /g, "-");
     }
 
     if (ELEMENTS.fileSearch.value !== "") {
@@ -120,7 +134,8 @@ class History {
     }
 
     if (ELEMENTS.printerSearch.value !== "") {
-      url += "&printerSearch=" + ELEMENTS.printerSearch.value.replace(/ /g, "-");
+      url +=
+        "&printerSearch=" + ELEMENTS.printerSearch.value.replace(/ /g, "-");
     }
 
     if (ELEMENTS.spoolSearch.value !== "") {
@@ -135,12 +150,17 @@ class History {
 
     if (records) {
       for (let r = 0; r < records.length; r++) {
-        historyTable.insertAdjacentHTML("beforeend", returnHistoryTableRow(records[r]));
+        historyTable.insertAdjacentHTML(
+          "beforeend",
+          returnHistoryTableRow(records[r])
+        );
       }
     }
   }
   static addHistoryFilterListeners(pagination) {
-    const paginationElementsList = document.querySelectorAll('*[id^="changePage"]');
+    const paginationElementsList = document.querySelectorAll(
+      '*[id^="changePage"]'
+    );
     paginationElementsList.forEach((element) => {
       element.addEventListener("click", (e) => {
         const split = e.target.id.split("-");
@@ -165,10 +185,6 @@ class History {
       this.get(pagination.pageCount, true);
     });
 
-    // if (forceFilterRedraw) {
-    //   this.listenersApplied = false;
-    // }
-
     if (!this?.listenersApplied) {
       this.datePicker.on("selected", async (date1, date2) => {
         const daysBetweenDates = daysBetweenTwoDates(
@@ -181,16 +197,17 @@ class History {
             buttons: {
               confirm: {
                 label: "Yes",
-                className: "btn-success"
+                className: "btn-success",
               },
               cancel: {
                 label: "No",
-                className: "btn-danger"
-              }
+                className: "btn-danger",
+              },
             },
             callback: async (result) => {
               if (result) {
-                const datesElements = document.querySelectorAll('[id^="dateRange-"]');
+                const datesElements =
+                  document.querySelectorAll('[id^="dateRange-"]');
                 datesElements.forEach((element) => {
                   element.innerHTML =
                     new Date(date1.dateInstance).toLocaleDateString() +
@@ -199,7 +216,7 @@ class History {
                 });
                 await this.get(undefined, true);
               }
-            }
+            },
           });
         } else {
           const datesElements = document.querySelectorAll('[id^="dateRange-"]');
@@ -223,18 +240,18 @@ class History {
             buttons: {
               confirm: {
                 label: "Yes",
-                className: "btn-success"
+                className: "btn-success",
               },
               cancel: {
                 label: "No",
-                className: "btn-danger"
-              }
+                className: "btn-danger",
+              },
             },
             callback: async (result) => {
               if (result) {
                 this.get(undefined, true);
               }
-            }
+            },
           });
         } else {
           this.get(undefined, true);
@@ -295,13 +312,16 @@ class History {
         resetButton: true,
         tooltipText: {
           one: "night",
-          other: "nights"
+          other: "nights",
         },
         tooltipNumber: (totalDays) => {
           return totalDays - 1;
-        }
+        },
       });
-      this.datePicker.setDateRange(getFirstDayOfLastMonth(), Calc.lastDayOfMonth());
+      this.datePicker.setDateRange(
+        getFirstDayOfLastMonth(),
+        Calc.lastDayOfMonth()
+      );
       const datesElements = document.querySelectorAll('[id^="dateRange-"]');
       datesElements.forEach((element) => {
         element.innerHTML =
@@ -311,15 +331,19 @@ class History {
       });
     }
     if (forceFilterRedraw) {
-      ELEMENTS.printerGroupsFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      ELEMENTS.printerGroupsFilter.innerHTML =
+        returnHistoryFilterDefaultSelected();
       filterData.printerGroups.forEach((group) => {
         ELEMENTS.printerNamesFilter.insertAdjacentHTML(
           "beforeend",
-          `<option value="${group.replace(/[^\w\-]+/g, "-").toLowerCase()}${group} </option>`
+          `<option value="${group
+            .replace(/[^\w\-]+/g, "-")
+            .toLowerCase()}${group} </option>`
         );
       });
 
-      ELEMENTS.printerNamesFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      ELEMENTS.printerNamesFilter.innerHTML =
+        returnHistoryFilterDefaultSelected();
       filterData.printerNames.forEach((printer) => {
         ELEMENTS.printerNamesFilter.insertAdjacentHTML(
           "beforeend",
@@ -377,7 +401,8 @@ class History {
     });
     let failureRateList = statistics.map((stat) => {
       const currentRate =
-        parseInt(stat.statistics.cancelledPercent) + parseInt(stat.statistics.failedPercent);
+        parseInt(stat.statistics.cancelledPercent) +
+        parseInt(stat.statistics.failedPercent);
       if (isNaN(currentRate)) {
         return 0;
       } else {
@@ -393,15 +418,15 @@ class History {
         width: "100%",
         height: "250px",
         animations: {
-          enabled: true
+          enabled: true,
         },
         toolbar: {
-          show: false
+          show: false,
         },
         zoom: {
-          enabled: false
+          enabled: false,
         },
-        background: "#303030"
+        background: "#303030",
       },
       colors: ["#00bc8c", "#e74c3c", "#f39c12"],
       dataLabels: {
@@ -413,37 +438,37 @@ class History {
           borderRadius: 2,
           borderWidth: 1,
           borderColor: "#fff",
-          opacity: 0.9
-        }
+          opacity: 0.9,
+        },
       },
       // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
       toolbar: {
-        show: false
+        show: false,
       },
       stroke: {
         width: 4,
-        curve: "smooth"
+        curve: "smooth",
       },
       theme: {
-        mode: "dark"
+        mode: "dark",
       },
       noData: {
-        text: "Loading..."
+        text: "Loading...",
       },
       series: [
         {
           name: "Success Percent",
-          data: successRateList
+          data: successRateList,
         },
         {
           name: "Failed Percent",
-          data: failureRateList
-        }
+          data: failureRateList,
+        },
       ],
       yaxis: [
         {
           title: {
-            text: "Success Percent"
+            text: "Success Percent",
           },
           min: 0,
           max: 100,
@@ -452,12 +477,12 @@ class History {
               if (val !== null) {
                 return val.toFixed(0) + "%";
               }
-            }
-          }
+            },
+          },
         },
         {
           title: {
-            text: "Count"
+            text: "Count",
           },
           seriesName: "Failed Percent",
           labels: {
@@ -465,14 +490,14 @@ class History {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            }
+            },
           },
-          show: false
-        }
+          show: false,
+        },
       ],
       xaxis: {
-        categories: monthArray
-      }
+        categories: monthArray,
+      },
     };
 
     if (!this?.monthlySuccessRateGraph) {
@@ -485,21 +510,26 @@ class History {
     this.monthlySuccessRateGraph.updateSeries([
       {
         name: "Success Percent",
-        data: successRateList
+        data: successRateList,
       },
       {
         name: "Failed Percent",
-        data: failureRateList
-      }
+        data: failureRateList,
+      },
     ]);
 
     let printerLists = statistics.map((stat) => {
       return { month: stat.month, data: stat.statistics.sortedTopPrinterList };
     });
     let printerSuccessLists = statistics.map((stat) => {
-      return { month: stat.month, data: stat.statistics.sortedTopSuccessPrinterList };
+      return {
+        month: stat.month,
+        data: stat.statistics.sortedTopSuccessPrinterList,
+      };
     });
-    const topPrinterPerMonth = document.getElementById("monthlyMostUtilisedPrinter");
+    const topPrinterPerMonth = document.getElementById(
+      "monthlyMostUtilisedPrinter"
+    );
     topPrinterPerMonth.innerHTML = "";
     topPrinterPerMonth.insertAdjacentHTML(
       "beforeend",
@@ -510,7 +540,9 @@ class History {
     printerLists.forEach((item) => {
       if (item?.data) {
         const total =
-          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+          item.data[0].failedCount +
+          item.data[0].cancelledCount +
+          item.data[0].successCount;
         const failedPercent = (item.data[0].failedCount * 100) / total;
         const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
         const successPercent = (item.data[0].successCount * 100) / total;
@@ -563,10 +595,11 @@ class History {
       </small></li>
       `
         );
-      } else {
       }
     });
-    const monthlyMostSuccessPrinter = document.getElementById("monthlyMostSuccessPrinter");
+    const monthlyMostSuccessPrinter = document.getElementById(
+      "monthlyMostSuccessPrinter"
+    );
     monthlyMostSuccessPrinter.innerHTML = "";
     monthlyMostSuccessPrinter.insertAdjacentHTML(
       "beforeend",
@@ -577,7 +610,9 @@ class History {
     printerSuccessLists.forEach((item) => {
       if (item?.data) {
         const total =
-          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+          item.data[0].failedCount +
+          item.data[0].cancelledCount +
+          item.data[0].successCount;
         const failedPercent = (item.data[0].failedCount * 100) / total;
         const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
         const successPercent = (item.data[0].successCount * 100) / total;
@@ -630,7 +665,6 @@ class History {
       </small></li>
       `
         );
-      } else {
       }
     });
     let fileLists = statistics.map((stat) => {
@@ -647,7 +681,9 @@ class History {
     fileLists.forEach((item) => {
       if (item?.data) {
         const total =
-          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+          item.data[0].failedCount +
+          item.data[0].cancelledCount +
+          item.data[0].successCount;
         const failedPercent = (item.data[0].failedCount * 100) / total;
         const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
         const successPercent = (item.data[0].successCount * 100) / total;
@@ -705,7 +741,10 @@ class History {
     });
 
     let successPercentList = statistics.map((stat) => {
-      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const total =
+        stat.statistics.cancelled +
+        stat.statistics.failed +
+        stat.statistics.completed;
       const currentRate = (stat.statistics.completed * 100) / total;
       if (isNaN(currentRate)) {
         return 0;
@@ -714,7 +753,10 @@ class History {
       }
     });
     let failedPercentList = statistics.map((stat) => {
-      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const total =
+        stat.statistics.cancelled +
+        stat.statistics.failed +
+        stat.statistics.completed;
       const currentRate = (stat.statistics.failed * 100) / total;
       if (isNaN(currentRate)) {
         return 0;
@@ -723,7 +765,10 @@ class History {
       }
     });
     let cancelledPercentList = statistics.map((stat) => {
-      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const total =
+        stat.statistics.cancelled +
+        stat.statistics.failed +
+        stat.statistics.completed;
       const currentRate = (stat.statistics.cancelled * 100) / total;
       if (isNaN(currentRate)) {
         return 0;
@@ -760,7 +805,9 @@ class History {
     });
     let totalPrintCountList = statistics.map((stat) => {
       const calculation =
-        stat.statistics.complete + stat.statistics.failed + stat.statistics.cancelled;
+        stat.statistics.complete +
+        stat.statistics.failed +
+        stat.statistics.cancelled;
       if (isNaN(calculation)) {
         return 0;
       } else {
@@ -782,15 +829,15 @@ class History {
         width: "100%",
         height: "250px",
         animations: {
-          enabled: true
+          enabled: true,
         },
         toolbar: {
-          show: false
+          show: false,
         },
         zoom: {
-          enabled: false
+          enabled: false,
         },
-        background: "#303030"
+        background: "#303030",
       },
       colors: ["#00bc8c", "#e74c3c", "#f39c12", "#12d1f3"],
       dataLabels: {
@@ -802,28 +849,28 @@ class History {
           borderRadius: 2,
           borderWidth: 1,
           borderColor: "#fff",
-          opacity: 0.9
-        }
+          opacity: 0.9,
+        },
       },
       // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
       toolbar: {
-        show: false
+        show: false,
       },
       stroke: {
         width: 4,
-        curve: "smooth"
+        curve: "smooth",
       },
       theme: {
-        mode: "dark"
+        mode: "dark",
       },
       noData: {
-        text: "Loading..."
+        text: "Loading...",
       },
       series: [],
       yaxis: [
         {
           title: {
-            text: "Count"
+            text: "Count",
           },
 
           seriesName: "Success Count",
@@ -832,12 +879,12 @@ class History {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            }
-          }
+            },
+          },
         },
         {
           title: {
-            text: "Count"
+            text: "Count",
           },
           seriesName: "Success Count",
           labels: {
@@ -845,13 +892,13 @@ class History {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            }
+            },
           },
-          show: false
+          show: false,
         },
         {
           title: {
-            text: "Count"
+            text: "Count",
           },
           seriesName: "Success Count",
           labels: {
@@ -859,13 +906,13 @@ class History {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            }
+            },
           },
-          show: false
+          show: false,
         },
         {
           title: {
-            text: "Total"
+            text: "Total",
           },
           seriesName: "Success Count",
           labels: {
@@ -873,14 +920,14 @@ class History {
               if (val !== null) {
                 return val.toFixed(0);
               }
-            }
+            },
           },
-          show: false
-        }
+          show: false,
+        },
       ],
       xaxis: {
-        categories: monthArray
-      }
+        categories: monthArray,
+      },
     };
     if (!this?.monthlyCompetionByDay) {
       this.monthlyCompetionByDay = new ApexCharts(
@@ -893,17 +940,17 @@ class History {
     this.monthlyCompetionByDay.updateSeries([
       {
         name: "Success Count",
-        data: successCountList
+        data: successCountList,
       },
       {
         name: "Failed Count",
-        data: failedCountList
+        data: failedCountList,
       },
       {
         name: "Cancelled Count",
-        data: cancelledCountList
+        data: cancelledCountList,
       },
-      { name: "Total Count", data: totalPrintCountList }
+      { name: "Total Count", data: totalPrintCountList },
     ]);
 
     const sparkOptions = dashboardOptions.historySparkLineOptions;
@@ -913,12 +960,18 @@ class History {
       return monthArray[value - 1]; // The formatter function overrides format property
     };
     if (!this?.totalSpark) {
-      this.totalSpark = new ApexCharts(document.querySelector("#totalSpark"), sparkOptions);
+      this.totalSpark = new ApexCharts(
+        document.querySelector("#totalSpark"),
+        sparkOptions
+      );
       this.totalSpark.render();
     }
 
-    const totalDays = UI.milisecondsToDays(totalPrintTimeList[totalPrintTimeList.length - 1]);
-    document.getElementById("totalSparkLast").innerHTML = totalDays.toFixed(0) + " Days";
+    const totalDays = UI.milisecondsToDays(
+      totalPrintTimeList[totalPrintTimeList.length - 1]
+    );
+    document.getElementById("totalSparkLast").innerHTML =
+      totalDays.toFixed(0) + " Days";
 
     sparkOptions.colors = ["#00bc8c"];
     sparkOptions.series[0].data = successPercentList;
@@ -927,7 +980,10 @@ class History {
     };
     sparkOptions.tooltip.y.title.formatter = (seriesName) => "Success: ";
     if (!this?.completeSpark) {
-      this.completeSpark = new ApexCharts(document.querySelector("#successSpark"), sparkOptions);
+      this.completeSpark = new ApexCharts(
+        document.querySelector("#successSpark"),
+        sparkOptions
+      );
       this.completeSpark.render();
     }
 
@@ -938,7 +994,10 @@ class History {
     sparkOptions.series[0].data = cancelledPercentList;
     sparkOptions.tooltip.y.title.formatter = (seriesName) => "Cancelled: ";
     if (!this?.cancelledSpark) {
-      this.cancelledSpark = new ApexCharts(document.querySelector("#cancelledSpark"), sparkOptions);
+      this.cancelledSpark = new ApexCharts(
+        document.querySelector("#cancelledSpark"),
+        sparkOptions
+      );
       this.cancelledSpark.render();
     }
 
@@ -949,7 +1008,10 @@ class History {
     sparkOptions.series[0].data = failedPercentList;
     sparkOptions.tooltip.y.title.formatter = (seriesName) => "Failed: ";
     if (!this?.failedSpark) {
-      this.failedSpark = new ApexCharts(document.querySelector("#failedSpark"), sparkOptions);
+      this.failedSpark = new ApexCharts(
+        document.querySelector("#failedSpark"),
+        sparkOptions
+      );
       this.failedSpark.render();
     }
 
@@ -982,8 +1044,13 @@ class History {
     this.overTimeGraph.updateSeries(historyGraphData);
   }
   static async get(pageNumber = 1, forceFilterRedraw = false) {
-    const { history, statisticsClean, pagination, monthlyStatistics, historyFilterData } =
-      await OctoFarmClient.get(this.getHistoryRequestURL(pageNumber));
+    const {
+      history,
+      statisticsClean,
+      pagination,
+      monthlyStatistics,
+      historyFilterData,
+    } = await OctoFarmClient.get(this.getHistoryRequestURL(pageNumber));
 
     if (!history || !statisticsClean || !pagination) {
       this.loadNoData();
@@ -1011,23 +1078,19 @@ class History {
   }
 
   static async edit(e) {
-    function SelectHasValue(select, value) {
-      const obj = document.getElementById(select);
-      if (obj !== null) {
-        return obj.innerHTML.indexOf(`value="${value}"`) > -1;
-      }
-      return false;
-    }
-
     if (e.target.classList.contains("historyEdit")) {
       document.getElementById("saveHistoryBtns").innerHTML =
         ' <button id="historyUpdateCostBtn" type="button" class="btn btn-warning" data-dismiss="modal">\n        Update Cost\n      </button>\n      <button id="historySaveBtn" type="button" class="btn btn-success" data-dismiss="modal">\n        Save Changes\n      </button>';
-      document.getElementById("historySaveBtn").addEventListener("click", (f) => {
-        History.save(e.target.id);
-      });
-      document.getElementById("historyUpdateCostBtn").addEventListener("click", (f) => {
-        History.updateCost(e.target.id);
-      });
+      document
+        .getElementById("historySaveBtn")
+        .addEventListener("click", (f) => {
+          History.save(e.target.id);
+        });
+      document
+        .getElementById("historyUpdateCostBtn")
+        .addEventListener("click", (f) => {
+          History.updateCost(e.target.id);
+        });
       // Grab elements
       const printerName = document.getElementById("printerName");
       const fileName = document.getElementById("fileName");
@@ -1080,7 +1143,9 @@ class History {
       jobMaintenanceCost.placeholder = " - ";
 
       const thumbnail = document.getElementById("thumbnails");
-      const thumbnailIndicators = document.getElementById("thumbnails-indicators");
+      const thumbnailIndicators = document.getElementById(
+        "thumbnails-indicators"
+      );
       thumbnail.innerHTML = "";
       thumbnailIndicators.innerHTML = "";
       const split = e.target.id.split("-");
@@ -1090,17 +1155,25 @@ class History {
       const current = this.historyList[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
-      jobElectricityCost.value = current?.electricityCosts ? current.electricityCosts.toFixed(2) : "";
-      jobMaintenanceCost.value = current?.maintenanceCosts ? current.maintenanceCosts.toFixed(2) : "";
+      jobElectricityCost.value = current?.electricityCosts
+        ? current.electricityCosts.toFixed(2)
+        : "";
+      jobMaintenanceCost.value = current?.maintenanceCosts
+        ? current.maintenanceCosts.toFixed(2)
+        : "";
       if (typeof current.resend !== "undefined" && current.resend !== null) {
         resendStats.placeholder = `${current.resend.count} / ${
           current.resend.transmitted / 1000
         }K (${current.resend.ratio.toFixed(0)})`;
-        if (document.getElementById("resendsTitle").classList.contains("d-none")) {
+        if (
+          document.getElementById("resendsTitle").classList.contains("d-none")
+        ) {
           document.getElementById("resendsTitle").classList.remove("d-none");
         }
       } else {
-        if (!document.getElementById("resendsTitle").classList.contains("d-none")) {
+        if (
+          !document.getElementById("resendsTitle").classList.contains("d-none")
+        ) {
           document.getElementById("resendsTitle").classList.add("d-none");
         }
       }
@@ -1123,7 +1196,9 @@ class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${encodeURI(current.snapshot)}')">
+              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${encodeURI(
+            current.snapshot
+          )}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Camera Snapshot</h6>
                   </div>
@@ -1149,7 +1224,9 @@ class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${encodeURI(current.thumbnail)}')">
+              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${encodeURI(
+            current.thumbnail
+          )}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Slicer Thumbnail</h6>
                   </div>
@@ -1185,8 +1262,6 @@ class History {
           `
         );
         thbs = true;
-        // active = "";
-        // counter = counter + 1;
       }
       if (thbs) {
         document.getElementById("galleryElements").style.display = "block";
@@ -1196,36 +1271,49 @@ class History {
 
       startDate.innerHTML = `<b>Started</b><hr>${new Date(
         current.startDate
-      ).toLocaleDateString()} - ${new Date(current.startDate).toLocaleTimeString()}`;
-      printTime.innerHTML = `<b>Duration</b><hr>${Calc.generateTime(current.printTime)}`;
+      ).toLocaleDateString()} - ${new Date(
+        current.startDate
+      ).toLocaleTimeString()}`;
+      printTime.innerHTML = `<b>Duration</b><hr>${Calc.generateTime(
+        current.printTime
+      )}`;
       endDate.innerHTML = `<b>Finished</b><hr>${new Date(
         current.endDate
-      ).toLocaleDateString()} - ${new Date(current.endDate).toLocaleTimeString()}`;
+      ).toLocaleDateString()} - ${new Date(
+        current.endDate
+      ).toLocaleTimeString()}`;
       printerCost.value = current.printerCost;
       jobHourlyCost.value = current.costPerHour;
       notes.value = current.notes;
       actualPrintTime.value = Calc.generateTime(current.printTime);
       status.innerHTML = `${current.state}`;
       if (typeof current.job !== "undefined" && current.job !== null) {
-        estimatedPrintTime.value = Calc.generateTime(current.job.estimatedPrintTime);
-        printTimeAccuracy.value = `${current.job.printTimeAccuracy.toFixed(0) / 100}%`;
+        estimatedPrintTime.value = Calc.generateTime(
+          current.job.estimatedPrintTime
+        );
+        printTimeAccuracy.value = `${
+          current.job.printTimeAccuracy.toFixed(0) / 100
+        }%`;
       }
       jobCosting.value = current.totalCost;
       let upDate = new Date(current.file.uploadDate * 1000);
       upDate = `${upDate.toLocaleDateString()} ${upDate.toLocaleTimeString()}`;
       uploadDate.value = upDate;
       path.value = current.file.path;
-      size.value = Calc.bytes(current.file.size).replace("<i class=\"fas fa-hdd\"></i> ", "");
+      size.value = Calc.bytes(current.file.size).replace(
+        '<i class="fas fa-hdd"></i> ',
+        ""
+      );
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
-      for(const [i, spool] of current.spools.entries()){
+      for (const [i, spool] of current.spools.entries()) {
         const sp = Object.keys(spool)[0];
         const spoolSelector = returnBigFilamentSelectorTemplate(i);
         toolsArray.push(sp);
         viewTable.insertAdjacentHTML(
-            "beforeend",
-            `
+          "beforeend",
+          `
           <tr>
               <td>
                 ${spoolSelector}
@@ -1246,7 +1334,10 @@ class History {
           </tr>
         `
         );
-        await drawHistoryDropDown(document.getElementById(`tool-${i}-bigFilamentSelect`), spool[sp].spoolId);
+        await drawHistoryDropDown(
+          document.getElementById(`tool-${i}-bigFilamentSelect`),
+          spool[sp].spoolId
+        );
       }
       viewTable.insertAdjacentHTML(
         "beforeend",
@@ -1276,7 +1367,7 @@ class History {
   static async updateCost(id) {
     const split = id.split("-");
     const update = {
-      id: split[1]
+      id: split[1],
     };
     let post = await OctoFarmClient.post("history/updateCostMatch", update);
     if (post) {
@@ -1297,7 +1388,7 @@ class History {
   }
 
   static async save(id) {
-    const filamentDrops = findBigFilamentDropDowns()
+    const filamentDrops = findBigFilamentDropDowns();
     const filamentID = [];
     filamentDrops.forEach((drop) => {
       filamentID.push(drop.value);
@@ -1306,40 +1397,51 @@ class History {
     const update = {
       id: split[1],
       note: document.getElementById("notes").value,
-      filamentId: filamentID
+      filamentId: filamentID,
     };
 
     const post = await OctoFarmClient.post("history/update", update);
 
     if (post) {
-      UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
+      UI.createAlert(
+        "success",
+        "Successfully updated your history entry...",
+        3000,
+        "clicked"
+      );
     }
   }
 
   static async delete(e) {
     if (e.target.classList.value.includes("historyDelete")) {
       bootbox.confirm({
-        message: "Are you sure you'd like to delete this entry? this is not reversible.",
+        message:
+          "Are you sure you'd like to delete this entry? this is not reversible.",
         buttons: {
           confirm: {
             label: "Yes",
-            className: "btn-success"
+            className: "btn-success",
           },
           cancel: {
             label: "No",
-            className: "btn-danger"
-          }
+            className: "btn-danger",
+          },
         },
         async callback(result) {
           if (result) {
             const split = e.target.id.split("-");
             const histID = {
-              id: split[1]
+              id: split[1],
             };
             const post = await OctoFarmClient.post("history/delete", histID);
             if (post) {
               e.target.parentElement.parentElement.remove();
-              UI.createAlert("success", "Your history entry has been deleted...", 3000, "clicked");
+              UI.createAlert(
+                "success",
+                "Your history entry has been deleted...",
+                3000,
+                "clicked"
+              );
             } else {
               UI.createAlert(
                 "error",
@@ -1349,7 +1451,7 @@ class History {
               );
             }
           }
-        }
+        },
       });
     }
   }
@@ -1388,7 +1490,8 @@ class History {
 
     const avgHourCost = totalHourCost / costPerHour.length;
 
-    const total = statesCancelled.length + statesFailed.length + statesSuccess.length;
+    const total =
+      statesCancelled.length + statesFailed.length + statesSuccess.length;
     const cancelledPercent = (statesCancelled.length / total) * 100;
     const failurePercent = (statesFailed.length / total) * 100;
     const successPercent = (statesSuccess.length / total) * 100;
@@ -1407,10 +1510,18 @@ class History {
     );
     ELEMENTS.filamentUsageTotal.innerHTML = `${filamentUsageLength
       .reduce((a, b) => a + b, 0)
-      .toFixed(2)}m / ${filamentUsageGrams.reduce((a, b) => a + b, 0).toFixed(2)}g`;
-    ELEMENTS.filamentCostTotal.innerHTML = filamentCost.reduce((a, b) => a + b, 0).toFixed(2);
-    ELEMENTS.printerCostTotal.innerHTML = printerCostTotal.reduce((a, b) => a + b, 0).toFixed(2);
-    ELEMENTS.totalCost.innerHTML = fullCostTotal.reduce((a, b) => a + b, 0).toFixed(2);
+      .toFixed(2)}m / ${filamentUsageGrams
+      .reduce((a, b) => a + b, 0)
+      .toFixed(2)}g`;
+    ELEMENTS.filamentCostTotal.innerHTML = filamentCost
+      .reduce((a, b) => a + b, 0)
+      .toFixed(2);
+    ELEMENTS.printerCostTotal.innerHTML = printerCostTotal
+      .reduce((a, b) => a + b, 0)
+      .toFixed(2);
+    ELEMENTS.totalCost.innerHTML = fullCostTotal
+      .reduce((a, b) => a + b, 0)
+      .toFixed(2);
     ELEMENTS.averageCostPerHour.innerHTML = avgHourCost.toFixed(2);
   }
 }

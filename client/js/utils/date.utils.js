@@ -11,5 +11,5 @@ const daysBetweenTwoDates = function (date1, date2) {
 
 module.exports = {
   getFirstDayOfLastMonth,
-  daysBetweenTwoDates
+  daysBetweenTwoDates,
 };

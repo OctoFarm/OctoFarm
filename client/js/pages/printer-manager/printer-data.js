@@ -8,22 +8,29 @@ import {
 } from "../../services/printer-action-buttons.service";
 import {
   sendPowerCommandToOctoPrint,
-  setupUpdateOctoPrintClientBtn
+  setupUpdateOctoPrintClientBtn,
 } from "../../services/octoprint/octoprint-client-commands.actions";
 import { setupUpdateOctoPrintPluginsBtn } from "../../services/octoprint/octoprint-plugin-commands.actions";
 import UI from "../../utils/ui.js";
 import PrinterLogsService from "./services/printer-logs.service.js";
-import PrinterStatisticsService from "./services/printer-statistics.service"
+import PrinterStatisticsService from "./services/printer-statistics.service";
 import PrinterEditService from "./services/printer-edit.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "./services/printer-settings.service";
 import {
   loadPrinterHealthChecks,
   reSyncAPI,
-  loadPrintersRegisteredEvents
+  loadPrintersRegisteredEvents,
 } from "./functions/printer-manager.functions";
-import {createAlertsLogString, removeLogLine, updateLogLine} from "./log-tickers.functions";
-import {isPrinterFullyScanned, printerIsDisabled} from "../../utils/octofarm.utils";
+import {
+  createAlertsLogString,
+  removeLogLine,
+  updateLogLine,
+} from "./log-tickers.functions";
+import {
+  isPrinterFullyScanned,
+  printerIsDisabled,
+} from "../../utils/octofarm.utils";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
 
@@ -80,13 +87,14 @@ function updatePrinterInfo(printer) {
   );
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
-  let printerName = "<i class=\"fa-solid fa-arrows-spin fa-spin\"></i>"
+  let printerName = '<i class="fa-solid fa-arrows-spin fa-spin"></i>';
 
-  if(printer?.printerName && printer.printerName !== "Grabbing from OctoPrint..."){
+  if (
+    printer?.printerName &&
+    printer.printerName !== "Grabbing from OctoPrint..."
+  ) {
     printerName = JSON.parse(JSON.stringify(printer?.printerName));
   }
-
-
 
   UI.doesElementNeedUpdating(printer.sortIndex, printerSortIndex, "innerHTML");
   UI.doesElementNeedUpdating(printerName, printName, "innerHTML");
@@ -105,28 +113,40 @@ function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
   if (printer?.healthChecksPass === false) {
     UI.removeDisplayNoneFromElement(healthAlert);
-    updateLogLine("healthCheck-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "healthCheck-" + printer._id,
-      name: "Failed health check!",
-      printerName: printer.printerName,
-      colour: "Active",
-    }),);
+    updateLogLine(
+      "healthCheck-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "healthCheck-" + printer._id,
+        name: "Failed health check!",
+        printerName: printer.printerName,
+        colour: "Active",
+      })
+    );
   } else {
     UI.addDisplayNoneToElement(healthAlert);
     removeLogLine({ id: "healthCheck-" + printer._id });
   }
 }
 
-function checkIfPrinterHasEvents(printer){
-  const eventsAlerts = document.getElementById(`printerEventsAlert-${printer._id}`);
-  const printerEventsCount = document.getElementById(`printerEventsCount-${printer._id}`);
-  if(printer?.registeredEvents.length > 0){
-    updateLogLine("printerEvents-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "printerEvents-" + printer._id,
-      name: "Printer events are registered!",
-      printerName: printer.printerName,
-      colour: "Info",
-    }));
+function checkIfPrinterHasEvents(printer) {
+  const eventsAlerts = document.getElementById(
+    `printerEventsAlert-${printer._id}`
+  );
+  const printerEventsCount = document.getElementById(
+    `printerEventsCount-${printer._id}`
+  );
+  if (printer?.registeredEvents.length > 0) {
+    updateLogLine(
+      "printerEvents-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "printerEvents-" + printer._id,
+        name: "Printer events are registered!",
+        printerName: printer.printerName,
+        colour: "Info",
+      })
+    );
     printerEventsCount.innerHTML = printer.registeredEvents.length;
     UI.removeDisplayNoneFromElement(eventsAlerts);
     return;
@@ -135,26 +155,49 @@ function checkIfPrinterHasEvents(printer){
   removeLogLine({ id: "printerEvents-" + printer._id });
 }
 
-function checkIfCpuDataAvailable(printer){
-  const octoprintCpuUsage = document.getElementById(`octoPrintsUsage-${printer._id}`);
-  const octoprintCpuUsagePercent = document.getElementById(`octoprintCpuUsagePercent-${printer._id}`);
-  const octoprintMemoryUsagePercent = document.getElementById(`octoprintMemoryUsagePercent-${printer._id}`);
-  const octoprintsCpuUsage = document.getElementById(`octoprintsCpuUsagePercent-${printer._id}`);
-  if(!!printer?.octoResourceMonitor){
-    octoprintCpuUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_cpu[printer?.octoResourceMonitor?.system_cpu.length - 1].toFixed(0);
-    octoprintMemoryUsagePercent.innerHTML = printer?.octoResourceMonitor?.system_memory[printer?.octoResourceMonitor?.system_memory.length - 1].toFixed(0);
-    octoprintsCpuUsage.innerHTML = printer?.octoResourceMonitor?.octoprint_cpu[printer?.octoResourceMonitor?.octoprint_cpu.length - 1].toFixed(0);
+function checkIfCpuDataAvailable(printer) {
+  const octoprintCpuUsage = document.getElementById(
+    `octoPrintsUsage-${printer._id}`
+  );
+  const octoprintCpuUsagePercent = document.getElementById(
+    `octoprintCpuUsagePercent-${printer._id}`
+  );
+  const octoprintMemoryUsagePercent = document.getElementById(
+    `octoprintMemoryUsagePercent-${printer._id}`
+  );
+  const octoprintsCpuUsage = document.getElementById(
+    `octoprintsCpuUsagePercent-${printer._id}`
+  );
+  if (!!printer?.octoResourceMonitor) {
+    octoprintCpuUsagePercent.innerHTML =
+      printer?.octoResourceMonitor?.system_cpu[
+        printer?.octoResourceMonitor?.system_cpu.length - 1
+      ].toFixed(0);
+    octoprintMemoryUsagePercent.innerHTML =
+      printer?.octoResourceMonitor?.system_memory[
+        printer?.octoResourceMonitor?.system_memory.length - 1
+      ].toFixed(0);
+    octoprintsCpuUsage.innerHTML =
+      printer?.octoResourceMonitor?.octoprint_cpu[
+        printer?.octoResourceMonitor?.octoprint_cpu.length - 1
+      ].toFixed(0);
     UI.removeDisplayNoneFromElement(octoprintCpuUsage);
     return;
   }
   UI.addDisplayNoneToElement(octoprintCpuUsage);
 }
 
-function checkIfPrinterConnectionThrottled(printer){
-  const printerConnectionThrottled = document.getElementById(`printerConnectionThrottled-${printer._id}`);
-  const printerConnectionThrottledCount = document.getElementById(`printerConnectionThrottledCount-${printer._id}`);
-  if(printer?.websocket_throttle > 1){
-    printerConnectionThrottledCount.innerHTML = `${parseInt(printer.websocket_throttle)}`;
+function checkIfPrinterConnectionThrottled(printer) {
+  const printerConnectionThrottled = document.getElementById(
+    `printerConnectionThrottled-${printer._id}`
+  );
+  const printerConnectionThrottledCount = document.getElementById(
+    `printerConnectionThrottledCount-${printer._id}`
+  );
+  if (printer?.websocket_throttle > 1) {
+    printerConnectionThrottledCount.innerHTML = `${parseInt(
+      printer.websocket_throttle
+    )}`;
     UI.removeDisplayNoneFromElement(printerConnectionThrottled);
     return;
   }
@@ -164,12 +207,16 @@ function checkIfPrinterConnectionThrottled(printer){
 function corsWarningCheck(printer) {
   const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
   if (!printer.corsCheck) {
-    updateLogLine("corsCheck-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "corsCheck-" + printer._id,
-      name: "Cors is not enabled!",
-      printerName: printer.printerName,
-      colour: "Offline",
-    }));
+    updateLogLine(
+      "corsCheck-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "corsCheck-" + printer._id,
+        name: "Cors is not enabled!",
+        printerName: printer.printerName,
+        colour: "Offline",
+      })
+    );
     UI.removeDisplayNoneFromElement(corsAlert);
   } else {
     removeLogLine({ id: "corsCheck-" + printer._id });
@@ -189,7 +236,7 @@ function setupReconnectingIn(printer) {
     UI.removeDisplayNoneFromElement(printerReScanButton);
     // updateLogLine({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
-      printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
+      printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -201,7 +248,7 @@ function setupReconnectingIn(printer) {
   } else {
     // removeAlertsLog({id: "apiReconnect-"+printer._id})
     UI.addDisplayNoneToElement(printerReScanButton);
-    printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
+    printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
     printerReScanText.innerHTML = "";
   }
 }
@@ -221,7 +268,7 @@ function reconnectingWebsocketIn(printer) {
     // updateLogLine({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML =
-        "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
+        '<i class="fas fa-sync-alt fa-sm fa-spin"></i>';
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -233,7 +280,7 @@ function reconnectingWebsocketIn(printer) {
   } else {
     UI.addDisplayNoneToElement(printerReScanButton);
     // removeAlertsLog({id: "socketReconnect-"+printer._id})
-    printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
+    printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i>';
     printerReScanText.innerHTML = "";
   }
 }
@@ -243,12 +290,16 @@ function checkForOctoPrintUpdate(printer) {
 
   if (printer?.octoPrintUpdate?.updateAvailable) {
     UI.removeDisplayNoneFromElement(updateButton);
-    updateLogLine("opUpdate-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "opUpdate-" + printer._id,
-      name: "OctoPrint update available!",
-      printerName: printer.printerName,
-      colour: "Info",
-    }));
+    updateLogLine(
+      "opUpdate-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "opUpdate-" + printer._id,
+        name: "OctoPrint update available!",
+        printerName: printer.printerName,
+        colour: "Info",
+      })
+    );
     updateButton.setAttribute(
       "title",
       "You have an OctoPrint Update to install!"
@@ -270,12 +321,16 @@ function checkForOctoPrintPluginUpdates(printer) {
     printer.octoPrintPluginUpdates.length > 0
   ) {
     UI.removeDisplayNoneFromElement(updatePluginButton);
-    updateLogLine("pluginUpdate-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "pluginUpdate-" + printer._id,
-      name: "OctoPrint plugin update(s) available!",
-      printerName: printer.printerName,
-      colour: "Info",
-    }));
+    updateLogLine(
+      "pluginUpdate-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "pluginUpdate-" + printer._id,
+        name: "OctoPrint plugin update(s) available!",
+        printerName: printer.printerName,
+        colour: "Info",
+      })
+    );
     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
   } else {
     UI.addDisplayNoneToElement(updatePluginButton);
@@ -289,12 +344,16 @@ function checkIfRestartRequired(printer) {
     `restartRequired-${printer._id}`
   );
   if (restartRequiredTag && printer?.restartRequired) {
-    updateLogLine("restartWaiting-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "restartWaiting-" + printer._id,
-      name: "Waiting for OctoPrint restart",
-      printerName: printer.printerName,
-      colour: "Active",
-    }));
+    updateLogLine(
+      "restartWaiting-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "restartWaiting-" + printer._id,
+        name: "Waiting for OctoPrint restart",
+        printerName: printer.printerName,
+        colour: "Active",
+      })
+    );
     UI.removeDisplayNoneFromElement(restartRequiredTag);
   } else {
     removeLogLine({ id: "restartWaiting-" + printer._id });
@@ -307,12 +366,16 @@ function checkIfMultiUserIssueFlagged(printer) {
     "multiUserIssue-" + printer._id
   );
   if (printer?.multiUserIssue) {
-    updateLogLine("userIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "userIssue-" + printer._id,
-      name: "Couldn't determine which user to use!",
-      printerName: printer.printerName,
-      colour: "Offline",
-    }));
+    updateLogLine(
+      "userIssue-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "userIssue-" + printer._id,
+        name: "Couldn't determine which user to use!",
+        printerName: printer.printerName,
+        colour: "Offline",
+      })
+    );
     UI.removeDisplayNoneFromElement(multiUserIssueAlert);
   } else {
     removeLogLine({ id: "userIssue-" + printer._id });
@@ -321,22 +384,26 @@ function checkIfMultiUserIssueFlagged(printer) {
 }
 
 function checkIfUnderVoltagedPi(printer) {
-  const {octoPi} = printer
+  const { octoPi } = printer;
 
-  if(!octoPi || Object.keys(octoPi).length === 0){
+  if (!octoPi || Object.keys(octoPi).length === 0) {
     return;
   }
   const printerUnderVoltaged = document.getElementById(
-      "printerUnderVoltaged-" + printer._id
+    "printerUnderVoltaged-" + printer._id
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_undervoltage) {
-    updateLogLine("underVoltageIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "underVoltageIssue-" + printer._id,
-      name: "Pi is reporting been undervoltaged!",
-      printerName: printer.printerName,
-      colour: "Offline",
-    }));
+    updateLogLine(
+      "underVoltageIssue-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "underVoltageIssue-" + printer._id,
+        name: "Pi is reporting been undervoltaged!",
+        printerName: printer.printerName,
+        colour: "Offline",
+      })
+    );
     UI.removeDisplayNoneFromElement(printerUnderVoltaged);
   } else {
     removeLogLine({ id: "underVoltageIssue-" + printer._id });
@@ -345,29 +412,32 @@ function checkIfUnderVoltagedPi(printer) {
 }
 
 function checkIfOverheatingPi(printer) {
-  const {octoPi} = printer
+  const { octoPi } = printer;
 
-  if(!octoPi || Object.keys(octoPi).length === 0){
+  if (!octoPi || Object.keys(octoPi).length === 0) {
     return;
   }
   const printerOverHeating = document.getElementById(
-      "printerOverHeating-" + printer._id
+    "printerOverHeating-" + printer._id
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_overheat) {
-    updateLogLine("overheatingIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-      id: "overheatingIssue-" + printer._id,
-      name: "Pi is reporting it is overheating!",
-      printerName: printer.printerName,
-      colour: "Offline",
-    }));
+    updateLogLine(
+      "overheatingIssue-" + printer._id,
+      alertsLogMesssageBox,
+      createAlertsLogString({
+        id: "overheatingIssue-" + printer._id,
+        name: "Pi is reporting it is overheating!",
+        printerName: printer.printerName,
+        colour: "Offline",
+      })
+    );
     UI.removeDisplayNoneFromElement(printerOverHeating);
   } else {
     removeLogLine({ id: "overheatingIssue-" + printer._id });
     UI.addDisplayNoneToElement(printerOverHeating);
   }
 }
-
 
 function checkForApiErrors(printer) {
   if (
@@ -396,12 +466,16 @@ function checkForApiErrors(printer) {
         UI.removeDisplayNoneFromElement(apiErrorTag);
       }
     } else {
-      updateLogLine("apiIssue-" + printer._id, alertsLogMesssageBox, createAlertsLogString({
-        id: "apiIssue-" + printer._id,
-        name: "API Scan has issues!",
-        printerName: printer.printerName,
-        colour: "Offline",
-      }));
+      updateLogLine(
+        "apiIssue-" + printer._id,
+        alertsLogMesssageBox,
+        createAlertsLogString({
+          id: "apiIssue-" + printer._id,
+          name: "API Scan has issues!",
+          printerName: printer.printerName,
+          colour: "Offline",
+        })
+      );
       UI.addDisplayNoneToElement(apiErrorTag);
     }
   }
@@ -417,7 +491,8 @@ function updateButtonState(printer) {
     `printerStatistics-${printer._id}`
   );
 
-  const allowedActions = (!isPrinterFullyScanned(printer) || printerIsDisabled(printer));
+  const allowedActions =
+    !isPrinterFullyScanned(printer) || printerIsDisabled(printer);
 
   UI.doesElementNeedUpdating(allowedActions, apiReScan, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
@@ -492,22 +567,39 @@ export function createOrUpdatePrinterTableRow(printers) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
-      document.getElementById(`printerAPIScanning-${printer._id}`).addEventListener("click", async () => {
-        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
-        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
-      });
-
-      document.getElementById(`printerForceReconnect-${printer._id}`).addEventListener("click", async () => {
-        const { msg } = await OctoFarmClient.forceReconnect(printer._id);
-        UI.createAlert("warning", `Reconnection was forced, response: ${msg}`, 5000, "Clicked");
-      });
+      document
+        .getElementById(`printerAPIScanning-${printer._id}`)
+        .addEventListener("click", async () => {
+          const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+          UI.createAlert(
+            "warning",
+            `Reconnection was forced, response: ${msg}`,
+            5000,
+            "Clicked"
+          );
+        });
 
       document
-          .getElementById(`printerEdit-${printer._id}`)
-          .addEventListener("click", async () => {
-            const printersInfo = await OctoFarmClient.listPrinters(false, true);
-            await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id);
-          });
+        .getElementById(`printerForceReconnect-${printer._id}`)
+        .addEventListener("click", async () => {
+          const { msg } = await OctoFarmClient.forceReconnect(printer._id);
+          UI.createAlert(
+            "warning",
+            `Reconnection was forced, response: ${msg}`,
+            5000,
+            "Clicked"
+          );
+        });
+
+      document
+        .getElementById(`printerEdit-${printer._id}`)
+        .addEventListener("click", async () => {
+          const printersInfo = await OctoFarmClient.listPrinters(false, true);
+          await PrinterEditService.loadPrinterEditInformation(
+            printersInfo,
+            printer._id
+          );
+        });
 
       document
         .getElementById(`printerSettings-${printer._id}`)
@@ -537,7 +629,7 @@ export function createOrUpdatePrinterTableRow(printers) {
           bootbox.dialog({
             title: "Rescan All API endpoints",
             message:
-              "<p class=\"alert alert-danger text-dark\" role=\"alert\">ReScan: Will rescan all endpoints regardless of existing data.</p>",
+              '<p class="alert alert-danger text-dark" role="alert">ReScan: Will rescan all endpoints regardless of existing data.</p>',
             size: "large",
             buttons: {
               force: {
@@ -571,10 +663,10 @@ export function createOrUpdatePrinterTableRow(printers) {
 
             buttons: {
               cancel: {
-                label: "<i class=\"fa fa-times\"></i> Cancel",
+                label: '<i class="fa fa-times"></i> Cancel',
               },
               confirm: {
-                label: "<i class=\"fa fa-check\"></i> Confirm",
+                label: '<i class="fa fa-check"></i> Confirm',
               },
             },
             callback: async function (result) {
@@ -618,109 +710,125 @@ export function createOrUpdatePrinterTableRow(printers) {
         });
 
       document
-          .getElementById("multiUserIssue-" + printer._id)
-          .addEventListener("click", async (e) => {
-            const printersInfo = await OctoFarmClient.listPrinters(false, true);
-            await PrinterEditService.loadPrinterEditInformation(printersInfo, printer._id, true);
-          });
-
-      document.getElementById("printerEventsAlert-" + printer._id).addEventListener("click", async () => {
-            await loadPrintersRegisteredEvents(printer._id);
-      })
+        .getElementById("multiUserIssue-" + printer._id)
+        .addEventListener("click", async (e) => {
+          const printersInfo = await OctoFarmClient.listPrinters(false, true);
+          await PrinterEditService.loadPrinterEditInformation(
+            printersInfo,
+            printer._id,
+            true
+          );
+        });
 
       document
-          .getElementById("restartRequired-" + printer._id)
-          .addEventListener("click", async (e) => {
-            bootbox.confirm({
-              message: "This will restart your OctoPrint instance, are you sure?",
-              buttons: {
-                confirm: {
-                  label: "Yes",
-                  className: "btn-success"
-                },
-                cancel: {
-                  label: "No",
-                  className: "btn-danger"
-                }
+        .getElementById("printerEventsAlert-" + printer._id)
+        .addEventListener("click", async () => {
+          await loadPrintersRegisteredEvents(printer._id);
+        });
+
+      document
+        .getElementById("restartRequired-" + printer._id)
+        .addEventListener("click", async (e) => {
+          bootbox.confirm({
+            message: "This will restart your OctoPrint instance, are you sure?",
+            buttons: {
+              confirm: {
+                label: "Yes",
+                className: "btn-success",
               },
-              callback: async function (result) {
-                if(result){
-                  document.getElementById("restartRequired-"+printer._id).disabled = true;
-                  await sendPowerCommandToOctoPrint(printer, "restart");
-                }
+              cancel: {
+                label: "No",
+                className: "btn-danger",
+              },
+            },
+            callback: async function (result) {
+              if (result) {
+                document.getElementById(
+                  "restartRequired-" + printer._id
+                ).disabled = true;
+                await sendPowerCommandToOctoPrint(printer, "restart");
               }
-            });
+            },
           });
-
-
-      document.getElementById("printerOverHeating-" + printer._id).addEventListener("click", async () => {
-        bootbox.dialog({
-          title: "Reported overheating by your Pi!",
-          message: "<p>Your RaspberryPi has reported it's overheating... Please sort the issue and ReScan the API!</p>",
-          size: "small",
-          buttons: {
-            cancel: {
-              label: "Ignore",
-              className: "btn-danger"
-            },
-            ok: {
-              label: "Sorted, ReScan API!",
-              className: "btn-info",
-              callback: async () =>{
-                await reSyncAPI(true, printer._id);
-              }
-            }
-          }
         });
-      })
 
-
-      document.getElementById("printerUnderVoltaged-" + printer._id).addEventListener("click", async () => {
-        bootbox.dialog({
-          title: "Reported undervoltage by your Pi!",
-          message: "<p>Your RaspberryPi has reported it's undervoltaged... Please sort the issue and ReScan the API!</p>",
-          size: "small",
-          buttons: {
-            cancel: {
-              label: "Ignore",
-              className: "btn-danger"
+      document
+        .getElementById("printerOverHeating-" + printer._id)
+        .addEventListener("click", async () => {
+          bootbox.dialog({
+            title: "Reported overheating by your Pi!",
+            message:
+              "<p>Your RaspberryPi has reported it's overheating... Please sort the issue and ReScan the API!</p>",
+            size: "small",
+            buttons: {
+              cancel: {
+                label: "Ignore",
+                className: "btn-danger",
+              },
+              ok: {
+                label: "Sorted, ReScan API!",
+                className: "btn-info",
+                callback: async () => {
+                  await reSyncAPI(true, printer._id);
+                },
+              },
             },
-            ok: {
-              label: "Sorted, ReScan API!",
-              className: "btn-info",
-              callback: async () =>{
-                await reSyncAPI(true, printer._id);
-              }
-            }
-          }
+          });
         });
-      })
 
-      document.getElementById("printerConnectionThrottled-" + printer._id).addEventListener("click", async () => {
-        bootbox.dialog({
-          title: "Printer connection is throttled!",
-          message: "<p>This is just an alert to let you know. Your printer connection is been throttled because the websocket messages are returning" +
+      document
+        .getElementById("printerUnderVoltaged-" + printer._id)
+        .addEventListener("click", async () => {
+          bootbox.dialog({
+            title: "Reported undervoltage by your Pi!",
+            message:
+              "<p>Your RaspberryPi has reported it's undervoltaged... Please sort the issue and ReScan the API!</p>",
+            size: "small",
+            buttons: {
+              cancel: {
+                label: "Ignore",
+                className: "btn-danger",
+              },
+              ok: {
+                label: "Sorted, ReScan API!",
+                className: "btn-info",
+                callback: async () => {
+                  await reSyncAPI(true, printer._id);
+                },
+              },
+            },
+          });
+        });
+
+      document
+        .getElementById("printerConnectionThrottled-" + printer._id)
+        .addEventListener("click", async () => {
+          bootbox.dialog({
+            title: "Printer connection is throttled!",
+            message:
+              "<p>This is just an alert to let you know. Your printer connection is been throttled because the websocket messages are returning" +
               " slower than the throttle rate on OctoPrint.</p><br><p>There's not much to do to resolve it apart from upgrading/reducing your network conjestion." +
               "</p><br><p>The count on the icon is indicative to how much it is currently been throttled. You can devide the value by 2 to get the milisecond " +
               "rate your messages will come through from OctoPrint at. The default amount is 1 which results in a message speed of 500ms (0.5 seconds). The warning" +
               " will only trigger when a throttle rate above 1 is activated by the server. This is an automated process currently.</p>",
-          size: "small",
-          buttons: {
-            cancel: {
-              label: "Ignore",
-              className: "btn-danger d-none"
+            size: "small",
+            buttons: {
+              cancel: {
+                label: "Ignore",
+                className: "btn-danger d-none",
+              },
+              ok: {
+                label: "Ok!",
+                className: "btn-info",
+              },
             },
-            ok: {
-              label: "Ok!",
-              className: "btn-info",
-            }
-          }
+          });
         });
-      })
-      document.getElementById("octoPrintsUsage-" + printer._id).addEventListener("click", async () => {
-        UI.createAlert("warning", "Doesn't do anything..... YET!", 3000)
-      });
+      document
+        .getElementById("octoPrintsUsage-" + printer._id)
+        .addEventListener("click", async () => {
+          UI.createAlert("warning", "Doesn't do anything..... YET!", 3000);
+        });
     }
-
   });
 }

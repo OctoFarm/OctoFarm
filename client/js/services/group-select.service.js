@@ -7,17 +7,19 @@ export default function initGroupSelect(printers) {
     currentGroups.push(printer.group);
   });
   const uniqueGroups = _.uniq(currentGroups);
-  if (uniqueGroups.length === 1) {
-  } else {
+  if (uniqueGroups.length !== 1) {
     uniqueGroups.forEach((group) => {
       if (group != "") {
         groupSelectionDropDown.insertAdjacentHTML(
-          "beforeend",
-          `
+            "beforeend",
+            `
                       <option href="#" data-path=".${group.replace(
-                        / /g,
-                        "_"
-                      )}" value="${group.replace(/ /g, "_")}">Group: ${group}</option>
+                / /g,
+                "_"
+            )}" value="${group.replace(
+                / /g,
+                "_"
+            )}">Group: ${group}</option>
         `
         );
       }

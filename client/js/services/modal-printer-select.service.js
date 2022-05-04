@@ -21,7 +21,8 @@ export function setupClientSwitchDropDown(
     if (document.getElementById("printerControls")) {
       document.getElementById("printerControls").innerHTML = "";
     }
-    document.getElementById("pmStatus").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    document.getElementById("pmStatus").innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i>';
     document.getElementById("pmStatus").className = "btn btn-secondary mb-2";
     //Load Connection Panel
     document.getElementById("printerPortDrop").innerHTML = "";

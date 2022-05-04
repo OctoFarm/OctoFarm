@@ -345,10 +345,10 @@ router.post("/reSyncAPI", ensureAuthenticated, ensureAdministrator, async (req, 
 });
 
 router.post("/forceReconnect", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-    const id = req.body.id;
-    logger.info(`Force Reconnect ${id ? id : "no id provided..."}`);
-    const forceReconnect = await getPrinterStoreCache().forceReconnectPrinter(id);
-    res.send({ msg: forceReconnect });
+  const id = req.body.id;
+  logger.info(`Force Reconnect ${id ? id : "no id provided..."}`);
+  const forceReconnect = await getPrinterStoreCache().forceReconnectPrinter(id);
+  res.send({ msg: forceReconnect });
 });
 
 router.post("/reSyncSockets", ensureAuthenticated, async (req, res) => {

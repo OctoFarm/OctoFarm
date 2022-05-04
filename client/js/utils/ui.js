@@ -10,14 +10,14 @@ const currentModals = [
   printerManagerModal,
   printerLogsModal,
   printerStatisticsModal,
-  printerSelectModal
+  printerSelectModal,
 ];
 
 export default class UI {
   static elementsScrollPosition = {
     scrollTop: null,
-    scrollLeft: null
-  }
+    scrollLeft: null,
+  };
   //Colour function
   static getColour(state) {
     if (state === "Operational") {
@@ -73,7 +73,7 @@ export default class UI {
       closeWith: click,
       timeout: delay,
       layout: "bottomRight",
-      text: message
+      text: message,
     });
     alert.show();
     return alert;
@@ -119,7 +119,10 @@ export default class UI {
 
   static removeLoaderFromElementInnerHTML(element) {
     if (!!element && element.innerHTML.includes("spinner")) {
-      element.innerHTML = element.innerHTML.replace(UI.returnSpinnerTemplate(), "");
+      element.innerHTML = element.innerHTML.replace(
+        UI.returnSpinnerTemplate(),
+        ""
+      );
     }
   }
   static addLoaderToElementsInnerHTML(element) {
@@ -134,7 +137,9 @@ export default class UI {
     return modalArray.includes(true);
   }
   static checkIfSpecificModalShown(modalToCheck) {
-    const currentModal = currentModals.filter((modal) => modal.id === modalToCheck);
+    const currentModal = currentModals.filter(
+      (modal) => modal.id === modalToCheck
+    );
     if (currentModal[0]) {
       return currentModal[0].classList.contains("show");
     } else {
@@ -230,7 +235,7 @@ export default class UI {
   static generateMilisecondsTime(miliseconds) {
     let seconds = miliseconds / 1000;
     let string = "";
-    if (seconds === undefined || isNaN(seconds) || seconds === null) {
+    if (!seconds || isNaN(seconds)) {
       string = "No Interval";
     } else {
       const days = Math.floor(seconds / (3600 * 24));
@@ -246,32 +251,32 @@ export default class UI {
 
       string = `${days}d, ${hrs}h, ${mnts}m, ${seconds}s`;
 
-      if (mnts == 0) {
+      if (mnts === 0) {
         if (string.includes("0m")) {
           string = string.replace(" 0m,", "");
         }
       }
-      if (hrs == 0) {
+      if (hrs === 0) {
         if (string.includes("0h")) {
           string = string.replace(" 0h,", "");
         }
       }
-      if (days == 0) {
+      if (days === 0) {
         if (string.includes("0d")) {
           string = string.replace("0d,", "");
         }
       }
-      if (seconds == 0) {
+      if (seconds === 0) {
         string = string.replace(", 0s", "");
       }
-      if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
+      if (mnts === 0 && hrs === 0 && days === 0 && seconds === 0) {
         string = string.replace("0s", miliseconds + " ms");
       }
       if (!miliseconds) {
         string = "No Interval";
       }
-      return string;
     }
+    return string;
   }
 
   static isPrinterDisabled(e) {
@@ -294,7 +299,6 @@ export default class UI {
     }
   }
 
-
   static removeFaSpinFromElement(element) {
     if (element.classList.contains("fa-spin")) {
       element.classList.remove("fa-spin");
@@ -307,13 +311,13 @@ export default class UI {
     }
   }
 
-  static addNotYetToElement(element){
+  static addNotYetToElement(element) {
     if (!element.classList.contains("notyet")) {
       element.classList.add("notyet");
     }
   }
 
-  static removeNotYetFromElement(element){
+  static removeNotYetFromElement(element) {
     if (element.classList.contains("notyet")) {
       element.classList.remove("notyet");
     }
@@ -321,10 +325,10 @@ export default class UI {
 
   static togglePrinterDisableState(e) {
     if (e.target.innerHTML.includes("running")) {
-      e.target.innerHTML = "<i class=\"fas fa-wheelchair\"></i> Disable";
+      e.target.innerHTML = '<i class="fas fa-wheelchair"></i> Disable';
       e.target.title = "Printer is Disabled, click to enable";
     } else if (e.target.innerHTML.includes("wheelchair")) {
-      e.target.innerHTML = "<i class=\"fas fa-running text-success\"></i> Enable";
+      e.target.innerHTML = '<i class="fas fa-running text-success"></i> Enable';
       e.target.title = "Printer is Enabled, click to disable";
     }
   }
@@ -351,10 +355,10 @@ export default class UI {
     }
   }
 
-  static convertValueToTemplate(key, value){
+  static convertValueToTemplate(key, value) {
     const VALUE_NAME = UI.camelCaseToWords(key);
-    const ELEMENT_ID = `opBulk-${key}`
-    if(typeof value === "string"){
+    const ELEMENT_ID = `opBulk-${key}`;
+    if (typeof value === "string") {
       return `
         <div class="input-group mb-3 col-3">
           <div class="input-group-prepend">
@@ -362,9 +366,9 @@ export default class UI {
           </div>
           <input id="${ELEMENT_ID}" type="text" class="form-control" placeholder="${value}" aria-label="Username" aria-describedby="basic-addon1">
         </div>
-      `
+      `;
     }
-    if(typeof value === "number"){
+    if (typeof value === "number") {
       return `
         <div class="input-group mb-3 col-3">
           <div class="input-group-prepend">
@@ -372,11 +376,11 @@ export default class UI {
           </div>
           <input id="${ELEMENT_ID}" type="number" class="form-control" placeholder="${value}" aria-label="Username" aria-describedby="basic-addon1">
         </div>
-      `
+      `;
     }
 
-    if(typeof value === "boolean"){
-      const checked = value ? "checked='true'": ""
+    if (typeof value === "boolean") {
+      const checked = value ? "checked='true'" : "";
       return `
         <div class="col-4">
           <form class="was-validated">
@@ -388,26 +392,28 @@ export default class UI {
             </div>
           </form>
         </div>
-      `
+      `;
     }
-    if(value instanceof Array){
+    if (value instanceof Array) {
       //return select box
     }
   }
 
-  static camelCaseToWords(str){
-    return str.match(/^[a-z]+|[A-Z][a-z]*/g).map(function(x){
-      return x[0].toUpperCase() + x.substr(1).toLowerCase();
-    }).join(" ");
-  };
+  static camelCaseToWords(str) {
+    return str
+      .match(/^[a-z]+|[A-Z][a-z]*/g)
+      .map(function (x) {
+        return x[0].toUpperCase() + x.substr(1).toLowerCase();
+      })
+      .join(" ");
+  }
 
-  static captureScrollPosition(element){
+  static captureScrollPosition(element) {
     this.elementsScrollPosition.scrollTop = element.scrollTop;
     this.elementsScrollPosition.scrollLeft = element.scrollLeft;
   }
-  static reApplyScrollPosition(element){
+  static reApplyScrollPosition(element) {
     element.scrollTop = this.elementsScrollPosition.scrollTop;
     element.scrollLeft = this.elementsScrollPosition.scrollLeft;
   }
-
 }

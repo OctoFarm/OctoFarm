@@ -3,7 +3,7 @@ const errorTypes = {
   SERVER: "SERVER",
   NETWORK: "NETWORK",
   UNKNOWN: "UNKNOWN",
-  SILENT: "SILENT"
+  SILENT: "SILENT",
 };
 
 export { errorTypes };

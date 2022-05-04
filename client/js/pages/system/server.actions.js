@@ -9,7 +9,6 @@ import {
 import {
   isFilamentManagerPluginSyncEnabled,
   setupFilamentManagerDisableBtn,
-  setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn,
 } from "../../services/octoprint/filament-manager-plugin.service";
 import {
@@ -21,8 +20,8 @@ import {
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import ApexCharts from "apexcharts";
 import { activeUserListRowTemplate } from "./system.templates";
-import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../exceptions/application-error.handler";
+import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../exceptions/application-error.handler";
 
 let historicUsageGraph;
 let cpuUsageDonut;
@@ -338,7 +337,8 @@ async function restartOctoFarmServer() {
 }
 
 async function checkFilamentManagerPluginState() {
-  const { filamentManagerPluginIsEnabled } = await isFilamentManagerPluginSyncEnabled()
+  const { filamentManagerPluginIsEnabled } =
+    await isFilamentManagerPluginSyncEnabled();
   if (filamentManagerPluginIsEnabled) {
     setupFilamentManagerDisableBtn();
   } else {
@@ -362,7 +362,7 @@ async function updateServerSettings() {
       hideEmpty: settingsElements.filament.hideEmpty.checked,
       downDateFailed: settingsElements.filament.downDateFailed.checked,
       downDateSuccess: settingsElements.filament.downDateSuccess.checked,
-      allowMultiSelect: settingsElements.filament.allowMultiSelect.checked
+      allowMultiSelect: settingsElements.filament.allowMultiSelect.checked,
     },
     history: {
       snapshot: {
@@ -406,42 +406,45 @@ async function updateServerSettings() {
   };
 
   const previousSettings = await OctoFarmClient.get("settings/server/get");
-  if(previousSettings.filament.allowMultiSelect === true && settingsElements.filament.allowMultiSelect.checked === false){
+  if (
+    previousSettings.filament.allowMultiSelect === true &&
+    settingsElements.filament.allowMultiSelect.checked === false
+  ) {
     bootbox.confirm({
-      message: "You are turning off Mutli-Select, this will remove all your current assignments... are you sure?",
+      message:
+        "You are turning off Mutli-Select, this will remove all your current assignments... are you sure?",
       buttons: {
         confirm: {
           label: "Yes",
-          className: "btn-success"
+          className: "btn-success",
         },
         cancel: {
           label: "No",
-          className: "btn-danger"
-        }
+          className: "btn-danger",
+        },
       },
       callback: function (result) {
-        if(result){
+        if (result) {
           OctoFarmClient.post("settings/server/update", opts).then((res) => {
-            UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
-            if (res.restartRequired) {
-              bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
-            }
+            bootboxRestartRequired(res);
           });
-          return;
-        }else{
-          settingsElements.filament.allowMultiSelect.checked = true
+        } else {
+          settingsElements.filament.allowMultiSelect.checked = true;
         }
-      }
+      },
     });
-  }else{
+  } else {
     OctoFarmClient.post("settings/server/update", opts).then((res) => {
-      UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
-      if (res.restartRequired) {
-        bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
-      }
+      bootboxRestartRequired(res);
     });
   }
+}
 
+function bootboxRestartRequired(res){
+  UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
+  if (res.restartRequired) {
+    bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
+  }
 }
 
 async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
@@ -658,8 +661,8 @@ async function clearOldLogs() {
   } catch (e) {
     UI.createAlert("error", "Failed to house keep logs! " + e, 3000, "clicked");
     const errorObject = ClientErrors.SILENT_ERROR;
-    errorObject.message =  `Bulk Commands - ${e}`
-    throw new ApplicationError(errorObject)
+    errorObject.message = `Bulk Commands - ${e}`;
+    throw new ApplicationError(errorObject);
   }
 }
 
@@ -682,8 +685,10 @@ async function renderSystemCharts() {
 }
 
 async function updateCurrentActiveUsers() {
-  const activeUserList = await OctoFarmClient.get("settings/system/activeUsers");
-  if(!activeUserList){
+  const activeUserList = await OctoFarmClient.get(
+    "settings/system/activeUsers"
+  );
+  if (!activeUserList) {
     return;
   }
   const activeUserListContainer = document.getElementById(

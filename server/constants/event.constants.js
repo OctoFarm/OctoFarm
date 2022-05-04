@@ -1,6 +1,6 @@
 const EVENT_ID_MAP = {
   coolDown: "COOL_DOWN"
-}
+};
 
 const eventListConstants = {
   COOL_DOWN: {

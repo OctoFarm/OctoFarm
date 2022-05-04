@@ -17,7 +17,7 @@ ssdp.on("DeviceFound", (res) => {
     })
       .then((response) => response.text())
       .then((data) => {
-        if(data === "status=ok"){
+        if (data === "status=ok") {
           return;
         }
         parseString(data, function (err, result) {
@@ -68,7 +68,7 @@ let searchForDevicesOnNetwork = async function () {
   function x() {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        ssdp.close;
+        ssdp.close();
         resolve(discoveredDevices);
       }, 20001);
     });

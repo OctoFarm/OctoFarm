@@ -1,10 +1,14 @@
 import { asyncParse, debounce } from "./utils/sse.utils";
-import { MESSAGE_TYPES } from "../../server/constants/sse.constants"
+import { MESSAGE_TYPES } from "../../server/constants/sse.constants";
 import { updateLiveFileInformation } from "./pages/file-manager/file-manager-sse.handler";
-import { triggerCountDownTimer, drawModal, setServerAlive, reconnectFrequency } from "./services/amialive.service";
-import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "./exceptions/application-error.handler";
-
+import {
+  triggerCountDownTimer,
+  drawModal,
+  setServerAlive,
+  reconnectFrequency,
+} from "./services/amialive.service";
+import { ClientErrors } from "./exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "./exceptions/application-error.handler";
 
 // Keeping hold of this, may return a use for later...
 // function checkUpdateAndNotify(updateResponse) {
@@ -89,17 +93,16 @@ const reconnectFunc = debounce(
   }
 );
 
-
 function setupEventSource() {
   evtSource = new EventSource("/events");
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
-    if(type === MESSAGE_TYPES.AM_I_ALIVE){
+    if (type === MESSAGE_TYPES.AM_I_ALIVE) {
       await setServerAlive(message);
     }
 
-    if(type === MESSAGE_TYPES.FILE_UPDATE){
-      await updateLiveFileInformation(id, message)
+    if (type === MESSAGE_TYPES.FILE_UPDATE) {
+      await updateLiveFileInformation(id, message);
     }
   };
   evtSource.onopen = function (e) {
@@ -109,28 +112,33 @@ function setupEventSource() {
   };
   evtSource.onerror = async function (e) {
     window.serverOffline = true;
-    console.debug("Server connection lost! Re-connecting in... " + reconnectFrequency.getSeconds + "s");
-    triggerCountDownTimer(reconnectFrequency.getSeconds)
+    console.debug(
+      "Server connection lost! Re-connecting in... " +
+        reconnectFrequency.getSeconds +
+        "s"
+    );
+    triggerCountDownTimer(reconnectFrequency.getSeconds);
     console.error(e);
     await drawModal();
     evtSource.close();
     reconnectFunc();
     const errorObject = ClientErrors.SILENT_ERROR;
-    errorObject.message =  `Events Service - ${e.target.url}: ${e.target.readyState}`
-    throw new ApplicationError(errorObject)
+    errorObject.message = `Events Service - ${e.target.url}: ${e.target.readyState}`;
+    throw new ApplicationError(errorObject);
   };
   evtSource.onclose = async function (e) {
     window.serverOffline = true;
-    console.debug("Server connection closed! Re-establishing..." + reconnectFrequency.getSeconds + "s");
-    triggerCountDownTimer(reconnectFrequency.getSeconds)
+    console.debug(
+      "Server connection closed! Re-establishing..." +
+        reconnectFrequency.getSeconds +
+        "s"
+    );
+    triggerCountDownTimer(reconnectFrequency.getSeconds);
     console.warn(e);
     await drawModal();
     evtSource.close();
     reconnectFunc();
   };
-
 }
-
-
 
 setupEventSource();

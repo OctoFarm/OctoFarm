@@ -1,15 +1,18 @@
-
 import Calc from "../../../utils/calc.js";
 import UI from "../../../utils/ui.js";
 import FileManagerService from "../../../services/file-manager.service.js";
 import FileManagerSortingService from "../../../services/file-manager-sorting.service.js";
-import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
-import {allowedFileTypes} from "../../../constants/file-types.constants";
-import "../../../utils/cleanup-modals.util"
-import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
-import {closePrinterManagerModalIfOffline} from "../../../utils/octofarm.utils";
-import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../../exceptions/application-error.handler";
+import { setupClientSwitchDropDown } from "../../../services/modal-printer-select.service";
+import { allowedFileTypes } from "../../../constants/file-types.constants";
+import "../../../utils/cleanup-modals.util";
+import {
+  setupConnectButton,
+  setupConnectButtonListeners,
+  updateConnectButtonState,
+} from "./connect-button.service";
+import { closePrinterManagerModalIfOffline } from "../../../utils/octofarm.utils";
+import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../../exceptions/application-error.handler";
 
 let currentIndex = 0;
 let currentPrinter = null;
@@ -28,7 +31,12 @@ export default class PrinterFileManagerService {
         PrinterFileManagerService.init(value, printers, printerControlList);
       };
 
-      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+      setupClientSwitchDropDown(
+        currentPrinter._id,
+        printerControlList,
+        changeFunction,
+        true
+      );
 
       await PrinterFileManagerService.loadPrinter(currentPrinter);
       const elements = PrinterFileManagerService.grabPage();
@@ -157,8 +165,8 @@ export default class PrinterFileManagerService {
       );
       console.error(e);
       const errorObject = ClientErrors.SILENT_ERROR;
-      errorObject.message =  `Printer File Manager - ${e}`
-      throw new ApplicationError(errorObject)
+      errorObject.message = `Printer File Manager - ${e}`;
+      throw new ApplicationError(errorObject);
     }
   }
 
@@ -170,33 +178,46 @@ export default class PrinterFileManagerService {
       });
     });
 
-    setupConnectButtonListeners(currentPrinter, elements.connectPage.connectButton)
+    setupConnectButtonListeners(
+      currentPrinter,
+      elements.connectPage.connectButton
+    );
 
-    elements.fileManager.uploadFiles.addEventListener("change", async function () {
-      UI.createAlert(
-        "warning",
-        "Your files for Printer: " +
-          currentPrinter.printerName +
-          " has begun. Please do not navigate away from this page.",
-        3000,
-        "Clicked"
-      );
-      await FileManagerService.handleFiles(this?.files, currentPrinter);
-    });
+    elements.fileManager.uploadFiles.addEventListener(
+      "change",
+      async function () {
+        UI.createAlert(
+          "warning",
+          "Your files for Printer: " +
+            currentPrinter.printerName +
+            " has begun. Please do not navigate away from this page.",
+          3000,
+          "Clicked"
+        );
+        await FileManagerService.handleFiles(this?.files, currentPrinter);
+      }
+    );
     elements.fileManager.createFolderBtn.addEventListener("click", async () => {
       await FileManagerService.createFolder(currentPrinter);
     });
     elements.fileManager.fileSearch.addEventListener("keyup", async () => {
       await FileManagerService.search(currentPrinter._id);
     });
-    elements.fileManager.uploadPrintFile.addEventListener("change", async function() {
-      await FileManagerService.handleFiles(this?.files, currentPrinter, "print");
-    });
+    elements.fileManager.uploadPrintFile.addEventListener(
+      "change",
+      async function () {
+        await FileManagerService.handleFiles(
+          this?.files,
+          currentPrinter,
+          "print"
+        );
+      }
+    );
     elements.fileManager.back.addEventListener("click", async () => {
-     await FileManagerService.openFolder(undefined, undefined, currentPrinter);
+      await FileManagerService.openFolder(undefined, undefined, currentPrinter);
     });
     elements.fileManager.syncFiles.addEventListener("click", async (e) => {
-     await FileManagerService.reSyncFiles(e, currentPrinter);
+      await FileManagerService.reSyncFiles(e, currentPrinter);
     });
   }
 
@@ -204,7 +225,7 @@ export default class PrinterFileManagerService {
     return {
       mainPage: {
         title: document.getElementById("printerSelection"),
-        status: document.getElementById("pmStatus")
+        status: document.getElementById("pmStatus"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -214,11 +235,11 @@ export default class PrinterFileManagerService {
         connectButton: document.getElementById("pmConnect"),
         portDropDown: document.getElementById("pmSerialPort"),
         baudDropDown: document.getElementById("pmBaudrate"),
-        profileDropDown: document.getElementById("pmProfile")
+        profileDropDown: document.getElementById("pmProfile"),
       },
       printerControls: {
         filamentDrop: document.getElementById("filamentManagerFolderSelect"),
-        fileUpload: document.getElementById("printerManagerUploadBtn")
+        fileUpload: document.getElementById("printerManagerUploadBtn"),
       },
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),
@@ -228,8 +249,8 @@ export default class PrinterFileManagerService {
         uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
         syncFiles: document.getElementById("fileReSync"),
         back: document.getElementById("fileBackBtn"),
-        createFolderBtn: document.getElementById("createFolderBtn")
-      }
+        createFolderBtn: document.getElementById("createFolderBtn"),
+      },
     };
   }
 
@@ -250,8 +271,13 @@ export default class PrinterFileManagerService {
       )} / ${Calc.bytes(0)}`;
     }
 
-
-    updateConnectButtonState(printer, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
-
+    updateConnectButtonState(
+      printer,
+      elements.mainPage.status,
+      elements.connectPage.connectButton,
+      elements.connectPage.printerPort,
+      elements.connectPage.printerBaud,
+      elements.connectPage.printerProfile
+    );
   }
 }

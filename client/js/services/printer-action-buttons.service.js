@@ -5,11 +5,16 @@ import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
 import {
   canWeTurnOnThePrinter,
-  printerIsDisconnectedOrError, printerIsIdle,
+  printerIsDisconnectedOrError,
+  printerIsIdle,
   printerIsOnline,
-  printerIsPrinting
+  printerIsPrinting,
 } from "../utils/octofarm.utils";
-import {printerEmergencyStop, printerHomeAllAxis, printerTurnOffHeaters} from "./octoprint/octoprint-printer-commands.actions";
+import {
+  printerEmergencyStop,
+  printerHomeAllAxis,
+  printerTurnOffHeaters,
+} from "./octoprint/octoprint-printer-commands.actions";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -97,17 +102,18 @@ function returnActionBtnTemplate(id, webURL) {
 
 function printerQuickConnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
+  connectBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
   connectBtn.title = "Quickly bring your printer online! Power -> Connect";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
+  connectBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
-  connectBtn.title = "Quickly take your printer offline! Disconnect -> Power Off";
+  connectBtn.title =
+    "Quickly take your printer offline! Disconnect -> Power Off";
 }
 
 function groupInit(printers) {
@@ -128,7 +134,8 @@ function groupInit(printers) {
       if (
         printer.currentConnection !== null &&
         printer.currentConnection.port !== null &&
-        printer.printerState.colour.category !== "Offline" && printer.printerState.colour.category !== "Searching"
+        printer.printerState.colour.category !== "Offline" &&
+        printer.printerState.colour.category !== "Searching"
       ) {
         printerQuickConnected(cleanGroup);
       } else {
@@ -325,11 +332,16 @@ function addEventListeners(printer) {
       ) {
         const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
         //TODO enable quick connect setting for this to be enabled or disabled...
-        if(canPowerOnThePrinter){
-          await PrinterPowerService.sendPowerCommandForPrinter(printer, printer.powerSettings.powerOnURL, printer.powerSettings.powerOnCommand, "power on");
+        if (canPowerOnThePrinter) {
+          await PrinterPowerService.sendPowerCommandForPrinter(
+            printer,
+            printer.powerSettings.powerOnURL,
+            printer.powerSettings.powerOnCommand,
+            "power on"
+          );
           // Should be long enough for the printer to boot up.
           // TODO also make customisable
-          await UI.delay(3000)
+          await UI.delay(3000);
         }
 
         let data = {};
@@ -446,29 +458,38 @@ function addEventListeners(printer) {
       e.target.disabled = false;
     });
   // Emergency Stop
-  document.getElementById(`printerEmergency-${printer._id}`).addEventListener("click", async (e) => {
-    e.target.disabled = true;
-    bootbox.confirm("You are about to send \"M112\" to your printer, this will cause an emergency stop! Are you sure?", async function(result){
-      if(result){
-        const {status, message} = await printerEmergencyStop(printer);
-        UI.createAlert(status, message, 3000, "Clicked")
-        e.target.disabled = false;
-      }
+  document
+    .getElementById(`printerEmergency-${printer._id}`)
+    .addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      bootbox.confirm(
+        'You are about to send "M112" to your printer, this will cause an emergency stop! Are you sure?',
+        async function (result) {
+          if (result) {
+            const { status, message } = await printerEmergencyStop(printer);
+            UI.createAlert(status, message, 3000, "Clicked");
+            e.target.disabled = false;
+          }
+        }
+      );
     });
-  })
-  document.getElementById(`printerHome-${printer._id}`).addEventListener("click", async (e) => {
-    e.target.disabled = true;
-    const {status, message} = await printerHomeAllAxis(printer);
-    UI.createAlert(status, message, 3000, "Clicked")
-    e.target.disabled = false;
-  })
+  document
+    .getElementById(`printerHome-${printer._id}`)
+    .addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const { status, message } = await printerHomeAllAxis(printer);
+      UI.createAlert(status, message, 3000, "Clicked");
+      e.target.disabled = false;
+    });
 
-  document.getElementById(`printerHeatersOff-${printer._id}`).addEventListener("click", async (e) => {
-    e.target.disabled = true;
-    const {status, message} = await printerTurnOffHeaters(printer);
-    UI.createAlert(status, message, 3000, "Clicked")
-    e.target.disabled = false;
-  })
+  document
+    .getElementById(`printerHeatersOff-${printer._id}`)
+    .addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      const { status, message } = await printerTurnOffHeaters(printer);
+      UI.createAlert(status, message, 3000, "Clicked");
+      e.target.disabled = false;
+    });
 
   PrinterPowerService.setupEventListeners(printer);
 }
@@ -477,16 +498,22 @@ function checkQuickConnectState(printer) {
   const isOnline = printerIsOnline(printer);
   const isPrinting = printerIsPrinting(printer);
 
-      //printerActionsHeader
-  document.getElementById("printerSyncButton-"+printer._id).disabled = !isOnline;
-  document.getElementById("printerQuickConnect-" + printer._id).disabled = !isOnline;
-  document.getElementById("printerManageDropDown-" + printer._id).disabled = !isOnline;
-  document.getElementById("printerHome-"+printer._id).disabled = !printerIsIdle(printer);
-  document.getElementById("printerEmergency-"+printer._id).disabled = !isPrinting;
-  document.getElementById("printerHeatersOff-"+printer._id).disabled = !printerIsIdle(printer);
+  //printerActionsHeader
+  document.getElementById("printerSyncButton-" + printer._id).disabled =
+    !isOnline;
+  document.getElementById("printerQuickConnect-" + printer._id).disabled =
+    !isOnline;
+  document.getElementById("printerManageDropDown-" + printer._id).disabled =
+    !isOnline;
+  document.getElementById("printerHome-" + printer._id).disabled =
+    !printerIsIdle(printer);
+  document.getElementById("printerEmergency-" + printer._id).disabled =
+    !isPrinting;
+  document.getElementById("printerHeatersOff-" + printer._id).disabled =
+    !printerIsIdle(printer);
 
-  PrinterPowerService.revealPowerButtons(printer).catch(e => {
-    console.error(e)
+  PrinterPowerService.revealPowerButtons(printer).catch((e) => {
+    console.error(e);
   });
 
   if (typeof printer.connectionOptions !== "undefined") {
@@ -505,12 +532,12 @@ function checkQuickConnectState(printer) {
     ).disabled = true;
   }
 
-  if(!isOnline){
+  if (!isOnline) {
     printerQuickDisconnected(printer._id);
     return;
   }
 
-  if(printerIsDisconnectedOrError(printer)) {
+  if (printerIsDisconnectedOrError(printer)) {
     printerQuickDisconnected(printer._id);
     return;
   }

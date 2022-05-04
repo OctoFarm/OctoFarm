@@ -20,10 +20,10 @@ const patchPrinterValues = async (printer) => {
 };
 
 const nameSearchPatch = (printer) => {
-  if(printer?.settingsAppearance?.name.length === 0){
-    printer.settingsAppearance.name = "Grabbing from OctoPrint..."
+  if (printer?.settingsAppearance?.name.length === 0) {
+    printer.settingsAppearance.name = "Grabbing from OctoPrint...";
   }
-}
+};
 
 const categoryPatch = (printer) => {
   if (!printer?.category) {

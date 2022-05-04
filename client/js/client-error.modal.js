@@ -1,4 +1,4 @@
-import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
+import { ClientErrors } from "./exceptions/octofarm-client.exceptions";
 import OctoFarmClient from "./services/octofarm-client.service";
 const octoFarmErrorModalElement = "#octofarmErrorModal";
 let dealingWithError = false;
@@ -13,7 +13,7 @@ function returnErrorMessage(options) {
      <div class="py-3">
         Please report this error to <a href="https://github.com/octofarm/octofarm/issues">OctoFarm Issues</a>!
      </div>
-     ${options?.message ? options.message: options.toString()}
+     ${options?.message ? options.message : options.toString()}
   `;
 }
 
@@ -31,13 +31,13 @@ function returnModalDeveloperInfo(options) {
 }
 
 function returnDeveloperObject(options) {
-  const { lineNumber, columnNumber, fileName, stack } = options
+  const { lineNumber, columnNumber, fileName, stack } = options;
   return {
     lineNumber,
     columnNumber,
     fileName,
-    stack
-  }
+    stack,
+  };
 }
 
 function openErrorModal(options) {
@@ -59,18 +59,17 @@ function openErrorModal(options) {
   apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
-  if(errorObject?.statusCode === 999){
+  if (errorObject?.statusCode === 999) {
     setTimeout(async () => {
-      await OctoFarmClient.sendError(errorObject)
-    }, 1000)
-    if(options.code === "SILENT_ERROR"){
+      await OctoFarmClient.sendError(errorObject);
+    }, 1000);
+    if (options.code === "SILENT_ERROR") {
       return;
     }
-
   }
   setTimeout(() => {
     $(octoFarmErrorModalElement).modal("show");
-  }, 2000)
+  }, 2000);
 }
 
 function handleEvent(event) {

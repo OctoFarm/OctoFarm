@@ -1,7 +1,7 @@
 import axios from "axios";
-import {ApplicationError} from "../exceptions/application-error.handler";
-import {HTTPError} from "../exceptions/octofarm-api.exceptions";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../exceptions/application-error.handler";
+import { HTTPError } from "../exceptions/octofarm-api.exceptions";
+import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 
 //REFACTOR move out to utility file
 const prettyPrintStatusError = (errorString) => {
@@ -9,12 +9,14 @@ const prettyPrintStatusError = (errorString) => {
 
   let prettyString = `<br>###${name}###<br>`;
 
-  for (const key in errors ){
-    prettyString += `<br>#${key.toLocaleUpperCase()}#<br> ${errors[key].message} <br>`
+  for (const key in errors) {
+    prettyString += `<br>#${key.toLocaleUpperCase()}#<br> ${
+      errors[key].message
+    } <br>`;
   }
 
-  return prettyString
-}
+  return prettyString;
+};
 
 // axios request interceptor
 axios.interceptors.request.use(
@@ -37,8 +39,8 @@ axios.interceptors.response.use(
   },
   function (error) {
     //Guard clause - Server offline then these commands will always error...
-    if(window.serverOffline) {
-      return { data: false }
+    if (window.serverOffline) {
+      return { data: false };
     }
 
     // Any status codes that falls outside the range of 2xx cause this function to trigger
@@ -47,7 +49,11 @@ axios.interceptors.response.use(
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST, {message: `${HTTPError.BAD_REQUEST.message}: ${prettyPrintStatusError(error.response.data)}`});
+        throw new ApplicationError(HTTPError.BAD_REQUEST, {
+          message: `${HTTPError.BAD_REQUEST.message}: ${prettyPrintStatusError(
+            error.response.data
+          )}`,
+        });
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
       case 403:
@@ -55,15 +61,21 @@ axios.interceptors.response.use(
       case 404:
         throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
       case 500:
-        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR, {message: `${HTTPError.INTERNAL_SERVER_ERROR.message}: ${error.response.statusText}`});
+        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR, {
+          message: `${HTTPError.INTERNAL_SERVER_ERROR.message}: ${error.response.statusText}`,
+        });
       case 502:
         throw new ApplicationError(HTTPError.BAD_GATEWAY);
       case 503:
-        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE, {message: `${HTTPError.SERVICE_UNAVAILABLE.message}: ${error.response.statusText}`});
+        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE, {
+          message: `${HTTPError.SERVICE_UNAVAILABLE.message}: ${error.response.statusText}`,
+        });
       case 504:
         throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
       default:
-        throw new ApplicationError(HTTPError.UNKNOWN, {message: `${HTTPError.UNKNOWN.message}: ${error?.response?.statusText}`});
+        throw new ApplicationError(HTTPError.UNKNOWN, {
+          message: `${HTTPError.UNKNOWN.message}: ${error?.response?.statusText}`,
+        });
     }
   }
 );
@@ -75,7 +87,8 @@ export default class OctoFarmClient {
   static printerRoute = "/printers";
   static disablePrinterRoute = this.printerRoute + "/disable";
   static enablePrinterRoute = this.printerRoute + "/enable";
-  static generatePrinterNameRoute = this.printerRoute + "/generate_printer_name";
+  static generatePrinterNameRoute =
+    this.printerRoute + "/generate_printer_name";
   static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
   static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
   static printerStepChangeRoute = this.printerRoute + "/stepChange";
@@ -88,7 +101,7 @@ export default class OctoFarmClient {
   static filamentSpools = `${this.filamentRoute}/get/filament`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
-  static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`
+  static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`;
   static userRoute = `/users/users`;
   static healthCheckRoute = `${this.printerRoute}/healthChecks`;
   static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
@@ -99,7 +112,7 @@ export default class OctoFarmClient {
     if (!pathname) {
       const newURL = new URL(path, window.location.origin);
       throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, {
-        message: `${ClientErrors.FAILED_VALIDATION_PATH} ${newURL}`
+        message: `${ClientErrors.FAILED_VALIDATION_PATH} ${newURL}`,
       });
     }
   }
@@ -109,31 +122,31 @@ export default class OctoFarmClient {
       throw new Error("Cant fetch printer without defined 'id' input");
     }
     const body = {
-      i: id
+      i: id,
     };
     return this.post(`${this.printerRoute}/printerInfo/`, body);
   }
 
-  static async getPrinterName(){
-    return this.get(this.generatePrinterNameRoute)
+  static async getPrinterName() {
+    return this.get(this.generatePrinterNameRoute);
   }
 
-  static async forceReconnect(id){
+  static async forceReconnect(id) {
     const data = {
-      id
-    }
+      id,
+    };
     return this.post(this.forceReconnectRoute, data);
   }
 
   static async listPrinters(disabled = false, showFullList = false) {
-    let path = `${this.printerRoute}/printerInfo`
+    let path = `${this.printerRoute}/printerInfo`;
 
-    if(disabled){
-      path += "?disabled=true"
+    if (disabled) {
+      path += "?disabled=true";
     }
 
-    if(showFullList){
-      path += "?fullList=true"
+    if (showFullList) {
+      path += "?fullList=true";
     }
 
     return this.post(path);
@@ -141,21 +154,21 @@ export default class OctoFarmClient {
 
   static async disablePrinter(idList) {
     const body = {
-      idList
-    }
+      idList,
+    };
     return this.post(`${this.disablePrinterRoute}`, body);
   }
 
   static async enablePrinter(idList) {
     const body = {
-      idList
-    }
+      idList,
+    };
     return this.post(`${this.enablePrinterRoute}`, body);
   }
 
   static async refreshPrinterSettings(id) {
     const body = {
-      i: id
+      i: id,
     };
     return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
   }
@@ -165,11 +178,11 @@ export default class OctoFarmClient {
   }
 
   static async deleteLogFile(filename) {
-    return this.delete(`${this.logsRoute}/${filename}`)
+    return this.delete(`${this.logsRoute}/${filename}`);
   }
 
   static async clearOldLogs() {
-    return this.delete(`${this.logsRoute}/clear-old`)
+    return this.delete(`${this.logsRoute}/clear-old`);
   }
 
   static async getHistoryStatistics() {
@@ -184,14 +197,14 @@ export default class OctoFarmClient {
     return this.get(`${this.serverSettingsRoute}/get`);
   }
 
-  static async getSelectedFilament(id){
+  static async getSelectedFilament(id) {
     return this.get(`${this.selectedFilamentRoute}/${id}`);
   }
 
   static async setPrinterSteps(id, newSteps) {
     return this.post("printers/stepChange", {
       printer: id,
-      newSteps
+      newSteps,
     });
   }
 
@@ -219,12 +232,12 @@ export default class OctoFarmClient {
     return this.get(this.filamentStatistics);
   }
 
-  static async getFilamentSpools(){
-    return this.get(this.filamentSpools)
+  static async getFilamentSpools() {
+    return this.get(this.filamentSpools);
   }
 
-  static async getFilamentProfiles(){
-    return this.get(this.filamentProfiles)
+  static async getFilamentProfiles() {
+    return this.get(this.filamentProfiles);
   }
 
   static async updateServerSettings(settingsObject) {
@@ -263,33 +276,31 @@ export default class OctoFarmClient {
   static getConnectionOverview() {
     return this.get(this.connectionOverviewRoute);
   }
-  static async sendError(error){
+  static async sendError(error) {
     try {
-      await  this.post(this.fireLogToServerRoute, error)
+      await this.post(this.fireLogToServerRoute, error);
     } catch (e) {
       console.error(e.toString());
     }
   }
 
-
   static updateCurrentOpState({ iterie, order }) {
     return this.post("client/currentOpSorting", { iterie, order });
   }
 
-  static async updateActiveControlUser(id){
+  static async updateActiveControlUser(id) {
     try {
-      await this.patch(`${this.updateActiveUserRoute}/${id}`)
-    }catch (e){
-      console.error("Unable to update active control user!", e.toString())
+      await this.patch(`${this.updateActiveUserRoute}/${id}`);
+    } catch (e) {
+      console.error("Unable to update active control user!", e.toString());
     }
-
   }
 
-  static async updateUserActionsLog(id, body){
+  static async updateUserActionsLog(id, body) {
     try {
-      await this.post(`${this.updateUserActionsLogRoute}/${id}`, body)
+      await this.post(`${this.updateUserActionsLogRoute}/${id}`, body);
     } catch (e) {
-      console.error("Unable to update user actions log!", e.toString())
+      console.error("Unable to update user actions log!", e.toString());
     }
   }
 

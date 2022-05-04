@@ -1,11 +1,11 @@
-import {DashboardStorage} from "./dashboard.storage";
+import { DashboardStorage } from "./dashboard.storage";
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
-import {GridStack} from "gridstack";
+import { GridStack } from "gridstack";
 
 const gridStack = GridStack.init({
   cellHeight: 50,
-  float: true
+  float: true,
 });
 
 /**
@@ -27,7 +27,7 @@ export async function loadGrid() {
           x: item.x,
           y: item.y,
           w: item.width,
-          h: item.height
+          h: item.height,
         });
       }
     });

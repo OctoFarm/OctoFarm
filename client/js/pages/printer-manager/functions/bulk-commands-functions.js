@@ -1,17 +1,17 @@
-import {findIndex} from "lodash";
+import { findIndex } from "lodash";
 
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
 import UI from "../../../utils/ui";
 import PrinterSelectionService from "../services/printer-selection.service";
 import {
   octoPrintPluginInstallAction,
-  updateOctoPrintPlugins
+  updateOctoPrintPlugins,
 } from "../../../services/octoprint/octoprint-plugin-commands.actions";
 import {
   disconnectPrinterFromOctoPrint,
   quickConnectPrinterToOctoPrint,
   sendPowerCommandToOctoPrint,
-  updateOctoPrintClient
+  updateOctoPrintClient,
 } from "../../../services/octoprint/octoprint-client-commands.actions";
 import {
   printerHomeAxis,
@@ -24,35 +24,37 @@ import {
   printerResumePrint,
   printerSendGcode,
   printerStartPrint,
-  printerStopPrint
+  printerStopPrint,
 } from "../../../services/octoprint/octoprint-printer-commands.actions";
-import {setupOctoPrintForVirtualPrinter} from "../../../services/octoprint/octoprint-settings.actions";
+import { setupOctoPrintForVirtualPrinter } from "../../../services/octoprint/octoprint-settings.actions";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service";
-import {setupPluginSearch} from "./plugin-search.function";
-import {returnPluginListTemplate, returnPluginSelectTemplate} from "../templates/octoprint-plugin-list.template";
+import { setupPluginSearch } from "./plugin-search.function";
+import {
+  returnPluginListTemplate,
+  returnPluginSelectTemplate,
+} from "../templates/octoprint-plugin-list.template";
 import {
   generateTableRows,
   showBulkActionsModal,
   updateBulkActionsProgress,
-  updateTableRow
+  updateTableRow,
 } from "./bulk-actions-progress.functions";
-import {populateBulkSettingsForms} from "./bulk-settings-update.functions";
+import { populateBulkSettingsForms } from "./bulk-settings-update.functions";
 import bulkActionsStates from "../bulk-actions.constants";
-import {allowedFileTypes} from "../../../constants/file-types.constants";
+import { allowedFileTypes } from "../../../constants/file-types.constants";
 
 import Queue from "../../../services/file-manager-queue.service.js";
 import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
-import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../../exceptions/application-error.handler";
+import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../../exceptions/application-error.handler";
 
 const fileUploads = new Queue();
 
 let selectedFolder = "";
-const LIGHT_BUTTON_CLASS = "btn btn-light"
-const LIGHT_BUTTON_CLASS_ACTIVE = "btn btn-light active"
-const IS_INVALID = "is_invalid"
-const IS_VALID = "is_valid"
-
+const LIGHT_BUTTON_CLASS = "btn btn-light";
+const LIGHT_BUTTON_CLASS_ACTIVE = "btn btn-light active";
+const IS_INVALID = "is_invalid";
+const IS_VALID = "is_valid";
 
 //REFACTOR this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList(disabled) {
@@ -73,7 +75,12 @@ async function getCurrentlySelectedPrinterList(disabled) {
     return matchedPrinters;
   } catch (e) {
     console.error(e);
-    UI.createAlert("error", `Couldn't get selected printer list: ${e}`, 0, "clicked");
+    UI.createAlert(
+      "error",
+      `Couldn't get selected printer list: ${e}`,
+      0,
+      "clicked"
+    );
     return [];
   }
 }
@@ -93,21 +100,26 @@ export async function bulkOctoPrintPluginUpdate() {
           _id: currentPrinter._id,
           printerURL: currentPrinter.printerURL,
           printerName: currentPrinter.printerName,
-          apikey: currentPrinter.apikey
+          apikey: currentPrinter.apikey,
         });
-        let count = 0
+        let count = 0;
         for (const plugin of currentPrinter.octoPrintPluginUpdates) {
-          const n = plugin.releaseNotesURL.lastIndexOf('/');
-          const version = plugin.releaseNotesURL.substring(n + 1)
-          message += `<b>${count}.</b> ${plugin.displayName} - Current: ${plugin.displayVersion} - Latest: ${version} <br>`
+          const n = plugin.releaseNotesURL.lastIndexOf("/");
+          const version = plugin.releaseNotesURL.substring(n + 1);
+          message += `<b>${count}.</b> ${plugin.displayName} - Current: ${plugin.displayVersion} - Latest: ${version} <br>`;
           pluginList.push(plugin.id);
-          displayNameList.push(plugin.displayName)
-          count++
+          displayNameList.push(plugin.displayName);
+          count++;
         }
       }
     }
     if (toUpdate.length < 1) {
-      UI.createAlert("error", "There are no plugin updates available!", 0, "clicked");
+      UI.createAlert(
+        "error",
+        "There are no plugin updates available!",
+        0,
+        "clicked"
+      );
       return;
     }
     message += "Are you sure?";
@@ -121,13 +133,17 @@ export async function bulkOctoPrintPluginUpdate() {
           updateBulkActionsProgress(0, toUpdate.length);
           generateTableRows(toUpdate);
           for (let i = 0; i < toUpdate.length; i++) {
-            const response = await updateOctoPrintPlugins(pluginList, toUpdate[i], displayNameList);
+            const response = await updateOctoPrintPlugins(
+              pluginList,
+              toUpdate[i],
+              displayNameList
+            );
             updateTableRow(toUpdate[i]._id, response.status, response.message);
             updateBulkActionsProgress(i, toUpdate.length);
           }
           updateBulkActionsProgress(toUpdate.length, toUpdate.length);
         }
-      }
+      },
     });
   } catch (e) {
     console.error(e);
@@ -153,12 +169,17 @@ export async function bulkOctoPrintClientUpdate() {
           _id: currentPrinter._id,
           printerURL: currentPrinter.printerURL,
           printerName: currentPrinter.printerName,
-          apikey: currentPrinter.apikey
+          apikey: currentPrinter.apikey,
         });
       }
     }
     if (toUpdate.length < 1) {
-      UI.createAlert("error", "There are no OctoPrint updates available!", 0, "clicked");
+      UI.createAlert(
+        "error",
+        "There are no OctoPrint updates available!",
+        0,
+        "clicked"
+      );
       return;
     }
     message += "Are you sure?";
@@ -178,7 +199,7 @@ export async function bulkOctoPrintClientUpdate() {
           }
           updateBulkActionsProgress(toUpdate.length, toUpdate.length);
         }
-      }
+      },
     });
   } catch (e) {
     console.error(e);
@@ -211,33 +232,45 @@ export async function bulkDisablePrinters() {
   generateTableRows(printersToControl);
   for (let p = 0; p < printersToControl.length; p++) {
     await OctoFarmClient.disablePrinter([printersToControl[p]._id]);
-    const disableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
+    const disableButton = document.getElementById(
+      "printerDisable-" + printersToControl[p]._id
+    );
     const e = {
-      target: disableButton
-    }
-    UI.togglePrinterDisableState(e)
-    updateTableRow(printersToControl[p]._id, "success", "Successfully Disabled your printer!");
+      target: disableButton,
+    };
+    UI.togglePrinterDisableState(e);
+    updateTableRow(
+      printersToControl[p]._id,
+      "success",
+      "Successfully Disabled your printer!"
+    );
     updateBulkActionsProgress(p, printersToControl.length);
   }
   updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
 export async function bulkEnablePrinters(disabled) {
-    const printersToControl = await getCurrentlySelectedPrinterList(disabled);
-    showBulkActionsModal();
-    updateBulkActionsProgress(0, printersToControl.length);
-    generateTableRows(printersToControl);
-    for (let p = 0; p < printersToControl.length; p++) {
-      await OctoFarmClient.enablePrinter([printersToControl[p]._id]);
-      const enableButton = document.getElementById("printerDisable-"+printersToControl[p]._id);
-      const e = {
-        target: enableButton
-      }
-      UI.togglePrinterDisableState(e)
-      updateTableRow(printersToControl[p]._id, "success", "Successfully Enabled your printer!");
-      updateBulkActionsProgress(p, printersToControl.length);
-    }
-    updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+  const printersToControl = await getCurrentlySelectedPrinterList(disabled);
+  showBulkActionsModal();
+  updateBulkActionsProgress(0, printersToControl.length);
+  generateTableRows(printersToControl);
+  for (let p = 0; p < printersToControl.length; p++) {
+    await OctoFarmClient.enablePrinter([printersToControl[p]._id]);
+    const enableButton = document.getElementById(
+      "printerDisable-" + printersToControl[p]._id
+    );
+    const e = {
+      target: enableButton,
+    };
+    UI.togglePrinterDisableState(e);
+    updateTableRow(
+      printersToControl[p]._id,
+      "success",
+      "Successfully Enabled your printer!"
+    );
+    updateBulkActionsProgress(p, printersToControl.length);
+  }
+  updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
 function setupSingleFileMode(printers, file = "No File", folder = "") {
@@ -252,11 +285,15 @@ function setupMultiFileMode(printers, files, folder = "") {
   if (files) {
     printers.forEach((printer, index) => {
       if (files[index]) {
-        document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+        document.getElementById(
+          `printerFileChoice-${printer._id}`
+        ).innerHTML = `
       <small><i class="fas fa-file-code"></i>${folder}/${files[index].name}</small>
     `;
       } else {
-        document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+        document.getElementById(
+          `printerFileChoice-${printer._id}`
+        ).innerHTML = `
       <small><i class="fas fa-forward"></i> Select more files to send to this printer!</small>
     `;
       }
@@ -291,7 +328,9 @@ function fileUpload(file) {
     xhr.upload.onprogress = function (e) {
       if (e.lengthComputable) {
         // Update progress
-        const progressBar = document.getElementById("bpUploadProgress-" + index);
+        const progressBar = document.getElementById(
+          "bpUploadProgress-" + index
+        );
         progressBar.classList = "progress-bar progress-bar-striped bg-warning";
         if (progressBar) {
           let percentLoad = (e.loaded / e.total) * 100;
@@ -301,7 +340,8 @@ function fileUpload(file) {
           progressBar.style.width = `${Math.floor(percentLoad)}%`;
           progressBar.innerHTML = `Uploading: ${Math.floor(percentLoad)}%`;
           if (percentLoad === 100) {
-            progressBar.classList = "progress-bar progress-bar-striped bg-success";
+            progressBar.classList =
+              "progress-bar progress-bar-striped bg-success";
           }
         }
       }
@@ -312,13 +352,14 @@ function fileUpload(file) {
       if (this.status >= 200 && this.status < 300) {
         resolve({
           status: bulkActionsStates.SUCCESS,
-          message: "Successfully uploaded your file! Printing started."
+          message: "Successfully uploaded your file! Printing started.",
         });
         // Success!
       } else {
         resolve({
           status: bulkActionsStates.ERROR,
-          message: "An error occured whilst updating your file... Printing failed."
+          message:
+            "An error occured whilst updating your file... Printing failed.",
         });
         // Error occured
       }
@@ -326,7 +367,8 @@ function fileUpload(file) {
     xhr.onerror = function () {
       resolve({
         status: bulkActionsStates.ERROR,
-        message: "An error occured whilst updating your file... printing failed."
+        message:
+          "An error occured whilst updating your file... printing failed.",
       });
       // Error occured!
     };
@@ -337,7 +379,9 @@ function fileUpload(file) {
 export async function bulkPrintFileSetup() {
   document.getElementById("bpActionButtonElement").innerHTML =
     "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
-  document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
+  document.getElementById(
+    "bpuploadFilesElement"
+  ).innerHTML = `<div class="custom-file">
           <input type="file" accept="${allowedFileTypes}" class="custom-file-input" id="bpFileUpload" multiple>
           <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
       </div>
@@ -365,7 +409,9 @@ export async function bulkPrintFileSetup() {
   let selectedFiles;
   const printersToControl = await getCurrentlySelectedPrinterList();
 
-  const printerDisplayElement = document.getElementById("bpSelectedPrintersAndFiles");
+  const printerDisplayElement = document.getElementById(
+    "bpSelectedPrintersAndFiles"
+  );
   printerDisplayElement.innerHTML = "";
   const bpActionButton = document.getElementById("bpActionButton");
   printersToControl.forEach((printer) => {
@@ -409,12 +455,15 @@ export async function bulkPrintFileSetup() {
         if (doesFileExist === 200) {
           const opt = {
             command: "select",
-            print: true
+            print: true,
           };
           await OctoPrintClient.updateFeedAndFlow(currentPrinter);
           await OctoPrintClient.updateFilamentOffsets(currentPrinter);
 
-          const url = `files/local/${selectedFolder}${selectedFiles[0].name.replaceAll(" ", "_")}`;
+          const url = `files/local/${selectedFolder}${selectedFiles[0].name.replaceAll(
+            " ",
+            "_"
+          )}`;
           const file = await OctoPrintClient.post(currentPrinter, url, opt);
           if (file.status === 204) {
             updateTableRow(
@@ -436,7 +485,7 @@ export async function bulkPrintFileSetup() {
             index: currentPrinter._id,
             printerInfo: currentPrinter,
             currentFolder: `local/${selectedFolder}`,
-            print: true
+            print: true,
           };
           updateTableRow(
             currentPrinter._id,
@@ -452,7 +501,12 @@ export async function bulkPrintFileSetup() {
           );
 
           const response = await fileUpload(newObject);
-          updateTableRow(currentPrinter._id, response.status, response.message, true);
+          updateTableRow(
+            currentPrinter._id,
+            response.status,
+            response.message,
+            true
+          );
         }
       } else if (selectedFiles.length > 1) {
         if (selectedFiles[p]) {
@@ -463,7 +517,7 @@ export async function bulkPrintFileSetup() {
           if (doesFileExist === 200) {
             const opt = {
               command: "select",
-              print: true
+              print: true,
             };
             await OctoPrintClient.updateFeedAndFlow(currentPrinter);
             await OctoPrintClient.updateFilamentOffsets(currentPrinter);
@@ -489,9 +543,8 @@ export async function bulkPrintFileSetup() {
               index: currentPrinter._id,
               printerInfo: currentPrinter,
               currentFolder: "local/",
-              print: true
+              print: true,
             };
-
 
             updateTableRow(
               currentPrinter._id,
@@ -507,7 +560,12 @@ export async function bulkPrintFileSetup() {
             );
 
             const response = await fileUpload(newObject);
-            updateTableRow(currentPrinter._id, response.status, response.message, true);
+            updateTableRow(
+              currentPrinter._id,
+              response.status,
+              response.message,
+              true
+            );
           }
         } else {
           updateTableRow(
@@ -517,13 +575,16 @@ export async function bulkPrintFileSetup() {
           );
         }
       }
-      updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+      updateBulkActionsProgress(
+        printersToControl.length,
+        printersToControl.length
+      );
     }
 
     // Run a background sync of all printers files...
     for (const printer of printersToControl) {
       await OctoFarmClient.post("printers/resyncFile", {
-        i: printer._id
+        i: printer._id,
       });
     }
   }
@@ -539,7 +600,11 @@ export async function bulkPrintFileSetup() {
       if (selectedFiles.length === 1) {
         // Setup single file mode
         bpActionButton.disabled = false;
-        setupSingleFileMode(printersToControl, selectedFiles[0], selectedFolder);
+        setupSingleFileMode(
+          printersToControl,
+          selectedFiles[0],
+          selectedFolder
+        );
       } else if (selectedFiles.length > 1) {
         // Setup multiple file mode
         bpActionButton.disabled = false;
@@ -551,10 +616,12 @@ export async function bulkPrintFileSetup() {
   }
 
   // Upload file listener
-  document.getElementById("bpFileUpload").addEventListener("change", function () {
-    selectedFiles = grabFiles(this.files);
-    setup();
-  });
+  document
+    .getElementById("bpFileUpload")
+    .addEventListener("change", function () {
+      selectedFiles = grabFiles(this.files);
+      setup();
+    });
 
   bpActionButton.addEventListener("click", async function () {
     await runUpload();
@@ -565,14 +632,21 @@ export async function bulkPrintFileSetup() {
       if (folder[0] === "/") {
         selectedFolder = selectedFolder.replace("/", "");
       }
-      const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, folder);
+      const doesFolderExist = await OctoPrintClient.checkFile(
+        currentPrinter,
+        folder
+      );
 
       if (doesFolderExist === 200) {
-        document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
+        document.getElementById(
+          "printerFolderChoice-" + currentPrinter._id
+        ).innerHTML =
           "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
         printersToControl[i].folderExists = true;
       } else {
-        document.getElementById("printerFolderChoice-" + currentPrinter._id).innerHTML =
+        document.getElementById(
+          "printerFolderChoice-" + currentPrinter._id
+        ).innerHTML =
           "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
         printersToControl[i].folderExists = false;
       }
@@ -628,11 +702,20 @@ export async function bulkDisconnectPrinters() {
   updateBulkActionsProgress(0, printersToDisconnect.length);
   generateTableRows(printersToDisconnect);
   for (let p = 0; p < printersToDisconnect.length; p++) {
-    const response = await disconnectPrinterFromOctoPrint(printersToDisconnect[p]);
-    updateTableRow(printersToDisconnect[p]._id, response.status, response.message);
+    const response = await disconnectPrinterFromOctoPrint(
+      printersToDisconnect[p]
+    );
+    updateTableRow(
+      printersToDisconnect[p]._id,
+      response.status,
+      response.message
+    );
     updateBulkActionsProgress(p, printersToDisconnect.length);
   }
-  updateBulkActionsProgress(printersToDisconnect.length, printersToDisconnect.length);
+  updateBulkActionsProgress(
+    printersToDisconnect.length,
+    printersToDisconnect.length
+  );
 }
 
 export function bulkOctoPrintPowerCommand() {
@@ -643,16 +726,16 @@ export function bulkOctoPrintPowerCommand() {
     inputOptions: [
       {
         text: "Restart OctoPrint",
-        value: "restart"
+        value: "restart",
       },
       {
         text: "Reboot Host",
-        value: "reboot"
+        value: "reboot",
       },
       {
         text: "Shutdown Host",
-        value: "shutdown"
-      }
+        value: "shutdown",
+      },
     ],
     callback: async function (result) {
       const printersToPower = await getCurrentlySelectedPrinterList();
@@ -660,12 +743,19 @@ export function bulkOctoPrintPowerCommand() {
       updateBulkActionsProgress(0, printersToPower.length);
       generateTableRows(printersToPower);
       for (let p = 0; p < printersToPower.length; p++) {
-        const response = await sendPowerCommandToOctoPrint(printersToPower[p], result);
-        updateTableRow(printersToPower[p]._id, response.status, response.message);
+        const response = await sendPowerCommandToOctoPrint(
+          printersToPower[p],
+          result
+        );
+        updateTableRow(
+          printersToPower[p]._id,
+          response.status,
+          response.message
+        );
         updateBulkActionsProgress(p, printersToPower.length);
       }
       updateBulkActionsProgress(printersToPower.length, printersToPower.length);
-    }
+    },
   });
 }
 
@@ -726,7 +816,9 @@ export function bulkOctoPrintPreHeatCommand() {
           const toolNumber = document.getElementById("preHeatToolSelect");
           const toolTemp = document.getElementById("preHeatToolTempSelect");
           const bedTemp = document.getElementById("preHeatBedTempSelect");
-          const chamberTemp = document.getElementById("preHeatChamberTempSelect");
+          const chamberTemp = document.getElementById(
+            "preHeatChamberTempSelect"
+          );
 
           const printersToPreHeat = await getCurrentlySelectedPrinterList();
           showBulkActionsModal();
@@ -735,25 +827,47 @@ export function bulkOctoPrintPreHeatCommand() {
           for (let p = 0; p < printersToPreHeat.length; p++) {
             let response;
             if (toolTemp.value && toolTemp.value > 0) {
-              response = await printerPreHeatTool(printersToPreHeat[p], toolTemp, toolNumber);
-              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              response = await printerPreHeatTool(
+                printersToPreHeat[p],
+                toolTemp,
+                toolNumber
+              );
+              updateTableRow(
+                printersToPreHeat[p]._id,
+                response.status,
+                response.message
+              );
               updateBulkActionsProgress(p, printersToPreHeat.length);
             }
             if (bedTemp.value !== "" && bedTemp.value > 0) {
               response = await printerPreHeatBed(printersToPreHeat[p], bedTemp);
-              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              updateTableRow(
+                printersToPreHeat[p]._id,
+                response.status,
+                response.message
+              );
               updateBulkActionsProgress(p, printersToPreHeat.length);
             }
             if (chamberTemp.value !== "" && chamberTemp.value > 0) {
-              response = await printerPreHeatChamber(printersToPreHeat[p], chamberTemp);
-              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              response = await printerPreHeatChamber(
+                printersToPreHeat[p],
+                chamberTemp
+              );
+              updateTableRow(
+                printersToPreHeat[p]._id,
+                response.status,
+                response.message
+              );
               updateBulkActionsProgress(p, printersToPreHeat.length);
             }
           }
-          updateBulkActionsProgress(printersToPreHeat.length, printersToPreHeat.length);
-        }
-      }
-    }
+          updateBulkActionsProgress(
+            printersToPreHeat.length,
+            printersToPreHeat.length
+          );
+        },
+      },
+    },
   });
 }
 
@@ -875,7 +989,7 @@ export async function bulkOctoPrintControlCommand() {
         printPause: document.getElementById("pmPrintPause"),
         printRestart: document.getElementById("pmPrintRestart"),
         printResume: document.getElementById("pmPrintResume"),
-        printStop: document.getElementById("pmPrintStop")
+        printStop: document.getElementById("pmPrintStop"),
       };
       printerControls.printStart.addEventListener("click", (element) => {
         printersToControl.forEach((printer) => {
@@ -902,11 +1016,11 @@ export async function bulkOctoPrintControlCommand() {
           message: "Are you sure you want to cancel all of your ongoing print?",
           buttons: {
             cancel: {
-              label: "<i class=\"fa fa-times\"></i> Cancel"
+              label: "<i class=\"fa fa-times\"></i> Cancel",
             },
             confirm: {
-              label: "<i class=\"fa fa-check\"></i> Confirm"
-            }
+              label: "<i class=\"fa fa-check\"></i> Confirm",
+            },
           },
           callback(result) {
             if (result) {
@@ -914,7 +1028,7 @@ export async function bulkOctoPrintControlCommand() {
                 printerStopPrint(printer, element);
               });
             }
-          }
+          },
         });
       });
 
@@ -998,7 +1112,7 @@ export async function bulkOctoPrintControlCommand() {
         printerControls.step10.className = LIGHT_BUTTON_CLASS;
         printerControls.step01.className = LIGHT_BUTTON_CLASS;
       });
-    }
+    },
   });
 }
 
@@ -1022,46 +1136,51 @@ export async function bulkOctoPrintGcodeCommand() {
         gcodeButtons.forEach((scripts) => {
           const button = CustomGenerator.getButton(scripts);
           area.insertAdjacentHTML("beforeend", button);
-          document.getElementById("gcode-" + scripts._id).addEventListener("click", async () => {
-            showBulkActionsModal();
-            updateBulkActionsProgress(0, printersToSendGcode.length);
-            generateTableRows(printersToSendGcode);
-            for (let p = 0; p < printersToSendGcode.length; p++) {
-              // To cover old script states we must check for blank printer ids.
-              if (
-                scripts.printerIds.length === 0 ||
-                scripts.printerIds.includes(printersToSendGcode[p]._id)
-              ) {
-                const post = await CustomGenerator.fireCommand(
-                  scripts._id,
-                  scripts.gcode,
-                  printersToSendGcode[p]
-                );
-                updateBulkActionsProgress(p, printersToSendGcode.length);
-                if (post.status === 204) {
-                  updateTableRow(
-                    printersToSendGcode[p]._id,
-                    "success",
-                    "Successfully sent your command to the printer!"
+          document
+            .getElementById("gcode-" + scripts._id)
+            .addEventListener("click", async () => {
+              showBulkActionsModal();
+              updateBulkActionsProgress(0, printersToSendGcode.length);
+              generateTableRows(printersToSendGcode);
+              for (let p = 0; p < printersToSendGcode.length; p++) {
+                // To cover old script states we must check for blank printer ids.
+                if (
+                  scripts.printerIds.length === 0 ||
+                  scripts.printerIds.includes(printersToSendGcode[p]._id)
+                ) {
+                  const post = await CustomGenerator.fireCommand(
+                    scripts._id,
+                    scripts.gcode,
+                    printersToSendGcode[p]
                   );
+                  updateBulkActionsProgress(p, printersToSendGcode.length);
+                  if (post.status === 204) {
+                    updateTableRow(
+                      printersToSendGcode[p]._id,
+                      "success",
+                      "Successfully sent your command to the printer!"
+                    );
+                  } else {
+                    updateTableRow(
+                      printersToSendGcode[p]._id,
+                      "danger",
+                      "Failed to send your command to the printer!"
+                    );
+                  }
                 } else {
+                  //Skipped
                   updateTableRow(
                     printersToSendGcode[p]._id,
-                    "danger",
-                    "Failed to send your command to the printer!"
+                    "warning",
+                    "Printer was skipped because it is not allowed to be sent the script..."
                   );
                 }
-              } else {
-                //Skipped
-                updateTableRow(
-                  printersToSendGcode[p]._id,
-                  "warning",
-                  "Printer was skipped because it is not allowed to be sent the script..."
-                );
               }
-            }
-            updateBulkActionsProgress(printersToSendGcode.length, printersToSendGcode.length);
-          });
+              updateBulkActionsProgress(
+                printersToSendGcode.length,
+                printersToSendGcode.length
+              );
+            });
         });
       }
     },
@@ -1074,9 +1193,12 @@ export async function bulkOctoPrintGcodeCommand() {
           const response = await printerSendGcode(printer, result);
           updateTableRow(printer._id, response.status, response.message);
         }
-        updateBulkActionsProgress(printersToSendGcode.length, printersToSendGcode.length);
+        updateBulkActionsProgress(
+          printersToSendGcode.length,
+          printersToSendGcode.length
+        );
       }
-    }
+    },
   });
 }
 
@@ -1085,11 +1207,13 @@ export async function bulkOctoPrintPluginAction(action) {
   try {
     const pluginList = [];
     if (action === "install") {
-      const pluginRepositoryList = await OctoFarmClient.get("printers/pluginList");
+      const pluginRepositoryList = await OctoFarmClient.get(
+        "printers/pluginList"
+      );
       pluginRepositoryList.forEach((plugin) => {
         pluginList.push({
           text: returnPluginListTemplate(plugin),
-          value: plugin.archive
+          value: plugin.archive,
         });
       });
     } else {
@@ -1098,31 +1222,31 @@ export async function bulkOctoPrintPluginAction(action) {
       });
       for (const id of idList) {
         if (action === "enable") {
-            const disabledPluginList = await OctoFarmClient.get(
-              "printers/disabledPluginList/" + id
-            );
-            const cleanDisabledList = createPluginList(disabledPluginList)
-            cleanDisabledList.forEach(plugin => {
-              pluginList.push(plugin)
-            })
+          const disabledPluginList = await OctoFarmClient.get(
+            "printers/disabledPluginList/" + id
+          );
+          const cleanDisabledList = createPluginList(disabledPluginList);
+          cleanDisabledList.forEach((plugin) => {
+            pluginList.push(plugin);
+          });
         }
         if (action === "disable") {
-            const enabledPluginList = await OctoFarmClient.get(
-              "printers/enabledPluginList/" + id
-            );
-            const cleanEnabledList = createPluginList(enabledPluginList)
-            cleanEnabledList.forEach(plugin => {
-              pluginList.push(plugin)
-            })
+          const enabledPluginList = await OctoFarmClient.get(
+            "printers/enabledPluginList/" + id
+          );
+          const cleanEnabledList = createPluginList(enabledPluginList);
+          cleanEnabledList.forEach((plugin) => {
+            pluginList.push(plugin);
+          });
         }
         if (action === "uninstall") {
-            const allInstalledPlugins = await OctoFarmClient.get(
-              "printers/allPluginsList/" + id
-            );
-            const cleanAllPluginList = createPluginList(allInstalledPlugins)
-            cleanAllPluginList.forEach(plugin => {
-              pluginList.push(plugin)
-            })
+          const allInstalledPlugins = await OctoFarmClient.get(
+            "printers/allPluginsList/" + id
+          );
+          const cleanAllPluginList = createPluginList(allInstalledPlugins);
+          cleanAllPluginList.forEach((plugin) => {
+            pluginList.push(plugin);
+          });
         }
       }
     }
@@ -1130,7 +1254,7 @@ export async function bulkOctoPrintPluginAction(action) {
     const sortedPluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
-      }
+      },
     ]);
 
     const uniquePluginList = _.uniqBy(sortedPluginList, function (e) {
@@ -1138,9 +1262,14 @@ export async function bulkOctoPrintPluginAction(action) {
     });
 
     //Install Promt
-    if(uniquePluginList.length === 0){
-      UI.createAlert("info", `You don't have any plugins to ${action}`, "clicked", 4000)
-    }else{
+    if (uniquePluginList.length === 0) {
+      UI.createAlert(
+        "info",
+        `You don't have any plugins to ${action}`,
+        "clicked",
+        4000
+      );
+    } else {
       bootbox.prompt({
         size: "large",
         title: `<form class="form-inline float-right">
@@ -1166,26 +1295,32 @@ export async function bulkOctoPrintPluginAction(action) {
             generateTableRows(printersForPluginAction);
             let count = 0;
             for (const printer of printersForPluginAction) {
-              for(const plugin of result) {
+              for (const plugin of result) {
                 const response = await octoPrintPluginInstallAction(
-                    printer,
-                    plugin,
-                    action
+                  printer,
+                  plugin,
+                  action
                 );
                 updateTableRow(printer._id, response.status, response.message);
                 updateBulkActionsProgress(count, pluginAmount);
-                count++
+                count++;
               }
-              await OctoFarmClient.post("printers/rescanOctoPrintUpdates/"+printer._id);
+              await OctoFarmClient.post(
+                "printers/rescanOctoPrintUpdates/" + printer._id
+              );
             }
             updateBulkActionsProgress(pluginAmount, pluginAmount);
-          }else{
-            UI.createAlert("warning", "No plugins we're selected to install... please select some plugins", 3000, "Clicked")
+          } else {
+            UI.createAlert(
+              "warning",
+              "No plugins we're selected to install... please select some plugins",
+              3000,
+              "Clicked"
+            );
           }
-        }
+        },
       });
     }
-
   } catch (e) {
     console.error(e);
     UI.createAlert(
@@ -1195,17 +1330,17 @@ export async function bulkOctoPrintPluginAction(action) {
       "clicked"
     );
     const errorObject = ClientErrors.SILENT_ERROR;
-    errorObject.message =  `Bulk Commands - ${e}`
-    throw new ApplicationError(errorObject)
+    errorObject.message = `Bulk Commands - ${e}`;
+    throw new ApplicationError(errorObject);
   }
 }
 
-function createPluginList(plugins){
+function createPluginList(plugins) {
   const pluginList = [];
   plugins.forEach((plugin) => {
     pluginList.push({
       text: returnPluginSelectTemplate(plugin),
-      value: plugin.key
+      value: plugin.key,
     });
   });
   return pluginList;
@@ -1218,7 +1353,8 @@ export async function bulkEnableVirtualPrinter() {
     `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
   );
 
-  const { successfulPrinters, failedPrinters } = await setupOctoPrintForVirtualPrinter(printers);
+  const { successfulPrinters, failedPrinters } =
+    await setupOctoPrintForVirtualPrinter(printers);
 
   alert.close();
   bootbox.alert(successfulPrinters + failedPrinters);
@@ -1226,7 +1362,10 @@ export async function bulkEnableVirtualPrinter() {
 
 export async function bulkUpdateOctoPrintSettings() {
   const printersForSettingsAction = await getCurrentlySelectedPrinterList();
-  const getSettingsList = await OctoPrintClient.get(printersForSettingsAction[0], "api/settings");
+  const getSettingsList = await OctoPrintClient.get(
+    printersForSettingsAction[0],
+    "api/settings"
+  );
   if (getSettingsList?.status === 200) {
     const {
       appearance,
@@ -1238,13 +1377,14 @@ export async function bulkUpdateOctoPrintSettings() {
       system,
       temperature,
       terminalFilters,
-      webcam
+      webcam,
       //github
     } = await getSettingsList.json();
 
     $("#bulkUpdateOctoPrintSettingsModal").modal("show");
     // populate appearance settings
-    populateBulkSettingsForms({appearance,
+    populateBulkSettingsForms({
+      appearance,
       gcodeAnalysis,
       plugins, //Special Case, it's it's own settings set...
       scripts,
@@ -1253,7 +1393,7 @@ export async function bulkUpdateOctoPrintSettings() {
       system,
       temperature,
       terminalFilters,
-      webcam
+      webcam,
       //github
     });
 
@@ -1276,9 +1416,13 @@ export async function bulkUpdateOctoPrintSettings() {
     // populate webcam
 
     // populate github
-
   } else {
-    UI.createAlert("danger", "Failed to grab latest settings list...", 3000, "Clicked");
+    UI.createAlert(
+      "danger",
+      "Failed to grab latest settings list...",
+      3000,
+      "Clicked"
+    );
   }
 }
 

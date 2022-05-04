@@ -5,20 +5,24 @@ import UI from "../../utils/ui";
 export default class ClientSettings {
   static async init() {
     const clientSettings = await OctoFarmClient.get("settings/client/get");
-    //// localStorage.setItem("clientSettings", JSON.stringify(res));
-    document.getElementById("panelCurrentOpOn").checked = clientSettings.views.currentOperations;
-    document.getElementById("panelHideOffline").checked = clientSettings.views.showOffline;
-    document.getElementById("panelHideClosed").checked = clientSettings.views.showDisconnected;
-    // document.getElementById("panelHideIdle").checked =
-    //   res.panelView.hideIdle;
+
+    document.getElementById("panelCurrentOpOn").checked =
+      clientSettings.views.currentOperations;
+    document.getElementById("panelHideOffline").checked =
+      clientSettings.views.showOffline;
+    document.getElementById("panelHideClosed").checked =
+      clientSettings.views.showDisconnected;
+
     if (clientSettings.views.cameraColumns) {
-      document.getElementById("selectCameraGrid").value = clientSettings.views.cameraColumns;
+      document.getElementById("selectCameraGrid").value =
+        clientSettings.views.cameraColumns;
     } else {
       document.getElementById("selectCameraGrid").value = 2;
     }
 
     if (clientSettings.views.groupColumns) {
-      document.getElementById("selectGroupGrid").value = clientSettings.views.groupColumns;
+      document.getElementById("selectGroupGrid").value =
+        clientSettings.views.groupColumns;
     } else {
       document.getElementById("selectGroupGrid").value = 2;
     }
@@ -59,7 +63,8 @@ export default class ClientSettings {
         clientSettings.dashboard.historical.historyCompletionByDay;
       document.getElementById("filamentUsageOverTimeCheck").checked =
         clientSettings.dashboard.historical.filamentUsageOverTime;
-      document.getElementById("dateAndTime").checked = clientSettings.dashboard.other.timeAndDate;
+      document.getElementById("dateAndTime").checked =
+        clientSettings.dashboard.other.timeAndDate;
     }
   }
 
@@ -70,7 +75,7 @@ export default class ClientSettings {
         showOffline: document.getElementById("panelHideOffline").checked,
         showDisconnected: document.getElementById("panelHideClosed").checked,
         cameraColumns: document.getElementById("selectCameraGrid").value,
-        groupColumns: document.getElementById("selectGroupGrid").value
+        groupColumns: document.getElementById("selectGroupGrid").value,
       },
 
       dashboard: {
@@ -92,7 +97,7 @@ export default class ClientSettings {
             y: 19,
             width: 12,
             height: 8,
-            id: "filamentUsageOverTime"
+            id: "filamentUsageOverTime",
           },
           { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
           {
@@ -100,41 +105,52 @@ export default class ClientSettings {
             y: 19,
             width: 12,
             height: 8,
-            id: "historyCompletionByDay"
-          }
+            id: "historyCompletionByDay",
+          },
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
-          currentOperations: document.getElementById("panelCurrentOpOn").checked,
+          currentOperations:
+            document.getElementById("panelCurrentOpOn").checked,
           cumulativeTimes: document.getElementById("cumulativeTimes").checked,
-          averageTimes: document.getElementById("averageTimes").checked
+          averageTimes: document.getElementById("averageTimes").checked,
         },
         printerStates: {
           printerState: document.getElementById("printerState").checked,
           printerTemps: document.getElementById("printerTemps").checked,
-          printerUtilisation: document.getElementById("printerUtilisation").checked,
+          printerUtilisation:
+            document.getElementById("printerUtilisation").checked,
           printerProgress: document.getElementById("printerProgress").checked,
-          currentStatus: document.getElementById("currentStatus").checked
+          currentStatus: document.getElementById("currentStatus").checked,
         },
         farmUtilisation: {
-          currentUtilisation: document.getElementById("currentUtilisation").checked,
-          farmUtilisation: document.getElementById("farmUtilisation").checked
+          currentUtilisation:
+            document.getElementById("currentUtilisation").checked,
+          farmUtilisation: document.getElementById("farmUtilisation").checked,
         },
         historical: {
-          weeklyUtilisation: document.getElementById("weeklyUtilisation").checked,
-          hourlyTotalTemperatures: document.getElementById("hourlyTotalTemperatures").checked,
-          environmentalHistory: document.getElementById("environmentalHistory").checked,
-          historyCompletionByDay: document.getElementById("printCompletionCheck").checked,
-          filamentUsageByDay: document.getElementById("filamentUsageCheck").checked,
-          filamentUsageOverTime: document.getElementById("filamentUsageOverTimeCheck").checked
+          weeklyUtilisation:
+            document.getElementById("weeklyUtilisation").checked,
+          hourlyTotalTemperatures: document.getElementById(
+            "hourlyTotalTemperatures"
+          ).checked,
+          environmentalHistory: document.getElementById("environmentalHistory")
+            .checked,
+          historyCompletionByDay: document.getElementById(
+            "printCompletionCheck"
+          ).checked,
+          filamentUsageByDay:
+            document.getElementById("filamentUsageCheck").checked,
+          filamentUsageOverTime: document.getElementById(
+            "filamentUsageOverTimeCheck"
+          ).checked,
         },
         other: {
-          timeAndDate: document.getElementById("dateAndTime").checked
-        }
-      }
+          timeAndDate: document.getElementById("dateAndTime").checked,
+        },
+      },
     };
     await OctoFarmClient.post("settings/client/update", opts);
     UI.createAlert("success", "Client settings updated", 3000, "clicked");
-    //localStorage.setItem("clientSettings", JSON.stringify(opts));
   }
 }

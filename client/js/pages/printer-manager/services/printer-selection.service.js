@@ -1,7 +1,7 @@
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import UI from "../../../utils/ui.js";
 
-const showFullList = ["Edit Printers", "Printer Deletion"]
+const showFullList = ["Edit Printers", "Printer Deletion"];
 
 const editMessage = `
 <div class="alert alert-info" role="alert">
@@ -197,7 +197,9 @@ export default class PrinterSelectionService {
     <th scope="row">${printer.index}</th>
     <td>${printer.name}</td>
     <td class="${printer.state}">${printer.state}</td>
-    <td class="g-${printer.group.replace(/[^\w\s]/gi, "-").toLowerCase()}">${printer.group}</td>
+    <td class="g-${printer.group.replace(/[^\w\s]/gi, "-").toLowerCase()}">${
+      printer.group
+    }</td>
     <td>${printer.spool}</td>
 </tr>
 `;
@@ -205,9 +207,13 @@ export default class PrinterSelectionService {
 
   static getEditableList(printer) {
     return `
-<tr id="editPrinterCard-${printer.id}" class="${printer.state}" data-jplist-item>
+<tr id="editPrinterCard-${printer.id}" class="${
+      printer.state
+    }" data-jplist-item>
   <th scope="row">${printer.index}</th>
-  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${
+  <td><input id="editInputName-${
+    printer.id
+  }" type="text" class="form-control Idle" placeholder="${
       printer.name
     }" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td><input id="editInputURL-${
@@ -215,7 +221,9 @@ export default class PrinterSelectionService {
                           }" type="text" class="form-control Idle" placeholder="${
       printer.printerURL
     }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td class="${printer.state} d-none">${printer.state}</td>
+                          <td class="${printer.state} d-none">${
+      printer.state
+    }</td>
                           <td><input id="editInputGroup-${
                             printer.id
                           }" type="text" class="form-control Idle" placeholder="${
@@ -281,9 +289,9 @@ export default class PrinterSelectionService {
       messageBox.innerHTML = gcodePrintersMessage;
     } else if (action === "Start a Bulk Print") {
       messageBox.innerHTML = multiPrintMessage;
-    } else if (action === "Disable Printers"){
+    } else if (action === "Disable Printers") {
       messageBox.innerHTML = disablePrintersMessage;
-    } else if(action === "Enable Printers"){
+    } else if (action === "Enable Printers") {
       messageBox.innerHTML = enablePrintersMessage;
     }
 
@@ -293,15 +301,18 @@ export default class PrinterSelectionService {
     let disabled = false;
     let fullPrinterList = false;
 
-    if(action === "Enable Printers"){
-      disabled = true
+    if (action === "Enable Printers") {
+      disabled = true;
     }
 
-    if(showFullList.includes(action)){
-      fullPrinterList = true
+    if (showFullList.includes(action)) {
+      fullPrinterList = true;
     }
 
-    const printers = await OctoFarmClient.listPrinters(disabled, fullPrinterList);
+    const printers = await OctoFarmClient.listPrinters(
+      disabled,
+      fullPrinterList
+    );
 
     printers.forEach((printer) => {
       if (
@@ -329,14 +340,14 @@ export default class PrinterSelectionService {
           group: printer.group,
           spool: spoolName,
           cameraURL: printer.camURL,
-          apikey: printer.apikey
+          apikey: printer.apikey,
         };
         printerList.push(forList);
       }
       if (printer.group !== "") {
         const group = {
           display: printer.group,
-          tag: printer.group.replace(/[^\w\s]/gi, "-").toLowerCase()
+          tag: printer.group.replace(/[^\w\s]/gi, "-").toLowerCase(),
         };
         groupList.push(group);
       }
@@ -357,11 +368,17 @@ export default class PrinterSelectionService {
         document.getElementById("urlColumn").classList.remove("d-none");
 
         printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML("beforeend", this.getEditableList(printer));
+          tableBody.insertAdjacentHTML(
+            "beforeend",
+            this.getEditableList(printer)
+          );
         });
       } else {
         printerList.forEach((printer) => {
-          tableBody.insertAdjacentHTML("beforeend", this.getSelectableList(printer));
+          tableBody.insertAdjacentHTML(
+            "beforeend",
+            this.getSelectableList(printer)
+          );
         });
       }
 
@@ -381,7 +398,9 @@ export default class PrinterSelectionService {
 
       // Printer group dropdown
       printers.forEach((printer) => {
-        const printerGroupAssignSelect = document.getElementById(`editInputGroup-${printer._id}`);
+        const printerGroupAssignSelect = document.getElementById(
+          `editInputGroup-${printer._id}`
+        );
         if (!printerGroupAssignSelect) return;
 
         groupListUnique.forEach((group, index) => {
@@ -393,7 +412,10 @@ export default class PrinterSelectionService {
       });
     } else {
       const tableBody = document.getElementById("printerSelectBody");
-      tableBody.insertAdjacentHTML("beforeend", "<tr><td>No Online Printers</td></tr>");
+      tableBody.insertAdjacentHTML(
+        "beforeend",
+        "<tr><td>No Online Printers</td></tr>"
+      );
     }
     PrinterSelectionService.addListeners(editable, callback);
   }
@@ -405,13 +427,17 @@ export default class PrinterSelectionService {
                     <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
             `;
       document.getElementById("selectAll").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll("input[type=\"checkbox\"]:not(:checked)");
+        const checkBoxes = document.querySelectorAll(
+          "input[type=\"checkbox\"]:not(:checked)"
+        );
         checkBoxes.forEach((box) => {
           box.checked = true;
         });
       });
       document.getElementById("selectNone").addEventListener("click", (e) => {
-        const checkBoxes = document.querySelectorAll("input[type=\"checkbox\"]:checked");
+        const checkBoxes = document.querySelectorAll(
+          "input[type=\"checkbox\"]:checked"
+        );
         checkBoxes.forEach((box) => {
           box.checked = false;
         });
@@ -426,13 +452,17 @@ export default class PrinterSelectionService {
                       <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
       `
       );
-      document.getElementById("saveEditsBtn").addEventListener("click", callback);
+      document
+        .getElementById("saveEditsBtn")
+        .addEventListener("click", callback);
     }
     jplist.init();
   }
 
   static getSelected() {
-    const checkedBoxes = document.querySelectorAll("input[type=\"checkbox\"]:checked");
+    const checkedBoxes = document.querySelectorAll(
+      "input[type=\"checkbox\"]:checked"
+    );
     const printers = [];
     checkedBoxes.forEach((box) => {
       if (box.id.includes("checkBox")) {
@@ -441,6 +471,4 @@ export default class PrinterSelectionService {
     });
     return printers;
   }
-
-  static selectFilter() {}
 }

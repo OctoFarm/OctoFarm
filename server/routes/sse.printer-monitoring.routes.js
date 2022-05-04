@@ -4,9 +4,7 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
-const {
-  getCurrentOperations
-} = require("../services/printer-statistics.service");
+const { getCurrentOperations } = require("../services/printer-statistics.service");
 
 const logger = new Logger("OctoFarm-API");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
@@ -144,7 +142,6 @@ async function sendData() {
 
 // Called once for each new client. Note, this response is left open!
 router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async function (req, res) {
-  //req.socket.setTimeout(Number.MAX_VALUE);
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -152,7 +149,7 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async functi
     Expires: 0,
     Connection: "keep-alive"
   });
-  // res.write("\n");
+  res.write("\n");
   (function (clientId) {
     clients[clientId] = { req, res }; // <- Add this client to those we consider "attached"
     req.on("close", function () {
@@ -166,7 +163,6 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async functi
 });
 
 function sendToInflux(printersInformation) {
-  //console.log(printersInformation[0]);
   printersInformation.forEach((printer) => {
     if (printer.printerState.colour.category !== "Offline") {
       const date = Date.now();
@@ -176,7 +172,9 @@ function sendToInflux(printersInformation) {
         group: printer?.group ? printer.group : " ",
         url: printer?.printerURL ? printer.printerURL : " ",
         state: printer?.printerState?.state ? printer.printerState.state : " ",
-        stateCategory: printer?.printerState?.colour?.category ? printer.printerState?.colour?.category : " ",
+        stateCategory: printer?.printerState?.colour?.category
+          ? printer.printerState?.colour?.category
+          : " ",
         host_state: printer?.hostState?.state ? printer.hostState?.state : " ",
         websocket_state: printer?.webSocketState?.colour ? printer.webSocketState?.colour : " ",
         octoprint_version: printer?.octoPrintVersion ? printer.octoPrintVersion : " "
@@ -189,7 +187,9 @@ function sendToInflux(printersInformation) {
         host_state: printer?.hostState?.state ? printer.hostState.state : " ",
         websocket_state: printer?.webSocketState?.colour ? printer.webSocketState.colour : " ",
         octoprint_version: printer?.octoPrintVersion ? printer.octoPrintVersion : " ",
-        state_category: printer?.printerState?.colour?.category ? printer.printerState.colour.category : " ",
+        state_category: printer?.printerState?.colour?.category
+          ? printer.printerState.colour.category
+          : " ",
         current_idle_time: printer.currentIdle ? parseFloat(printer.currentIdle) : 0,
         current_active_time: printer.currentActive ? parseFloat(printer.currentActive) : 0,
         current_offline_time: printer.currentOffline ? parseFloat(printer.currentOffline) : 0,
