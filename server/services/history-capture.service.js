@@ -17,6 +17,7 @@ const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 const { sleep } = require("../utils/promise.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getInfluxCleanerCache } = require("../cache/influx-export.cache");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -152,6 +153,7 @@ class HistoryCaptureService {
     // Save the initial value of the record...
     await saveHistory.save().catch((e) => {
       logger.error("Unable to save the history record to database...", e);
+      return e;
     });
 
     const serverSettingsCache = SettingsClean.returnSystemSettings();
@@ -171,11 +173,14 @@ class HistoryCaptureService {
 
     // Save initial history
     if (this.#success) {
-      await this.checkForAdditionalSuccessProperties();
+      this.checkForAdditionalSuccessProperties().catch((e) => {
+        logger.error("Couldn't check for additional success properties", e.toString());
+      });
     }
-
     if (!this.#success) {
-      await this.checkForAdditionalFailureProperties();
+      this.checkForAdditionalFailureProperties().catch((e) => {
+        logger.error("Couldn't check for additional success properties", e.toString());
+      });
     }
 
     // await this.updateFilamentInfluxDB(
@@ -185,11 +190,22 @@ class HistoryCaptureService {
     //   printer
     // );
 
-    //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
-    setTimeout(async () => {
-      // Re-generate history cache...
+    await sleep(5000);
+    // Re-generate history cache...
+    try {
       await getHistoryCache().initCache();
-    }, 5000);
+    } catch (e) {
+      logger.error("Unable to generate history cache!", e.toString());
+    }
+    try {
+      await getInfluxCleanerCache().cleanAndWriteFinishedPrintInformationForInflux(saveHistory, {
+        printerName: this.#printerName,
+        printerID: this.#printerID,
+        printerGroup: this.#printerGroup
+      });
+    } catch (e) {
+      logger.error("Unable to send finished print data to influx!", e.toString());
+    }
 
     return {
       saveHistory
@@ -361,7 +377,7 @@ class HistoryCaptureService {
 
     const timelapseResponse = await timeLapseCall.json();
 
-    logger.info("Timelapse call: ", timelapseResponse);
+    logger.debug("Timelapse call: ", timelapseResponse);
 
     //Give time for OP to start generating the file...
     await sleep(5000);
@@ -483,81 +499,6 @@ class HistoryCaptureService {
       if (obj[propName] === null) {
         delete obj[propName];
       }
-    }
-  }
-
-  async updateInfluxDB(historyID, measurement, printer) {
-    try {
-      let historyArchive = getHistoryCache().historyClean;
-      let currentArchive = findIndex(historyArchive, function (o) {
-        return JSON.stringify(o._id) === JSON.stringify(historyID);
-      });
-      if (currentArchive <= -1) {
-        return;
-      }
-      let workingHistory = historyArchive[currentArchive];
-      let currentState = " ";
-      if (workingHistory.state.includes("Success")) {
-        currentState = "Success";
-      } else if (workingHistory.state.includes("Cancelled")) {
-        currentState = "Cancelled";
-      } else if (workingHistory.state.includes("Failure")) {
-        currentState = "Failure";
-      }
-      let group;
-      if (printer.group === "") {
-        group = " ";
-      } else {
-        group = printer.group;
-      }
-      const tags = {
-        printer_name: workingHistory.printer,
-        group: group,
-        url: printer.printerURL,
-        history_state: currentState,
-        file_name: workingHistory.file.name
-      };
-      let printerData = {
-        id: String(workingHistory._id),
-        index: parseInt(workingHistory.index),
-        state: currentState,
-        printer_name: workingHistory.printer,
-        start_date: new Date(workingHistory.startDate),
-        end_date: new Date(workingHistory.endDate),
-        print_time: parseInt(workingHistory.printTime),
-        file_name: workingHistory.file.name,
-        file_upload_date: parseFloat(workingHistory.file.uploadDate),
-        file_path: workingHistory.file.path,
-        file_size: parseInt(workingHistory.file.size),
-
-        notes: workingHistory.notes,
-        job_estimated_print_time: parseFloat(workingHistory.job.estimatedPrintTime),
-        job_actual_print_time: parseFloat(workingHistory.job.actualPrintTime),
-
-        cost_printer: parseFloat(workingHistory.printerCost),
-        cost_spool: parseFloat(workingHistory.spoolCost),
-        cost_total: parseFloat(workingHistory.totalCost),
-        cost_per_hour: parseFloat(workingHistory.costPerHour),
-        total_volume: parseFloat(workingHistory.totalVolume),
-        total_length: parseFloat(workingHistory.totalLength),
-        total_weight: parseFloat(workingHistory.totalWeight)
-      };
-      let averagePrintTime = parseFloat(workingHistory.file.averagePrintTime);
-      if (!isNaN(averagePrintTime)) {
-        printerData["file_average_print_time"] = averagePrintTime;
-      }
-      let lastPrintTime = parseFloat(workingHistory.file.lastPrintTime);
-      if (!isNaN(averagePrintTime)) {
-        printerData["file_last_print_time"] = lastPrintTime;
-      }
-      if (typeof workingHistory.resend !== "undefined") {
-        printerData["job_resends"] = `${workingHistory.resend.count} / ${
-          workingHistory.resend.transmitted / 1000
-        }K (${workingHistory.resend.ratio.toFixed(0)})`;
-      }
-      writePoints(tags, "HistoryInformation", printerData);
-    } catch (e) {
-      logger.error(e);
     }
   }
 

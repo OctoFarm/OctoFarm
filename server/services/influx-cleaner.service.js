@@ -2,10 +2,13 @@ const { writePoints } = require("./influx-export.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Influx-Export");
+const { getHistoryCache } = require("../cache/history.cache");
 
 class InfluxCleanerService {
   #printersInformationTimer;
   #livePrinterDataMeasurementKey = "LivePrinterData";
+  #finishedPrintDataMeasurementKey = "FinishedPrintData";
+  #materialsInformationMeasurementKey = "MaterialsData";
 
   constructor() {
     this.#printersInformationTimer = 0;
@@ -165,6 +168,72 @@ class InfluxCleanerService {
       this.#printersInformationTimer = 0; // Reset timer to 0
     }
   };
+  cleanAndWriteFinishedPrintInformationForInflux = (currentHistory, printerInformation) => {
+    const historyRecord = getHistoryCache().generateDataSummary([currentHistory])[0];
+    let currentState = " ";
+    if (historyRecord.state.includes("Success")) {
+      currentState = "Success";
+    } else if (historyRecord.state.includes("Cancelled")) {
+      currentState = "Cancelled";
+    } else if (historyRecord.state.includes("Failure")) {
+      currentState = "Failure";
+    }
+    const tags = {
+      printer_name: printerInformation?.printerName ? printerInformation?.printerName : " ",
+      group: printerInformation?.printerGroup ? printerInformation?.printerGroup : " ",
+      history_state: currentState,
+      file_name: historyRecord?.file?.name ? historyRecord.file.name : " "
+    };
+
+    let printerData = {
+      id: historyRecord._id.toString(),
+      state: currentState,
+      printer_name: printerInformation?.printerName ? printerInformation?.printerName : " ",
+      start_date: historyRecord?.startDate ? new Date(historyRecord.startDate).getTime() : 0,
+      end_date: historyRecord?.endDate ? new Date(historyRecord.endDate).getTime() : 0,
+      print_time: historyRecord?.printTime ? parseInt(historyRecord.printTime) : 0,
+      file_name: historyRecord?.file?.name ? historyRecord.file.name : " ",
+      file_upload_date: historyRecord?.file?.uploadDate
+        ? parseFloat(historyRecord.file.uploadDate)
+        : 0,
+      file_path: historyRecord?.file?.path ? historyRecord.file.path : " ",
+      file_size: historyRecord?.file?.size ? parseFloat(historyRecord.file.size) : 0,
+      job_estimated_print_time: historyRecord?.job?.estimatedPrintTime
+        ? parseFloat(historyRecord.job.estimatedPrintTime)
+        : 0,
+      job_actual_print_time: historyRecord?.job?.actualPrintTime
+        ? parseFloat(historyRecord.job.actualPrintTime)
+        : 0,
+      cost_printer: historyRecord?.printerCost ? parseFloat(historyRecord.printerCost) : 0,
+      cost_spool: historyRecord?.spoolCost ? parseFloat(historyRecord.spoolCost) : 0,
+      cost_total: historyRecord?.totalCost ? parseFloat(historyRecord.totalCost) : 0,
+      cost_maintenance: historyRecord?.maintenanceCosts
+        ? parseFloat(historyRecord?.maintenanceCosts)
+        : 0,
+      cost_electricity: historyRecord?.electricityCosts
+        ? parseFloat(historyRecord.electricityCosts)
+        : 0,
+      total_volume: historyRecord?.totalVolume ? parseFloat(historyRecord.totalVolume) : 0,
+      total_length: historyRecord?.totalLength ? parseFloat(historyRecord.totalLength) : 0,
+      total_weight: historyRecord?.totalWeight ? parseFloat(historyRecord.totalWeight) : 0
+    };
+    let averagePrintTime = parseFloat(historyRecord?.file?.averagePrintTime);
+    if (!isNaN(averagePrintTime)) {
+      printerData["file_average_print_time"] = averagePrintTime;
+    }
+    let lastPrintTime = parseFloat(historyRecord.file.lastPrintTime);
+    if (!isNaN(averagePrintTime)) {
+      printerData["file_last_print_time"] = lastPrintTime;
+    }
+    if (!!historyRecord?.resends) {
+      printerData["job_resends_transmitted"] = parseFloat(historyRecord.resends.transmitted);
+      printerData["job_resends_count"] = parseFloat(historyRecord.resends.count);
+      printerData["job_resends_ratio"] = parseFloat(historyRecord.resends.ratio);
+    }
+    writePoints(tags, this.#finishedPrintDataMeasurementKey, printerData);
+    logger.debug("Logged data to influx database", printerData, tags);
+  };
+  cleanAndWriteMaterialsInformationForInflux = () => {};
 }
 
 module.exports = InfluxCleanerService;

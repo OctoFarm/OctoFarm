@@ -17,7 +17,6 @@ const { toTimeFormat } = require("../utils/time.util");
 const { last12Month } = require("../utils/date.utils");
 const { orderBy } = require("lodash");
 const { SettingsClean } = require("./settings-cleaner.service");
-
 let logger;
 
 class HistoryCleanerService {
