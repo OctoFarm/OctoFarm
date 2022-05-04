@@ -3,6 +3,7 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Influx-Export");
 const { getHistoryCache } = require("../cache/history.cache");
+const { toBase64 } = require("request/lib/helpers");
 
 class InfluxCleanerService {
   #printersInformationTimer;
@@ -233,7 +234,48 @@ class InfluxCleanerService {
     writePoints(tags, this.#finishedPrintDataMeasurementKey, printerData);
     logger.debug("Logged data to influx database", printerData, tags);
   };
-  cleanAndWriteMaterialsInformationForInflux = () => {};
+  cleanAndWriteMaterialsInformationForInflux = (
+    filament,
+    printerInformation,
+    historyRecord,
+    used
+  ) => {
+    if (!!filament) {
+      let currentState = " ";
+      if (historyRecord.success) {
+        currentState = "Success";
+      } else {
+        if (historyRecord.reason === "cancelled") {
+          currentState = "Cancelled";
+        } else {
+          currentState = "Failure";
+        }
+      }
+
+      const tags = {
+        spool_name: filament.spools.name,
+        printer_name: printerInformation?.printerName ? printerInformation?.printerName : " ",
+        group: printerInformation?.printerGroup ? printerInformation?.printerGroup : " ",
+        file_name: historyRecord?.fileName ? historyRecord.fileName : "",
+        print_state: currentState
+      };
+
+      let filamentData = {
+        name: filament.spools.name,
+        price: parseFloat(filament.spools.price),
+        weight: parseFloat(filament.spools.weight),
+        removed: used ? parseFloat(used) : 0,
+        used_spool: parseFloat(filament.spools.used),
+        temp_offset: parseFloat(filament.spools.tempOffset),
+        spool_manufacturer: filament.spools.profile.manufacturer,
+        spool_material: filament.spools.profile.material,
+        spool_density: parseFloat(filament.spools.profile.density),
+        spool_diameter: parseFloat(filament.spools.profile.diameter)
+      };
+      console.log(tags, filamentData);
+      // writePoints(tags, this.#materialsInformationMeasurementKey, filamentData);
+    }
+  };
 }
 
 module.exports = InfluxCleanerService;

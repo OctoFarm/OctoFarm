@@ -11,7 +11,6 @@ const {
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
-const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
@@ -183,13 +182,6 @@ class HistoryCaptureService {
       });
     }
 
-    // await this.updateFilamentInfluxDB(
-    //   printer.selectedFilament,
-    //   printHistory,
-    //   printer.selectedFilament,
-    //   printer
-    // );
-
     await sleep(5000);
     // Re-generate history cache...
     try {
@@ -205,6 +197,49 @@ class HistoryCaptureService {
       });
     } catch (e) {
       logger.error("Unable to send finished print data to influx!", e.toString());
+    }
+
+    if (
+      !serverSettingsCache.history.downDateFailed &&
+      !serverSettingsCache.history.downDateSuccess &&
+      !serverSettingsCache.filamentManager
+    ) {
+      try {
+        this.#selectedFilament.forEach((spool) => {
+          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
+            spool,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            0
+          );
+        });
+      } catch (e) {
+        logger.error("Unable to update spool information to influx!", e.toString());
+      }
     }
 
     return {
@@ -250,6 +285,36 @@ class HistoryCaptureService {
           logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity.spools}`);
           spoolEntity.markModified("spools");
           await spoolEntity.save();
+          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
+            spoolEntity,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            element.spools.used - spoolEntity.spools.used
+          );
           returnSpools.push(spoolEntity);
         }
         return;
@@ -494,61 +559,6 @@ class HistoryCaptureService {
     });
   }
 
-  async objectCleanforInflux(obj) {
-    for (const propName in obj) {
-      if (obj[propName] === null) {
-        delete obj[propName];
-      }
-    }
-  }
-
-  async updateFilamentInfluxDB(selectedFilament, history, printer) {
-    for (let i = 0; i < selectedFilament.length; i++) {
-      if (selectedFilament[i] !== null) {
-        let currentState = " ";
-        let group = " ";
-        if (printer.group === "") {
-          group = " ";
-        } else {
-          group = printer.group;
-        }
-        if (history.success) {
-          currentState = "Success";
-        } else {
-          if (history.reason === "cancelled") {
-            currentState = "Cancelled";
-          } else {
-            currentState = "Failure";
-          }
-        }
-
-        const tags = {
-          name: selectedFilament[i].spools.name,
-          printer_name: history.printerName,
-          group: group,
-          url: printer.printerURL,
-          history_state: currentState,
-          file_name: history.fileName
-        };
-
-        let filamentData = {
-          name: selectedFilament[i].spools.name,
-          price: parseFloat(selectedFilament[i].spools.price),
-          weight: parseFloat(selectedFilament[i].spools.weight),
-          used_difference: parseFloat(used),
-          used_spool: parseFloat(selectedFilament[i].spools.used),
-          temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
-          spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
-          spool_material: selectedFilament[i].spools.profile.material,
-          spool_density: parseFloat(selectedFilament[i].spools.profile.density),
-          spool_diameter: parseFloat(selectedFilament[i].spools.profile.diameter)
-        };
-
-        writePoints(tags, "SpoolInformation", filamentData);
-      }
-    }
-  }
-
   generateStartEndDates(payload) {
     const today = new Date();
     const printTime = new Date(payload.time * 1000);
@@ -613,6 +623,36 @@ class HistoryCaptureService {
             .catch((e) => {
               logger.error("Unable to update spool data!", e);
             });
+          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
+            spool,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            spool.spools.used
+          );
         });
       } else {
         logger.error("Unable to downdate spool weight, non selected...");
