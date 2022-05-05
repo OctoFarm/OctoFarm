@@ -197,7 +197,7 @@ class Manager {
     const printer = await OctoFarmClient.getPrinter(id);
     await FileManagerSortingService.loadSort(id);
     document.getElementById("backBtn").innerHTML =
-      '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
+      "<button id=\"fileBackBtn\" type=\"button\" class=\"btn btn-success\"><i class=\"fas fa-chevron-left\"></i> Back</button>";
     const fileButtons = {
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),
@@ -249,7 +249,7 @@ class Manager {
     });
     fileButtons.fileManager.fileDeleteAll.addEventListener(
       "click",
-      async () => {
+      async (e) => {
         await FileManagerService.deleteAllFiles(e, printer);
       }
     );
@@ -259,7 +259,7 @@ class Manager {
         bootbox.prompt({
           title: "Clean all files older than 'X' days...",
           message:
-            '<div class="alert alert-warning text-dark" role="alert">This action is permanent, and does NOT affect your folder structure.</div>',
+            "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
           inputType: "number",
           callback: async function (result) {
             if (!!result) {

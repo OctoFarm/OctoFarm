@@ -524,7 +524,6 @@ class OctoPrintPrinter {
   }
 
   async enablePrinter() {
-    this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
     // Setup initial client stuff, database, api
     this.enabling = true;
     if (this.disabled) {
@@ -1611,7 +1610,10 @@ class OctoPrintPrinter {
   }
 
   async forceReconnect() {
-    this.resetApiTimeout();
+    if (this.disabled) {
+      return "Sorry, I'm disabled I cannot perform this action!";
+    }
+    this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
     return this.resetSocketConnection();
   }
 

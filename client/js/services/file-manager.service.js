@@ -32,8 +32,8 @@ const loadingBarWarning = "progress-bar progress-bar-striped bg-warning";
 const loadingBarSuccess = "progress-bar progress-bar-striped bg-success";
 const buttonSuccess = "btn btn-success mb-0";
 const buttonFailed = "btn btn-danger mb-0";
-const defaultReSync = '<i class="fas fa-sync"></i> Re-Sync';
-const defaultDeleteAll = '<i class="fa-solid fa-trash-can"></i> Delete All';
+const defaultReSync = "<i class=\"fas fa-sync\"></i> Re-Sync";
+const defaultDeleteAll = "<i class=\"fa-solid fa-trash-can\"></i> Delete All";
 const isValid = "is-valid";
 const isInValid = "is-invalid";
 
@@ -465,7 +465,7 @@ export default class FileManagerService {
 
     if (houseCleanFiles.length === 0) {
       prettyList.push(
-        '<div class="alert alert-danger" role="alert">No Files to Clean...</div>'
+        "<div class=\"alert alert-danger\" role=\"alert\">No Files to Clean...</div>"
       );
       buttons = {
         cancel: {
@@ -526,7 +526,7 @@ export default class FileManagerService {
 
           setTimeout(async () => {
             e.target.innerHTML =
-              '<i class="fa-solid fa-broom"></i> House Keeping';
+              "<i class=\"fa-solid fa-broom\"></i> House Keeping";
             await FileManagerSortingService.loadSort(printer._id);
           }, 500);
         }
@@ -579,7 +579,7 @@ export default class FileManagerService {
               }
 
               let thumbnail =
-                '<i class="fas fa-file-code fa-2x text-center"></i>';
+                "<i class=\"fas fa-file-code fa-2x text-center\"></i>";
               if (!!file.thumbnail) {
                 thumbnail = `<img alt="Gcode Thumbnail" class="text-center" src='${printer.printerURL}/${file.thumbnail}' width="100%">`;
               }
@@ -592,7 +592,7 @@ export default class FileManagerService {
                 "fileHistoryRate-" + file.fullPath
               ).innerHTML =
                 spinnerIcon +
-                '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
+                "<i class=\"fas fa-thumbs-up\"></i> 0 / <i class=\"fas fa-thumbs-down\"></i> 0";
               document.getElementById(
                 `fileDate-${file.fullPath}`
               ).innerHTML = ` ${fileDate}`;
@@ -806,7 +806,7 @@ export default class FileManagerService {
       document.getElementById("multiFolderSection").classList.remove("hidden");
       document.getElementById("multiFileSection").classList.add("hidden");
       document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right">Next</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
       document
         .getElementById("multiUpSubmitBtn")
         .addEventListener("click", async () => {
@@ -888,13 +888,13 @@ export default class FileManagerService {
           document.getElementById(
             "folderCheckBody-" + currentPrinter._id
           ).innerHTML =
-            '<i class="fas fa-folder-plus text-success"></i> Folder exists!';
+            "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
           currentPrinter.folderExists = true;
         } else {
           document.getElementById(
             "folderCheckBody-" + currentPrinter._id
           ).innerHTML =
-            '<i class="fas fa-folder-minus text-warning"></i> Folder will be created!';
+            "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
           currentPrinter.folderExists = false;
         }
       }
@@ -912,7 +912,7 @@ export default class FileManagerService {
       document.getElementById("multiFolderSection").classList.add("hidden");
 
       document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\" data-dismiss=\"modal\">Start!</button>";
       document
         .getElementById("multiUpSubmitBtn")
         .addEventListener("click", () => {
@@ -931,13 +931,13 @@ export default class FileManagerService {
             fileBtn.removeAttribute("multiple");
             fileBtn.setAttribute("single", "");
             fileBtnLabel.innerHTML =
-              '<i class="fas fa-file-import"></i> Upload File';
+              "<i class=\"fas fa-file-import\"></i> Upload File";
             printAfterUpload = true;
           } else {
             fileBtn.setAttribute("multiple", "");
             fileBtn.removeAttribute("single");
             fileBtnLabel.innerHTML =
-              '<i class="fas fa-file-import"></i> Upload Files';
+              "<i class=\"fas fa-file-import\"></i> Upload Files";
             printAfterUpload = false;
           }
         });
@@ -1029,7 +1029,7 @@ export default class FileManagerService {
     document.getElementById("multiFolderSection").classList.add("hidden");
     document.getElementById("multiFileSection").classList.add("hidden");
     document.getElementById("multiUploadFooter").innerHTML =
-      '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+      "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-warning float-right\">Next</button>";
     document
       .getElementById("multiUpSubmitBtn")
       .addEventListener("click", () => {
@@ -1064,7 +1064,7 @@ export class FileActions {
       await FileManagerSortingService.loadSort(printer._id, "recursive");
     }
     if (fileList) {
-      const buttons = fileList.querySelectorAll('*[id^="file-"]');
+      const buttons = fileList.querySelectorAll("*[id^=\"file-\"]");
 
       for (const button of buttons) {
         const file = button.id.replace("file-", "");
@@ -1254,7 +1254,7 @@ export class FileActions {
 
   static async updateFile(printer, btn, fullPath) {
     const refreshBtn = document.getElementById(btn);
-    refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing...';
+    refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Syncing...";
     const how = await OctoFarmClient.post("printers/resyncFile", {
       id: printer._id,
       fullPath,
@@ -1344,10 +1344,10 @@ export class FileActions {
       message: `Are you sure you want to delete ${fullPath}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel',
+          label: "<i class=\"fa fa-times\"></i> Cancel",
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm',
+          label: "<i class=\"fa fa-check\"></i> Confirm",
         },
       },
       async callback(result) {
@@ -1395,10 +1395,10 @@ export class FileActions {
       message: `Are you sure you want to delete ${fullPath}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel',
+          label: "<i class=\"fa fa-times\"></i> Cancel",
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm',
+          label: "<i class=\"fa fa-check\"></i> Confirm",
         },
       },
       async callback(result) {

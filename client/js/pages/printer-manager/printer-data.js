@@ -29,7 +29,7 @@ import {
 } from "./log-tickers.functions";
 import {
   isPrinterFullyScanned,
-  printerIsDisabled,
+  printerIsDisabled, printerIsOffline, printerIsOnline, printerIsSearching,
 } from "../../utils/octofarm.utils";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
@@ -87,7 +87,7 @@ function updatePrinterInfo(printer) {
   );
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
-  let printerName = '<i class="fa-solid fa-arrows-spin fa-spin"></i>';
+  let printerName = "<i class=\"fa-solid fa-arrows-spin fa-spin\"></i>";
 
   if (
     printer?.printerName &&
@@ -236,7 +236,7 @@ function setupReconnectingIn(printer) {
     UI.removeDisplayNoneFromElement(printerReScanButton);
     // updateLogLine({id: "apiReconnect-"+printer._id, name: "Planned API Re-Scan", printerName: printer.printerName, colour: "Offline"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
-      printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i>';
+      printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -248,7 +248,7 @@ function setupReconnectingIn(printer) {
   } else {
     // removeAlertsLog({id: "apiReconnect-"+printer._id})
     UI.addDisplayNoneToElement(printerReScanButton);
-    printerReScanIcon.innerHTML = '<i class="fas fa-redo fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -268,7 +268,7 @@ function reconnectingWebsocketIn(printer) {
     // updateLogLine({id: "socketReconnect-"+printer._id, name: "Planned Socket Reconnection!", printerName: printer.printerName, colour: "Info"})
     if (!printerReScanIcon.innerHTML.includes("fa-spin")) {
       printerReScanIcon.innerHTML =
-        '<i class="fas fa-sync-alt fa-sm fa-spin"></i>';
+        "<i class=\"fas fa-sync-alt fa-sm fa-spin\"></i>";
       printerReScanText.innerHTML = UI.generateMilisecondsTime(
         reconnectingInCalculation
       );
@@ -280,7 +280,7 @@ function reconnectingWebsocketIn(printer) {
   } else {
     UI.addDisplayNoneToElement(printerReScanButton);
     // removeAlertsLog({id: "socketReconnect-"+printer._id})
-    printerReScanIcon.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i>';
+    printerReScanIcon.innerHTML = "<i class=\"fas fa-sync-alt fa-sm\"></i>";
     printerReScanText.innerHTML = "";
   }
 }
@@ -365,7 +365,7 @@ function checkIfMultiUserIssueFlagged(printer) {
   const multiUserIssueAlert = document.getElementById(
     "multiUserIssue-" + printer._id
   );
-  if (printer?.multiUserIssue) {
+  if (printer?.multiUserIssue && !printerIsSearching()) {
     updateLogLine(
       "userIssue-" + printer._id,
       alertsLogMesssageBox,
@@ -490,6 +490,7 @@ function updateButtonState(printer) {
   const printerStatistics = document.getElementById(
     `printerStatistics-${printer._id}`
   );
+  const forceReconnect = document.getElementById(`printerForceReconnect-${printer._id}`)
 
   const allowedActions =
     !isPrinterFullyScanned(printer) || printerIsDisabled(printer);
@@ -498,6 +499,7 @@ function updateButtonState(printer) {
   UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerLog, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerStatistics, "disabled");
+  UI.doesElementNeedUpdating(!printerIsOnline(printer), forceReconnect, "disabled");
 }
 
 function updatePrinterRow(printer) {
@@ -573,7 +575,7 @@ export function createOrUpdatePrinterTableRow(printers) {
           const { msg } = await OctoFarmClient.forceReconnect(printer._id);
           UI.createAlert(
             "warning",
-            `Reconnection was forced, response: ${msg}`,
+            `${msg}`,
             5000,
             "Clicked"
           );
@@ -585,7 +587,7 @@ export function createOrUpdatePrinterTableRow(printers) {
           const { msg } = await OctoFarmClient.forceReconnect(printer._id);
           UI.createAlert(
             "warning",
-            `Reconnection was forced, response: ${msg}`,
+            `${msg}`,
             5000,
             "Clicked"
           );
@@ -629,7 +631,7 @@ export function createOrUpdatePrinterTableRow(printers) {
           bootbox.dialog({
             title: "Rescan All API endpoints",
             message:
-              '<p class="alert alert-danger text-dark" role="alert">ReScan: Will rescan all endpoints regardless of existing data.</p>',
+              "<p class=\"alert alert-danger text-dark\" role=\"alert\">ReScan: Will rescan all endpoints regardless of existing data.</p>",
             size: "large",
             buttons: {
               force: {
@@ -663,10 +665,10 @@ export function createOrUpdatePrinterTableRow(printers) {
 
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel',
+                label: "<i class=\"fa fa-times\"></i> Cancel",
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm',
+                label: "<i class=\"fa fa-check\"></i> Confirm",
               },
             },
             callback: async function (result) {
