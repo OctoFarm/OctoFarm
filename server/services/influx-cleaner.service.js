@@ -3,7 +3,6 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Influx-Export");
 const { getHistoryCache } = require("../cache/history.cache");
-const { toBase64 } = require("request/lib/helpers");
 
 class InfluxCleanerService {
   #printersInformationTimer;
@@ -251,7 +250,6 @@ class InfluxCleanerService {
           currentState = "Failure";
         }
       }
-
       const tags = {
         spool_name: filament.spools.name,
         printer_name: printerInformation?.printerName ? printerInformation?.printerName : " ",
@@ -259,7 +257,6 @@ class InfluxCleanerService {
         file_name: historyRecord?.fileName ? historyRecord.fileName : "",
         print_state: currentState
       };
-
       let filamentData = {
         name: filament.spools.name,
         price: parseFloat(filament.spools.price),
@@ -272,8 +269,8 @@ class InfluxCleanerService {
         spool_density: parseFloat(filament.spools.profile.density),
         spool_diameter: parseFloat(filament.spools.profile.diameter)
       };
-
       writePoints(tags, this.#materialsInformationMeasurementKey, filamentData);
+
       logger.debug("Logged data to influx database", filamentData, tags);
     }
   };

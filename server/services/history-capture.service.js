@@ -178,7 +178,7 @@ class HistoryCaptureService {
     }
     if (!this.#success) {
       this.checkForAdditionalFailureProperties().catch((e) => {
-        logger.error("Couldn't check for additional success properties", e.toString());
+        logger.error("Couldn't check for additional failed properties", e.toString());
       });
     }
 
@@ -286,7 +286,7 @@ class HistoryCaptureService {
           spoolEntity.markModified("spools");
           await spoolEntity.save();
           getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
-            spoolEntity,
+            element,
             {
               printerName: this.#printerName,
               printerID: this.#printerID,
@@ -463,7 +463,6 @@ class HistoryCaptureService {
     if (this.#fileName.includes(".gcode")) {
       cleanFileName = cleanFileName.replace(".gcode", "");
     }
-
     const unrenderedTimelapseIndex = unrendered.findIndex((o) => o.name.includes(cleanFileName));
 
     //if unrendered check timelapse again...
@@ -587,7 +586,6 @@ class HistoryCaptureService {
   }
 
   async downDateWeight() {
-    console.log("DOWNDATING SPOOL WEIGHT!");
     // Complete guess at a heat up time... deffo no filament used by this time, or very unimportant amounts.
     if (!this.#success && this.#payload.time < 60) {
       logger.warning("Not downdating failed print as shorter than 1 minute...");
@@ -618,10 +616,8 @@ class HistoryCaptureService {
           currentSpool,
           completionRatio
         );
-        console.log(currentGram);
         await Spool.findById(currentSpool._id).then((spool) => {
           const currentUsed = parseFloat(spool.spools.used);
-          console.log(currentUsed);
           spool.spools.used = currentUsed + parseFloat(currentGram);
           spool.markModified("spools.used");
           spool
@@ -632,8 +628,9 @@ class HistoryCaptureService {
             .catch((e) => {
               logger.error("Unable to update spool data!", e);
             });
+          currentSpool.spools.used = currentUsed + parseFloat(currentGram);
           getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
-            this.#job?.filament["tool" + s],
+            currentSpool,
             {
               printerName: this.#printerName,
               printerID: this.#printerID,
