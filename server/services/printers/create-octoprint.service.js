@@ -524,6 +524,7 @@ class OctoPrintPrinter {
   }
 
   async enablePrinter() {
+    this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
     // Setup initial client stuff, database, api
     this.enabling = true;
     if (this.disabled) {
