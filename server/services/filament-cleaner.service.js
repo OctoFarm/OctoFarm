@@ -127,7 +127,7 @@ class FilamentCleanerService {
     const selectedArray = [];
     for (const printer of printers) {
       if (typeof printer !== "undefined" && Array.isArray(printer.selectedFilament)) {
-        for (const selectedFilament of printer.selectedFilament) {
+        for (const [f, selectedFilament] of printer.selectedFilament.entries()) {
           if (selectedFilament !== null) {
             selectedArray.push(printer.selectedFilament[f]._id);
           }

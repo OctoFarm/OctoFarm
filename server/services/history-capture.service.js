@@ -200,13 +200,13 @@ class HistoryCaptureService {
     }
 
     if (
-      !serverSettingsCache.history.downDateFailed &&
-      !serverSettingsCache.history.downDateSuccess &&
+      (!serverSettingsCache.filament.downDateFailed ||
+        !serverSettingsCache.filament.downDateSuccess) &&
       !serverSettingsCache.filamentManager
     ) {
       try {
         this.#selectedFilament.forEach((spool) => {
-          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
             spool,
             {
               printerName: this.#printerName,
@@ -285,7 +285,7 @@ class HistoryCaptureService {
           logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity.spools}`);
           spoolEntity.markModified("spools");
           await spoolEntity.save();
-          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
             spoolEntity,
             {
               printerName: this.#printerName,
@@ -587,6 +587,13 @@ class HistoryCaptureService {
   }
 
   async downDateWeight() {
+    console.log("DOWNDATING SPOOL WEIGHT!");
+    // Complete guess at a heat up time... deffo no filament used by this time, or very unimportant amounts.
+    if (!this.#success && this.#payload.time < 60) {
+      logger.warning("Not downdating failed print as shorter than 1 minute...");
+      return;
+    }
+
     let printTime = 0;
     if (this.#job?.lastPrintTime) {
       // Last print time available, use this as it's more accurate
@@ -611,8 +618,10 @@ class HistoryCaptureService {
           currentSpool,
           completionRatio
         );
+        console.log(currentGram);
         await Spool.findById(currentSpool._id).then((spool) => {
           const currentUsed = parseFloat(spool.spools.used);
+          console.log(currentUsed);
           spool.spools.used = currentUsed + parseFloat(currentGram);
           spool.markModified("spools.used");
           spool
@@ -623,8 +632,8 @@ class HistoryCaptureService {
             .catch((e) => {
               logger.error("Unable to update spool data!", e);
             });
-          getInfluxCleanerCache.cleanAndWriteMaterialsInformationForInflux(
-            spool,
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+            this.#job?.filament["tool" + s],
             {
               printerName: this.#printerName,
               printerID: this.#printerID,
@@ -651,7 +660,7 @@ class HistoryCaptureService {
               resends: this.#resends,
               activeControlUser: this.#activeControlUser
             },
-            spool.spools.used
+            currentGram
           );
         });
       } else {

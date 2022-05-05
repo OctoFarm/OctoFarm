@@ -129,7 +129,7 @@ class InfluxCleanerService {
         }
 
         if (printer.selectedFilament.length >= 1) {
-          for (const spool of printer.selectedFilament) {
+          for (const [index, spool] of printer.selectedFilament.entries()) {
             if (spool !== null) {
               printerData[`tool_${index}_spool_name`] = spool.spools.name;
               printerData[`tool_${index}_spool_used`] = parseFloat(spool.spools.used);
@@ -272,8 +272,9 @@ class InfluxCleanerService {
         spool_density: parseFloat(filament.spools.profile.density),
         spool_diameter: parseFloat(filament.spools.profile.diameter)
       };
-      console.log(tags, filamentData);
-      // writePoints(tags, this.#materialsInformationMeasurementKey, filamentData);
+
+      writePoints(tags, this.#materialsInformationMeasurementKey, filamentData);
+      logger.debug("Logged data to influx database", filamentData, tags);
     }
   };
 }
