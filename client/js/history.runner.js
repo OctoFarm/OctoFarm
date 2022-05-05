@@ -1304,6 +1304,7 @@ class History {
         '<i class="fas fa-hdd"></i> ',
         ""
       );
+
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
