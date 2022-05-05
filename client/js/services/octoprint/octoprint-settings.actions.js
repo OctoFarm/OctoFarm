@@ -1,5 +1,6 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "../octofarm-client.service";
+import {isPrinterDisconnected} from "../../utils/octofarm.utils";
 
 async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   let successfulPrinters = "";
@@ -76,17 +77,17 @@ async function setupOctoPrintForVirtualPrinter(printers) {
       },
     },
   };
-  for (let i = 0; i < printers.length; i++) {
-    if (printers[i].printerState.colour.category !== "Offline") {
+  for (const printer of printers) {
+    if (printer.printerState.colour.category !== "Offline") {
       await OctoPrintClient.post(
-        printers[i],
+        printer,
         "settings",
         virtualPrinterSettings
       );
-      await OctoFarmClient.refreshPrinterSettings(printers[i]._id);
-      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
+      await OctoFarmClient.refreshPrinterSettings(printer._id);
+      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printer.printerName}: Settings Updated! <br>`;
     } else {
-      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printers[i].printerName}: Offline! <br>`;
+      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printer.printerName}: Offline! <br>`;
     }
   }
   return {

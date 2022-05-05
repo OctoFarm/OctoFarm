@@ -312,11 +312,15 @@ class OctoprintWebsocketMessageService {
         captureResourceMonitorData(printerID, data);
         break;
       case OP_WS_PLUGIN_KEYS.display_layer_progress:
+        // Silence the other outputs from the plugin
+        break;
+      case OP_WS_PLUGIN_KEYS.display_layer_progress_ws_payload:
+        // Capture websocket data, it's all we need
         captureDisplayLayerProgress(printerID, data);
         break;
       default:
-        logger.debug("Unknown plugin detected!", { header, type });
-        logger.debug("Unknown data!", data);
+        logger.warning("Unknown plugin detected!", { header, type });
+        logger.warning("Unknown data!", data);
     }
   }
 }
