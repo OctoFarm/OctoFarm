@@ -321,6 +321,9 @@ class OctoprintWebsocketMessageService {
       default:
         logger.warning("Unknown plugin detected!", { header, type });
         logger.warning("Unknown data!", data);
+        logger.info(
+          "This plugin is currently un-supported, please open a discussion if you'd like it supporting in OctoFarm!"
+        );
     }
   }
 }
