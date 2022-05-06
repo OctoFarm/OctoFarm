@@ -30,6 +30,10 @@ const UserSchema = new mongoose.Schema({
   loginToken: {
     type: String,
     required: false
+  },
+  apiKey: {
+    type: String,
+    required: false
   }
 });
 
