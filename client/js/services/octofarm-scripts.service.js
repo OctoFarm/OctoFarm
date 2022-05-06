@@ -153,10 +153,14 @@ export default class Script {
                        </select>
                 </td> 
                 <td >    
-                        <div id="scriptLocation-${alert._id}" contenteditable="false"> ${alert.scriptLocation}  </div>
+                  <div class="form-group">
+                    <input type="input" class="form-control" id="scriptLocation-${alert._id}" aria-describedby="scriptLocation" placeholder="Enter your script location" value="${alert.scriptLocation}" disabled />
+                  </div>
                 </td>
                 <td>    
-                        <div  id="message-${alert._id}" contenteditable="false"> ${alert.message}</div>
+                  <div class="form-group">
+                    <textarea type="input" rows="1" class="form-control" id="message-${alert._id}" aria-describedby="message" placeholder="Enter you message" disabled>${alert.message}</textarea>
+                  </div>
                 </td>
                 <td id="printers-${alert._id}">
                         ${alert.printer}
@@ -193,10 +197,10 @@ export default class Script {
               trigger: document.getElementById("trigger-" + alert._id).value,
               script: document
                 .getElementById("scriptLocation-" + alert._id)
-                .innerHTML.trim(),
+                .value.trim(),
               message: document
                 .getElementById("message-" + alert._id)
-                .innerHTML.trim(),
+                .value.trim(),
             };
             Script.saveEdit(alert._id, newAlert);
           });
@@ -229,13 +233,10 @@ export default class Script {
     }
   }
   static async edit(id) {
-    let row = document.getElementById("alertList-" + id);
-    let editable = row.querySelectorAll("[contenteditable]");
-
-    editable.forEach((edit) => {
-      edit.contentEditable = true;
-      edit.classList.add("contentEditable");
-    });
+    document.getElementById("scriptLocation-"+id).disabled = false;
+    const message = document.getElementById("message-"+id);
+    message.disabled = false;
+    message.rows = "5";
     document.getElementById("save-" + id).classList.remove("d-none");
     document.getElementById("edit-" + id).classList.add("d-none");
     document.getElementById("trigger-" + id).disabled = false;
