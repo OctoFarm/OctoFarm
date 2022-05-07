@@ -287,6 +287,18 @@ export default class UI {
     }
   }
 
+  static removeClassIfExists(element, className) {
+    if (element.classList.contains(className)) {
+      element.classList.remove(className);
+    }
+  }
+
+  static addClassIfDoesNotExist(element, className){
+    if (!element.classList.contains(className)) {
+      element.classList.add(className);
+    }
+  }
+
   static removeDisplayNoneFromElement(element) {
     if (element.classList.contains("d-none")) {
       element.classList.remove("d-none");

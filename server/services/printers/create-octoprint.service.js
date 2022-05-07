@@ -145,6 +145,7 @@ class OctoPrintPrinter {
   };
   printerFirmware = undefined;
   octoPrintVersion = undefined;
+  klipperState = undefined;
   current = undefined;
   options = undefined;
   profiles = undefined;
@@ -1193,7 +1194,9 @@ class OctoPrintPrinter {
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {
-        this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
+        if(this.camURL.length === 0){
+          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
+        }
         this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
         this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
         if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
@@ -1614,11 +1617,11 @@ class OctoPrintPrinter {
       return "Sorry, I'm disabled I cannot perform this action!";
     }
     this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
+    this.resetApiTimeout();
     return this.resetSocketConnection();
   }
 
   resetConnectionInformation() {
-    this.resetApiTimeout();
     if (!!this?.#api) {
       this.#api.updateConnectionInformation(this.printerURL, this.apikey);
     }
@@ -1627,7 +1630,7 @@ class OctoPrintPrinter {
       this.#ws.updateConnectionInformation(this.webSocketURL, this.currentUser);
     }
 
-    this.resetSocketConnection().then();
+    return this.resetSocketConnection();
   }
 
   async resetSocketConnection() {

@@ -129,17 +129,37 @@ const captureKlipperPluginData = (id, data) => {
   logger.debug("Klipper data", data);
   const { payload, subtype } = data;
 
+  //Enable klipper ready state monitoring
+  const { klipperState } = getPrinterStoreCache().getPrinterInformation(id);
+  if (typeof klipperState === "undefined") {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "danger"
+    });
+  }
+
   let state = subtype === "info" ? "Info" : "Offline";
 
   if (payload.includes("file")) {
     return;
   }
 
+  if(payload.includes("Standby")){
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "warning"
+    });
+  }
+
   if (payload.includes("Disconnect") || payload.includes("Lost")) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "danger"
+    });
     state = "Offline";
   }
 
   if (payload.includes("Ready")) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "success"
+    });
     state = "Complete";
   }
 

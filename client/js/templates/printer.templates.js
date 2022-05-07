@@ -16,7 +16,8 @@ export const getPrinterNameBadge = (id, colour, position = undefined) => {
                 style="max-width:${position ? 100 : 60}%;"
                 disabled
               >
-                <i id="powerState-${id}" class="fa-solid fa-power-off fa-2 d-none"></i>           
+                <i id="powerState-${id}" class="fa-solid fa-power-off fa-2 d-none"></i>    
+                <i id="klipperState-${id}" class="fa-solid fa-scissors fa-2 d-none"></i>          
                 <span><i class="fas fa-print" style="color:${colour};"></i></span>
                 <span id="name-${id}"></span>
               </button>

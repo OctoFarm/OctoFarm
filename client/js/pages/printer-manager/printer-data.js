@@ -499,7 +499,7 @@ function updateButtonState(printer) {
   UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerLog, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerStatistics, "disabled");
-  UI.doesElementNeedUpdating(!printerIsOnline(printer), forceReconnect, "disabled");
+  UI.doesElementNeedUpdating(printerIsDisabled(printer), forceReconnect, "disabled");
 }
 
 function updatePrinterRow(printer) {
@@ -537,6 +537,8 @@ function updatePrinterRow(printer) {
       checkIfPrinterConnectionThrottled(printer);
 
       checkIfCpuDataAvailable(printer);
+
+      checkKlipperState(printer);
     }
   }
 }
