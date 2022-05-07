@@ -143,7 +143,6 @@ export const pageElements = {
 
 export const loadPageStatistics = async () => {
   const { statistics } = await OctoFarmClient.getFilamentStatistics();
-  console.log(statistics)
   pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
   pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
   pageElements.filamentSpoolsActiveTotals.innerHTML =
@@ -251,7 +250,7 @@ export const renderFilamentUsageCharts = async () => {
 
   console.log(totalByDay, usageOverTime)
 
-  if (usageOverTime.length > 2) {
+  if (!!usageOverTime && usageOverTime[0].data.length > 1) {
     const filamentUsageOverTimeChart = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
       dashboardOptions.filamentUsageOverTimeChartOptions
@@ -260,7 +259,7 @@ export const renderFilamentUsageCharts = async () => {
 
     await filamentUsageOverTimeChart.updateSeries(usageOverTime);
   }
-  if (totalByDay.length > 2) {
+  if (!!totalByDay && totalByDay[0].data.length > 1) {
     const totalByDayChart = new ApexCharts(
       document.querySelector("#usageOverTime"),
       dashboardOptions.filamentUsageByDayChartOptions
