@@ -2,7 +2,7 @@ import OctoPrintClient from "./octoprint/octoprint-client.service";
 import Queue from "./file-manager-queue.service.js";
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
-import { dragAndDropEnableMultiplePrinters } from "../utils/dragAndDrop.js";
+import {dragAndDropEnable} from "../utils/dragAndDrop.js";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import PrinterSelectionService from "../pages/printer-manager/services/printer-selection.service.js";
 import OctoFarmClient from "./octofarm-client.service";
@@ -729,8 +729,7 @@ export default class FileManagerService {
   }
 
   static updateListeners(printer) {
-    const fileElem = document.getElementById(`fileList-${printer._id}`);
-    dragAndDropEnableMultiplePrinters(fileElem, printer);
+
     const folders = document.querySelectorAll(".folderAction");
     folders.forEach((folder) => {
       folder.addEventListener("click", async (e) => {
