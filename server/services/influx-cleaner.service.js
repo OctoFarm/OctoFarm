@@ -3,6 +3,7 @@ const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Influx-Export");
 const { getHistoryCache } = require("../cache/history.cache");
+const { SettingsClean } = require("./settings-cleaner.service.js");
 
 class InfluxCleanerService {
   #printersInformationTimer;
@@ -14,9 +15,18 @@ class InfluxCleanerService {
     this.#printersInformationTimer = 0;
   }
 
+  checkKlipperState = () => {
+    let serverSettings = SettingsClean.returnSystemSettings();
+    return serverSettings?.influxExport.active;
+  }
+
   cleanAndWritePrintersInformationForInflux = () => {
     if (this.#printersInformationTimer < 5000) {
       this.#printersInformationTimer = this.#printersInformationTimer + 1000; // data rate of sse socket
+      return;
+    }
+
+    if(!this.checkKlipperState()){
       return;
     }
 
@@ -169,6 +179,11 @@ class InfluxCleanerService {
     }
   };
   cleanAndWriteFinishedPrintInformationForInflux = (currentHistory, printerInformation) => {
+
+    if(!this.checkKlipperState()){
+      return;
+    }
+
     const historyRecord = getHistoryCache().generateDataSummary([currentHistory])[0];
     let currentState = " ";
     if (historyRecord.state.includes("Success")) {
@@ -239,6 +254,11 @@ class InfluxCleanerService {
     historyRecord,
     used
   ) => {
+
+    if(!this.checkKlipperState()){
+      return;
+    }
+
     if (!!filament) {
       let currentState = " ";
       if (historyRecord.success) {

@@ -1,8 +1,7 @@
 // Support for influx v1.X
 
 const Influx = require("influx");
-const settingsClean = require("./settings-cleaner.service.js");
-const SettingsClean = settingsClean.SettingsClean;
+const { SettingsClean } = require("./settings-cleaner.service.js");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
