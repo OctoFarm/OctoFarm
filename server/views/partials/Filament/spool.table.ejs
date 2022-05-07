@@ -16,6 +16,7 @@
 <% }else{ %>
 <% spools.forEach(spool => { %>
     <% if(!hideEmpty && (spool.weight - spool.used) > 1){ %>
+        <% console.log("PRINT THE TABLE") %>
     <tr>
         <th style="display: none;"> </th>
         <th><i class="fas fa-toilet-paper"></i></th>

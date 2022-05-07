@@ -74,8 +74,6 @@ export const getFileTemplate = (file, printerURL, id) => {
     bgColour = "bg-dark-failed";
   }
 
-  console.log(file.maintenanceCosts)
-
   return `
     <div
       id="file-${file.fullPath}"

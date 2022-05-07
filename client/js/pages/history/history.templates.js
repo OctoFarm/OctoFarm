@@ -20,7 +20,6 @@ export const returnHistoryTableRow = function (record) {
   spoolType.forEach((spool) => {
     spoolString.push(spool + "<br>");
   });
-  console.log(record);
   return `
        <tr>
           <td class="d-none">
