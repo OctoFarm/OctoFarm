@@ -185,7 +185,9 @@ router.post("/register", async (req, res) => {
                   req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
-                .catch((theError) => console.error(theError))
+                .catch((theError) => {
+                  logger.error("Couldn't save user to database!", theError);
+                })
                 .finally(async () => {
                   await fetchUsers(true);
                 });
