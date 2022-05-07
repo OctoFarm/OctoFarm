@@ -1,6 +1,6 @@
 {
   "name": "@notexpectedyet/octofarm-client",
-  "version": "0.9.9-alpha.29",
+  "version": "0.9.9-alpha.30",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
@@ -27,7 +27,6 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
-
     "apexcharts": "^3.35.0",
     "axios": "^0.21.1",
     "before-build-webpack": "^0.2.11",
