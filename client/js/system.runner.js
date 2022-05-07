@@ -79,7 +79,10 @@ if (serverActionsElements.LOG_DUMP_GENERATE) {
 }
 
 renderSystemCharts().then();
-startUpdateTasksRunner();
+if (serverActionsElements.SERVER_TASK_LIST) {
+  startUpdateTasksRunner();
+}
+
 startUpdateInfoRunner().then();
 ClientSettings.init().then();
 

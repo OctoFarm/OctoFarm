@@ -35,9 +35,9 @@
                     <% if(user.name === name || name === ""){ %>
                         <!-- Current user, do not allow password reset, edit, delete! -->
                         <tr id="userRow-<%=user._id%>">
-                            <th scope="row"><%= user.name %></th>
-                            <td><%= user.username %></td>
-                            <td><%= user.group %></td>
+                            <th id="userRowName-<%=user._id%>" scope="row"><%= user.name %></th>
+                            <td id="userRowUserName-<%=user._id%>"><%= user.username %></td>
+                            <td id="userRowUserGroup-<%=user._id%>"><%= user.group %></td>
                             <td><%= user.date.toLocaleDateString() %></td>
                             <td>
                                 <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal" disabled><i class="fas fa-user-shield"></i> Reset Password</button>
@@ -47,9 +47,9 @@
                         </tr>
                     <% } else { %>
                     <tr id="userRow-<%=user._id%>">
-                        <th scope="row"><%= user.name %></th>
-                        <td><%= user.username %></td>
-                        <td><%= user.group %></td>
+                        <th id="userRowName-<%=user._id%>" scope="row"><%= user.name %></th>
+                        <td id="userRowUserName-<%=user._id%>"><%= user.username %></td>
+                        <td id="userRowUserGroup-<%=user._id%>"><%= user.group %></td>
                         <td><%= user.date.toLocaleDateString() %></td>
                         <td>
                             <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>

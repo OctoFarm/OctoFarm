@@ -21,6 +21,8 @@ const serverActionsElements = {
   CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn"),
   OP_FILAMENT_SETUP: document.getElementById("filamentManagerPluginSetupBtn"),
   CLEAR_OLD_LOGS: document.getElementById("clearOldLogs"),
+  SERVER_TASK_LIST: document.getElementById("systemTasksTable"),
+  ACTIVE_USERS_ROW: document.getElementById("activeUsersRow")
 };
 
 const filamentManagerPluginActionElements = {

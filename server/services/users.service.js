@@ -214,6 +214,7 @@ async function editUser(id, { name = undefined, username = undefined, group = un
     user.username = username;
     user.group = group;
     await user.save();
+    await fetchUsers(true);
   } catch (e) {
     errors.push({ msg: "Error saving user information: " + e });
   }

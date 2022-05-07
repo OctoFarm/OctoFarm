@@ -220,15 +220,19 @@ router.patch(
     const newUserInformation = {
       name: req.bodyString("name"),
       username: req.bodyString("username"),
-      group: req.bodyString("group")
+      group: req.bodyString("group"),
+      password: req.bodyString("password"),
+      password2: req.bodyString("password2")
     };
     const id = req.paramString("id");
 
+    console.log(newUserInformation)
+
     if ("password" in newUserInformation) {
-      res.send(await resetPassword(id, newUserInformation));
+      return res.send(await resetPassword(id, newUserInformation));
     }
     if ("username" in newUserInformation) {
-      res.send(await editUser(id, newUserInformation));
+      return res.send(await editUser(id, newUserInformation));
     }
   }
 );

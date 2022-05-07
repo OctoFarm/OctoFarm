@@ -13,7 +13,7 @@ import {
 } from "../../services/octoprint/filament-manager-plugin.service";
 import {
   filamentManagerPluginActionElements,
-  returnSaveBtn,
+  returnSaveBtn, serverActionsElements,
   settingsElements,
   userActionElements,
 } from "./server.options";
@@ -771,10 +771,14 @@ async function updateLiveSystemInformation() {
 
 async function startUpdateInfoRunner() {
   await updateLiveSystemInformation();
-  await updateCurrentActiveUsers();
+  if(!!serverActionsElements.ACTIVE_USERS_ROW){
+    await updateCurrentActiveUsers();
+  }
   setInterval(async () => {
     await updateLiveSystemInformation();
-    await updateCurrentActiveUsers();
+    if(!!serverActionsElements.ACTIVE_USERS_ROW){
+      await updateCurrentActiveUsers();
+    }
   }, 5000);
 }
 
@@ -953,6 +957,12 @@ async function editUser(id) {
     userActionElements.editUserName.value = "";
     userActionElements.editGroup.value = "User";
     $("#userEditModal").modal("hide");
+    if(!!editedUser?.user){
+      const { user } = editedUser;
+      document.getElementById("userRowName-"+user._id).innerHTML = user.name;
+      document.getElementById("userRowUserName-"+user._id).innerHTML = user.username;
+      document.getElementById("userRowUserGroup-"+user._id).innerHTML = user.group;
+    }
   }
 }
 
