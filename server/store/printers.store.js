@@ -81,7 +81,8 @@ class PrinterStore {
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
         activeControlUser: printer.activeControlUser,
-        fullyScanned: printer?.onboarding?.fullyScanned
+        fullyScanned: printer?.onboarding?.fullyScanned,
+        klipperState: printer?.klipperState
       };
     });
 
@@ -121,7 +122,8 @@ class PrinterStore {
         powerSettings: printer.powerSettings,
         resends: printer.resends,
         activeControlUser: printer.activeControlUser,
-        fullyScanned: printer?.onboarding?.fullyScanned
+        fullyScanned: printer?.onboarding?.fullyScanned,
+        klipperState: printer?.klipperState
       };
     });
 
