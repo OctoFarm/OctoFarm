@@ -43,10 +43,10 @@ import {
   fillMiniFilamentDropDownList,
   findMiniFilamentDropDownsSelect,
 } from "../../services/printer-filament-selector.service";
+import {checkKlipperState} from "../../services/octoprint/checkKlipperState.actions";
 
 let elems = [];
 let groupElems = [];
-let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 let printerArea = document.getElementById("printerArea");
@@ -611,6 +611,7 @@ async function updateState(printer, clientSettings, view, index) {
 
   //Printer
   checkQuickConnectState(printer);
+  checkKlipperState(printer);
   const isOffline = !printerIsOnline(printer);
   const isPrintingOrComplete = printerIsPrintingOrComplete(printer);
 

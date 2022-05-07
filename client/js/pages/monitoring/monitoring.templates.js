@@ -22,24 +22,24 @@ export function drawListView(printer, clientSettings) {
       printer.currentProfile.heatedChamber
     ) {
       environment = `<small
-      id="bedTemp-${printer._id}"
-    class="mb-0 float-right"
-
+      id="badTemp-${printer._id}"
+    class="mb-0"
+          >
           </small><br><small
       id="chamberTemp-${printer._id}"
-    class="mb-0 float-right"
-
+    class="mb-0"
+        >
           </small>`;
     } else if (printer.currentProfile.heatedBed) {
       environment = `<div
       id="badTemp-${printer._id}"
-    class="mb-0 float-left"
+    class="mb-0"
           >
           </div>`;
     } else if (printer.currentProfile.heatedChamber) {
       environment = `<div
       id="chamberTemp-${printer._id}"
-    class="mb-0 float-right"
+    class="mb-0"
         >
           </div>`;
     }
@@ -440,13 +440,12 @@ export function drawCameraView(printer, clientSettings) {
 
     if (printer.currentProfile.heatedBed) {
       environment += `
-          <b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+          <span class="float-left"><b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></span>
 `;
     }
     if (printer.currentProfile.heatedChamber) {
       environment += `
-    class="mb-0"
-        <b>Chamber: </b><span id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+         <span class="float-right"><b>Chamber: </b><span id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></span>
  `;
     }
   }

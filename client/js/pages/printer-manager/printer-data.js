@@ -29,8 +29,11 @@ import {
 } from "./log-tickers.functions";
 import {
   isPrinterFullyScanned,
-  printerIsDisabled, printerIsOffline, printerIsOnline, printerIsSearching,
+  printerIsDisabled, printerIsSearching,
 } from "../../utils/octofarm.utils";
+import {
+  checkKlipperState
+} from "../../services/octoprint/checkKlipperState.actions";
 
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
 
