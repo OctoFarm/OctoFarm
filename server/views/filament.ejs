@@ -24,7 +24,7 @@
     </div>
 </div>
 <div class="row">
-<% if(typeof historyStats !== "undefined" && typeof historyStats.totalByDay[0] !== "undefined") {%>
+<% if(typeof historyStats !== "undefined" && typeof historyStats.totalByDay[0] !== "undefined" && historyStats.totalByDay.length >= 2) {%>
     <div class="col-lg-6">
         <%- include(card, {
         tile:{
@@ -35,7 +35,7 @@
         %>
     </div>
 <% } %>
-<% if(typeof historyStats !== "undefined" && typeof historyStats.usageOverTime[0] !== "undefined") {%>
+<% if(typeof historyStats !== "undefined" && typeof historyStats.usageOverTime[0] !== "undefined" && historyStats.usageOverTime.length >= 2) {%>
     <div class="col-lg-6">
         <%- include(card, {
         tile:{
