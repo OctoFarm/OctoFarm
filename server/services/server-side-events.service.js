@@ -21,10 +21,11 @@ const addClientConnection = (req, res) => {
   // Store the id and the whole response object with a clone of the user information
   // Limitations it doesn't update user information, don't think it's needed
   const id = Date.now();
+  console.log(req.user)
   const client = {
     id,
     res,
-    user: Object.assign({}, req.user)
+    user: JSON.parse(JSON.stringify(req.user))
   };
   clientList.push(client);
 
