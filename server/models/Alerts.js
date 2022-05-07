@@ -17,6 +17,11 @@ const AlertsSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  type: {
+    // Change to required true when other endpoints are setup.
+    type: String,
+    required: false
+  },
   scriptLocation: {
     type: String,
     required: true

@@ -13,6 +13,8 @@ module.exports = {
       "Unable to update existing server settings..." + SERVER_ACTIONS.ABORTING_BOOT,
     CLIENT_SETTINGS_FAIL_UPDATE:
       "Unable to update existing server settings..." + SERVER_ACTIONS.ABORTING_BOOT,
-    REQUIRED_BOOT_TASKS_FAILED: "Unable to start server, some required boot tasks have failed... " + SERVER_ACTIONS.ABORTING_BOOT
+    REQUIRED_BOOT_TASKS_FAILED:
+      "Unable to start server, some required boot tasks have failed... " +
+      SERVER_ACTIONS.ABORTING_BOOT
   }
 };

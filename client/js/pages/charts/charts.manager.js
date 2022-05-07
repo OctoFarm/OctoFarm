@@ -1,5 +1,5 @@
 import ApexCharts from "apexcharts";
-import {dashboardOptions} from "./dashboard.options";
+import { dashboardOptions } from "./dashboard.options";
 
 const chartIds = {
   hourlyTotalTemperatureChart: "#hourlyTotalTemperatureChart",
@@ -9,7 +9,7 @@ const chartIds = {
   filamentUsageOverTimeChart: "#filamentUsageOverTimeChart",
   filamentUsageByDayChart: "#filamentUsageByDayChart",
   printCompletionByDayChart: "#printCompletionByDay",
-  environmentalHistory: "#environmentalHistory"
+  environmentalHistory: "#environmentalHistory",
 };
 let environmentDataChart,
   hourlyTotalTemperatureChart,
@@ -105,7 +105,8 @@ export class ChartsManager {
    * @param labels analyzed labels
    */
   static async renderEnvironmentDataChart(seriesData, labels) {
-    const environmentalHistoryChartOptions = dashboardOptions.environmentalDataChartOptions;
+    const environmentalHistoryChartOptions =
+      dashboardOptions.environmentalDataChartOptions;
     environmentalHistoryChartOptions.yaxis = labels;
     environmentDataChart = await renderChart(
       chartIds.environmentalHistory,

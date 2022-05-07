@@ -1,6 +1,13 @@
 // Store the current active view type like camera, panel, location map or list
 let currentViewType = "none";
-const viewTypes = ["panel", "list", "camera", "group", "current-ops", "combined"];
+const viewTypes = [
+  "panel",
+  "list",
+  "camera",
+  "group",
+  "current-ops",
+  "combined",
+];
 
 let printerInfo = null;
 let printerControlList = null;

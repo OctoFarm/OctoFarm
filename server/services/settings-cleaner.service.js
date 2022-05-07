@@ -25,7 +25,7 @@ class SettingsCleanerService {
     return systemClean.filamentManager;
   }
 
-  static isMultipleSelectEnabled(){
+  static isMultipleSelectEnabled() {
     return systemClean.filament.allowMultiSelect;
   }
 
@@ -82,8 +82,7 @@ class SettingsCleanerService {
         throw new Error(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_INIT + e);
       });
     } else {
-      for (let i = 0; i < clientSettings.length; i++) {
-        const existingSettings = clientSettings[i];
+      for (const existingSettings of clientSettings) {
         existingSettings.save().catch((e) => {
           throw new Error(SERVER_ISSUES.CLIENT_SETTINGS_FAIL_UPDATE + e);
         });

@@ -4,30 +4,34 @@ import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constant
 export async function printerPreHeatChamber(printer, chamberTemp) {
   let chamberData = {
     command: "target",
-    target: 0
+    target: 0,
   };
   if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
     chamberData.target = parseInt(chamberTemp.value);
   }
   //Set chamber temp
   if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
-    let post = await OctoPrintClient.post(printer, "printer/chamber", chamberData);
+    let post = await OctoPrintClient.post(
+      printer,
+      "printer/chamber",
+      chamberData
+    );
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         return {
           status: bulkActionsStates.SUCCESS,
-          message: "Chamber successfully set at " + chamberData.target + "°C"
+          message: "Chamber successfully set at " + chamberData.target + "°C",
         };
       } else {
         return {
           status: bulkActionsStates.ERROR,
-          message: "Failed to set chamber temp!"
+          message: "Failed to set chamber temp!",
         };
       }
     } else {
       return {
         status: bulkActionsStates.ERROR,
-        message: "Failed to contact OctoPrint, is it online?"
+        message: "Failed to contact OctoPrint, is it online?",
       };
     }
   }
@@ -35,7 +39,7 @@ export async function printerPreHeatChamber(printer, chamberTemp) {
 export async function printerPreHeatBed(printer, bedTemp) {
   let bedData = {
     command: "target",
-    target: 0
+    target: 0,
   };
   if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
     bedData.target = parseInt(bedTemp.value);
@@ -47,18 +51,18 @@ export async function printerPreHeatBed(printer, bedTemp) {
       if (post.status === 204) {
         return {
           status: bulkActionsStates.SUCCESS,
-          message: "Bed successfully set at " + bedData.target + "°C"
+          message: "Bed successfully set at " + bedData.target + "°C",
         };
       } else {
         return {
           status: bulkActionsStates.ERROR,
-          message: "Failed to set bed temp!"
+          message: "Failed to set bed temp!",
         };
       }
     } else {
       return {
         status: bulkActionsStates.ERROR,
-        message: "Failed to contact OctoPrint, is it online?"
+        message: "Failed to contact OctoPrint, is it online?",
       };
     }
   }
@@ -66,7 +70,7 @@ export async function printerPreHeatBed(printer, bedTemp) {
 export async function printerPreHeatTool(printer, toolTemp, toolNumber) {
   let toolData = {
     command: "target",
-    targets: {}
+    targets: {},
   };
   if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
     toolData.targets["tool" + toolNumber.value] = parseInt(toolTemp.value);
@@ -78,18 +82,20 @@ export async function printerPreHeatTool(printer, toolTemp, toolNumber) {
         return {
           status: bulkActionsStates.SUCCESS,
           message:
-            "Tool(s) successfully set at " + toolData.targets["tool" + toolNumber.value] + "°C"
+            "Tool(s) successfully set at " +
+            toolData.targets["tool" + toolNumber.value] +
+            "°C",
         };
       } else {
         return {
           status: bulkActionsStates.ERROR,
-          message: "Failed to set Tool(s) temp!"
+          message: "Failed to set Tool(s) temp!",
         };
       }
     } else {
       return {
         status: bulkActionsStates.ERROR,
-        message: "Failed to contact OctoPrint, is it online?"
+        message: "Failed to contact OctoPrint, is it online?",
       };
     }
   }
@@ -98,7 +104,7 @@ export async function printerPreHeatTool(printer, toolTemp, toolNumber) {
 export async function printerStartPrint(printer, e) {
   e.target.disabled = true;
   const opts = {
-    command: "start"
+    command: "start",
   };
   await OctoPrintClient.jobAction(printer, opts, e);
 }
@@ -107,7 +113,7 @@ export async function printerPausePrint(printer, e) {
   e.target.disabled = true;
   const opts = {
     command: "pause",
-    action: "pause"
+    action: "pause",
   };
   await OctoPrintClient.jobAction(printer, opts, e);
 }
@@ -115,7 +121,7 @@ export async function printerPausePrint(printer, e) {
 export async function printerRestartPrint(printer, e) {
   e.target.disabled = true;
   const opts = {
-    command: "restart"
+    command: "restart",
   };
   await OctoPrintClient.jobAction(printer, opts, e);
 }
@@ -124,7 +130,7 @@ export async function printerResumePrint(printer, e) {
   e.target.disabled = true;
   const opts = {
     command: "pause",
-    action: "resume"
+    action: "resume",
   };
   await OctoPrintClient.jobAction(printer, opts, e);
 }
@@ -132,7 +138,7 @@ export async function printerResumePrint(printer, e) {
 export async function printerStopPrint(printer, e) {
   e.target.disabled = true;
   const opts = {
-    command: "cancel"
+    command: "cancel",
   };
   await OctoPrintClient.jobAction(printer, opts, e);
 }
@@ -155,72 +161,85 @@ export async function printerSendGcode(printer, result) {
     }
   });
   const opt = {
-    commands: lines
+    commands: lines,
   };
   const post = await OctoPrintClient.post(printer, "printer/command", opt);
   if (post.status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
-      message: "Successfully sent your gcode script to the client!"
+      message: "Successfully sent your gcode script to the client!",
     };
   } else {
     return {
       status: bulkActionsStates.ERROR,
-      message: "Failed to send your gcode script to the client!"
+      message: "Failed to send your gcode script to the client!",
     };
   }
 }
 
 export async function printerEmergencyStop(printer) {
   const opt = {
-    commands: ["M112"]
+    commands: ["M112"],
   };
-  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  const { status } = await OctoPrintClient.post(
+    printer,
+    "printer/command",
+    opt
+  );
   if (status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
-      message: "Emergency stop has successfully been actioned!"
+      message: "Emergency stop has successfully been actioned!",
     };
   } else {
     return {
       status: bulkActionsStates.ERROR,
-      message: "Emergency stop failed to send!"
+      message: "Emergency stop failed to send!",
     };
   }
 }
 
 export async function printerHomeAllAxis(printer) {
   const opt = {
-    commands: ["G28"]
+    commands: ["G28"],
   };
-  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+  const { status } = await OctoPrintClient.post(
+    printer,
+    "printer/command",
+    opt
+  );
   if (status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
-      message: "Home printer command has successfully been actioned!"
+      message: "Home printer command has successfully been actioned!",
     };
   } else {
     return {
       status: bulkActionsStates.ERROR,
-      message: "Home printer command failed to send!"
+      message: "Home printer command failed to send!",
     };
   }
 }
 
-export async function printerTurnOffHeaters(printer){
+export async function printerTurnOffHeaters(printer) {
   const opt = {
-    commands: ["M104 S0", "M140 S0"]
-  }
-  const { status } = await OctoPrintClient.post(printer, "printer/command", opt);
+    commands: ["M104 S0", "M140 S0"],
+  };
+  const { status } = await OctoPrintClient.post(
+    printer,
+    "printer/command",
+    opt
+  );
   if (status === 204) {
     return {
       status: bulkActionsStates.SUCCESS,
-      message: "Turn off printers heaters command has successfully been actioned!"
+      message:
+        "Turn off printers heaters command has successfully been actioned!",
     };
   } else {
     return {
       status: bulkActionsStates.ERROR,
-      message: "Turn off printers heaters command failed to send!"
+      message: "Turn off printers heaters command failed to send!",
     };
   }
 }

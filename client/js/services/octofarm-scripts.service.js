@@ -111,7 +111,7 @@ if (saveScriptBtn) {
         active: true,
         trigger: elements.trigger.value,
         script: elements.script.value,
-        message: elements.message.value
+        message: elements.message.value,
       };
       Script.save(newAlert);
     }
@@ -153,10 +153,14 @@ export default class Script {
                        </select>
                 </td> 
                 <td >    
-                        <div id="scriptLocation-${alert._id}" contenteditable="false"> ${alert.scriptLocation}  </div>
+                  <div class="form-group">
+                    <input type="input" class="form-control" id="scriptLocation-${alert._id}" aria-describedby="scriptLocation" placeholder="Enter your script location" value="${alert.scriptLocation}" disabled />
+                  </div>
                 </td>
                 <td>    
-                        <div  id="message-${alert._id}" contenteditable="false"> ${alert.message}</div>
+                  <div class="form-group">
+                    <textarea type="input" rows="1" class="form-control" id="message-${alert._id}" aria-describedby="message" placeholder="Enter you message" disabled>${alert.message}</textarea>
+                  </div>
                 </td>
                 <td id="printers-${alert._id}">
                         ${alert.printer}
@@ -180,21 +184,31 @@ export default class Script {
         alertsTrigger.value = alert.trigger;
 
         document.getElementById("active-" + alert._id).checked = alert.active;
-        document.getElementById("edit-" + alert._id).addEventListener("click", (event) => {
-          Script.edit(alert._id);
-        });
-        document.getElementById("save-" + alert._id).addEventListener("click", (event) => {
-          let newAlert = {
-            active: document.getElementById("active-" + alert._id).checked,
-            trigger: document.getElementById("trigger-" + alert._id).value,
-            script: document.getElementById("scriptLocation-" + alert._id).innerHTML.trim(),
-            message: document.getElementById("message-" + alert._id).innerHTML.trim()
-          };
-          Script.saveEdit(alert._id, newAlert);
-        });
-        document.getElementById("delete-" + alert._id).addEventListener("click", (event) => {
-          Script.delete(alert._id);
-        });
+        document
+          .getElementById("edit-" + alert._id)
+          .addEventListener("click", (event) => {
+            Script.edit(alert._id);
+          });
+        document
+          .getElementById("save-" + alert._id)
+          .addEventListener("click", (event) => {
+            let newAlert = {
+              active: document.getElementById("active-" + alert._id).checked,
+              trigger: document.getElementById("trigger-" + alert._id).value,
+              script: document
+                .getElementById("scriptLocation-" + alert._id)
+                .value.trim(),
+              message: document
+                .getElementById("message-" + alert._id)
+                .value.trim(),
+            };
+            Script.saveEdit(alert._id, newAlert);
+          });
+        document
+          .getElementById("delete-" + alert._id)
+          .addEventListener("click", (event) => {
+            Script.delete(alert._id);
+          });
       });
     } else {
       alertsTable.insertAdjacentHTML("beforeend"`
@@ -219,13 +233,10 @@ export default class Script {
     }
   }
   static async edit(id) {
-    let row = document.getElementById("alertList-" + id);
-    let editable = row.querySelectorAll("[contenteditable]");
-
-    editable.forEach((edit) => {
-      edit.contentEditable = true;
-      edit.classList.add("contentEditable");
-    });
+    document.getElementById("scriptLocation-"+id).disabled = false;
+    const message = document.getElementById("message-"+id);
+    message.disabled = false;
+    message.rows = "5";
     document.getElementById("save-" + id).classList.remove("d-none");
     document.getElementById("edit-" + id).classList.add("d-none");
     document.getElementById("trigger-" + id).disabled = false;
@@ -236,13 +247,18 @@ export default class Script {
       active: newAlert.active,
       trigger: newAlert.trigger,
       scriptLocation: newAlert.script,
-      message: newAlert.message
+      message: newAlert.message,
     };
     let post = await OctoFarmClient.post("scripts/edit", opts);
     if (!post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
-      UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
+      UI.createAlert(
+        "success",
+        "Successfully saved your alert!",
+        3000,
+        "Clicked"
+      );
       Script.get();
     }
     let row = document.getElementById("alertList-" + id);
@@ -262,13 +278,18 @@ export default class Script {
       trigger: newAlert.trigger,
       scriptLocation: newAlert.script,
       message: newAlert.message,
-      printer: []
+      printer: [],
     };
     let post = await OctoFarmClient.post("scripts/save", opts);
     if (!post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
-      UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
+      UI.createAlert(
+        "success",
+        "Successfully saved your alert!",
+        3000,
+        "Clicked"
+      );
       Script.get();
     }
   }
@@ -277,14 +298,19 @@ export default class Script {
     if (!post) {
       UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
     } else {
-      UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked");
+      UI.createAlert(
+        "success",
+        "Successfully deleted your alert.",
+        3000,
+        "Clicked"
+      );
       document.getElementById("alertList-" + id).remove();
     }
   }
   static async test(scriptLocation, message) {
     let opts = {
       scriptLocation: scriptLocation,
-      message: message
+      message: message,
     };
     let post = await OctoFarmClient.post("scripts/test", opts);
     if (typeof post.testFire === "object") {
@@ -311,7 +337,7 @@ export default class Script {
     return {
       trigger: document.getElementById("alertsTrigger"),
       script: document.getElementById("scriptLocation"),
-      message: document.getElementById("scriptMessage")
+      message: document.getElementById("scriptMessage"),
     };
   }
 }

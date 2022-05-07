@@ -1,4 +1,4 @@
-const { randomString } = require("../utils/random.util")
+const { randomString } = require("../utils/random.util");
 
 const MONGO_KEY = "MONGO";
 const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
@@ -68,7 +68,7 @@ class AppConstants {
     return defaultLogLevel;
   }
 
-  static get defaultSuperSecretKey(){
+  static get defaultSuperSecretKey() {
     return defaultSuperSecretKey;
   }
 

@@ -1,7 +1,7 @@
 import FileManagerService from "../services/file-manager.service.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
-import {groupBy, mapValues} from "lodash";
+import { groupBy, mapValues } from "lodash";
 
 let activeFile = false;
 
@@ -92,7 +92,9 @@ export function dragAndDropGroupEnable(printers) {
     if (groupedPrinters.hasOwnProperty(key)) {
       if (key !== "") {
         const currentGroupEncoded = encodeURIComponent(key);
-        const dropArea = document.getElementById(`dropPanel-${currentGroupEncoded}`);
+        const dropArea = document.getElementById(
+          `dropPanel-${currentGroupEncoded}`
+        );
 
         // Prevent default drag behaviors
         ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
@@ -146,20 +148,30 @@ function unhighlight(e, currentElement) {
   currentElement.classList.remove("highlight");
 }
 
-function handleDrop(e, currentPrinter, currentElement) {
+function handleDrop(e, currentPrinter) {
   const dt = e.dataTransfer;
   const { files } = dt;
-  handleFiles(files, [currentPrinter], currentElement);
+  handleFiles(files, [currentPrinter]);
 }
 
-function handleMassDrop(e, printers, currentElement) {
+function handleMassDrop(e, printers) {
   const dt = e.dataTransfer;
   const { files } = dt;
-  handleFiles(files, printers, currentElement);
+  handleFiles(files, printers);
 }
 
-function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, printer) {
-  UI.createAlert("warning", `${Validate.getName(printer)}: started upload`, 3000, "Clicked");
+function sendFilesToPrinter(
+  singleFileOnly,
+  printAfterUpload,
+  uploadableFiles,
+  printer
+) {
+  UI.createAlert(
+    "warning",
+    `${Validate.getName(printer)}: started upload`,
+    3000,
+    "Clicked"
+  );
 
   // Only single files can be sent to be printed immediately after upload
   if (printAfterUpload && singleFileOnly) {
@@ -180,18 +192,18 @@ export function handleFiles(uploadableFiles, printerArray) {
       buttons: {
         confirm: {
           label: "Yes",
-          className: "btn-success"
+          className: "btn-success",
         },
         cancel: {
           label: "No",
-          className: "btn-danger"
-        }
+          className: "btn-danger",
+        },
       },
       callback(bootBoxConfirmed) {
         printerArray.forEach((printer) => {
           sendFilesToPrinter(true, bootBoxConfirmed, uploadableFiles, printer);
         });
-      }
+      },
     });
   } else {
     printerArray.forEach((printer) => {

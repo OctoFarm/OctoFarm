@@ -1,8 +1,6 @@
 import Validate from "../../utils/validate";
 import UI from "../../utils/ui";
 import OctoFarmClient from "../../services/octofarm-client.service.js";
-import {ClientErrors} from "../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../exceptions/application-error.handler";
 
 let newPrintersIndex = 0;
 
@@ -15,7 +13,7 @@ class Printer {
       colorTransparent: false,
       defaultLanguage: "_default",
       name,
-      showFahrenheitAlso: false
+      showFahrenheitAlso: false,
     };
     this.printerURL = printerURL;
     this.camURL = camURL;
@@ -31,7 +29,9 @@ export class PrintersManagement {
 
   static addPrinter(newPrinter) {
     // Insert Blank Row at top of printer list
-    if (document.getElementById("printerNewTable").classList.contains("d-none")) {
+    if (
+      document.getElementById("printerNewTable").classList.contains("d-none")
+    ) {
       document.getElementById("printerNewTable").classList.remove("d-none");
     }
 
@@ -102,18 +102,24 @@ export class PrintersManagement {
       );
     }
     let currentIndex = JSON.parse(JSON.stringify(newPrintersIndex));
-    document.getElementById(`delButton-${newPrintersIndex}`).addEventListener("click", (event) => {
-      UI.removeLine(document.getElementById(`newPrinterCard-${currentIndex}`));
-      const table = document.getElementById("printerNewTable");
-      if (table.rows.length === 1) {
-        if (!table.classList.contains("d-none")) {
-          table.classList.add("d-none");
+    document
+      .getElementById(`delButton-${newPrintersIndex}`)
+      .addEventListener("click", (event) => {
+        UI.removeLine(
+          document.getElementById(`newPrinterCard-${currentIndex}`)
+        );
+        const table = document.getElementById("printerNewTable");
+        if (table.rows.length === 1) {
+          if (!table.classList.contains("d-none")) {
+            table.classList.add("d-none");
+          }
         }
-      }
-    });
-    document.getElementById(`saveButton-${newPrintersIndex}`).addEventListener("click", (event) => {
-      PrintersManagement.savePrinter(event.target);
-    });
+      });
+    document
+      .getElementById(`saveButton-${newPrintersIndex}`)
+      .addEventListener("click", (event) => {
+        PrintersManagement.savePrinter(event.target);
+      });
     newPrintersIndex++;
   }
 
@@ -133,7 +139,7 @@ export class PrintersManagement {
             cameraURL: "Key not found",
             name: "Key not found",
             group: "Key not found",
-            apikey: "Key not found"
+            apikey: "Key not found",
           };
           if (typeof newPrinter.name !== "undefined") {
             printer.name = newPrinter.name;
@@ -169,23 +175,25 @@ export class PrintersManagement {
 
   static async deletePrinter(deletedPrinters) {
     const deletingAlert = UI.createAlert(
-        "warning",
-        `Deleting ${[...deletedPrinters]} from the farm...`,
-        0
+      "warning",
+      `Deleting ${[...deletedPrinters]} from the farm...`,
+      0
     );
     if (deletedPrinters.length > 0) {
-        const printersToRemove = await OctoFarmClient.post("printers/remove", { idList: deletedPrinters });
-        const { printersRemoved } = printersToRemove;
-        deletingAlert.close();
-        printersRemoved.forEach((printer) => {
-          UI.createAlert(
-            "success",
-            `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
-            1000,
-            "Clicked"
-          );
-          document.getElementById(`printerCard-${printer.printerId}`).remove();
-        });
+      const printersToRemove = await OctoFarmClient.post("printers/remove", {
+        idList: deletedPrinters,
+      });
+      const { printersRemoved } = printersToRemove;
+      deletingAlert.close();
+      printersRemoved.forEach((printer) => {
+        UI.createAlert(
+          "success",
+          `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
+          1000,
+          "Clicked"
+        );
+        document.getElementById(`printerCard-${printer.printerId}`).remove();
+      });
     } else {
       deletingAlert.close();
       UI.createAlert(
@@ -199,94 +207,96 @@ export class PrintersManagement {
 
   static async savePrinter(event) {
     // Gather the printer data...
-      let newId = event.id.split("-");
-      newId = newId[1];
+    let newId = event.id.split("-");
+    newId = newId[1];
 
-      // Grab new printer cells...
-      const printerURL = document.getElementById(`newPrinterURL-${newId}`);
-      const printerCamURL = document.getElementById(`newPrinterCamURL-${newId}`);
-      const printerAPIKEY = document.getElementById(`newPrinterAPIKEY-${newId}`);
-      const printerGroup = document.getElementById(`newPrinterGroup-${newId}`);
-      const printerName = document.getElementById(`newPrinterName-${newId}`);
+    // Grab new printer cells...
+    const printerURL = document.getElementById(`newPrinterURL-${newId}`);
+    const printerCamURL = document.getElementById(`newPrinterCamURL-${newId}`);
+    const printerAPIKEY = document.getElementById(`newPrinterAPIKEY-${newId}`);
+    const printerGroup = document.getElementById(`newPrinterGroup-${newId}`);
+    const printerName = document.getElementById(`newPrinterName-${newId}`);
 
-      const errors = [];
-      let printCheck = -1;
-      if (printerURL.value !== "") {
-        const printerInfo = await OctoFarmClient.listPrinters();
-        printCheck = _.findIndex(printerInfo, function (o) {
-          return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
+    const errors = [];
+    let printCheck = -1;
+    if (printerURL.value !== "") {
+      const printerInfo = await OctoFarmClient.listPrinters();
+      printCheck = _.findIndex(printerInfo, function (o) {
+        return (
+          JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value)
+        );
+      });
+    }
+    // Check information is filled correctly...
+    if (
+      printerURL.value === "" ||
+      printCheck > -1 ||
+      printerAPIKEY.value === "" ||
+      printerName.value === "" ||
+      printerCamURL.value === "" ||
+      printerName.value.length > 50
+    ) {
+      if (printerURL.value === "") {
+        errors.push({
+          type: "warning",
+          msg: "Please input your printers URL",
         });
       }
-      // Check information is filled correctly...
-      if (
-        printerURL.value === "" ||
-        printCheck > -1 ||
-        printerAPIKEY.value === "" ||
-        printerName.value === "" ||
-        printerCamURL.value === "" || printerName.value.length > 50
-      ) {
-        if (printerURL.value === "") {
-          errors.push({
-            type: "warning",
-            msg: "Please input your printers URL"
-          });
-        }
-        if (printerAPIKEY.value === "") {
-          errors.push({
-            type: "warning",
-            msg: "Please input your printers API Key"
-          });
-        }
-        if (printerName.value.length > 50){
-          errors.push({
-            type: "warning",
-            msg: "Printer names must be less than 50 characters"
-          });
-        }
-        if (printCheck > -1) {
-          errors.push({
-            type: "error",
-            msg: `Printer URL: ${printerURL.value} already exists on farm`
-          });
-        }
-      }
-      if (errors.length > 0) {
-        errors.forEach((error) => {
-          UI.createAlert(error.type, error.msg, 3000, "clicked");
+      if (printerAPIKEY.value === "") {
+        errors.push({
+          type: "warning",
+          msg: "Please input your printers API Key",
         });
-      } else {
-        const saveButton = document.getElementById(`saveButton-${newId}`);
-        saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
-        saveButton.disabled = true;
-
-        const printer = new PrintersManagement(
-          printerURL.value,
-          printerCamURL.value,
-          printerAPIKEY.value,
-          printerGroup.value,
-          printerName.value
-        ).build();
-        const printersToAdd = await OctoFarmClient.post("printers/add", printer);
-        const { printersAdded } = printersToAdd;
-        printersAdded.forEach((p) => {
-          UI.createAlert(
-            "success",
-            `Printer: ${p.printerURL} has successfully been added to the farm...`,
-            500,
-            "Clicked"
-          );
+      }
+      if (printerName.value.length > 50) {
+        errors.push({
+          type: "warning",
+          msg: "Printer names must be less than 50 characters",
         });
-        event.parentElement.parentElement.parentElement.remove();
-        saveButton.innerHTML = "<i class=\"fas fa-save\"></i>";
-        saveButton.disabled = false;
       }
-      const table = document.getElementById("printerNewTable");
-      if (table.rows.length === 1) {
-        if (!table.classList.contains("d-none")) {
-          table.classList.add("d-none");
-        }
+      if (printCheck > -1) {
+        errors.push({
+          type: "error",
+          msg: `Printer URL: ${printerURL.value} already exists on farm`,
+        });
       }
+    }
+    if (errors.length > 0) {
+      errors.forEach((error) => {
+        UI.createAlert(error.type, error.msg, 3000, "clicked");
+      });
+    } else {
+      const saveButton = document.getElementById(`saveButton-${newId}`);
+      saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
+      saveButton.disabled = true;
 
+      const printer = new PrintersManagement(
+        printerURL.value,
+        printerCamURL.value,
+        printerAPIKEY.value,
+        printerGroup.value,
+        printerName.value
+      ).build();
+      const printersToAdd = await OctoFarmClient.post("printers/add", printer);
+      const { printersAdded } = printersToAdd;
+      printersAdded.forEach((p) => {
+        UI.createAlert(
+          "success",
+          `Printer: ${p.printerURL} has successfully been added to the farm...`,
+          500,
+          "Clicked"
+        );
+      });
+      event.parentElement.parentElement.parentElement.remove();
+      saveButton.innerHTML = "<i class=\"fas fa-save\"></i>";
+      saveButton.disabled = false;
+    }
+    const table = document.getElementById("printerNewTable");
+    if (table.rows.length === 1) {
+      if (!table.classList.contains("d-none")) {
+        table.classList.add("d-none");
+      }
+    }
   }
 
   build() {

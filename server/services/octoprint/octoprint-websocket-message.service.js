@@ -122,12 +122,8 @@ class OctoprintWebsocketMessageService {
       case OP_WS_MSG.plugin:
         OP_EM.handlePluginData(printerID, data);
         break;
-      case OP_WS_MSG.timelapse:
-        OP_EM.handleTimelapseData(printerID, data);
-        break;
-      case OP_WS_MSG.slicingProgress:
-        OP_EM.handleSlicingData(printerID, data);
-        break;
+      default:
+        logger.debug("No case matched... ignoring data", data);
     }
   }
 
@@ -167,7 +163,6 @@ class OctoprintWebsocketMessageService {
     };
 
     getPrinterStoreCache().updatePrinterState(printerID, currentState);
-    // logger.error(printerID + "HISTORY DATA RECEIVED", data);
   }
   static async handleEventData(printerID, data) {
     const { type, payload } = data.event;
@@ -296,7 +291,6 @@ class OctoprintWebsocketMessageService {
         captureZChange(printerID, payload);
         break;
     }
-    //logger.error(printerID + "EVENT DATA RECEIVED", data);
   }
   static handlePluginData(printerID, message) {
     const OP_EM = OctoprintWebsocketMessageService;
@@ -318,15 +312,19 @@ class OctoprintWebsocketMessageService {
         captureResourceMonitorData(printerID, data);
         break;
       case OP_WS_PLUGIN_KEYS.display_layer_progress:
+        // Silence the other outputs from the plugin
+        break;
+      case OP_WS_PLUGIN_KEYS.display_layer_progress_ws_payload:
+        // Capture websocket data, it's all we need
         captureDisplayLayerProgress(printerID, data);
         break;
       default:
-        logger.debug("Unknown plugin detected!", { header, type });
-        logger.debug("Unknown data!", data);
+        logger.warning("Unknown plugin detected!", { header, type });
+        logger.warning("Unknown data!", data);
+        logger.info(
+          "This plugin is currently un-supported, please open a discussion if you'd like it supporting in OctoFarm!"
+        );
     }
   }
-  static handleTimelapseData(printerID, data) {
-  }
-  static handleSlicingData(printerID, data) {}
 }
 module.exports = OctoprintWebsocketMessageService;

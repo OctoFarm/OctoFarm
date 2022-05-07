@@ -23,4 +23,3 @@ export const setCurrentUploadLimit = () => {};
 export const getFileListElement = (id) => {
   return document.getElementById(`fileList-${id}`);
 };
-

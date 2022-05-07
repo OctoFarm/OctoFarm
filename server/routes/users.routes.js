@@ -19,9 +19,11 @@ const {
 } = require("../services/users.service");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
+const Logger = require("../handlers/logger");
+const logger = new Logger("OctoFarm-API")
 
 // Login Page
-router.get("/login", async (req, res) => {
+router.get("/login", async (_req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   res.render("login", {
     page: "Login",
@@ -42,6 +44,7 @@ router.post(
   async function (req, res, next) {
     const prevSession = req.session;
     req.session.regenerate((err) => {
+      logger.error("Unable to regenerate session!", err);
       Object.assign(req.session, prevSession);
     });
 
@@ -61,13 +64,13 @@ router.post(
       return next();
     });
   },
-  (req, res) => {
+  (_req, res) => {
     res.redirect("/dashboard");
   }
 );
 
 // Register Page
-router.get("/register", async (req, res) => {
+router.get("/register", async (_req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   if (serverSettings.server.registration !== true) {
     return res.redirect("login");
@@ -143,7 +146,7 @@ router.post("/register", async (req, res) => {
       } else {
         // Check if first user that's created.
         User.find({}).then(async (userList) => {
-          let userGroup = "";
+          let userGroup;
           if (userList.length < 1) {
             userGroup = "Administrator";
           } else {
@@ -162,22 +165,29 @@ router.post("/register", async (req, res) => {
           // Hash Password
           bcrypt.genSalt(10, (error, salt) =>
             bcrypt.hash(newUser.password, salt, (err, hash) => {
-              if (err) throw err;
+              if (err) {
+                logger.error("Unable to generate bycrpt hash!!", err);
+                throw err;
+              };
               // Set password to hashed
               newUser.password = hash;
               // Save new User
               newUser
                 .save()
                 .then(async () => {
-                  const currentSettings = await ServerSettingsDB.find({});
-                  currentSettings[0].server.registration = false;
-                  currentSettings[0].markModified("server.registration");
-                  currentSettings[0].save();
-                  await SettingsClean.start();
+                  if (userList.length < 1) {
+                    const currentSettings = await ServerSettingsDB.find({});
+                    currentSettings[0].server.registration = false;
+                    currentSettings[0].markModified("server.registration");
+                    currentSettings[0].save();
+                    await SettingsClean.start();
+                  }
                   req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
-                .catch((theError) => console.error(theError))
+                .catch((theError) => {
+                  logger.error("Couldn't save user to database!", theError);
+                })
                 .finally(async () => {
                   await fetchUsers(true);
                 });
@@ -218,15 +228,17 @@ router.patch(
     const newUserInformation = {
       name: req.bodyString("name"),
       username: req.bodyString("username"),
-      group: req.bodyString("group")
+      group: req.bodyString("group"),
+      password: req.bodyString("password"),
+      password2: req.bodyString("password2")
     };
     const id = req.paramString("id");
 
     if ("password" in newUserInformation) {
-      res.send(await resetPassword(id, newUserInformation));
+      return res.send(await resetPassword(id, newUserInformation));
     }
     if ("username" in newUserInformation) {
-      res.send(await editUser(id, newUserInformation));
+      return res.send(await editUser(id, newUserInformation));
     }
   }
 );

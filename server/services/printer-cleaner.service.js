@@ -5,7 +5,6 @@ const ErrorLogs = require("../models/ErrorLog.js");
 const TempHistory = require("../models/TempHistory.js");
 const PluginLogs = require("../models/PluginLogs.js");
 const UserActions = require("../models/userActionsLog");
-const Printer = require("../models/Printer");
 const { PrinterTicker } = require("./printer-connection-log.service.js");
 const { generateRandomName } = require("./printer-name-generator.service");
 const {
@@ -25,7 +24,6 @@ class PrinterCleanerService {
   }
 
   static async generateConnectionLogs(farmPrinter) {
-    const currentPrinter = Printer.findById(farmPrinter._id);
     const printerErrorLogs = await ErrorLogs.find({ "errorLog.printerID": farmPrinter._id })
       .sort({ _id: -1 })
       .limit(1000);
@@ -70,7 +68,7 @@ class PrinterCleanerService {
           fullPath: element?.fullPath,
           action: element.action
         };
-        currentUserActionLogs.push(userActionLog)
+        currentUserActionLogs.push(userActionLog);
       }
     }
 
@@ -89,13 +87,13 @@ class PrinterCleanerService {
       }
     }
     let currentIssues = PrinterTicker.returnIssue();
-    for (let i = 0; i < currentIssues.length; i++) {
-      if (!!currentIssues[i] && currentIssues[i].printerID === farmPrinter._id) {
+    for (const issue of currentIssues) {
+      if (!!issue && issue.printerID === farmPrinter._id) {
         let errorFormat = {
-          date: currentIssues[i].date,
-          message: currentIssues[i].message,
-          printer: currentIssues[i].printer,
-          state: currentIssues[i].state
+          date: issue.date,
+          message: issue.message,
+          printer: issue.printer,
+          state: issue.state
         };
         currentOctoFarmLogs.push(errorFormat);
       }
@@ -129,9 +127,9 @@ class PrinterCleanerService {
     if (typeof tempHistory !== "undefined") {
       for (const element of tempHistory) {
         let hist = element.currentTemp;
-        const reFormatTempHistory = async function (tempHistory) {
+        const reFormatTempHistory = async function (tempHis) {
           // create a new object to store full name.
-          let keys = Object.keys(tempHistory);
+          let keys = Object.keys(tempHis);
           let array = [];
 
           for (let k = 0; k < keys.length; k++) {
@@ -229,8 +227,6 @@ class PrinterCleanerService {
 
     return otherSettings;
   }
-
-  static sortTerminal(logs, currentLogs) {}
 
   static sortGCODE(settings) {
     if (typeof settings !== "undefined") {

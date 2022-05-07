@@ -111,7 +111,8 @@ const OP_WS_PLUGIN_KEYS = {
   psucontrol: "psucontrol", //Not used
   pi_support: "pi_support",
   resource_monitor: "resource_monitor",
-  display_layer_progress: "DisplayLayerProgress-websocket-payload"
+  display_layer_progress_ws_payload: "DisplayLayerProgress-websocket-payload",
+  display_layer_progress: "DisplayLayerProgress"
 };
 
 module.exports = {

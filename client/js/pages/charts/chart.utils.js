@@ -1,4 +1,10 @@
-import {actualToolSeriesName, darkColor, dataLabelBackground, defaultLoadingText, defaultTheme} from "./chart.options";
+import {
+  actualToolSeriesName,
+  darkColor,
+  dataLabelBackground,
+  defaultLoadingText,
+  defaultTheme,
+} from "./chart.options";
 import Calc from "../../utils/calc";
 
 export const toFixedTempCelciusFormatter = (value) => {
@@ -79,8 +85,8 @@ export function clippedPercentageFormatter(value) {
 export function noZoom() {
   return {
     zoom: {
-      enabled: false
-    }
+      enabled: false,
+    },
   };
 }
 
@@ -90,7 +96,7 @@ export function defaultDarkColor() {
 
 export function defaultBackground() {
   return {
-    background: defaultDarkColor()
+    background: defaultDarkColor(),
   };
 }
 
@@ -104,61 +110,61 @@ export function tooltipDataPointFormatter(val, opt) {
 
 export function defaultChartWidth() {
   return {
-    width: "100%"
+    width: "100%",
   };
 }
 
 export function fullChartDimensions() {
   return {
     width: "100%",
-    height: "100%"
+    height: "100%",
   };
 }
 
 export function defaultChartDimensions() {
   return {
     ...defaultChartWidth(),
-    height: "90%"
+    height: "90%",
   };
 }
 
 export function theme() {
   return {
     theme: {
-      mode: defaultTheme
-    }
+      mode: defaultTheme,
+    },
   };
 }
 
 export function loadingText() {
   return {
     noData: {
-      text: defaultLoadingText
-    }
+      text: defaultLoadingText,
+    },
   };
 }
 
 export function showToolbar(enabled = false) {
   return {
     toolbar: {
-      show: enabled
-    }
+      show: enabled,
+    },
   };
 }
 
 export function enableAnimations(enabled = false) {
   return {
     animations: {
-      enabled
-    }
+      enabled,
+    },
   };
 }
 
 export function showStroke(enabled = false) {
   return {
     stroke: {
-      show: enabled
-    }
+      show: enabled,
+    },
   };
 }
 
@@ -170,45 +176,45 @@ export function getDefaultWeightDataLabelFormat() {
   return {
     enabled: false,
     background: defaultDataLabelBackground,
-    formatter: toFixedWeightGramFormatter
+    formatter: toFixedWeightGramFormatter,
   };
 }
 
 export function getChartLabel(shortName, seriesName, formatter, min, max) {
   return {
     title: {
-      text: shortName
+      text: shortName,
     },
     seriesName: seriesName,
     labels: {
-      formatter: formatter
+      formatter: formatter,
     },
     min,
-    max
+    max,
   };
 }
 
 export function getToolTempSeries(titleText) {
   return {
     title: {
-      text: titleText
+      text: titleText,
     },
     seriesName: actualToolSeriesName,
     labels: {
-      formatter: toFixedTempCelciusFormatter
-    }
+      formatter: toFixedTempCelciusFormatter,
+    },
   };
 }
 
 export function getUsageWeightSeries(titleText, seriesName) {
   return {
     title: {
-      text: titleText
+      text: titleText,
     },
     seriesName: seriesName,
     labels: {
-      formatter: toFixedWeightGramFormatter
-    }
+      formatter: toFixedWeightGramFormatter,
+    },
   };
 }
 
@@ -217,8 +223,8 @@ export function getHiddenToolTempRepeated(count) {
     seriesName: actualToolSeriesName,
     show: false,
     labels: {
-      formatter: toFixedTempCelciusFormatter
-    }
+      formatter: toFixedTempCelciusFormatter,
+    },
   };
 
   const templateSeriesStringified = JSON.stringify(hiddenToolSeries);
@@ -237,9 +243,21 @@ export const temperatureLabel = getChartLabel(
   45
 );
 
-export const humidityLabel = getChartLabel("Humidity", "Humidity", percentageFormatter, 0, 100);
+export const humidityLabel = getChartLabel(
+  "Humidity",
+  "Humidity",
+  percentageFormatter,
+  0,
+  100
+);
 
-export const pressureLabel = getChartLabel("Pressure", "Pressure", pascalPressureFormatter, 0, 100);
+export const pressureLabel = getChartLabel(
+  "Pressure",
+  "Pressure",
+  pascalPressureFormatter,
+  0,
+  100
+);
 
 export const iaqLabel = getChartLabel(
   "Indoor Air Quality",

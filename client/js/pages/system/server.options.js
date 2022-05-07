@@ -7,7 +7,7 @@ const serverDatabaseKeys = {
   PRINTERS: "Printers",
   ROOMDATA: "RoomData",
   SERVER: "ServerSettings",
-  USERS: "User"
+  USERS: "User",
 };
 
 const serverActionsElements = {
@@ -20,14 +20,16 @@ const serverActionsElements = {
   UPDATE_OCTOFARM: document.getElementById("updateOctoFarmBtn"),
   CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn"),
   OP_FILAMENT_SETUP: document.getElementById("filamentManagerPluginSetupBtn"),
-  CLEAR_OLD_LOGS: document.getElementById("clearOldLogs")
+  CLEAR_OLD_LOGS: document.getElementById("clearOldLogs"),
+  SERVER_TASK_LIST: document.getElementById("systemTasksTable"),
+  ACTIVE_USERS_ROW: document.getElementById("activeUsersRow")
 };
 
 const filamentManagerPluginActionElements = {
   postgresURI: document.getElementById("filamentPostGresURI"),
   databaseName: document.getElementById("filamentDatebaseName"),
   username: document.getElementById("filamentUsername"),
-  password: document.getElementById("filamentPassword")
+  password: document.getElementById("filamentPassword"),
 };
 
 const userActionElements = {
@@ -48,45 +50,45 @@ const userActionElements = {
   createPassword2: document.getElementById("createPassword2"),
   createUserFooter: document.getElementById("userCreateModalFooter"),
   userCreateMessage: document.getElementById("userCreateMessage"),
-  userTableContent: document.getElementById("userTable")
+  userTableContent: document.getElementById("userTable"),
 };
 
 const localStorageKeys = {
-  DASHBOARD_SETTINGS: "dashboardConfiguration"
+  DASHBOARD_SETTINGS: "dashboardConfiguration",
 };
 
 const settingsElements = {
   server: {
     loginRequired: document.getElementById("requireLogin"),
-    registration: document.getElementById("requireRegistration")
+    registration: document.getElementById("requireRegistration"),
   },
   timeout: {
     webSocketRetry: document.getElementById("webSocketRetry"),
     apiTimeout: document.getElementById("APITimeout"),
     apiRetryCutoff: document.getElementById("APIRetryTimeout"),
-    apiRetry: document.getElementById("APIRetry")
+    apiRetry: document.getElementById("APIRetry"),
   },
   filament: {
     filamentCheck: document.getElementById("checkFilament"),
     hideEmpty: document.getElementById("hideEmpty"),
     downDateFailed: document.getElementById("downDateFailed"),
     downDateSuccess: document.getElementById("downDateSuccess"),
-    allowMultiSelect: document.getElementById("allowMultiSelect")
+    allowMultiSelect: document.getElementById("allowMultiSelect"),
   },
   history: {
     snapshot: {
       onComplete: document.getElementById("snapOnComplete"),
-      onFailure: document.getElementById("snapOnFailure")
+      onFailure: document.getElementById("snapOnFailure"),
     },
     thumbnails: {
       onComplete: document.getElementById("thumbOnComplete"),
-      onFailure: document.getElementById("thumbOnFailure")
+      onFailure: document.getElementById("thumbOnFailure"),
     },
     timelapse: {
       onComplete: document.getElementById("timelapseOnComplete"),
       onFailure: document.getElementById("timelapseOnFailure"),
-      deleteAfter: document.getElementById("timelapseDelete")
-    }
+      deleteAfter: document.getElementById("timelapseDelete"),
+    },
   },
   influxExport: {
     active: document.getElementById("infActivateInfluxExport"),
@@ -98,8 +100,8 @@ const settingsElements = {
     retentionPolicy: {
       duration: document.getElementById("infDuration"),
       replication: document.getElementById("infReplication"),
-      defaultRet: document.getElementById("infRetention")
-    }
+      defaultRet: document.getElementById("infRetention"),
+    },
   },
   monitoringViews: {
     panel: document.getElementById("monitoring-panel"),
@@ -107,8 +109,8 @@ const settingsElements = {
     camera: document.getElementById("monitoring-camera"),
     group: document.getElementById("monitoring-group"),
     currentOperations: document.getElementById("monitoring-currentOperations"),
-    combined: document.getElementById("monitoring-combined")
-  }
+    combined: document.getElementById("monitoring-combined"),
+  },
 };
 
 function returnSaveBtn() {
@@ -124,5 +126,5 @@ export {
   settingsElements,
   userActionElements,
   returnSaveBtn,
-  filamentManagerPluginActionElements
+  filamentManagerPluginActionElements,
 };

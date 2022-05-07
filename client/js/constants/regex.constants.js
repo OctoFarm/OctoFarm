@@ -1,1 +1,1 @@
-export const findDigitsInString = /(\d+)/
+export const findDigitsInString = /(\d+)/;

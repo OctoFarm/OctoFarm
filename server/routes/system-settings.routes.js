@@ -440,7 +440,7 @@ router.post("/client/logs", ensureAuthenticated, async (req, res) => {
     clientLogger.warning(loggingMessage, errorObject);
   } else {
     clientLogger.error(loggingMessage, errorObject);
-    clientLogger.info("Developer Message: ", developerMessage)
+    clientLogger.info("Developer Message: ", developerMessage);
   }
 });
 

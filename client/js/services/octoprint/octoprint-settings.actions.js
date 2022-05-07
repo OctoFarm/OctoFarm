@@ -1,5 +1,6 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "../octofarm-client.service";
+import {isPrinterDisconnected} from "../../utils/octofarm.utils";
 
 async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   let successfulPrinters = "";
@@ -8,8 +9,8 @@ async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   const webCamSettings = {
     webcam: {
       ffmpegVideoCodec: "libx264",
-      webcamEnabled: true
-    }
+      webcamEnabled: true,
+    },
   };
   for (const printer of printers) {
     if (printer.printerState.colour.category !== "Offline") {
@@ -23,7 +24,7 @@ async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   }
   return {
     successfulPrinters,
-    failedPrinters
+    failedPrinters,
   };
 }
 
@@ -41,14 +42,18 @@ async function setupOctoPrintForFilamentManager(printers, settings) {
           name: name,
           user: user,
           password: password,
-          useExternal: true
-        }
-      }
-    }
+          useExternal: true,
+        },
+      },
+    },
   };
   for (let i = 0; i < printers.length; i++) {
     if (printers[i].printerState.colour.category !== "Offline") {
-      await OctoPrintClient.post(printers[i], "settings", filamentManagerSettings);
+      await OctoPrintClient.post(
+        printers[i],
+        "settings",
+        filamentManagerSettings
+      );
       await OctoFarmClient.refreshPrinterSettings(printers[i]._id);
       successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
     } else {
@@ -57,7 +62,7 @@ async function setupOctoPrintForFilamentManager(printers, settings) {
   }
   return {
     successfulPrinters,
-    failedPrinters
+    failedPrinters,
   };
 }
 
@@ -68,27 +73,31 @@ async function setupOctoPrintForVirtualPrinter(printers) {
   let virtualPrinterSettings = {
     plugins: {
       virtual_printer: {
-        enabled: true
-      }
-    }
+        enabled: true,
+      },
+    },
   };
-  for (let i = 0; i < printers.length; i++) {
-    if (printers[i].printerState.colour.category !== "Offline") {
-      await OctoPrintClient.post(printers[i], "settings", virtualPrinterSettings);
-      await OctoFarmClient.refreshPrinterSettings(printers[i]._id);
-      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
+  for (const printer of printers) {
+    if (printer.printerState.colour.category !== "Offline") {
+      await OctoPrintClient.post(
+        printer,
+        "settings",
+        virtualPrinterSettings
+      );
+      await OctoFarmClient.refreshPrinterSettings(printer._id);
+      successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printer.printerName}: Settings Updated! <br>`;
     } else {
-      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printers[i].printerName}: Offline! <br>`;
+      failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printer.printerName}: Offline! <br>`;
     }
   }
   return {
     successfulPrinters,
-    failedPrinters
+    failedPrinters,
   };
 }
 
 export {
   setupOctoPrintForTimelapses,
   setupOctoPrintForFilamentManager,
-  setupOctoPrintForVirtualPrinter
+  setupOctoPrintForVirtualPrinter,
 };

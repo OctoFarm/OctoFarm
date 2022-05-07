@@ -1,13 +1,19 @@
 import OctoPrintClient from "../../../services/octoprint/octoprint-client.service";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import CustomGenerator from "../../../services/custom-gcode-scripts.service.js";
-import {setupClientSwitchDropDown} from "../../../services/modal-printer-select.service";
-import "../../../utils/cleanup-modals.util"
-import {setupConnectButton, setupConnectButtonListeners, updateConnectButtonState} from "./connect-button.service";
-import {closePrinterManagerModalIfOffline,
-  imageOrCamera} from "../../../utils/octofarm.utils";
-import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../../exceptions/application-error.handler";
+import { setupClientSwitchDropDown } from "../../../services/modal-printer-select.service";
+import "../../../utils/cleanup-modals.util";
+import {
+  setupConnectButton,
+  setupConnectButtonListeners,
+  updateConnectButtonState,
+} from "./connect-button.service";
+import {
+  closePrinterManagerModalIfOffline,
+  imageOrCamera,
+} from "../../../utils/octofarm.utils";
+import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../../exceptions/application-error.handler";
 
 let currentIndex = 0;
 
@@ -29,7 +35,12 @@ export default class PrinterTerminalManagerService {
         PrinterTerminalManagerService.init(value, printers, printerControlList);
       };
 
-      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+      setupClientSwitchDropDown(
+        currentPrinter._id,
+        printerControlList,
+        changeFunction,
+        true
+      );
 
       //Load the printer dropdown
       await PrinterTerminalManagerService.loadPrinter(
@@ -40,7 +51,8 @@ export default class PrinterTerminalManagerService {
       elements.terminal.terminalWindow.innerHTML = "";
       await PrinterTerminalManagerService.applyState(currentPrinter, elements);
       PrinterTerminalManagerService.applyListeners(elements, currentPrinter);
-      elements.terminal.terminalWindow.scrollTop = elements.terminal.terminalWindow.scrollHeight;
+      elements.terminal.terminalWindow.scrollTop =
+        elements.terminal.terminalWindow.scrollHeight;
     } else {
       if (document.getElementById("terminal")) {
         const id = _.findIndex(printers, function (o) {
@@ -49,7 +61,10 @@ export default class PrinterTerminalManagerService {
         currentPrinter = printers[id];
 
         const elements = PrinterTerminalManagerService.grabPage();
-        await PrinterTerminalManagerService.applyState(currentPrinter, elements);
+        await PrinterTerminalManagerService.applyState(
+          currentPrinter,
+          elements
+        );
         document.getElementById("printerManagerModal").style.overflow = "auto";
       }
     }
@@ -127,13 +142,13 @@ export default class PrinterTerminalManagerService {
     } catch (e) {
       console.error(e);
       const errorObject = ClientErrors.SILENT_ERROR;
-      errorObject.message =  `Printer Terminal - ${e}`
-      throw new ApplicationError(errorObject)
+      errorObject.message = `Printer Terminal - ${e}`;
+      throw new ApplicationError(errorObject);
     }
   }
 
   static applyListeners(elements, printer) {
-    setupConnectButtonListeners(printer, elements.connectPage.connectButton)
+    setupConnectButtonListeners(printer, elements.connectPage.connectButton);
 
     const submitTerminal = async function (e) {
       let input = elements.terminal.input.value.match(/[^\r\n]+/g);
@@ -156,9 +171,13 @@ export default class PrinterTerminalManagerService {
         elements.terminal.sendBtn.classList = "btn btn-secondary";
       };
       const opt = {
-        commands: input
+        commands: input,
       };
-      const post = await OctoPrintClient.post(currentPrinter, "printer/command", opt);
+      const post = await OctoPrintClient.post(
+        currentPrinter,
+        "printer/command",
+        opt
+      );
       if (post.status === 204) {
         elements.terminal.sendBtn.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
@@ -181,10 +200,12 @@ export default class PrinterTerminalManagerService {
     return {
       mainPage: {
         title: document.getElementById("printerSelection"),
-        status: document.getElementById("pmStatus")
+        status: document.getElementById("pmStatus"),
       },
       jobStatus: {
-        expectedCompletionDate: document.getElementById("pmExpectedCompletionDate"),
+        expectedCompletionDate: document.getElementById(
+          "pmExpectedCompletionDate"
+        ),
         expectedTime: document.getElementById("pmExpectedTime"),
         remainingTime: document.getElementById("pmTimeRemain"),
         elapsedTime: document.getElementById("pmTimeElapsed"),
@@ -198,7 +219,7 @@ export default class PrinterTerminalManagerService {
         printerResends: document.getElementById("printerResends"),
         resendTitle: document.getElementById("resentTitle"),
         dlpPluginDataTitle: document.getElementById("dlpPluginDataTitle"),
-        dlpPluginDataData: document.getElementById("dlpPluginDataData")
+        dlpPluginDataData: document.getElementById("dlpPluginDataData"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -208,12 +229,12 @@ export default class PrinterTerminalManagerService {
         connectButton: document.getElementById("pmConnect"),
         portDropDown: document.getElementById("pmSerialPort"),
         baudDropDown: document.getElementById("pmBaudrate"),
-        profileDropDown: document.getElementById("pmProfile")
+        profileDropDown: document.getElementById("pmProfile"),
       },
       terminal: {
         terminalWindow: document.getElementById("terminal"),
         sendBtn: document.getElementById("terminalInputBtn"),
-        input: document.getElementById("terminalInput")
+        input: document.getElementById("terminalInput"),
       },
       printerControls: {
         filamentDrop: document.getElementById("filamentManagerFolderSelect"),
@@ -246,7 +267,7 @@ export default class PrinterTerminalManagerService {
         printPause: document.getElementById("pmPrintPause"),
         printRestart: document.getElementById("pmPrintRestart"),
         printResume: document.getElementById("pmPrintResume"),
-        printStop: document.getElementById("pmPrintStop")
+        printStop: document.getElementById("pmPrintStop"),
       },
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),
@@ -256,21 +277,23 @@ export default class PrinterTerminalManagerService {
         uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
         syncFiles: document.getElementById("fileReSync"),
         back: document.getElementById("fileBackBtn"),
-        createFolderBtn: document.getElementById("createFolderBtn")
+        createFolderBtn: document.getElementById("createFolderBtn"),
       },
       temperatures: {
         tempTime: document.getElementById("pmTempTime"),
         bed: document.querySelectorAll("[id^='bed']"),
         chamber: document.querySelectorAll("[id^='chamber']"),
-        tools: document.querySelectorAll("[id^='tool']")
+        tools: document.querySelectorAll("[id^='tool']"),
       },
-      filamentDrops: document.querySelectorAll("[id$=FilamentManagerFolderSelect]")
+      filamentDrops: document.querySelectorAll(
+        "[id$=FilamentManagerFolderSelect]"
+      ),
     };
   }
 
   static async applyState(printer, elements) {
-    if(closePrinterManagerModalIfOffline(printer)){
-      return
+    if (closePrinterManagerModalIfOffline(printer)) {
+      return;
     }
 
     //Garbage collection for terminal
@@ -285,7 +308,8 @@ export default class PrinterTerminalManagerService {
       const tempCheck = document.getElementById("tempMessages").checked;
       const sdCheck = document.getElementById("sdMessages").checked;
       for (let l = 0; l < printer.terminal.length; l++) {
-        const tempMess = /(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+)?.*(B|T\d*):\d+)/;
+        const tempMess =
+          /(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+)?.*(B|T\d*):\d+)/;
         const sdMess = /(Send: (N\d+\s+)?M27)|(Recv: SD printing byte)/;
         const sdMess2 = /Recv: Not SD printing/;
         const waitMess = /Recv: wait/;
@@ -305,7 +329,10 @@ export default class PrinterTerminalManagerService {
         `
             );
           }
-        } else if (printer.terminal[l].match(sdMess) || printer.terminal[l].match(sdMess2)) {
+        } else if (
+          printer.terminal[l].match(sdMess) ||
+          printer.terminal[l].match(sdMess2)
+        ) {
           if (sdCheck) {
             elements.terminal.terminalWindow.insertAdjacentHTML(
               "beforeend",
@@ -354,7 +381,13 @@ export default class PrinterTerminalManagerService {
         elements.terminal.terminalWindow.clientHeight;
     }
 
-    updateConnectButtonState(currentPrinter, elements.mainPage.status, elements.connectPage.connectButton, elements.connectPage.printerPort, elements.connectPage.printerBaud, elements.connectPage.printerProfile)
-
+    updateConnectButtonState(
+      currentPrinter,
+      elements.mainPage.status,
+      elements.connectPage.connectButton,
+      elements.connectPage.printerPort,
+      elements.connectPage.printerBaud,
+      elements.connectPage.printerProfile
+    );
   }
 }

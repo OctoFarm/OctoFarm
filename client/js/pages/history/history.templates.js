@@ -5,7 +5,12 @@ export const returnHistoryTableRow = function (record) {
   if (!!record?.spools) {
     record.spools.forEach((tool, index) => {
       spoolType.push(
-        index + ": " + tool["tool" + index].type + " - " + tool["tool" + index].weight + "g"
+        index +
+          ": " +
+          tool["tool" + index].type +
+          " - " +
+          tool["tool" + index].weight +
+          "g"
       );
     });
   } else {
@@ -15,7 +20,7 @@ export const returnHistoryTableRow = function (record) {
   spoolType.forEach((spool) => {
     spoolString.push(spool + "<br>");
   });
-    console.log(record)
+  console.log(record);
   return `
        <tr>
           <td class="d-none">
@@ -28,7 +33,11 @@ export const returnHistoryTableRow = function (record) {
             ${record.printer}
           </td>
           <td>
-            ${record?.activeControlUser ? record.activeControlUser : "No user logged"}
+            ${
+              record?.activeControlUser
+                ? record.activeControlUser
+                : "No user logged"
+            }
           </td>
           <td title="${record.file.path.replace(/_/g, " ")}">
             ${record.file.name.replace(/_/g, " ")}
@@ -104,7 +113,14 @@ const returnSkipPageNumber = function () {
 };
 
 export const returnHistoryPagination = function (pagination) {
-  const { hasPrevPage, hasNextPage, pageCount, currentPage, itemCount, perPage } = pagination;
+  const {
+    hasPrevPage,
+    hasNextPage,
+    pageCount,
+    currentPage,
+    itemCount,
+    perPage,
+  } = pagination;
   let pageList = "";
   let itemsOutOf = `${perPage} Items of ${itemCount}`;
 

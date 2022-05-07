@@ -5,7 +5,7 @@ import {
   localStorageKeys,
   returnSaveBtn,
   serverActionsElements,
-  userActionElements
+  userActionElements,
 } from "./pages/system/server.options";
 import {
   checkFilamentManagerPluginState,
@@ -26,21 +26,25 @@ import {
   startUpdateInfoRunner,
   startUpdateTasksRunner,
   updateOctoFarmCommand,
-  updateServerSettings
+  updateServerSettings,
 } from "./pages/system/server.actions";
-import {serverBootBoxOptions} from "./pages/system/utils/bootbox.options";
-import {removeLocalStorage} from "./services/local-storage.service";
-import { serverDatabaseKeys } from "../../server/constants/database.constants"
+import { serverBootBoxOptions } from "./pages/system/utils/bootbox.options";
+import { removeLocalStorage } from "./services/local-storage.service";
+import { serverDatabaseKeys } from "../../server/constants/database.constants";
 
 // Setup Page
 for (const key in serverDatabaseKeys) {
   if (serverDatabaseKeys.hasOwnProperty(key)) {
-    const elementNuke = document.getElementById(`nuke${serverDatabaseKeys[key]}`);
+    const elementNuke = document.getElementById(
+      `nuke${serverDatabaseKeys[key]}`
+    );
     if (elementNuke) {
       elementNuke.addEventListener("click", async (e) => {
         const alert = UI.createAlert(
           "warning",
-          `${UI.returnSpinnerTemplate()} Deleting ${serverDatabaseKeys[key]} database...`
+          `${UI.returnSpinnerTemplate()} Deleting ${
+            serverDatabaseKeys[key]
+          } database...`
         );
         await nukeDatabases(`${serverDatabaseKeys[key]}DB`, e);
         alert.close();
@@ -48,13 +52,17 @@ for (const key in serverDatabaseKeys) {
     }
 
     if (key !== "ALL") {
-      const elementExport = document.getElementById(`export${serverDatabaseKeys[key]}`);
+      const elementExport = document.getElementById(
+        `export${serverDatabaseKeys[key]}`
+      );
 
       if (elementExport) {
         elementExport.addEventListener("click", async (e) => {
           const alert = UI.createAlert(
             "warning",
-            `${UI.returnSpinnerTemplate()} Preparing ${serverDatabaseKeys[key]} database...`
+            `${UI.returnSpinnerTemplate()} Preparing ${
+              serverDatabaseKeys[key]
+            } database...`
           );
           await exportDatabases(`${serverDatabaseKeys[key]}DB`, e);
           alert.close();
@@ -71,57 +79,80 @@ if (serverActionsElements.LOG_DUMP_GENERATE) {
 }
 
 renderSystemCharts().then();
-startUpdateTasksRunner();
+if (serverActionsElements.SERVER_TASK_LIST) {
+  startUpdateTasksRunner();
+}
+
 startUpdateInfoRunner().then();
 ClientSettings.init().then();
 
-if(serverActionsElements.CLEAR_OLD_LOGS){
+if (serverActionsElements.CLEAR_OLD_LOGS) {
   serverActionsElements.CLEAR_OLD_LOGS.addEventListener("click", async (e) => {
     await clearOldLogs();
-  })
+  });
 }
 
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
-  serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
-    bootbox.dialog(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
-  });
+  serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener(
+    "click",
+    async (e) => {
+      bootbox.dialog(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
+    }
+  );
 }
 
 if (serverActionsElements.OP_FILAMENT_SETUP) {
-  serverActionsElements.OP_FILAMENT_SETUP.addEventListener("click", async (e) => {
-    await setupOPFilamentManagerPluginSettings();
-  });
+  serverActionsElements.OP_FILAMENT_SETUP.addEventListener(
+    "click",
+    async (e) => {
+      await setupOPFilamentManagerPluginSettings();
+    }
+  );
 }
 
 if (serverActionsElements.LOG_DUMP_GENERATE) {
-  serverActionsElements.LOG_DUMP_GENERATE.addEventListener("click", async (e) => {
-    const alert = UI.createAlert(
-      "warning",
-      `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
-    );
-    await generateLogDumpFile();
-    alert.close();
-  });
+  serverActionsElements.LOG_DUMP_GENERATE.addEventListener(
+    "click",
+    async (e) => {
+      const alert = UI.createAlert(
+        "warning",
+        `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
+      );
+      await generateLogDumpFile();
+      alert.close();
+    }
+  );
 }
 
 if (serverActionsElements.RESET_DASHBOARD) {
   serverActionsElements.RESET_DASHBOARD.addEventListener("click", (e) => {
     removeLocalStorage(localStorageKeys.DASHBOARD_SETTINGS);
-    UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
+    UI.createAlert(
+      "success",
+      "Dashboard data cleared from browser",
+      3000,
+      "clicked"
+    );
   });
 }
 
 if (serverActionsElements.SAVE_SERVER_SETTINGS) {
-  serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener("click", async (e) => {
-    // Validate Printer Form, then Add
-    await updateServerSettings();
-  });
+  serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener(
+    "click",
+    async (e) => {
+      // Validate Printer Form, then Add
+      await updateServerSettings();
+    }
+  );
 }
 
 if (serverActionsElements.RESTART_OCTOFARM) {
-  serverActionsElements.RESTART_OCTOFARM.addEventListener("click", async (e) => {
-    await restartOctoFarmServer();
-  });
+  serverActionsElements.RESTART_OCTOFARM.addEventListener(
+    "click",
+    async (e) => {
+      await restartOctoFarmServer();
+    }
+  );
 }
 
 if (serverActionsElements.UPDATE_OCTOFARM) {
@@ -131,16 +162,22 @@ if (serverActionsElements.UPDATE_OCTOFARM) {
 }
 
 if (serverActionsElements.CHECK_OCTOFARM_UPDATES) {
-  serverActionsElements.CHECK_OCTOFARM_UPDATES.addEventListener("click", async (e) => {
-    await checkForOctoFarmUpdates();
-  });
+  serverActionsElements.CHECK_OCTOFARM_UPDATES.addEventListener(
+    "click",
+    async (e) => {
+      await checkForOctoFarmUpdates();
+    }
+  );
 }
 
 if (serverActionsElements.SAVE_CLIENT_SETTINGS) {
-  serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener("click", async (e) => {
-    // Validate Printer Form, then Add
-    await ClientSettings.update();
-  });
+  serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener(
+    "click",
+    async (e) => {
+      // Validate Printer Form, then Add
+      await ClientSettings.update();
+    }
+  );
 }
 
 if (userActionElements.createUserBtn) {
@@ -156,10 +193,10 @@ if (userActionElements.createUserBtn) {
   });
 }
 
-if (serverActionsElements.RESET_DASHBOARD) {
-}
 // Setup user password resets
-const passResetButtons = document.querySelectorAll("*[id^=\"resetPasswordBtn-\"]");
+const passResetButtons = document.querySelectorAll(
+  "*[id^=\"resetPasswordBtn-\"]"
+);
 passResetButtons.forEach((btn) => {
   const split = btn.id.split("-");
   btn.addEventListener("click", (e) => {
@@ -191,8 +228,6 @@ userEditButtons.forEach((btn) => {
   });
 });
 
-if (serverActionsElements.RESET_DASHBOARD) {
-}
 // Setup user deletes
 const deleteButtons = document.querySelectorAll("*[id^=\"deleteUserBtn-\"]");
 deleteButtons.forEach((btn) => {

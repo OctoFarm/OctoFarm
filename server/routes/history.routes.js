@@ -38,7 +38,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
           spool.spools.profile = profile.profile;
           history.printHistory.filamentSelection[f] = spool;
         } else {
-          filamentId.forEach((id, index) => {
+          filamentId.forEach((theID, index) => {
             history.printHistory.filamentSelection[index] = null;
           });
         }
@@ -53,11 +53,11 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
         history.printHistory.filamentSelection = [];
         if (filamentId[f] !== 0) {
           const spool = await Spools.findById(filamentId[f]);
-            const profile = await Profiles.findById(spool.spools.profile);
-            spool.spools.profile = profile.profile;
-            history.printHistory.filamentSelection[f] = spool;
+          const profile = await Profiles.findById(spool.spools.profile);
+          spool.spools.profile = profile.profile;
+          history.printHistory.filamentSelection[f] = spool;
         }
-        }
+      }
     }
   }
   history.markModified("printHistory");

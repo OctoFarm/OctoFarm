@@ -45,8 +45,8 @@ const testAndCollectCostPlugin = (id, currentSettings, plugins) => {
         purchasePrice: plugins["costestimation"].priceOfPrinter,
         estimateLifespan: plugins["costestimation"].lifespanOfPrinter,
         maintenanceCosts: plugins["costestimation"].maintenanceCosts
-      }
-      const pluginData = JSON.stringify(costSettings)
+      };
+      const pluginData = JSON.stringify(costSettings);
       addOctoPrintLogWrapper(
         id,
         "Cost estimation settings found and saved: " + pluginData,
@@ -76,22 +76,22 @@ const testAndCollectPSUControlPlugin = (id, currentSettings, plugins) => {
       purchasePrice: plugins["costestimation"].priceOfPrinter,
       estimateLifespan: plugins["costestimation"].lifespanOfPrinter,
       maintenanceCosts: plugins["costestimation"].maintenanceCosts
-    }
-    const pluginData = JSON.stringify(costSettings)
+    };
+    const pluginData = JSON.stringify(costSettings);
     addOctoPrintLogWrapper(
-        id,
-        "PSU Control plugin found and settings applied: " + pluginData,
-        "Success",
-        "PSU Control"
+      id,
+      "PSU Control plugin found and settings applied: " + pluginData,
+      "Success",
+      "PSU Control"
     );
     return {
-      powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+      powerOnCommand: '{"command":"turnPSUOn"}',
       powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+      powerOffCommand: '{"command":"turnPSUOff"}',
       powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerToggleCommand: "{\"command\":\"togglePSU\"}",
+      powerToggleCommand: '{"command":"togglePSU"}',
       powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerStatusCommand: "{\"command\":\"getPSUState\"}",
+      powerStatusCommand: '{"command":"getPSUState"}',
       powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
       wol: {
         enabled: false,
@@ -129,17 +129,37 @@ const captureKlipperPluginData = (id, data) => {
   logger.debug("Klipper data", data);
   const { payload, subtype } = data;
 
+  //Enable klipper ready state monitoring
+  const { klipperState } = getPrinterStoreCache().getPrinterInformation(id);
+  if (typeof klipperState === "undefined") {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "danger"
+    });
+  }
+
   let state = subtype === "info" ? "Info" : "Offline";
 
   if (payload.includes("file")) {
     return;
   }
 
+  if(payload.includes("Standby")){
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "warning"
+    });
+  }
+
   if (payload.includes("Disconnect") || payload.includes("Lost")) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "danger"
+    });
     state = "Offline";
   }
 
   if (payload.includes("Ready")) {
+    getPrinterStoreCache().updatePrinterLiveValue(id, {
+      klipperState: "success"
+    });
     state = "Complete";
   }
 
@@ -249,12 +269,11 @@ const captureThrottlePluginData = (id, data) => {
 
   let octoPi = {};
 
-  if(!!printerOctoPiData){
+  if (!!printerOctoPiData) {
     octoPi = JSON.stringify(JSON.parse(printerOctoPiData));
-  }else{
+  } else {
     return;
   }
-
 
   octoPi.throttled_state.current_overheat = current_overheat;
   octoPi.throttled_state.current_undervoltage = current_undervoltage;

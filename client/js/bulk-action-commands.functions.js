@@ -1,12 +1,12 @@
 import PrinterSelectionService from "./pages/printer-manager/services/printer-selection.service";
 import {
-    bulkConnectPrinters,
-    bulkDisconnectPrinters,
-    bulkOctoPrintControlCommand,
-    bulkOctoPrintGcodeCommand,
-    bulkOctoPrintPowerCommand,
-    bulkOctoPrintPreHeatCommand,
-    bulkPrintFileSetup
+  bulkConnectPrinters,
+  bulkDisconnectPrinters,
+  bulkOctoPrintControlCommand,
+  bulkOctoPrintGcodeCommand,
+  bulkOctoPrintPowerCommand,
+  bulkOctoPrintPreHeatCommand,
+  bulkPrintFileSetup,
 } from "./pages/printer-manager/functions/bulk-commands-functions";
 
 const multiPrintersSection = document.getElementById("multiPrintersSection");

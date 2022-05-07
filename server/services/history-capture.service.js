@@ -11,12 +11,12 @@ const {
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
-const { writePoints } = require("./influx-export.service.js");
 const { DEFAULT_SPOOL_DENSITY, DEFAULT_SPOOL_RATIO } = require("../constants/cleaner.constants");
 const { OctoprintApiClientService } = require("./octoprint/octoprint-api-client.service");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 const { sleep } = require("../utils/promise.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { getInfluxCleanerCache } = require("../cache/influx-export.cache");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 
@@ -152,6 +152,7 @@ class HistoryCaptureService {
     // Save the initial value of the record...
     await saveHistory.save().catch((e) => {
       logger.error("Unable to save the history record to database...", e);
+      return e;
     });
 
     const serverSettingsCache = SettingsClean.returnSystemSettings();
@@ -171,25 +172,75 @@ class HistoryCaptureService {
 
     // Save initial history
     if (this.#success) {
-      await this.checkForAdditionalSuccessProperties();
+      this.checkForAdditionalSuccessProperties().catch((e) => {
+        logger.error("Couldn't check for additional success properties", e.toString());
+      });
     }
-
     if (!this.#success) {
-      await this.checkForAdditionalFailureProperties();
+      this.checkForAdditionalFailureProperties().catch((e) => {
+        logger.error("Couldn't check for additional failed properties", e.toString());
+      });
     }
 
-    // await this.updateFilamentInfluxDB(
-    //   printer.selectedFilament,
-    //   printHistory,
-    //   printer.selectedFilament,
-    //   printer
-    // );
-
-    //await this.updateInfluxDB(saveHistory._id, "historyInformation", printer);
-    setTimeout(async () => {
-      // Re-generate history cache...
+    await sleep(5000);
+    // Re-generate history cache...
+    try {
       await getHistoryCache().initCache();
-    }, 5000);
+    } catch (e) {
+      logger.error("Unable to generate history cache!", e.toString());
+    }
+    try {
+      await getInfluxCleanerCache().cleanAndWriteFinishedPrintInformationForInflux(saveHistory, {
+        printerName: this.#printerName,
+        printerID: this.#printerID,
+        printerGroup: this.#printerGroup
+      });
+    } catch (e) {
+      logger.error("Unable to send finished print data to influx!", e.toString());
+    }
+
+    if (
+      (!serverSettingsCache.filament.downDateFailed ||
+        !serverSettingsCache.filament.downDateSuccess) &&
+      !serverSettingsCache.filamentManager
+    ) {
+      try {
+        this.#selectedFilament.forEach((spool) => {
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+            spool,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            0
+          );
+        });
+      } catch (e) {
+        logger.error("Unable to update spool information to influx!", e.toString());
+      }
+    }
 
     return {
       saveHistory
@@ -234,6 +285,36 @@ class HistoryCaptureService {
           logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity.spools}`);
           spoolEntity.markModified("spools");
           await spoolEntity.save();
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+            element,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            element.spools.used - spoolEntity.spools.used
+          );
           returnSpools.push(spoolEntity);
         }
         return;
@@ -361,7 +442,7 @@ class HistoryCaptureService {
 
     const timelapseResponse = await timeLapseCall.json();
 
-    logger.info("Timelapse call: ", timelapseResponse);
+    logger.debug("Timelapse call: ", timelapseResponse);
 
     //Give time for OP to start generating the file...
     await sleep(5000);
@@ -382,7 +463,6 @@ class HistoryCaptureService {
     if (this.#fileName.includes(".gcode")) {
       cleanFileName = cleanFileName.replace(".gcode", "");
     }
-
     const unrenderedTimelapseIndex = unrendered.findIndex((o) => o.name.includes(cleanFileName));
 
     //if unrendered check timelapse again...
@@ -478,136 +558,6 @@ class HistoryCaptureService {
     });
   }
 
-  async objectCleanforInflux(obj) {
-    for (const propName in obj) {
-      if (obj[propName] === null) {
-        delete obj[propName];
-      }
-    }
-  }
-
-  async updateInfluxDB(historyID, measurement, printer) {
-    try {
-      let historyArchive = getHistoryCache().historyClean;
-      let currentArchive = findIndex(historyArchive, function (o) {
-        return JSON.stringify(o._id) === JSON.stringify(historyID);
-      });
-      if (currentArchive <= -1) {
-        return;
-      }
-      let workingHistory = historyArchive[currentArchive];
-      let currentState = " ";
-      if (workingHistory.state.includes("Success")) {
-        currentState = "Success";
-      } else if (workingHistory.state.includes("Cancelled")) {
-        currentState = "Cancelled";
-      } else if (workingHistory.state.includes("Failure")) {
-        currentState = "Failure";
-      }
-      let group;
-      if (printer.group === "") {
-        group = " ";
-      } else {
-        group = printer.group;
-      }
-      const tags = {
-        printer_name: workingHistory.printer,
-        group: group,
-        url: printer.printerURL,
-        history_state: currentState,
-        file_name: workingHistory.file.name
-      };
-      let printerData = {
-        id: String(workingHistory._id),
-        index: parseInt(workingHistory.index),
-        state: currentState,
-        printer_name: workingHistory.printer,
-        start_date: new Date(workingHistory.startDate),
-        end_date: new Date(workingHistory.endDate),
-        print_time: parseInt(workingHistory.printTime),
-        file_name: workingHistory.file.name,
-        file_upload_date: parseFloat(workingHistory.file.uploadDate),
-        file_path: workingHistory.file.path,
-        file_size: parseInt(workingHistory.file.size),
-
-        notes: workingHistory.notes,
-        job_estimated_print_time: parseFloat(workingHistory.job.estimatedPrintTime),
-        job_actual_print_time: parseFloat(workingHistory.job.actualPrintTime),
-
-        cost_printer: parseFloat(workingHistory.printerCost),
-        cost_spool: parseFloat(workingHistory.spoolCost),
-        cost_total: parseFloat(workingHistory.totalCost),
-        cost_per_hour: parseFloat(workingHistory.costPerHour),
-        total_volume: parseFloat(workingHistory.totalVolume),
-        total_length: parseFloat(workingHistory.totalLength),
-        total_weight: parseFloat(workingHistory.totalWeight)
-      };
-      let averagePrintTime = parseFloat(workingHistory.file.averagePrintTime);
-      if (!isNaN(averagePrintTime)) {
-        printerData["file_average_print_time"] = averagePrintTime;
-      }
-      let lastPrintTime = parseFloat(workingHistory.file.lastPrintTime);
-      if (!isNaN(averagePrintTime)) {
-        printerData["file_last_print_time"] = lastPrintTime;
-      }
-      if (typeof workingHistory.resend !== "undefined") {
-        printerData["job_resends"] = `${workingHistory.resend.count} / ${
-          workingHistory.resend.transmitted / 1000
-        }K (${workingHistory.resend.ratio.toFixed(0)})`;
-      }
-      writePoints(tags, "HistoryInformation", printerData);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  async updateFilamentInfluxDB(selectedFilament, history, printer) {
-    for (let i = 0; i < selectedFilament.length; i++) {
-      if (selectedFilament[i] !== null) {
-        let currentState = " ";
-        let group = " ";
-        if (printer.group === "") {
-          group = " ";
-        } else {
-          group = printer.group;
-        }
-        if (history.success) {
-          currentState = "Success";
-        } else {
-          if (history.reason === "cancelled") {
-            currentState = "Cancelled";
-          } else {
-            currentState = "Failure";
-          }
-        }
-
-        const tags = {
-          name: selectedFilament[i].spools.name,
-          printer_name: history.printerName,
-          group: group,
-          url: printer.printerURL,
-          history_state: currentState,
-          file_name: history.fileName
-        };
-
-        let filamentData = {
-          name: selectedFilament[i].spools.name,
-          price: parseFloat(selectedFilament[i].spools.price),
-          weight: parseFloat(selectedFilament[i].spools.weight),
-          used_difference: parseFloat(used),
-          used_spool: parseFloat(selectedFilament[i].spools.used),
-          temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
-          spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
-          spool_material: selectedFilament[i].spools.profile.material,
-          spool_density: parseFloat(selectedFilament[i].spools.profile.density),
-          spool_diameter: parseFloat(selectedFilament[i].spools.profile.diameter)
-        };
-
-        writePoints(tags, "SpoolInformation", filamentData);
-      }
-    }
-  }
-
   generateStartEndDates(payload) {
     const today = new Date();
     const printTime = new Date(payload.time * 1000);
@@ -636,6 +586,12 @@ class HistoryCaptureService {
   }
 
   async downDateWeight() {
+    // Complete guess at a heat up time... deffo no filament used by this time, or very unimportant amounts.
+    if (!this.#success && this.#payload.time < 60) {
+      logger.warning("Not downdating failed print as shorter than 1 minute...");
+      return;
+    }
+
     let printTime = 0;
     if (this.#job?.lastPrintTime) {
       // Last print time available, use this as it's more accurate
@@ -672,6 +628,37 @@ class HistoryCaptureService {
             .catch((e) => {
               logger.error("Unable to update spool data!", e);
             });
+          currentSpool.spools.used = currentUsed + parseFloat(currentGram);
+          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+            currentSpool,
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup
+            },
+            {
+              printerName: this.#printerName,
+              printerID: this.#printerID,
+              printerGroup: this.#printerGroup,
+              costSettings: this.#costSettings,
+              success: this.#success,
+              reason: this.#reason,
+              fileName: this.#fileName,
+              filePath: this.#filePath,
+              startDate: this.#startDate,
+              endDate: this.#endDate,
+              printTime: this.#printTime,
+              filamentSelection: this.#filamentSelection,
+              job: this.#job,
+              notes: this.#notes,
+              snapshot: this.#snapshot,
+              timelapse: this.#timelapse,
+              thumbnail: this.#thumbnail,
+              resends: this.#resends,
+              activeControlUser: this.#activeControlUser
+            },
+            currentGram
+          );
         });
       } else {
         logger.error("Unable to downdate spool weight, non selected...");

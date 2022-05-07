@@ -20,11 +20,16 @@ const addClientConnection = (req, res) => {
   // Add a new client that just connected
   // Store the id and the whole response object with a clone of the user information
   // Limitations it doesn't update user information, don't think it's needed
+  if (!req?.user) {
+    // On login page... no user available... do not register connection
+    return;
+  }
+
   const id = Date.now();
   const client = {
     id,
     res,
-    user: Object.assign({}, req.user)
+    user: JSON.parse(JSON.stringify(req?.user))
   };
   clientList.push(client);
 
@@ -54,7 +59,7 @@ const removeClient = (id) => {
   clientList = clientList.filter((client) => client.id !== id);
 };
 
-const listActiveClients = (req, res) => {
+const listActiveClients = (_req, res) => {
   const currentActiveClientList = clientList.map((client) => {
     return {
       connectionDate: client.id,

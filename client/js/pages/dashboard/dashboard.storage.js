@@ -1,5 +1,8 @@
-import {getLocalStorage, saveLocalStorage} from "../../services/local-storage.service"
-import {LOCAL_STORAGE_CONSTANTS} from "../../constants/local-storage.constants"
+import {
+  getLocalStorage,
+  saveLocalStorage,
+} from "../../services/local-storage.service";
+import { LOCAL_STORAGE_CONSTANTS } from "../../constants/local-storage.constants";
 
 export class DashboardStorage {
   /**
@@ -7,7 +10,7 @@ export class DashboardStorage {
    * @returns {any}
    */
   static fetchConfig() {
-    return getLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG)
+    return getLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG);
   }
 
   /**
@@ -15,7 +18,7 @@ export class DashboardStorage {
    * @param config
    */
   static saveConfig(config) {
-    saveLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG, config)
+    saveLocalStorage(LOCAL_STORAGE_CONSTANTS().DASHBOARD_CONFIG, config);
   }
 
   /**
@@ -30,9 +33,9 @@ export class DashboardStorage {
         y: node.y,
         width: node.w,
         height: node.h,
-        id: node.id
+        id: node.id,
       });
     });
-    DashboardStorage.saveConfig(gridStackConfig)
+    DashboardStorage.saveConfig(gridStackConfig);
   }
 }

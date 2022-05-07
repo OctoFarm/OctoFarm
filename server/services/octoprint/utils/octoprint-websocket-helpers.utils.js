@@ -153,6 +153,11 @@ const captureResendsData = (id, data) => {
 };
 
 const capturePrinterProgress = (id, data) => {
+  // Patch completion, could be print time genius... Need to try without.
+  if (data?.printTimeLeftOrigin === "genius") {
+    data.completion = (100 * data.printTime) / (data.printTime + data.printTimeLeft);
+  }
+
   if (!!data) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       progress: data

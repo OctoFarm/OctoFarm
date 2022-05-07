@@ -1,4 +1,7 @@
-import {getFileQueueRow, getFileRowID} from "../pages/file-manager/upload-queue.templates"
+import {
+  getFileQueueRow,
+  getFileRowID,
+} from "../pages/file-manager/upload-queue.templates";
 
 let FILE_QUEUE_TABLE_BODY;
 
@@ -10,19 +13,19 @@ export default class Queue {
   add(record) {
     record.active = false;
     this.data.push(record);
-    this.addToFileQueue(record)
+    this.addToFileQueue(record);
   }
-  deleteQueue(){
+  deleteQueue() {
     this.data = [];
   }
   remove() {
-    this.removeFromFileQueue(this.data[0])
+    this.removeFromFileQueue(this.data[0]);
     this.data.shift();
   }
   first() {
     return this.data[0];
   }
-  n(index){
+  n(index) {
     return this.data[index];
   }
   activate(index) {
@@ -40,31 +43,31 @@ export default class Queue {
     return res;
   }
 
-  addToFileQueue(record){
+  addToFileQueue(record) {
     let file = {
       printer: record.printerInfo.printerName,
       name: record.file.name,
       size: record.file.size,
       currentFolder: record.currentFolder,
+    };
+    file.index = getFileRowID(file);
+    if (!!FILE_QUEUE_TABLE_BODY) {
+      FILE_QUEUE_TABLE_BODY.insertAdjacentHTML(
+        "beforeend",
+        getFileQueueRow(file)
+      );
     }
-    file.index = getFileRowID(file)
-    if(!!FILE_QUEUE_TABLE_BODY){
-      FILE_QUEUE_TABLE_BODY.insertAdjacentHTML("beforeend", getFileQueueRow(file))
-    }
-
   }
-  removeFromFileQueue(record){
+  removeFromFileQueue(record) {
     const file = {
       printer: record.printerInfo.printerName,
       name: record.file.name,
-    }
+    };
     setTimeout(() => {
-      const queRow = document.getElementById(`queueRow-${getFileRowID(file)}`)
-      if(!!queRow){
+      const queRow = document.getElementById(`queueRow-${getFileRowID(file)}`);
+      if (!!queRow) {
         queRow.remove();
       }
-
-    }, 3000)
-
+    }, 3000);
   }
 }

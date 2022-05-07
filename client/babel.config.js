@@ -11,9 +11,9 @@ module.exports = (api) => {
         "@babel/preset-env",
         {
           debug: api.env("production"),
-          useBuiltIns: "entry"
-        }
-      ]
-    ]
+          useBuiltIns: "entry",
+        },
+      ],
+    ],
   };
 };

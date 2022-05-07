@@ -11,7 +11,7 @@ export default class Calculate {
     return amount?.toFixed(fractional) || 0;
   }
 
-  static percentOf(amount, percent){
+  static percentOf(amount, percent) {
     return this.toFixed((percent / 100) * amount, 2);
   }
 
@@ -71,7 +71,9 @@ export default class Calculate {
     const d = b || 2;
     const e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     const f = Math.floor(Math.log(a) / Math.log(c));
-    return `<i class=\"fas fa-hdd\"></i> ${parseFloat((a / Math.pow(c, f)).toFixed(d))} ${e[f]}`;
+    return `<i class=\"fas fa-hdd\"></i> ${parseFloat(
+      (a / Math.pow(c, f)).toFixed(d)
+    )} ${e[f]}`;
   }
 
   static dateClean(date) {

@@ -1,20 +1,19 @@
 import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./utils/calc.js";
 import FileManagerService from "./services/file-manager.service.js";
-import {dragAndDropEnable} from "./utils/dragAndDrop.js";
+import { dragAndDropEnable } from "./utils/dragAndDrop.js";
 import {
   returnBigFilamentSelectorTemplate,
-  fillFilamentDropDownList
+  fillFilamentDropDownList,
 } from "./services/printer-filament-selector.service";
 import FileManagerSortingService from "./services/file-manager-sorting.service.js";
-import {allowedFileTypes} from "./constants/file-types.constants"
+import { allowedFileTypes } from "./constants/file-types.constants";
 
-import {printerIsOnline} from "./utils/octofarm.utils";
-import {printerTemplate} from "./pages/file-manager/file.template";
-import {ClientErrors} from "./exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "./exceptions/application-error.handler";
+import { printerIsOnline } from "./utils/octofarm.utils";
+import { printerTemplate } from "./pages/file-manager/file.template";
+import { ClientErrors } from "./exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "./exceptions/application-error.handler";
 import "./services/gcode-scripts.service";
-
 
 let lastId = null;
 
@@ -32,16 +31,16 @@ class Manager {
     const printerList = document.getElementById("printerList");
     printerList.innerHTML = "";
 
-    const onlinePrinters = printers.some(printer => {
+    const onlinePrinters = printers.some((printer) => {
       return printerIsOnline(printer);
-    })
+    });
 
-    if(!printerList || !onlinePrinters){
+    if (!printerList || !onlinePrinters) {
       printerList.innerHTML = `
       <div class="alert alert-dark text-center" role="alert">
         No printers are online... Please refresh when they are!
       </div>
-      `
+      `;
       return;
     }
 
@@ -55,18 +54,19 @@ class Manager {
     for (const [index, printer] of onlinePrinterList.entries()) {
       let storageWarning = "";
       if (printer?.storage) {
-        const percentRemain = (printer.storage.free * 100) / printer.storage.total;
+        const percentRemain =
+          (printer.storage.free * 100) / printer.storage.total;
         if (percentRemain > 90) {
           storageWarning = `<button type="button" class="btn btn-outline-danger text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
-              0
-          )}% Space Left</button>`;
+                                     0
+                                   )}% Space Left</button>`;
         }
         if (percentRemain > 80) {
           storageWarning = `<button type="button" class="btn btn-outline-warning text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
-              0
-          )}% Space Left</button>`;
+                                     0
+                                   )}% Space Left</button>`;
         }
       }
 
@@ -77,13 +77,15 @@ class Manager {
       }
 
       printerList.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
           ${printerTemplate(printer, storageWarning, extruderList)}
       `
       );
       //Setup for first printer
-      const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
+      const listItem = document.getElementById(
+        `fileManagerPrinter-${printer._id}`
+      );
       listItem.addEventListener("click", async (e) => {
         if (!e.target.id.includes("tool")) {
           await Manager.changePrinter(e, printer._id);
@@ -93,12 +95,18 @@ class Manager {
       dragAndDropEnable(listItem, printer);
 
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-        await fillFilamentDropDownList(document.getElementById(`tool-${printer._id}-${i}-bigFilamentSelect`), printer, i);
+        await fillFilamentDropDownList(
+          document.getElementById(`tool-${printer._id}-${i}-bigFilamentSelect`),
+          printer,
+          i
+        );
       }
 
       if (index === 0) {
         lastId = printer._id;
-        const item = document.getElementById("fileManagerPrinter-" + printer._id);
+        const item = document.getElementById(
+          "fileManagerPrinter-" + printer._id
+        );
         item.classList.add("bg-dark", "printerSelected");
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
@@ -127,7 +135,9 @@ class Manager {
 
       //Update old index to this one
       lastId = target;
-      const printerName = document.getElementById("printerName-" + lastId).innerHTML;
+      const printerName = document.getElementById(
+        "printerName-" + lastId
+      ).innerHTML;
       const panel = document.getElementById("fileManagerPrinter-" + target);
 
       panel.classList.add("bg-dark", "printerSelected");
@@ -140,7 +150,9 @@ class Manager {
 
   static async updatePrinterList(id) {
     let fileList = document.getElementById("fileBody");
-    const fileManagerManagement = document.getElementById("fileManagerManagement");
+    const fileManagerManagement = document.getElementById(
+      "fileManagerManagement"
+    );
     if (fileManagerManagement) {
       fileList = fileManagerManagement;
     }
@@ -197,8 +209,8 @@ class Manager {
         fileDeleteAll: document.getElementById("fileDeleteAll"),
         fileHouseKeeping: document.getElementById("fileHouseKeeping"),
         back: document.getElementById("fileBackBtn"),
-        createFolderBtn: document.getElementById("createFolderBtn")
-      }
+        createFolderBtn: document.getElementById("createFolderBtn"),
+      },
     };
     fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.fileList.length} <i class="fas fa-folder"></i> ${printer.fileList.folderList.length}`;
     if (typeof printer.storage !== "undefined") {
@@ -220,9 +232,12 @@ class Manager {
     fileButtons.fileManager.fileSearch.addEventListener("keyup", () => {
       FileManagerService.search(printer._id);
     });
-    fileButtons.fileManager.uploadPrintFile.addEventListener("change", async function () {
-      await FileManagerService.handleFiles(this.files, printer, "print");
-    });
+    fileButtons.fileManager.uploadPrintFile.addEventListener(
+      "change",
+      async function () {
+        await FileManagerService.handleFiles(this.files, printer, "print");
+      }
+    );
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
@@ -232,27 +247,33 @@ class Manager {
     fileButtons.fileManager.syncFiles.addEventListener("click", async (e) => {
       await FileManagerService.reSyncFiles(e, printer);
     });
-    fileButtons.fileManager.fileDeleteAll.addEventListener("click", async () => {
-      await FileManagerService.deleteAllFiles(e, printer);
-    });
-    fileButtons.fileManager.fileHouseKeeping.addEventListener("click", async (e) => {
-      bootbox.prompt({
-        title: "Clean all files older than 'X' days...",
-        message: "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
-        inputType: "number",
-        callback: async function (result) {
-          if(!!result){
-            await FileManagerService.fileHouseKeeping(e, printer, result);
-          }
-        }
-      });
-
-    });
+    fileButtons.fileManager.fileDeleteAll.addEventListener(
+      "click",
+      async (e) => {
+        await FileManagerService.deleteAllFiles(e, printer);
+      }
+    );
+    fileButtons.fileManager.fileHouseKeeping.addEventListener(
+      "click",
+      async (e) => {
+        bootbox.prompt({
+          title: "Clean all files older than 'X' days...",
+          message:
+            "<div class=\"alert alert-warning text-dark\" role=\"alert\">This action is permanent, and does NOT affect your folder structure.</div>",
+          inputType: "number",
+          callback: async function (result) {
+            if (!!result) {
+              await FileManagerService.fileHouseKeeping(e, printer, result);
+            }
+          },
+        });
+      }
+    );
   }
 }
 
-Manager.init().catch(e => {
+Manager.init().catch((e) => {
   const errorObject = ClientErrors.UNKNOWN_ERROR;
-  errorObject.message =  `File Manager - ${e}`
-  throw new ApplicationError(errorObject)
+  errorObject.message = `File Manager - ${e}`;
+  throw new ApplicationError(errorObject);
 });

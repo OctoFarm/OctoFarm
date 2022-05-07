@@ -11,21 +11,21 @@ const title = {
     fontSize: "14px",
     fontWeight: "bold",
     fontFamily: undefined,
-    color: "#fff"
-  }
+    color: "#fff",
+  },
 };
 
 const chart = {
   type: "donut",
   height: "300px",
   animations: {
-    enabled: false
+    enabled: false,
   },
-  background: "#303030"
+  background: "#303030",
 };
 
 const theme = {
-  mode: "dark"
+  mode: "dark",
 };
 
 const plotOptions = {
@@ -33,17 +33,17 @@ const plotOptions = {
     expandOnClick: true,
     dataLabels: {
       offset: 10,
-      minAngleToShowLabel: 15
-    }
-  }
+      minAngleToShowLabel: 15,
+    },
+  },
 };
 
 const stroke = {
-  show: false
+  show: false,
 };
 
 const noData = {
-  text: "Loading..."
+  text: "Loading...",
 };
 
 const legend = {
@@ -66,7 +66,7 @@ const legend = {
   offsetY: 0,
   labels: {
     colors: undefined,
-    useSeriesColors: false
+    useSeriesColors: false,
   },
   markers: {
     width: 9,
@@ -78,18 +78,18 @@ const legend = {
     customHTML: undefined,
     onClick: undefined,
     offsetX: 0,
-    offsetY: 0
+    offsetY: 0,
   },
   itemMargin: {
     horizontal: 1,
-    vertical: 0
+    vertical: 0,
   },
   onItemClick: {
-    toggleDataSeries: false
+    toggleDataSeries: false,
   },
   onItemHover: {
-    highlightDataSeries: false
-  }
+    highlightDataSeries: false,
+  },
 };
 
 const memoryChartOptions = {
@@ -102,14 +102,14 @@ const memoryChartOptions = {
     y: {
       formatter(val) {
         return Calc.bytes(val);
-      }
-    }
+      },
+    },
   },
   noData: noData,
   series: [],
   labels: ["Other", "OctoFarm", "Free"],
   colors: ["#f39c12", "#3498db", "#00bc8c"],
-  legend: legend
+  legend: legend,
 };
 const cpuChartOptions = {
   title: title,
@@ -121,14 +121,14 @@ const cpuChartOptions = {
     y: {
       formatter(val) {
         return `${Math.round(val * 10) / 10}%`;
-      }
-    }
+      },
+    },
   },
   noData: noData,
   series: [],
   labels: ["System", "OctoFarm", "User", "Free"],
   colors: ["#f39c12", "#3498db", "#375a7f", "#00bc8c"],
-  legend: legend
+  legend: legend,
 };
 
 export { cpuChartOptions, memoryChartOptions };

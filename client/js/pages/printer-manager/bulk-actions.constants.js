@@ -3,5 +3,5 @@ export default {
   LOADING: "loading",
   ERROR: "danger",
   SUCCESS: "success",
-  WARNING: "warning"
+  WARNING: "warning",
 };

@@ -23,38 +23,44 @@ export default class CustomGenerator {
       customScripts.forEach((scripts) => {
         let button = CustomGenerator.getButton(scripts);
         area.insertAdjacentHTML("beforeend", button);
-        document.getElementById("gcode-" + scripts._id).addEventListener("click", async () => {
-          let post = await CustomGenerator.fireCommand(scripts._id, scripts.gcode, printer);
-          if (post.status === 204) {
-            UI.createAlert(
-              "success",
-              "Your gcode commands have successfully been sent!",
-              3000,
-              "Clicked"
+        document
+          .getElementById("gcode-" + scripts._id)
+          .addEventListener("click", async () => {
+            let post = await CustomGenerator.fireCommand(
+              scripts._id,
+              scripts.gcode,
+              printer
             );
-          } else {
-            UI.createAlert(
-              "error",
-              "Your gcode failed to send! Please check the printer is able to receive these commands.",
-              3000,
-              "Clicked"
-            );
-          }
-        });
+            if (post.status === 204) {
+              UI.createAlert(
+                "success",
+                "Your gcode commands have successfully been sent!",
+                3000,
+                "Clicked"
+              );
+            } else {
+              UI.createAlert(
+                "error",
+                "Your gcode failed to send! Please check the printer is able to receive these commands.",
+                3000,
+                "Clicked"
+              );
+            }
+          });
       });
     }
   }
   static async fireCommand(id, script, printer) {
     const opt = {
-      commands: script
+      commands: script,
     };
     const post = await OctoPrintClient.post(printer, "printer/command", opt);
     const body = {
       action: `Printer: gcode`,
       opts: opt,
-      status: post.status
-    }
-    await OctoFarmClient.updateUserActionsLog(printer._id, body)
-    return post
+      status: post.status,
+    };
+    await OctoFarmClient.updateUserActionsLog(printer._id, body);
+    return post;
   }
 }

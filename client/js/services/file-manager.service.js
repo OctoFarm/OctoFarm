@@ -23,8 +23,8 @@ import {
   generatePathList,
   getFileListElement,
 } from "../pages/file-manager/file-manager.helpers";
-import {ClientErrors} from "../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../exceptions/application-error.handler";
+import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../exceptions/application-error.handler";
 
 const fileUploads = new Queue();
 
@@ -57,15 +57,17 @@ const handleUploadFromQueue = async (current, index) => {
     await OctoFarmClient.post("printers/newFiles", file);
 
     const currentFolder = document.getElementById("currentFolder").innerHTML;
-    const fileFolder = "local/"+file.files.local.path;
+    const fileFolder = "local/" + file.files.local.path;
     const currentPrinter = document.getElementById("currentPrinter");
     const filePrinter = current.printerInfo.printerName;
-    if(!!currentPrinter && !!fileFolder){
-      if(fileFolder.includes(currentFolder) && currentPrinter.innerHTML.includes(filePrinter)){
+    if (!!currentPrinter && !!fileFolder) {
+      if (
+        fileFolder.includes(currentFolder) &&
+        currentPrinter.innerHTML.includes(filePrinter)
+      ) {
         await FileManagerSortingService.loadSort(current.index);
       }
     }
-
 
     const uploadsRemaining = document.getElementById("uploadsRemaining");
     if (!!uploadsRemaining) {
@@ -83,7 +85,7 @@ const handleUploadFromQueue = async (current, index) => {
 
 setInterval(async () => {
   const uploadQueueElement = document.getElementById("queueUploadLimitInput");
-  let uploadQueueSize = 1
+  let uploadQueueSize = 1;
   if (!!uploadQueueElement && !isNaN(parseInt(uploadQueueElement.value))) {
     uploadQueueSize = parseInt(uploadQueueElement.value);
   }
@@ -317,10 +319,9 @@ export default class FileManagerService {
           );
           const uploadsSpinnerIcon =
             document.getElementById("uploadsSpinnerIcon");
-          if(!!uploadsSpinnerIcon){
+          if (!!uploadsSpinnerIcon) {
             uploadsSpinnerIcon.innerHTML = "<i class='fas fa-spinner'></i>";
           }
-
         } else {
           fileUploads.remove();
           resolve(xhr.response);
@@ -392,8 +393,8 @@ export default class FileManagerService {
       e.target.className = buttonFailed;
     }
     e.target.innerHTML = defaultReSync;
-    setTimeout( () => {
-      flashReturn(e.target)
+    setTimeout(() => {
+      flashReturn(e.target);
       e.target.disabled = false;
     }, 1000);
     e.target.disabled = false;
@@ -401,42 +402,52 @@ export default class FileManagerService {
   }
 
   static async deleteAllFiles(e, printer) {
-
     bootbox.confirm({
       title: "Delete everything!",
-      message: "This will delete all files and folders on your OctoPrint instance... Are you sure?",
+      message:
+        "This will delete all files and folders on your OctoPrint instance... Are you sure?",
       callback: async function (result) {
-        if(!!result) {
-          e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Deleting...";
+        if (!!result) {
+          e.target.innerHTML =
+            "<i class='fas fa-sync fa-spin'></i> Deleting...";
           e.target.disabled = true;
           const deletedList = await OctoFarmClient.post("printers/nukeFiles", {
-            id: printer._id
+            id: printer._id,
           });
 
           const prettyFolderList = [];
           const prettyFilesList = [];
-          deletedList.deletedFiles.forEach(file => {
-            prettyFilesList.push(`${file}<br>`)
-          })
-          deletedList.deletedFolders.forEach(folder => {
-            prettyFolderList.push(`${folder}<br>`)
-          })
-
+          deletedList.deletedFiles.forEach((file) => {
+            prettyFilesList.push(`${file}<br>`);
+          });
+          deletedList.deletedFolders.forEach((folder) => {
+            prettyFolderList.push(`${folder}<br>`);
+          });
 
           setTimeout(async () => {
             e.target.className = "btn btn-outline-danger mb-0 float-right";
             e.target.innerHTML = defaultDeleteAll;
             e.target.disabled = false;
-            if(deletedList.deletedFiles.length > 0){
-              UI.createAlert("success", "Successfully deleted files: <br>" + prettyFilesList, 5000, "Clicked");
+            if (deletedList.deletedFiles.length > 0) {
+              UI.createAlert(
+                "success",
+                "Successfully deleted files: <br>" + prettyFilesList,
+                5000,
+                "Clicked"
+              );
             }
-            if(deletedList.deletedFolders.length > 0){
-              UI.createAlert("success", "Successfully deleted folders: <br>" + prettyFolderList, 5000, "Clicked")
+            if (deletedList.deletedFolders.length > 0) {
+              UI.createAlert(
+                "success",
+                "Successfully deleted folders: <br>" + prettyFolderList,
+                5000,
+                "Clicked"
+              );
             }
             await FileManagerSortingService.loadSort(printer._id);
           }, 1000);
         }
-      }
+      },
     });
   }
 
@@ -450,34 +461,38 @@ export default class FileManagerService {
     );
     const prettyList = [];
 
-    let buttons = {}
+    let buttons = {};
 
-    if(houseCleanFiles.length === 0){
-      prettyList.push("<div class=\"alert alert-danger\" role=\"alert\">No Files to Clean...</div>")
+    if (houseCleanFiles.length === 0) {
+      prettyList.push(
+        "<div class=\"alert alert-danger\" role=\"alert\">No Files to Clean...</div>"
+      );
       buttons = {
         cancel: {
           label: "OK",
-          className: "btn-secondary"
+          className: "btn-secondary",
         },
         confirm: {
           label: "OK",
-          className: "btn-secondary d-none"
-        }
-      }
-    }else{
-      for(const file of houseCleanFiles) {
-        prettyList.push(`<div class="alert alert-danger" role="alert"><i class="fas fa-file-code fa-2x"></i> ${file}</div>`)
+          className: "btn-secondary d-none",
+        },
+      };
+    } else {
+      for (const file of houseCleanFiles) {
+        prettyList.push(
+          `<div class="alert alert-danger" role="alert"><i class="fas fa-file-code fa-2x"></i> ${file}</div>`
+        );
       }
       buttons = {
         confirm: {
           label: "Yes",
-          className: "btn-success"
+          className: "btn-success",
         },
         cancel: {
           label: "No",
-          className: "btn-danger"
-        }
-      }
+          className: "btn-danger",
+        },
+      };
     }
 
     bootbox.confirm({
@@ -486,35 +501,37 @@ export default class FileManagerService {
       buttons: buttons,
       scrollable: true,
       callback: async function (result) {
-        if(!!result){
-          e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Cleaning...";
+        if (!!result) {
+          e.target.innerHTML =
+            "<i class='fas fa-sync fa-spin'></i> Cleaning...";
           const deletedList = await OctoFarmClient.post(
-              "printers/houseCleanFiles",
-              {
-                id: printer._id,
-                pathList: houseCleanFiles
-              }
+            "printers/houseCleanFiles",
+            {
+              id: printer._id,
+              pathList: houseCleanFiles,
+            }
           );
           const prettyDelete = [];
 
-          for(const file of deletedList){
-            prettyDelete.push(`${file} <br>`)
+          for (const file of deletedList) {
+            prettyDelete.push(`${file} <br>`);
           }
 
-          UI.createAlert("success", "Deleted the following files: <br>" + prettyDelete, 5000, "clicked")
+          UI.createAlert(
+            "success",
+            "Deleted the following files: <br>" + prettyDelete,
+            5000,
+            "clicked"
+          );
 
           setTimeout(async () => {
-            e.target.innerHTML = "<i class=\"fa-solid fa-broom\"></i> House Keeping";
+            e.target.innerHTML =
+              "<i class=\"fa-solid fa-broom\"></i> House Keeping";
             await FileManagerSortingService.loadSort(printer._id);
           }, 500);
-
         }
-      }
+      },
     });
-
-
-
-
   }
 
   static async openFolder(folder, target, printer) {
@@ -638,7 +655,7 @@ export default class FileManagerService {
   static updatePrinterFilesList(printer, recursive) {
     const { fileList } = printer;
     const fileElem = getFileListElement(printer._id);
-    if(fileElem){
+    if (fileElem) {
       fileElem.innerHTML = "";
     }
 
@@ -1121,7 +1138,11 @@ export class FileActions {
         formData.append("foldername", folderSplit[path]);
         formData.append("path", octofarmPath);
       }
-      const {status, files} = await OctoPrintClient.folder(printer, "local", formData);
+      const { status, files } = await OctoPrintClient.folder(
+        printer,
+        "local",
+        formData
+      );
       if (status === 201) {
         // Add status folder creation success and update OctoFarm with new folder...
         const opts = {
@@ -1179,55 +1200,54 @@ export class FileActions {
     };
     await OctoPrintClient.file(printer, filePath, "load", false);
     const ret = await OctoPrintClient.jobAction(printer, opts);
-    if(!!ret?.status){
+    if (!!ret?.status) {
       if (ret?.status === 200 || ret?.status === 201 || ret?.status === 204) {
         UI.createAlert(
-            "success",
-            `${printer.printerName}: Successfully started printing ${filePath}`,
-            3000,
-            "Clicked"
+          "success",
+          `${printer.printerName}: Successfully started printing ${filePath}`,
+          3000,
+          "Clicked"
         );
       } else if (ret?.status === 409) {
         UI.createAlert(
-            "warning",
-            `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`,
-            3000,
-            "Clicked"
+          "warning",
+          `${printer.printerName}: Could not start file... ${filePath} OctoPrint reported a conflict!`,
+          3000,
+          "Clicked"
         );
       } else {
         UI.createAlert(
-            "error",
-            `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`,
-            3000,
-            "Clicked"
+          "error",
+          `${printer.printerName}: Error occured starting: ${filePath} is your printer contactable?`,
+          3000,
+          "Clicked"
         );
       }
     }
-
   }
 
   static async selectFile(printer, filePath) {
-    const {status} = await OctoPrintClient.file(printer, filePath, "load");
+    const { status } = await OctoPrintClient.file(printer, filePath, "load");
     if (status === 404) {
       UI.createAlert(
-          "error",
-          "We could not find the location, does it exist?",
-          3000,
-          "clicked"
+        "error",
+        "We could not find the location, does it exist?",
+        3000,
+        "clicked"
       );
     } else if (status === 409) {
       UI.createAlert(
-          "warning",
-          "There was a conflict, file is in use...",
-          3000,
-          "clicked"
+        "warning",
+        "There was a conflict, file is in use...",
+        3000,
+        "clicked"
       );
     } else {
       UI.createAlert(
-          "success",
-          "Successfully selected your file...",
-          3000,
-          "clicked"
+        "success",
+        "Successfully selected your file...",
+        3000,
+        "clicked"
       );
     }
   }
@@ -1332,20 +1352,24 @@ export class FileActions {
       },
       async callback(result) {
         if (result) {
-          const {status} = await OctoPrintClient.file(printer, fullPath, "delete");
+          const { status } = await OctoPrintClient.file(
+            printer,
+            fullPath,
+            "delete"
+          );
           if (status === 404) {
             UI.createAlert(
-                "error",
-                "We could not find the location, does it exist?",
-                3000,
-                "clicked"
+              "error",
+              "We could not find the location, does it exist?",
+              3000,
+              "clicked"
             );
           } else if (status === 409) {
             UI.createAlert(
-                "warning",
-                "There was a conflict, file is in use...",
-                3000,
-                "clicked"
+              "warning",
+              "There was a conflict, file is in use...",
+              3000,
+              "clicked"
             );
           } else {
             const opt = {
@@ -1355,10 +1379,10 @@ export class FileActions {
             await OctoFarmClient.post("printers/removefile", opt);
             document.getElementById(`file-${fullPath}`).remove();
             UI.createAlert(
-                "success",
-                "Successfully deleted your file...",
-                3000,
-                "clicked"
+              "success",
+              "Successfully deleted your file...",
+              3000,
+              "clicked"
             );
           }
         }
@@ -1409,7 +1433,7 @@ export class FileActions {
             `files/local/${fullPath}`,
             opt
           );
-          const {status} = post;
+          const { status } = post;
           if (status === 404) {
             UI.createAlert(
               "error",
@@ -1455,8 +1479,8 @@ export class FileActions {
                 "Clicked"
               );
               const errorObject = ClientErrors.SILENT_ERROR;
-              errorObject.message =  `Bulk Commands - ${e}`
-              throw new ApplicationError(errorObject)
+              errorObject.message = `Bulk Commands - ${e}`;
+              throw new ApplicationError(errorObject);
             }
           }
         }

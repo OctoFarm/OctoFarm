@@ -17,7 +17,7 @@
     // Browser globals (root is window)
     root.bootbox = factory(root.jQuery);
   }
-}(this, function init($, undefined) {
+})(this, function init($, undefined) {
   "use strict";
 
   //  Polyfills Object.keys, if necessary.
@@ -25,7 +25,7 @@
   if (!Object.keys) {
     Object.keys = (function () {
       var hasOwnProperty = Object.prototype.hasOwnProperty,
-        hasDontEnumBug = !({ toString: null }).propertyIsEnumerable("toString"),
+        hasDontEnumBug = !{ toString: null }.propertyIsEnumerable("toString"),
         dontEnums = [
           "toString",
           "toLocaleString",
@@ -42,7 +42,9 @@
           throw new TypeError("Object.keys called on non-object");
         }
 
-        var result = [], prop, i;
+        var result = [],
+          prop,
+          i;
 
         for (prop in obj) {
           if (hasOwnProperty.call(obj, prop)) {
@@ -60,7 +62,7 @@
 
         return result;
       };
-    }());
+    })();
   }
 
   var exports = {};
@@ -69,64 +71,50 @@
   exports.VERSION = VERSION;
 
   var locales = {
-    en : {
-      OK      : "OK",
-      CANCEL  : "Cancel",
-      CONFIRM : "OK"
+    en: {
+      OK: "OK",
+      CANCEL: "Cancel",
+      CONFIRM: "OK"
     }
   };
 
   var templates = {
     dialog:
-    "<div class=\"bootbox modal\" tabindex=\"-1\" role=\"dialog\" aria-hidden=\"true\">" +
-    "<div class=\"modal-dialog\">" +
-    "<div class=\"modal-content\">" +
-    "<div class=\"modal-body\"><div class=\"bootbox-body\"></div></div>" +
-    "</div>" +
-    "</div>" +
-    "</div>",
-    header:
-    "<div class=\"modal-header\">" +
-    "<h5 class=\"modal-title\"></h5>" +
-    "</div>",
-    footer:
-    "<div class=\"modal-footer\"></div>",
+      '<div class="bootbox modal" tabindex="-1" role="dialog" aria-hidden="true">' +
+      '<div class="modal-dialog">' +
+      '<div class="modal-content">' +
+      '<div class="modal-body"><div class="bootbox-body"></div></div>' +
+      "</div>" +
+      "</div>" +
+      "</div>",
+    header: '<div class="modal-header">' + '<h5 class="modal-title"></h5>' + "</div>",
+    footer: '<div class="modal-footer"></div>',
     closeButton:
-    "<button type=\"button\" class=\"bootbox-close-button close\" aria-hidden=\"true\">&times;</button>",
-    form:
-    "<form class=\"bootbox-form\"></form>",
-    button:
-    "<button type=\"button\" class=\"btn\"></button>",
-    option:
-    "<option></option>",
-    promptMessage:
-    "<div class=\"bootbox-prompt-message\"></div>",
+      '<button type="button" class="bootbox-close-button close" aria-hidden="true">&times;</button>',
+    form: '<form class="bootbox-form"></form>',
+    button: '<button type="button" class="btn"></button>',
+    option: "<option></option>",
+    promptMessage: '<div class="bootbox-prompt-message"></div>',
     inputs: {
-      text:
-      "<input class=\"bootbox-input bootbox-input-text form-control\" autocomplete=\"off\" type=\"text\" />",
-      textarea:
-      "<textarea class=\"bootbox-input bootbox-input-textarea form-control\"></textarea>",
+      text: '<input class="bootbox-input bootbox-input-text form-control" autocomplete="off" type="text" />',
+      textarea: '<textarea class="bootbox-input bootbox-input-textarea form-control"></textarea>',
       email:
-      "<input class=\"bootbox-input bootbox-input-email form-control\" autocomplete=\"off\" type=\"email\" />",
-      select:
-      "<select class=\"bootbox-input bootbox-input-select form-control\"></select>",
+        '<input class="bootbox-input bootbox-input-email form-control" autocomplete="off" type="email" />',
+      select: '<select class="bootbox-input bootbox-input-select form-control"></select>',
       checkbox:
-      "<div class=\"form-check checkbox\"><label class=\"form-check-label\"><input class=\"form-check-input bootbox-input bootbox-input-checkbox\" type=\"checkbox\" /></label></div>",
+        '<div class="form-check checkbox"><label class="form-check-label"><input class="form-check-input bootbox-input bootbox-input-checkbox" type="checkbox" /></label></div>',
       radio:
-      "<div class=\"form-check radio\"><label class=\"form-check-label\"><input class=\"form-check-input bootbox-input bootbox-input-radio\" type=\"radio\" name=\"bootbox-radio\" /></label></div>",
-      date:
-      "<input class=\"bootbox-input bootbox-input-date form-control\" autocomplete=\"off\" type=\"date\" />",
-      time:
-      "<input class=\"bootbox-input bootbox-input-time form-control\" autocomplete=\"off\" type=\"time\" />",
+        '<div class="form-check radio"><label class="form-check-label"><input class="form-check-input bootbox-input bootbox-input-radio" type="radio" name="bootbox-radio" /></label></div>',
+      date: '<input class="bootbox-input bootbox-input-date form-control" autocomplete="off" type="date" />',
+      time: '<input class="bootbox-input bootbox-input-time form-control" autocomplete="off" type="time" />',
       number:
-      "<input class=\"bootbox-input bootbox-input-number form-control\" autocomplete=\"off\" type=\"number\" />",
+        '<input class="bootbox-input bootbox-input-number form-control" autocomplete="off" type="number" />',
       password:
-      "<input class=\"bootbox-input bootbox-input-password form-control\" autocomplete=\"off\" type=\"password\" />",
+        '<input class="bootbox-input bootbox-input-password form-control" autocomplete="off" type="password" />',
       range:
-      "<input class=\"bootbox-input bootbox-input-range form-control-range\" autocomplete=\"off\" type=\"range\" />"
+        '<input class="bootbox-input bootbox-input-range form-control-range" autocomplete="off" type="range" />'
     }
   };
-
 
   var defaults = {
     // default language
@@ -159,7 +147,6 @@
     reusable: false
   };
 
-
   // PUBLIC FUNCTIONS
   // *************************************************************************************************************
 
@@ -168,12 +155,11 @@
     return name ? locales[name] : locales;
   };
 
-
   // Register localized strings for the OK, CONFIRM, and CANCEL buttons
   exports.addLocale = function (name, values) {
     $.each(["OK", "CANCEL", "CONFIRM"], function (_, v) {
       if (!values[v]) {
-        throw new Error("Please supply a translation for \"" + v + "\"");
+        throw new Error('Please supply a translation for "' + v + '"');
       }
     });
 
@@ -186,25 +172,21 @@
     return exports;
   };
 
-
   // Remove a previously-registered locale
   exports.removeLocale = function (name) {
     if (name !== "en") {
       delete locales[name];
-    }
-    else {
-      throw new Error("\"en\" is used as the default and fallback locale and cannot be removed.");
+    } else {
+      throw new Error('"en" is used as the default and fallback locale and cannot be removed.');
     }
 
     return exports;
   };
 
-
   // Set the default locale
   exports.setLocale = function (name) {
     return exports.setDefaults("locale", name);
   };
-
 
   // Override default value(s) of Bootbox.
   exports.setDefaults = function () {
@@ -223,7 +205,6 @@
     return exports;
   };
 
-
   // Hides all currently active Bootbox Models
   exports.hideAll = function () {
     $(".bootbox").modal("hide");
@@ -231,12 +212,10 @@
     return exports;
   };
 
-
   // Allows the base init() function to be overridden
   exports.init = function (_$) {
     return init(_$ || $);
   };
-
 
   // CORE HELPER FUNCTIONS
   // *************************************************************************************************************
@@ -245,9 +224,9 @@
   exports.dialog = function (options) {
     if ($.fn.modal === undefined) {
       throw new Error(
-        "\"$.fn.modal\" is not defined; please double check you have included " +
-        "the Bootstrap JavaScript library. See https://getbootstrap.com/docs/4.4/getting-started/javascript/ " +
-        "for more details."
+        '"$.fn.modal" is not defined; please double check you have included ' +
+          "the Bootstrap JavaScript library. See https://getbootstrap.com/docs/4.4/getting-started/javascript/ " +
+          "for more details."
       );
     }
 
@@ -257,12 +236,13 @@
       options.fullBootstrapVersion = $.fn.modal.Constructor.VERSION;
       var i = options.fullBootstrapVersion.indexOf(".");
       options.bootstrap = options.fullBootstrapVersion.substring(0, i);
-    }
-    else {
+    } else {
       // Assuming version 2.3.2, as that was the last "supported" 2.x version
       options.bootstrap = "2";
       options.fullBootstrapVersion = "2.3.2";
-      console.warn("Bootbox will *mostly* work with Bootstrap 2, but we do not officially support it. Please upgrade, if possible.");
+      console.warn(
+        "Bootbox will *mostly* work with Bootstrap 2, but we do not officially support it. Please upgrade, if possible."
+      );
     }
 
     var dialog = $(templates.dialog);
@@ -317,7 +297,11 @@
     if (options.size) {
       // Requires Bootstrap 3.1.0 or higher
       if (options.fullBootstrapVersion.substring(0, 3) < "3.1") {
-        console.warn("\"size\" requires Bootstrap 3.1.0 or higher. You appear to be using " + options.fullBootstrapVersion + ". Please upgrade to use this option.");
+        console.warn(
+          '"size" requires Bootstrap 3.1.0 or higher. You appear to be using ' +
+            options.fullBootstrapVersion +
+            ". Please upgrade to use this option."
+        );
       }
 
       switch (options.size) {
@@ -337,7 +321,11 @@
 
           // Requires Bootstrap 4.2.0 or higher
           if (options.fullBootstrapVersion.substring(0, 3) < "4.2") {
-            console.warn("Using size \"xl\"/\"extra-large\" requires Bootstrap 4.2.0 or higher. You appear to be using " + options.fullBootstrapVersion + ". Please upgrade to use this option.");
+            console.warn(
+              'Using size "xl"/"extra-large" requires Bootstrap 4.2.0 or higher. You appear to be using ' +
+                options.fullBootstrapVersion +
+                ". Please upgrade to use this option."
+            );
           }
           break;
       }
@@ -348,7 +336,11 @@
 
       // Requires Bootstrap 4.3.0 or higher
       if (options.fullBootstrapVersion.substring(0, 3) < "4.3") {
-        console.warn("Using \"scrollable\" requires Bootstrap 4.3.0 or higher. You appear to be using " + options.fullBootstrapVersion + ". Please upgrade to use this option.");
+        console.warn(
+          'Using "scrollable" requires Bootstrap 4.3.0 or higher. You appear to be using ' +
+            options.fullBootstrapVersion +
+            ". Please upgrade to use this option."
+        );
       }
     }
 
@@ -363,8 +355,7 @@
       if (options.title) {
         if (options.bootstrap > 3) {
           dialog.find(".modal-header").append(closeButton);
-        }
-        else {
+        } else {
           dialog.find(".modal-header").prepend(closeButton);
         }
       } else {
@@ -377,7 +368,11 @@
 
       // Requires Bootstrap 4.0.0-beta.3 or higher
       if (options.fullBootstrapVersion < "4.0.0") {
-        console.warn("\"centerVertical\" requires Bootstrap 4.0.0-beta.3 or higher. You appear to be using " + options.fullBootstrapVersion + ". Please upgrade to use this option.");
+        console.warn(
+          '"centerVertical" requires Bootstrap 4.0.0-beta.3 or higher. You appear to be using ' +
+            options.fullBootstrapVersion +
+            ". Please upgrade to use this option."
+        );
       }
     }
 
@@ -385,7 +380,7 @@
     // setup & teardown required after the underlying
     // modal has performed certain actions.
 
-    if(!options.reusable) {
+    if (!options.reusable) {
       // make sure we unbind any listeners once the dialog has definitively been dismissed
       dialog.one("hide.bs.modal", { dialog: dialog }, unbindModal);
     }
@@ -393,31 +388,28 @@
     if (options.onHide) {
       if ($.isFunction(options.onHide)) {
         dialog.on("hide.bs.modal", options.onHide);
-      }
-      else {
-        throw new Error("Argument supplied to \"onHide\" must be a function");
+      } else {
+        throw new Error('Argument supplied to "onHide" must be a function');
       }
     }
 
-    if(!options.reusable) {
+    if (!options.reusable) {
       dialog.one("hidden.bs.modal", { dialog: dialog }, destroyModal);
     }
 
     if (options.onHidden) {
       if ($.isFunction(options.onHidden)) {
         dialog.on("hidden.bs.modal", options.onHidden);
-      }
-      else {
-        throw new Error("Argument supplied to \"onHidden\" must be a function");
+      } else {
+        throw new Error('Argument supplied to "onHidden" must be a function');
       }
     }
 
     if (options.onShow) {
       if ($.isFunction(options.onShow)) {
         dialog.on("show.bs.modal", options.onShow);
-      }
-      else {
-        throw new Error("Argument supplied to \"onShow\" must be a function");
+      } else {
+        throw new Error('Argument supplied to "onShow" must be a function');
       }
     }
 
@@ -426,9 +418,8 @@
     if (options.onShown) {
       if ($.isFunction(options.onShown)) {
         dialog.on("shown.bs.modal", options.onShown);
-      }
-      else {
-        throw new Error("Argument supplied to \"onShown\" must be a function");
+      } else {
+        throw new Error('Argument supplied to "onShown" must be a function');
       }
     }
 
@@ -467,7 +458,6 @@
         processCallback(e, dialog, callbacks.onEscape);
       }
     });
-
 
     dialog.on("click", ".modal-footer button:not(.disabled)", function (e) {
       var callbackKey = $(this).data("bb-handler");
@@ -511,7 +501,6 @@
     return dialog;
   };
 
-
   // Helper function to simulate the native alert() behavior. **NOTE**: This is non-blocking, so any
   // code that must happen after the alert is dismissed should be placed within the callback function
   // for this alert.
@@ -523,7 +512,7 @@
     // @TODO: can this move inside exports.dialog when we're iterating over each
     // button and checking its button.callback value instead?
     if (options.callback && !$.isFunction(options.callback)) {
-      throw new Error("alert requires the \"callback\" property to be a function when provided");
+      throw new Error('alert requires the "callback" property to be a function when provided');
     }
 
     // override the ok and escape callback to make sure they just invoke
@@ -539,14 +528,18 @@
     return exports.dialog(options);
   };
 
-
   // Helper function to simulate the native confirm() behavior. **NOTE**: This is non-blocking, so any
   // code that must happen after the confirm is dismissed should be placed within the callback function
   // for this confirm.
   exports.confirm = function () {
     var options;
 
-    options = mergeDialogOptions("confirm", ["cancel", "confirm"], ["message", "callback"], arguments);
+    options = mergeDialogOptions(
+      "confirm",
+      ["cancel", "confirm"],
+      ["message", "callback"],
+      arguments
+    );
 
     // confirm specific validation; they don't make sense without a callback so make
     // sure it's present
@@ -565,7 +558,6 @@
 
     return exports.dialog(options);
   };
-
 
   // Helper function to simulate the native prompt() behavior. **NOTE**: This is non-blocking, so any
   // code that must happen after the prompt is dismissed should be placed within the callback function
@@ -599,7 +591,7 @@
     // capture the user's show value; we always set this to false before
     // spawning the dialog to give us a chance to attach some handlers to
     // it, but we need to make sure we respect a preference not to show it
-    shouldShow = (options.show === undefined) ? defaults.show : options.show;
+    shouldShow = options.show === undefined ? defaults.show : options.show;
 
     // This is required prior to calling the dialog builder below - we need to
     // add an event handler just before the prompt is shown
@@ -616,23 +608,27 @@
       var value;
 
       if (options.inputType === "checkbox") {
-        value = input.find("input:checked").map(function () {
-          return $(this).val();
-        }).get();
+        value = input
+          .find("input:checked")
+          .map(function () {
+            return $(this).val();
+          })
+          .get();
       } else if (options.inputType === "radio") {
         value = input.find("input:checked").val();
-      }
-      else {
+      } else {
         if (input[0].checkValidity && !input[0].checkValidity()) {
           // prevents button callback from being called
           return false;
         } else {
           if (options.inputType === "select" && options.multiple === true) {
-            value = input.find("option:selected").map(function () {
-              return $(this).val();
-            }).get();
-          }
-          else {
+            value = input
+              .find("option:selected")
+              .map(function () {
+                return $(this).val();
+              })
+              .get();
+          } else {
             value = input.val();
           }
         }
@@ -677,17 +673,16 @@
         }
 
         if (options.required) {
-          input.prop({ "required": true });
+          input.prop({ required: true });
         }
 
         if (options.rows && !isNaN(parseInt(options.rows))) {
           if (options.inputType === "textarea") {
-            input.attr({ "rows": options.rows });
+            input.attr({ rows: options.rows });
           }
         }
 
         break;
-
 
       case "date":
       case "time":
@@ -704,7 +699,7 @@
         }
 
         if (options.required) {
-          input.prop({ "required": true });
+          input.prop({ required: true });
         }
 
         // These input types have extra attributes which affect their input validation.
@@ -715,9 +710,10 @@
           if (options.step) {
             if (options.step === "any" || (!isNaN(options.step) && parseFloat(options.step) > 0)) {
               input.attr("step", options.step);
-            }
-            else {
-              throw new Error("\"step\" must be a valid positive number or the value \"any\". See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-step for more information.");
+            } else {
+              throw new Error(
+                '"step" must be a valid positive number or the value "any". See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-step for more information.'
+              );
             }
           }
         }
@@ -733,7 +729,6 @@
 
         break;
 
-
       case "select":
         var groups = {};
         inputOptions = options.inputOptions || [];
@@ -743,7 +738,7 @@
         }
 
         if (!inputOptions.length) {
-          throw new Error("prompt with \"inputType\" set to \"select\" requires at least one option");
+          throw new Error('prompt with "inputType" set to "select" requires at least one option');
         }
 
         // placeholder is not actually a valid attribute for select,
@@ -753,11 +748,11 @@
         }
 
         if (options.required) {
-          input.prop({ "required": true });
+          input.prop({ required: true });
         }
 
         if (options.multiple) {
-          input.prop({ "multiple": true });
+          input.prop({ multiple: true });
         }
 
         each(inputOptions, function (_, option) {
@@ -765,7 +760,7 @@
           var elem = input;
 
           if (option.value === undefined || option.text === undefined) {
-            throw new Error("each option needs a \"value\" property and a \"text\" property");
+            throw new Error('each option needs a "value" property and a "text" property');
           }
 
           // ... but override that element if this option sits in a group
@@ -793,23 +788,22 @@
 
         break;
 
-
       case "checkbox":
         var checkboxValues = $.isArray(options.value) ? options.value : [options.value];
         inputOptions = options.inputOptions || [];
 
         if (!inputOptions.length) {
-          throw new Error("prompt with \"inputType\" set to \"checkbox\" requires at least one option");
+          throw new Error('prompt with "inputType" set to "checkbox" requires at least one option');
         }
 
         // checkboxes have to nest within a containing element, so
         // they break the rules a bit and we end up re-assigning
         // our 'input' element to this container instead
-        input = $("<div class=\"bootbox-checkbox-list\"></div>");
+        input = $('<div class="bootbox-checkbox-list"></div>');
 
         each(inputOptions, function (_, option) {
           if (option.value === undefined || option.text === undefined) {
-            throw new Error("each option needs a \"value\" property and a \"text\" property");
+            throw new Error('each option needs a "value" property and a "text" property');
           }
 
           var checkbox = $(templates.inputs[options.inputType]);
@@ -828,23 +822,24 @@
         });
         break;
 
-
       case "radio":
         // Make sure that value is not an array (only a single radio can ever be checked)
         if (options.value !== undefined && $.isArray(options.value)) {
-          throw new Error("prompt with \"inputType\" set to \"radio\" requires a single, non-array value for \"value\"");
+          throw new Error(
+            'prompt with "inputType" set to "radio" requires a single, non-array value for "value"'
+          );
         }
 
         inputOptions = options.inputOptions || [];
 
         if (!inputOptions.length) {
-          throw new Error("prompt with \"inputType\" set to \"radio\" requires at least one option");
+          throw new Error('prompt with "inputType" set to "radio" requires at least one option');
         }
 
         // Radiobuttons have to nest within a containing element, so
         // they break the rules a bit and we end up re-assigning
         // our 'input' element to this container instead
-        input = $("<div class=\"bootbox-radiobutton-list\"></div>");
+        input = $('<div class="bootbox-radiobutton-list"></div>');
 
         // Radiobuttons should always have an initial checked input checked in a "group".
         // If value is undefined or doesn't match an input option, select the first radiobutton
@@ -852,7 +847,7 @@
 
         each(inputOptions, function (_, option) {
           if (option.value === undefined || option.text === undefined) {
-            throw new Error("each option needs a \"value\" property and a \"text\" property");
+            throw new Error('each option needs a "value" property and a "text" property');
           }
 
           var radio = $(templates.inputs[options.inputType]);
@@ -871,7 +866,7 @@
         });
 
         if (checkFirstRadio) {
-          input.find("input[type=\"radio\"]").first().prop("checked", true);
+          input.find('input[type="radio"]').first().prop("checked", true);
         }
         break;
     }
@@ -894,8 +889,7 @@
       var message = $(templates.promptMessage).html(options.message);
       form.prepend(message);
       options.message = form;
-    }
-    else {
+    } else {
       options.message = form;
     }
 
@@ -918,7 +912,6 @@
 
     return promptDialog;
   };
-
 
   // INTERNAL FUNCTIONS
   // *************************************************************************************************************
@@ -948,7 +941,6 @@
     return options;
   }
 
-
   //  Merge a set of default dialog options with user supplied arguments
   function mergeArguments(defaults, args, properties) {
     return $.extend(
@@ -960,13 +952,9 @@
       defaults,
       // args could be an object or array; if it's an array properties will
       // map it to a proper options object
-      mapArguments(
-        args,
-        properties
-      )
+      mapArguments(args, properties)
     );
   }
-
 
   //  This entry-level method makes heavy use of composition to take a simple
   //  range of inputs and return valid options suitable for passing to bootbox.dialog
@@ -1001,7 +989,6 @@
     );
   }
 
-
   //  Checks each button object to see if key is valid.
   //  This function will only be called by the alert, confirm, and prompt helpers.
   function validateButtons(options, buttons) {
@@ -1012,14 +999,14 @@
 
     each(options.buttons, function (key) {
       if (allowedButtons[key] === undefined) {
-        throw new Error("button key \"" + key + "\" is not allowed (options are " + buttons.join(" ") + ")");
+        throw new Error(
+          'button key "' + key + '" is not allowed (options are ' + buttons.join(" ") + ")"
+        );
       }
     });
 
     return options;
   }
-
-
 
   //  From a given list of arguments, return a suitable object of button labels.
   //  All this does is normalise the given labels and translate them where possible.
@@ -1040,8 +1027,6 @@
     return buttons;
   }
 
-
-
   //  Get localized text from a locale. Defaults to 'en' locale if no locale
   //  provided or a non-registered locale is requested
   function getText(key, locale) {
@@ -1049,8 +1034,6 @@
 
     return labels ? labels[key] : locales.en[key];
   }
-
-
 
   //  Filter and tidy up any user supplied parameters to this dialog.
   //  Also looks for any shorthands used and ensures that the options
@@ -1064,7 +1047,7 @@
     }
 
     if (!options.message) {
-      throw new Error("\"message\" option must not be null or an empty string.");
+      throw new Error('"message" option must not be null or an empty string.');
     }
 
     // make sure any supplied options take precedence over defaults
@@ -1072,9 +1055,12 @@
 
     //make sure backdrop is either true, false, or 'static'
     if (!options.backdrop) {
-      options.backdrop = (options.backdrop === false || options.backdrop === 0) ? false : "static";
+      options.backdrop = options.backdrop === false || options.backdrop === 0 ? false : "static";
     } else {
-      options.backdrop = typeof options.backdrop === "string" && options.backdrop.toLowerCase() === "static" ? "static" : true;
+      options.backdrop =
+        typeof options.backdrop === "string" && options.backdrop.toLowerCase() === "static"
+          ? "static"
+          : true;
     }
 
     // no buttons is still a valid dialog but it's cleaner to always have
@@ -1098,7 +1084,7 @@
 
       // before any further checks make sure by now button is the correct type
       if ($.type(button) !== "object") {
-        throw new Error("button with key \"" + key + "\" must be an object");
+        throw new Error('button with key "' + key + '" must be an object');
       }
 
       if (!button.label) {
@@ -1110,8 +1096,7 @@
         var isPrimary = false;
         if (options.swapButtonOrder) {
           isPrimary = index === 0;
-        }
-        else {
+        } else {
           isPrimary = index === total - 1;
         }
 
@@ -1128,12 +1113,10 @@
     return options;
   }
 
-
   //  Returns a count of the properties defined on the object
   function getKeyLength(obj) {
     return Object.keys(obj).length;
   }
-
 
   //  Tiny wrapper function around jQuery.each; just adds index as the third parameter
   function each(collection, iterator) {
@@ -1143,11 +1126,9 @@
     });
   }
 
-
   function focusPrimaryButton(e) {
     e.data.dialog.find(".bootbox-accept").first().trigger("focus");
   }
-
 
   function destroyModal(e) {
     // ensure we don't accidentally intercept hidden events triggered
@@ -1158,14 +1139,12 @@
     }
   }
 
-
   function unbindModal(e) {
     if (e.target === e.data.dialog[0]) {
       e.data.dialog.off("escape.close.bb");
       e.data.dialog.off("click");
     }
   }
-
 
   //  Handle the invoked dialog callback
   function processCallback(e, dialog, callback) {
@@ -1193,37 +1172,46 @@
 
     if (type === "date") {
       if (min !== undefined && !(minValid = dateIsValid(min))) {
-        console.warn("Browsers which natively support the \"date\" input type expect date values to be of the form \"YYYY-MM-DD\" (see ISO-8601 https://www.iso.org/iso-8601-date-and-time-format.html). Bootbox does not enforce this rule, but your min value may not be enforced by this browser.");
+        console.warn(
+          'Browsers which natively support the "date" input type expect date values to be of the form "YYYY-MM-DD" (see ISO-8601 https://www.iso.org/iso-8601-date-and-time-format.html). Bootbox does not enforce this rule, but your min value may not be enforced by this browser.'
+        );
+      } else if (max !== undefined && !(maxValid = dateIsValid(max))) {
+        console.warn(
+          'Browsers which natively support the "date" input type expect date values to be of the form "YYYY-MM-DD" (see ISO-8601 https://www.iso.org/iso-8601-date-and-time-format.html). Bootbox does not enforce this rule, but your max value may not be enforced by this browser.'
+        );
       }
-      else if (max !== undefined && !(maxValid = dateIsValid(max))) {
-        console.warn("Browsers which natively support the \"date\" input type expect date values to be of the form \"YYYY-MM-DD\" (see ISO-8601 https://www.iso.org/iso-8601-date-and-time-format.html). Bootbox does not enforce this rule, but your max value may not be enforced by this browser.");
-      }
-    }
-    else if (type === "time") {
+    } else if (type === "time") {
       if (min !== undefined && !(minValid = timeIsValid(min))) {
-        throw new Error("\"min\" is not a valid time. See https://www.w3.org/TR/2012/WD-html-markup-20120315/datatypes.html#form.data.time for more information.");
+        throw new Error(
+          '"min" is not a valid time. See https://www.w3.org/TR/2012/WD-html-markup-20120315/datatypes.html#form.data.time for more information.'
+        );
+      } else if (max !== undefined && !(maxValid = timeIsValid(max))) {
+        throw new Error(
+          '"max" is not a valid time. See https://www.w3.org/TR/2012/WD-html-markup-20120315/datatypes.html#form.data.time for more information.'
+        );
       }
-      else if (max !== undefined && !(maxValid = timeIsValid(max))) {
-        throw new Error("\"max\" is not a valid time. See https://www.w3.org/TR/2012/WD-html-markup-20120315/datatypes.html#form.data.time for more information.");
-      }
-    }
-    else {
+    } else {
       if (min !== undefined && isNaN(min)) {
         minValid = false;
-        throw new Error("\"min\" must be a valid number. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-min for more information.");
+        throw new Error(
+          '"min" must be a valid number. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-min for more information.'
+        );
       }
 
       if (max !== undefined && isNaN(max)) {
         maxValid = false;
-        throw new Error("\"max\" must be a valid number. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-max for more information.");
+        throw new Error(
+          '"max" must be a valid number. See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-max for more information.'
+        );
       }
     }
 
     if (minValid && maxValid) {
       if (max <= min) {
-        throw new Error("\"max\" must be greater than \"min\". See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-max for more information.");
-      }
-      else {
+        throw new Error(
+          '"max" must be greater than "min". See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-max for more information.'
+        );
+      } else {
         result = true;
       }
     }
@@ -1241,4 +1229,4 @@
 
   //  The Bootbox object
   return exports;
-}));
+});

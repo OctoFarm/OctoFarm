@@ -1,8 +1,8 @@
 import Calc from "../../utils/calc";
 
 const getSpinnerElement = () => {
-    return "<i class=\"fa-solid fa-circle-notch fa-spin\"></i>"
-}
+  return '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+};
 
 export const getFolderTemplate = (folder, id) => {
   return `
@@ -50,19 +50,19 @@ export const getFolderTemplate = (folder, id) => {
 
 export const getFileTemplate = (file, printerURL, id) => {
   let toolInfo = "";
-  if(file.toolUnits.length === 0){
-      toolInfo = getSpinnerElement();
-  }else{
-      file.toolUnits.forEach((unit, index) => {
-          toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-      });
+  if (file.toolUnits.length === 0) {
+    toolInfo = getSpinnerElement();
+  } else {
+    file.toolUnits.forEach((unit, index) => {
+      toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+    });
   }
 
   let thumbnail =
-    "<span class=\"text-center\"><i class=\"fas fa-file-code fa-2x\"></i></span>";
+    '<span class="text-center"><i class="fas fa-file-code fa-2x"></i></span>';
   if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
-      const thumbnailURL = `${printerURL}/${file.thumbnail}`;
-      thumbnail = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
+    const thumbnailURL = `${printerURL}/${file.thumbnail}`;
+    thumbnail = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
   }
   let fileDate = new Date(file.uploadDate * 1000);
   const dateString = fileDate.toDateString();
@@ -110,18 +110,28 @@ export const getFileTemplate = (file, printerURL, id) => {
                 <i class="fas fa-dollar-sign"></i> 
                 <span title="Expected Printer Cost" class="cost" id="fileCost-${
                   file.fullPath
-                }"> Printer Cost: ${!!file.printCost ? file.printCost.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                }"> Printer Cost: ${
+    !!file.printCost ? file.printCost.toFixed(2) : getSpinnerElement()
+  } </span>    <br> 
                 <i class="fa-solid fa-bolt"></i> 
                 <span title="Expected Electricity Cost" class="cost" id="fileElectricityCost-${
                   file.fullPath
-              }">
+                }">
                
-                Electricity Cost: ${!!file.electricityCosts ? file.electricityCosts.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                Electricity Cost: ${
+                  !!file.electricityCosts
+                    ? file.electricityCosts.toFixed(2)
+                    : getSpinnerElement()
+                } </span>    <br> 
                 <i class="fa-solid fa-wrench"></i>
                 <span title="Expected Maintainence Cost" class="cost" id="fileMaintainenceCost-${
-                      file.fullPath
-                  }"> 
-                Maintainence Cost: ${!!file.maintenanceCosts ? file.maintenanceCosts.toFixed(2) : getSpinnerElement()} </span>    <br> 
+                  file.fullPath
+                }"> 
+                Maintainence Cost: ${
+                  !!file.maintenanceCosts
+                    ? file.maintenanceCosts.toFixed(2)
+                    : getSpinnerElement()
+                } </span>    <br> 
                 <span title="Expected Filament Cost"> </span>
 
                 </p>
@@ -130,10 +140,12 @@ export const getFileTemplate = (file, printerURL, id) => {
                   file.fullPath
                 }" class="date d-none"> ${
     file.uploadDate
-  }</span><span id="fileDate-${file.fullPath}"> ${dateString} ${timeString}</span><br>
-                <span class="size" id="fileSize-${
-                  file.fullPath
-                }">${!!file?.fileSize ? Calc.bytes(file.fileSize) : getSpinnerElement()}</span> <br>
+  }</span><span id="fileDate-${
+    file.fullPath
+  }"> ${dateString} ${timeString}</span><br>
+                <span class="size" id="fileSize-${file.fullPath}">${
+    !!file?.fileSize ? Calc.bytes(file.fileSize) : getSpinnerElement()
+  }</span> <br>
             <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
               file.fullPath
             }"> ${toolInfo} </span>
@@ -158,31 +170,27 @@ export const getFileTemplate = (file, printerURL, id) => {
                 </button>
                 <button           title="Start printing file"
             id="${id}*fileActionStart*${
-      file.fullPath
+    file.fullPath
   }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
-              <button  title="Select file" id="${
-                id
-              }*fileActionSelect*${
-      file.fullPath
+              <button  title="Select file" id="${id}*fileActionSelect*${
+    file.fullPath
   }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
             </button>
-            <button          title="Move file" id="${
-              id
-            }*fileActionMove*${
-      file.fullPath
+            <button          title="Move file" id="${id}*fileActionMove*${
+    file.fullPath
   }" type="button" class="btn btn-warning">
       <i class="fas fa-people-carry"></i> Move
           </button>
-          <button          title="Download file" onclick="window.open('${printerURL}/downloads/files/local/${
-      encodeURI(file.fullPath)
-  }')" type="button" class="btn btn-dark">
+          <button          title="Download file" onclick="window.open('${printerURL}/downloads/files/local/${encodeURI(
+    file.fullPath
+  )}')" type="button" class="btn btn-dark">
     <i class="fas fa-download"></i> Download
         </button>
         <button title="Delete file" id="${printerURL}*fileActionDelete*${
-      file.fullPath
+    file.fullPath
   }" type="button" class="btn btn-danger">
   <i class="fas fa-trash-alt"></i> Delete
       </button>
@@ -216,7 +224,7 @@ export const noFilesToShow = () => {
 };
 
 export const printerTemplate = (printer, storageWarning, extruderList) => {
-    return `
+  return `
           <a
             data-jplist-item
             id="fileManagerPrinter-${printer._id}"
@@ -262,5 +270,5 @@ export const printerTemplate = (printer, storageWarning, extruderList) => {
               </div>
             </div>
           </a>
-    `
-}
+    `;
+};

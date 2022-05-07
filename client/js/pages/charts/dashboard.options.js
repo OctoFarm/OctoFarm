@@ -1,39 +1,39 @@
 import {
-    clippedPercentageFormatter,
-    defaultBackground,
-    defaultChartDimensions,
-    defaultChartWidth,
-    defaultDarkColor,
-    defaultDataLabelBackground,
-    enableAnimations,
-    fullChartDimensions,
-    getDefaultWeightDataLabelFormat,
-    getHiddenToolTempRepeated,
-    getToolTempSeries,
-    loadingText,
-    noopFormatter,
-    noZoom,
-    showStroke,
-    showToolbar,
-    theme,
-    toFixedWeightGramFormatter,
-    tooltipDataPointFormatter,
-    valueToLocaleDateStringFormatter,
-    valueToLocaleTimeStringFormatter
+  clippedPercentageFormatter,
+  defaultBackground,
+  defaultChartDimensions,
+  defaultChartWidth,
+  defaultDarkColor,
+  defaultDataLabelBackground,
+  enableAnimations,
+  fullChartDimensions,
+  getDefaultWeightDataLabelFormat,
+  getHiddenToolTempRepeated,
+  getToolTempSeries,
+  loadingText,
+  noopFormatter,
+  noZoom,
+  showStroke,
+  showToolbar,
+  theme,
+  toFixedWeightGramFormatter,
+  tooltipDataPointFormatter,
+  valueToLocaleDateStringFormatter,
+  valueToLocaleTimeStringFormatter,
 } from "./chart.utils";
 import {
-    defaultEnvironmentalYAxisAnnotations,
-    defaultHeatmapColorScaleOptions,
-    defaultTheme,
-    environmentalDataColors,
-    farmTempColors,
-    historyColors,
-    rainBow,
-    succesCountSeries,
-    successRateSeries,
-    utilisationConnectionColors,
-    utilisationConnectionLabels,
-    xAxisConnectionCategories
+  defaultEnvironmentalYAxisAnnotations,
+  defaultHeatmapColorScaleOptions,
+  defaultTheme,
+  environmentalDataColors,
+  farmTempColors,
+  historyColors,
+  rainBow,
+  succesCountSeries,
+  successRateSeries,
+  utilisationConnectionColors,
+  utilisationConnectionLabels,
+  xAxisConnectionCategories,
 } from "./chart.options";
 import UI from "../../utils/ui";
 
@@ -45,12 +45,12 @@ const optionsHourlyTemperature = {
     ...enableAnimations(false),
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   colors: farmTempColors,
   stroke: {
     curve: "smooth",
-    width: 2
+    width: 2,
   },
   ...showToolbar(false),
   ...theme(),
@@ -60,9 +60,9 @@ const optionsHourlyTemperature = {
   xaxis: {
     type: "datetime",
     labels: {
-      formatter: valueToLocaleTimeStringFormatter
-    }
-  }
+      formatter: valueToLocaleTimeStringFormatter,
+    },
+  },
 };
 const optionsWeeklyUtilisationPerDayHeatMap = {
   chart: {
@@ -73,12 +73,12 @@ const optionsWeeklyUtilisationPerDayHeatMap = {
       enabled: true,
       easing: "linear",
       dynamicAnimation: {
-        speed: 1000
-      }
+        speed: 1000,
+      },
     },
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   ...theme(),
   ...loadingText(),
@@ -90,8 +90,8 @@ const optionsWeeklyUtilisationPerDayHeatMap = {
       fontSize: "14px",
       fontFamily: "Helvetica, Arial, sans-serif",
       fontWeight: "bold",
-      colors: ["#000000"]
-    }
+      colors: ["#000000"],
+    },
   },
   stroke: {
     show: true,
@@ -99,27 +99,27 @@ const optionsWeeklyUtilisationPerDayHeatMap = {
     lineCap: "butt",
     colors: [defaultDarkColor()],
     width: 2,
-    dashArray: 0
+    dashArray: 0,
   },
   plotOptions: {
     heatmap: {
-      ...defaultHeatmapColorScaleOptions
-    }
+      ...defaultHeatmapColorScaleOptions,
+    },
   },
   legend: {
     markers: {
       offsetX: 0,
-      offsetY: 0
-    }
+      offsetY: 0,
+    },
   },
   tooltip: {
     y: {
-      formatter: clippedPercentageFormatter
-    }
+      formatter: clippedPercentageFormatter,
+    },
   },
   xaxis: {
-    reversed: true
-  }
+    reversed: true,
+  },
 };
 const currentStatusChartOptions = {
   series: [],
@@ -129,33 +129,33 @@ const currentStatusChartOptions = {
     height: "85%",
     ...showToolbar(false),
     ...enableAnimations(false),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   ...theme(),
   ...loadingText(),
   plotOptions: {
     bar: {
-      horizontal: true
-    }
+      horizontal: true,
+    },
   },
   dataLabels: {
     enabled: false,
-    formatter: noopFormatter
+    formatter: noopFormatter,
   },
   xaxis: {
-    categories: xAxisConnectionCategories
+    categories: xAxisConnectionCategories,
   },
   tooltip: {
     theme: defaultTheme,
     x: {
-      show: false
+      show: false,
     },
     y: {
       title: {
-        formatter: tooltipDataPointFormatter
-      }
-    }
-  }
+        formatter: tooltipDataPointFormatter,
+      },
+    },
+  },
 };
 
 const optionsUtilisation = {
@@ -163,7 +163,7 @@ const optionsUtilisation = {
     type: "donut",
     ...fullChartDimensions(),
     ...enableAnimations(true),
-    background: defaultBackground()
+    background: defaultBackground(),
   },
   ...theme(),
   plotOptions: {
@@ -171,19 +171,19 @@ const optionsUtilisation = {
       expandOnClick: false,
       dataLabels: {
         offset: 10,
-        minAngleToShowLabel: 15
-      }
-    }
+        minAngleToShowLabel: 15,
+      },
+    },
   },
   ...showStroke(false),
   tooltip: {
     y: {
-      formatter: clippedPercentageFormatter
-    }
+      formatter: clippedPercentageFormatter,
+    },
   },
   ...loadingText,
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   series: [],
   labels: utilisationConnectionLabels,
@@ -208,7 +208,7 @@ const optionsUtilisation = {
     offsetY: 0,
     labels: {
       colors: undefined,
-      useSeriesColors: false
+      useSeriesColors: false,
     },
     markers: {
       width: 9,
@@ -220,19 +220,19 @@ const optionsUtilisation = {
       customHTML: undefined,
       onClick: undefined,
       offsetX: 0,
-      offsetY: 0
+      offsetY: 0,
     },
     itemMargin: {
       horizontal: 1,
-      vertical: 0
+      vertical: 0,
     },
     onItemClick: {
-      toggleDataSeries: false
+      toggleDataSeries: false,
     },
     onItemHover: {
-      highlightDataSeries: false
-    }
-  }
+      highlightDataSeries: false,
+    },
+  },
 };
 
 const filamentUsageOverTimeChartOptions = {
@@ -244,17 +244,17 @@ const filamentUsageOverTimeChartOptions = {
     ...enableAnimations(true),
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   dataLabels: {
     enabled: true,
     background: defaultDataLabelBackground(),
-    formatter: toFixedWeightGramFormatter
+    formatter: toFixedWeightGramFormatter,
   },
   colors: rainBow(),
   stroke: {
     width: 2,
-    curve: "smooth"
+    curve: "smooth",
   },
   ...showToolbar(false),
   ...theme(),
@@ -265,9 +265,9 @@ const filamentUsageOverTimeChartOptions = {
   xaxis: {
     type: "datetime",
     labels: {
-      formatter: valueToLocaleDateStringFormatter
-    }
-  }
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
 };
 const printCompletionByDayChartOptions = {
   chart: {
@@ -277,28 +277,32 @@ const printCompletionByDayChartOptions = {
     ...enableAnimations(true),
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   colors: historyColors,
   dataLabels: {
     enabled: true,
-    background: defaultDataLabelBackground()
+    background: defaultDataLabelBackground(),
   },
   stroke: {
     width: 4,
-    curve: "smooth"
+    curve: "smooth",
   },
   ...showToolbar(false),
   ...theme(),
   ...loadingText(),
   series: [],
-  yaxis: [succesCountSeries(true), succesCountSeries(false), succesCountSeries(false)],
+  yaxis: [
+    succesCountSeries(true),
+    succesCountSeries(false),
+    succesCountSeries(false),
+  ],
   xaxis: {
     type: "category",
     labels: {
-      formatter: valueToLocaleDateStringFormatter
-    }
-  }
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
 };
 const printSuccessRatePerDay = {
   chart: {
@@ -310,28 +314,32 @@ const printSuccessRatePerDay = {
     ...enableAnimations(true),
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   colors: historyColors,
   dataLabels: {
     enabled: true,
-    background: defaultDataLabelBackground()
+    background: defaultDataLabelBackground(),
   },
   stroke: {
     width: 4,
-    curve: "smooth"
+    curve: "smooth",
   },
   ...showToolbar(false),
   ...theme(),
   ...loadingText(),
   series: [],
-  yaxis: [successRateSeries(true), successRateSeries(false), successRateSeries(false)],
+  yaxis: [
+    successRateSeries(true),
+    successRateSeries(false),
+    successRateSeries(false),
+  ],
   xaxis: {
     type: "category",
     labels: {
-      formatter: valueToLocaleDateStringFormatter
-    }
-  }
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
 };
 
 const filamentUsageByDayChartOptions = {
@@ -345,17 +353,17 @@ const filamentUsageByDayChartOptions = {
       curve: "smooth",
       lineCap: "butt",
       width: 1,
-      dashArray: 0
+      dashArray: 0,
     },
     ...enableAnimations(true),
     plotOptions: {
       bar: {
-        horizontal: false
-      }
+        horizontal: false,
+      },
     },
     ...showToolbar(false),
     ...noZoom(),
-    background: defaultBackground()
+    background: defaultBackground(),
   },
   dataLabels: getDefaultWeightDataLabelFormat(),
   colors: rainBow(),
@@ -366,19 +374,19 @@ const filamentUsageByDayChartOptions = {
   yaxis: [
     {
       title: {
-        text: "Weight"
+        text: "Weight",
       },
       labels: {
-        formatter: toFixedWeightGramFormatter
-      }
-    }
+        formatter: toFixedWeightGramFormatter,
+      },
+    },
   ],
   xaxis: {
     type: "category",
     labels: {
-      formatter: valueToLocaleDateStringFormatter
-    }
-  }
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
 };
 
 const environmentalDataChartOptions = {
@@ -389,11 +397,11 @@ const environmentalDataChartOptions = {
     ...enableAnimations(false),
     ...showToolbar(false),
     ...noZoom(),
-    ...defaultBackground()
+    ...defaultBackground(),
   },
   colors: environmentalDataColors,
   stroke: {
-    curve: "smooth"
+    curve: "smooth",
   },
   ...showToolbar(false),
   ...theme(),
@@ -404,61 +412,61 @@ const environmentalDataChartOptions = {
   xaxis: {
     type: "datetime",
     labels: {
-      formatter: valueToLocaleTimeStringFormatter
-    }
+      formatter: valueToLocaleTimeStringFormatter,
+    },
   },
   annotations: {
     position: "front",
-    yaxis: defaultEnvironmentalYAxisAnnotations
-  }
+    yaxis: defaultEnvironmentalYAxisAnnotations,
+  },
 };
 
 const historySparkLineOptions = {
   series: [
     {
-      data: []
-    }
+      data: [],
+    },
   ],
   chart: {
     type: "line",
     width: "100%",
     height: 85,
     sparkline: {
-      enabled: true
+      enabled: true,
     },
     zoom: {
-      enabled: false
+      enabled: false,
     },
-    background: "#303030"
+    background: "#303030",
   },
 
   theme: {
-    mode: "dark"
+    mode: "dark",
   },
   noData: {
-    text: "No Data to Display"
+    text: "No Data to Display",
   },
   colors: ["#3498db"],
   tooltip: {
     fixed: {
-      enabled: false
+      enabled: false,
     },
     x: {
       show: true,
-      formatter: ""
+      formatter: "",
     },
     y: {
       formatter: function (value) {
         return UI.generateTime(value);
       },
       title: {
-        formatter: (seriesName) => ""
-      }
+        formatter: (seriesName) => "",
+      },
     },
     marker: {
-      show: false
-    }
-  }
+      show: false,
+    },
+  },
 };
 
 export const dashboardOptions = {
@@ -471,5 +479,5 @@ export const dashboardOptions = {
   printCompletionByDayChartOptions,
   environmentalDataChartOptions,
   printSuccessRatePerDay,
-  historySparkLineOptions
+  historySparkLineOptions,
 };

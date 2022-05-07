@@ -22,14 +22,18 @@ currentHarvest.forEach((harvest) => {
     resetFile(id[1]);
   });
 });
-const currentRestartPrint = document.querySelectorAll("[id^='restartCurrentPrint-']");
+const currentRestartPrint = document.querySelectorAll(
+  "[id^='restartCurrentPrint-']"
+);
 currentRestartPrint.forEach((harvest) => {
   harvest.addEventListener("click", (e) => {
     const id = harvest.id.split("-");
     rePrint(id[1]);
   });
 });
-const currentOperationsSorting = document.getElementById("currentOperationsSort");
+const currentOperationsSorting = document.getElementById(
+  "currentOperationsSort"
+);
 
 if (currentOperationsSorting) {
   OctoFarmClient.getCurrentOpState()
@@ -37,68 +41,128 @@ if (currentOperationsSorting) {
       // Apply state
       const { currentIterie, currentOrder } = res;
       if (currentIterie === "progress" && currentOrder === "desc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-down").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-progress-down").innerHTML;
       }
       if (currentIterie === "progress" && currentOrder === "asc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-up").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-progress-up").innerHTML;
       }
       if (currentIterie === "timeRemaining" && currentOrder === "desc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-time-down").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-time-down").innerHTML;
       }
       if (currentIterie === "timeRemaining" && currentOrder === "asc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-time-up").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-time-up").innerHTML;
       }
       if (currentIterie === "fileName" && currentOrder === "desc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-file-down").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-file-down").innerHTML;
       }
       if (currentIterie === "fileName" && currentOrder === "asc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-file-up").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-file-up").innerHTML;
       }
       if (currentIterie === "sortIndex" && currentOrder === "desc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-index-down").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-index-down").innerHTML;
       }
       if (currentIterie === "sortIndex" && currentOrder === "asc") {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-index-up").innerHTML;
+        currentOperationsSorting.innerHTML =
+          document.getElementById("ci-index-up").innerHTML;
       }
-      document.getElementById("ci-progress-up").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-up").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "progress", order: "asc" });
-      });
-      document.getElementById("ci-progress-down").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-progress-down").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "progress", order: "desc" });
-      });
-      document.getElementById("ci-time-up").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-time-up").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "timeRemaining", order: "asc" });
-      });
-      document.getElementById("ci-time-down").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-time-down").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "timeRemaining", order: "desc" });
-      });
-      document.getElementById("ci-file-up").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-file-up").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "fileName", order: "asc" });
-      });
-      document.getElementById("ci-file-down").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-file-down").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "fileName", order: "desc" });
-      });
-      document.getElementById("ci-index-up").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-index-up").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "sortIndex", order: "asc" });
-      });
-      document.getElementById("ci-index-down").addEventListener("click", async () => {
-        currentOperationsSorting.innerHTML = document.getElementById("ci-index-down").innerHTML;
-        await OctoFarmClient.updateCurrentOpState({ iterie: "sortIndex", order: "desc" });
-      });
+      document
+        .getElementById("ci-progress-up")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-progress-up").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "progress",
+            order: "asc",
+          });
+        });
+      document
+        .getElementById("ci-progress-down")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-progress-down").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "progress",
+            order: "desc",
+          });
+        });
+      document
+        .getElementById("ci-time-up")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-time-up").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "timeRemaining",
+            order: "asc",
+          });
+        });
+      document
+        .getElementById("ci-time-down")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-time-down").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "timeRemaining",
+            order: "desc",
+          });
+        });
+      document
+        .getElementById("ci-file-up")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-file-up").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "fileName",
+            order: "asc",
+          });
+        });
+      document
+        .getElementById("ci-file-down")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-file-down").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "fileName",
+            order: "desc",
+          });
+        });
+      document
+        .getElementById("ci-index-up")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-index-up").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "sortIndex",
+            order: "asc",
+          });
+        });
+      document
+        .getElementById("ci-index-down")
+        .addEventListener("click", async () => {
+          currentOperationsSorting.innerHTML =
+            document.getElementById("ci-index-down").innerHTML;
+          await OctoFarmClient.updateCurrentOpState({
+            iterie: "sortIndex",
+            order: "desc",
+          });
+        });
     })
     .catch((e) => {
       // OH NOOO
     });
 }
 
-export default function currentOperationsService(currentOperations, currentOperationsCount, printerInfo) {
+export default function currentOperationsService(
+  currentOperations,
+  currentOperationsCount,
+  printerInfo
+) {
   printers = printerInfo;
   if (currentOperations.length === 0) {
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
@@ -109,27 +173,35 @@ export default function currentOperationsService(currentOperations, currentOpera
 
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;
-  document.getElementById("idleCount").innerHTML = "Idle: " + currentOperationsCount.idle;
-  document.getElementById("activeCount").innerHTML = "Active: " + currentOperationsCount.active;
+  document.getElementById("idleCount").innerHTML =
+    "Idle: " + currentOperationsCount.idle;
+  document.getElementById("activeCount").innerHTML =
+    "Active: " + currentOperationsCount.active;
   document.getElementById("disconCount").innerHTML =
     "Disconnected: " + currentOperationsCount.disconnected;
 
-  document.getElementById("offlineCount").innerHTML = "Offline: " + currentOperationsCount.offline;
+  document.getElementById("offlineCount").innerHTML =
+    "Offline: " + currentOperationsCount.offline;
 
-  document.getElementById("farmProgress").innerHTML = currentOperationsCount.farmProgress + "%";
-  document.getElementById("farmProgress").style = `width: ${currentOperationsCount.farmProgress}%`;
+  document.getElementById("farmProgress").innerHTML =
+    currentOperationsCount.farmProgress + "%";
+  document.getElementById(
+    "farmProgress"
+  ).style = `width: ${currentOperationsCount.farmProgress}%`;
   document.getElementById(
     "farmProgress"
   ).classList = `progress-bar progress-bar-striped bg-${currentOperationsCount.farmProgressColour}`;
-
-  // currentOperationsService = _.orderBy(currentOperationsService, ["progress"], ["desc"]);
 
   currentOperations.forEach((current, index) => {
     // Generate future time
     let currentDate = new Date();
     currentDate = currentDate.getTime();
-    const futureDateString = new Date(currentDate + current.timeRemaining * 1000).toDateString();
-    let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString();
+    const futureDateString = new Date(
+      currentDate + current.timeRemaining * 1000
+    ).toDateString();
+    let futureTimeString = new Date(
+      currentDate + current.timeRemaining * 1000
+    ).toTimeString();
     futureTimeString = futureTimeString.substring(0, 8);
     const dateComplete = futureDateString + ": " + futureTimeString;
     const finishedPrint = `<button id='currentHarvest-${current.index}' type='button' title="Clear your finished print from current operations" class='tag btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
@@ -145,22 +217,43 @@ export default function currentOperationsService(currentOperations, currentOpera
     // check if exists, create if not....
     if (document.getElementById("currentOpCard-" + current.index)) {
       if (current.progress === 100) {
-        document.getElementById("finishedPrint-" + current.index).classList.remove("d-none");
-        document.getElementById("futureDate-" + current.index).classList.add("d-none");
-        document.getElementById("currentRestart-" + current.index).classList.remove("d-none");
-        document.getElementById("currentTime-" + current.index).classList.add("d-none");
-        document.getElementById("currentProgressMain-" + current.index).classList.add("d-none");
+        document
+          .getElementById("finishedPrint-" + current.index)
+          .classList.remove("d-none");
+        document
+          .getElementById("futureDate-" + current.index)
+          .classList.add("d-none");
+        document
+          .getElementById("currentRestart-" + current.index)
+          .classList.remove("d-none");
+        document
+          .getElementById("currentTime-" + current.index)
+          .classList.add("d-none");
+        document
+          .getElementById("currentProgressMain-" + current.index)
+          .classList.add("d-none");
       } else {
-        document.getElementById("finishedPrint-" + current.index).classList.add("d-none");
-        document.getElementById("futureDate-" + current.index).classList.remove("d-none");
-        document.getElementById("currentRestart-" + current.index).classList.add("d-none");
-        document.getElementById("currentTime-" + current.index).classList.remove("d-none");
-        document.getElementById("currentProgressMain-" + current.index).classList.remove("d-none");
+        document
+          .getElementById("finishedPrint-" + current.index)
+          .classList.add("d-none");
+        document
+          .getElementById("futureDate-" + current.index)
+          .classList.remove("d-none");
+        document
+          .getElementById("currentRestart-" + current.index)
+          .classList.add("d-none");
+        document
+          .getElementById("currentTime-" + current.index)
+          .classList.remove("d-none");
+        document
+          .getElementById("currentProgressMain-" + current.index)
+          .classList.remove("d-none");
       }
-      const progress = document.getElementById("currentProgress-" + current.index);
-      document.getElementById("currentTime-" + current.index).innerHTML = Calc.generateTime(
-        current.timeRemaining
+      const progress = document.getElementById(
+        "currentProgress-" + current.index
       );
+      document.getElementById("currentTime-" + current.index).innerHTML =
+        Calc.generateTime(current.timeRemaining);
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
@@ -192,9 +285,13 @@ export default function currentOperationsService(currentOperations, currentOpera
         <h6 id="finishedPrint-${
           current.index
         }" class="pb-0 text-center d-none" style="font-size:0.6rem;"> ${finishedPrint} </h6>
-                    <div id="currentProgressMain-${current.index}" class="progress">
+                    <div id="currentProgressMain-${
+                      current.index
+                    }" class="progress">
                       <div id="currentProgress-${current.index}"
-                        class="progress-bar progress-bar-striped bg-${current.progressColour}"
+                        class="progress-bar progress-bar-striped bg-${
+                          current.progressColour
+                        }"
                         role="progressbar"
                         style="width: ${current.progress}%"
                         aria-valuenow="${current.progress}"
@@ -208,19 +305,26 @@ export default function currentOperationsService(currentOperations, currentOpera
                 </div>
                 `
       );
-      document.getElementById("currentHarvest-" + current.index).addEventListener("click", (e) => {
-        const id = document.getElementById("currentHarvest-" + current.index).id.split("-");
-        resetFile(id[1]);
-      });
+      document
+        .getElementById("currentHarvest-" + current.index)
+        .addEventListener("click", (e) => {
+          const id = document
+            .getElementById("currentHarvest-" + current.index)
+            .id.split("-");
+          resetFile(id[1]);
+        });
       document
         .getElementById("restartCurrentPrint-" + current.index)
         .addEventListener("click", (e) => {
-          const id = document.getElementById("restartCurrentPrint-" + current.index).id.split("-");
+          const id = document
+            .getElementById("restartCurrentPrint-" + current.index)
+            .id.split("-");
           rePrint(id[1]);
         });
     }
 
-    document.getElementById("currentOpCard-" + current.index).style.order = index;
+    document.getElementById("currentOpCard-" + current.index).style.order =
+      index;
 
     const currentCards = document.querySelectorAll("[id^='currentOpCard-']");
     const curr = [];

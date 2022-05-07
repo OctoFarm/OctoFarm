@@ -57,10 +57,10 @@ const updateUserActionTicker = (action) => {
 };
 
 const returnLast100Actions = () => {
-  if(last100Actions.length === 0){
-    getLast100ActionsFromDatabase().catch(e => {
+  if (last100Actions.length === 0) {
+    getLast100ActionsFromDatabase().catch((e) => {
       logger.error("Error returning last 100 actions", e.toString());
-    })
+    });
   }
   return last100Actions;
 };
@@ -85,5 +85,5 @@ const getLast100ActionsFromDatabase = async () => {
 
 module.exports = {
   updateUserActionLog,
-  returnLast100Actions,
+  returnLast100Actions
 };

@@ -2,9 +2,9 @@ import Calc from "../../../utils/calc.js";
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import OctoPrintClient from "../../../services/octoprint/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
-import UI from "../../../utils/ui"
-import {ClientErrors} from "../../../exceptions/octofarm-client.exceptions";
-import {ApplicationError} from "../../../exceptions/application-error.handler";
+import UI from "../../../utils/ui";
+import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
+import { ApplicationError } from "../../../exceptions/application-error.handler";
 
 let chart = null;
 let eventListener = false;
@@ -16,15 +16,15 @@ const options = {
     width: "100%",
     height: "500px",
     animations: {
-      enabled: false
+      enabled: false,
     },
     toolbar: {
-      show: false
+      show: false,
     },
     zoom: {
-      enabled: false
+      enabled: false,
     },
-    background: "#303030"
+    background: "#303030",
   },
   colors: [
     "#3e0b0b",
@@ -42,35 +42,35 @@ const options = {
     "#2d4c0d",
     "#93fc29",
     "#450124",
-    "#ff0084"
+    "#ff0084",
   ],
   stroke: {
     curve: "smooth",
-    width: 2
+    width: 2,
   },
   toolbar: {
-    show: false
+    show: false,
   },
   theme: {
-    mode: "dark"
+    mode: "dark",
   },
   noData: {
-    text: "Loading..."
+    text: "Loading...",
   },
   series: [],
   yaxis: [
     {
       title: {
-        text: "Temperature"
+        text: "Temperature",
       },
       labels: {
         formatter(value) {
           if (value !== null) {
             return `${value}°C`;
           }
-        }
-      }
-    }
+        },
+      },
+    },
   ],
   xaxis: {
     tickAmount: 10,
@@ -78,14 +78,11 @@ const options = {
     labels: {
       formatter(value) {
         const date = new Date(value * 1000);
-        return (
-           date.toLocaleTimeString("en-gb", { hour12 :false })
-        );
-      }
-    }
-  }
+        return date.toLocaleTimeString("en-gb", { hour12: false });
+      },
+    },
+  },
 };
-
 
 const octoFarmLogsMenu = document.getElementById("system-logs-list");
 const octoFarmLogsTable = document.getElementById("printerConnectionLogRows");
@@ -97,24 +94,33 @@ const octoPrintLogsMenu = document.getElementById("system-octologs-list");
 const octoPrintLogsTable = document.getElementById("octologsLogsTable");
 const octoPrintLogsCount = document.getElementById("octoPrintCount");
 const octoPrintLogsSelect = document.getElementById("octoPrintLogsSelect");
-const octoPrintPluginLogsMenu = document.getElementById("system-octoprint-list");
+const octoPrintPluginLogsMenu = document.getElementById(
+  "system-octoprint-list"
+);
 const octoPrintPluginLogsTable = document.getElementById("octoprintLogsRows");
 const octoPrintPluginLogsCount = document.getElementById("octoCount");
-const octoPrintKlipperLogsMenu = document.getElementById("system-octoprint-klipper-list");
-const octoPrintKlipperLogsTable = document.getElementById("klipperLogsTableRows");
+const octoPrintKlipperLogsMenu = document.getElementById(
+  "system-octoprint-klipper-list"
+);
+const octoPrintKlipperLogsTable = document.getElementById(
+  "klipperLogsTableRows"
+);
 const octoPrintKlipperLogsCount = document.getElementById("klipperCount");
-const octoPrintTemperatureMenu = document.getElementById("system-temperature-list");
+const octoPrintTemperatureMenu = document.getElementById(
+  "system-temperature-list"
+);
 const octoPrintTemperatureChart = document.getElementById("printerTempChart");
 const octoPrintTemperatureCount = document.getElementById("tempCount");
 const userActionLogsMenu = document.getElementById("system-action-list");
 const userActionLogsTable = document.getElementById("actionLogsTableRow");
-const userActionLogsCount = document.getElementById("actionCount")
+const userActionLogsCount = document.getElementById("actionCount");
 const refreshMenuButton = document.getElementById("system-refresh-list");
 const refreshMenuIcon = document.getElementById("refreshButtonIcon");
 
 export default class PrinterLogsService {
   static setPageToLoading(printerName) {
-    document.getElementById("printerLogsTitle").innerHTML = "Printer Logs: " + printerName;
+    document.getElementById("printerLogsTitle").innerHTML =
+      "Printer Logs: " + printerName;
     UI.addLoaderToElementsInnerHTML(octoFarmLogsCount);
     UI.addNotYetToElement(octoFarmLogsMenu);
     octoFarmLogsTable.innerHTML = "";
@@ -138,14 +144,14 @@ export default class PrinterLogsService {
 
     UI.addLoaderToElementsInnerHTML(octoPrintTemperatureCount);
     UI.addNotYetToElement(octoPrintTemperatureMenu);
-    if(chart !== null){
+    if (chart !== null) {
       chart.destroy();
     }
     chart = null;
     octoPrintTemperatureChart.innerHTML = "";
     octoPrintKlipperLogsTable.innerHTML = "";
     refreshMenuButton.disabled = true;
-    UI.addFaSpinToElement(refreshMenuIcon)
+    UI.addFaSpinToElement(refreshMenuIcon);
     updatedSeries = false;
   }
 
@@ -158,17 +164,17 @@ export default class PrinterLogsService {
     UI.removeLoaderFromElementInnerHTML(octoFarmLogsCount);
     UI.removeNotYetFromElement(octoFarmLogsMenu);
 
-    octofarmLogs.forEach(log => {
+    octofarmLogs.forEach((log) => {
       octoFarmLogsTable.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
             <tr class="${log.state}">
               <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.message}</td>
             </tr>
         `
       );
-    })
+    });
   }
 
   static loadUserActionLogs(userActionLogs) {
@@ -180,15 +186,15 @@ export default class PrinterLogsService {
     UI.removeLoaderFromElementInnerHTML(userActionLogsCount);
     UI.removeNotYetFromElement(userActionLogsMenu);
 
-    userActionLogs.forEach(log => {
+    userActionLogs.forEach((log) => {
       let prettyData = "";
-      for(const key in log?.data){
-        prettyData += `${key}: ${log.data[key]}<br>`
+      for (const key in log?.data) {
+        prettyData += `${key}: ${log.data[key]}<br>`;
       }
 
       userActionLogsTable.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
             <tr class="${log?.status}">
               <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.currentUser}</td>
@@ -198,24 +204,24 @@ export default class PrinterLogsService {
             </tr>
         `
       );
-    })
+    });
   }
-  static async drawOctoPrintLogs(printer, download){
+  static async drawOctoPrintLogs(printer, download) {
     octoPrintLogsTable.innerHTML = "";
     const octoPrintLogText = await this.parseOctoPrintLogs(printer, download);
-    octoPrintLogText.forEach(log => {
+    octoPrintLogText.forEach((log) => {
       octoPrintLogsTable.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
                                   <tr class="${log.colour}">
                                     <th scope="row">${log.index}: ${log.text}</th>
                                   </tr>
                               `
       );
-    })
+    });
   }
-  static loadPrinterErrors(errorLogs){
-    if(!errorLogs || errorLogs.length === 0){
+  static loadPrinterErrors(errorLogs) {
+    if (!errorLogs || errorLogs.length === 0) {
       printerErrorsCount.innerHTML = "(0)";
       return;
     }
@@ -223,16 +229,20 @@ export default class PrinterLogsService {
     UI.removeNotYetFromElement(printerErrorsMenu);
     printerErrorsCount.innerHTML = `(${errorLogs.length})`;
 
-    errorLogs.forEach(log => {
-      const resendsFormat = (!!log?.resendStats ? `Count: ${log.resendStats.count} / Transmitted: ${log.resendStats.transmitted} (${log.resendStats.ratio}%)` : "No resend stats")
+    errorLogs.forEach((log) => {
+      const resendsFormat = !!log?.resendStats
+        ? `Count: ${log.resendStats.count} / Transmitted: ${log.resendStats.transmitted} (${log.resendStats.ratio}%)`
+        : "No resend stats";
 
-      let logsFormat = "No terminal logs"
-      if(!!log.terminal){
+      let logsFormat = "No terminal logs";
+      if (!!log.terminal) {
         let prettyTerminal = "";
 
         log.terminal.forEach((terminal, index) => {
-          prettyTerminal += `<code><b>${index + 1}: </b>${terminal} <br></code>`
-        })
+          prettyTerminal += `<code><b>${
+            index + 1
+          }: </b>${terminal} <br></code>`;
+        });
 
         logsFormat = `
 
@@ -248,18 +258,16 @@ export default class PrinterLogsService {
         
             <div id="collapseOne-${log.id}" class="collapse" aria-labelledby="${log.id}-accordian-heading" data-parent="#accordionExample-${log.id}">
               <div class="card-body">
-                ${ prettyTerminal }
+                ${prettyTerminal}
               </div>
             </div>
           </div>
-      `
+      `;
       }
 
-
-
       printerErrorsTable.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
             <tr class="${log.state}">
               <th class="text-wrap" scope="row">${Calc.dateClean(log.date)}</th>
               <td class="text-wrap" >${log.message}</td>
@@ -268,10 +276,10 @@ export default class PrinterLogsService {
             </tr>
       `
       );
-    })
+    });
   }
-  static async loadPrinterTemperatures(printerTemperatures){
-    if(!printerTemperatures || printerTemperatures?.length === 0){
+  static async loadPrinterTemperatures(printerTemperatures) {
+    if (!printerTemperatures || printerTemperatures?.length === 0) {
       octoPrintTemperatureCount.innerHTML = "(0)";
       return;
     }
@@ -279,18 +287,17 @@ export default class PrinterLogsService {
     UI.removeNotYetFromElement(octoPrintTemperatureMenu);
     chart = new ApexCharts(octoPrintTemperatureChart, options);
     await chart.render();
-    await UI.delay(1000)
-    if(!updatedSeries){
+    await UI.delay(1000);
+    if (!updatedSeries) {
       await chart.updateSeries(printerTemperatures);
     }
-
   }
-  static fillChartData(printerTemperatures){
+  static fillChartData(printerTemperatures) {
     chart.updateSeries(printerTemperatures);
   }
-  static async loadOctoPrintLogs(printer){
+  static async loadOctoPrintLogs(printer) {
     const octoPrintLogsList = await this.getOctoPrintLogsList(printer);
-    if(!octoPrintLogsList || octoPrintLogsList?.files.length === 0){
+    if (!octoPrintLogsList || octoPrintLogsList?.files.length === 0) {
       octoPrintLogsCount.innerHTML = "(0)";
       return;
     }
@@ -304,24 +311,26 @@ export default class PrinterLogsService {
     const orderedSelectList = _.sortBy(octoPrintLogsList.files, [
       function (o) {
         return o.name;
-      }
+      },
     ]);
 
-    for(const log of orderedSelectList){
+    for (const log of orderedSelectList) {
       octoPrintLogsSelect.insertAdjacentHTML(
-          "beforeend",
-          `
+        "beforeend",
+        `
             <option value="${log.refs.download}">${log.name}</option>
           `
       );
     }
 
     octoPrintLogsSelect.value = octoPrintLogsList.files[mainLog].refs.download;
-    await this.drawOctoPrintLogs(printer, octoPrintLogsList.files[mainLog].refs.download)
-
+    await this.drawOctoPrintLogs(
+      printer,
+      octoPrintLogsList.files[mainLog].refs.download
+    );
   }
-  static loadPluginLogs(pluginLogs){
-    if(!pluginLogs || pluginLogs.length === 0){
+  static loadPluginLogs(pluginLogs) {
+    if (!pluginLogs || pluginLogs.length === 0) {
       octoPrintPluginLogsCount.innerHTML = "(0)";
       return;
     }
@@ -330,16 +339,18 @@ export default class PrinterLogsService {
     UI.removeLoaderFromElementInnerHTML(octoPrintPluginLogsCount);
     UI.removeNotYetFromElement(octoPrintPluginLogsMenu);
     octoPrintPluginLogsCount.innerHTML = `(${pluginLogs.length})`;
-    pluginLogs.forEach(log => {
-      octoPrintPluginLogsTable.insertAdjacentHTML("beforeend",
-          `
+    pluginLogs.forEach((log) => {
+      octoPrintPluginLogsTable.insertAdjacentHTML(
+        "beforeend",
+        `
             <tr class="${log.state}">
               <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.pluginDisplay}</td>
               <td>${log.message}</td>
             </tr>
-      `);
-    })
+      `
+      );
+    });
   }
   static async parseOctoPrintLogs(printer, url) {
     const octoPrintLogCall = await fetch(url, {
@@ -347,11 +358,11 @@ export default class PrinterLogsService {
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": printer.apikey,
-        Range: "bytes=-500000"
-      }
-    })
+        Range: "bytes=-500000",
+      },
+    });
 
-    if(octoPrintLogCall?.ok){
+    if (octoPrintLogCall?.ok) {
       const octoPrintLogBlob = await octoPrintLogCall.blob();
       const octoPrintLogTextUnparsed = await octoPrintLogBlob.text();
       const octoPrintLogTextParsed = [];
@@ -374,32 +385,45 @@ export default class PrinterLogsService {
           octoPrintLogTextParsed.push({
             colour,
             text: splitText[i],
-            index: splitText.length - i
-          })
+            index: splitText.length - i,
+          });
         }
       }
       return octoPrintLogTextParsed;
-    }else{
-      UI.createAlert("error", "Unable to download OctoPrint log... please check the logs", 3000, "Clicked");
+    } else {
+      UI.createAlert(
+        "error",
+        "Unable to download OctoPrint log... please check the logs",
+        3000,
+        "Clicked"
+      );
       const errorObject = ClientErrors.SILENT_ERROR;
-      errorObject.message =  `Unable to download OctoPrint log... OctoPrintLogCall: ${octoPrintLogCall}`
-      throw new ApplicationError(errorObject)
+      errorObject.message = `Unable to download OctoPrint log... OctoPrintLogCall: ${octoPrintLogCall}`;
+      throw new ApplicationError(errorObject);
     }
   }
-  static async getOctoPrintLogsList(printer){
-    const octoPrintLogsCall = await OctoPrintClient.get(printer, "plugin/logging/logs")
+  static async getOctoPrintLogsList(printer) {
+    const octoPrintLogsCall = await OctoPrintClient.get(
+      printer,
+      "plugin/logging/logs"
+    );
 
-    if(octoPrintLogsCall?.ok){
+    if (octoPrintLogsCall?.ok) {
       return octoPrintLogsCall.json();
-    }else{
-      UI.createAlert("error", "Unable to get OctoPrint logs list... please check the logs", 3000, "Clicked");
+    } else {
+      UI.createAlert(
+        "error",
+        "Unable to get OctoPrint logs list... please check the logs",
+        3000,
+        "Clicked"
+      );
       const errorObject = ClientErrors.SILENT_ERROR;
-      errorObject.message =  `Unable to grab OctoPrint Logs List... OctoPrintLogsCall: ${octoPrintLogsCall}`
-      throw new ApplicationError(errorObject)
+      errorObject.message = `Unable to grab OctoPrint Logs List... OctoPrintLogsCall: ${octoPrintLogsCall}`;
+      throw new ApplicationError(errorObject);
     }
   }
-  static loadKlipperLogs(klipperLogs){
-    if(!klipperLogs || klipperLogs.length === 0){
+  static loadKlipperLogs(klipperLogs) {
+    if (!klipperLogs || klipperLogs.length === 0) {
       octoPrintKlipperLogsCount.innerHTML = "(0)";
       return;
     }
@@ -408,44 +432,43 @@ export default class PrinterLogsService {
     UI.removeLoaderFromElementInnerHTML(octoPrintKlipperLogsCount);
     UI.removeNotYetFromElement(octoPrintKlipperLogsMenu);
     octoPrintKlipperLogsCount.innerHTML = `(${klipperLogs.length})`;
-    klipperLogs.forEach(log => {
-      octoPrintKlipperLogsTable.insertAdjacentHTML("beforeend",
-            `
+    klipperLogs.forEach((log) => {
+      octoPrintKlipperLogsTable.insertAdjacentHTML(
+        "beforeend",
+        `
             <tr class="${log.state}">
               <th scope="row">${Calc.dateClean(log.date)}</th>
               <td>${log.message}</td>
             </tr>
-      `);
-      })
+      `
+      );
+    });
   }
 
-  static setupListeners(printer, printerTemperatures){
-    if(eventListener){
+  static setupListeners(printer, printerTemperatures) {
+    if (eventListener) {
       return;
     }
 
     octoPrintLogsSelect.addEventListener("change", async (e) => {
-      await this.drawOctoPrintLogs(printer,  e.target.value)
-    })
-
+      await this.drawOctoPrintLogs(printer, e.target.value);
+    });
 
     refreshMenuButton.addEventListener("click", async () => {
       UI.addFaSpinToElement(refreshMenuIcon);
       refreshMenuButton.disabled = true;
       let connectionLogs = await OctoFarmClient.get(
-          "printers/connectionLogs/" + printer._id
+        "printers/connectionLogs/" + printer._id
       );
       await this.initialise(printer, connectionLogs);
-
-    })
+    });
 
     octoPrintTemperatureMenu.addEventListener("click", async () => {
-      if(!updatedSeries){
+      if (!updatedSeries) {
         this.fillChartData(printerTemperatures);
         updatedSeries = true;
       }
-
-    })
+    });
 
     eventListener = true;
   }
@@ -453,7 +476,14 @@ export default class PrinterLogsService {
   static async initialise(printer, connectionLogs) {
     this.setPageToLoading(printer.printerName);
 
-    const { currentErrorLogs, currentKlipperLogs, currentOctoFarmLogs, currentPluginManagerLogs, currentTempLogs, currentUserActionLogs } = connectionLogs;
+    const {
+      currentErrorLogs,
+      currentKlipperLogs,
+      currentOctoFarmLogs,
+      currentPluginManagerLogs,
+      currentTempLogs,
+      currentUserActionLogs,
+    } = connectionLogs;
 
     this.loadOctoFarmLogs(currentOctoFarmLogs);
 
@@ -472,6 +502,6 @@ export default class PrinterLogsService {
     this.setupListeners(printer, currentTempLogs);
 
     refreshMenuButton.disabled = false;
-    UI.removeFaSpinFromElement(refreshMenuIcon)
+    UI.removeFaSpinFromElement(refreshMenuIcon);
   }
 }

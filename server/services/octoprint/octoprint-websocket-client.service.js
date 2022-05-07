@@ -13,7 +13,6 @@ const ConnectionMonitorService = require("../../services/connection-monitor.serv
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
-const { averageMeanOfArray } = require("../../utils/math.utils.js");
 
 const logger = new Logger("OctoFarm-State");
 
