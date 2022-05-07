@@ -169,11 +169,13 @@ router.post("/register", async (req, res) => {
               newUser
                 .save()
                 .then(async () => {
-                  const currentSettings = await ServerSettingsDB.find({});
-                  currentSettings[0].server.registration = false;
-                  currentSettings[0].markModified("server.registration");
-                  currentSettings[0].save();
-                  await SettingsClean.start();
+                  if (userList.length < 1) {
+                    const currentSettings = await ServerSettingsDB.find({});
+                    currentSettings[0].server.registration = false;
+                    currentSettings[0].markModified("server.registration");
+                    currentSettings[0].save();
+                    await SettingsClean.start();
+                  }
                   req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
