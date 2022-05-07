@@ -732,7 +732,7 @@ async function updateLiveSystemInformation() {
     sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.osUptime);
   }
 
-  if (systemInformation.memoryLoadHistory.length > 0) {
+  if (!!systemInformation?.memoryLoadHistory && systemInformation.memoryLoadHistory.length > 0) {
     await memoryUsageDonut.updateSeries([
       systemInformation.memoryLoadHistory[
         systemInformation.memoryLoadHistory.length - 1
@@ -742,7 +742,7 @@ async function updateLiveSystemInformation() {
     await historicUsageGraph.updateOptions(initialChartOptions);
   }
 
-  if (systemInformation.cpuLoadHistory.length > 0) {
+  if (!!systemInformation?.cpuLoadHistory && systemInformation.cpuLoadHistory.length > 0) {
     await cpuUsageDonut.updateSeries([
       systemInformation.cpuLoadHistory[
         systemInformation.cpuLoadHistory.length - 1
