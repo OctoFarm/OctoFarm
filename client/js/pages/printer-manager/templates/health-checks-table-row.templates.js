@@ -735,11 +735,11 @@ export function returnFarmOverviewTableRow(
     });
   } else {
     octoPiColumns = `
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+      <td class="d-none"></td>
+      <td class="d-none"></td>
+      <td class="d-none"></td>
+      <td class="d-none"></td>
+      <td class="d-none"></td>
     `;
   }
 
