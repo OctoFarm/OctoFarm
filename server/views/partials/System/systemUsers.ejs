@@ -3,7 +3,9 @@
 
 <div class="row">
     <div class="col-12">
+        <% let disabledUsers = "" %>
         <% if(!serverSettings.server.loginRequired){ %>
+        <% disabledUsers = "disabled=true" %>
             <div class="alert alert-warning text-dark" role="alert">
                 The server has the login requirement turned off, the users below cannot be used.
             </div>
@@ -14,7 +16,7 @@
             <h4>User Manager</h4>
         </div>
         <div class="float-right">
-            <button id="createUserBtn" type="button" class="btn btn-success" data-toggle="modal" data-target="#userCreateModal"><i class="fas fa-user-plus"></i> New User</button>
+            <button id="createUserBtn" type="button" class="btn btn-success" data-toggle="modal" data-target="#userCreateModal" <%=disabledUsers%>><i class="fas fa-user-plus"></i> New User</button>
         </div>
     </div>
 </div>

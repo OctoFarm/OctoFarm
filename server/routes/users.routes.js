@@ -226,8 +226,6 @@ router.patch(
     };
     const id = req.paramString("id");
 
-    console.log(newUserInformation)
-
     if ("password" in newUserInformation) {
       return res.send(await resetPassword(id, newUserInformation));
     }
