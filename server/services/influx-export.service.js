@@ -51,6 +51,8 @@ function writePoints(tags, measurement, dataPoints) {
         fields: dataPoints
       }
     ]).catch((err) => {
+      db = null;
+      // switch off influx database too save calls and spamming logs.
       logger.error("Influx Tags", tags);
       logger.error("Influx Measurement", measurement);
       logger.error("Influx Datapoints", dataPoints);
