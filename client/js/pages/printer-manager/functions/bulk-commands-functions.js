@@ -403,7 +403,6 @@ export async function bulkPrintFileSetup() {
       "printers/listUnifiedFiles/" + JSON.stringify(idList)
   );
 
-  console.log(fileList)
   let selectedFiles;
 
   fileList.forEach(file => {
@@ -617,9 +616,7 @@ export async function bulkPrintFileSetup() {
   }
 
   function setup(printers) {
-    console.log("UPDATING")
     updateSelectedFolder(printers);
-    console.log(selectedFiles)
     if (selectedFiles) {
 
       if (selectedFiles.length === 1) {
