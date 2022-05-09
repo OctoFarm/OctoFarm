@@ -848,7 +848,7 @@ export default class FileManagerService {
           });
           if (newFolder !== "") {
             if (newFolder[0] === "/") {
-              newFolder.replace("/", "");
+             newFolder = newFolder.replace("/", "");
             }
           }
           if (locationInput[0] === "/") {
