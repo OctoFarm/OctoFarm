@@ -404,8 +404,19 @@ export async function bulkPrintFileSetup() {
   );
 
   console.log(fileList)
+  let selectedFiles;
 
-  bpFileSelect.addEventListener("change", () => {
+  fileList.forEach(file => {
+    bpFileSelect.insertAdjacentHTML("beforeend", `
+      <option value="${file.fullPath.replace(/%/g, "_")}"> ${file.fullPath} </option>
+    `)
+  })
+
+  bpFileSelect.addEventListener("change", (e) => {
+    selectedFiles = [];
+    for(const option of e.target.selectedOptions) {
+      selectedFiles.push({name: option.value})
+    }
     setup(printersToControl);
   })
 
@@ -430,7 +441,6 @@ export async function bulkPrintFileSetup() {
   // Load the new modal up...
   $("#bulkPrintSetupModal").modal("show");
   // Grab current list of printers...
-  let selectedFiles;
 
   const printerDisplayElement = document.getElementById(
     "bpSelectedPrintersAndFiles"
@@ -607,7 +617,9 @@ export async function bulkPrintFileSetup() {
   }
 
   function setup(printers) {
+    console.log("UPDATING")
     updateSelectedFolder(printers);
+    console.log(selectedFiles)
     if (selectedFiles) {
 
       if (selectedFiles.length === 1) {

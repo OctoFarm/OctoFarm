@@ -401,10 +401,12 @@ router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
 router.get(
   "/listUnifiedFiles/:idList",
   ensureAuthenticated,
-  validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
+  // validateParamsMiddleware(P_VALID.PRINTER_ID_LIST),
   async (req, res) => {
     const idList = req.paramString("idList");
-    const uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(idList);
+    const uniqueFolderPaths = getPrinterStoreCache().listCommonFilesOnAllPrinters(
+      JSON.parse(idList)
+    );
     res.json(uniqueFolderPaths);
   }
 );

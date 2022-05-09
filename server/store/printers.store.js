@@ -1014,7 +1014,7 @@ class PrinterStore {
             return o.name === file.name;
           });
           if (index === -1) {
-            uniqueFilesListFromAllPrinters.push(fileList[p]);
+            uniqueFilesListFromAllPrinters.push(file);
           }
         }
       }
