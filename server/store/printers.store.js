@@ -987,14 +987,14 @@ class PrinterStore {
   listUniqueFolderPaths() {
     const printers = this.listPrintersInformation();
 
-    const filePathsArray = [""];
+    const filePathsArray = ["/"];
 
     for (let printer of printers) {
       const folderList = printer?.fileList?.folderList;
       if (folderList) {
         for (let folder of folderList) {
-          if (!filePathsArray.includes(folder.name)) {
-            filePathsArray.push(folder.name);
+          if (!filePathsArray.includes(folder.name + "/")) {
+            filePathsArray.push(folder.name + "/");
           }
         }
       }
@@ -1145,6 +1145,14 @@ class PrinterStore {
     return printer;
   }
 
+  doesFolderExist(id, folderName) {
+    const printer = this.#findMePrinter(id);
+
+    return printer.fileList.folderList.filter(function (entry) {
+      return entry.name === folderName;
+    });
+  }
+
   addNewFolder(folder) {
     const { i, foldername } = folder;
     const printer = this.#findMePrinter(i);
@@ -1163,13 +1171,17 @@ class PrinterStore {
       display
     };
 
-    PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
-      .then(() => {
-        printer.fileList.folderList.push(newFolder);
-      })
-      .catch((e) => {
-        logger.error("Issue updating file list", e);
-      });
+    console.log(this.doesFolderExist(i, newFolder.name).length)
+
+    if (this.doesFolderExist(i, newFolder.name).length < 1) {
+      PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
+        .then(() => {
+          printer.fileList.folderList.push(newFolder);
+        })
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
+    }
 
     return printer;
   }

@@ -388,7 +388,7 @@ router.get("/scanNetwork", ensureAuthenticated, ensureAdministrator, async (req,
 });
 
 router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
-  const uniqueFolderPaths = getPrinterStoreCache.listUniqueFolderPaths();
+  const uniqueFolderPaths = getPrinterStoreCache().listUniqueFolderPaths();
   res.json(uniqueFolderPaths);
 });
 
