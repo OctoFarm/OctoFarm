@@ -1146,7 +1146,7 @@ export async function bulkOctoPrintGcodeCommand() {
                 // To cover old script states we must check for blank printer ids.
                 if (
                   scripts.printerIds.length === 0 ||
-                  scripts.printerIds.includes(printersToSendGcode[p]._id)
+                  scripts.printerIds.includes("99aa99aaa9999a99999999aa")
                 ) {
                   const post = await CustomGenerator.fireCommand(
                     scripts._id,
