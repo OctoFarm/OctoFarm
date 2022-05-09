@@ -148,6 +148,7 @@ class FileCleanerService {
     }
 
     const electricityCosts = getElectricityCosts(file.time, costSettings);
+
     const maintenanceCosts = getMaintenanceCosts(file.time, costSettings);
     const printCost = electricityCosts + maintenanceCosts;
 

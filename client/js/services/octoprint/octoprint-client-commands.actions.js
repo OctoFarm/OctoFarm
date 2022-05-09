@@ -2,6 +2,7 @@ import OctoPrintClient from "./octoprint-client.service.js";
 import UI from "../../utils/ui";
 import OctoFarmClient from "../octofarm-client.service";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
+import {printStartSequence} from "./octoprint-helpers.service";
 
 async function updateBtnOnClick(printerID) {
   const printer = await OctoFarmClient.getPrinter(printerID);
@@ -82,26 +83,10 @@ export async function updateOctoPrintClient(printer) {
 }
 
 export async function quickConnectPrinterToOctoPrint(printer) {
-  let data = {};
-  if (printer.connectionOptions) {
-    data = {
-      command: "connect",
-      port: printer?.connectionOptions?.portPreference,
-      baudrate: printer?.connectionOptions?.baudratePreference,
-      printerProfile: printer?.connectionOptions?.printerProfilePreference,
-      save: true,
-    };
-  } else {
-    data.command = "connect";
-    data.port = "AUTO";
-    data.baudrate = 0;
-    data.printerProfile = "_default";
-    data.save = false;
-  }
+  const status = await printStartSequence(printer);
   if (printer.printerState.colour.category === "Disconnected") {
-    const post = await OctoPrintClient.post(printer, "connection", data);
-    if (typeof post !== "undefined") {
-      if (post.status === 204) {
+    if (!!status) {
+      if (status === 204) {
         return {
           status: bulkActionsStates.SUCCESS,
           message: "Connection attempt was successful!",
@@ -111,7 +96,7 @@ export async function quickConnectPrinterToOctoPrint(printer) {
           status: bulkActionsStates.ERROR,
           message:
             "OctoPrint responded with a status of: " +
-            post.status +
+            status +
             "... please check your connection values in the printer settings modal.",
         };
       }

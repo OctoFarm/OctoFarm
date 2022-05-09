@@ -61,9 +61,10 @@ export const disconnectPrinterSequenceNoConfirm = async (printer) => {
 }
 
 export const printStartSequence = async (printer) => {
-  await connectPrinterSequence(printer);
+  const post = await connectPrinterSequence(printer);
   await OctoPrintClient.updateFeedAndFlow(printer);
   await OctoPrintClient.updateFilamentOffsets(printer);
   await OctoPrintClient.updateBedOffsets(printer);
   await OctoFarmClient.updateActiveControlUser(printer._id);
+  return post?.status;
 };

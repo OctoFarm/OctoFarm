@@ -1,6 +1,5 @@
 import OctoPrintClient from "./octoprint-client.service";
 import OctoFarmClient from "../octofarm-client.service";
-import {isPrinterDisconnected} from "../../utils/octofarm.utils";
 
 async function setupOctoPrintForTimelapses(printers, timeLapseSettings) {
   let successfulPrinters = "";
