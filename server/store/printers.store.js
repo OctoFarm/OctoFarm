@@ -81,7 +81,8 @@ class PrinterStore {
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
         activeControlUser: printer.activeControlUser,
-        fullyScanned: printer?.onboarding?.fullyScanned
+        fullyScanned: printer?.onboarding?.fullyScanned,
+        klipperState: printer?.klipperState
       };
     });
 
@@ -121,7 +122,8 @@ class PrinterStore {
         powerSettings: printer.powerSettings,
         resends: printer.resends,
         activeControlUser: printer.activeControlUser,
-        fullyScanned: printer?.onboarding?.fullyScanned
+        fullyScanned: printer?.onboarding?.fullyScanned,
+        klipperState: printer?.klipperState
       };
     });
 
@@ -985,14 +987,14 @@ class PrinterStore {
   listUniqueFolderPaths() {
     const printers = this.listPrintersInformation();
 
-    const filePathsArray = [""];
+    const filePathsArray = ["/"];
 
     for (let printer of printers) {
       const folderList = printer?.fileList?.folderList;
       if (folderList) {
         for (let folder of folderList) {
-          if (!filePathsArray.includes(folder.name)) {
-            filePathsArray.push(folder.name);
+          if (!filePathsArray.includes(folder.name + "/")) {
+            filePathsArray.push(folder.name + "/");
           }
         }
       }
@@ -1012,7 +1014,7 @@ class PrinterStore {
             return o.name === file.name;
           });
           if (index === -1) {
-            uniqueFilesListFromAllPrinters.push(fileList[p]);
+            uniqueFilesListFromAllPrinters.push(file);
           }
         }
       }
@@ -1117,13 +1119,12 @@ class PrinterStore {
       filePath = "local";
     }
 
-    const fileDisplay = name.replace(/_/g, " ");
     const data = {
       path: filePath,
       fullPath: path,
-      display: fileDisplay,
+      display: name,
       length: null,
-      name: name,
+      name: name.replace(/ /g, "_"),
       size: null,
       time: null,
       date: date.getTime() / 1000,
@@ -1132,15 +1133,33 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.fileList", data)
-      .then(() => {
-        printer.fileList.fileList.push(data);
-      })
-      .catch((e) => {
-        logger.error("Issue updating file list", e);
-      });
 
+    if (this.doesFileExist(index, data.fullPath).length < 1) {
+      PrinterService.findOneAndPush(index, "fileList.fileList", data)
+        .then(() => {
+          printer.fileList.fileList.push(data);
+        })
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
+    }
     return printer;
+  }
+
+  doesFileExist(id, pathName) {
+    const printer = this.#findMePrinter(id);
+
+    return printer.fileList.fileList.filter(function (entry) {
+      return entry.fullPath === pathName;
+    });
+  }
+
+  doesFolderExist(id, folderName) {
+    const printer = this.#findMePrinter(id);
+
+    return printer.fileList.folderList.filter(function (entry) {
+      return entry.name === folderName;
+    });
   }
 
   addNewFolder(folder) {
@@ -1154,20 +1173,21 @@ class PrinterStore {
       name = `${path}/${name}`;
     }
     const display = JSON.parse(JSON.stringify(name));
-    name = name.replace(/ /g, "_");
     const newFolder = {
-      name,
+      name: name,
       path,
       display
     };
 
-    PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
-      .then(() => {
-        printer.fileList.folderList.push(newFolder);
-      })
-      .catch((e) => {
-        logger.error("Issue updating file list", e);
-      });
+    if (this.doesFolderExist(i, newFolder.name).length < 1) {
+      PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)
+        .then(() => {
+          printer.fileList.folderList.push(newFolder);
+        })
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
+    }
 
     return printer;
   }

@@ -17,8 +17,11 @@ function getMaintenanceCosts(printTime, costSettings) {
   const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
   const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
   const estimatedPrintTime = getEstimatedPrintTime(printTime);
+
+  const cost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+
   // assembling string
-  return (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+  return !!cost ? cost : 0;
 }
 
 function getEstimatedPrintTime(printTime) {
@@ -33,7 +36,10 @@ function getElectricityCosts(printTime, costSettings) {
   const costOfElectricity = parseFloat(costSettings.electricityCosts);
   const costPerHour = powerConsumption * costOfElectricity;
   const estimatedPrintTime = getEstimatedPrintTime(printTime); // h
-  return costPerHour * estimatedPrintTime;
+
+  const cost = costPerHour * estimatedPrintTime;
+
+  return !!cost ? cost : 0;
 }
 
 module.exports = {

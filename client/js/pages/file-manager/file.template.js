@@ -73,6 +73,7 @@ export const getFileTemplate = (file, printerURL, id) => {
   } else if (file.last === false) {
     bgColour = "bg-dark-failed";
   }
+
   return `
     <div
       id="file-${file.fullPath}"
@@ -119,7 +120,7 @@ export const getFileTemplate = (file, printerURL, id) => {
                 }">
                
                 Electricity Cost: ${
-                  !!file.electricityCosts
+                  typeof file?.electricityCosts !== "undefined"
                     ? file.electricityCosts.toFixed(2)
                     : getSpinnerElement()
                 } </span>    <br> 
@@ -127,8 +128,9 @@ export const getFileTemplate = (file, printerURL, id) => {
                 <span title="Expected Maintainence Cost" class="cost" id="fileMaintainenceCost-${
                   file.fullPath
                 }"> 
+               
                 Maintainence Cost: ${
-                  !!file.maintenanceCosts
+                  typeof file?.maintenanceCosts !== "undefined"
                     ? file.maintenanceCosts.toFixed(2)
                     : getSpinnerElement()
                 } </span>    <br> 

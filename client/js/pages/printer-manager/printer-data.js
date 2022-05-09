@@ -576,7 +576,9 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document
         .getElementById(`printerAPIScanning-${printer._id}`)
-        .addEventListener("click", async () => {
+        .addEventListener("click", async (e) => {
+          e.target.disabled = true;
+          UI.addDisplayNoneToElement(e.target);
           const { msg } = await OctoFarmClient.forceReconnect(printer._id);
           UI.createAlert(
             "warning",
@@ -584,6 +586,7 @@ export function createOrUpdatePrinterTableRow(printers) {
             5000,
             "Clicked"
           );
+          e.target.disabled = false;
         });
 
       document

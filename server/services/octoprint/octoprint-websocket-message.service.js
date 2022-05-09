@@ -66,6 +66,8 @@ const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 
 const logger = new Logger("OctoFarm-OctoPrint-Messages");
 
+const loggedMissingPlugins = {};
+
 class OctoprintWebsocketMessageService {
   static parseOctoPrintWebsocketMessage = (message) => {
     const packet = JSON.parse(message);
@@ -314,16 +316,22 @@ class OctoprintWebsocketMessageService {
       case OP_WS_PLUGIN_KEYS.display_layer_progress:
         // Silence the other outputs from the plugin
         break;
+      case OP_WS_PLUGIN_KEYS.psucontrol:
+        // silent psu control, supported an easier way
+        break;
       case OP_WS_PLUGIN_KEYS.display_layer_progress_ws_payload:
         // Capture websocket data, it's all we need
         captureDisplayLayerProgress(printerID, data);
         break;
       default:
-        logger.warning("Unknown plugin detected!", { header, type });
-        logger.warning("Unknown data!", data);
-        logger.info(
-          "This plugin is currently un-supported, please open a discussion if you'd like it supporting in OctoFarm!"
-        );
+        if (!loggedMissingPlugins[header]) {
+          loggedMissingPlugins[header] = true;
+          logger.warning("Unknown plugin detected!", { header, type });
+          logger.warning("Unknown data!", data);
+          logger.info(
+            "This plugin is currently un-supported, please open a discussion if you'd like it supporting in OctoFarm!"
+          );
+        }
     }
   }
 }

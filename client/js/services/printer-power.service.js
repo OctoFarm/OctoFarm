@@ -248,5 +248,6 @@ export default class PrinterPowerService {
     this.timer[printer._id].isPoweredOn = await this.printerIsPoweredOn(
       printer
     );
+    return post;
   }
 }

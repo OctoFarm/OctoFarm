@@ -165,17 +165,17 @@ export const loadPageStatistics = async () => {
   let remainingBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
     remainingBreakdown += `<th scope="col">${
-      (used.total - used.used).toFixed(2) / 1000
+        ((used.total - used.used)/ 1000).toFixed(2)
     }kg</th>`;
   });
   let usedBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    usedBreakdown += `<th scope="col">${used.used.toFixed(2) / 1000}kg</th>`;
+    usedBreakdown += `<th scope="col">${(used.used / 1000).toFixed(2)}kg</th>`;
   });
 
   let weightBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    weightBreakdown += `<th scope="col">${used.total.toFixed(2) / 1000}kg</th>`;
+    weightBreakdown += `<th scope="col">${(used.total / 1000).toFixed(0)}kg</th>`;
   });
 
   let costBreakdown = "";
@@ -189,23 +189,23 @@ export const loadPageStatistics = async () => {
     ${headerBreakdown}    
   </tr>
   `;
-
   pageElements.filamentOverviewTable.innerHTML = `
   <tr>
+
       <td scope="row">Remaining <span class="badge badge-success ml-2">${
-        (statistics.total.toFixed(0) - statistics.used.toFixed(0)) / 1000
+      (statistics.total - statistics.used / 1000 ).toFixed(2)
       }kg</span></td>
       ${remainingBreakdown}
   </tr>
   <tr>
       <td scope="row">Used <span class="badge badge-warning ml-2">${
-        statistics.used.toFixed(0) / 1000
+      (statistics.used / 1000).toFixed(2)
       }kg</span> </td>
       ${usedBreakdown}
   </tr>
   <tr>
       <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${
-        statistics.total.toFixed(0) / 1000
+      (statistics.total / 1000).toFixed(0)
       }kg</span></th>
       ${weightBreakdown}
   </tr>
@@ -248,7 +248,9 @@ export const renderFilamentUsageCharts = async () => {
     history: { totalByDay, usageOverTime },
   } = await OctoFarmClient.getHistoryStatistics();
 
-  if (usageOverTime.length > 1) {
+  console.log(totalByDay, usageOverTime)
+
+  if (!!usageOverTime && usageOverTime[0].data.length > 1) {
     const filamentUsageOverTimeChart = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
       dashboardOptions.filamentUsageOverTimeChartOptions
@@ -257,7 +259,7 @@ export const renderFilamentUsageCharts = async () => {
 
     await filamentUsageOverTimeChart.updateSeries(usageOverTime);
   }
-  if (totalByDay.length > 1) {
+  if (!!totalByDay && totalByDay[0].data.length > 1) {
     const totalByDayChart = new ApexCharts(
       document.querySelector("#usageOverTime"),
       dashboardOptions.filamentUsageByDayChartOptions

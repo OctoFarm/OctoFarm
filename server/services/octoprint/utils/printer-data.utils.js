@@ -97,7 +97,8 @@ const acquirePrinterFilesAndFolderData = function (fileList) {
 
     const folderPaths = {
       name: "",
-      path: ""
+      path: "",
+      display: ""
     };
     if (isFolder) {
       if (entry.path.indexOf("/") > -1) {
@@ -108,10 +109,12 @@ const acquirePrinterFilesAndFolderData = function (fileList) {
 
       if (entry.path.indexOf("/")) {
         folderPaths.name = entry.path;
+        folderPaths.display = entry.path;
       } else {
         folderPaths.name = entry.path.substr(0, entry.path.lastIndexOf("/"));
+        folderPaths.display = entry.path.substr(0, entry.path.lastIndexOf("/"));
       }
-      folderPaths.display = folderPaths.name.replace("/_/g", " ");
+
       printerLocations.push(folderPaths);
     }
 

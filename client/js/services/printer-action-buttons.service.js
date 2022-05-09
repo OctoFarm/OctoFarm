@@ -15,6 +15,7 @@ import {
   printerHomeAllAxis,
   printerTurnOffHeaters,
 } from "./octoprint/octoprint-printer-commands.actions";
+import {connectPrinterSequence, disconnectPrinterSequenceNoConfirm} from "./octoprint/octoprint-helpers.service";
 
 function returnActionBtnTemplate(id, webURL) {
   return `
@@ -330,66 +331,34 @@ function addEventListeners(printer) {
           .getElementById("printerQuickConnect-" + printer._id)
           .classList.contains("btn-danger")
       ) {
-        const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
-        //TODO enable quick connect setting for this to be enabled or disabled...
-        if (canPowerOnThePrinter) {
-          await PrinterPowerService.sendPowerCommandForPrinter(
-            printer,
-            printer.powerSettings.powerOnURL,
-            printer.powerSettings.powerOnCommand,
-            "power on"
-          );
-          // Should be long enough for the printer to boot up.
-          // TODO also make customisable
-          await UI.delay(3000);
-        }
-
-        let data = {};
-        if (typeof printer.connectionOptions !== "undefined") {
-          data = {
-            command: "connect",
-            port: printer?.connectionOptions?.portPreference,
-            baudrate: parseInt(printer.connectionOptions?.baudratePreference),
-            printerProfile: printer.connectionOptions?.printerProfilePreference,
-          };
-        } else {
-          UI.createAlert(
-            "warning",
-            `${printer.printerName} has no preferences saved, defaulting to AUTO...`,
-            8000,
-            "Clicked"
-          );
-          data.command = "connect";
-          data.port = "AUTO";
-          data.baudrate = 0;
-          data.printerProfile = "_default";
-        }
-        let post = await OctoPrintClient.post(printer, "connection", data);
-        if (typeof post !== "undefined") {
-          if (post.status === 204) {
+        // Connect Printer Sequence
+        const status = await connectPrinterSequence(printer);
+        if (typeof status !== "undefined") {
+          if (status === 204) {
             UI.createAlert(
-              "success",
-              `Successfully made connection attempt to ${printer.printerName}...`,
-              3000,
-              "Clicked"
+                "success",
+                `${printer.printerName}: Brought online`,
+                3000,
+                "Clicked"
             );
           } else {
             UI.createAlert(
-              "error",
-              `There was an issue connecting to ${printer.printerName} it's either not online, or the connection options supplied are not available...`,
-              3000,
-              "Clicked"
+                "error",
+                `There was an issue connecting to ${printer.printerName} it's either not online, or the connection options supplied are not available...`,
+                3000,
+                "Clicked"
             );
           }
         } else {
           UI.createAlert(
-            "error",
-            `No response from ${printer.printerName}, is it online???`,
-            3000,
-            "Clicked"
+              "error",
+              `No response from ${printer.printerName}, is it online???`,
+              3000,
+              "Clicked"
           );
         }
-      } else {
+      }else{
+        // Disconnect Printer Sequence
         bootbox.confirm({
           message: "Are you sure you want to disconnect your printer?",
           buttons: {
@@ -403,41 +372,34 @@ function addEventListeners(printer) {
             },
           },
           callback: async function (result) {
-            if (result) {
-              let data = {
-                command: "disconnect",
-              };
-              let post = await OctoPrintClient.post(
-                printer,
-                "connection",
-                data
-              );
-              if (typeof post !== "undefined") {
-                if (post.status === 204) {
+            if(result){
+              const status = await disconnectPrinterSequenceNoConfirm(printer);
+              if (!!status) {
+                if (status === 204) {
                   UI.createAlert(
-                    "success",
-                    `Successfully made disconnect attempt to ${printer.printerName}...`,
-                    3000,
-                    "Clicked"
+                      "success",
+                      `${printer.printerName}: Disconnected!`,
+                      3000,
+                      "Clicked"
                   );
                 } else {
                   UI.createAlert(
-                    "error",
-                    `There was an issue disconnecting to ${printer.printerName} are you sure it's online?`,
-                    3000,
-                    "Clicked"
+                      "error",
+                      `There was an issue disconnecting to ${printer.printerName} are you sure it's online?`,
+                      3000,
+                      "Clicked"
                   );
                 }
               } else {
                 UI.createAlert(
-                  "error",
-                  `No response from ${printer.printerName}, is it online???`,
-                  3000,
-                  "Clicked"
+                    "error",
+                    `No response from ${printer.printerName}, is it online???`,
+                    3000,
+                    "Clicked"
                 );
               }
             }
-          },
+          }
         });
       }
     });

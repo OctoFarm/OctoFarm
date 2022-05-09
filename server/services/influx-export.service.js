@@ -1,8 +1,7 @@
 // Support for influx v1.X
 
 const Influx = require("influx");
-const settingsClean = require("./settings-cleaner.service.js");
-const SettingsClean = settingsClean.SettingsClean;
+const { SettingsClean } = require("./settings-cleaner.service.js");
 const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
@@ -52,6 +51,8 @@ function writePoints(tags, measurement, dataPoints) {
         fields: dataPoints
       }
     ]).catch((err) => {
+      db = null;
+      // switch off influx database too save calls and spamming logs.
       logger.error("Influx Tags", tags);
       logger.error("Influx Measurement", measurement);
       logger.error("Influx Datapoints", dataPoints);
