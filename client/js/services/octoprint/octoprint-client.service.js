@@ -3,7 +3,7 @@ import OctoFarmClient from "../octofarm-client.service";
 import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import { printActionStatusResponse } from "./octoprint.helpers-commands.actions";
-import { printStartSequence } from "./octoprint-helpers.service";
+import {printLoadSequence, printStartSequence} from "./octoprint-helpers.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
