@@ -764,6 +764,7 @@ export default class FileManagerService {
   static async multiUpload() {
     let selectedPrinters = null;
     let selectedFolder = "";
+    let newFolder = "";
     let printAfterUpload = true;
     let selectedFile = null;
     await PrinterSelectionService.create(
@@ -802,7 +803,7 @@ export default class FileManagerService {
         multiFolderInput.insertAdjacentHTML(
           "beforeend",
           `
-          <option value=${path.replace(/ /g, "_")}>${path.replace(/_/g, " ")}</option>
+          <option value=${path.replace(/ /g, "%")}>${path}</option>
         `
         );
       });
@@ -813,7 +814,7 @@ export default class FileManagerService {
         .getElementById("multiUpSubmitBtn")
         .addEventListener("click", async () => {
           let locationInput = multiFolderInput.value;
-          let newFolder = multiNewFolderNew.value;
+          newFolder = multiNewFolderNew.value;
 
           const printers = await OctoFarmClient.listPrinters();
           selectedPrinters.forEach((printer, index) => {
@@ -854,15 +855,17 @@ export default class FileManagerService {
             locationInput = locationInput.replace("/", "");
           }
 
-          selectedFolder = `${locationInput}${newFolder}`;
+          selectedFolder = `${locationInput}${newFolder}`.replace(/%/g, " ");
 
           if (selectedFolder[selectedFolder.length-1] === "/") {
             selectedFolder = selectedFolder.replace("/", "");
           }
 
-          const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
+          const testFolderPath = selectedFolder.replace(/ /g, "%")
+
+          const regexValidation = new RegExp("\\/[a-zA-Z0-9_%\\/-]*[^\\/]$");
           // validate the path
-          if (selectedFolder !== "" && !regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
+          if (newFolder !== "" && !regexValidation.exec("/" + testFolderPath)) {
             multiFolderInput.classList.add(isInValid);
             multiNewFolderNew.classList.add(isInValid);
           } else {
@@ -871,7 +874,6 @@ export default class FileManagerService {
             multiFolderInput.classList.remove(isInValid);
             multiFolderInput.classList.add(isValid);
             await checkIfPathExistsOnOctoPrint();
-
             await selectFilesToupload();
           }
         });
@@ -900,7 +902,6 @@ export default class FileManagerService {
           continue;
         }
 
-
         const doesFolderExist = await OctoPrintClient.checkFile(
           currentPrinter,
           selectedFolder
@@ -922,7 +923,7 @@ export default class FileManagerService {
       if(selectedFolder === ""){
         multiSelectFolderElement.innerHTML = "local/"
       }else{
-        multiSelectFolderElement.innerHTML = selectedFolder.replace(/_/g, " ");
+        multiSelectFolderElement.innerHTML = selectedFolder.replace(/%/g, " ");
       }
 
       document.getElementById("multiFolder").disabled = true;
@@ -979,11 +980,33 @@ export default class FileManagerService {
         const currentPrinter = selectedPrinters[p].printerInfo;
         // Make sure the folder is created...
         if (!selectedPrinters[p].folderExists) {
-          const response = await FileActions.multiUploadCreateFolders(
-            currentPrinter,
-            selectedFolder
-          );
-          updateTableRow(printerInfo[p]._id, response.status, response.message);
+          const folderSplit = selectedFolder.split("/");
+          let octofarmPath;
+          for (let path = 0; path < folderSplit.length; path++) {
+            const formData = new FormData();
+            if (path === 0) {
+              //First folder goes to no path
+              octofarmPath = "";
+              formData.append("foldername", folderSplit[path]);
+              formData.append("path", "");
+            } else if(path === folderSplit.length) {
+              octofarmPath += `/${folderSplit[path]}`;
+              formData.append("foldername", folderSplit[path]);
+              formData.append("path", octofarmPath);
+            } else {
+              //Subsequent folders go to previous folder path... should be created!
+              octofarmPath += `/${folderSplit[path - 1]}`;
+              formData.append("foldername", folderSplit[path]);
+              formData.append("path", octofarmPath);
+            }
+            const response = await FileActions.multiUploadCreateFolders(
+              currentPrinter,
+              octofarmPath,
+              formData,
+              folderSplit[path]
+            );
+            updateTableRow(printerInfo[p]._id, response.status, response.message);
+          }
         } else {
           const response = {
             status: "skipped",
@@ -998,7 +1021,7 @@ export default class FileManagerService {
           newObject.index = currentPrinter._id;
           newObject.printerInfo = currentPrinter;
           newObject.upload = FileManagerService.fileUpload;
-          newObject.currentFolder = "local/" + selectedFolder.replace(/_/g, " ");
+          newObject.currentFolder = "local/" + selectedFolder.replace(/%/g, " ");
 
           if (printAfterUpload) {
             newObject.print = true;
@@ -1110,14 +1133,14 @@ export class FileActions {
       async function (result) {
         if (result) {
           formData.append("foldername", result);
-          formData.append("path", `${currentFolder}/`.replace(/_/g, " "));
+          formData.append("path", `${currentFolder}/`);
           const post = await OctoPrintClient.folder(printer, "local", formData);
           const { status } = post;
           if (status === 201 || status === 200) {
             const opts = {
               i: printer._id,
               foldername: result,
-              path: currentFolder.replace(/_/g, " ")
+              path: currentFolder
             };
             await OctoFarmClient.post("printers/newFolder", opts);
             await FileManagerSortingService.loadSort(printer._id);
@@ -1139,47 +1162,34 @@ export class FileActions {
       }
     );
   }
-  static async multiUploadCreateFolders(printer, folderPath) {
-    const folderSplit = folderPath.split("/");
-    for (let path = 0; path < folderSplit.length; path++) {
-      const formData = new FormData();
-      let octofarmPath;
-      if (path === 0) {
-        //First folder goes to no path
-        octofarmPath = "";
-        formData.append("foldername", folderSplit[path]);
-        formData.append("path", "");
-      } else {
-        //Subsequent folders go to previous folder path... should be created!
-        octofarmPath = folderSplit[path - 1];
-        formData.append("foldername", folderSplit[path]);
-        formData.append("path", octofarmPath);
-      }
+  static async multiUploadCreateFolders(printer, octofarmPath, formData, currentPath) {
+
       const { status, files } = await OctoPrintClient.folder(
         printer,
         "local",
         formData
       );
+
       if (status === 201) {
         // Add status folder creation success and update OctoFarm with new folder...
         const opts = {
           i: printer._id,
-          foldername: folderSplit[path].replace(/_/g, " "),
-          path: octofarmPath.replace(/_/g, " "),
+          foldername: currentPath,
+          path: octofarmPath,
         };
+
         await OctoFarmClient.post("printers/newFolder", opts);
         return {
           status: "success",
-          message: "Successfully created your missing folder!",
+          message: `${currentPath}: Successfully created!`,
         };
       } else {
         // Add status folder creation great failure
         return {
           status: "error",
-          message: "Successfully created your missing folder!",
+          message: `${currentPath}: Failed to create!!`,
         };
       }
-    }
   }
 
   // Needs updating when filament is brought in.

@@ -1173,9 +1173,8 @@ class PrinterStore {
       name = `${path}/${name}`;
     }
     const display = JSON.parse(JSON.stringify(name));
-    name = name.replace(/ /g, "_");
     const newFolder = {
-      name,
+      name: name,
       path,
       display
     };
