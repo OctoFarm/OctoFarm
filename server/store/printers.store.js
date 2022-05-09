@@ -1119,13 +1119,12 @@ class PrinterStore {
       filePath = "local";
     }
 
-    const fileDisplay = name.replace(/_/g, " ");
     const data = {
       path: filePath,
       fullPath: path,
-      display: fileDisplay,
+      display: name,
       length: null,
-      name: name,
+      name: name.replace(/ /g, "_"),
       size: null,
       time: null,
       date: date.getTime() / 1000,
@@ -1134,15 +1133,25 @@ class PrinterStore {
       failed: 0,
       last: null
     };
-    PrinterService.findOneAndPush(index, "fileList.fileList", data)
-      .then(() => {
-        printer.fileList.fileList.push(data);
-      })
-      .catch((e) => {
-        logger.error("Issue updating file list", e);
-      });
 
+    if (this.doesFileExist(index, data.fullPath).length < 1) {
+      PrinterService.findOneAndPush(index, "fileList.fileList", data)
+        .then(() => {
+          printer.fileList.fileList.push(data);
+        })
+        .catch((e) => {
+          logger.error("Issue updating file list", e);
+        });
+    }
     return printer;
+  }
+
+  doesFileExist(id, pathName) {
+    const printer = this.#findMePrinter(id);
+
+    return printer.fileList.fileList.filter(function (entry) {
+      return entry.fullPath === pathName;
+    });
   }
 
   doesFolderExist(id, folderName) {
@@ -1170,8 +1179,6 @@ class PrinterStore {
       path,
       display
     };
-
-    console.log(this.doesFolderExist(i, newFolder.name).length)
 
     if (this.doesFolderExist(i, newFolder.name).length < 1) {
       PrinterService.findOneAndPush(i, "fileList.folderList", newFolder)

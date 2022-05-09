@@ -2,7 +2,6 @@ import OctoPrintClient from "./octoprint/octoprint-client.service";
 import Queue from "./file-manager-queue.service.js";
 import Calc from "../utils/calc.js";
 import UI from "../utils/ui.js";
-import {dragAndDropEnable} from "../utils/dragAndDrop.js";
 import FileManagerSortingService from "./file-manager-sorting.service.js";
 import PrinterSelectionService from "../pages/printer-manager/services/printer-selection.service.js";
 import OctoFarmClient from "./octofarm-client.service";
@@ -772,6 +771,20 @@ export default class FileManagerService {
     );
 
     async function chooseOrCreateFolder() {
+      // Setup view
+
+      document.getElementById("multiPrinterBtn").disabled = true;
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiPrinterSection").classList.add("hidden");
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+
+      document.getElementById("multiSelectedPrinters2").innerHTML = "";
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiFile").disabled = true;
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+      document.getElementById("multiFileSection").classList.add("hidden");
+
+
       const multiFolderInput = document.getElementById(
         "multi-UploadFolderSelect"
       );
@@ -789,28 +802,19 @@ export default class FileManagerService {
         multiFolderInput.insertAdjacentHTML(
           "beforeend",
           `
-          <option value=${path}>${path}</option>
+          <option value=${path.replace(/ /g, "_")}>${path.replace(/_/g, " ")}</option>
         `
         );
       });
 
-      document.getElementById("multiPrinterBtn").disabled = true;
-      document.getElementById("multiFolder").disabled = false;
-      document.getElementById("multiPrinterSection").classList.add("hidden");
-      document.getElementById("multiFolderSection").classList.remove("hidden");
-
-      document.getElementById("multiSelectedPrinters2").innerHTML = "";
-      document.getElementById("multiFolder").disabled = false;
-      document.getElementById("multiFile").disabled = true;
-      document.getElementById("multiFolderSection").classList.remove("hidden");
-      document.getElementById("multiFileSection").classList.add("hidden");
       document.getElementById("multiUploadFooter").innerHTML =
         "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
       document
         .getElementById("multiUpSubmitBtn")
         .addEventListener("click", async () => {
-          selectedFolder = document.getElementById("multiNewFolder").value;
-          const newFolder = document.getElementById("multiNewFolderNew").value;
+          let locationInput = multiFolderInput.value;
+          let newFolder = multiNewFolderNew.value;
+
           const printers = await OctoFarmClient.listPrinters();
           selectedPrinters.forEach((printer, index) => {
             if (printer) {
@@ -841,27 +845,24 @@ export default class FileManagerService {
               };
             }
           });
-
           if (newFolder !== "") {
             if (newFolder[0] === "/") {
               newFolder.replace("/", "");
             }
-
-            selectedFolder = `${selectedFolder}/${newFolder}`;
+          }
+          if (locationInput[0] === "/") {
+            locationInput = locationInput.replace("/", "");
           }
 
-          if (selectedFolder === "") {
-            selectedFolder = "local";
-          }
+          selectedFolder = `${locationInput}${newFolder}`;
 
-          if (selectedFolder[0] === "/") {
+          if (selectedFolder[selectedFolder.length-1] === "/") {
             selectedFolder = selectedFolder.replace("/", "");
           }
 
           const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
-
           // validate the path
-          if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
+          if (selectedFolder !== "" && !regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
             multiFolderInput.classList.add(isInValid);
             multiNewFolderNew.classList.add(isInValid);
           } else {
@@ -879,22 +880,35 @@ export default class FileManagerService {
     async function checkIfPathExistsOnOctoPrint() {
       for (const printer of selectedPrinters) {
         const currentPrinter = printer.printerInfo;
+        const folderExists = (id) => {
+          document.getElementById(
+              "folderCheckBody-" + id
+          ).innerHTML =
+              "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
+          currentPrinter.folderExists = true;
+        }
+        const folderDoesntExist = (id) => {
+            document.getElementById(
+                "folderCheckBody-" + id
+            ).innerHTML =
+                "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
+          currentPrinter.folderExists = false;
+        }
+
+        if(selectedFolder === ""){
+          folderExists(currentPrinter._id);
+          continue;
+        }
+
+
         const doesFolderExist = await OctoPrintClient.checkFile(
           currentPrinter,
           selectedFolder
         );
         if (doesFolderExist === 200) {
-          document.getElementById(
-            "folderCheckBody-" + currentPrinter._id
-          ).innerHTML =
-            "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
-          currentPrinter.folderExists = true;
-        } else {
-          document.getElementById(
-            "folderCheckBody-" + currentPrinter._id
-          ).innerHTML =
-            "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
-          currentPrinter.folderExists = false;
+          folderExists(currentPrinter._id);
+        }else{
+          folderDoesntExist(currentPrinter._id);
         }
       }
       document.getElementById("multiFileUploadBtn").disabled = false;
@@ -904,7 +918,13 @@ export default class FileManagerService {
     }
 
     async function selectFilesToupload() {
-      document.getElementById("multiSelectedFolder").innerHTML = selectedFolder;
+      const multiSelectFolderElement = document.getElementById("multiSelectedFolder")
+      if(selectedFolder === ""){
+        multiSelectFolderElement.innerHTML = "local/"
+      }else{
+        multiSelectFolderElement.innerHTML = selectedFolder.replace(/_/g, " ");
+      }
+
       document.getElementById("multiFolder").disabled = true;
       document.getElementById("multiFile").disabled = false;
       document.getElementById("multiFileSection").classList.remove("hidden");
@@ -956,11 +976,11 @@ export default class FileManagerService {
       });
       generateTableRows(printerInfo);
       for (let p = 0; p < selectedPrinters.length; p++) {
-        const currentPrinter = selectedPrinters[p];
+        const currentPrinter = selectedPrinters[p].printerInfo;
         // Make sure the folder is created...
         if (!selectedPrinters[p].folderExists) {
           const response = await FileActions.multiUploadCreateFolders(
-            currentPrinter.printerInfo,
+            currentPrinter,
             selectedFolder
           );
           updateTableRow(printerInfo[p]._id, response.status, response.message);
@@ -974,12 +994,11 @@ export default class FileManagerService {
 
         selectedFile.forEach((file) => {
           const newObject = {};
-          const num = currentPrinter.value;
           newObject.file = file;
-          newObject.index = num;
-          newObject.printerInfo = currentPrinter.printerInfo;
+          newObject.index = currentPrinter._id;
+          newObject.printerInfo = currentPrinter;
           newObject.upload = FileManagerService.fileUpload;
-          newObject.currentFolder = "local/" + selectedFolder;
+          newObject.currentFolder = "local/" + selectedFolder.replace(/_/g, " ");
 
           if (printAfterUpload) {
             newObject.print = true;
@@ -1091,14 +1110,14 @@ export class FileActions {
       async function (result) {
         if (result) {
           formData.append("foldername", result);
-          formData.append("path", `${currentFolder}/`);
+          formData.append("path", `${currentFolder}/`.replace(/_/g, " "));
           const post = await OctoPrintClient.folder(printer, "local", formData);
           const { status } = post;
           if (status === 201 || status === 200) {
             const opts = {
               i: printer._id,
               foldername: result,
-              path: currentFolder,
+              path: currentFolder.replace(/_/g, " ")
             };
             await OctoFarmClient.post("printers/newFolder", opts);
             await FileManagerSortingService.loadSort(printer._id);
@@ -1122,7 +1141,6 @@ export class FileActions {
   }
   static async multiUploadCreateFolders(printer, folderPath) {
     const folderSplit = folderPath.split("/");
-
     for (let path = 0; path < folderSplit.length; path++) {
       const formData = new FormData();
       let octofarmPath;
@@ -1146,11 +1164,10 @@ export class FileActions {
         // Add status folder creation success and update OctoFarm with new folder...
         const opts = {
           i: printer._id,
-          foldername: folderSplit[path],
-          path: octofarmPath,
+          foldername: folderSplit[path].replace(/_/g, " "),
+          path: octofarmPath.replace(/_/g, " "),
         };
         await OctoFarmClient.post("printers/newFolder", opts);
-        await FileManagerSortingService.loadSort(files);
         return {
           status: "success",
           message: "Successfully created your missing folder!",
