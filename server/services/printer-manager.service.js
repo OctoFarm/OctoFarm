@@ -5,7 +5,7 @@ const { OctoPrintPrinter } = require("../services/printers/create-octoprint.serv
 const { CATEGORIES } = require("./printers/constants/printer-state.constants");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { patchPrinterValues } = require("../services/version-patches.service");
-const { isEmpty, findIndex } = require("lodash");
+const { isEmpty } = require("lodash");
 
 const Filament = require("../models/Filament");
 const Printers = require("../models/Printer");
