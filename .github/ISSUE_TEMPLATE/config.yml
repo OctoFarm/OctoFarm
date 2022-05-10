@@ -1,14 +1,23 @@
 blank_issues_enabled: false
 contact_links:
+  - name: OctoFarms Website
+    url: https://octofarm.net
+    about: OctoFarms official website.
+  - name: OctoFarm Documentation
+    url: https://docs.octofarm.net
+    about: OctoFarms official documentation.
+  - name: OctoFarm Blog
+    url: https://octofarm.net/blog
+    about: OctoFarms official blog.
   - name: Community Support on Facebook
     url: https://www.facebook.com/groups/octofarm
-    about: Join our growing Facebook group!
+    about: Join our growing Facebook group.
   - name: Community Support on Discord
     url: https://discord.gg/vjabMUn
-    about: Join our growing discord community!
+    about: Join our growing discord community.
   - name: General Question or Feature Request?
     url: https://github.com/OctoFarm/OctoFarm/discussions
-    about: Please use the github discussions area
+    about: Please use the github discussions area.
   - name: Fancy donating to the project?
     url: https://octofarm.net/sponsor
     about: We have various options for donation, some with kickbacks to the donator! Please take a look.
