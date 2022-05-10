@@ -1,13 +1,5 @@
 #!/bin/sh
 
-if [ -d "node_modules" ]
-then
-    echo "Node modules exist, skipping install"
-else
-    echo "Installing node packages"
-    npm ci
-fi
-
 if [ -z "$MONGO" ]
 then
     echo "MONGO is not defined, please define the MongoDB connection with the MONGO environment variable"
