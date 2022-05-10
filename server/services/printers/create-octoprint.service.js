@@ -1299,8 +1299,8 @@ class OctoPrintPrinter {
     if (!this?.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
       const pluginList = await this.#api.getPluginManager(this.octoPrintVersion).catch((e) => {
-        logger.http("Failed Aquire plugin lists data", e);
-        return false;
+        logger.http("Failed Aquire plugin lists data", e.toString());
+        return e;
       });
       const globalStatusCode = checkApiStatusResponse(pluginList);
 
