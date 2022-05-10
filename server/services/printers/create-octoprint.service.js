@@ -1299,8 +1299,8 @@ class OctoPrintPrinter {
     if (!this?.pluginsList || this.pluginsList.length === 0 || force) {
       this.pluginsList = [];
       const pluginList = await this.#api.getPluginManager(this.octoPrintVersion).catch((e) => {
-        logger.http("Failed Aquire plugin lists data", e);
-        return false;
+        logger.http("Failed Aquire plugin lists data", e.toString());
+        return e;
       });
       const globalStatusCode = checkApiStatusResponse(pluginList);
 
@@ -1492,6 +1492,10 @@ class OctoPrintPrinter {
   async acquireOctoPrintFilesData(force = false, returnObject = false) {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
+
+    if(!this.onboarding.fullyScanned){
+      force = true
+    }
 
     if (this?.fileList?.fileList?.length === 0 || force) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
