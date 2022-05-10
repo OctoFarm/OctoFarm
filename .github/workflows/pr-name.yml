@@ -13,6 +13,7 @@ jobs:
           # Configure which types are allowed.
           # Default: https://github.com/commitizen/conventional-commit-types
           types: |
+            version
             fix
             feat
             style
