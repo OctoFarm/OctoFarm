@@ -55,10 +55,10 @@ All notable changes to this project will be documented in this file.
   - Graceful shutdown to OctoFarms service. The app will not close all tasks, printer connections and database connections
     before killing itself.
   - Added the ability to set the logging level by environment variables. Example: LOG_LEVEL=info. Accepted
-    values=info,debug,verbose
+    values=info,debug,silly
   - New alerts section on printer manager, moved all the OP updates, and printer issues to here with their own dedicated
     icon and action button.
-  - New button to do a Re-Scan and Forced Re-Scan of OctoPrint's API. This is to update information from OctoPrint ->
+  - New button to do a Re-Scan and of OctoPrint's API. This is to update information from OctoPrint ->
     OctoFarm. Does nothing to your websocket connection.
   - New button to do a websocket reconnect if one is available. It will close the socket and re-open to refresh.
   - New websocket management system that keeps itself sustained. Should not require re-connecting to it at all unless
@@ -72,6 +72,7 @@ All notable changes to this project will be documented in this file.
     - Additional button to house keep log files. Cleans any logs older than a day.
   - Added support for additional file types. These should allow the further support of OctoPrint-BetterGrblSupport Plugin and OctoPrint-Chituboard Plugin ".gcode,.gco,.g,.ctb,.fdg,.nc,.gc" - Added to docs.octofarm.net 
   - Active sessions now viewable on System -> System Information page.
+  - All print start buttons, File Manager and Views now check if the printer is turned on (if available) and connected. 
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
