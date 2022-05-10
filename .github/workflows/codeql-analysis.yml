@@ -14,7 +14,7 @@ name: "CodeQL"
 on:
   workflow_dispatch:
   push:
-    branches: [ master, development, canary ]
+    branches: [ master, development ]
   pull_request:
     types: [opened, synchronize, reopened]
     # The branches below must be a subset of the branches above
