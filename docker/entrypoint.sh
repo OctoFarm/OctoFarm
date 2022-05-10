@@ -5,7 +5,9 @@ then
     echo "Node modules exist, skipping install"
 else
     echo "Installing node packages"
+    cd server/
     npm ci
+    cd ../
 fi
 
 if [ -z "$MONGO" ]
