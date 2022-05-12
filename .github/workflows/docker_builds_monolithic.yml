@@ -1,12 +1,9 @@
 name: Docker Monolithic
 on:
-  pull_request:
-  push:
-    tags:
-      - '*'
-    branches:
-      - 'master'
-      - 'development'
+  workflow_run:
+    workflows: [ "Semantic Release Workflow" ]
+    types:
+      - completed
 jobs:
   docker_monolithic:
     name: "Docker build monolithic"
