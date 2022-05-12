@@ -49,8 +49,7 @@
       }
     ],
     ["@semantic-release/npm", {
-      "npmPublish": false,
-      "pkgRoot": "./client"
+      "npmPublish": false
     }],
     [
       "@semantic-release/git",
