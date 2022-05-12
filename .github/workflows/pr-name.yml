@@ -22,7 +22,6 @@ jobs:
             test
             build
             ci
-            chore
           # Configure which scopes are allowed.
           scopes: |
             main
