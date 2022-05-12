@@ -1,0 +1,112 @@
+name: Development Release
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - canary
+    paths-ignore:
+      - "server/package.json"
+      - "client/package.json"
+      - "server/package-lock.json"
+      - "client/package-lock.json"
+      - "client/dist"
+      - "server/views/assets/dist"
+
+jobs:
+  bump-versions-pre-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      INPUT_TOKEN: ''
+
+    steps:
+      # Checkout the development repository
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: development
+          token: ${{ secrets.TOKEN_ACTION }}
+
+      # Check to see if changes have occurred in client / server directories
+      - name: Detecting changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            server:
+            - 'server/**'
+            client:
+            - 'client/**'
+
+      # Install node v14 to use.
+      - name: Use Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16.15.0"
+
+      # Up revision the rc version for development
+      - if: steps.filter.outputs.server == 'true'
+        name: server up revision
+        run: npm version prerelease --preid=alpha
+        working-directory: ./server
+
+      # Up revision the rc version for development
+      - name: client up revision
+        if: steps.filter.outputs.client == 'true'
+        run: npm version prerelease --preid=alpha
+        working-directory: ./client
+
+      # Build the client for npm publish
+      - name: client build
+        if: steps.filter.outputs.client == 'true'
+        run: |
+          cd ./client
+          npm ci --no-optional
+          npm run build
+
+      # Publish the new build to npm
+      - name: publish to npm
+        if: steps.filter.outputs.client == 'true'
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./client/package.json
+
+      # Grab the client package version into a variable.
+      - name: get-client-current-version
+        id: client-package-version
+        uses: martinbeentjes/npm-get-version-action@main
+        with:
+          path: client
+
+      # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
+      - name: Wait for npm to update package...
+        uses: whatnick/wait-action@master
+        with:
+         time: '30s'
+
+      # Update Server Package with latest client package
+      - name: update server client version
+        if: steps.filter.outputs.client == 'true'
+        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
+        working-directory: ./server
+
+      # Commit changes to the current development repository
+      - name: get-server-current-version
+        id: server-package-version
+        uses: martinbeentjes/npm-get-version-action@main
+        with:
+          path: server
+
+        ## commit to repo, and prep pre-release
+      - name: commit-changes-made
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: development
+          commit_message: "bot: bump alpha version - v${{ steps.server-package-version.outputs.current-version }}"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          ## This action should only ever commit these two files!
+          file_pattern: server/package*.json client/package*.json
