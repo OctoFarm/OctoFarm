@@ -1,4 +1,4 @@
-name: Canary Release
+name: Semantic Release Workflow
 on:
   pull_request:
     types: [closed]

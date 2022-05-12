@@ -1,7 +1,7 @@
 name: Docker Monolithic
 on:
   workflow_run:
-    workflows: [ "Development Release", "Master Release" ]
+    workflows: [ "Semantic Release Workflow" ]
     types:
       - completed
 jobs:
