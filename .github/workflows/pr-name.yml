@@ -13,16 +13,15 @@ jobs:
           # Configure which types are allowed.
           # Default: https://github.com/commitizen/conventional-commit-types
           types: |
-            version
             fix
             feat
             style
             refactor
             perf
             test
-            build
             ci
             breaking
+            database
           # Configure which scopes are allowed.
           scopes: |
             main

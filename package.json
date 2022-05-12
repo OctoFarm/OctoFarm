@@ -19,7 +19,8 @@
     "setup-alpha": "cd server && npm run start-alpha",
     "update-alpha": "git pull && npm run setup-alpha && pm2 restart OctoFarm-Testing",
     "update-main": "git pull && npm run install-server && pm2 restart OctoFarm",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -39,8 +40,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^4.1.0",
-    "prettier": "^2.6.0",
-    "husky": "^8.0.0"
+    "husky": "^8.0.0",
+    "prettier": "^2.6.0"
   },
   "pkg": {
     "scripts": [
