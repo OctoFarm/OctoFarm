@@ -1,0 +1,16 @@
+{
+  "branches": [
+    "master",
+    {
+      "name": "development",
+      "prerelease": "rc"
+    },
+    {
+      "name": "canary",
+      "prerelease": "beta"
+    }
+  ],
+  "dryRun": true,
+  "debug": true,
+  "plugins": []
+}

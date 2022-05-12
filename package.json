@@ -18,7 +18,9 @@
     "setup-dev": "npm run install-server && npm run install-client",
     "setup-alpha": "cd server && npm run start-alpha",
     "update-alpha": "git pull && npm run setup-alpha && pm2 restart OctoFarm-Testing",
-    "update-main": "git pull && npm run install-server && pm2 restart OctoFarm"
+    "update-main": "git pull && npm run install-server && pm2 restart OctoFarm",
+    "prepare": "husky install",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -38,8 +40,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^4.1.0",
-    "prettier": "^2.6.0",
-    "semantic-release": "^19.0.2"
+    "husky": "^8.0.0",
+    "prettier": "^2.6.0"
   },
   "pkg": {
     "scripts": [
@@ -57,5 +59,9 @@
       "node14-linux-arm64"
     ],
     "outputPath": "dist"
+  },
+  "dependencies": {
+    "@commitlint/cli": "^16.2.4",
+    "@commitlint/config-conventional": "^16.2.4"
   }
 }

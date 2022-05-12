@@ -1,3 +1,9 @@
+# No longer updated
+This file was originally entered and updated manually. This is no longer the case and changelogs are now generated automatically in the relevant client/server directories.
+
+- [Client Changelog](client/CHANGELOG.md)
+- [Server Changelog](server/CHANGELOG.md)
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

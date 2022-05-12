@@ -1,4 +1,4 @@
-name: Bump Server Version Alpha
+name: Master Release
 on:
   pull_request:
     types: [closed]
