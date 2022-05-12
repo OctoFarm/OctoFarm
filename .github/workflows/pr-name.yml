@@ -22,6 +22,7 @@ jobs:
             test
             build
             ci
+            breaking
           # Configure which scopes are allowed.
           scopes: |
             main

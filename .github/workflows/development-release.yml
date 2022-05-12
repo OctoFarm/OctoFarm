@@ -110,3 +110,14 @@ jobs:
           commit_author: James Mackay <online@notexpectedyet.com>
           ## This action should only ever commit these two files!
           file_pattern: server/package*.json client/package*.json
+  updateBranch:
+    name: Update canary branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: Embraser01/update-git-branch-action@v1.0.0
+        if: github.ref == 'refs/heads/master'
+        with:
+          branch: canary
+          force: false # To push-force to the branch
+          githubToken: ${{ secrets.PAT_TOKEN }} # Github Token
