@@ -19,8 +19,7 @@
     "setup-alpha": "cd server && npm run start-alpha",
     "update-alpha": "git pull && npm run setup-alpha && pm2 restart OctoFarm-Testing",
     "update-main": "git pull && npm run install-server && pm2 restart OctoFarm",
-    "prepare": "husky install",
-    "release": "semantic-release"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
