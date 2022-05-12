@@ -7,7 +7,7 @@
       <%- include('./partials/messages') %>
       <% if(userCount === 0){ %>
         <div class="alert alert-warning text-dark" role="alert">
-          Please create and administrator... After you have registered, registration will be disabled and you can either enable it again or manage your users on the "System" page.
+          This will create an Administrator... After you have registered, registration will be disabled and you can either enable it again or manage your users on the "System" page.
         </div>
       <% } %>
       <form action="/users/register" method="POST">
@@ -31,7 +31,7 @@
           <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
             value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
         </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" onclick="this.disabled=true; this.value='Registering…';">
+        <button type="submit" class="btn btn-primary btn-block bg-colour-1" onSubmit="this.disabled=true; this.value='Registering…';">
           Register
         </button>
       </form>
