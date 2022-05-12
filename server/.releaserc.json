@@ -10,8 +10,8 @@
       "prerelease": "beta"
     }
   ],
-  "dryRun": true,
-  "debug": true,
+  "dryRun": false,
+  "debug": false,
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "preset": "angular",
