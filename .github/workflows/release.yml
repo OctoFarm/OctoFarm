@@ -1,7 +1,6 @@
 name: Semantic Release Workflow
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - canary
       - development
