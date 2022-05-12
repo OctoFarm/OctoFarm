@@ -44,7 +44,8 @@
     [
       "@semantic-release/changelog",
       {
-        "changelogFile": "CHANGELOG.md"
+        "changelogFile": "CHANGELOG.md",
+        "changelogTitle": "OctoFarm Server Changelog"
       }
     ],
     ["@semantic-release/npm", {

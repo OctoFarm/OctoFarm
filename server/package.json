@@ -11,9 +11,9 @@
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
     "migration:status": "migrate-mongo status",
-    "release": "git archive -o octofarm.zip HEAD",
     "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\"",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "release": "semantic-release -p @semantic-release/changelog "
   },
   "repository": {
     "type": "git",
