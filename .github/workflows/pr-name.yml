@@ -23,6 +23,7 @@ jobs:
             security
             removed
             ci
+            dependency
             chore
           # Configure which scopes are allowed.
           scopes: |

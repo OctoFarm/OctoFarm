@@ -31,13 +31,6 @@
         "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
       }
     }],
-    [
-      "@semantic-release/changelog",
-      {
-        "changelogFile": "CHANGELOG.md",
-        "changelogTitle": "OctoFarm Client Changelog"
-      }
-    ],
     ["@semantic-release/npm", {
       "npmPublish": true
     }]
