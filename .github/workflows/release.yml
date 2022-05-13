@@ -2,7 +2,6 @@ name: Semantic Release Workflow
 on:
   push:
     branches:
-      - canary
       - development
       - master
     paths-ignore:
@@ -30,12 +29,26 @@ jobs:
           node-version: 'lts/*'
       - name: Install dependencies
         run: |
-          cd ./server
+          cd ./client
           npm ci --include=dev
-      - name: Release
+          cd ../server
+          npm ci --include=dev
+      - name: Release Client
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          cd ./server
+          cd ../client
+          npx semantic-release
+      - name: Wait for npm to update package...
+        uses: whatnick/wait-action@master
+        with:
+          time: '30s'
+      - name: Release Server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ../server
+          npm install @notexpectedyet/octofarm-client@latest --save
           npx semantic-release
