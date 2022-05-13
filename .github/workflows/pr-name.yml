@@ -23,7 +23,6 @@ jobs:
             security
             removed
             ci
-            dependency
             chore
           # Configure which scopes are allowed.
           scopes: |
@@ -31,6 +30,7 @@ jobs:
             server
             client
             main
+            release
           # Configure that a scope must always be provided.
           requireScope: true
           # Configure additional validation for the subject based on a regex.
