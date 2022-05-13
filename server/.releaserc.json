@@ -25,7 +25,8 @@
         {"type": "breaking", "release": "major"},
         {"type": "security", "release":  "patch"},
         {"type": "removed", "release":  "patch"},
-        {"type": "ci", "release":  false}
+        {"type": "ci", "release":  false},
+        {"type": "chore", "release":  false}
       ],
       "parserOpts": {
         "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
@@ -84,6 +85,11 @@
             "type": "ci",
             "section": ":curly_loop: Continuous Integration :curly_loop:",
             "hidden": false
+          },
+          {
+            "type": "chore",
+            "section": ":curly_loop: What a drag! :curly_loop:",
+            "hidden": true
           }
         ]
       },
