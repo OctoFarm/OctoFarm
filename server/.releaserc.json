@@ -32,7 +32,7 @@
       }
     }],
     ["@semantic-release/release-notes-generator", {
-      "preset": "angular",
+      "preset": "conventionalcommits",
       "presetConfig": {
         "types": [
           {
@@ -83,7 +83,7 @@
           {
             "type": "ci",
             "section": ":curly_loop: Continuous Integration :curly_loop:",
-            "hidden": true
+            "hidden": false
           }
         ]
       },
