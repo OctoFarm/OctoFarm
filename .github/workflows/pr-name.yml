@@ -23,6 +23,7 @@ jobs:
             security
             removed
             ci
+            chore
           # Configure which scopes are allowed.
           scopes: |
             docker
