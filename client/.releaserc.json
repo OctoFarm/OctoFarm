@@ -7,7 +7,7 @@
     },
     {
       "name": "canary",
-      "prerelease": "alpha"
+      "prerelease": false
     }
   ],
   "dryRun": false,
