@@ -15,18 +15,20 @@ jobs:
           types: |
             fix
             feat
-            style
             refactor
             perf
             test
-            ci
             breaking
             database
+            security
+            removed
+            ci
           # Configure which scopes are allowed.
           scopes: |
-            main
+            docker
             server
             client
+            main
           # Configure that a scope must always be provided.
           requireScope: true
           # Configure additional validation for the subject based on a regex.

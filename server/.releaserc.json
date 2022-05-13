@@ -7,7 +7,7 @@
     },
     {
       "name": "canary",
-      "prerelease": "beta"
+      "prerelease": "alpha"
     }
   ],
   "dryRun": false,
@@ -18,17 +18,75 @@
       "releaseRules": [
         {"type": "fix", "release": "patch"},
         {"type": "feat", "release": "minor"},
-        {"type": "style", "release": false},
         {"type": "refactor", "release": "patch"},
         {"type": "perf", "release": "patch"},
         {"type": "test", "release": false},
-        {"type": "ci", "release": false},
         {"type": "database", "release": "minor"},
-        {"type": "breaking", "release": "major"}
-      ]
+        {"type": "breaking", "release": "major"},
+        {"type": "security", "release":  "patch"},
+        {"type": "removed", "release":  "patch"},
+        {"type": "ci", "release":  false}
+      ],
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+      }
     }],
     ["@semantic-release/release-notes-generator", {
       "preset": "angular",
+      "presetConfig": {
+        "types": [
+          {
+            "type": "fix",
+            "section": ":hammer: Bug Fix :hammer:",
+            "hidden": false
+          },
+          {
+            "type": "feat",
+            "section": ":stars: New Feature :stars:",
+            "hidden": false
+          },
+          {
+            "type": "refactor",
+            "section": ":persevere: Code Refactor :persevere:",
+            "hidden": false
+          },
+          {
+            "type": "perf",
+            "section": ":dash: Performance Boost :dash:",
+            "hidden": false
+          },
+          {
+            "type": "test",
+            "section": ":link: Test Implemented :link:",
+            "hidden": false
+          },
+          {
+            "type": "breaking",
+            "section": ":boom: BREAKING CHANGE :boom:",
+            "hidden": false
+          },
+          {
+            "type": "database",
+            "section": ":scroll: Database Change :scroll:",
+            "hidden": false
+          },
+          {
+            "type": "security",
+            "section": ":key: Security Improvements :key:",
+            "hidden": false
+          },
+          {
+            "type": "removed",
+            "section": ":x: Removed :x:",
+            "hidden": false
+          },
+          {
+            "type": "ci",
+            "section": ":curly_loop: Continuous Integration :curly_loop:",
+            "hidden": true
+          }
+        ]
+      },
       "parserOpts": {
         "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
       },
@@ -38,7 +96,8 @@
     }],
     ["@semantic-release/github",
       {
-       "releasedLabels": ["on-the-way"]
+       "releasedLabels": ["on-the-way"],
+        "assignees": ["notexpectedyet"]
       }
     ],
     [
