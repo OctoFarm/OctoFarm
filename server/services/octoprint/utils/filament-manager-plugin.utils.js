@@ -152,7 +152,7 @@ const assignSpoolToOctoPrint = async function (spoolId, printers) {
 
   logger.info("Updating OctoPrint with new spool selection", selection)
 
-  const url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
+  const url = `${printer.printerURL}/plugin/filamentmanager/selections/${printers[0].tool}`;
   const updateFilamentManager = await fetch(url, {
     method: "PATCH",
     headers: {
