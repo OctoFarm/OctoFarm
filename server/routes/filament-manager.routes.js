@@ -509,7 +509,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   await Profiles.deleteMany({});
 
   const { newSpools, newProfiles, errors: SyncErrors } = await filamentManagerReSync();
-
+  console.log(newSpools, newProfiles)
   if (SyncErrors.length > 0) {
     SyncErrors.forEach((e) => {
       errors.push(e);
@@ -535,8 +535,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   return res.send({
     errors,
     warnings,
-    spoolCount: newSpools.length,
-    profileCount: newProfiles.length
+    spoolCount: newSpools,
+    profileCount: newProfiles
   });
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
