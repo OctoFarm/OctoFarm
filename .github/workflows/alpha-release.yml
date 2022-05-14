@@ -20,11 +20,11 @@ jobs:
       INPUT_TOKEN: ''
 
     steps:
-      # Checkout the development repository
+      # Checkout the canary repository
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          ref: development
+          ref: canary
           token: ${{ secrets.TOKEN_ACTION }}
 
       # Check to see if changes have occurred in client / server directories
@@ -37,20 +37,19 @@ jobs:
             - 'server/**'
             client:
             - 'client/**'
-
       # Install node v14 to use.
       - name: Use Node
         uses: actions/setup-node@v2
         with:
           node-version: "16.15.0"
 
-      # Up revision the rc version for development
+      # Up revision the rc version for canary
       - if: steps.filter.outputs.server == 'true'
         name: server up revision
         run: npm version prerelease --preid=alpha
         working-directory: ./server
 
-      # Up revision the rc version for development
+      # Up revision the rc version for canary
       - name: client up revision
         if: steps.filter.outputs.client == 'true'
         run: npm version prerelease --preid=alpha
@@ -63,7 +62,6 @@ jobs:
           cd ./client
           npm ci --no-optional
           npm run build
-
       # Publish the new build to npm
       - name: publish to npm
         if: steps.filter.outputs.client == 'true'
@@ -81,9 +79,10 @@ jobs:
 
       # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
       - name: Wait for npm to update package...
+        if: steps.filter.outputs.client == 'true'
         uses: whatnick/wait-action@master
         with:
-         time: '30s'
+          time: '30s'
 
       # Update Server Package with latest client package
       - name: update server client version
@@ -91,7 +90,7 @@ jobs:
         run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
         working-directory: ./server
 
-      # Commit changes to the current development repository
+      # Commit changes to the current canary repository
       - name: get-server-current-version
         id: server-package-version
         uses: martinbeentjes/npm-get-version-action@main
@@ -103,8 +102,8 @@ jobs:
         if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          branch: development
-          commit_message: "bot: bump alpha version - v${{ steps.server-package-version.outputs.current-version }}"
+          branch: canary
+          commit_message: "chore(release) - v${{ steps.server-package-version.outputs.current-version }} [skip ci]"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>

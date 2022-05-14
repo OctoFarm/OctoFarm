@@ -1,0 +1,54 @@
+name: Semantic Release Workflow
+on:
+  push:
+    branches:
+      - development
+      - master
+    paths-ignore:
+      - "server/package.json"
+      - "client/package.json"
+      - "server/package-lock.json"
+      - "client/package-lock.json"
+      - "package.json"
+      - "package-lock.json"
+      - "client/dist"
+      - "server/views/assets/dist"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      - name: Install dependencies
+        run: |
+          cd ./client
+          npm ci --include=dev
+          cd ../server
+          npm ci --include=dev
+      - name: Release Client
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ../client
+          npx semantic-release
+      - name: Wait for npm to update package...
+        uses: whatnick/wait-action@master
+        with:
+          time: '30s'
+      - name: Release Server
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ../server
+          npm install @notexpectedyet/octofarm-client@latest --save
+          npx semantic-release

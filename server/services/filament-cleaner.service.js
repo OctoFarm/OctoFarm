@@ -97,11 +97,11 @@ class FilamentCleanerService {
     const createList = [this.noSpoolOptions];
     spools.forEach((spool) => {
       let profileId = _.findIndex(profiles, function (o) {
-        return o._id == spool.spools.profile;
+        return o._id.toString() === spool.spools.profile.toString();
       });
 
       const index = _.findIndex(selected, function (o) {
-        return o == spool._id;
+        return o.toString() === spool._id.toString();
       });
       if (profileId >= 0) {
         const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
@@ -140,10 +140,10 @@ class FilamentCleanerService {
   static createStatistics(spools, profiles, usedFilamentList) {
     const materials = [];
     let materialBreak = [];
-    for (let p = 0; p < profiles.length; p++) {
-      materials.push(profiles[p].material.replace(/ /g, "_"));
+    for (const element of profiles) {
+      materials.push(element.material);
       const material = {
-        name: profiles[p].material.replace(/ /g, "_"),
+        name: element.material,
         weight: [],
         used: [],
         price: []
@@ -155,31 +155,30 @@ class FilamentCleanerService {
     const used = [];
     const total = [];
     const price = [];
-    for (let s = 0; s < spools.length; s++) {
-      used.push(parseFloat(spools[s].used));
-      total.push(parseFloat(spools[s].weight));
-      price.push(parseFloat(spools[s].price));
+    for (const element of spools) {
+      used.push(parseFloat(element.used));
+      total.push(parseFloat(element.weight));
+      price.push(parseFloat(element.price));
       const profInd = _.findIndex(profiles, function (o) {
-        return o._id == spools[s].profile;
+        return o._id.toString() === element.profile.toString();
       });
       if (profInd > -1) {
         const index = _.findIndex(materialBreak, function (o) {
-          return o.name == profiles[profInd].material.replace(/ /g, "_");
+          return o.name === profiles[profInd].material;
         });
-
-        materialBreak[index].weight.push(parseFloat(spools[s].weight));
-        materialBreak[index].used.push(parseFloat(spools[s].used));
-        materialBreak[index].price.push(parseFloat(spools[s].price));
+        materialBreak[index].weight.push(parseFloat(element.weight));
+        materialBreak[index].used.push(parseFloat(element.used));
+        materialBreak[index].price.push(parseFloat(element.price));
       }
     }
 
     const materialBreakDown = [];
-    for (let m = 0; m < materialBreak.length; m++) {
+    for (const element of materialBreak) {
       const mat = {
-        name: materialBreak[m].name,
-        used: materialBreak[m].used.reduce((a, b) => a + b, 0),
-        total: materialBreak[m].weight.reduce((a, b) => a + b, 0),
-        price: materialBreak[m].price.reduce((a, b) => a + b, 0)
+        name: element.name,
+        used: element.used.reduce((a, b) => a + b, 0),
+        total: element.weight.reduce((a, b) => a + b, 0),
+        price: element.price.reduce((a, b) => a + b, 0)
       };
       materialBreakDown.push(mat);
     }

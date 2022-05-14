@@ -13,22 +13,24 @@ jobs:
           # Configure which types are allowed.
           # Default: https://github.com/commitizen/conventional-commit-types
           types: |
-            version
             fix
             feat
-            style
             refactor
             perf
             test
-            build
+            breaking
+            database
+            security
+            removed
             ci
             chore
           # Configure which scopes are allowed.
           scopes: |
-            main
+            docker
             server
             client
-            security
+            main
+            release
           # Configure that a scope must always be provided.
           requireScope: true
           # Configure additional validation for the subject based on a regex.

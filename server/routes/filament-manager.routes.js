@@ -2,7 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 const fetch = require("node-fetch");
-const _ = require("lodash");
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const Spool = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
@@ -28,35 +27,42 @@ const {
   checkIfProfileAttachedToSpool,
   findFirstOnlinePrinter,
   checkIfDatabaseCanBeConnected,
-  filamentManagerReSync
+  filamentManagerReSync,
+  assignSpoolToOctoPrint
 } = require("../services/octoprint/utils/filament-manager-plugin.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { TaskManager } = require("../services/task-manager.service");
 
-router.get("/get/printerList", ensureAuthenticated, (req, res) => {
+router.get("/get/printerList", ensureAuthenticated, (_req, res) => {
   const printerList = FilamentClean.createPrinterList();
   res.send({ printerList });
 });
-router.get("/get/statistics", ensureAuthenticated, async (req, res) => {
+router.get("/get/statistics", ensureAuthenticated, async (_req, res) => {
   const statistics = FilamentClean.getStatistics();
   res.send({
     statistics
   });
 });
-router.get("/get/profile", ensureAuthenticated, (req, res) => {
+router.get("/get/profile", ensureAuthenticated, (_req, res) => {
   const profiles = FilamentClean.getProfiles();
   res.send({ profiles });
 });
-router.get("/get/filament", ensureAuthenticated, (req, res) => {
+router.get("/get/filament", ensureAuthenticated, (_req, res) => {
   const spools = FilamentClean.getSpools();
   res.send({ spools });
 });
-router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
+router.get("/get/dropDownList", ensureAuthenticated, async (_req, res) => {
   res.send({ dropDownList: FilamentClean.getDropDown() });
 });
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);
   const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
+
+  const filamentManager = SettingsClean.returnFilamentManagerSettings();
+  if(filamentManager){
+    await assignSpoolToOctoPrint(req.bodyString("spoolId"), req.body.printers);
+  }
+
   await getPrinterStoreCache().assignSpoolToPrinters(
     req.body.printers,
     req.bodyString("spoolId"),
@@ -205,7 +211,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       return res.send({ errors });
     }
 
-    const dataProfile = await Profiles.findById(oldSpoolData.profile);
+    const dataProfile = await Profiles.findById(oldSpoolData.spools.profile);
     if (!dataProfile) {
       errors.push("Couldn't find matching profile! Please Resync your spools...");
       return res.send({ errors });
@@ -229,7 +235,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     };
     logger.info("Updating OctoPrint: ", newSpool);
     const url = `${printer.printerURL}/plugin/filamentmanager/spools/${oldSpoolData.spools.fmID}`;
-    await fetch(url, {
+    const updateFilamentManager = await fetch(url, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -437,7 +443,7 @@ router.post(
   "/filamentManagerReSync",
   ensureAuthenticated,
   ensureAdministrator,
-  async (req, res) => {
+  async (_req, res) => {
     // Find first online printer...
     logger.info("Re-Syncing filament manager database");
     const reSync = await filamentManagerReSync();
@@ -446,7 +452,7 @@ router.post(
   }
 );
 
-router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, async (_req, res) => {
   const errors = [];
   const warnings = [];
 
@@ -535,11 +541,11 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   return res.send({
     errors,
     warnings,
-    spoolCount: newSpools.length,
-    profileCount: newProfiles.length
+    spoolCount: newSpools,
+    profileCount: newProfiles
   });
 });
-router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
+router.post("/disableFilamentPlugin", ensureAuthenticated, async (_req, res) => {
   logger.info("Request to disabled filament manager plugin");
   await Spool.deleteMany({}).then(() => {
     logger.info("Spools deleted");
