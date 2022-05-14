@@ -261,7 +261,16 @@ const filamentUsageOverTimeChartOptions = {
   ...loadingText(),
   series: [],
   // Set dynamically
-  // yaxis: yAxisSeries,
+  yaxis: [
+    {
+      title: {
+        text: "Weight",
+      },
+      labels: {
+        formatter: toFixedWeightGramFormatter,
+      },
+    },
+  ],
   xaxis: {
     type: "datetime",
     labels: {
@@ -460,7 +469,7 @@ const historySparkLineOptions = {
         return UI.generateTime(value);
       },
       title: {
-        formatter: (seriesName) => "",
+        formatter: () => "",
       },
     },
     marker: {
