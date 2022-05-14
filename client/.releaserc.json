@@ -7,11 +7,11 @@
     },
     {
       "name": "canary",
-      "prerelease": false
+      "prerelease": "alpha"
     }
   ],
-  "dryRun": false,
-  "debug": false,
+  "dryRun": true,
+  "debug": true,
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "preset": "angular",
