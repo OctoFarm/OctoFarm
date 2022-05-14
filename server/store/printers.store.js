@@ -115,6 +115,7 @@ class PrinterStore {
         layerData: printer.layerData,
         tools: printer.tools,
         selectedFilament: printer.selectedFilament,
+        currentConnection: printer.currentConnection,
         feedRate: printer.feedRate,
         flowRate: printer.flowRate,
         stepRate: printer.stepRate,

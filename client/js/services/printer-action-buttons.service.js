@@ -4,7 +4,7 @@ import OctoPrintClient from "./octoprint/octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
 import { groupBy, mapValues } from "lodash";
 import {
-  canWeTurnOnThePrinter,
+  printerIsAvailableToView,
   printerIsDisconnectedOrError,
   printerIsIdle,
   printerIsOnline,
@@ -17,7 +17,11 @@ import {
 } from "./octoprint/octoprint-printer-commands.actions";
 import {connectPrinterSequence, disconnectPrinterSequenceNoConfirm} from "./octoprint/octoprint-helpers.service";
 
-function returnActionBtnTemplate(id, webURL) {
+function returnActionBtnTemplate(id, webURL, disableWeb = false) {
+  let disabledWebButton;
+  if(disableWeb){
+    disabledWebButton = "d-none"
+  }
   return `
       <div class="btn-group dropright">
          <button  
@@ -31,7 +35,7 @@ function returnActionBtnTemplate(id, webURL) {
         <a title="Open OctoPrint"
                id="printerWeb-${id}"
                type="button"
-               class="tag btn btn-info btn-sm"
+               class="tag btn btn-info btn-sm ${disabledWebButton}"
                target="_blank"
                href="${webURL}" role="button"><i class="fas fa-globe-europe "></i> </a>   
         <button id="printerManageDropDown-${id}" type="button" class="btn btn-primary btn-sm dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -40,7 +44,7 @@ function returnActionBtnTemplate(id, webURL) {
         <div class="dropdown-menu">
           <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i> Commands</h6>
           <button
-             title="Uses the values from your selected filament and pre-heats to those values."
+             title="Homes your printers X,Y and Z"
              id="printerHome-${id}"
              type="button"
              class="dropdown-item"
@@ -118,95 +122,100 @@ function printerQuickDisconnected(id) {
 }
 
 function groupInit(printers) {
-  printers.forEach((printer) => {
-    if (printer.group !== "") {
-      const cleanGroup = encodeURIComponent(printer.group);
-      const groupContainer = document.getElementById(
-        `printerActionBtns-${cleanGroup}`
-      );
-      const skipElement = document.getElementById(
+  const uniqueGroupList = [
+    ...new Set(printers.map((printer) => printer.group)),
+  ];
+  uniqueGroupList.forEach((group) => {
+    const cleanGroup = encodeURIComponent(group);
+    const skipElement = document.getElementById(
         `printerQuickConnect-${cleanGroup}`
-      );
-      if (!skipElement) {
-        groupContainer.innerHTML = `
-        ${returnActionBtnTemplate(`${cleanGroup}`)}
+    );
+    const groupContainer = document.getElementById(
+        `printerActionBtns-${cleanGroup}`
+    );
+    if (!skipElement) {
+      groupContainer.innerHTML = `
+        ${returnActionBtnTemplate(`${cleanGroup}`, "", true)}
       `;
-      }
-      if (
-        printer.currentConnection !== null &&
-        printer.currentConnection.port !== null &&
-        printer.printerState.colour.category !== "Offline" &&
-        printer.printerState.colour.category !== "Searching"
-      ) {
-        printerQuickConnected(cleanGroup);
-      } else {
-        printerQuickDisconnected(cleanGroup);
-      }
-      document.getElementById("printerQuickConnect-" + cleanGroup).disabled =
-        printer.printerState.colour.category === "Offline";
     }
-  });
-  addGroupEventListeners(printers);
+    const filteredGroupPrinterList = printers.filter((printer) => {
+      if (encodeURIComponent(printer.group) === cleanGroup){
+        return printer;
+      }
+    });
+
+    checkGroupQuickConnectState(filteredGroupPrinterList, cleanGroup);
+    addGroupEventListeners(printers, cleanGroup);
+  })
 }
 
-function addGroupEventListeners(printers) {
-  //Group the prints via there respective groups
-  const groupedPrinters = mapValues(groupBy(printers, "group"));
-  for (const key in groupedPrinters) {
-    if (groupedPrinters.hasOwnProperty(key)) {
-      if (key !== "") {
-        const currentGroupEncoded = encodeURIComponent(key);
-        //Quick Connect
+function addGroupEventListeners(printers, group) {
+  //Quick Connect
+  document
+    .getElementById(`printerQuickConnect-${group}`)
+    .addEventListener("click", async (e) => {
+      e.disabled = true;
+      if (
         document
-          .getElementById(`printerQuickConnect-${currentGroupEncoded}`)
-          .addEventListener("click", async (e) => {
-            e.disabled = true;
-            if (
-              document
-                .getElementById("printerQuickConnect-" + currentGroupEncoded)
-                .classList.contains("btn-danger")
-            ) {
-              for (const printer of groupedPrinters[key]) {
-                let data = {};
-                if (typeof printer.connectionOptions !== "undefined") {
-                  data = {
-                    command: "connect",
-                    port: printer.connectionOptions?.portPreference,
-                    baudrate: parseInt(
-                      printer.connectionOptions?.baudratePreference
-                    ),
-                    printerProfile:
-                      printer.connectionOptions?.printerProfilePreference,
-                  };
-                } else {
-                  UI.createAlert(
-                    "warning",
-                    `${printer.printerName} has no preferences saved, defaulting to AUTO... OctoFarm has saved these connection preferences as default for you...`,
-                    10000,
-                    "Clicked"
-                  );
-                  data.command = "connect";
-                  data.port = "AUTO";
-                  data.baudrate = 0;
-                  data.printerProfile = "_default";
-                }
-                let post = await OctoPrintClient.post(
-                  printer,
-                  "connection",
-                  data
-                );
-                if (typeof post !== "undefined") {
-                  if (post.status === 204) {
+          .getElementById("printerQuickConnect-" + group)
+          .classList.contains("btn-danger")
+      ) {
+        for (const printer of printers) {
+          const status = await connectPrinterSequence(printer);
+          if (typeof status !== "undefined") {
+            if (status === 204) {
+              UI.createAlert(
+                  "success",
+                  `Successfully made connection attempt to ${printer.printerName}...`,
+                  3000,
+                  "Clicked"
+              );
+            } else {
+              UI.createAlert(
+                  "error",
+                  `There was an issue connecting to ${printer.printerName} it's either not online, or the connection options supplied are not available...`,
+                  3000,
+                  "Clicked"
+              );
+            }
+          } else {
+            UI.createAlert(
+                "error",
+                `No response from ${printer.printerName}, is it online???`,
+                3000,
+                "Clicked"
+            );
+          }
+        }
+      } else {
+        bootbox.confirm({
+          message: "Are you sure you want to disconnect your printers?",
+          buttons: {
+            confirm: {
+              label: "Yes",
+              className: "btn-success",
+            },
+            cancel: {
+              label: "No",
+              className: "btn-danger",
+            },
+          },
+          callback: async function (result) {
+            if (result) {
+              for (const printer of printers) {
+                const status = await disconnectPrinterSequenceNoConfirm(printer);
+                if (typeof status !== "undefined") {
+                  if (status === 204) {
                     UI.createAlert(
                       "success",
-                      `Successfully made connection attempt to ${printer.printerName}...`,
+                      `Successfully made disconnect attempt to ${printer.printerName}...`,
                       3000,
                       "Clicked"
                     );
                   } else {
                     UI.createAlert(
                       "error",
-                      `There was an issue connecting to ${printer.printerName} it's either not online, or the connection options supplied are not available...`,
+                      `There was an issue disconnecting to ${printer.printerName} are you sure it's online?`,
                       3000,
                       "Clicked"
                     );
@@ -220,95 +229,84 @@ function addGroupEventListeners(printers) {
                   );
                 }
               }
-            } else {
-              bootbox.confirm({
-                message: "Are you sure you want to disconnect your printers?",
-                buttons: {
-                  confirm: {
-                    label: "Yes",
-                    className: "btn-success",
-                  },
-                  cancel: {
-                    label: "No",
-                    className: "btn-danger",
-                  },
-                },
-                callback: async function (result) {
-                  if (result) {
-                    for (const printer of groupedPrinters[key]) {
-                      let data = {
-                        command: "disconnect",
-                      };
-                      let post = await OctoPrintClient.post(
-                        printer,
-                        "connection",
-                        data
-                      );
-                      if (typeof post !== "undefined") {
-                        if (post.status === 204) {
-                          UI.createAlert(
-                            "success",
-                            `Successfully made disconnect attempt to ${printer.printerName}...`,
-                            3000,
-                            "Clicked"
-                          );
-                        } else {
-                          UI.createAlert(
-                            "error",
-                            `There was an issue disconnecting to ${printer.printerName} are you sure it's online?`,
-                            3000,
-                            "Clicked"
-                          );
-                        }
-                      } else {
-                        UI.createAlert(
-                          "error",
-                          `No response from ${printer.printerName}, is it online???`,
-                          3000,
-                          "Clicked"
-                        );
-                      }
-                    }
-                  }
-                },
-              });
             }
-          });
+          },
+        });
+      }
+    });
 
-        //Re-Sync printer
-        document
-          .getElementById(`printerSyncButton-${currentGroupEncoded}`)
-          .addEventListener("click", async (e) => {
-            e.target.disabled = true;
-            for (const printer of groupedPrinters[key]) {
-              const data = {
-                id: printer._id,
-              };
-              let post = await OctoFarmClient.post(
-                "printers/reSyncSockets",
-                data
-              );
-              if (post.msg.status !== "error") {
-                UI.createAlert(
-                  "success",
-                  printer.printerName + ": " + post.msg.msg,
-                  3000,
-                  "clicked"
-                );
-              } else {
-                UI.createAlert(
-                  "error",
-                  printer.printerName + ": " + post.msg.msg,
-                  3000,
-                  "clicked"
-                );
+  //Re-Sync printer
+  document
+    .getElementById(`printerSyncButton-${group}`)
+    .addEventListener("click", async (e) => {
+      e.target.disabled = true;
+      for (const printer of printers) {
+        const data = {
+          id: printer._id,
+        };
+        let post = await OctoFarmClient.post(
+          "printers/reSyncSockets",
+          data
+        );
+        if (post.msg.status !== "error") {
+          UI.createAlert(
+            "success",
+            printer.printerName + ": " + post.msg,
+            3000,
+            "clicked"
+          );
+        } else {
+          UI.createAlert(
+            "error",
+            printer.printerName + ": " + post.msg,
+            3000,
+            "clicked"
+          );
+        }
+      }
+      e.target.disabled = false;
+    });
+
+  // Emergency Stop
+  document
+      .getElementById(`printerEmergency-${group}`)
+      .addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        bootbox.confirm(
+            'You are about to send "M112" to your printers, this will cause an emergency stop! Are you sure?',
+            async function (result) {
+              if (result) {
+                for (const printer of printers){
+                  const { status, message } = await printerEmergencyStop(printer);
+                  UI.createAlert(status, message, 3000, "Clicked");
+                }
+                e.target.disabled = false;
               }
             }
-            e.target.disabled = false;
-          });
-      }
-    }
-  }
+        );
+      });
+  document
+      .getElementById(`printerHome-${group}`)
+      .addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        for (const printer of printers){
+          const { status, message } = await printerHomeAllAxis(printer);
+          UI.createAlert(status, message, 3000, "Clicked");
+        }
+        e.target.disabled = false;
+      });
+
+  document
+      .getElementById(`printerHeatersOff-${group}`)
+      .addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        for (const printer of printers){
+          const { status, message } = await printerTurnOffHeaters(printer);
+          UI.createAlert(status, message, 3000, "Clicked");
+        }
+        e.target.disabled = false;
+      });
+
 }
 
 function init(printer, element) {
@@ -507,52 +505,48 @@ function checkQuickConnectState(printer) {
   printerQuickConnected(printer._id);
 }
 
-function checkGroupQuickConnectState(printers) {
-  const groupedPrinters = mapValues(groupBy(printers, "group"));
-  for (const key in groupedPrinters) {
-    if (groupedPrinters.hasOwnProperty(key)) {
-      if (key !== "") {
-        const currentGroupEncoded = encodeURIComponent(key);
-        const offlinePrinters = groupedPrinters[key].filter(
-          (obj) => obj.printerState.colour.category === "Offline"
-        ).length;
-        if (offlinePrinters > 0) {
-          document.getElementById(
-            "printerQuickConnect-" + currentGroupEncoded
-          ).disabled = true;
-        }
-        const noConnectionOptions = groupedPrinters[key].filter(
-          (obj) =>
-            obj?.connectionOptions?.portPreference === null ||
-            obj?.connectionOptions?.baudratePreference === null ||
-            obj?.connectionOptions?.printerProfilePreference === null
-        ).length;
-        if (noConnectionOptions > 0) {
-          document.getElementById(
-            "printerQuickConnect-" + currentGroupEncoded
-          ).disabled = true;
-        }
-        const disconnectedOrError = groupedPrinters[key].filter(
-          (obj) =>
-            (obj.printerState.colour.category !== "Offline" &&
-              obj.printerState.colour.category === "Disconnected") ||
-            obj.printerState.colour.category === "Error!"
-        ).length;
-        const offlineDisconnectedAndError = groupedPrinters[key].filter(
-          (obj) =>
-            obj.printerState.colour.category !== "Offline" &&
-            obj.printerState.colour.category !== "Disconnected" &&
-            obj.printerState.colour.category !== "Error!"
-        ).length;
-        if (disconnectedOrError > 0) {
-          printerQuickDisconnected(currentGroupEncoded);
-        } else if (offlineDisconnectedAndError > 0) {
-          printerQuickConnected(currentGroupEncoded);
-        } else {
-          printerQuickDisconnected(currentGroupEncoded);
-        }
-      }
-    }
+function checkGroupQuickConnectState(printers, group) {
+  const printersAllOnline = printers.filter(
+      (printer) => printerIsOnline(printer)
+  ).length;
+  const printersAllIdle = printers.filter(
+      (printer) => printerIsIdle(printer)
+  ).length;
+  const printersAllPrinting = printers.filter(
+      (printer) => printerIsPrinting(printer)
+  ).length;
+  const printersAllDisconnectedOrError = printers.filter(
+      (printer) => printerIsDisconnectedOrError(printer)
+  ).length;
+  document.getElementById("printerSyncButton-" + group).disabled =
+      !printersAllOnline > 0;
+  document.getElementById("printerQuickConnect-" + group).disabled =
+      !printersAllOnline > 0;
+  document.getElementById("printerManageDropDown-" + group).disabled =
+      !printersAllOnline > 0;
+  document.getElementById("printerHome-" + group).disabled =
+      !printersAllIdle;
+  document.getElementById("printerEmergency-" + group).disabled =
+      !printersAllPrinting;
+  document.getElementById("printerHeatersOff-" + group).disabled =
+      !printersAllIdle;
+  const noConnectionOptions = printers.filter(
+    (obj) =>
+      obj?.connectionOptions?.portPreference === null ||
+      obj?.connectionOptions?.baudratePreference === null ||
+      obj?.connectionOptions?.printerProfilePreference === null
+  ).length;
+  if (noConnectionOptions > 0) {
+    document.getElementById(
+      "printerQuickConnect-" + group
+    ).disabled = true;
+  }
+  if (printersAllDisconnectedOrError > 0) {
+    printerQuickDisconnected(group);
+  } else if (printersAllDisconnectedOrError === 0) {
+    printerQuickConnected(group);
+  } else {
+    printerQuickDisconnected(group);
   }
 }
 
