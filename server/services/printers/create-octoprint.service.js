@@ -1194,7 +1194,7 @@ class OctoPrintPrinter {
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
       if (!force) {
-        if(this.camURL.length === 0){
+        if (this.camURL.length === 0) {
           this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
         }
         this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
@@ -1493,8 +1493,8 @@ class OctoPrintPrinter {
     this.#apiPrinterTickerWrap("Acquiring file list data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().FILES, "warning");
 
-    if(!this.onboarding.fullyScanned){
-      force = true
+    if (!this.onboarding.fullyScanned) {
+      force = true;
     }
 
     if (this?.fileList?.fileList?.length === 0 || force) {
@@ -1612,8 +1612,14 @@ class OctoPrintPrinter {
     this.#reconnectTimeout = false;
     const { timeout } = SettingsClean.returnSystemSettings();
     this.#apiRetry = timeout.apiRetry;
-    this.reconnectingIn = Date.now() + this.#apiRetry;
+    this.reconnectingIn = 0;
     this.#retryNumber = 0;
+    logger.debug("Cleared API Timeout", {
+      reconnectTimeout: this.#reconnectTimeout,
+      apiRetry: this.#apiRetry,
+      reconnectingIn: this.reconnectingIn,
+      retryNumber: this.#retryNumber
+    });
   }
 
   async forceReconnect() {
@@ -1672,7 +1678,7 @@ class OctoPrintPrinter {
     }
     this.#retryNumber = this.#retryNumber + 1;
     this.reconnectingIn = Date.now() + this.#apiRetry;
-    // if (this.#reconnect) return; //Reconnection is planned..
+    if (!!this.#reconnectTimeout) return; //Reconnection is planned..
     this.#reconnectTimeout = setTimeout(() => {
       this.reconnectingIn = 0;
       if (this.#retryNumber > 0) {
