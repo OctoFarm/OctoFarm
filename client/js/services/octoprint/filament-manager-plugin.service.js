@@ -3,6 +3,22 @@ import UI from "../../utils/ui";
 
 let filamentManagerSettings = {};
 
+const syncFilamentManagerButton = `
+        <button id="setupFilamentManagerBtn" type="button"
+                class="btn btn-warning text-dark mb-1 btn-lg"><i
+                    class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
+        </button>
+    `
+const disabledFilamentManagerButton = `
+       <button id="disableFilamentManager" type="button" class="btn btn-danger mb-1 btn-lg"><i class="fas fa-skull-crossbones"></i><br>
+                        Disable Filament Manager
+      </button>
+`
+
+const filamentManagerSyncDiv = document.getElementById(
+    "filamentManagerButton"
+);
+
 export async function isFilamentManagerPluginSyncEnabled() {
   if (_.isEmpty(filamentManagerSettings)) {
     const {
@@ -43,10 +59,11 @@ async function disabledFilamentManagerSync() {
 }
 
 export function setupFilamentManagerDisableBtn() {
-  const disableFilManagerBtn = document.getElementById(
-    "disableFilamentManager"
-  );
-  if (!!disableFilManagerBtn) {
+  if (!!filamentManagerSyncDiv) {
+    filamentManagerSyncDiv.innerHTML = disabledFilamentManagerButton;
+    const disableFilManagerBtn = document.getElementById(
+        "disableFilamentManager"
+    );
     disableFilManagerBtn.addEventListener("click", () => {
       bootbox.confirm({
         message:
@@ -73,10 +90,9 @@ export function setupFilamentManagerDisableBtn() {
 }
 
 export function setupFilamentManagerSyncBtn() {
-  const filamentManagerSyncBtn = document.getElementById(
-    "setupFilamentManagerBtn"
-  );
-  if (!!filamentManagerSyncBtn) {
+  if (!!filamentManagerSyncDiv) {
+    filamentManagerSyncDiv.innerHTML = syncFilamentManagerButton
+    const filamentManagerSyncBtn = document.getElementById("setupFilamentManagerBtn")
     filamentManagerSyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
       filamentManagerSyncBtn.disabled = true;
@@ -90,6 +106,8 @@ export function setupFilamentManagerSyncBtn() {
           activate: true,
         }
       );
+
+      console.log(filamentManagerSyncEnabled)
 
       if (filamentManagerSyncEnabled.errors.length > 0) {
         filamentManagerAlert.close();

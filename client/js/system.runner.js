@@ -95,7 +95,7 @@ if (serverActionsElements.CLEAR_OLD_LOGS) {
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
   serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       bootbox.dialog(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
     }
   );
@@ -104,7 +104,7 @@ if (serverActionsElements.OP_TIMELAPSE_SETUP) {
 if (serverActionsElements.OP_FILAMENT_SETUP) {
   serverActionsElements.OP_FILAMENT_SETUP.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       await setupOPFilamentManagerPluginSettings();
     }
   );
@@ -113,7 +113,7 @@ if (serverActionsElements.OP_FILAMENT_SETUP) {
 if (serverActionsElements.LOG_DUMP_GENERATE) {
   serverActionsElements.LOG_DUMP_GENERATE.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       const alert = UI.createAlert(
         "warning",
         `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
@@ -139,7 +139,7 @@ if (serverActionsElements.RESET_DASHBOARD) {
 if (serverActionsElements.SAVE_SERVER_SETTINGS) {
   serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       // Validate Printer Form, then Add
       await updateServerSettings();
     }
@@ -149,7 +149,7 @@ if (serverActionsElements.SAVE_SERVER_SETTINGS) {
 if (serverActionsElements.RESTART_OCTOFARM) {
   serverActionsElements.RESTART_OCTOFARM.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       await restartOctoFarmServer();
     }
   );
@@ -164,7 +164,7 @@ if (serverActionsElements.UPDATE_OCTOFARM) {
 if (serverActionsElements.CHECK_OCTOFARM_UPDATES) {
   serverActionsElements.CHECK_OCTOFARM_UPDATES.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       await checkForOctoFarmUpdates();
     }
   );
@@ -173,7 +173,7 @@ if (serverActionsElements.CHECK_OCTOFARM_UPDATES) {
 if (serverActionsElements.SAVE_CLIENT_SETTINGS) {
   serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener(
     "click",
-    async (e) => {
+    async () => {
       // Validate Printer Form, then Add
       await ClientSettings.update();
     }
