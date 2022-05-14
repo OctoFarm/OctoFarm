@@ -44,6 +44,7 @@ import {
   findMiniFilamentDropDownsSelect,
 } from "../../services/printer-filament-selector.service";
 import {checkKlipperState} from "../../services/octoprint/checkKlipperState.actions";
+import {getFileTemplate} from "../file-manager/file.template";
 
 let elems = [];
 let groupElems = [];
@@ -230,35 +231,14 @@ async function addListeners(printer) {
   return "done";
 }
 function updateGroupFileListeners(printers) {
-  const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
-  fileActionBtns.forEach((btn) => {
-    // Gate Keeper listener for file action buttons
-    const button = btn;
-    btn.addEventListener("click", async function () {
-      printers.forEach((printer) => {
-        const data = button.id.split("*");
-        const action = data[1];
-        const filePath = data[2];
-        if (action === "fileActionStart") {
-          FileActions.startPrint(printer, filePath, true);
-          UI.createAlert(
-            "success",
-            filePath + " has started to print on all printers!",
-            3000,
-            "clicked"
-          );
-        } else if (action === "fileActionSelect") {
-          FileActions.selectFile(printer, filePath, true);
-          UI.createAlert(
-            "success",
-            filePath + " has been selected on all printers!",
-            3000,
-            "clicked"
-          );
-        }
-      });
-    });
-  });
+  const fileActionBtns = document.getElementById("groupFileActionButton")
+  fileActionBtns.addEventListener("click", async () => {
+    const selectBox = document.getElementById("groupFilesList");
+    const filePath = selectBox.value;
+    for (const printer of printers){
+      await FileActions.startPrint(printer, filePath, true);
+    }
+  })
 }
 function drawGroupFiles(fileList, currentGroupEncoded, printers) {
   try {
@@ -269,114 +249,16 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
       const currentFileList = fileList;
       // Show empty or filled list
       if (currentFileList.length > 0) {
+        fileElem.innerHTML = "<select id=\"groupFilesList\" class=\"custom-select\"></select>"
+        const groupFileList = document.getElementById("groupFilesList");
+
         currentFileList.forEach((file) => {
-          let toolInfo = "";
-          file.toolUnits.forEach((unit, index) => {
-            toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-          });
-          let thumbnail =
-            "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
-          if (
-            typeof file.thumbnail !== "undefined" &&
-            file.thumbnail !== null
-          ) {
-            thumbnail = `<center><img src='${printers[0].printerURL}/${file.thumbnail}' width="100%"></center>`;
-          }
-          let fileDate = new Date(file.uploadDate * 1000);
-          const dateString = fileDate.toDateString();
-          const timeString = fileDate.toTimeString().substring(0, 8);
-          let bgColour = "bg-secondary";
-          if (file.last === true) {
-            bgColour = "bg-dark-success";
-          } else if (file.last === false) {
-            bgColour = "bg-dark-failed";
-          }
-          fileDate = `${dateString} ${timeString}`;
-          const f = ` <div
-            id="file-${file.fullPath}"
-            href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}"
-            style="display: block;
-            padding: 0.7rem 0.1rem;"
-            >
-            <div class="row">
-                <div
-                            id="fileThumbnail-${file.fullPath}"
-          class="col-lg-2"
-            style="display:flex; justify-content:center; align-items:center;"
-                >
-                ${thumbnail}
-                </div>
-                <div class="col-lg-10">
-                <div class="row">
-                <div class="col-12">
-                <h5 class="mb-1 name">${file.fullPath}</h5>              
-                </div>
-                </div>
-                <div class="row">
-                <div class="col-12">
-                <p class="mb-1 float-right">
-                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${
-                  file.fullPath
-                }"><i class="fas fa-thumbs-up"></i> ${
-            file.success
-          } / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
-                <i class="fas fa-stopwatch"></i> 
-                <span class="time" id="fileTime-${file.fullPath}">
-                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
-                <i class="fas fa-dollar-sign"></i> 
-                <span title="Expected Printer Cost" class="cost" id="fileCost-${
-                  file.fullPath
-                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
-            <span title="Expected Filament Cost"> </span>
-
-                </p>
-                <p class="mb-1 float-left">
-                <i class="fas fa-clock"></i><span id="fileDateClean-${
-                  file.fullPath
-                }" class="date d-none"> ${
-            file.uploadDate
-          }</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
-                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
-                  file.fullPath
-                }"> ${Calc.bytes(file.fileSize)}</span> <br>
-            <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
-              file.fullPath
-            }"> ${toolInfo} </span>
-
-                </p> 
-                </div>
-                </div>
-                </div>
-                <div class="col-lg-12">
-                <div
-          class="d-flex btn-group flex-wrap btn-group-sm"
-            role="group"
-            aria-label="Basic example"
-                >
-                <button           title="Start printing file"
-            id="${currentGroupEncoded._id}*fileActionStart*${
-            file.fullPath
-          }" type="button" class="btn btn-success">
-          <i class="fas fa-play"></i> Start
-              </button>
-              <button  title="Select file" id="${
-                currentGroupEncoded._id
-              }*fileActionSelect*${
-            file.fullPath
-          }" type="button" class="btn btn-info">
-        <i class="fas fa-file-upload"></i> Select
-            </button>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>`;
-          fileElem.insertAdjacentHTML("beforeend", f);
+          groupFileList.insertAdjacentHTML("beforeend",  `<option value="${file.fullPath.replace(/%/g, "_")}"> ${file.fullPath} </option>`)
         });
+
+        fileElem.insertAdjacentHTML("beforeend",   "<button id=\"groupFileActionButton\" type=\"button\" class=\"mt-5 btn btn-success\">Start Prints!</button>")
       } else {
-        fileElem.insertAdjacentHTML(
-          "beforeend",
+        fileElem.innerHTML =
           `
             <div
             id="noFilesToBeShown"
@@ -395,9 +277,7 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
       </div>
       </div>
       </div>
-            
-            `
-        );
+            `;
       }
     }
   } catch (e) {
@@ -1090,7 +970,13 @@ async function updateState(printer, clientSettings, view, index) {
 }
 
 async function updateGroupState(printers, clientSettings, view) {
-  checkGroupQuickConnectState(printers);
+  const uniqueGroupList = [
+    ...new Set(printers.map((printer) => printer.group)),
+  ];
+  uniqueGroupList.forEach((group) => {
+    const cleanGroup = encodeURIComponent(group);
+    checkGroupQuickConnectState(printers, cleanGroup);
+  })
   printers.forEach((printer, index) => {
     if (printer.group !== "" || !printer.disabled) {
       const elements = grabElements(printer);
@@ -1438,6 +1324,26 @@ export async function initMonitoring(printers, clientSettings, view) {
       break;
     case false:
       // initialise or start the information updating..
+      if (view === "group") {
+        const groupViewPrinterList = printers.filter((printer) => {
+          if (printerIsAvailableToView(printer) && printer.group.length !== 0){
+            return printer;
+          }
+        });
+        if (!actionButtonsInitialised) {
+              drawGroupViewContainers(groupViewPrinterList, printerArea, clientSettings);
+              drawGroupViewPrinters(groupViewPrinterList, clientSettings);
+              //Setup Action Buttons
+              await actionButtonGroupInit(groupViewPrinterList);
+
+              addGroupListeners(groupViewPrinterList);
+              await dragAndDropGroupEnable(groupViewPrinterList);
+              actionButtonsInitialised = true;
+        }else{
+          await updateGroupState(groupViewPrinterList, clientSettings, view);
+        }
+        return;
+      }
       for (let p = 0; p < printers.length; p++) {
         if (printerIsAvailableToView(printers[p])) {
           let printerPanel = document.getElementById(
@@ -1453,9 +1359,6 @@ export async function initMonitoring(printers, clientSettings, view) {
             } else if (view === "camera") {
               let printerHTML = drawCameraView(printers[p], clientSettings);
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            } else if (view === "group") {
-              drawGroupViewContainers(printers, printerArea, clientSettings);
-              drawGroupViewPrinters(printers, clientSettings);
             } else if (view === "combined") {
               let printerHTML = drawCombinedView(printers[p], clientSettings);
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
@@ -1468,46 +1371,27 @@ export async function initMonitoring(printers, clientSettings, view) {
               errorObject.message = `Monitoring Updater - ${e}`;
               throw new ApplicationError(errorObject);
             }
-
-            if (view !== "group") {
-              //Update the printer panel to the actual one
-              printerPanel = document.getElementById(
+            printerPanel = document.getElementById(
                 "panel-" + printers[p]._id
-              );
-              //Setup Action Buttons
-              await actionButtonInit(
+            );
+            //Setup Action Buttons
+            await actionButtonInit(
                 printers[p],
                 `printerActionBtns-${printers[p]._id}`
-              );
-              //Add page listeners
-              await addListeners(printers[p]);
-              //Grab elements
-              await grabElements(printers[p]);
-              //Initialise Drag and Drop
-              await dragAndDropEnable(printerPanel, printers[p]);
-            } else {
-              if (!actionButtonsInitialised) {
-                //Setup Action Buttons
-                await actionButtonGroupInit(printers);
+            );
+            //Add page listeners
+            await addListeners(printers[p]);
+            //Grab elements
+            await grabElements(printers[p]);
+            //Initialise Drag and Drop
+            await dragAndDropEnable(printerPanel, printers[p]);
 
-                addGroupListeners(printers);
-                await dragAndDropGroupEnable(printers);
-                actionButtonsInitialised = true;
-              }
-            }
           } else {
-            if (!printerManagerModal.classList.contains("show")) {
-              if (!dragCheck()) {
-                if (view !== "group") {
-                  await updateState(printers[p], clientSettings, view, p);
-                }
-              }
+            if (!dragCheck()) {
+                await updateState(printers[p], clientSettings, view, p);
             }
           }
         }
-      }
-      if (view === "group") {
-        await updateGroupState(printers, clientSettings, view);
       }
       break;
   }
