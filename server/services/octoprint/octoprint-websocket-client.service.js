@@ -98,6 +98,7 @@ class WebSocketClient {
 
     this.#instance.on("pong", () => {
       this.#lastPongMessage = Date.now();
+      getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
     });
 
     this.#instance.on("unexpected-response", (err) => {
@@ -439,31 +440,6 @@ class WebSocketClient {
   }
 
   ping() {
-    // getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
-    // logger.debug(this.url + " received pong message from server");
-    // clearTimeout(this.#heartbeatTerminate);
-    // clearTimeout(this.#heartbeatPing);
-    //
-    // logger.debug(this.url + " ping timout set", this.#pingPongTimer);
-    //
-    // this.#heartbeatTerminate = setTimeout(() => {
-    //   logger.http(this.url + ": Didn't receive a pong from client, reconnecting!");
-    //   PrinterTicker.addIssue(
-    //     new Date(),
-    //     this.url,
-    //     "Didn't receive a pong from client, reconnecting!",
-    //     "Offline",
-    //     this.id
-    //   );
-    //   ConnectionMonitorService.updateOrAddResponse(
-    //     this.url,
-    //     REQUEST_TYPE.WEBSOCKET,
-    //     REQUEST_KEYS.TOTAL_PING_PONG
-    //   );
-    //   this.terminate();
-    //   // consider a minute without response a dead connection! Should cover WiFi devices better.
-    // }, this.#pingPongTimer + 5000);
-    // logger.debug(this.url + " terminate timeout set", this.#pingPongTimer + 5000);
     getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
     logger.info(this.url + ": Pinging client");
     this.#instance.ping();
@@ -477,7 +453,7 @@ class WebSocketClient {
         lastPingMessage: this.#lastPingMessage,
         lastPongMessage: this.#lastPongMessage,
         time: this.#lastPingMessage - this.#lastPongMessage
-      })
+      });
       clearTimeout(registerLastPing);
       PrinterTicker.addIssue(
         new Date(),
