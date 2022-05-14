@@ -403,47 +403,49 @@
                             </form>
                         </div>
                         <div class="col-lg-12">
-                        <h5>Filament Manager Sync</h5>
-                        <div class="alert alert-info" role="alert">
-                            <h5>Update your instances settings</h5>
-                            The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.
-                            <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
-                                    class="btn btn-outline-dark btn-block mt-1">
-                                Setup Your Farm!
-                            </button>
-                        </div>
-                        <p class="mb-1">Click the button below to activate filament
-                            manager plugin and link it to OctoFarm. Please read the
-                            notes below before proceeding.</p>
-                        <code><b>Note:</b></code> <span>OctoFarm expects filament manager
-                            installed on every instance. If it isn't, and you
-                            activate it you run the risk of some updates/selections
-                            failing to register.</span>
-                        <br>
-                        <code><b>Note:</b></code> <span>You must also have all these instances
-                            setup with a postgres database. Without this you will
-                            not be able to select filament on every
-                            instance.</span>
-                        <br>
-                        <code><b>Note:</b></code> <span>Any spool within OctoFarm will be deleted
-                            upon successful sync and replaced with those on your filament manager database...</span>
-                        <% if(!serverSettings.filamentManager){ %>
-                            <span class="text-center">
-                                <br>
-                                <button id="setupFilamentManagerBtn" type="button"
-                                        class="btn btn-warning text-dark mb-1 btn-lg"><i
-                                            class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
-                                </button>
+                            <h5>Filament Manager Sync</h5>
+                            <div class="row">
+                                <div class="col-lg-8 text-center">
+                                    <% if(!serverSettings.filamentManager){ %>
+                                    <div class="alert alert-info" role="alert">
+                                        <p class="mb-1">Click the button below to activate filament
+                                            manager plugin and link it to OctoFarm. Please read the
+                                            notes below before proceeding.</p></div>
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-danger" role="alert">
+                                                <span>OctoFarm expects filament manager
+                                                    installed on every instance. If it isn't, and you
+                                                    activate it you run the risk of some updates/selections
+                                                    failing to register.</span></div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <span>You must also have all these instances
+                                                    setup with a postgres database. Without this you will
+                                                    not be able to select filament on every instance.</span></div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <span>Any spool within OctoFarm will be deleted
+                                                    upon successful sync and replaced with those on your filament manager database...</span></div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                        <div id="filamentManagerButton">
 
-                        <% }else{ %>
-                                <br>
-                                <button id="disableFilamentManager" type="button"
-                                        class="btn btn-danger mb-1 btn-lg"><i
-                                            class="fas fa-skull-crossbones"></i><br>
-                                    Disable Filament Manager
-                                </button>
-                            </span>
-                        <% } %>
+                                        </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="alert alert-info" role="alert">
+                                        <h5>Update your instances settings</h5>
+                                        The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.</div>
+                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
+                                            class="btn btn-outline-warning btn-block mt-1">
+                                        Setup Your Farm!
+                                    </button>
+                                </div>
+                            </div>
                     </div>
                 </div>
             </div>
