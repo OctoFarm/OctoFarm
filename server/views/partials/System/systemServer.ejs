@@ -405,6 +405,15 @@
                         <div class="col-lg-12">
                             <h5>Filament Manager Sync</h5>
                             <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="alert alert-info" role="alert">
+                                        <h5>Update your instances settings</h5>
+                                        The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.</div>
+                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
+                                            class="btn btn-outline-warning btn-block mt-1">
+                                        Setup Your Farm!
+                                    </button>
+                                </div>
                                 <div class="col-lg-8 text-center">
                                     <% if(!serverSettings.filamentManager){ %>
                                     <div class="alert alert-info" role="alert">
@@ -435,15 +444,6 @@
                                         <div id="filamentManagerButton">
 
                                         </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="alert alert-info" role="alert">
-                                        <h5>Update your instances settings</h5>
-                                        The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.</div>
-                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
-                                            class="btn btn-outline-warning btn-block mt-1">
-                                        Setup Your Farm!
-                                    </button>
                                 </div>
                             </div>
                     </div>
