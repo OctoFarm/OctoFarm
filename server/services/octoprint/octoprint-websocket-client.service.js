@@ -441,7 +441,7 @@ class WebSocketClient {
 
   ping() {
     getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
-    logger.info(this.url + ": Pinging client");
+    logger.debug(this.url + ": Pinging client");
     this.#instance.ping();
 
     const registerLastPing = setTimeout(() => {
