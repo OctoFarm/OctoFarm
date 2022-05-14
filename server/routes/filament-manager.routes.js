@@ -27,7 +27,8 @@ const {
   checkIfProfileAttachedToSpool,
   findFirstOnlinePrinter,
   checkIfDatabaseCanBeConnected,
-  filamentManagerReSync
+  filamentManagerReSync,
+  assignSpoolToOctoPrint
 } = require("../services/octoprint/utils/filament-manager-plugin.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { TaskManager } = require("../services/task-manager.service");
@@ -56,6 +57,12 @@ router.get("/get/dropDownList", ensureAuthenticated, async (_req, res) => {
 router.post("/assign", ensureAuthenticated, async (req, res) => {
   logger.info("Request to change selected spool:", req.body.printers);
   const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
+
+  const filamentManager = SettingsClean.returnFilamentManagerSettings();
+  if(filamentManager){
+    await assignSpoolToOctoPrint(req.bodyString("spoolId"), req.body.printers);
+  }
+
   await getPrinterStoreCache().assignSpoolToPrinters(
     req.body.printers,
     req.bodyString("spoolId"),

@@ -130,6 +130,46 @@ const checkIfDatabaseCanBeConnected = async function (printers) {
   return unconnectedDatabases;
 };
 
+const assignSpoolToOctoPrint = async function (spoolId, printers) {
+  let spool = null;
+  if(!!spoolId){
+    spool = await Spool.findById(spoolId);
+  }
+
+  if(!spoolId || !printers){
+    logger.error("Unable to assign spool on OctoPrint, missing data...", {
+      spoolId,
+      printers
+    })
+  }
+
+  const printer = getPrinterStoreCache().getPrinterInformation(printers[0].printer);
+
+  const selection = {
+    tool: parseInt(printers[0].tool),
+    spool: { id: parseInt(spool?.spools?.fmID ? spool.spools.fmID : null) }
+  };
+
+  logger.info("Updating OctoPrint with new spool selection", selection)
+
+  const url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
+  const updateFilamentManager = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
+    },
+    body: JSON.stringify({ selection })
+  });
+
+  if(!updateFilamentManager.ok){
+    logger.error(
+      "Unable to assign spool on OctoPrint, response errored!",
+      updateFilamentManager.toString()
+    );
+  }
+}
+
 const filamentManagerReSync = async function () {
   const errors = [];
 
@@ -246,5 +286,6 @@ module.exports = {
   checkIfSpoolAttachedToPrinter,
   checkIfProfileAttachedToSpool,
   checkIfDatabaseCanBeConnected,
-  filamentManagerReSync
+  filamentManagerReSync,
+  assignSpoolToOctoPrint
 };
