@@ -97,11 +97,11 @@ class FilamentCleanerService {
     const createList = [this.noSpoolOptions];
     spools.forEach((spool) => {
       let profileId = _.findIndex(profiles, function (o) {
-        return o._id == spool.spools.profile;
+        return o._id.toString() === spool.spools.profile.toString();
       });
 
       const index = _.findIndex(selected, function (o) {
-        return o == spool._id;
+        return o.toString() === spool._id.toString();
       });
       if (profileId >= 0) {
         const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
@@ -162,12 +162,10 @@ class FilamentCleanerService {
       const profInd = _.findIndex(profiles, function (o) {
         return o._id.toString() === element.profile.toString();
       });
-      console.log(profInd)
       if (profInd > -1) {
         const index = _.findIndex(materialBreak, function (o) {
-          return o.name == profiles[profInd].material;
+          return o.name === profiles[profInd].material;
         });
-        console.log(index)
         materialBreak[index].weight.push(parseFloat(element.weight));
         materialBreak[index].used.push(parseFloat(element.used));
         materialBreak[index].price.push(parseFloat(element.price));
