@@ -55,13 +55,13 @@ const handleUploadFromQueue = async (current, index) => {
     fileUploads.remove();
     await OctoFarmClient.post("printers/newFiles", file);
 
-    const currentFolder = document.getElementById("currentFolder").innerHTML;
+    const currentFolder = document.getElementById("currentFolder");
     const fileFolder = "local/" + file.files.local.path;
     const currentPrinter = document.getElementById("currentPrinter");
     const filePrinter = current.printerInfo.printerName;
-    if (!!currentPrinter && !!fileFolder) {
+    if (!!currentPrinter && !!fileFolder && !!currentFolder) {
       if (
-        fileFolder.includes(currentFolder) &&
+        fileFolder.includes(currentFolder.innerHTML) &&
         currentPrinter.innerHTML.includes(filePrinter)
       ) {
         await FileManagerSortingService.loadSort(current.index);

@@ -145,7 +145,7 @@ function groupInit(printers) {
     });
 
     checkGroupQuickConnectState(filteredGroupPrinterList, cleanGroup);
-    addGroupEventListeners(printers, cleanGroup);
+    addGroupEventListeners(filteredGroupPrinterList, cleanGroup);
   })
 }
 

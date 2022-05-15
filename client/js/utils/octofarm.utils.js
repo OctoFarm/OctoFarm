@@ -301,7 +301,7 @@ export function printerIsIdle(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category === "Idle";
+  return category === "Idle" || category === "Complete";
 }
 
 export function closePrinterManagerModalIfOffline(printer) {

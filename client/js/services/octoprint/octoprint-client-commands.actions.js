@@ -3,6 +3,7 @@ import UI from "../../utils/ui";
 import OctoFarmClient from "../octofarm-client.service";
 import bulkActionsStates from "../../pages/printer-manager/bulk-actions.constants";
 import {printStartSequence} from "./octoprint-helpers.service";
+import {printerIsIdle} from "../../utils/octofarm.utils";
 
 async function updateBtnOnClick(printerID) {
   const printer = await OctoFarmClient.getPrinter(printerID);
@@ -119,7 +120,7 @@ export async function disconnectPrinterFromOctoPrint(printer) {
   let data = {
     command: "disconnect",
   };
-  if (printer.printerState.colour.category === "Idle") {
+  if (printerIsIdle(printer)) {
     let post = await OctoPrintClient.post(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
