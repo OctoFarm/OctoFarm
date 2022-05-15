@@ -22,11 +22,11 @@ module.exports = {
     "idList.*": ["required", "string", "mongoose_object_id"]
   },
   UPDATE_PRINTERS: {
-    infoList: ["required", "array", MIN_LENGTH_0, MAX_PRINTER_ARRAY],
+    infoList: ["required", "array", MIN_LENGTH_0],
     "infoList.*._id": ["required", "mongoose_object_id"],
     "infoList.*.apikey": ["required", "string", API_MIN_LENGTH, API_MAX_LENGTH],
     "infoList.*.camURL": ["string", "url"],
-    "infoList.*.group": ["string", MIN_LENGTH_0, MAX_PRINTER_ARRAY],
+    "infoList.*.group": ["string", MIN_LENGTH_0],
     "infoList.*.printerURL": ["required", "string", "url"],
     "infoList.*.settingsAppearance": "settings_appearance"
   },

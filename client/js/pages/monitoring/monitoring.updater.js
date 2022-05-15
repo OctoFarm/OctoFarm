@@ -230,17 +230,8 @@ async function addListeners(printer) {
 
   return "done";
 }
-function updateGroupFileListeners(printers) {
-  const fileActionBtns = document.getElementById("groupFileActionButton")
-  fileActionBtns.addEventListener("click", async () => {
-    const selectBox = document.getElementById("groupFilesList");
-    const filePath = selectBox.value;
-    for (const printer of printers){
-      await FileActions.startPrint(printer, filePath, true);
-    }
-  })
-}
-function drawGroupFiles(fileList, currentGroupEncoded, printers) {
+
+function drawGroupFiles(fileList) {
   try {
     const fileElem = document.getElementById("printFilesList");
     fileElem.innerHTML = "";
@@ -283,7 +274,6 @@ function drawGroupFiles(fileList, currentGroupEncoded, printers) {
   } catch (e) {
     console.log(e);
   }
-  updateGroupFileListeners(printers);
 }
 
 function addGroupListeners(printers) {
@@ -975,7 +965,12 @@ async function updateGroupState(printers, clientSettings, view) {
   ];
   uniqueGroupList.forEach((group) => {
     const cleanGroup = encodeURIComponent(group);
-    checkGroupQuickConnectState(printers, cleanGroup);
+    const filteredGroupPrinterList = printers.filter((printer) => {
+      if (encodeURIComponent(printer.group) === cleanGroup){
+        return printer;
+      }
+    });
+    checkGroupQuickConnectState(filteredGroupPrinterList, cleanGroup);
   })
   printers.forEach((printer, index) => {
     if (printer.group !== "" || !printer.disabled) {

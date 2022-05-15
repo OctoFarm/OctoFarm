@@ -197,7 +197,9 @@ export default class PrinterSelectionService {
     <th scope="row">${printer.index}</th>
     <td>${printer.name}</td>
     <td class="${printer.state}">${printer.state}</td>
-    <td class="g-${printer.group.replace(/[^\w\s]/gi, "-").toLowerCase()}">${
+    <td class="g-${printer.group
+        .replace(/[^\w\-]+/g, "-")
+        .toLowerCase().replace(/ /g, "-")}">${
       printer.group
     }</td>
     <td>${printer.spool}</td>
@@ -229,9 +231,9 @@ export default class PrinterSelectionService {
                           }" type="text" class="form-control Idle" placeholder="${
       printer.group
     }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td class="${printer.group
+                          <td class="g-${printer.group
                             .replace(/[^\w\-]+/g, "-")
-                            .toLowerCase()}"><input id="editInputCamera-${
+                            .toLowerCase().replace(/ /g, "-")}"><input id="editInputCamera-${
       printer.id
     }" type="text" class="form-control Idle" placeholder="${
       printer.cameraURL
@@ -347,7 +349,7 @@ export default class PrinterSelectionService {
       if (printer.group !== "") {
         const group = {
           display: printer.group,
-          tag: printer.group.replace(/[^\w\s]/gi, "-").toLowerCase(),
+          tag: printer.group.replace(/[^\w\s]/gi, "-").toLowerCase().replace(/ /g, "-"),
         };
         groupList.push(group);
       }
@@ -389,7 +391,8 @@ export default class PrinterSelectionService {
         "<option selected value=\"all\" data-path=\"default\">Filter</option>"
       );
 
-      groupListUnique.forEach((group, index) => {
+      groupListUnique.forEach((group) => {
+        console.log(group)
         printerGroupList.insertAdjacentHTML(
           "beforeend",
           `<option value="${group.tag}" data-path=".g-${group.tag}">${group.display}</option>`
