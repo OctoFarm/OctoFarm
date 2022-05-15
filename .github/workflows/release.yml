@@ -27,28 +27,70 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 'lts/*'
-      - name: Install dependencies
-        run: |
-          cd ./client
-          npm ci --include=dev
-          cd ../server
-          npm ci --include=dev
-      - name: Release Client
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd ../client
-          npx semantic-release
-      - name: Wait for npm to update package...
-        uses: whatnick/wait-action@master
+      # Check to see if changes have occurred in client / server directories
+      - name: Detecting changes
+        uses: dorny/paths-filter@v2
+        id: filter
         with:
-          time: '30s'
+          filters: |
+            client:
+            - 'client/**'    
+
       - name: Release Server
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          cd ./server
+          npm ci --include=dev
+          npx semantic-release
+          cd ../
+
+      # Grab the client package version into a variable.
+      - name: Get current server version
+        if: steps.filter.outputs.client == 'true'
+        id: server-package-version
+        uses: martinbeentjes/npm-get-version-action@main
+        with:
+          path: server
+
+      # Build the client for npm publish
+      - name: Client Build
+        if: steps.filter.outputs.client == 'true'
+        run: |
+          cd ./client
+          npm version ${{ steps.server-package-version.outputs.current-version }}
+          npm ci --no-optional
+          npm run build
+
+      # Publish the new build to npm
+      - name: publish to npm
+        if: steps.filter.outputs.client == 'true'
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: ./client/package.json
+
+      - name: Wait for npm to update package...
+        uses: whatnick/wait-action@master
+        with:
+          time: '30s'
+
+      # Build the client for npm publish
+      - name: Install new client to server
+        if: steps.filter.outputs.client == 'true'
+        run: |
           cd ../server
           npm install @notexpectedyet/octofarm-client@latest --save
-          npx semantic-release
+          cd ../
+
+      - name: commit-changes-made
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore(release) - v${{ steps.server-package-version.outputs.current-version }} [skip ci]"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          ## This action should only ever commit these two files!
+          file_pattern: server/package*.json client/package*.json
