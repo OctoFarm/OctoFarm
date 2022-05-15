@@ -27,8 +27,7 @@ const powerOnPrinterSequence = async (printer) => {
 
 export const connectPrinterSequence = async (printer) => {
   await powerOnPrinterSequence(printer);
-  let data = {};
-  data = {
+  const data = {
     command: "connect",
     port: printer?.connectionOptions?.portPreference ? printer.connectionOptions.portPreference : "AUTO",
     baudrate: printer?.connectionOptions?.baudratePreference ? parseInt(printer.connectionOptions.baudratePreference) : 0,
@@ -61,10 +60,10 @@ export const disconnectPrinterSequenceNoConfirm = async (printer) => {
 }
 
 export const printStartSequence = async (printer) => {
-  const post = await connectPrinterSequence(printer);
+  const status = await connectPrinterSequence(printer);
   await OctoPrintClient.updateFeedAndFlow(printer);
   await OctoPrintClient.updateFilamentOffsets(printer);
   await OctoPrintClient.updateBedOffsets(printer);
   await OctoFarmClient.updateActiveControlUser(printer._id);
-  return post?.status;
+  return status;
 };
