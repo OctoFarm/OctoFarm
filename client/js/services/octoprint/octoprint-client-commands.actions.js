@@ -87,7 +87,6 @@ export async function quickConnectPrinterToOctoPrint(printer) {
   const status = await printStartSequence(printer);
   if (printer.printerState.colour.category === "Disconnected") {
     if (!!status) {
-      console.log(status)
       if (status === 204) {
         return {
           status: bulkActionsStates.SUCCESS,
