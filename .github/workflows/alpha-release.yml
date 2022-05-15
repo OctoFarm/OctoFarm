@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.TOKEN_ACTION }}
 
       # Check to see if changes have occurred in client / server directories
-      - name: Detecting changes
+      - name: Detect Client and Server Changes
         uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -38,32 +38,32 @@ jobs:
             client:
             - 'client/**'
       # Install node v14 to use.
-      - name: Use Node
+      - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: "16.15.0"
 
       # Up revision the rc version for canary
       - if: steps.filter.outputs.server == 'true'
-        name: server up revision
+        name: Up Revision the Server
         run: npm version prerelease --preid=alpha
         working-directory: ./server
 
       # Up revision the rc version for canary
-      - name: client up revision
+      - name: Up Revision the Client
         if: steps.filter.outputs.client == 'true'
         run: npm version prerelease --preid=alpha
         working-directory: ./client
 
       # Build the client for npm publish
-      - name: client build
+      - name: Build the Client
         if: steps.filter.outputs.client == 'true'
         run: |
           cd ./client
           npm ci --no-optional
           npm run build
       # Publish the new build to npm
-      - name: publish to npm
+      - name: Publish Client to NPM
         if: steps.filter.outputs.client == 'true'
         uses: JS-DevTools/npm-publish@v1
         with:
@@ -71,34 +71,34 @@ jobs:
           package: ./client/package.json
 
       # Grab the client package version into a variable.
-      - name: get-client-current-version
+      - name: Get Clients New Version
         id: client-package-version
         uses: martinbeentjes/npm-get-version-action@main
         with:
           path: client
 
       # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
-      - name: Wait for npm to update package...
+      - name: Wait for NPM to Update the Package
         if: steps.filter.outputs.client == 'true'
         uses: whatnick/wait-action@master
         with:
           time: '30s'
 
       # Update Server Package with latest client package
-      - name: update server client version
+      - name: Update Server with New Client
         if: steps.filter.outputs.client == 'true'
         run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
         working-directory: ./server
 
       # Commit changes to the current canary repository
-      - name: get-server-current-version
+      - name: Get Current Server Version
         id: server-package-version
         uses: martinbeentjes/npm-get-version-action@main
         with:
           path: server
 
         ## commit to repo, and prep pre-release
-      - name: commit-changes-made
+      - name: Commit Changes Made
         if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
