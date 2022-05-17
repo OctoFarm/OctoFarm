@@ -150,7 +150,7 @@ class WebSocketClient {
 
       this.#currentMessageMSRate = timeDifference - this.#lastMessage;
 
-      this.checkMessageSpeed(timeDifference - this.#lastMessage);
+      this.checkMessageSpeed(this.#currentMessageMSRate);
 
       this.#onMessage(this.id, data);
 
