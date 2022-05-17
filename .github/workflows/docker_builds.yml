@@ -1,7 +1,7 @@
 name: Docker
 on:
   workflow_run:
-    workflows: [ "Semantic Release Workflow" ]
+    #workflows: [ "Semantic Release Workflow" ]
     types:
       - completed
 jobs:
