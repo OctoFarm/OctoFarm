@@ -14,7 +14,7 @@
     "dev-server": "cd server && npm run dev",
     "dev-client": "cd client && npm run dev",
     "setup-dev": "npm run install-server && npm run install-client",
-    "update-main": "git pull && npm run install-server && pm2 restart OctoFarm",
+    "update-octofarm": "git pull && npm run install-server && pm2 restart OctoFarm",
     "prepare": "husky install"
   },
   "repository": {

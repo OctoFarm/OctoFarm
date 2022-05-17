@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
+    "install": "npm run build",
     "build": "webpack --mode=production",
     "webpack": "webpack",
     "dev": "webpack --watch"

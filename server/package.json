@@ -12,7 +12,7 @@
     "migration:status": "migrate-mongo status",
     "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\"",
     "test": "jest --forceExit",
-    "release": "semantic-release -p @semantic-release/changelog "
+    "release": "semantic-release -p @semantic-release/changelog"
   },
   "repository": {
     "type": "git",
