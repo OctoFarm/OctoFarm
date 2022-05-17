@@ -34,8 +34,10 @@ jobs:
         with:
           filters: |
             client:
-            - 'client/**'    
-
+            - 'client/**'
+      #Make sure npm is upgraded
+      - name: Upgrade NPM
+        run: npm install -g npm
       - name: Release Server Version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
