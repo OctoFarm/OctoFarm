@@ -42,5 +42,5 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd ./server
-          npm ci --include=dev
+          npm ci --include=dev --no-optional
           npx semantic-release
