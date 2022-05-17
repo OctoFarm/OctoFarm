@@ -6,7 +6,6 @@
   "scripts": {
     "prestart": "npm ci",
     "start": "pm2 flush && pm2 start ecosystem.config.js",
-    "postinstall": "cd ../client && npm run build",
     "dev": "nodemon ./app.js",
     "migration:up": "migrate-mongo up",
     "migration:down": "migrate-mongo down",
