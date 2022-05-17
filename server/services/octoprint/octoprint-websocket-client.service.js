@@ -98,7 +98,7 @@ class WebSocketClient {
     });
 
     this.#instance.on("pong", () => {
-      logger.info("Received a pong message");
+      logger.silly("Received a pong message");
       this.#lastPongMessage = Date.now();
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
     });
