@@ -37,7 +37,7 @@ jobs:
             - 'server/**'
             client:
             - 'client/**'
-      # Install node v14 to use.
+      # Install node v16 to use.
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
@@ -55,40 +55,14 @@ jobs:
         run: npm version prerelease --preid=alpha
         working-directory: ./client
 
-      # Build the client for npm publish
+      # Build new lock files for client and server
       - name: Build the Client
         if: steps.filter.outputs.client == 'true'
         run: |
-          cd ./client
-          npm ci --no-optional
-          npm run build
-      # Publish the new build to npm
-      - name: Publish Client to NPM
-        if: steps.filter.outputs.client == 'true'
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./client/package.json
-
-      # Grab the client package version into a variable.
-      - name: Get Clients New Version
-        id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@main
-        with:
-          path: client
-
-      # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
-      - name: Wait for NPM to Update the Package
-        if: steps.filter.outputs.client == 'true'
-        uses: whatnick/wait-action@master
-        with:
-          time: '30s'
-
-      # Update Server Package with latest client package
-      - name: Update Server with New Client
-        if: steps.filter.outputs.client == 'true'
-        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
-        working-directory: ./server
+          npm install
+          cd ../server
+          npm install
+          cd ../
 
       # Commit changes to the current canary repository
       - name: Get Current Server Version

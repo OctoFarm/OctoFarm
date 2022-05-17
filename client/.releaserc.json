@@ -7,7 +7,7 @@
     },
     {
       "name": "canary",
-      "prerelease": "alpha"
+      "prerelease": false
     }
   ],
   "dryRun": true,
@@ -32,7 +32,7 @@
       }
     }],
     ["@semantic-release/npm", {
-      "npmPublish": true
+      "npmPublish": false
     }]
   ]
 }

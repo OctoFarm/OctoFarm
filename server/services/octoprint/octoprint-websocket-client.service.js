@@ -98,7 +98,7 @@ class WebSocketClient {
     });
 
     this.#instance.on("pong", () => {
-      logger.info("Received a pong message");
+      logger.silly("Received a pong message");
       this.#lastPongMessage = Date.now();
       getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_ONLINE);
     });
@@ -150,7 +150,7 @@ class WebSocketClient {
 
       this.#currentMessageMSRate = timeDifference - this.#lastMessage;
 
-      this.checkMessageSpeed(timeDifference - this.#lastMessage);
+      this.checkMessageSpeed(this.#currentMessageMSRate);
 
       this.#onMessage(this.id, data);
 
