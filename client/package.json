@@ -1,11 +1,9 @@
 {
   "name": "@notexpectedyet/octofarm-client",
-  "version": "0.0.0",
+  "version": "1.2.0",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
-    "prettier": "prettier --write \"./test/**/*.js\" \"./js/**/*.js\"",
-    "test": "jest --passWithNoTests",
     "webpack": "webpack",
     "dev": "webpack --watch"
   },
