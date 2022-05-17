@@ -3,7 +3,6 @@
   "version": "1.0.1",
   "main": "server/app.js",
   "scripts": {
-    "prestart": "cd client && npm run build",
     "start": "cd server && npm run start",
     "restart": "pm2 restart OctoFarm",
     "pupdate": "pm2 update",
