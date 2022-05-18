@@ -9,6 +9,7 @@ RUN apk add --no-cache --virtual .base-deps \
 
 ENV NODE_ENV=production
 
+RUN npm install -g npm
 RUN npm install -g pm2
 
 RUN adduser -D octofarm --home /app && \

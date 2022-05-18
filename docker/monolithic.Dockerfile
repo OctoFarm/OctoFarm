@@ -24,6 +24,8 @@ WORKDIR /app/server
 ENV NODE_ENV=production
 ENV MONGO=mongodb://127.0.0.1:27017/octofarm
 
+
+RUN npm install -g npm
 RUN npm ci
 RUN npm install -g pm2
 
