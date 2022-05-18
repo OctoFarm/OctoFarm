@@ -31,7 +31,7 @@ COPY server/package-lock.json ./server/
 
 WORKDIR /tmp/app/server
 
-RUN npm clean cache
+RUN npm cache clean
 RUN npm ci --omit=dev
 
 RUN apk del .build-deps
