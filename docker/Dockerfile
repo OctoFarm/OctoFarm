@@ -9,6 +9,7 @@ RUN apk add --no-cache --virtual .base-deps \
 
 ENV NODE_ENV=production
 
+RUN npm install -g npm@latest
 RUN npm install -g pm2
 
 RUN adduser -D octofarm --home /app && \
@@ -31,7 +32,7 @@ COPY server/package-lock.json ./server/
 
 WORKDIR /tmp/app/server
 
-RUN npm ci
+RUN npm ci --omit=dev
 
 RUN apk del .build-deps
 
