@@ -2,8 +2,7 @@ module.exports = {
   apps: [
     {
       name: "OctoFarm",
-      script: "npm",
-      args: "start",
+      script: "app.js",
       listen_timeout: 10000,
       exp_backoff_restart_delay: 1500,
       restart_delay: 1000,
