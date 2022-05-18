@@ -1,9 +1,16 @@
 name: Docker
 on:
-  workflow_run:
+  pull_request:
+  push:
+    tags:
+      - '*'
+    branches:
+      - 'master'
+      - 'development'
+  #workflow_run:
     #workflows: [ "Semantic Release Workflow" ]
-    types:
-      - completed
+    #types:
+    #  - completed
 jobs:
   docker:
     name: "Docker build"
