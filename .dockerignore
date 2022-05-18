@@ -13,8 +13,8 @@
 Makefile
 /**/node_modules
 
-/client_2x
-/server_2x
+/client
+/server
 /screenshots
 /test
 
