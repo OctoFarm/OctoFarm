@@ -1,0 +1,76 @@
+<div class="col-12">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="gcodeScriptName">Name</label>
+                <input type="text" class="form-control" id="gcodeScriptName"
+                       placeholder="New script name">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="gcodeScriptDescription">Description</label>
+                <input type="text" class="form-control" id="gcodeScriptDescription"
+                       placeholder="New script description">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="gcodeScriptBtnColour">Button Colour</label>
+            <select class="custom-select" id="gcodeScriptBtnColour">
+                <option selected value="success">Green</option>
+                <option value="warning">Yellow</option>
+                <option value="info">Blue</option>
+                <option value="danger">Red</option>
+                <option value="dark">Black</option>
+            </select>
+            <small class="form-text text-muted">Choose a colour for your button!</small>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gcodeScriptScript">Script</label>
+                <textarea class="form-control" id="gcodeScriptScript" rows="5"></textarea>
+                <small class="form-text text-muted">New lines will be treated as separate
+                    commands<br> <kbd>SHIFT + RETURN/ENTER</kbd> or <kbd>RETURN/ENTER</kbd> To create a new line</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="gcodeScriptPrinters">Select Printers</label>
+            <select multiple class="custom-select" id="gcodeScriptPrinters" size="6">
+                <option value="99aa99aaa9999a99999999aa" selected>Allow all printers</option>
+                <% printers.forEach(printer => { %>
+                    <option value="<%= printer._id %>"> <%= printer.printerName %> </option>
+                <% }) %>
+            </select>
+            <small class="form-text text-muted">Choose the printers this button is visible to. <br>
+                <kbd>CTRL + A</kbd> to select all <br>
+                <kbd>CTRL + Left Click</kbd> to select multiple
+            </small>
+        </div>
+        <div class="col-12">
+            <button id="createNewScriptBtn" type="submit" class="btn btn-success">Create Script</button>
+        </div>
+    </div>
+</div>
+<div id="wrapper"
+     class="col-12">
+    <table id="historyTableTop" class="table table-dark text-center">
+        <thead>
+        <tr>
+            <th class="table-dark table-dark d-none" scope="col"></th>
+            <th class="table-dark table-dark" scope="col" style="min-width: 50px">Name</th>
+            <th class="table-dark table-dark" scope="col">Description</th>
+            <th class="table-dark" scope="col">Colour</th>
+            <th class="table-dark" scope="col" style="min-width: 300px">Printers</th>
+            <th class="table-dark table-dark" scope="col" style="min-width: 400px">Script</th>
+            <th class="table-dark table-dark" scope="col">
+                Actions
+            </th>
+        </tr>
+        </thead>
+        <tbody id="gcodeScriptTable">
+
+        </tbody>
+
+    </table>
+</div>
+

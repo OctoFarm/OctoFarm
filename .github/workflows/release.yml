@@ -1,0 +1,48 @@
+name: Semantic Release Workflow
+on:
+  push:
+    branches:
+      - development
+      - master
+    paths-ignore:
+      - "server/package.json"
+      - "client/package.json"
+      - "server/package-lock.json"
+      - "client/package-lock.json"
+      - "package.json"
+      - "package-lock.json"
+      - "client/dist"
+      - "server/views/assets/dist"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      # Check to see if changes have occurred in client / server directories
+      - name: Detect Client Changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            client:
+            - 'client/**'
+      #Make sure npm is upgraded
+      - name: Upgrade NPM
+        run: npm install -g npm
+      - name: Release Server Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd ./server
+          npm ci --include=dev --no-optional
+          npx semantic-release

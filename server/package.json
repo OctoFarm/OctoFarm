@@ -1,0 +1,112 @@
+{
+  "name": "octofarm",
+  "version": "1.2.0",
+  "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
+  "main": "app.js",
+  "scripts": {
+    "prestart": "npm ci --omit=dev",
+    "start": "pm2 flush && pm2 start ecosystem.config.js",
+    "dev": "nodemon ./app.js",
+    "migration:up": "migrate-mongo up",
+    "migration:down": "migrate-mongo down",
+    "migration:status": "migrate-mongo status",
+    "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\"",
+    "test": "jest --forceExit",
+    "release": "semantic-release -p @semantic-release/changelog"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OctoFarm/OctoFarm"
+  },
+  "bin": {
+    "octofarm": "app.js"
+  },
+  "keywords": [
+    "octofarm",
+    "octo",
+    "octoprint",
+    "pi",
+    "node"
+  ],
+  "author": "James Mackay (NotExpectedYet)",
+  "license": "ISC",
+  "dependencies": {
+    "@notexpectedyet/octofarm-client": "^1.2.0",
+    "archiver": "^5.3.0",
+    "auto-git-update": "^1.1.1",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^4.6.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.8",
+    "express": "^4.17.3",
+    "express-ejs-layouts": "^2.5.1",
+    "express-rate-limit": "^6.3.0",
+    "express-session": "^1.17.2",
+    "flatted": "^3.2.5",
+    "helmet": "^5.0.2",
+    "influx": "^5.9.3",
+    "is-docker": "2.2.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "lookpath": "^1.2.2",
+    "luxon": "^2.3.1",
+    "marked": "^4.0.12",
+    "migrate-mongo": "^8.2.3",
+    "mjpeg-decoder": "^1.0.3",
+    "mongoose": "^6.2.7",
+    "mongoose-paginate-v2": "^1.6.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.4",
+    "node-fetch": "2.6.7",
+    "node-input-validator": "^4.5.0",
+    "node-upnp-ssdp": "^0.1.1",
+    "passport": "0.4.1",
+    "passport-local": "^1.0.0",
+    "passport-remember-me": "0.0.1",
+    "pws": "^5.0.2",
+    "request": "^2.88.2",
+    "sanitize": "^2.1.0",
+    "semver": "^7.3.5",
+    "simple-git": "^3.7.1",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.3.0",
+    "systeminformation": "^5.11.8",
+    "table": "^6.8.0",
+    "toad-scheduler": "^1.6.0",
+    "wake_on_lan": "^1.0.0",
+    "winston": "^3.6.0",
+    "ws": "^8.5.0",
+    "xml2js": "^0.4.23"
+  },
+  "engine-strict": true,
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.10.0"
+  },
+  "nodemonConfig": {
+    "verbose": false,
+    "ignore": [
+      "views/assets/*",
+      "logs/*",
+      "client_src/*"
+    ],
+    "delay": 2500
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.6",
+    "utf-8-validate": "^5.0.9"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.4",
+    "@semantic-release/npm": "^9.0.1",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "conventional-changelog-conventionalcommits": "^4.6.3",
+    "nodemon": "^2.0.16",
+    "semantic-release": "^19.0.2"
+  }
+}

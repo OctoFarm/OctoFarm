@@ -17,7 +17,7 @@ body:
   id: octofarm-version
   attributes:
     label: OctoFarm Version
-    placeholder: "latest 1.1.13"
+    placeholder: "latest 1.2"
   validations:
     required: true
 - type: input
@@ -54,7 +54,6 @@ body:
     label: "Location of the problem"
     options:
       - Server
-      - NodeJS
       - MongoDb
       - Web Interface
       - Not sure
@@ -64,9 +63,9 @@ body:
   id: problem-desc
   attributes:
     label: Description of the problem
-    value: |
-      ...
-    render: bash
+    description: Also tell us, what did you expect to happen?
+    placeholder: Tell us what you see!
+    render: markdown
   validations:
     required: true
 - type: textarea
@@ -74,30 +73,27 @@ body:
   attributes:
     label: Steps taken to reproduce
     description: "How do you trigger this bug? Please walk us through it step by step."
-    value: |
+    placeholder: |
       1.
       2.
       3.
       ...
-    render: bash
   validations:
     required: true
 - type: textarea
   id: epected-behaviour
   attributes:
     label: What did you expect to happen
-    value: |
+    placeholder: |
       ...
-    render: bash
   validations:
     required: true
 - type: textarea
   id: avoid-problem
   attributes:
     label: To avoid the problem I had to
-    value: |
+    placeholder: |
       ...
-    render: bash
 - type: markdown
   attributes:
     value: |
@@ -106,7 +102,6 @@ body:
       contain all relevant information for the developers.
 
       1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
-      2) **Console logs** in your browser.
       (How to: https://javascript.info/devtools)
-      3) **Screenshots**
-      These are always effective, add screenshots to help explain your problem.
+      2) **Screenshots / Videos**
+      These are always effective, add screenshots to help explain your problem. Try "Peek" on Linux or "ShareX" on Windows.

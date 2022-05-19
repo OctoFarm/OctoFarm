@@ -1,0 +1,274 @@
+<div class="row mt-5">
+    <div class="col-md-8 col-lg-8 m-auto">
+        <div class="card">
+            <div class="card-title">
+                <h1 class="text-center mb-3" style="margin-top:20px">
+                    <i class="fas fa-database"></i> Database Issue!
+                </h1>
+            </div>
+            <div class="card-subtitle row align-items-center">
+                <h4 class="badge col text-warning">
+                    OctoFarm failed to connect with MongoDB. Please adjust, test and save your connection setting below.
+                </h4>
+            </div>
+            <div class="card card-body">
+                <%- include('./partials/messages') %>
+                <span>
+                    Docker mode:
+                    <span class="badge badge-dark"><%= isDocker; %></span>
+                </span>
+                <span>
+                    Pm2 mode:
+                    <span class="badge badge-dark"><%= isPm2; %></span>
+                </span>
+                <span>
+                    Nodemon mode:
+                    <span class="badge badge-dark"><%= isNodemon; %></span>
+                </span>
+                <span>
+                    OctoFarm version:
+                    <span class="badge badge-dark"><%= npmPackageJson; %></span>
+                </span>
+                <span>
+                    NodeJS version:
+                    <span class="badge badge-dark"><%= nodeVersion; %></span>
+                </span>
+                <span>
+                    OS:
+                    <span class="badge badge-dark"><%= os; %></span>
+                </span>
+                <br/>
+
+                <form method="post">
+                    <div class="form-group">
+                        <label for="connString">MongoDB url:</label>
+                        <div class="input-group">
+                            <div id="set-default-connection-button"
+                                 class="btn btn-secondary"
+                                 onclick="setDefaultMongoDbString()">
+                                Set default
+                            </div>
+                            <input type="url" id="connString" class="input-group-append form-control"
+                                   oninput="evaluateMongoDbInput()"
+                                   value="<%= mongoURL; %>"
+                                   placeholder=""/>
+                        </div>
+                        <small id="connection-string-invalid" class="form-text text-danger">
+                            Your connection string seems to have invalid format. <br/>
+                            <ul>
+                                <li>Must start with <small class="badge">'mongodb://'</small></li>
+                                <li>Must contain <small class="badge">'/octofarm'</small></li>
+                                <li>
+                                    Read more about connection string in
+                                    <a href="https://docs.mongodb.com/manual/reference/connection-string/"
+                                       target="_blank">
+                                        MongoDB Connection String URI Format documentation
+                                    </a>...
+                                </li>
+                            </ul>
+                        </small>
+                        <small id="connection-string-valid" class="form-text text-success">
+                            Your connection string seems properly formatted.
+                        </small>
+                    </div>
+                    <br/>
+                    <button type="button"
+                            id="test-connection-button"
+                            class="btn btn-warning"
+                            onclick="postTestConnection()"
+                            disabled>
+                        Test connection
+                    </button>
+                    <button
+                            type="button"
+                            id="save-connection-button"
+                            class="btn btn-success"
+                            onclick="postSaveConnection()"
+                    <% if (isDocker) { %>
+                            hidden
+                            <% } %>
+                            disabled>
+                        Save connection setting
+                    </button>
+                    <button
+                            type="button"
+                            id="restart-server-button"
+                            class="btn btn-danger"
+                            onclick="postRestartServer()"
+                            disabled>
+                        Restart OctoFarm
+                    </button>
+                    <small id="not-yet-validated-connection" class="form-text text-warning">
+                        Test your connection before saving.
+                    </small>
+                    <br/>
+                    <% if (isDocker) { %>
+                        <div class="text-warning">
+                            <strong>Running OctoFarm in a docker container.</strong>
+                            <br/> Update the MONGO variable in your docker command `-e
+                            MONGO=...` or docker-compose.yml file's `environment:` section.
+                            <br/>
+                            You can still use the test button above. Make sure to restart the container after you've
+                            managed to establish a successful connection here.
+                        </div>
+                    <% } %>
+
+                    <div class="list-group" style="margin-top: 15px">
+                        Last OctoFarm response:
+                        <small id="connection-string-server-response" class="text-light">
+                            not requested yet
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  const defaultMongoDBString = "<%= defaultMongoConnectionString %>";
+  const defaultPlaceholder = "Add your 'mongodb://.../octofarm' string";
+  const isDocker = <%= isDocker %>;
+  const isPm2 = "<%= isPm2 %>";
+
+  // State
+  let notYetValidatedConnection = true;
+
+  function getPageElements() {
+    const mongoDbElement = document.getElementById("connString");
+    return {
+      mongoDBInput: mongoDbElement,
+      mongoDBString: mongoDbElement.value,
+      testButton: document.getElementById("test-connection-button"),
+      saveButton: document.getElementById("save-connection-button"),
+      invalidErrorElem: document.getElementById("connection-string-invalid"),
+      validErrorElem: document.getElementById("connection-string-valid"),
+      connectionResponse: document.getElementById("connection-string-server-response"),
+      restartOctoFarmButton: document.getElementById("restart-server-button")
+    }
+  }
+
+  function setDefaultMongoDbString() {
+    getPageElements().mongoDBInput.value = defaultMongoDBString;
+    evaluateMongoDbInput();
+  }
+
+  function isValidMongoDbInput() {
+    const pageElements = getPageElements();
+    const mongoString = pageElements.mongoDBString.toLowerCase();
+    const hasMongoPrefix = mongoString.toLowerCase().includes("mongodb://") || mongoString.toLowerCase().includes("mongodb+srv://");
+    const hasOctoFarmTable = mongoString.includes("/octofarm");
+    return hasMongoPrefix && hasOctoFarmTable;
+  }
+
+  function evaluateMongoDbInput() {
+    const pageElements = getPageElements();
+    const isInvalidConnection = isValidMongoDbInput();
+
+    pageElements.testButton.disabled = !isInvalidConnection;
+    pageElements.saveButton.disabled = !isInvalidConnection || isDocker === true || notYetValidatedConnection;
+    pageElements.invalidErrorElem.hidden = isInvalidConnection;
+    pageElements.validErrorElem.hidden = !isInvalidConnection;
+  }
+
+  function getValidatedMongoStringAsFetchOptions() {
+    const mongoDbURL = getPageElements().mongoDBString;
+
+    if (!isValidMongoDbInput()) {
+      alert("Connection URL is invalid " + mongoDbURL);
+      return;
+    }
+
+    const data = {
+      "connectionURL": mongoDbURL
+    }
+    return {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    }
+  }
+
+  function setLastMessageBox(message, isErrors) {
+    const messageElem = getPageElements().connectionResponse;
+    messageElem.innerText = message;
+    messageElem.classList = [isErrors ? "text-danger" : "text-success"];
+  }
+
+  function postTestConnection() {
+    const fetchOptions = getValidatedMongoStringAsFetchOptions();
+    if (!fetchOptions) {
+      return;
+    }
+    notYetValidatedConnection = true;
+    setLastMessageBox("Awaiting response from OctoFarm server.");
+    fetch("/test-connection", fetchOptions)
+        .then(r => r.json())
+        .catch(e => {
+          setLastMessageBox("Could not test because of lost connection... is OctoFarm still alive and kicking?", true);
+        })
+        .then(b => {
+          if (b.succeeded === true) {
+            notYetValidatedConnection = false;
+            if (isDocker) {
+              setLastMessageBox("Successfully tested, you should rebuild or edit the octofarm docker container with the new MONGO variable to apply this change! \n If this is a startup problem, use the restart button.", false);
+              getPageElements().restartOctoFarmButton.disabled = notYetValidatedConnection;
+            } else {
+              setLastMessageBox("Successfully tested, you can save this setting!", false);
+            }
+          } else {
+            setLastMessageBox("Test failed! Reason '" + b.reason + "'", true);
+          }
+        })
+        .finally(() => {
+          getPageElements().saveButton.disabled = notYetValidatedConnection;
+        });
+  }
+
+  function postSaveConnection() {
+    const fetchOptions = getValidatedMongoStringAsFetchOptions();
+    if (!fetchOptions) {
+      return;
+    }
+    fetch("/save-connection-env", fetchOptions)
+        .then(r => r.json())
+        .catch(e => {
+          setLastMessageBox("Could not test because of lost connection... is OctoFarm still alive and kicking?", true);
+        })
+        .then(b => {
+          if (b.succeeded === true) {
+            setLastMessageBox(b.reason, false);
+          } else {
+            setLastMessageBox("Failed to save connection setting. Reason '" + b.reason + "'", true);
+          }
+        })
+        .finally(() => {
+          getPageElements().restartOctoFarmButton.disabled = notYetValidatedConnection;
+        });
+  }
+
+  function postRestartServer() {
+    const fetchOptions = getValidatedMongoStringAsFetchOptions();
+    if (!fetchOptions) {
+      return;
+    }
+    fetch("/restart-octofarm", fetchOptions)
+        .then(r => r.json())
+        .catch(e => {
+          setLastMessageBox("Could not restart because of lost connection... is OctoFarm still alive and kicking?", true);
+        })
+        .then(b => {
+          if (b === true) {
+            setLastMessageBox("System restart command was successful,the server will restart in 5 seconds... Please refresh page or wait for automatic refresh in 10 seconds.", false);
+            setTimeout(() => location.reload(), 10 * 1000)
+          } else {
+            setLastMessageBox("Failed to Restart OctoFarm. Reason:'" + b + "'", true);
+          }
+        });
+  }
+
+  getPageElements().mongoDBInput.setAttribute("placeholder", defaultPlaceholder);
+  evaluateMongoDbInput();
+</script>

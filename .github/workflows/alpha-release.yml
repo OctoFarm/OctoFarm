@@ -1,0 +1,85 @@
+name: Bump Server Version Alpha
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - canary
+    paths-ignore:
+      - "server/package.json"
+      - "client/package.json"
+      - "server/package-lock.json"
+      - "client/package-lock.json"
+      - "client/dist"
+      - "server/views/assets/dist"
+
+jobs:
+  bump-versions-pre-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      INPUT_TOKEN: ''
+
+    steps:
+      # Checkout the canary repository
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: canary
+          token: ${{ secrets.TOKEN_ACTION }}
+
+      # Check to see if changes have occurred in client / server directories
+      - name: Detect Client and Server Changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            server:
+            - 'server/**'
+            client:
+            - 'client/**'
+      # Install node v16 to use.
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16.15.0"
+
+      # Up revision the rc version for canary
+      - if: steps.filter.outputs.server == 'true'
+        name: Up Revision the Server
+        run: npm version prerelease --preid=alpha
+        working-directory: ./server
+
+      # Up revision the rc version for canary
+      - name: Up Revision the Client
+        if: steps.filter.outputs.client == 'true'
+        run: npm version prerelease --preid=alpha
+        working-directory: ./client
+
+      # Build new lock files for client and server
+      - name: Build the Client
+        if: steps.filter.outputs.client == 'true'
+        run: |
+          npm install
+          cd ../server
+          npm install
+          cd ../
+
+      # Commit changes to the current canary repository
+      - name: Get Current Server Version
+        id: server-package-version
+        uses: martinbeentjes/npm-get-version-action@main
+        with:
+          path: server
+
+        ## commit to repo, and prep pre-release
+      - name: Commit Changes Made
+        if: steps.filter.outputs.server == 'true' || steps.filter.outputs.client == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: canary
+          commit_message: "chore(release) - v${{ steps.server-package-version.outputs.current-version }} [skip ci]"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          ## This action should only ever commit these two files!
+          file_pattern: server/package*.json client/package*.json
