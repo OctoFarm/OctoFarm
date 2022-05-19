@@ -313,7 +313,7 @@ class WebSocketClient {
 
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
     if (ms > throttleLimit + (this.throttleBase + this.upperThrottleHysteresis)) {
-      logger.warning(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
+      logger.debug(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
       this.increaseMessageThrottle(ms);
     } else if (this.currentThrottleRate > 1) {
       const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
@@ -328,7 +328,7 @@ class WebSocketClient {
   increaseMessageThrottle(ms) {
     this.currentThrottleRate++;
     this.sendThrottle();
-    logger.warning(
+    logger.silly(
       `Messages speed normalising at: ${ms}ms throttling connection speed to ${this.currentThrottleRate}`
     );
   }
@@ -336,7 +336,7 @@ class WebSocketClient {
   decreaseMessageThrottle(ms) {
     this.currentThrottleRate--;
     this.sendThrottle();
-    logger.warning(
+    logger.silly(
       `Messages speed normalising at: ${ms}ms de-throttling connection speed to ${this.currentThrottleRate}`
     );
   }
