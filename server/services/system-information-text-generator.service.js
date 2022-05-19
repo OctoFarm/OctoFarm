@@ -21,6 +21,7 @@ const { returnPrinterHealthChecks } = require("../store/printer-health-checks.st
 const { TaskManager } = require("./task-manager.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { generatePrinterStatistics } = require("./printer-statistics.service");
+const { averageMeanOfArray } = require("../utils/math.utils");
 
 const systemInformationFileName = "system_information.txt";
 const NO_DATA = " - ";
@@ -32,16 +33,14 @@ const NO_DATA = " - ";
 async function generateSystemInformationContents() {
   let systemInformationContents = "--- OctoFarm Setup Information ---\n\n";
   systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
-  const airGapped = "Are we connected to the internet?\n";
-  const pm2 = "Are we running under pm2?\n";
-  const nodemon = "Are we running under nodemon?\n";
-  const node = "Are we running with node?\n";
-  const docker = "Are we in a docker container?\n";
-  const loginRequires = "Is login required on the server?\n";
-  const registration = "Is registration turned on the server?\n";
-  const filamentManagerPlugin = "Is the filament manager plugin enabled?\n";
-  const historySnapshot = "What are the history snapshot settings?\n";
-  const influxDB = "What are the influxDB database settings? \n";
+  const airGapped = "Connected to the internet?\n";
+  const pm2 = "Running under pm2?\n";
+  const nodemon = "Running under nodemon?\n";
+  const node = "Running with node?\n";
+  const docker = "Docker container?\n";
+  const loginRequires = "Login Required?\n";
+  const registration = "Registration On?\n";
+  const filamentManagerPlugin = "Filament manager plugin enabled?\n";
   const yes = " ✓  \n";
   const no = " ✘ \n";
   const truth = " ✓";
@@ -81,7 +80,9 @@ async function generateSystemInformationContents() {
 
   const systemInformation = SystemRunner.returnInfo();
 
-  if (!systemInformation) throw "No system information found";
+  if (!systemInformation) {
+    return false;
+  }
 
   systemInformationContents += "--- System Information ---\n\n";
 
@@ -174,13 +175,13 @@ async function generateSystemInformationContents() {
     "Safe Mode"
   ]);
 
-  for (let i = 0; i < printers.length; i++) {
-    let stats = getPrinterStoreCache().getPrinterStatistics(printers[i]._id);
+  for (const printer of printers) {
+    let stats = getPrinterStoreCache().getPrinterStatistics(printer._id);
     if (!stats) {
-      stats = await generatePrinterStatistics(printers[i]._id);
-      getPrinterStoreCache().updatePrinterStatistics(printers[i]._id, stats);
+      stats = await generatePrinterStatistics(printer._id);
+      getPrinterStoreCache().updatePrinterStatistics(printer._id, stats);
     }
-    const { printerName, octoPrintVersion, printerFirmware } = printers[i];
+    const { printerName, octoPrintVersion, printerFirmware } = printer;
 
     const { octoPrintSystemInfo } = stats;
     printerOverViewTable.push([
@@ -235,9 +236,7 @@ async function generateSystemInformationContents() {
     "Saved Port",
     "Saved Profile"
   ]);
-  for (let i = 0; i < healthChecks.length; i++) {
-    const check = healthChecks[i];
-
+  for (const check of healthChecks) {
     healthCheckTable.push([
       check.dateChecked,
       check.printerName,
@@ -250,7 +249,9 @@ async function generateSystemInformationContents() {
       check?.apiChecksRequired.profileCheck ? truth : falsth,
       check?.apiChecksRequired.settingsCheck ? truth : falsth,
       check?.apiChecksRequired.systemCheck ? truth : falsth,
-      check?.websocketChecks.lastResponseTimes ? check?.websocketChecks.lastResponseTimes : falsth,
+      check?.websocketChecks.lastResponseTimes
+        ? averageMeanOfArray(check?.websocketChecks.lastResponseTimes, 0)
+        : falsth,
       check?.connectionChecks.baud ? check?.connectionChecks.baud : falsth,
       check?.connectionChecks.port ? check?.connectionChecks.port : falsth,
       check?.connectionChecks.profile ? check?.connectionChecks.profile : falsth
@@ -275,8 +276,10 @@ async function generateOctoFarmSystemInformationTxt() {
 
   let systemInformationContents = await generateSystemInformationContents();
 
-  if (!systemInformationContents)
-    throw { status: "error", msg: "Couldn't generate system_information.txt" };
+  if (!systemInformationContents) {
+    return false;
+  }
+
   await writeFileSync(systemInformation?.path, systemInformationContents);
 
   return systemInformation;
