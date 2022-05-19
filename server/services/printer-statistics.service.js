@@ -164,12 +164,6 @@ const generatePrinterStatistics = async (id) => {
               x: dateParse,
               y: 1
             });
-            // printerStatistics.historyByDayIncremental[
-            //   checkNestedIndexHistoryRates
-            // ].data.push({
-            //   x: dateParse,
-            //   y: 1,
-            // });
           }
         } else {
           let successKey = {
@@ -188,9 +182,6 @@ const generatePrinterStatistics = async (id) => {
             printerStatistics.historyByDay.push(successKey);
             printerStatistics.historyByDay.push(cancellKey);
             printerStatistics.historyByDay.push(failedKey);
-            // printerStatistics.historyByDayIncremental.push(successKey);
-            // printerStatistics.historyByDayIncremental.push(cancellKey);
-            // printerStatistics.historyByDayIncremental.push(failedKey);
           }
         }
       }
@@ -203,7 +194,6 @@ const generatePrinterStatistics = async (id) => {
     printerStatistics.filamentUsedLengthDay.push(d.totalLength);
     printerStatistics.printerCostDay.push(parseFloat(d.totalCost));
     printerStatistics.filamentCostDay.push(d.spoolCost);
-    // console.log(d);
     if (typeof d.resend !== "undefined") {
       printerStatistics.printerResendRatioDaily.push(d.resend.ratio);
     }
@@ -286,7 +276,7 @@ const generateDashboardStatistics = async () => {
   const activePer = (activeTotal / farmTotal) * 100;
   const idlePer = (idleTotal / farmTotal) * 100;
   const offlinePer = (offlineTotal / farmTotal) * 100;
-  dashboardStatistics.currentStatus = [activePer, idlePer, offlinePer];
+  dashboardStatistics.currentStatus = [activePer || 0, idlePer || 0, offlinePer || 0];
 
   const arrayEstimated = [];
   const arrayRemaining = [];
@@ -307,8 +297,7 @@ const generateDashboardStatistics = async () => {
   const arrayGlobalChamberTempActual = [];
   const arrayGlobalChamberTempTarget = [];
   const printersInformation = getPrinterStoreCache().listPrintersInformation();
-  for (let p = 0; p < printersInformation.length; p++) {
-    const printer = printersInformation[p];
+  for (const printer of printersInformation) {
     if (typeof printer !== "undefined") {
       if (typeof printer.currentJob !== "undefined") {
         if (printer.currentJob.expectedPrintTime !== null) {
@@ -324,9 +313,7 @@ const generateDashboardStatistics = async () => {
       arrayIdle.push(printer.currentIdle);
       arrayActive.push(printer.currentActive);
       arrayOffline.push(printer.currentOffline);
-      // console.log(printer);
       if (typeof printer.printerState !== "undefined") {
-        // console.log(printer.printerState);
         const status = printer.printerState.colour.category;
         let colour = printer.printerState.colour.name;
         if (printer.printerState.colour.category === "Offline") {
