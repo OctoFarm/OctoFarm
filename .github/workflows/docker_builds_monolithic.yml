@@ -45,7 +45,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: "Show docker tags"
         run: |
           echo '${{ steps.docker_meta.outputs.tags }}'
