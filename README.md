@@ -14,7 +14,7 @@
 
 <div align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
-    <img src="https://github.com/OctoFarm/OctoFarm/blob/master/views/images/logo.png?raw=true" alt="Logo" width="400px">
+    <img src="https://github.com/OctoFarm/OctoFarm/blob/master/server/views/images/logo.png?raw=true" alt="Logo" width="400px">
   </a>
 
   <p align="center">
@@ -78,7 +78,11 @@ Feel free to join any of the OctoFarm communities or follow OctoFarms progress o
 Before installing it is best to read the getting started documents here:
 [Getting Started](https://docs.octofarm.net/getting-started/)
 
-### Installation Development
+## Installation Production
+Check out the OctoFarm documentation website for installation instructions on various platforms
+[Getting Started](https://docs.octofarm.net/installation/)
+
+## Installation Development
 1. Clone the OctoFarm
 
 ```sh
