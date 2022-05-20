@@ -9,7 +9,7 @@
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
     "prettier": "prettier --write \"./server/**/*.js\" \"./client/**/*.js\"",
-    "install-server": "cd server && npm ci --omit=dev",
+    "install-server": "cd server && npm ci",
     "install-client": "cd client && npm ci",
     "dev-server": "cd server && npm run dev",
     "dev-client": "cd client && npm run dev",
