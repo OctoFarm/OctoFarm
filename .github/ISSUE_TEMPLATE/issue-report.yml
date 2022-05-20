@@ -7,12 +7,11 @@ body:
     value: |
         ### Big thanks for helping OctoFarm grow!
 
-        The OctoFarm developers would prefer people pointing out bugs they find so we can make OctoFarm
-        a much more stable platform.
+        The OctoFarm developer would prefer people pointing out bugs they find so we can make OctoFarm
+        a much more stable platform so thanks for starting this issue!
 
-        Plese fill out all required field (*) below to better help the developers understand your issue!
+        Please fill out all required field (*) below to better help the dev understand!
 
-        Failing to do so will waste the developer and your own time in sorting the issue. Thanks!
 - type: input
   id: octofarm-version
   attributes:
