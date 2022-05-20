@@ -41,7 +41,7 @@
     "jquery": "^3.5.1",
     "litepicker": "^2.0.12",
     "lodash": "^4.17.21",
-    "mini-css-extract-plugin": "^1.6.0",
+    "mini-css-extract-plugin": "^2.6.0",
     "noty": "^3.2.0-beta",
     "semantic-release": "^19.0.2",
     "source-map-loader": "^2.0.1",
