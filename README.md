@@ -1,6 +1,5 @@
 [comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/octofarm/octofarm?style=appveyor&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
 ![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/octofarm/octofarm/latest/total?style=appveyor)
 [![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/network)
 [![GitHub license](https://img.shields.io/github/license/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/octofarm/blob/master/LICENSE.txt)
