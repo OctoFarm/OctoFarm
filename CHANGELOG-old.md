@@ -11,7 +11,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
   - Fixed #968 - Some OctoPrint endpoints would timeout due to slower responses to the others
-  - Fixed #
+  - Fixed #970 - Main docker image fails to start due to missing paths
+  - 
 
 ## [v1.2]
 
