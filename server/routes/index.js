@@ -26,20 +26,6 @@ const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
 const { returnPatreonData } = require("../services/patreon.service");
-const fs = require("fs");
-const marked = require("marked");
-
-marked.setOptions({
-  renderer: new marked.Renderer(),
-  smartLists: true,
-  smartypants: true
-});
-
-const md = function (filename) {
-  const path = "../" + filename;
-  const include = fs.readFileSync(path, "utf8");
-  return marked.parse(include);
-};
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -362,7 +348,6 @@ router.get("/system", ensureAuthenticated, ensureCurrentUserAndGroup, async (req
     clientSettings,
     serverSettings,
     systemInformation,
-    md,
     db: fetchMongoDBConnectionString(),
     dashboardSettings: dashboardSettings,
     serviceInformation: {
