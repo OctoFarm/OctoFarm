@@ -7,6 +7,16 @@ This file was originally entered and updated manually. This is no longer the cas
 
 All notable changes to this project will be documented in this file.
 
+## [v1.2.2]
+
+### Fixed
+  - Fixed #962 - Re-Fix as I never applied the original fix... Dockers now load system page
+  - Fixed - "Running under docker" not displaying on the system information page
+  - Fixed - "Github Branch" not displaying "Not a repository" when so
+
+### Changed
+  - Changed the version display on the nav bar so it displays on master versions as well as beta/alpha
+
 ## [v1.2.1]
 
 ### Fixed
