@@ -1,8 +1,8 @@
 const simpleGit = require("simple-git");
-const { resolve } = require("path");
+const { resolve, join } = require("path");
 
-const path = resolve(__dirname, "../../");
-const git = simpleGit(path);
+const mainRepo = resolve(__dirname, "../../");
+const git = simpleGit(mainRepo);
 
 function getCurrentBranch() {
   if (!checkIfWereInAGitRepo()) {
@@ -19,15 +19,8 @@ function makeSureBranchIsUpToDateWithRemote() {
 }
 
 function checkIfWereInAGitRepo() {
-  let response;
-  try {
-    response = git.checkIsRepo();
-  } catch (e) {
-    console.warn("Not a git repository, ignoring...");
-  }
-  return response;
+  return fs.existsSync(join(mainRepo, ".git"));
 }
-
 function returnCurrentGitStatus() {
   if (!checkIfWereInAGitRepo()) {
     return false;
