@@ -1,5 +1,6 @@
 const simpleGit = require("simple-git");
 const { resolve, join } = require("path");
+const { existsSync } = require("fs");
 
 const mainRepo = resolve(__dirname, "../../");
 const git = simpleGit(mainRepo);
@@ -19,7 +20,7 @@ function makeSureBranchIsUpToDateWithRemote() {
 }
 
 function checkIfWereInAGitRepo() {
-  return fs.existsSync(join(mainRepo, ".git"));
+  return existsSync(join(mainRepo, ".git"));
 }
 function returnCurrentGitStatus() {
   if (!checkIfWereInAGitRepo()) {
