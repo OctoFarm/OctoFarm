@@ -32,7 +32,7 @@ COPY server/package-lock.json ./server/package-lock.json
 
 WORKDIR /tmp/app/server
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 RUN apk del .build-deps
 

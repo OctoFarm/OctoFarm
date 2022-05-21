@@ -27,7 +27,7 @@ ENV MONGO=mongodb://127.0.0.1:27017/octofarm
 RUN npm install -g npm@latest
 RUN npm install -g pm2
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 EXPOSE 4000
 WORKDIR /app
