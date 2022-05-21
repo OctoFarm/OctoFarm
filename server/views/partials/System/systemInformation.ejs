@@ -33,7 +33,7 @@
                             <% } %>
                             <% if(serviceInformation?.isDockerContainer){ %>
                                 <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-                                    <p class="text-light"><i class="fab fa-docker text-info"></i></p>
+                                    <p class="text-light"><i class="fab fa-docker text-info"></i> Running under docker</p>
                                 </div>
                             <% } %>
                             <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
@@ -104,7 +104,7 @@
                                  title="OctoFarm current version, will take you to github releases page"
                                  class="text-light"
                                  rel=”noopener”
-                                 target="_blank"><br><%= currentGitBranch.current; %></a>
+                                 target="_blank"><br><%= currentGitBranch?.current ? currentGitBranch.current : "Not a repository"; %></a>
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> Node Environment: <a
