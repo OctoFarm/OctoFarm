@@ -30,6 +30,8 @@ const apiTimelapse = (unrendered = true) =>
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
 class OctoprintApiClientService extends OctoprintApiService {
+  #amendedTimeout = 10000;
+
   constructor(printerURL, apikey, timeoutSettings) {
     super(printerURL, apikey, timeoutSettings);
   }
@@ -53,7 +55,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getSettings() {
-    return this.get(apiSettingsPart).catch((e) => {
+    return this.get(apiSettingsPart, this.#amendedTimeout).catch((e) => {
       return e;
     });
   }
@@ -66,10 +68,7 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   /**
    * List files recursively or not.
-   * @param printer
    * @param recursive
-   * @param retry
-   * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
   async getFiles(recursive = false) {
     return this.get(apiFiles(recursive)).catch((e) => {
@@ -79,10 +78,8 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   /**
    * Get a specific file
-   * @param printer
    * @param path
-   * @param retry
-   * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
+   * @returns {}
    */
   async getFile(path) {
     return this.get(apiFile(path)).catch((e) => {
@@ -130,19 +127,19 @@ class OctoprintApiClientService extends OctoprintApiService {
     });
   }
 
-  async getSoftwareUpdateCheck(force) {
-    return this.get(apiSoftwareUpdateCheck(force)).catch((e) => {
+  async getSoftwareUpdateCheck(force = false) {
+    return this.get(apiSoftwareUpdateCheck(force), this.#amendedTimeout).catch((e) => {
       return e;
     });
   }
 
   async getUsers() {
-    return this.get(apiUsers).catch((e) => {
+    return this.get(apiUsers, this.#amendedTimeout).catch((e) => {
       return e;
     });
   }
 
-  async getPluginPiSupport(e) {
+  async getPluginPiSupport() {
     return this.get(apiPluginPiSupport).catch((e) => {
       return e;
     });

@@ -87,11 +87,10 @@ class OctoprintApiService {
   /**
    * Fire an action onto OctoPrint API
    * @param route
-   * @param data
-   * @param timeout optional race to timeout (default: true)
+   * @param datal race to timeout (default: true)
    * @returns {Promise<unknown>}
    */
-  async post(route, data, timeout = true) {
+  async post(route, data) {
     const url = new URL(route, this.printerURL).href;
     return fetchApiTimeout(url, "POST", this.apikey, this.#currentTimeout, data).catch((e) => {
       return e;
@@ -101,10 +100,9 @@ class OctoprintApiService {
   /**
    * Delete request onto OctoPrint API
    * @param route
-   * @param timeout
    * @returns {Promise<unknown>}
    */
-  async delete(route, timeout = true) {
+  async delete(route) {
     const url = new URL(route, this.printerURL).href;
     return fetchApiTimeout(url, "DELETE", this.apikey, this.#currentTimeout).catch((e) => {
       return e;
@@ -114,12 +112,13 @@ class OctoprintApiService {
   /**
    * Acquire a GET resource
    * @param route
-   * @param timeout optional race to timeout (default: true)
+   * @param amendTimeout
    * @returns {Promise<unknown>}
    */
-  async get(route, timeout = true) {
+  async get(route, amendTimeout = 0) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, this.#currentTimeout).catch((e) => {
+    const amendedTimeout = this.#currentTimeout + amendTimeout;
+    return fetchApiTimeout(url, "GET", this.apikey, amendedTimeout).catch((e) => {
       return e;
     });
   }
@@ -127,11 +126,10 @@ class OctoprintApiService {
   /**
    * Call a PATCH action
    * @param route
-   * @param data body to be patched
-   * @param timeout optional race to timeout (default: true)
+   * @param data body to be patchede to timeout (default: true)
    * @returns {Promise<unknown>}
    */
-  patch(route, data, timeout = true) {
+  patch(route, data) {
     const url = new URL(route, this.printerURL).href;
     return fetchApiTimeout(url, "PATCH", this.apikey, this.#currentTimeout, data).catch((e) => {
       return e;
