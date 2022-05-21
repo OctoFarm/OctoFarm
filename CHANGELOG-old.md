@@ -1,12 +1,17 @@
 # No longer updated
 This file was originally entered and updated manually. This is no longer the case and changelogs are now generated automatically in the relevant client/server directories.
 
-- [Client Changelog](client/CHANGELOG.md)
-- [Server Changelog](server/CHANGELOG.md)
+# Will update with new location soon
 
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [v1.2.1]
+
+### Fixed
+  - Fixed #968 - Some OctoPrint endpoints would timeout due to slower responses to the others
+  - Fixed #
 
 ## [v1.2]
 

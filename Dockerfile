@@ -27,8 +27,8 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /tmp/app
 
-COPY server/package.json ./server/
-COPY server/package-lock.json ./server/
+COPY server/package.json ./server/package.json
+COPY server/package-lock.json ./server/package-lock.json
 
 WORKDIR /tmp/app/server
 
@@ -36,15 +36,18 @@ RUN npm ci --omit=dev
 
 RUN apk del .build-deps
 
+WORKDIR /tmp/app
+
 FROM base as runtime
 
 COPY --chown=octofarm:octofarm --from=compiler /tmp/app/server/node_modules /app/server/node_modules
 COPY --chown=octofarm:octofarm . /app
+
 RUN rm -rf /tmp/app
 
 USER octofarm
 WORKDIR /app
 
+RUN chmod +x ./docker/entrypoint.sh
 ENTRYPOINT [ "/sbin/tini", "--" ]
-RUN ["chmod", "+x", "./docker/entrypoint.sh"]
-CMD [ "bash", "./docker/entrypoint.sh" ]
+CMD ["./docker/entrypoint.sh"]
