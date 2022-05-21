@@ -13,7 +13,13 @@ function makeSureBranchIsUpToDateWithRemote() {
 }
 
 function checkIfWereInAGitRepo() {
-  return git.checkIsRepo();
+  let response;
+  try {
+    response = git.checkIsRepo();
+  } catch (e) {
+    console.warn("Not a git repository, ignoring...");
+  }
+  return response;
 }
 
 function returnCurrentGitStatus() {
