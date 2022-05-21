@@ -1,7 +1,7 @@
 import OctoFarmClient from "../../../services/octofarm-client.service";
 import UI from "../../../utils/ui.js";
 
-const showFullList = ["Edit Printers", "Printer Deletion"];
+const showFullList = ["Edit Printers", "Printer Deletion", "Printer Disable"];
 
 const editMessage = `
 <div class="alert alert-info" role="alert">
@@ -292,6 +292,7 @@ export default class PrinterSelectionService {
     } else if (action === "Start a Bulk Print") {
       messageBox.innerHTML = multiPrintMessage;
     } else if (action === "Disable Printers") {
+      override = true;
       messageBox.innerHTML = disablePrintersMessage;
     } else if (action === "Enable Printers") {
       messageBox.innerHTML = enablePrintersMessage;

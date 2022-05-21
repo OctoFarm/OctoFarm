@@ -44,7 +44,6 @@ function setupExpressServer() {
   // Helmet middleware. Anymore and would require customising by the user...
   app.use(helmet.dnsPrefetchControl());
   app.use(helmet.expectCt());
-  app.use(helmet.frameguard());
   app.use(helmet.hidePoweredBy());
   app.use(helmet.hsts());
   app.use(helmet.ieNoOpen());
