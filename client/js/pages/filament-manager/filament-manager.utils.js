@@ -247,8 +247,7 @@ export const renderFilamentUsageCharts = async () => {
   const {
     history: { totalByDay, usageOverTime },
   } = await OctoFarmClient.getHistoryStatistics();
-
-  if (!!usageOverTime && usageOverTime[0].data.length > 1) {
+  if (!!usageOverTime && usageOverTime.length > 0 && usageOverTime[0].data.length > 1) {
     const filamentUsageOverTimeChart = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
       dashboardOptions.filamentUsageOverTimeChartOptions
@@ -257,7 +256,7 @@ export const renderFilamentUsageCharts = async () => {
 
     await filamentUsageOverTimeChart.updateSeries(usageOverTime);
   }
-  if (!!totalByDay && totalByDay[0].data.length > 1) {
+  if (!!totalByDay && totalByDay.length > 0 && totalByDay[0].data.length > 1) {
     const totalByDayChart = new ApexCharts(
       document.querySelector("#usageOverTime"),
       dashboardOptions.filamentUsageByDayChartOptions
