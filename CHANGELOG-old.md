@@ -1,11 +1,12 @@
-# No longer updated
-This file was originally entered and updated manually. This is no longer the case and changelogs are now generated automatically in the relevant client/server directories.
-
-# Will update with new location soon
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [v1.2.3]
+
+### Fixed
+  - Fixed #985 - Inaccurate tooltip on group link on navigation bar 
+
 
 ## [v1.2.2]
 
