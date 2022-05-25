@@ -139,7 +139,6 @@ You can contact me at [info@notexpectedyet.com](mailto:info@notexpectedyet.com)
 - [My Patreons](https://www.patreon.com/NotExpectedYet) - You all keep me going and afford me a financial incentive to keep OctoFarm up to date with new features and fixes! Biggest thanks of all.
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
   of Gina and everyone who helps out with that.
-- All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.
