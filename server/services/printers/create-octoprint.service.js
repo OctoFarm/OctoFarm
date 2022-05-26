@@ -769,7 +769,7 @@ class OctoPrintPrinter {
           return res;
         })
         .catch((e) => {
-          logger.info("Failed to save your new printer to database", e);
+          logger.info("Failed to save your new printer to database", e.toString());
           return e;
         });
     }
@@ -822,7 +822,7 @@ class OctoPrintPrinter {
     // Compare entered API key to settings API Key...
     this.#apiPrinterTickerWrap("Checking API key doesn't match global API key...", "Active");
     const globalAPIKeyCheck = await this.#api.getSettings(true).catch((e) => {
-      logger.http("Failed to check global api key", e);
+      logger.http("Failed to check global api key", e.toString());
       return e;
     });
     const globalStatusCode = checkApiStatusResponse(globalAPIKeyCheck);
@@ -857,7 +857,7 @@ class OctoPrintPrinter {
   async acquireOctoPrintSessionKey() {
     this.#apiPrinterTickerWrap("Attempting passive login", "Active");
     const passiveLogin = await this.#api.login(true).catch((e) => {
-      logger.http("Failed passive login", e);
+      logger.http("Failed passive login", e.toString());
       return false;
     });
 
@@ -885,7 +885,7 @@ class OctoPrintPrinter {
     }
 
     let usersCheck = await this.#api.getUsers(true).catch((e) => {
-      logger.http("Failed to acquire user list", e);
+      logger.http("Failed to acquire user list", e.toString());
       return false;
     });
 
@@ -963,9 +963,9 @@ class OctoPrintPrinter {
     }
 
     let versionCheck = await this.#api.getVersion(true).catch((e) => {
-      logger.http("Hard failure on version check", e);
+      logger.http("Hard failure on version check", e.toString());
       return {
-        status: e
+        status: e.toString()
       };
     });
     const globalStatusCode = checkApiStatusResponse(versionCheck);
@@ -974,7 +974,7 @@ class OctoPrintPrinter {
       try {
         server = await versionCheck.json();
       } catch (e) {
-        logger.http("Failed version check", e);
+        logger.http("Failed version check", e.toString());
         return 999;
       }
 
@@ -1010,7 +1010,7 @@ class OctoPrintPrinter {
     // Would like to skip this if not a Pi, won't even fit in the retry/not retry system so call and fail for now.
     if (!this?.octoPi || force) {
       let piPluginCheck = await this.#api.getPluginPiSupport(true).catch((e) => {
-        logger.http("Failed check for raspberry pi", e);
+        logger.http("Failed check for raspberry pi", e.toString());
         return false;
       });
 
@@ -1085,7 +1085,7 @@ class OctoPrintPrinter {
     }
 
     let profileCheck = await this.#api.getPrinterProfiles(true).catch((e) => {
-      logger.http("Failed Aquire profile data", e);
+      logger.http("Failed Aquire profile data", e.toString());
       return false;
     });
     const globalStatusCode = checkApiStatusResponse(profileCheck);
@@ -1122,7 +1122,7 @@ class OctoPrintPrinter {
     }
 
     let stateCheck = await this.#api.getConnection(true).catch((e) => {
-      logger.http("Failed Aquire state data", e);
+      logger.http("Failed Aquire state data", e.toString());
       return false;
     });
 
@@ -1172,7 +1172,7 @@ class OctoPrintPrinter {
     }
 
     let settingsCheck = await this.#api.getSettings(true).catch((e) => {
-      logger.http("Failed Aquire settings data", e);
+      logger.http("Failed Aquire settings data", e.toString());
       return false;
     });
 
@@ -1253,7 +1253,7 @@ class OctoPrintPrinter {
 
     if (!this?.octoPrintSystemInfo || force) {
       let systemInfoCheck = await this.#api.getSystemInfo(true).catch((e) => {
-        logger.http("Failed Aquire System Info data", e);
+        logger.http("Failed Aquire System Info data", e.toString());
         return false;
       });
 
@@ -1344,7 +1344,7 @@ class OctoPrintPrinter {
       this?.octoPrintPluginUpdates.length === 0
     ) {
       const updateCheck = await this.#api.getSoftwareUpdateCheck(force, true).catch((e) => {
-        logger.http("Failed Aquire updates data", e);
+        logger.http("Failed Aquire updates data", e.toString());
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(updateCheck);
@@ -1413,7 +1413,7 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintFileData(fullPath) {
     const filesCheck = await this.#api.getFile(fullPath, true).catch((e) => {
-      logger.http("Failed Aquire file data", e);
+      logger.http("Failed Aquire file data", e.toString());
       return false;
     });
     const globalStatusCode = checkApiStatusResponse(filesCheck);
@@ -1499,7 +1499,7 @@ class OctoPrintPrinter {
 
     if (this?.fileList?.fileList?.length === 0 || force) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
-        logger.http("Failed Aquire files data", e);
+        logger.http("Failed Aquire files data", e.toString());
         return false;
       });
 
@@ -1559,7 +1559,7 @@ class OctoPrintPrinter {
   async updateOctoPrintProfileData(profile, profileID) {
     this.#apiPrinterTickerWrap("Updating OctoPrint profile data", "Info");
     const profilePatch = await this.#api.patchProfile(profile, profileID).catch((e) => {
-      logger.http("Failed Aquire profile data", e);
+      logger.http("Failed Aquire profile data", e.toString());
       return 900;
     });
     return checkApiStatusResponse(profilePatch);
@@ -1568,7 +1568,7 @@ class OctoPrintPrinter {
   async updateOctoPrintSettingsData(settings) {
     this.#apiPrinterTickerWrap("Updating OctoPrint settings data", "Info");
     const settingsPost = await this.#api.postSettings(settings).catch((e) => {
-      logger.http("Failed Update settings data", e);
+      logger.http("Failed Update settings data", e.toString());
       return 900;
     });
     return checkApiStatusResponse(settingsPost);
@@ -1650,7 +1650,7 @@ class OctoPrintPrinter {
         return res;
       })
       .catch((e) => {
-        logger.error("Failed starting service", e);
+        logger.error("Failed starting service", e.toString());
         return e;
       });
   }
@@ -1882,7 +1882,7 @@ class OctoPrintPrinter {
     for (const path of fileList) {
       logger.warning("Deleting File: ", path.fullPath);
       const pathDeleted = await this.#api.deleteFile(path.fullPath).catch((e) => {
-        logger.http("Error deleting file!", e);
+        logger.http("Error deleting file!", e.toString());
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(pathDeleted);
@@ -1901,7 +1901,7 @@ class OctoPrintPrinter {
     for (const path of folderList) {
       logger.warning("Deleting Folder: ", path.name);
       const pathDeleted = await this.#api.deleteFile(`${path.name}`).catch((e) => {
-        logger.http("Error deleting folder!", e);
+        logger.http("Error deleting folder!", e.toString());
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(pathDeleted);
@@ -1931,7 +1931,7 @@ class OctoPrintPrinter {
     const deletedList = [];
     for (const path of pathList) {
       const pathDeleted = await this.#api.deleteFile(path).catch((e) => {
-        logger.http("Error deleting file!", e);
+        logger.http("Error deleting file!", e.toString());
         return false;
       });
       const globalStatusCode = checkApiStatusResponse(pathDeleted);
