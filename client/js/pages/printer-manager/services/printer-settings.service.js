@@ -11,7 +11,7 @@ let printerOnline;
 let currentPrinter;
 let pageElements;
 let currentPrintersInformation;
-const NO_PREFERENCE = '<option value="0">No Preference</option>';
+const NO_PREFERENCE = "<option value=\"0\">No Preference</option>";
 
 export async function updatePrinterSettingsModal(
   printersInformation,
@@ -200,7 +200,7 @@ class PrinterSettingsService {
       }
     } else {
       pageElements.mainPage.offlineMessage.innerHTML =
-        '<div class="alert alert-danger" role="alert">' +
+        "<div class=\"alert alert-danger\" role=\"alert\">" +
         "NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... " +
         "Please turn on your OctoPrint instance to re-enabled these.</div>";
       baudrateDropdown.disabled = true;
@@ -588,7 +588,7 @@ class PrinterSettingsService {
         <p class="mb-0">Custom power commands is designed to work with all available plugins, and also custom API endpoints.</p>
         <p class="mb-0">If your endpoint requires url params, and not an object then please leave the command boxes empty.</p>
         <p class="mb-0">Alternatively they will accept a command in the form of a json object. You can find sample setups at 
-        <a type=”noopener” href="https://docs.octofarm.net/guides/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">
+        <a type=”noopener” href="https://docs.octofarm.net/getting-started/octoprint-supported-plugins.html#octoprint-s-power-control-plugins">
         OctoFarm Documentation</a></p>
         <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
         <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
@@ -620,21 +620,6 @@ class PrinterSettingsService {
               <input  id="psPowerOffURL" type="text" class="form-control" placeholder="URL">
                <small class="form-text text-muted">
                  The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
-               </small>
-            </div>
-          </div>
-          <h6>Power Toggle</h6>
-          <div class="form-row">
-            <div class="col-4">
-              <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
-               <small class="form-text text-muted">
-                 This is usually an json object supplied in the following format <code>{"command":"togglePSU"}</code>
-               </small>
-            </div>
-            <div class="col-8">
-              <input id="psPowerToggleURL" type="text" class="form-control" placeholder="URL">
-               <small class="form-text text-muted">
-                  The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                </small>
             </div>
           </div>
@@ -678,10 +663,6 @@ class PrinterSettingsService {
         currentPrinter.powerSettings.powerOffCommand;
       document.getElementById("psPowerOffURL").placeholder =
         currentPrinter.powerSettings.powerOffURL;
-      document.getElementById("psPowerToggleCommand").placeholder =
-        currentPrinter.powerSettings.powerToggleCommand;
-      document.getElementById("psPowerToggleURL").placeholder =
-        currentPrinter.powerSettings.powerToggleURL;
       document.getElementById("psPowerStateCommand").placeholder =
         currentPrinter.powerSettings.powerStatusCommand;
       document.getElementById("psPowerStateURL").placeholder =
@@ -901,7 +882,7 @@ class PrinterSettingsService {
   static async setupSaveButton() {
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
-      '<button id="savePrinterSettingsBtn" type="button" class="btn btn-success btn-block" id="savePrinterSettingsBtn">Save Settings</button>'
+      "<button id=\"savePrinterSettingsBtn\" type=\"button\" class=\"btn btn-success btn-block\">Save Settings</button>"
     );
 
     document
@@ -931,7 +912,7 @@ class PrinterSettingsService {
     pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
-      '<button id="settingsPageRefreshButton" type="button" class="btn btn-warning btn-block mt-2" id="savePrinterSettingsBtn">Refresh Settings</button>'
+      "<button id=\"settingsPageRefreshButton\" type=\"button\" class=\"btn btn-warning btn-block mt-2\">Refresh Settings</button>"
     );
 
     document
@@ -960,24 +941,24 @@ class PrinterSettingsService {
 
     if (response.status.octofarm === 200) {
       serverResponseMessage +=
-        '<i class="fas fa-check-circle text-success"></i> OctoFarm<br>';
+        "<i class=\"fas fa-check-circle text-success\"></i> OctoFarm<br>";
     } else {
       serverResponseMessage +=
-        '<i class="fas fa-exclamation-circle text-danger"></i> OctoFarm<br>';
+        "<i class=\"fas fa-exclamation-circle text-danger\"></i> OctoFarm<br>";
     }
     if (response.status.profile === 200) {
       serverResponseMessage +=
-        '<i class="fas fa-check-circle text-success"></i> OctoPrint Profile<br>';
+        "<i class=\"fas fa-check-circle text-success\"></i> OctoPrint Profile<br>";
     } else {
       serverResponseMessage +=
-        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile<br>';
+        "<i class=\"fas fa-exclamation-circle text-danger\"></i> OctoPrint Profile<br>";
     }
     if (response.status.settings === 200) {
       serverResponseMessage +=
-        '<i class="fas fa-check-circle text-success"></i> OctoPrint Settings <br>';
+        "<i class=\"fas fa-check-circle text-success\"></i> OctoPrint Settings <br>";
     } else {
       serverResponseMessage +=
-        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile <br>';
+        "<i class=\"fas fa-exclamation-circle text-danger\"></i> OctoPrint Profile <br>";
     }
 
     return serverResponseMessage;
@@ -1022,12 +1003,6 @@ class PrinterSettingsService {
         ),
         powerOffURL: UI.getValueOrPlaceHolder(
           document.getElementById("psPowerOffURL")
-        ),
-        powerToggleCommand: UI.getValueOrPlaceHolder(
-          document.getElementById("psPowerToggleCommand")
-        ),
-        powerToggleURL: UI.getValueOrPlaceHolder(
-          document.getElementById("psPowerToggleURL")
         ),
         powerStatusCommand: UI.getValueOrPlaceHolder(
           document.getElementById("psPowerStateCommand")
@@ -1207,7 +1182,7 @@ class PrinterSettingsService {
         "custom-select bg-secondary text-light";
     } else {
       pageElements.connectPage.portNotAvailableMessage.innerHTML =
-        '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on? ' +
+        "<div class=\"alert alert-danger\" role=\"alert\">Your port preference is not available... Is your printer turned on? " +
         "Please click the refresh button once the issue is rectified</div>";
       serialPortDropDownElement.classList = "custom-select bg-danger";
     }
@@ -1337,7 +1312,7 @@ class PrinterSettingsService {
     if (currentPrinter?.octoPrintVersion?.includes("1.4")) {
       pageElements.connectPage.systemInfoCheck.disabled = true;
       pageElements.connectPage.systemInfoCheck.innerHTML =
-        '<i class="fas fa-question-circle"></i> <b>System Info Check</b><br><b>Never Checked: </b>  - version not supported!';
+        "<i class=\"fas fa-question-circle\"></i> <b>System Info Check</b><br><b>Never Checked: </b>  - version not supported!";
     }
 
     pageElements.connectPage.pluginsCheck.innerHTML = `<i class="fas fa-plug"></i> <b>Plugins Check</b><br><b>Last Checked: </b>${Calc.dateClean(

@@ -798,12 +798,6 @@ class PrinterStore {
         ...(!!powerOffCommand
           ? { powerOffCommand }
           : { powerOffCommand: JSON.parse(originalPrinter.powerSettings.powerOffCommand) }),
-        ...(!!powerToggleCommand
-          ? { powerToggleCommand }
-          : { powerToggleCommand: JSON.parse(originalPrinter.powerSettings.powerToggleCommand) }),
-        ...(!!powerToggleURL
-          ? { powerToggleURL }
-          : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
         ...(!!powerStatusCommand
           ? { powerStatusCommand }
           : { powerStatusCommand: JSON.parse(originalPrinter.powerSettings.powerStatusCommand) }),
