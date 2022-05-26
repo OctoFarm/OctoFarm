@@ -135,27 +135,33 @@ class WebSocketClient {
 
     // This needs overriding by message passed through
     this.#instance.on("message", (data) => {
-      const timeDifference = ConnectionMonitorService.stopTimer();
-      logger.silly(
-        `${this.url}: Message #${this.#messageNumber} received, ${
-          timeDifference - this.#lastMessage
-        }ms since last message`
-      );
-      ConnectionMonitorService.updateOrAddResponse(
-        this.url,
-        REQUEST_TYPE.WEBSOCKET,
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
+      const shouldPrinterBeReceivingData = getPrinterStoreCache().shouldPrinterBeReceivingData(
+        this.id
       );
 
-      this.#currentMessageMSRate = timeDifference - this.#lastMessage;
+      if (shouldPrinterBeReceivingData) {
+        const timeDifference = ConnectionMonitorService.stopTimer();
+        logger.silly(
+          `${this.url}: Message #${this.#messageNumber} received, ${
+            timeDifference - this.#lastMessage
+          }ms since last message`
+        );
+        ConnectionMonitorService.updateOrAddResponse(
+          this.url,
+          REQUEST_TYPE.WEBSOCKET,
+          REQUEST_KEYS.LAST_RESPONSE,
+          ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
+        );
 
-      this.checkMessageSpeed(this.#currentMessageMSRate);
+        this.#currentMessageMSRate = timeDifference - this.#lastMessage;
+
+        this.checkMessageSpeed(this.#currentMessageMSRate);
+
+        this.#messageNumber++;
+        this.#lastMessage = ConnectionMonitorService.startTimer();
+      }
 
       this.#onMessage(this.id, data);
-
-      this.#messageNumber++;
-      this.#lastMessage = ConnectionMonitorService.startTimer();
     });
 
     this.#instance.on("close", (code, reason) => {
