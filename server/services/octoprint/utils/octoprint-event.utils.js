@@ -311,22 +311,21 @@ const capturePrintCancelling = (id, data) => {
 
 const printCaptureHelper = (id, data, state) => {
   const currentPrinterInfo = getPrinterStoreCache().getPrinterInformation(id);
-  const errorCaptureService = new HistoryCaptureService(data, currentPrinterInfo, state);
+  const historyCaptureService = new HistoryCaptureService(data, currentPrinterInfo, state);
   const scriptCheckTrigger = state ? "done" : "failed";
-  errorCaptureService
+  historyCaptureService
     .createHistoryRecord()
     .then(async (res) => {
       logger.info("Successfully captured history record data", res);
       await ScriptRunner.check(currentPrinterInfo, scriptCheckTrigger, res._id);
-      if (!state) {
-        getPrinterStoreCache().resetActiveControlUser(id);
-      }
     })
     .catch((e) => {
       logger.error(
-        "Failed to capture finished print data, print " + scriptCheckTrigger,
+        "Error occured whilst capturing print data.. " + scriptCheckTrigger,
         e.toString()
       );
+    })
+    .finally(() => {
       getPrinterStoreCache().resetActiveControlUser(id);
     });
 };
