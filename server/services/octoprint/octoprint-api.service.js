@@ -49,7 +49,12 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
-      logger.debug("Failed fetch timeout!", e);
+      logger.http("Promise timeout through an error!", {
+        error: e.toString(),
+        url,
+        method,
+        bodyData
+      });
       ConnectionMonitorService.updateOrAddResponse(
         url,
         REQUEST_TYPE[method],
@@ -135,19 +140,6 @@ class OctoprintApiService {
       return e;
     });
   }
-
-  // /**
-  //  * Acquire OctoPrint file references using GET and a timeout
-  //  * @param printerURL
-  //  * @param apikey
-  //  * @param item
-  //  * @param timeout optional race to timeout (default: true)
-  //  * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
-  //  */
-  // files(printerURL, apikey, item, timeout = true) {
-  //   const url = new URL('api/' + item, printerURL).href;
-  //   return fetchApiTimeout(url, "GET", apikey, timeout ? this.timeout.apiTimeout : false);
-  // }
 }
 
 module.exports = {
