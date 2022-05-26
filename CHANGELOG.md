@@ -15,7 +15,6 @@ All notable changes to this project will be documented in this file.
 ### Removed
   - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
 
-
 ## [v1.2.2]
 
 ### Fixed
