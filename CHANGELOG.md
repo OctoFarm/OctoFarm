@@ -6,7 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
   - Fixed #985 - Inaccurate tooltip on group link on navigation bar 
+  - Fixed #995 - Saving printer settings without toggle causes client error to throw due to missing "status" key
 
+### Removed
+  - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
 
 ## [v1.2.2]
 
