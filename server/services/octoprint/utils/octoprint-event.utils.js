@@ -324,8 +324,10 @@ const printCaptureHelper = (id, data, state) => {
         "Error occured whilst capturing print data.. " + scriptCheckTrigger,
         e.toString()
       );
+    })
+    .finally(() => {
+      getPrinterStoreCache().resetActiveControlUser(id);
     });
-  getPrinterStoreCache().resetActiveControlUser(id);
 };
 
 const capturePrintFailed = (id, data) => {
