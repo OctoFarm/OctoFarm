@@ -361,6 +361,21 @@ class PrinterStore {
     return category === "Active";
   }
 
+  shouldPrinterBeReceivingData(id) {
+    const printer = this.#findMePrinter(id);
+    const {
+      printerState: {
+        colour: { category }
+      }
+    } = printer;
+    return (
+      category === "Disconnected" ||
+      category === "Idle" ||
+      category === "Active" ||
+      category === "Complete"
+    );
+  }
+
   getDisabledPluginsList(id) {
     const printer = this.#findMePrinter(id);
     return printer.pluginsListDisabled;
@@ -616,8 +631,8 @@ class PrinterStore {
     let octoPrintProfiles = {};
 
     let octofarmCheck = 200;
-    let profileCheck = 900;
-    let settingsCheck = 900;
+    let profileCheck;
+    let settingsCheck;
 
     const {
       printer,
@@ -1106,7 +1121,7 @@ class PrinterStore {
 
     const { name, path } = files.local;
 
-    let filePath = "";
+    let filePath;
 
     if (path.indexOf("/") > -1) {
       filePath = path.substr(0, path.lastIndexOf("/"));
