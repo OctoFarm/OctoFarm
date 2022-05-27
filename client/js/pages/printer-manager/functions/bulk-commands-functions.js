@@ -53,8 +53,6 @@ const fileUploads = new Queue();
 let selectedFolder = "";
 const LIGHT_BUTTON_CLASS = "btn btn-light";
 const LIGHT_BUTTON_CLASS_ACTIVE = "btn btn-light active";
-const IS_INVALID = "is_invalid";
-const IS_VALID = "is_valid";
 
 //REFACTOR this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList(disabled) {
@@ -302,7 +300,7 @@ function setupMultiFileMode(printers, files, folder = "") {
 }
 
 function fileUpload(file) {
-  return new Promise(async function (resolve, reject) {
+  return new Promise(async function (resolve, _reject) {
     // Grab folder location
     const { currentFolder } = file;
     // Grab Client Info
@@ -518,7 +516,7 @@ export async function bulkPrintFileSetup() {
             <div class="progress">
               <div id="bpUploadProgress-${currentPrinter._id}"
                class="progress-bar" role="progressbar"
-                style="width: 0%;" aria-valuenow="25"
+                style="width: 0;" aria-valuenow="25"
                  aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
             </div>
           `
@@ -578,7 +576,7 @@ export async function bulkPrintFileSetup() {
               <div class="progress">
                 <div id="bpUploadProgress-${currentPrinter._id}" 
                 class="progress-bar" role="progressbar" 
-                style="width: 0%;" aria-valuenow="25" 
+                style="width: 0;" aria-valuenow="25" 
                 aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
               </div>
             `
@@ -850,7 +848,7 @@ export async function bulkOctoPrintControlCommand() {
     if (printer.camURL && printer.camURL.length !== 0) {
       cameraBlock += `
         <div class="col-lg-3">
-            <img width="100%" src="${printer.camURL}">
+            <img alt="Printer Camera Stream" width="100%" src="${printer.camURL}">
         </div>
         `;
     }
@@ -942,7 +940,7 @@ export async function bulkOctoPrintControlCommand() {
     onEscape: true,
     backdrop: true,
     closeButton: true,
-    onShow: function (e) {
+    onShow: function () {
       //Grab Page
       const printerControls = {
         xPlus: document.getElementById("pcXpos"),
@@ -1095,7 +1093,7 @@ export async function bulkOctoPrintGcodeCommand() {
     size: "large",
     title: "What gcode commands would you like sent?",
     inputType: "textarea",
-    onShow: async function (e) {
+    onShow: async function () {
       const textArea = document.getElementsByClassName(
         "bootbox-input bootbox-input-textarea form-control"
       );
@@ -1256,7 +1254,7 @@ export async function bulkOctoPrintPluginAction(action) {
         multiple: true,
         inputOptions: uniquePluginList,
         scrollable: true,
-        onShow: function (e) {
+        onShow: function () {
           setupPluginSearch();
         },
         callback: async function (result) {

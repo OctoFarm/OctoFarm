@@ -1,10 +1,7 @@
 import PrinterPowerService from "./printer-power.service.js";
 import UI from "../utils/ui";
-import OctoPrintClient from "./octoprint/octoprint-client.service";
 import OctoFarmClient from "./octofarm-client.service";
-import { groupBy, mapValues } from "lodash";
 import {
-  printerIsAvailableToView,
   printerIsDisconnectedOrError,
   printerIsIdle,
   printerIsOnline,
@@ -42,7 +39,7 @@ function returnActionBtnTemplate(id, webURL, disableWeb = false) {
          <i class="fas fa-bars"></i>
         </button>
         <div class="dropdown-menu">
-          <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i> Commands</h6>
+          <h6 id="printerActionsHeader-${id}" class="dropdown-header"><i class="fas fa-print"></i>Printer Commands</h6>
           <button
              title="Homes your printers X,Y and Z"
              id="printerHome-${id}"
@@ -75,6 +72,9 @@ function returnActionBtnTemplate(id, webURL, disableWeb = false) {
           >
             <i class="fa-solid fa-ban text-danger"></i> Emergency Stop
           </button> 
+          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
+          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
+          <hr class="d-none">
           <h6 class="dropdown-header d-none"><i class="fa-solid fa-compress"></i> Actions</h6>
           <button  
            title="Runs a pre-configured gcode sequence so you can detect which printer this is."
@@ -85,6 +85,7 @@ function returnActionBtnTemplate(id, webURL, disableWeb = false) {
         >
             <i class="fas fa-search text-info"></i> Find Printer!
           </button> 
+          <hr>
           <h6 id="octoPrintHeader-${id}" class="dropdown-header d-none"><i class="fab fa-octopus-deploy"></i> OctoPrint</h6>
           <button
              title="Terminate and reconnect OctoPrints Socket connection."
@@ -94,8 +95,6 @@ function returnActionBtnTemplate(id, webURL, disableWeb = false) {
           >
               <i class="fas fa-sync text-warning"></i> Re-Connect Socket
           </button>   
-          <button id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Power On Printer</button>
-          <button id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#" disabled><i class="text-danger fas fa-power-off"></i> Power Off Printer</button>
           <button id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"  disabled><i class="text-warning fas fa-redo"></i> Restart OctoPrint</button>
           <button id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-warning fas fa-sync-alt"></i> Reboot Host</button>
           <button id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#" disabled><i class="text-success fas fa-power-off"></i> Wake Host</button>
@@ -107,14 +106,14 @@ function returnActionBtnTemplate(id, webURL, disableWeb = false) {
 
 function printerQuickConnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-on"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
   connectBtn.title = "Quickly bring your printer online! Power -> Connect";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
-  connectBtn.innerHTML = '<i class="fas fa-toggle-off"></i>';
+  connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
   connectBtn.title =
@@ -273,7 +272,7 @@ function addGroupEventListeners(printers, group) {
       .addEventListener("click", async (e) => {
         e.target.disabled = true;
         bootbox.confirm(
-            'You are about to send "M112" to your printers, this will cause an emergency stop! Are you sure?',
+            "You are about to send \"M112\" to your printers, this will cause an emergency stop! Are you sure?",
             async function (result) {
               if (result) {
                 for (const printer of printers){
@@ -423,7 +422,7 @@ function addEventListeners(printer) {
     .addEventListener("click", async (e) => {
       e.target.disabled = true;
       bootbox.confirm(
-        'You are about to send "M112" to your printer, this will cause an emergency stop! Are you sure?',
+        "You are about to send \"M112\" to your printer, this will cause an emergency stop! Are you sure?",
         async function (result) {
           if (result) {
             const { status, message } = await printerEmergencyStop(printer);
