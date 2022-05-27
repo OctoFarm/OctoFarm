@@ -800,10 +800,13 @@ class PrinterStore {
         ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
         ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
       };
+
+      console.log(powerOnCommand)
+
       const newPowerSettings = {
         ...(!!powerOnCommand
           ? { powerOnCommand }
-          : { powerOnCommand: JSON.parse(originalPrinter.powerSettings.powerOnCommand) }),
+          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
         ...(!!powerOnURL
           ? { powerOnURL }
           : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
@@ -812,10 +815,10 @@ class PrinterStore {
           : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
         ...(!!powerOffCommand
           ? { powerOffCommand }
-          : { powerOffCommand: JSON.parse(originalPrinter.powerSettings.powerOffCommand) }),
+          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
         ...(!!powerStatusCommand
           ? { powerStatusCommand }
-          : { powerStatusCommand: JSON.parse(originalPrinter.powerSettings.powerStatusCommand) }),
+          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
         ...(!!powerStatusURL
           ? { powerStatusURL }
           : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),

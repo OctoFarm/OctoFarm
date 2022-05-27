@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
   - Fixed #995 - Saving printer settings without toggle causes client error to throw due to missing "status" key
   - Fixed #992 - Clear active user on printer when "Completed" print is triggered
   - Fixed #998 - Websocket throttle does not take into account printer state
+  - Fixed #1006 - Support responses with on/off values for power plugins
 
 ### Changed
   - Changed - Added more logging to the octoprint api connection service 

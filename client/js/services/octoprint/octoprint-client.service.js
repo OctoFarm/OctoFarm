@@ -3,7 +3,7 @@ import OctoFarmClient from "../octofarm-client.service";
 import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import { printActionStatusResponse } from "./octoprint.helpers-commands.actions";
-import {printLoadSequence, printStartSequence} from "./octoprint-helpers.service";
+import { printStartSequence } from "./octoprint-helpers.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
@@ -570,13 +570,16 @@ export default class OctoPrintClient {
           },
         });
         let status = false;
-        if (post.status === 200 || post.status === 204) {
+        if (post?.status === 200 || post?.status === 204) {
           status = post.json();
+        }else{
+          console.warn(`Power Status - ${post?.status ? post.status : "No Status"} \n Message - ${post?.statusMessage ? post.statusMessage : "No Message"}`);
         }
         return status;
       } catch (e) {
         const errorObject = ClientErrors.SILENT_ERROR;
         errorObject.message = `Power Status - ${e}`;
+        console.warn(`Power Status - ${e}`);
         throw new ApplicationError(errorObject);
       }
     } else {
@@ -590,13 +593,16 @@ export default class OctoPrintClient {
           body: command,
         });
         let status = false;
-        if (post.status === 200 || post.status === 204) {
+        if (post?.status === 200 || post?.status === 204) {
           status = post.json();
+        }else{
+          console.warn(`Power Status - ${post?.status ? post.status : "No Status"} \n Message - ${post?.statusMessage ? post.statusMessage : "No Message"}`);
         }
         return status;
       } catch (e) {
         const errorObject = ClientErrors.SILENT_ERROR;
         errorObject.message = `Power Status - ${e}`;
+        console.warn(`Power Status - ${e}`);
         throw new ApplicationError(errorObject);
       }
     }

@@ -16,6 +16,7 @@ export default class PrinterPowerService {
 
   static async printerIsPoweredOn(printer) {
     let powerStatus = false;
+
     const powerReturn = await OctoPrintClient.getPowerStatus(
       printer,
       printer.powerSettings.powerStatusURL,
@@ -24,6 +25,14 @@ export default class PrinterPowerService {
 
     if (!!powerReturn) {
       powerStatus = powerReturn[Object.keys(powerReturn)[0]];
+      // Patches for string based state response tasmota/tplink plugins
+      if(powerStatus === "off"){
+        powerStatus = false;
+      }
+
+      if(powerStatus === "on"){
+        powerStatus = true;
+      }
     }
 
     return powerStatus;
@@ -211,7 +220,7 @@ export default class PrinterPowerService {
     }
 
     let post;
-    if (!!command || command !== "") {
+    if (!!command || command.length !== 0) {
       post = await fetch(url, {
         method: "POST",
         headers: {
