@@ -20,7 +20,7 @@ const {
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-API")
+const logger = new Logger("OctoFarm-API");
 
 // Login Page
 router.get("/login", async (_req, res) => {

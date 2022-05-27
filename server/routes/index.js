@@ -27,6 +27,7 @@ const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
 const { returnPatreonData } = require("../services/patreon.service");
 
+
 const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
