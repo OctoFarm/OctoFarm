@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 ### Added
   - Added - More information to what API Re-Scan/Update Information does on the modal
   - Added - Seperators between sections on dropdown
+  - Added - Cache busting to the server, should help with any js/css changes going forward
 
 ### Removed
   - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
