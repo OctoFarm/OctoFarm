@@ -637,9 +637,10 @@ export function createOrUpdatePrinterTableRow(printers) {
         .getElementById(`printerAPIReScan-${printer._id}`)
         .addEventListener("click", async () => {
           bootbox.dialog({
-            title: "Rescan All API endpoints",
+            title: "Update Information from all API endpoints",
             message:
-              "<p class=\"alert alert-danger text-dark\" role=\"alert\">ReScan: Will rescan all endpoints regardless of existing data.</p>",
+                "<p class=\"alert alert-info text-dark\" role=\"alert\">This will do a force update of all OctoFarm's data it holds on OctoPrint from it's API</p>"
+                + "<p class=\"alert alert-warning text-dark\" role=\"alert\">This does not affect any connections between OctoFarm and OctoPrint</p>",
             size: "large",
             buttons: {
               force: {
@@ -715,13 +716,13 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document
         .getElementById("healthIssues-" + printer._id)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           await loadPrinterHealthChecks(printer._id);
         });
 
       document
         .getElementById("multiUserIssue-" + printer._id)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           const printersInfo = await OctoFarmClient.listPrinters(false, true);
           await PrinterEditService.loadPrinterEditInformation(
             printersInfo,
@@ -738,7 +739,7 @@ export function createOrUpdatePrinterTableRow(printers) {
 
       document
         .getElementById("restartRequired-" + printer._id)
-        .addEventListener("click", async (e) => {
+        .addEventListener("click", async () => {
           bootbox.confirm({
             message: "This will restart your OctoPrint instance, are you sure?",
             buttons: {

@@ -12,7 +12,15 @@ All notable changes to this project will be documented in this file.
   - Fixed #1006 - Support responses with on/off values for power plugins
 
 ### Changed
-  - Changed - Added more logging to the octoprint api connection service 
+  - Changed - Added more logging to the octoprint api connection service
+  - Changed - Moved "API Re-Scan" to "OctoPrint Manager" dropdown
+  - Changed #988 - Renamed "API Re-Scan" -> "Update Information"
+  - Changed - Quick Actions dropdown header "Commands" -> "Printer Commands"
+  - Changed - Moved Power On/Off Printer Options into "Printer Commands" section
+
+### Added
+  - Added - More information to what API Re-Scan/Update Information does on the modal
+  - Added - Seperators between sections on dropdown
 
 ### Removed
   - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
