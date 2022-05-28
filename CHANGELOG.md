@@ -16,8 +16,9 @@ All notable changes to this project will be documented in this file.
   - Fixed #976 - Client error when all printers not onboarded due to current operations
   - Fixed #991 - Dragging and dropping file onto printers subverts user capture action
   - Fixed #975 - OctoFarm doesn't re-attempt user grab on second connection attempt, after failing the first time
-  - Fixed #999 - Error when selecting "No Spool" with filament manager plugin setup.
-  - Fixed - Unable to Re-Sync spools / profiles from Filament Manager plugin.
+  - Fixed #999 - Error when selecting "No Spool" with filament manager plugin setup
+  - Fixed - Unable to Re-Sync spools / profiles from Filament Manager plugin
+  - Fixed - Filament manager plugin sync trying to connect to "Offline" printer
 
 ### Changed
   - Changed - Added more logging to the OctoPrint api connection service
