@@ -49,7 +49,7 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
       return res;
     })
     .catch((e) => {
-      logger.http("Promise timeout through an error!", {
+      logger.http("Promise timeout threw an error!", {
         error: e.toString(),
         url,
         method,
@@ -92,7 +92,7 @@ class OctoprintApiService {
   /**
    * Fire an action onto OctoPrint API
    * @param route
-   * @param datal race to timeout (default: true)
+   * @param data race to timeout (default: true)
    * @returns {Promise<unknown>}
    */
   async post(route, data) {

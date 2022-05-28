@@ -14,9 +14,10 @@ All notable changes to this project will be documented in this file.
   - Fixed #1003 - Offline state is not picked up correctly by manage dropdowns on printer manager
   - Fixed - Current Operations not correctly creating substring from filename..
   - Fixed #976 - Client error when all printers not onboarded due to current operations
+  - Fixed #991 - Dragging and dropping file onto printers subverts user capture action
 
 ### Changed
-  - Changed - Added more logging to the octoprint api connection service
+  - Changed - Added more logging to the OctoPrint api connection service
   - Changed - Moved "API Re-Scan" to "OctoPrint Manager" dropdown
   - Changed #988 - Renamed "API Re-Scan" -> "Update Information"
   - Changed - Quick Actions dropdown header "Commands" -> "Printer Commands"
@@ -24,11 +25,12 @@ All notable changes to this project will be documented in this file.
 
 ### Added
   - Added - More information to what API Re-Scan/Update Information does on the modal
-  - Added - Seperators between sections on dropdown
+  - Added - Separators between sections on dropdown
   - Added - Cache busting to the server, should help with any js/css changes going forward
 
 ### Removed
   - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
+
 
 ## [v1.2.2]
 

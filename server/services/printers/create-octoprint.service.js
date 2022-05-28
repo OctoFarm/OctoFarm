@@ -1420,7 +1420,7 @@ class OctoPrintPrinter {
 
     if (globalStatusCode === 200) {
       const fileEntry = await filesCheck.json();
-      let timeStat = null;
+      let timeStat;
       let filament = [];
       if (typeof fileEntry.gcodeAnalysis !== "undefined") {
         if (typeof fileEntry.gcodeAnalysis.estimatedPrintTime !== "undefined") {
@@ -1437,7 +1437,7 @@ class OctoPrintPrinter {
         timeStat = "No Time Estimate";
         filament = null;
       }
-      let path = null;
+      let path;
       if (fileEntry.path.indexOf("/") > -1) {
         path = fileEntry.path.substr(0, fileEntry.path.lastIndexOf("/"));
       } else {
