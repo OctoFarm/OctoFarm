@@ -276,8 +276,8 @@ const loadPrintersJobStatus = (printer) => {
   let hideCamera = false;
   let hideCameraDisplay = "";
   let thumbnailElement = "";
-  let printStatusClass = "col-lg-6 text-center";
-  let cameraClass = "col-md-12 col-lg-12";
+  let printStatusClass;
+  let cameraClass;
   // let temperatureClass = "col-md-8 text-center";
   if (printer?.currentJob?.thumbnail !== null) {
     printStatusClass = "col-lg-6 text-center";
@@ -512,8 +512,8 @@ const updateCurrentJobStatus = (printer, elements) => {
     elements.fileName.innerHTML = fileName;
     let usageDisplay = "";
     let filamentCost = "";
-    if (printer.currentJob.expectedTotals !== null) {
-      if (printer.currentJob.expectedFilamentCosts.length > 1) {
+    if (!!printer?.currentJob?.expectedTotals) {
+      if (printer?.currentJob?.expectedFilamentCosts.length > 1) {
         usageDisplay += `<p class="mb-0"><b>Total: </b>${percentOfDisplay(
           printer.currentJob.expectedTotals.totalLength,
           printer.currentJob.progress
@@ -534,8 +534,8 @@ const updateCurrentJobStatus = (printer, elements) => {
       if (printer.currentJob.expectedFilamentCosts !== null) {
         printer.currentJob.expectedFilamentCosts.forEach((unit) => {
           const firstKey = Object.keys(unit)[0];
-          let theLength = parseFloat(unit[firstKey].length);
-          let theWeight = parseFloat(unit[firstKey].weight);
+          let theLength = parseFloat(unit[firstKey]?.length);
+          let theWeight = parseFloat(unit[firstKey]?.weight);
           usageDisplay += `<p class="mb-0"><b>${
             unit[firstKey].toolName
           }: </b>${percentOfDisplay(
@@ -547,14 +547,14 @@ const updateCurrentJobStatus = (printer, elements) => {
           )}g</p>`;
         });
 
-        if (printer.currentJob.expectedFilamentCosts.length > 1) {
+        if (printer?.currentJob?.expectedFilamentCosts.length > 1) {
           filamentCost += `<p class="mb-0"><b>Total2: </b>${percentOfDisplay(
             printer.currentJob.expectedTotals.spoolCost,
             printer.currentJob.progress
           )}</p>`;
         }
 
-        printer.currentJob.expectedFilamentCosts.forEach((unit) => {
+        printer?.currentJob?.expectedFilamentCosts.forEach((unit) => {
           const firstKey = Object.keys(unit)[0];
           filamentCost += `<p class="mb-0"><b>${
             unit[firstKey].toolName
