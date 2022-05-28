@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
   - Fixed #1006 - Support responses with on/off values for power plugins
   - Fixed - Drag and drop uploads been allowed to offline printers
   - Fixed #1003 - Offline state is not picked up correctly by manage dropdowns on printer manager
+  - Fixed - Current Operations not correctly creating substring from filename..
+  - Fixed #976 - Client error when all printers not onboarded due to current operations
 
 ### Changed
   - Changed - Added more logging to the octoprint api connection service
