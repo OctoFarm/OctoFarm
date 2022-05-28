@@ -2,6 +2,7 @@ import FileManagerService from "../services/file-manager.service.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
 import { groupBy, mapValues } from "lodash";
+import { printerIsOnline } from "./octofarm.utils";
 
 let activeFile = false;
 
@@ -140,11 +141,11 @@ function preventDefaults(e) {
   e.stopPropagation();
 }
 
-function highlight(e, currentElement) {
+function highlight(_e, currentElement) {
   currentElement.classList.add("highlight");
 }
 
-function unhighlight(e, currentElement) {
+function unhighlight(_e, currentElement) {
   currentElement.classList.remove("highlight");
 }
 
@@ -185,6 +186,15 @@ export function handleFiles(uploadableFiles, printerArray) {
   if (!printerArray || printerArray.length === 0) {
     return;
   }
+
+  for(const printer of printerArray){
+    if(!printerIsOnline(printer)){
+      UI.createAlert("warning", "Your printer is not idle... this action has been aborted!", 3000, "Clicked");
+      return;
+    }
+  }
+
+
   const singleFileOnly = uploadableFiles.length === 1;
   if (singleFileOnly) {
     bootbox.confirm({

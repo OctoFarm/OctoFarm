@@ -29,7 +29,7 @@ import {
 } from "./log-tickers.functions";
 import {
   isPrinterFullyScanned,
-  printerIsDisabled, printerIsSearching,
+  printerIsDisabled, printerIsOffline, printerIsSearching,
 } from "../../utils/octofarm.utils";
 import {
   checkKlipperState
@@ -496,9 +496,9 @@ function updateButtonState(printer) {
   const forceReconnect = document.getElementById(`printerForceReconnect-${printer._id}`)
 
   const allowedActions =
-    !isPrinterFullyScanned(printer) || printerIsDisabled(printer);
+    !isPrinterFullyScanned(printer) || printerIsDisabled(printer)
 
-  UI.doesElementNeedUpdating(allowedActions, apiReScan, "disabled");
+  UI.doesElementNeedUpdating(allowedActions || printerIsOffline(printer), apiReScan, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerSettings, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerLog, "disabled");
   UI.doesElementNeedUpdating(allowedActions, printerStatistics, "disabled");
