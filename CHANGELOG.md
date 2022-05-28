@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   - Fixed #992 - Clear active user on printer when "Completed" print is triggered
   - Fixed #998 - Websocket throttle does not take into account printer state
   - Fixed #1006 - Support responses with on/off values for power plugins
+  - Fixed - Drag and drop uploads been allowed to offline printers
+  - Fixed #1003 - Offline state is not picked up correctly by manage dropdowns on printer manager
 
 ### Changed
   - Changed - Added more logging to the octoprint api connection service
