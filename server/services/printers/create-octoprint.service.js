@@ -524,7 +524,7 @@ class OctoPrintPrinter {
     this.#db.update(record);
   }
 
-  async enablePrinter() {
+  async enablePrinter(force = false) {
     // Setup initial client stuff, database, api
     this.enabling = true;
     if (this.disabled) {
@@ -625,7 +625,7 @@ class OctoPrintPrinter {
     }
 
     // Grab required api data, fail to shutdown... should not continue without this data...
-    const requiredApiCheck = await this.#requiredApiSequence();
+    const requiredApiCheck = await this.#requiredApiSequence(force);
     const requiredApiCheckValues = requiredApiCheck.map((check) => {
       return typeof check.value === "number";
     });
@@ -645,7 +645,7 @@ class OctoPrintPrinter {
     await this.#setupWebsocket();
 
     // Grab optional api data
-    await this.#optionalApiSequence();
+    await this.#optionalApiSequence(force);
 
     return "Successfully enabled printer...";
   }
@@ -1631,7 +1631,7 @@ class OctoPrintPrinter {
     return this.resetSocketConnection();
   }
 
-  resetConnectionInformation() {
+  resetConnectionInformation(force = false) {
     if (!!this?.#api) {
       this.#api.updateConnectionInformation(this.printerURL, this.apikey);
     }
@@ -1640,11 +1640,11 @@ class OctoPrintPrinter {
       this.#ws.updateConnectionInformation(this.webSocketURL, this.currentUser);
     }
 
-    return this.resetSocketConnection();
+    return this.resetSocketConnection(force);
   }
 
-  async resetSocketConnection() {
-    return this.enablePrinter()
+  async resetSocketConnection(force = false) {
+    return this.enablePrinter(force)
       .then((res) => {
         logger.debug(res);
         return res;
