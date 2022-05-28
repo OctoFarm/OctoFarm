@@ -17,7 +17,7 @@ const ServerSettingsSchema = new mongoose.Schema({
     // Connection Timeout
     apiTimeout: {
       type: Number,
-      default: 2000,
+      default: 5000,
       required: true
     },
     // When to retry the connections, this is a base for the

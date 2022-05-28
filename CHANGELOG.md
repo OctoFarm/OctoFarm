@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
   - Fixed - Current Operations not correctly creating substring from filename..
   - Fixed #976 - Client error when all printers not onboarded due to current operations
   - Fixed #991 - Dragging and dropping file onto printers subverts user capture action
+  - Fixed #975 - OctoFarm doesn't re-attempt user grab on second connection attempt, after failing the first time.
 
 ### Changed
   - Changed - Added more logging to the OctoPrint api connection service
@@ -22,6 +23,7 @@ All notable changes to this project will be documented in this file.
   - Changed #988 - Renamed "API Re-Scan" -> "Update Information"
   - Changed - Quick Actions dropdown header "Commands" -> "Printer Commands"
   - Changed - Moved Power On/Off Printer Options into "Printer Commands" section
+  - Changed - Default API timeout is now 5000ms
 
 ### Added
   - Added - More information to what API Re-Scan/Update Information does on the modal
