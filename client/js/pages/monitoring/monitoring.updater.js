@@ -28,7 +28,6 @@ import {
 } from "./monitoring.templates";
 import PrinterTerminalManagerService from "./services/printer-terminal-manager.service";
 import { groupBy, mapValues } from "lodash";
-import { FileActions } from "../../services/file-manager.service";
 import { printActionStatusResponse } from "../../services/octoprint/octoprint.helpers-commands.actions";
 import {
   printerIsAvailableToView,
@@ -44,7 +43,6 @@ import {
   findMiniFilamentDropDownsSelect,
 } from "../../services/printer-filament-selector.service";
 import {checkKlipperState} from "../../services/octoprint/checkKlipperState.actions";
-import {getFileTemplate} from "../file-manager/file.template";
 
 let elems = [];
 let groupElems = [];
@@ -72,7 +70,7 @@ const returnPrinterInfo = (id) => {
   const statePrinterInfo = getPrinterInfo();
   if (typeof id !== "undefined") {
     const zeeIndex = _.findIndex(statePrinterInfo, function (o) {
-      return o._id == id;
+      return o._id === id;
     });
     return statePrinterInfo[zeeIndex];
   } else {
@@ -379,7 +377,7 @@ function addGroupListeners(printers) {
         "unifiedFiles-" + currentGroupEncoded
       );
       if (filesBtn) {
-        filesBtn.addEventListener("click", async (e) => {
+        filesBtn.addEventListener("click", async () => {
           const idList = [];
           for (const printer of groupedPrinters[key]) {
             idList.push(printer._id);
@@ -387,7 +385,7 @@ function addGroupListeners(printers) {
           const fileList = await OctoFarmClient.get(
             "printers/listUnifiedFiles/" + JSON.stringify(idList)
           );
-          drawGroupFiles(fileList, currentGroupEncoded, groupedPrinters[key]);
+          drawGroupFiles(fileList);
         });
       }
     }

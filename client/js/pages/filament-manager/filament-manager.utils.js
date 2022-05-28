@@ -148,14 +148,14 @@ export const loadPageStatistics = async () => {
   pageElements.filamentSpoolsActiveTotals.innerHTML =
     statistics.activeSpoolCount;
   const usedPercent = ((statistics.used / statistics.total) * 100).toFixed(0);
-  pageElements.filamentUsedProgress.innerHTML = usedPercent + "%";
-  pageElements.filamentUsedProgress.style.width = usedPercent;
+  pageElements.filamentUsedProgress.innerHTML = isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
+  pageElements.filamentUsedProgress.style.width = isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
   const remainingPercent = (
     ((statistics.total - statistics.used) / statistics.total) *
     100
   ).toFixed(0);
-  pageElements.filamentRemainingProgress.innerHTML = remainingPercent + "%";
-  pageElements.filamentRemainingProgress.style.width = remainingPercent;
+  pageElements.filamentRemainingProgress.innerHTML = isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
+  pageElements.filamentRemainingProgress.style.width = isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
 
   let headerBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
@@ -185,32 +185,32 @@ export const loadPageStatistics = async () => {
 
   pageElements.filamentOverviewTableHeader.innerHTML = `
   <tr>
-    <td scope="row">Material Overview: </td>
+    <td >Material Overview: </td>
     ${headerBreakdown}    
   </tr>
   `;
   pageElements.filamentOverviewTable.innerHTML = `
   <tr>
 
-      <td scope="row">Remaining <span class="badge badge-success ml-2">${
+      <td >Remaining <span class="badge badge-success ml-2">${
       (statistics.total - statistics.used / 1000 ).toFixed(2)
       }kg</span></td>
       ${remainingBreakdown}
   </tr>
   <tr>
-      <td scope="row">Used <span class="badge badge-warning ml-2">${
+      <td >Used <span class="badge badge-warning ml-2">${
       (statistics.used / 1000).toFixed(2)
       }kg</span> </td>
       ${usedBreakdown}
   </tr>
   <tr>
-      <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${
+      <th >Weight<span class="badge badge-light text-dark ml-2">${
       (statistics.total / 1000).toFixed(0)
       }kg</span></th>
       ${weightBreakdown}
   </tr>
   <tr>
-      <th scope="row">Cost <span class="badge badge-info ml-2">${statistics.price.toFixed(
+      <th >Cost <span class="badge badge-info ml-2">${statistics.price.toFixed(
         2
       )}</span></th>
       ${costBreakdown}
@@ -227,7 +227,7 @@ export const loadOverviewTable = async () => {
                 <tr>
                     <th style="display: none;"> </th>
                     <th><i class="fas fa-toilet-paper"></i></th>
-                    <th scope="row">${spool.name}</th>
+                    <th >${spool.name}</th>
                     <td id="spoolsListMaterial-${spool._id}">
                     </td>
                     <td id="spoolsListManufacture-${spool._id}">
