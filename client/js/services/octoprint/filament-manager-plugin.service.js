@@ -107,8 +107,6 @@ export function setupFilamentManagerSyncBtn() {
         }
       );
 
-      console.log(filamentManagerSyncEnabled)
-
       if (filamentManagerSyncEnabled.errors.length > 0) {
         filamentManagerAlert.close();
         UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
