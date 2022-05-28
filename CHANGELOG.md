@@ -12,10 +12,12 @@ All notable changes to this project will be documented in this file.
   - Fixed #1006 - Support responses with on/off values for power plugins
   - Fixed - Drag and drop uploads been allowed to offline printers
   - Fixed #1003 - Offline state is not picked up correctly by manage dropdowns on printer manager
-  - Fixed - Current Operations not correctly creating substring from filename..
+  - Fixed - Current Operations not correctly creating substring from filename
   - Fixed #976 - Client error when all printers not onboarded due to current operations
   - Fixed #991 - Dragging and dropping file onto printers subverts user capture action
-  - Fixed #975 - OctoFarm doesn't re-attempt user grab on second connection attempt, after failing the first time.
+  - Fixed #975 - OctoFarm doesn't re-attempt user grab on second connection attempt, after failing the first time
+  - Fixed #999 - Error when selecting "No Spool" with filament manager plugin setup.
+  - Fixed - Unable to Re-Sync spools / profiles from Filament Manager plugin.
 
 ### Changed
   - Changed - Added more logging to the OctoPrint api connection service
@@ -29,9 +31,10 @@ All notable changes to this project will be documented in this file.
   - Added - More information to what API Re-Scan/Update Information does on the modal
   - Added - Separators between sections on dropdown
   - Added - Cache busting to the server, should help with any js/css changes going forward
+  - Added - Forced check for V1.2.x filament manager plugin changes. Requires Re-Sync of your spools.
 
 ### Removed
-  - Removed - Option to input Power toggle as it's no longer used by the system nor UI.
+  - Removed - Option to input Power toggle as it's no longer used by the system nor UI
 
 
 ## [v1.2.2]

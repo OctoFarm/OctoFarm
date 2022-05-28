@@ -1,5 +1,6 @@
 import OctoFarmClient from "../octofarm-client.service";
 import UI from "../../utils/ui";
+import {reRenderPageInformation} from "../../pages/filament-manager/filament-manager-ui.utils";
 
 let filamentManagerSettings = {};
 
@@ -140,9 +141,9 @@ export function setupFilamentManagerSyncBtn() {
   }
 }
 
-export function setupFilamentManagerReSyncBtn() {
+export async function setupFilamentManagerReSyncBtn() {
   const { filamentManagerPluginIsEnabled } =
-    isFilamentManagerPluginSyncEnabled();
+    await isFilamentManagerPluginSyncEnabled();
   if (filamentManagerPluginIsEnabled) {
     const resyncBtn = document.getElementById("resyncFilamentManagerBtn");
     resyncBtn.addEventListener("click", async () => {
@@ -155,6 +156,7 @@ export function setupFilamentManagerReSyncBtn() {
           4000,
           "Clicked"
         );
+        await reRenderPageInformation();
       } else {
         let errorText =
           "There was an issue updating your spools and profiles! Error(s): <br>";
