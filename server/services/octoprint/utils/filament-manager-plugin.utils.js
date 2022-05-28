@@ -12,13 +12,7 @@ const getOnlinePrinterList = async function () {
   const printerList = getPrinterStoreCache().listPrintersInformation();
   const onlinePrintersList = [];
   for (const printer of printerList) {
-    if (
-      printer.printerState.colour.category === "Disconnected" ||
-      printer.printerState.colour.category === "Idle" ||
-      printer.printerState.colour.category === "Active" ||
-      printer.printerState.colour.category === "Complete" ||
-      !printer.disabled
-    ) {
+    if (printer?.printerState?.colour?.category !== "Offline" && !printer.disabled) {
       onlinePrintersList.push(printer);
     }
   }
@@ -29,12 +23,7 @@ const findFirstOnlinePrinter = function () {
   const printerList = getPrinterStoreCache().listPrintersInformation();
   let firstOnlinePrinter = null;
   for (const printer of printerList) {
-    if (
-      printer.printerState.colour.category === "Disconnected" ||
-      printer.printerState.colour.category === "Idle" ||
-      printer.printerState.colour.category === "Active" ||
-      printer.printerState.colour.category === "Complete"
-    ) {
+    if (printer?.printerState?.colour?.category !== "Offline" && !printer.disabled) {
       firstOnlinePrinter = printer;
       break;
     }
@@ -132,15 +121,15 @@ const checkIfDatabaseCanBeConnected = async function (printers) {
 
 const assignSpoolToOctoPrint = async function (spoolId, printers) {
   let spool = null;
-  if(!!spoolId){
+  if (!!spoolId) {
     spool = await Spool.findById(spoolId);
   }
 
-  if(!spoolId || !printers){
+  if (!spoolId || !printers) {
     logger.error("Unable to assign spool on OctoPrint, missing data...", {
       spoolId,
       printers
-    })
+    });
   }
 
   const printer = getPrinterStoreCache().getPrinterInformation(printers[0].printer);
@@ -150,7 +139,7 @@ const assignSpoolToOctoPrint = async function (spoolId, printers) {
     spool: { id: parseInt(spool?.spools?.fmID ? spool.spools.fmID : null) }
   };
 
-  logger.info("Updating OctoPrint with new spool selection", selection)
+  logger.info("Updating OctoPrint with new spool selection", selection);
 
   const url = `${printer.printerURL}/plugin/filamentmanager/selections/${printers[0].tool}`;
   const updateFilamentManager = await fetch(url, {
@@ -162,13 +151,13 @@ const assignSpoolToOctoPrint = async function (spoolId, printers) {
     body: JSON.stringify({ selection })
   });
 
-  if(!updateFilamentManager.ok){
+  if (!updateFilamentManager.ok) {
     logger.error(
       "Unable to assign spool on OctoPrint, response errored!",
       updateFilamentManager.toString()
     );
   }
-}
+};
 
 const filamentManagerReSync = async function () {
   const errors = [];
