@@ -361,6 +361,21 @@ class PrinterStore {
     return category === "Active";
   }
 
+  shouldPrinterBeReceivingData(id) {
+    const printer = this.#findMePrinter(id);
+    const {
+      printerState: {
+        colour: { category }
+      }
+    } = printer;
+    return (
+      category === "Disconnected" ||
+      category === "Idle" ||
+      category === "Active" ||
+      category === "Complete"
+    );
+  }
+
   getDisabledPluginsList(id) {
     const printer = this.#findMePrinter(id);
     return printer.pluginsListDisabled;
@@ -616,8 +631,8 @@ class PrinterStore {
     let octoPrintProfiles = {};
 
     let octofarmCheck = 200;
-    let profileCheck = 900;
-    let settingsCheck = 900;
+    let profileCheck;
+    let settingsCheck;
 
     const {
       printer,
@@ -785,10 +800,13 @@ class PrinterStore {
         ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
         ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
       };
+
+      console.log(powerOnCommand)
+
       const newPowerSettings = {
         ...(!!powerOnCommand
           ? { powerOnCommand }
-          : { powerOnCommand: JSON.parse(originalPrinter.powerSettings.powerOnCommand) }),
+          : { powerOnCommand: originalPrinter.powerSettings.powerOnCommand }),
         ...(!!powerOnURL
           ? { powerOnURL }
           : { powerOnURL: originalPrinter.powerSettings.powerOnURL }),
@@ -797,16 +815,10 @@ class PrinterStore {
           : { powerOffURL: originalPrinter.powerSettings.powerOffURL }),
         ...(!!powerOffCommand
           ? { powerOffCommand }
-          : { powerOffCommand: JSON.parse(originalPrinter.powerSettings.powerOffCommand) }),
-        ...(!!powerToggleCommand
-          ? { powerToggleCommand }
-          : { powerToggleCommand: JSON.parse(originalPrinter.powerSettings.powerToggleCommand) }),
-        ...(!!powerToggleURL
-          ? { powerToggleURL }
-          : { powerToggleURL: originalPrinter.powerSettings.powerToggleURL }),
+          : { powerOffCommand: originalPrinter.powerSettings.powerOffCommand }),
         ...(!!powerStatusCommand
           ? { powerStatusCommand }
-          : { powerStatusCommand: JSON.parse(originalPrinter.powerSettings.powerStatusCommand) }),
+          : { powerStatusCommand: originalPrinter.powerSettings.powerStatusCommand }),
         ...(!!powerStatusURL
           ? { powerStatusURL }
           : { powerStatusURL: originalPrinter.powerSettings.powerStatusURL }),
@@ -1112,7 +1124,7 @@ class PrinterStore {
 
     const { name, path } = files.local;
 
-    let filePath = "";
+    let filePath;
 
     if (path.indexOf("/") > -1) {
       filePath = path.substr(0, path.lastIndexOf("/"));

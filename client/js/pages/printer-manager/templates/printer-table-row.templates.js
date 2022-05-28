@@ -109,7 +109,7 @@ const returnAlerts = (id, printerURL) => {
 };
 
 function returnPrinterManageDropDown(id, disabled) {
-  let printerDisabledButton = null;
+  let printerDisabledButton;
   if (!disabled) {
     printerDisabledButton = `
         <button  title="Printer is enabled, click to disable"
@@ -147,14 +147,6 @@ function returnPrinterManageDropDown(id, disabled) {
                 >
                 <i class="fa-solid fa-pen-to-square text-warning"></i> Edit
             </button>
-            <button  title="ReScan your printers API"
-                 id="printerAPIReScan-${id}"
-                 type="button"
-                 class="btn dropdown-item"
-                >
-                <i class="fab fa-searchengin text-warning"></i> Scan API
-                
-            </button>
             <button title="Forces a complete re-enable of your printer"
                  id="printerForceReconnect-${id}"
                  type="button"
@@ -164,6 +156,7 @@ function returnPrinterManageDropDown(id, disabled) {
                 
             </button>
             ${printerDisabledButton}
+            <hr>
             <h6 class="dropdown-header">Printer</h6>
             <button  title="Change your Printer Settings"
                  id="printerSettings-${id}"
@@ -183,6 +176,16 @@ function returnPrinterManageDropDown(id, disabled) {
             >
                 <i class="fas fa-file-alt text-primary"></i> Logs
             </button>
+            <hr>
+            <h6 class="dropdown-header">OctoPrint</h6>
+            <button  title="ReScan your printers API"
+                 id="printerAPIReScan-${id}"
+                 type="button"
+                 class="btn dropdown-item"
+                >
+                <i class="fa-solid fa-info text-info"></i> Update Information
+            </button>
+            <hr>
             <h6 class="dropdown-header">Other</h6>
              <button title="View individual Printer Statistics"
                      id="printerStatistics-${id}"

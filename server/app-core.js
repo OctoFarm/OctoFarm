@@ -22,6 +22,8 @@ const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
+const {ensureClientServerVersion} = require("./middleware/client-server-version");
+
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -124,6 +126,9 @@ async function ensureSystemSettingsInitiated() {
  * @param app
  */
 function serveOctoFarmRoutes(app) {
+
+  app.use(ensureClientServerVersion);
+
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
@@ -157,6 +162,7 @@ function serveOctoFarmRoutes(app) {
     }
     res.redirect("/");
   });
+
   app.use(exceptionHandler);
 }
 
