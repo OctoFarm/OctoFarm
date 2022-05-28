@@ -5,7 +5,7 @@ import {reRenderPageInformation} from "../../pages/filament-manager/filament-man
 let filamentManagerSettings = {};
 
 const syncFilamentManagerButton = `
-        <button id="setupFilamentManagerBtn" type="button"
+        <button id="setupFilamentManagerSyncBtn" type="button"
                 class="btn btn-warning text-dark mb-1 btn-lg"><i
                     class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
         </button>
@@ -92,8 +92,9 @@ export function setupFilamentManagerDisableBtn() {
 
 export function setupFilamentManagerSyncBtn() {
   if (!!filamentManagerSyncDiv) {
-    filamentManagerSyncDiv.innerHTML = syncFilamentManagerButton
-    const filamentManagerSyncBtn = document.getElementById("setupFilamentManagerBtn")
+    filamentManagerSyncDiv.innerHTML = syncFilamentManagerButton;
+    const filamentManagerSyncBtn = document.getElementById("setupFilamentManagerSyncBtn");
+    console.log("HELLO")
     filamentManagerSyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
       filamentManagerSyncBtn.disabled = true;
