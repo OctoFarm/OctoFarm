@@ -55,6 +55,20 @@ const handleUploadFromQueue = async (current, index) => {
     fileUploads.remove();
     await OctoFarmClient.post("printers/newFiles", file);
 
+    const body = {
+      action: "File Upload",
+      opts: {
+        print: !!current?.print
+      },
+      fullPath: file.files.local.path,
+      status: 200,
+    };
+    await OctoFarmClient.updateUserActionsLog(current?.printerInfo?._id, body);
+
+    if(!!current?.print){
+      await OctoFarmClient.updateActiveControlUser(current?.printerInfo?._id);
+    }
+
     const currentFolder = document.getElementById("currentFolder");
     const fileFolder = "local/" + file.files.local.path;
     const currentPrinter = document.getElementById("currentPrinter");
@@ -460,7 +474,7 @@ export default class FileManagerService {
     );
     const prettyList = [];
 
-    let buttons = {};
+    let buttons;
 
     if (houseCleanFiles.length === 0) {
       prettyList.push(
@@ -863,7 +877,7 @@ export default class FileManagerService {
 
           const testFolderPath = selectedFolder.replace(/ /g, "%")
 
-          const regexValidation = new RegExp("\\/[a-zA-Z0-9_%\\/-]*[^\\/]$");
+          const regexValidation = /\/[a-zA-Z0-9_%\/-]*[^\/]$/;
           // validate the path
           if (newFolder !== "" && !regexValidation.exec("/" + testFolderPath)) {
             multiFolderInput.classList.add(isInValid);
@@ -1164,7 +1178,7 @@ export class FileActions {
   }
   static async multiUploadCreateFolders(printer, octofarmPath, formData, currentPath) {
 
-      const { status, files } = await OctoPrintClient.folder(
+      const { status } = await OctoPrintClient.folder(
         printer,
         "local",
         formData
