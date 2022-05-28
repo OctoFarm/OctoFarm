@@ -121,7 +121,7 @@ const checkIfDatabaseCanBeConnected = async function (printers) {
 
 const assignSpoolToOctoPrint = async function (spoolId, printers) {
   let spool = null;
-  if (!!spoolId) {
+  if (!!spoolId && spoolId !== "0") {
     spool = await Spool.findById(spoolId);
   }
 
