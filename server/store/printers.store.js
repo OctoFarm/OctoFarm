@@ -583,7 +583,7 @@ class PrinterStore {
     if (!!idList) {
       idList.forEach((id) => {
         const printer = this.#findMePrinter(id);
-        printer.resetConnectionInformation();
+        printer.resetConnectionInformation(true);
       });
     }
   }
@@ -800,8 +800,6 @@ class PrinterStore {
         ...(!!packet ? { packet } : { packet: originalPrinter.powerSettings.wol.packet }),
         ...(!!MAC ? { MAC } : { MAC: originalPrinter.powerSettings.wol.MAC })
       };
-
-      console.log(powerOnCommand)
 
       const newPowerSettings = {
         ...(!!powerOnCommand
