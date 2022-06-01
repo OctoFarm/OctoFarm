@@ -8,7 +8,7 @@ on:
       - 'master'
       - 'development'
   workflow_run:
-    workflows: [ "Release Development Version" ]
+    workflows: [ "Release Development Version", "Release Master Version" ]
     types:
       - completed
 jobs:

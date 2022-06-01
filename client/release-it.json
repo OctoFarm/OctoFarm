@@ -1,0 +1,18 @@
+{
+  "git": {
+    "commitMessage": "release(release): client release v${version}",
+    "commit": true,
+    "tag": false,
+    "push": false
+  },
+  "npm": {
+    "publish": false,
+    "publishPath": ".",
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  "github": {
+    "release": false
+  }
+}
