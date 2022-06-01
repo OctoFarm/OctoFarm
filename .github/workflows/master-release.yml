@@ -40,7 +40,8 @@ jobs:
             server:
             - 'server/**'
             client:
-            - 'client/**'
+            - 'client/js/**'
+            - 'client/css/**'
       # Install node v16 to use.
       - name: Use Node
         uses: actions/setup-node@v2
