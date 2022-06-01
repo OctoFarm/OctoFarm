@@ -7,10 +7,10 @@ on:
     branches:
       - 'master'
       - 'development'
-  #workflow_run:
-    #workflows: [ "Semantic Release Workflow" ]
-    #types:
-    #  - completed
+  workflow_run:
+    workflows: [ "Release Development Version", "Release Master Version" ]
+    types:
+      - completed
 jobs:
   docker:
     name: "Docker build"
