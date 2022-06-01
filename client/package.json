@@ -33,7 +33,7 @@
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/npm": "^9.0.1",
     "apexcharts": "^3.35.0",
-    "axios": "^0.21.1",
+    "axios": "^0.27.2",
     "before-build-webpack": "^0.2.11",
     "bootbox": "^5.5.2",
     "bootstrap": "^4.3.1",
