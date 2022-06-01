@@ -92,7 +92,7 @@ jobs:
         if: steps.filter.outputs.client == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          branch: development
+          branch: master
           commit_message: "ci(main) - update client v${{ steps.server-package-version.outputs.current-version }} [skip ci]"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com

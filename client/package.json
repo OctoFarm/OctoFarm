@@ -43,6 +43,7 @@
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^1.6.0",
     "noty": "^3.2.0-beta",
+    "release-it": "^15.0.0",
     "semantic-release": "^19.0.2",
     "source-map-loader": "^2.0.1",
     "webpack": "5.36.2",
