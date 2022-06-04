@@ -89,11 +89,9 @@ function verifyPackageJsonRequirements(rootPath) {
 }
 
 function ensureBackgroundImageExists(rootPath) {
-  console.log(rootPath)
   // Explicit relative folder
   const targetBgDir = "../images";
   const targetBgPath = path.join(targetBgDir, "bg.jpg");
-  console.log(targetBgPath)
   if (!fs.existsSync(targetBgDir)) {
     fs.mkdirSync(targetBgDir);
   }
