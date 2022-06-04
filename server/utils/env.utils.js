@@ -89,9 +89,11 @@ function verifyPackageJsonRequirements(rootPath) {
 }
 
 function ensureBackgroundImageExists(rootPath) {
+  console.log(rootPath)
   // Explicit relative folder
   const targetBgDir = "../images";
   const targetBgPath = path.join(targetBgDir, "bg.jpg");
+  console.log(targetBgPath)
   if (!fs.existsSync(targetBgDir)) {
     fs.mkdirSync(targetBgDir);
   }
@@ -101,7 +103,7 @@ function ensureBackgroundImageExists(rootPath) {
     if (!fs.existsSync(defaultBgPath)) {
       logger.error("cant find default bg file...", defaultBgPath);
     } else if (!fs.existsSync("images")) {
-      logger.error("cant find target folder...", path.join(rootPath, "images"));
+      logger.error("cant find target folder...", path.join(rootPath, targetBgDir));
     } else {
       logger.info("everything good", defaultBgPath, targetBgPath);
     }
