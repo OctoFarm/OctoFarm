@@ -53,7 +53,7 @@ jobs:
             - 'server/utils/**'
             - 'server/views/**'   
             client:
-            - 'client/**
+            - 'client/**'
       # Install node v16 to use.
       - name: Use Node
         uses: actions/setup-node@v2
