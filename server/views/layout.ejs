@@ -37,7 +37,7 @@
 <body id="body-pd">
 <header class="header navbar-dark bg-dark" id="header">
     <button type="button" class="header-toggle btn-sm btn btn-outline-purple" id="header-toggle"><i class="fa-solid fa-bars fs-5" id="header-icon"></i></button>
-    <div class="btn-group btn-group-sm ms-5" role="group" aria-label="Basic example">
+    <div class="btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
         <% if(monitoringSettings.panel){ %>
            <a title="Panel layout monitoring view" id="menuPanelView" href="/mon/panel" type="button" class="btn btn-outline-purple <%= page === 'Panel View' && 'active-monitoring' %>">
                <i class="fas fa-columns"></i>
@@ -68,6 +68,18 @@
                 <i class="fas fa-star"></i>
             </a>
         <% } %>
+    </div>
+    <div class="header_user_menu btn-group btn-group-sm">
+        <button type="button" class="btn btn-outline-purple dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Action</a></li>
+            <li><a class="dropdown-item" href="#">Another action</a></li>
+            <li><a class="dropdown-item" href="#">Something else here</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Separated link</a></li>
+        </ul>
     </div>
 </header>
 <div class="l-navbar" id="nav-bar">
