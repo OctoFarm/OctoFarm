@@ -35,13 +35,14 @@ const checkIfFilamentManagerPluginExists = async function (printers) {
   const missingPlugin = [];
 
   for (const printer of printers) {
-    let pluginList = await fetch(`${printer.printerURL}/plugin/pluginmanager/plugins`, {
+    let pluginList = await fetch(`${printer.printerURL}/api/plugin/pluginmanager`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": printer.apikey
       }
     });
+
     const responseJSON = await pluginList.json();
     const pluginIndex = findIndex(responseJSON.plugins, function (o) {
       return o.key === "filamentmanager";
