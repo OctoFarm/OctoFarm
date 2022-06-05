@@ -54,7 +54,7 @@
     "lookpath": "^1.2.2",
     "luxon": "^2.3.1",
     "marked": "^4.0.12",
-    "migrate-mongo": "^8.2.3",
+    "migrate-mongo": "^9.0.0",
     "mjpeg-decoder": "^1.0.3",
     "mongoose": "^6.3.5",
     "mongoose-paginate-v2": "^1.6.3",
