@@ -91,6 +91,7 @@ jobs:
 
       # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
       - name: Wait for npm to update package...
+        if: steps.filter.outputs.client == 'true'
         uses: whatnick/wait-action@master
         with:
           time: '30s'
