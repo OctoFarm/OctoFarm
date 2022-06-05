@@ -68,7 +68,7 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
           git status
-          npm build
+          npm run build
           npm run release
           cd ../
 
