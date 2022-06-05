@@ -33,7 +33,7 @@
   "license": "ISC",
   "dependencies": {
     "@notexpectedyet/octofarm-client": "^1.2.4",
-    "archiver": "^5.3.0",
+    "archiver": "^5.3.1",
     "auto-git-update": "^1.1.1",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
