@@ -7,7 +7,7 @@ import jplist from "./jplist.min";
 import "./darkmode.min";
 // You can specify which plugins you need
 import { Tooltip, Toast, Popover } from "bootstrap";
-import "../../css/vendor/bootstrap-nightsahde.min.css";
+import "../../css/vendor/theme.css";
 import "@fortawesome/fontawesome-free/js/fontawesome"
 import "@fortawesome/fontawesome-free/js/solid"
 import "@fortawesome/fontawesome-free/js/regular"
