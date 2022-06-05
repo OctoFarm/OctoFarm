@@ -65,6 +65,7 @@ jobs:
         if: steps.filter.outputs.client == 'true'
         run: |
           cd ./client
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
           git status
           npm run release
