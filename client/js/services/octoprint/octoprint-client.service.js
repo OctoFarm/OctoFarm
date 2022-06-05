@@ -558,7 +558,7 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
-    if (!!command || command === "") {
+    if (!!command && command.length === 0) {
       try {
         let post = await fetch(url, {
           method: "GET",
@@ -569,7 +569,7 @@ export default class OctoPrintClient {
         });
         let status = false;
         if (post?.status === 200 || post?.status === 204) {
-          status = post.json();
+          status = await post.json();
         }else{
           console.warn(`Power Status - ${post?.status ? post.status : "No Status"} \n Message - ${post?.statusMessage ? post.statusMessage : "No Message"}`);
         }
@@ -592,7 +592,7 @@ export default class OctoPrintClient {
         });
         let status = false;
         if (post?.status === 200 || post?.status === 204) {
-          status = post.json();
+          status = await post.json();
         }else{
           console.warn(`Power Status - ${post?.status ? post.status : "No Status"} \n Message - ${post?.statusMessage ? post.statusMessage : "No Message"}`);
         }
