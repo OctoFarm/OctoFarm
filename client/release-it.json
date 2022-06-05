@@ -8,10 +8,7 @@
   "npm": {
     "publish": true,
     "publishPath": ".",
-    "ignoreVersion": true,
-    "publishConfig": {
-      "access": "public"
-    }
+    "skipChecks": true
   },
   "github": {
     "release": false
