@@ -34,7 +34,19 @@ jobs:
         with:
           filters: |
             server:
-            - 'server/**'     
+            - 'server/*.js'
+            - 'server/cache/**'
+            - 'server/constants/**'
+            - 'server/exceptions/**'
+            - 'server/handlers/**'
+            - 'server/middleware/**'
+            - 'server/migrations/**'
+            - 'server/models/**'
+            - 'server/routes/**'
+            - 'server/services/**'
+            - 'server/store/**'
+            - 'server/utils/**'
+            - 'server/views/**'  
             client:
             - 'client/**'
       # Install node v16 to use.
