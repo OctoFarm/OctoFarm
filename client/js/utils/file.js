@@ -13,7 +13,7 @@ export default class FileOperations {
       element.click();
       document.body.removeChild(element);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 }
