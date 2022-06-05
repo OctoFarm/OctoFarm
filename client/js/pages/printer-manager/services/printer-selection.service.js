@@ -393,7 +393,6 @@ export default class PrinterSelectionService {
       );
 
       groupListUnique.forEach((group) => {
-        console.log(group)
         printerGroupList.insertAdjacentHTML(
           "beforeend",
           `<option value="${group.tag}" data-path=".g-${group.tag}">${group.display}</option>`

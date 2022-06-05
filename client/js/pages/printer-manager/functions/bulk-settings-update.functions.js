@@ -3,10 +3,7 @@ import UI from "../../../utils/ui";
 const formTemplate = (keyName, obj) => {
   let buttonsHTML = "";
   let checkBoxHTML = "";
-  console.log("KEY_NAME: ", keyName);
-  console.log(obj);
   for (const [key, value] of Object.entries(obj)) {
-    console.log(key);
     switch (key) {
       case "plugins":
         break;

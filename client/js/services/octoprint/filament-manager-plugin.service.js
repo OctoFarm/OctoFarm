@@ -94,7 +94,6 @@ export function setupFilamentManagerSyncBtn() {
   if (!!filamentManagerSyncDiv) {
     filamentManagerSyncDiv.innerHTML = syncFilamentManagerButton;
     const filamentManagerSyncBtn = document.getElementById("setupFilamentManagerSyncBtn");
-    console.log("HELLO")
     filamentManagerSyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
       filamentManagerSyncBtn.disabled = true;

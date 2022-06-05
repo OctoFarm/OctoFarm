@@ -110,7 +110,6 @@ export const updateElectricityCost = (id, electricityCost) => {
   if (!id) {
     return;
   }
-  console.log(electricityCost);
   if (!!electricityCost) {
     const fileElectEl = document.getElementById(`fileElectricityCost-${id}`);
     UI.doesElementNeedUpdating(
