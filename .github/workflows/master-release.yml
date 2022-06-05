@@ -19,6 +19,7 @@ jobs:
     env:
       INPUT_TOKEN: ''
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       # Checkout the development repository
       - uses: actions/checkout@v2
@@ -65,6 +66,7 @@ jobs:
         if: steps.filter.outputs.client == 'true'
         run: |
           cd ./client
+          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
           git status
           npm run release
@@ -89,16 +91,16 @@ jobs:
       # Update Server Package with latest client package
       - name: update server client version
         if: steps.filter.outputs.client == 'true'
-        run: npm install @notexpectedyet/octofarm-client@${{ steps.client-package-version.outputs.current-version }} --save
+        run: npm install @notexpectedyet/octofarm-client@latest --save
         working-directory: ./server
 
       # Commit changes to the current development repository
-      - name: get-server-current-version
+      - name: get-client-current-version
         if: steps.filter.outputs.client == 'true'
-        id: server-package-version
+        id: client-package-version
         uses: martinbeentjes/npm-get-version-action@main
         with:
-          path: server
+          path: client
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
@@ -106,7 +108,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
-          commit_message: "ci(main) - update client v${{ steps.server-package-version.outputs.current-version }} [skip ci]"
+          commit_message: "ci(main) - update client v${{ steps.client-package-version.outputs.current-version }} [skip ci]"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>

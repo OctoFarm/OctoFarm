@@ -44,9 +44,12 @@ const updateUserActionLog = (
 };
 
 const updateUserActionTicker = (action) => {
-  const tickerAction = action;
+  const tickerAction = cloneObject(action);
+
   tickerAction.id = `${tickerAction.printerID}-${new Date(tickerAction.date).getTime()}`;
+
   tickerAction.printerName = getPrinterStoreCache().getPrinterName(tickerAction.printerID);
+
   if (last100Actions.length <= 500) {
     last100Actions.push(tickerAction);
   } else {
@@ -67,7 +70,7 @@ const returnLast100Actions = () => {
 
 const getLast100ActionsFromDatabase = async () => {
   const last100Database = await UserAction.find({})
-    .sort({ _id: 1 })
+    .sort({ _id: -1 })
     .limit(100)
     .then((res) => {
       logger.debug("Successfully grabbed last 100 records from user actions database", res);

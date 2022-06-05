@@ -6,11 +6,9 @@
     "push": false
   },
   "npm": {
-    "publish": false,
+    "publish": true,
     "publishPath": ".",
-    "publishConfig": {
-      "access": "public"
-    }
+    "skipChecks": true
   },
   "github": {
     "release": false

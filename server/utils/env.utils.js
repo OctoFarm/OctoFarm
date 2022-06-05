@@ -101,7 +101,7 @@ function ensureBackgroundImageExists(rootPath) {
     if (!fs.existsSync(defaultBgPath)) {
       logger.error("cant find default bg file...", defaultBgPath);
     } else if (!fs.existsSync("images")) {
-      logger.error("cant find target folder...", path.join(rootPath, "images"));
+      logger.error("cant find target folder...", path.join(rootPath, targetBgDir));
     } else {
       logger.info("everything good", defaultBgPath, targetBgPath);
     }

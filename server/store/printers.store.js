@@ -311,7 +311,7 @@ class PrinterStore {
 
   getPrinterName(id) {
     const printer = this.#findMePrinter(id);
-    return printer.printerName;
+    return printer?.printerName ? printer.printerName : "Unknown Printer";
   }
 
   getPrinterInformation(id) {
