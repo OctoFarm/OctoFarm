@@ -174,7 +174,7 @@ export default class OctoPrintClient {
       element.target.classList = "btn btn-light";
     };
     const url = "printer/printhead";
-    let post = {};
+    let post;
     let amount = await document.querySelectorAll("#pcAxisSteps > .btn.active");
     amount = amount[0].innerHTML;
     let opt = {};
@@ -232,8 +232,6 @@ export default class OctoPrintClient {
         command: "select",
         print: false,
       };
-
-      await printStartSequence(printer);
 
       const post = await OctoPrintClient.post(
         printer,
