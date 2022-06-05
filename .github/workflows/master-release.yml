@@ -113,4 +113,4 @@ jobs:
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>
           ## This action should only ever commit these two files!
-          file_pattern: server/package*.json client/package*.json
+          file_pattern: server/package*.json client/package*.json CHANGELOG.md
