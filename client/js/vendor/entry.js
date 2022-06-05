@@ -4,6 +4,14 @@ import Sortable from "./sortable";
 import { Noty } from "noty/lib/noty.min";
 import lodash from "lodash/lodash.min";
 import jplist from "./jplist.min";
+import "./darkmode.min";
+// You can specify which plugins you need
+import { Tooltip, Toast, Popover } from "bootstrap";
+import "../../css/vendor/bootstrap-nightsahde.min.css";
+import "@fortawesome/fontawesome-free/js/fontawesome"
+import "@fortawesome/fontawesome-free/js/solid"
+import "@fortawesome/fontawesome-free/js/regular"
+import "@fortawesome/fontawesome-free/js/brands"
 
 module.export = {
   ApexCharts,
@@ -12,4 +20,7 @@ module.export = {
   lodash,
   Noty,
   Sortable,
+  Tooltip,
+  Toast,
+  Popover
 };
