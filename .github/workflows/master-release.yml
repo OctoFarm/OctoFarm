@@ -19,6 +19,7 @@ jobs:
     env:
       INPUT_TOKEN: ''
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       # Checkout the development repository
       - uses: actions/checkout@v2
