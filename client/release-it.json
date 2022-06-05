@@ -6,8 +6,9 @@
     "push": false
   },
   "npm": {
-    "publish": false,
+    "publish": true,
     "publishPath": ".",
+    "ignoreVersion": true,
     "publishConfig": {
       "access": "public"
     }
