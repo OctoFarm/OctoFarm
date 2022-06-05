@@ -35,7 +35,6 @@ const webpackEntries = fromPairs(
 );
 
 webpackEntries["vendor"] = `${clientJSFolder}vendor/entry.js`;
-webpackEntries["bootstrap"] = "bootstrap/dist/js/bootstrap.bundle";
 
 module.exports = (env, options) => {
   const isProd = options.mode === "production";
@@ -86,16 +85,7 @@ module.exports = (env, options) => {
               },
             },
           ],
-        },
-        // In case you want images to become dist assets use this
-        // Then look at https://webpack.js.org/loaders/file-loader/
-        // {
-        //   test: /\.(png|jpe?g|gif)$/i,
-        //   use: [
-        //     'ignore-loader'
-        //   ],
-        //   // type: 'asset/resource',
-        // },
+        }
       ],
     },
     plugins: [
