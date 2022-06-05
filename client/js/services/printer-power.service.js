@@ -26,13 +26,17 @@ export default class PrinterPowerService {
     if (!!powerReturn) {
       powerStatus = powerReturn[Object.keys(powerReturn)[0]];
       // Patches for string based state response tasmota/tplink plugins
-      if(powerStatus === "off"){
-        powerStatus = false;
+
+      if(typeof powerStatus === "string"){
+        if(powerStatus === "off"){
+          powerStatus = false;
+        }
+
+        if(powerStatus === "on"){
+          powerStatus = true;
+        }
       }
 
-      if(powerStatus === "on"){
-        powerStatus = true;
-      }
     }
 
     return powerStatus;
