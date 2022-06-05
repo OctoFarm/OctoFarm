@@ -56,7 +56,7 @@
     "marked": "^4.0.12",
     "migrate-mongo": "^8.2.3",
     "mjpeg-decoder": "^1.0.3",
-    "mongoose": "^6.3.4",
+    "mongoose": "^6.3.5",
     "mongoose-paginate-v2": "^1.6.3",
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
