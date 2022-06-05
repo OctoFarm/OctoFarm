@@ -12,8 +12,8 @@
     "migration:status": "migrate-mongo status",
     "prettier": "prettier --write \"./**/*.js\" \"../client/**/*.js\"\"",
     "test": "jest --forceExit",
-    "release": "release-it --ci --config release-it.json",
-    "release:dry": "release-it --dry-run --ci --config release-it.json"
+    "release": "release-it --ci --config release-it.js",
+    "release:dry": "NODE_DEBUG=release-it:* release-it --dry-run --ci --config release-it.js --VV"
   },
   "repository": {
     "type": "git",
