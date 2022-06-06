@@ -1,0 +1,32 @@
+<div class="btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
+    <% if(monitoringSettings.panel){ %>
+        <a title="Panel layout monitoring view" id="menuPanelView" href="/mon/panel" type="button" class="btn btn-outline-purple <%= page === 'Panel View' && 'active-monitoring' %>">
+            <i class="fas fa-columns"></i>
+        </a>
+    <% } %>
+    <% if(monitoringSettings.list){ %>
+        <a title="List layout monitoring view" id="menuPanelView" href="/mon/list" type="button" class="btn btn-outline-purple <%= page === 'List View' && 'active-monitoring' %>">
+            <i class="fas fa-list"></i>
+        </a>
+    <% } %>
+    <% if(monitoringSettings.camera){ %>
+        <a title="Camera layout monitoring view" id="menuPanelView" href="/mon/camera" type="button" class="btn btn-outline-purple <%= page === 'Camera View' && 'active-monitoring' %>">
+            <i class="fas fa-video"></i>
+        </a>
+    <% } %>
+    <% if(monitoringSettings.group){ %>
+        <a title="Group layout monitoring view" id="menuPanelView" href="/mon/group" type="button" class="btn btn-outline-purple <%= page === 'Group View' && 'active-monitoring' %>">
+            <i class="fas fa-map-marked-alt"></i>
+        </a>
+    <% } %>
+    <% if(monitoringSettings.combined){ %>
+        <a title="Combined monitoring view layout" id="menuPanelView" href="/mon/combined" type="button" class="btn btn-outline-purple <%= page === 'Super List View' && 'active-monitoring' %>">
+            <i class="fas fa-object-group"></i>
+        </a>
+    <% } %>
+    <% if(monitoringSettings.currentOperations){ %>
+        <a title="Current Operations monitoring layout view"  id="menuPanelView" href="/mon/currentOp" type="button" class="btn btn-outline-purple <%= page === 'Current Operations' && 'active-monitoring' %>">
+            <i class="fas fa-star"></i>
+        </a>
+    <% } %>
+</div>

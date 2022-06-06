@@ -1,0 +1,36 @@
+<div class="header_user_menu btn-group btn-group-sm">
+    <button type="button" class="btn btn-outline-purple dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-user"></i>
+    </button>
+    <ul class="dropdown-menu" style="max-width: 200px;">
+        <div class="ps-4 pe-4 text-muted text-center">
+            <p class="mb-1"><i class="far fa-user"></i></p>
+            <p class="mb-2"><%= name; %></p>
+            <p class="mb-1"><%= userGroup; %></p>
+        </div>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-display"></i> Client Settings</a></li>
+        <% if(currentUserGroup === "Administrator"){ %>
+            //TODO new system information modal
+            <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle"></i>  Information</a></li>
+            <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench"></i> Administration</a></li>
+            //TODO new users page
+            <li><a class="dropdown-item" href="/users"><i class="fa-solid fa-users"></i> Users</a></li>
+            //TODO new logs modal
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-clipboard"></i> Logs</a></li>
+        <% } %>
+        <% if(currentUserGroup === "Administrator"){ %>
+            //TODO about modal
+            <li><a class="dropdown-item" href=""><i class="fa-solid fa-address-card"></i> About</a></li>
+        <% } %>
+
+        <% if(serverSettings.server.loginRequired){ %>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a type="button" class="btn btn-success mb-3" href="/users/logout">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </li>
+        <% } %>
+    </ul>
+</div>

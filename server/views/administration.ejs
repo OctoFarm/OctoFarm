@@ -1,0 +1,17 @@
+<!--// Settings Panel-->
+<% let base = './partials' %>
+<% let card = base + '/octofarm-card.ejs' %>
+
+<div class="row">
+    <div class="col-lg-12 h-100">
+        <%- include(card, {
+            tile:{
+            id:"administrationSettings",i:"fa-tools",title:"Administration",class:"col-lg-12",
+            },
+            bodyFile:'./Administration/administrationMenu.ejs'
+        })
+        %>
+    </div>
+</div>
+<!--<script src="/assets/dist/system.runner.min.js?<%= clientVersion %>" type="module"></script>-->
+
