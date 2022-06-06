@@ -1,4 +1,13 @@
 <% const base = './partials' %>
+<% const navigation = base + '/Navigation' %>
+
+<% const header = navigation + '/header.ejs' %>
+<% const navbar = navigation + '/navbar.ejs' %>
+<% const navbarLogo = navigation + '/navbarLogo.ejs' %>
+<% const versionInformation = navigation + '/versionInformation.ejs' %>
+<% const monitoringViews = navigation + '/monitoringViews.ejs' %>
+<% const userDropDown = navigation + '/userDropDown.ejs' %>
+
 <% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
 <% const modal = base + '/octofarm-modal.ejs' %>
 <% let currentUserGroup = "User" %>
@@ -35,106 +44,136 @@
 </head>
 
 <body id="body-pd">
-<header class="header navbar-dark bg-dark" id="header">
-    <button type="button" class="header-toggle btn-sm btn btn-outline-purple" id="header-toggle"><i class="fa-solid fa-bars fs-5" id="header-icon"></i></button>
-    <div class="btn-group btn-group-sm ms-3" role="group" aria-label="Basic example">
-        <% if(monitoringSettings.panel){ %>
-           <a title="Panel layout monitoring view" id="menuPanelView" href="/mon/panel" type="button" class="btn btn-outline-purple <%= page === 'Panel View' && 'active-monitoring' %>">
-               <i class="fas fa-columns"></i>
-           </a>
-        <% } %>
-        <% if(monitoringSettings.list){ %>
-            <a title="List layout monitoring view" id="menuPanelView" href="/mon/list" type="button" class="btn btn-outline-purple <%= page === 'List View' && 'active-monitoring' %>">
-                <i class="fas fa-list"></i>
-            </a>
-        <% } %>
-        <% if(monitoringSettings.camera){ %>
-            <a title="Camera layout monitoring view" id="menuPanelView" href="/mon/camera" type="button" class="btn btn-outline-purple <%= page === 'Camera View' && 'active-monitoring' %>">
-                <i class="fas fa-video"></i>
-            </a>
-        <% } %>
-        <% if(monitoringSettings.group){ %>
-            <a title="Group layout monitoring view" id="menuPanelView" href="/mon/group" type="button" class="btn btn-outline-purple <%= page === 'Group View' && 'active-monitoring' %>">
-                <i class="fas fa-map-marked-alt"></i>
-            </a>
-        <% } %>
-        <% if(monitoringSettings.combined){ %>
-            <a title="Combined monitoring view layout" id="menuPanelView" href="/mon/combined" type="button" class="btn btn-outline-purple <%= page === 'Super List View' && 'active-monitoring' %>">
-                <i class="fas fa-object-group"></i>
-            </a>
-        <% } %>
-        <% if(monitoringSettings.currentOperations){ %>
-            <a title="Current Operations monitoring layout view"  id="menuPanelView" href="/mon/currentOp" type="button" class="btn btn-outline-purple <%= page === 'Current Operations' && 'active-monitoring' %>">
-                <i class="fas fa-star"></i>
-            </a>
-        <% } %>
-    </div>
-    <div class="header_user_menu btn-group btn-group-sm">
-        <button type="button" class="btn btn-outline-purple dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fa-solid fa-user"></i>
-        </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Separated link</a></li>
-        </ul>
-    </div>
-</header>
-<div class="l-navbar" id="nav-bar">
-    <nav class="nav">
-        <div class="nav_list">
-            <a href="https://octofarm.net" target="_blank" id="navTitle" class="nav_logo d-none">
-                <h4 class="text-purple text-uppercase mb-1"><%= octoFarmPageTitle %></h4>
-            </a>
-            <a title="Farm Dashboard" href="/dashboard" class="nav_link <%= page === 'Dashboard' && 'active-nav' %>">
-                <i class="fas fa-tachometer-alt text-purple"></i>
-                <span class="nav_name text-light">Dashboard</span>
-            </a>
-            <% if(currentUserGroup === "Administrator"){ %>
-                <a title="Printer Management" href="/printers" class="nav_link <%= page === 'Printer Manager' && 'active-nav' %>">
-                    <i class="fas fa-print text-purple"></i>
-                    <span class="nav_name text-light">Printers</span>
-                </a>
-            <% } %>
-            <a title="File Management" href="/filemanager" class="nav_link <%= page === 'File Manager' && 'active-nav' %>">
-                <i class="fas fa-folder-open text-purple"></i>
-                <span class="nav_name text-light">File Manager</span>
-            </a>
-            <a title="Print History" href="/history" class="nav_link <%= page === 'History' && 'active-nav' %>">
-                <i class="fas fa-history text-purple"></i>
-                <span class="nav_name text-light">History</span>
-            </a>
-            <a title="Filament Management" href="/filament" class="nav_link <%= page === 'Filament Manager' && 'active-nav' %>">
-                <i class="fas fa-toilet-paper text-purple"></i>
-                <span class="nav_name text-light">Filament</span>
-            </a>
-            <% if(currentUserGroup === "Administrator"){ %>
-                <a title="System Settings" href="/system" class="nav_link <%= page === 'System' && 'active-nav' %>">
-                    <i class="fas fa-cogs text-purple"></i>
-                    <span class="nav_name text-light">System</span>
-                </a>
-            <% } %>
-
-        </div>
-        <div class="versionInformation d-none" id="octofarmNavLogo">
-            <img width="190px" src="/images/logo.png?<%= clientVersion %>" alt="favicon">
-        </div>
-        <div class="versionInformation d-none text-center " id="versionInformation">
-            <small title="Current server version">
-                <i class="fa-solid fa-server"></i> v<%= serverVersion %>
-            </small>
-            <small title="Current client version">
-                <i class="fa-solid fa-desktop ms-4"></i> v<%= clientVersion %>
-            </small>
-        </div>
-    </nav>
-
-</div>
+<%- include(header, { monitoringSettings, currentUserGroup }) -%>
+<%- include(navbar, { octoFarmPageTitle, currentUserGroup }) -%>
 <!--Container Main start-->
 <div class="height-100">
     <%- body %>
+    <%- include(octofarmErrorModal) %>
+    //TODO move to includes
+    <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
+         aria-labelledby="printerManagerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header px-3 pt-3 pb-2">
+                    <div id="printerSelectionWrapper" class="input-group mb-0" style="width:600px">
+                        <div class="input-group-prepend">
+                            <label id="printerManagerModalTitle" class="input-group-text p-1" for="printerSelection"></label>
+                        </div>
+                        <select class="custom-select p-1" id="printerSelection">
+
+                        </select>
+                    </div>
+                    <span id="printerIndex" value="" style="display: none;"></span>
+                    <button id="printerManagerModalBtn" type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="connectionRow" class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2 mb-0 text-center" id="status">
+                            <button id="pmStatus" type="button" class="btn btn-secondary mb-1" href="#"
+                                    target="_blank" disabled><i class="fas fa-spinner fa-spin"></i></button>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 mb-0" id="printerPortDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-0" id="printerBaudDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 mb-0" id="printerProfileDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-0" id="printerConnect">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div id="printerControls"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="printerManagerFooter">
+                    <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="lostServerConnection"><i class="fa-solid fa-satellite-dish"></i> Lost Connection to Server...</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+                                <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
+                                <p id="lostConnectionText">Attempting to reconnect in... <span id="lostServerConnectionTimer"></span></p>
+                                <button class="btn btn-outline-success" id="forceRefreshPageButton"><i class="fas fa-redo"></i> Refresh Page</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="connectionModal" tabindex="0" role="dialog" aria-labelledby="connectionModal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="connectionModalLabel">Printer Connect/Disconnect</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div id="printerConnection" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include(modal, {
+    modal:{
+    id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true", zIndex: 99999
+    },
+    bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
+    })
+    %>
+    <%- include(modal, {
+    modal:{
+    id:"printerSelect", title:"Printer Select: "
+    },
+    bodyFile:'./PrinterManager/printerSelect.modal.ejs'
+    })
+    %>
+    <%- include(modal, {
+    modal:{
+    id:"bulkPrintSetup", title:"Multi-Print Setup: "
+    },
+    bodyFile:'./PrinterManager/bulkPrintSetup.modal.ejs'
+    })
+    %>
 </div>
 <!--Container Main end-->
 </body>

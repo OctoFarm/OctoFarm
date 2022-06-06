@@ -1,7 +1,6 @@
-const { sortBy } = require("lodash");
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth.js");
+const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth.js");
 const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const { FilamentClean } = require("../services/filament-cleaner.service.js");
@@ -26,7 +25,6 @@ const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
 const { returnPatreonData } = require("../services/patreon.service");
-
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -330,42 +328,48 @@ router.get("/filament", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   });
 });
 
-router.get("/system", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
-  const clientSettings = await SettingsClean.returnClientSettings();
-  const serverSettings = SettingsClean.returnSystemSettings();
-  const systemInformation = SystemRunner.returnInfo();
-  const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
-  let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
-  const currentUsers = await fetchUsers();
+router.get(
+  "/administration",
+  ensureAuthenticated,
+  ensureCurrentUserAndGroup,
+  ensureAdministrator,
+  async (req, res) => {
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = SettingsClean.returnSystemSettings();
+    const systemInformation = SystemRunner.returnInfo();
+    const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+    let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
+    const currentUsers = await fetchUsers();
 
-  res.render("system", {
-    name: req.user.name,
-    userGroup: req.user.group,
-    version: process.env[AppConstants.VERSION_KEY],
-    printerCount: getPrinterStoreCache().getPrinterCount(),
-    page: "System",
-    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    helpers: prettyHelpers,
-    clientSettings,
-    serverSettings,
-    systemInformation,
-    db: fetchMongoDBConnectionString(),
-    dashboardSettings: dashboardSettings,
-    serviceInformation: {
-      isDockerContainer: isDocker(),
-      isNodemon: isNodemon(),
-      isNode: isNode(),
-      isPm2: isPm2(),
-      update: softwareUpdateNotification
-    },
-    currentGitBranch: await getCurrentBranch(),
-    clientVersion: fetchClientVersion(),
-    areWeGitRepo: checkIfWereInAGitRepo(),
-    systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
-    patreonData: returnPatreonData(),
-    currentUsers,
-    taskManagerState: TaskManager.getTaskState()
-  });
-});
+    res.render("administration", {
+      name: req.user.name,
+      userGroup: req.user.group,
+      version: process.env[AppConstants.VERSION_KEY],
+      printerCount: getPrinterStoreCache().getPrinterCount(),
+      page: "Administration",
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      helpers: prettyHelpers,
+      clientSettings,
+      serverSettings,
+      systemInformation,
+      db: fetchMongoDBConnectionString(),
+      dashboardSettings: dashboardSettings,
+      serviceInformation: {
+        isDockerContainer: isDocker(),
+        isNodemon: isNodemon(),
+        isNode: isNode(),
+        isPm2: isPm2(),
+        update: softwareUpdateNotification
+      },
+      currentGitBranch: await getCurrentBranch(),
+      clientVersion: fetchClientVersion(),
+      areWeGitRepo: checkIfWereInAGitRepo(),
+      systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
+      patreonData: returnPatreonData(),
+      currentUsers,
+      taskManagerState: TaskManager.getTaskState()
+    });
+  }
+);
 
 module.exports = router;

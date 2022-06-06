@@ -1,58 +1,34 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const showOnOpen = () => {
+  const toggleNavBarItems = () => {
     setTimeout(() => {
-      const serverVersion = document.getElementById("versionInformation");
-      serverVersion.classList.toggle("d-none");
-      const octoFarmNavLogo = document.getElementById("octofarmNavLogo");
-      octoFarmNavLogo.classList.toggle("d-none");
-      const navTitle = document.getElementById("navTitle");
-      navTitle.classList.toggle("d-none");
+      const serverVersion = document.getElementById("versionInformation"),
+          navTitle = document.getElementById("navTitle"),
+          octoFarmNavLogo = document.getElementById("octofarmNavLogo"),
+          nav = document.getElementById("nav-bar"),
+          body = document.getElementById("body-pd"),
+          header = document.getElementById("header");
+
+      octoFarmNavLogo.classList.toggle("slow-hide");
+      serverVersion.classList.toggle("slow-hide");
+      navTitle.classList.toggle("slow-hide");
+      nav.classList.toggle("expand-nav");
+      // change icon
+      body.classList.toggle("body-pd");
+      // add padding to header
+      header.classList.toggle("body-pd");
     },200)
 
   }
-  const showNavbar = (toggleId, navId, bodyId, headerId, headerIconId) => {
-    const toggle = document.getElementById(toggleId),
-      nav = document.getElementById(navId),
-      body = document.getElementById(bodyId),
-      header = document.getElementById(headerId),
-      headericon = document.getElementById(headerIconId);
-
-
-    console.log(toggle)
-    console.log(nav)
-    console.log(body)
-    console.log(headericon)
+  const showNavbar = (toggleId) => {
+    const toggle = document.getElementById(toggleId)
 
     // Validate that all variables exist
-    if (toggle && nav && body && header && headericon) {
-      console.log("EXISTS")
+    if (toggle) {
       toggle.addEventListener("click", () => {
-        console.log("Toggle")
-        // show navbar
-        nav.classList.toggle("show");
-        // change icon
-        // headericon.classList.add("fa-solid fa-xmark");
-        // add padding to body
-        body.classList.toggle("body-pd");
-        // add padding to header
-        header.classList.toggle("body-pd");
-        showOnOpen();
+        toggleNavBarItems();
       });
     }
   };
 
-  showNavbar("header-toggle", "nav-bar", "body-pd", "header", "header-icon");
-
-  /*===== LINK ACTIVE =====*/
-  const linkColor = document.querySelectorAll(".nav_link");
-
-  function colorLink() {
-    if (linkColor) {
-      linkColor.forEach((l) => l.classList.remove("active"));
-      this.classList.add("active");
-    }
-  }
-  linkColor.forEach((l) => l.addEventListener("click", colorLink));
-
-  // Your code to run since DOM is loaded and ready
+  showNavbar("header-toggle");
 });

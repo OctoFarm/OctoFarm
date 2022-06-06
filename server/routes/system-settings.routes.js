@@ -271,9 +271,9 @@ router.post(
   (req, res) => {
     const file = req.file;
     if (!file) {
-      res.redirect("/system");
+      res.redirect("/administration");
     }
-    res.redirect("/system");
+    res.redirect("/administration");
   }
 );
 router.get("/server/get", ensureAuthenticated, (req, res) => {

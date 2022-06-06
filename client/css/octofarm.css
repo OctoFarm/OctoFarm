@@ -108,7 +108,7 @@ a {
 .nav_link {
   position: relative;
   margin-bottom: 0.5rem;
-  transition: 0.3s;
+  transition: 0.5s;
 }
 .nav_link:hover {
   color: var(--white-colour) !important;
@@ -116,7 +116,7 @@ a {
 .nav_name:hover {
   color: var(--white-colour) !important;
 }
-.show {
+.expand-nav {
   left: 0;
 }
 .body-pd {
@@ -145,12 +145,20 @@ a {
     left: 0;
     padding: 1rem 1rem 0 0;
   }
-  .show {
+  .expand-nav {
     width: calc(var(--nav-width) + 156px);
   }
   .body-pd {
     padding-left: calc(var(--nav-width) + 188px);
   }
+}
+.slow-hide {
+  display: none;
+  transition: 0.5s;
+}
+
+.card {
+  opacity: 0.95 !important;
 }
 /*!*MAIN OVERRIDES*!*/
 /*html {*/
