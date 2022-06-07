@@ -1,38 +1,44 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<% let is_invalid = ""; %>
+<% if(error != ''){ %>
+  <% is_invalid = "is-invalid" %>
+<% } %>
+<div class="row align-items-center vh-100">
+  <div class="col-6 mx-auto">
     <div class="card card-body">
-      <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Login</h1>
+      <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt text-purple"></i> Login</h1>
       <%- include('./partials/messages') %>
-      <form action="/users/login" method="POST" class="was-validated">
-        <div class="form-group">
+      <form action="/users/login" method="POST" class="needs-validation">
+        <div class="form-floating mb-2">
+          <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control <%= is_invalid %>"
+                  placeholder="Enter Username"
+                  autocomplete="username"
+          />
           <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            class="form-control"
-            placeholder="Enter Username"
-            autocomplete="username"
-          />
         </div>
-        <div class="form-group">
+        <div class="form-floating mb-2">
+          <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control <%= is_invalid%>"
+                  placeholder="Enter Password"
+                  autocomplete="current-password"
+          />
           <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="form-control"
-            placeholder="Enter Password"
-            autocomplete="current-password"
-          />
         </div>
-          <div class="custom-control custom-checkbox mb-3">
-            <input title="This does not persist server reboots" type="checkbox" class="custom-control-input" type="checkbox" name="remember_me" value="yes" id="rememberMe" required>
-            <label class="custom-control-label" for="rememberMe">Remember Me!</label>
-            <div class="valid-feedback">Will remember your user session... </div>
-            <div class="invalid-feedback">Not remembering user session.</div>
-          </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" formnovalidate>Login</button>
+        <div class="form-check mb-2">
+          <input title="This does not persist server reboots" name="remember_me" class="form-check-input text-purple" type="checkbox" value="yes" id="rememberMe" aria-describedby="invalidCheck3Feedback" required>
+          <label class="form-check-label" for="invalidCheck3">
+            Remember Me!
+          </label>
+        </div>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-outline-purple " formnovalidate>Login</button>
+        </div>
       </form>
       <p class="lead mt-4">
         <% if(registration){ %> No Account?
