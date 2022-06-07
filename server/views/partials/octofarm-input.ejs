@@ -1,0 +1,20 @@
+<% let value = "" %>
+<% if(typeof inputValue !== "undefined") { %>
+    <% value = inputValue %>
+<% } %>
+<% let invalid = "" %>
+<% if(typeof is_invalid !== "undefined") { %>
+    <% invalid = is_invalid %>
+<% } %>
+<div class="form-floating mb-2">
+    <input
+            type="<%= inputType %>"
+            id="<%= inputID %>"
+            name="<%= inputName %>"
+            class="form-control <%= invalid %>"
+            placeholder="<%= inputPlaceholder %>"
+            autocomplete="<%= inputAutoComplete %>"
+            value="<%= value %>"
+    />
+    <label for="<%= inputID %>"><%= inputLabel %></label>
+</div>

@@ -1,0 +1,85 @@
+<% let base = '..' %>
+<% let textInput = base + '/octofarm-settings-input.ejs' %>
+<% let checkbox = base + '/octofarm-checkbox.ejs' %>
+<% let infoAlert = base + '/octofarm-info-title.ejs' %>
+
+<div class="row">
+    <div class="col-12 col-md-6 col-lg-8">
+        <%- include(infoAlert, {
+                title: "Database Connection",
+                infoID: "infoDatabaseConnection",
+                infoText: "The connection string OctoFarm uses to establish a connection with it's database"
+            })
+        %>
+        <%- include(textInput, {
+                inputID: "serverDatabaseURI",
+                inputType: "text",
+                inputTag: "Mongo URI",
+                inputPlaceholder: "mongodb://127.0.0.1:27017/octofarm",
+                inputValue: "mongodb://127.0.0.1:27017/octofarm",
+                requiresRestart: true
+            })
+        %>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <%- include(infoAlert, {
+                title: "Server Port Number",
+                infoID: "infoPortNumber",
+                infoText: "The port number the OctoFarm server will accept connections on"
+            })
+        %>
+        <%- include(textInput, {
+                inputID: "serverDatabaseURI",
+                inputType: "number",
+                inputTag: "Port",
+                inputStep: 1,
+                inputPlaceholder: "4000",
+                inputValue: "4000",
+                requiresRestart: true
+            })
+        %>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <%- include(infoAlert, {
+                title: "Activate Login",
+                infoID: "infoLogin",
+                infoText: "Require a user account and activate login for the OctoFarm server"
+            })
+        %>
+        <form class="was-validated">
+            <div class="custom-control custom-checkbox mb-3">
+                <input type="checkbox" class="custom-control-input"
+                       id="requireLogin" required <%= (serverSettings.server.loginRequired) ? "checked" : "" %>
+                >
+                <label class="custom-control-label"
+                       for="requireLogin">Require a login</label>
+                <div class="valid-feedback">Login turned on</div>
+                <div class="invalid-feedback">Login turned off</div>
+            </div>
+            <code class="mt-0">Requires a restart</code>
+        </form>
+    </div>
+    <div class="col-12 col-md-6 col-lg-4">
+        <%- include(infoAlert, {
+                title: "Activate Registration",
+                infoID: "infodRegistration",
+                infoText: "Activate registration so users can create their own account"
+            })
+        %>
+        <form class="was-validated">
+            <div class="custom-control custom-checkbox mb-3">
+                <input type="checkbox" class="custom-control-input"
+                       id="requireRegistration" required <%= (serverSettings.server.registration) ? "checked" : "" %>
+                >
+                <label class="custom-control-label"
+                       for="requireRegistration">Registration</label>
+                <div class="valid-feedback">Registration is turned
+                    on
+                </div>
+                <div class="invalid-feedback">Registration is turned
+                    off
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

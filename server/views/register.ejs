@@ -1,41 +1,81 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<% let base = "./partials" %>
+<% let input = base + "/octofarm-input.ejs" %>
+<% let alert = base + "/octofarm-alert.ejs" %>
+
+<% let password_invalid = ""; %>
+<% let username_invalid = ""; %>
+<% if(typeof errors !== "undefined"){ %>
+  <% console.log(errors) %>
+  <% errors.forEach(error => { %>
+    <% if(error.msg.includes("Password")) {  %>
+      <% password_invalid = "is-invalid" %>
+    <% } %>
+    <% if(error.msg.includes("Username")) {  %>
+      <% username_invalid = "is-invalid" %>
+    <% } %>
+  <% }) %>
+<% } %>
+<div class="row align-items-center vh-100">
+  <div class="col-md-6 mx-auto">
     <div class="card card-body">
-      <h1 class="text-center mb-3">
-        <i class="fas fa-user-plus"></i> Register
-      </h1>
+      <% if(userCount === 0){ %>
+        <h1 class="text-center mb-3"><i class="fas fa-user-plus text-purple"></i> Initial User Creation!</h1>
+      <% } else { %>
+        <h1 class="text-center mb-3"><i class="fas fa-user-plus text-purple"></i> Registration</h1>
+      <% } %>
+
       <%- include('./partials/messages') %>
       <% if(userCount === 0){ %>
-        <div class="alert alert-warning text-dark" role="alert">
-          This will create an Administrator... After you have registered, registration will be disabled and you can either enable it again or manage your users on the "System" page.
-        </div>
+        <%- include(alert, {
+          alertType: "warning",
+          alertMessage: "This will create your first administrator user for OctoFarm. Subsquent user registrations will be considered 'User' groups"
+        })%>
       <% } %>
       <form action="/users/register" method="POST">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
-            value="<%= typeof name != 'undefined' ? name : '' %>" />
+        <%- include(input, {
+          inputType: "name",
+          inputID: "name",
+          inputName: "name",
+          inputPlaceholder: "Enter Name",
+          inputAutoComplete: "name",
+          inputLabel: "New Name",
+          inputValue: typeof name != 'undefined' ? name : ''
+        }) %>
+        <%- include(input, {
+          inputType: "text",
+          inputID: "username",
+          inputName: "username",
+          is_invalid: username_invalid,
+          inputPlaceholder: "Enter Username",
+          inputAutoComplete: "username",
+          inputLabel: "Create Username",
+          inputValue: typeof username != 'undefined' ? username : ''
+        }) %>
+        <%- include(input, {
+          inputType: "password",
+          inputID: "password",
+          inputName: "password",
+          is_invalid: password_invalid,
+          inputPlaceholder: "Create Password",
+          inputAutoComplete: "new-password",
+          inputLabel: "Create Password",
+          inputValue: typeof password != 'undefined' ? password : ''
+        }) %>
+        <%- include(input, {
+          inputType: "password",
+          inputID: "password2",
+          inputName: "password2",
+          is_invalid: password_invalid,
+          inputPlaceholder: "Confirm Password",
+          inputAutoComplete: "new-password",
+          inputLabel: "Confirm Password",
+          inputValue: typeof password2 != 'undefined' ? password2 : ''
+        }) %>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-outline-purple " onSubmit="this.disabled=true; this.value='Registering…';" formnovalidate>Register</button>
         </div>
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
-            value="<%= typeof username != 'undefined' ? username : '' %>" />
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" autocomplete="new-password"
-            value="<%= typeof password != 'undefined' ? password : '' %>" />
-        </div>
-        <div class="form-group">
-          <label for="password2">Confirm Password</label>
-          <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
-            value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
-        </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" onSubmit="this.disabled=true; this.value='Registering…';">
-          Register
-        </button>
       </form>
-      <% if(userCount === 0){ %>
+      <% if(userCount !== 0){ %>
         <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
       <% } %>
     </div>

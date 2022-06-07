@@ -42,6 +42,7 @@ router.get("/", async (req, res) => {
     } else {
       res.render("welcome", {
         page: "Welcome",
+        layout: "layout-no-sign-in",
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
         registration,
         serverSettings: serverSettings
