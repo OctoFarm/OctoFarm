@@ -1,3 +1,7 @@
+<% let base = "./partials" %>
+<% let checkbox = base + "/octofarm-checkbox.ejs" %>
+<% let input = base + "/octofarm-input.ejs" %>
+
 <% let is_invalid = ""; %>
 <% if(error != ''){ %>
   <% is_invalid = "is-invalid" %>
@@ -8,34 +12,30 @@
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt text-purple"></i> Login</h1>
       <%- include('./partials/messages') %>
       <form action="/users/login" method="POST" class="needs-validation">
-        <div class="form-floating mb-2">
-          <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  class="form-control <%= is_invalid %>"
-                  placeholder="Enter Username"
-                  autocomplete="username"
-          />
-          <label for="username">Username</label>
-        </div>
-        <div class="form-floating mb-2">
-          <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  class="form-control <%= is_invalid%>"
-                  placeholder="Enter Password"
-                  autocomplete="current-password"
-          />
-          <label for="password">Password</label>
-        </div>
-        <div class="form-check mb-2">
-          <input title="This does not persist server reboots" name="remember_me" class="form-check-input text-purple" type="checkbox" value="yes" id="rememberMe" aria-describedby="invalidCheck3Feedback" required>
-          <label class="form-check-label" for="invalidCheck3">
-            Remember Me!
-          </label>
-        </div>
+        <%- include(input, {
+          inputType: "text",
+          inputID: "username",
+          inputName: "username",
+          is_invalid,
+          inputPlaceholder: "Enter Username",
+          inputAutoComplete: "username",
+          inputLabel: "Username"
+        }) %>
+        <%- include(input, {
+          inputType: "text",
+          inputID: "password",
+          inputName: "password",
+          is_invalid,
+          inputPlaceholder: "Enter Password",
+          inputAutoComplete: "current-password",
+          inputLabel: "Password"
+        }) %>
+        <%- include(checkbox, {
+          checkBoxID: "rememberMe",
+          checkBoxTitle: "Remember you login... This does not persist server reboots",
+          checkBoxText: "Remember Me!",
+          checkBoxValue: ""
+        }) -%>
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-outline-purple " formnovalidate>Login</button>
         </div>

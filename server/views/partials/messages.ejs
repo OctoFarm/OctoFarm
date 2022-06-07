@@ -1,6 +1,6 @@
 <% if(typeof errors !== 'undefined'){ %>
   <% errors.forEach(function(error) { %>
-    <div class="alert alert-warning d-flex align-items-center" role="alert">
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
       <i class="fa-solid fa-triangle-exclamation me-3"></i>
       <div>
         <%= error.msg %>

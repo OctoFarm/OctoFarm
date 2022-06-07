@@ -33,6 +33,7 @@
     <link rel="mask-icon" href="/safari-pinned-tab.svg?<%= clientVersion %>" color="#5bbad5">
     <link rel="stylesheet" href="/assets/dist/vendor.css?<%= clientVersion %>"/>
     <link rel="stylesheet" href="/assets/dist/octofarm.css?<%= clientVersion %>"/>
+    <link rel="stylesheet" href="/assets/dist/navigation.css?<%= clientVersion %>"/>
     <title><%= octoFarmPageTitle %>: <%= page %></title>
     <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/client-error.modal.min.js?<%= clientVersion %>"></script>
@@ -43,7 +44,7 @@
     <script src="/assets/dist/events.service.min.js?<%= clientVersion %>"></script>
 </head>
 
-<body id="body-pd" class="container">
+<body id="body-pd" class="body-pd">
 <%- include(header, { monitoringSettings, currentUserGroup }) -%>
 <%- include(navbar, { octoFarmPageTitle, currentUserGroup }) -%>
 <!--Container Main start-->
@@ -52,9 +53,6 @@
     <%- include(octofarmErrorModal) %>
 
 <!--Container Main end-->
-</div>
-
-
 <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
      aria-labelledby="printerManagerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">

@@ -26,6 +26,7 @@ const logger = new Logger("OctoFarm-API");
 router.get("/login", async (_req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   res.render("login", {
+    layout: "layout-no-sign-in",
     page: "Login",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     registration: serverSettings.server.registration,
@@ -78,6 +79,7 @@ router.get("/register", async (_req, res) => {
 
   let currentUsers = await fetchUsers();
   res.render("register", {
+    layout: "layout-no-sign-in",
     page: "Register",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     serverSettings: serverSettings,
