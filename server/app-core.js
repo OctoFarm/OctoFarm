@@ -24,6 +24,7 @@ const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
 const { ensureClientServerVersion } = require("./middleware/client-server-version");
 const { ensureAuthenticated } = require("./middleware/auth");
+const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -148,11 +149,14 @@ function serveOctoFarmRoutes(app) {
   ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
   app.use(
     "/events",
-    ensureAuthenticated,
+    ensureCurrentUserAndGroup,
     require("./routes/sse.events.routes.js", { page: "route" })
   );
-
-  app.use(`${AppConstants.apiRoute}/data`, require("./routes/non-specific-data.routes.js"));
+  app.use(
+    `${AppConstants.apiRoute}/data`,
+    ensureAuthenticated,
+    require("./routes/non-specific-data.routes.js")
+  );
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));

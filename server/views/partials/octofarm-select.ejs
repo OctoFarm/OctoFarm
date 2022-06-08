@@ -1,0 +1,19 @@
+<div class="vstack gap-3">
+    <div class="input-group">
+        <label class="input-group-text" for="<%= selectID %>"><%= selectLabel %></label>
+        <select class="form-select" id="<%= selectID %>">
+            <% selectOptions.forEach(option => { %>
+                <option value="<%= option.toLowerCase().replace("/ /g", "_") %>"><%= option %></option>
+            <% }) %>
+        </select>
+    </div>
+    <% if(typeof requiresRestart !== "undefined" && requiresRestart) { %>
+        <code class="mt-0">Requires a restart</code>
+    <% } %>
+</div>
+
+<script>
+    const select = document.getElementById("<%= selectID %>")
+    const value = "<%= selectValue %>"
+    select.value = value.toLowerCase().replace("/ /g", "_")
+</script>
