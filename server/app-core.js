@@ -24,6 +24,8 @@ const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
 const { ensureClientServerVersion } = require("./middleware/client-server-version");
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+const { ensureAuthenticated } = require("./middleware/auth");
+const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
@@ -124,7 +126,6 @@ async function ensureSystemSettingsInitiated() {
  * @param app
  */
 function serveOctoFarmRoutes(app) {
-
   app.use(ensureClientServerVersion);
 
   //TODO migrate non-page routes to /api
@@ -149,8 +150,13 @@ function serveOctoFarmRoutes(app) {
   ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
   app.use(
     "/events",
-    ensureAuthenticated,
+    ensureCurrentUserAndGroup,
     require("./routes/sse.events.routes.js", { page: "route" })
+  );
+  app.use(
+    `${AppConstants.apiRoute}/data`,
+    ensureAuthenticated,
+    require("./routes/non-specific-data.routes.js")
   );
 
   app.use(`${AppConstants.apiRoute}/data`, require("./routes/non-specific-data.routes.js"));

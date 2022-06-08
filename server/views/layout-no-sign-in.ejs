@@ -5,6 +5,7 @@
 <% if(typeof userGroup !== "undefined") { %>
     <% currentUserGroup = userGroup %>
 <% } %>
+<% const modal = base + '/octofarm-modal.ejs' %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -24,12 +25,12 @@
     <link rel="stylesheet" href="/assets/dist/overrides.css?<%= clientVersion %>"/>
     <link rel="stylesheet" href="/assets/dist/background.css?<%= clientVersion %>"/>
     <title><%= octoFarmPageTitle %>: <%= page %></title>
-    <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
-    <script src="/assets/dist/client-error.modal.min.js?<%= clientVersion %>"></script>
     <script src="/assets/jquery.min.js?<%= clientVersion %>"></script>
     <script src="/assets/bootbox.min.js?<%= clientVersion %>"></script>
-    <script src="/assets/dist/bootstrap.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/vendor.min.js?<%= clientVersion %>"></script>
+    <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
+    <script src="/assets/dist/client-error.modal.min.js?<%= clientVersion %>"></script>
+    <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/events.service.min.js?<%= clientVersion %>"></script>
 </head>
 
@@ -37,30 +38,21 @@
 <!--Container Main start-->
 
     <%- body %>
-    <%- include(octofarmErrorModal) %>
-    <div class="modal fade" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection"
-         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="lostServerConnection"><i class="fa-solid fa-satellite-dish"></i> Lost Connection to Server...</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
-                                <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
-                                <p id="lostConnectionText">Attempting to reconnect in... <span id="lostServerConnectionTimer"></span></p>
-                                <button class="btn btn-outline-success" id="forceRefreshPageButton"><i class="fas fa-redo"></i> Refresh Page</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 <!--Container Main end-->
 </body>
+
+<%- include(octofarmErrorModal) %>
+<%- include(modal, {
+modal:{
+id: "lostConnection",
+title: "<i class='fa-solid fa-satellite-dish text-purple'></i> Lost Connection to Server...",
+isBodyScrollable: "false",
+centered: true,
+size: "modal-md",
+noClose: true
+},
+bodyFile:'./ModalContents/lostConnection.ejs'
+})
+%>
 
 </html>

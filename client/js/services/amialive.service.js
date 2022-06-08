@@ -1,5 +1,5 @@
 import { reloadWindow } from "../utils/window.utils";
-import { Modal } from "bootstrap";
+import Modal from "bootstrap/js/dist/modal"
 
 let countDownInterval = false;
 let triggerTimeout = false;

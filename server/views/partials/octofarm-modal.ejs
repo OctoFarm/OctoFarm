@@ -1,14 +1,18 @@
-<% let scrollable = "" %>
+<% let scrollable = ""; %>
 <% if (typeof modal.isBodyScrollable !== "undefined") { %>
-<% scrollable = "modal-dialog-scrollable" %>
+<% scrollable = "modal-dialog-scrollable"; %>
 <% } %>
-<% let size = "modal-xl"  %>
+<% let size = "modal-xl";  %>
 <% if (typeof modal.size !== "undefined") { %>
-    <% size = modal.size %>
+    <% size = modal.size; %>
 <% } %>
-<% let centered = "" %>
+<% let centered = ""; %>
 <% if (typeof modal.centered !== "undefined") { %>
-    <% centered = "modal-dialog-centered" %>
+    <% centered = "modal-dialog-centered"; %>
+<% } %>
+<% let no_close = ""; %>
+<% if (typeof modal.noClose !== "undefined") { %>
+    <% no_close = "d-none"; %>
 <% } %>
 
 <div class="modal" id="<%= modal.id %>Modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="<%= modal.id %>ModalLabel">
@@ -17,7 +21,7 @@
             <div class="modal-header">
                 <span id="<%= modal.id %>Index" value="" style="display: none;"></span>
                 <h5 class="modal-title" id="<%= modal.id %>Title"><%- modal.title %></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close <%= no_close %>" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <% if (!bodyFile) { %>
@@ -27,7 +31,7 @@
                     <%- include(bodyFile) %>
                 <% } %>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer <%= no_close %>">
                 <button type="button" class="btn btn-outline-purple" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

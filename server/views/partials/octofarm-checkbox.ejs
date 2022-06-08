@@ -1,6 +1,12 @@
-<div class="form-check mb-2">
-    <input title="This does not persist server reboots" name="remember_me" class="form-check-input text-purple" type="checkbox" value="yes" id="rememberMe" aria-describedby="invalidCheck3Feedback" required>
-    <label class="form-check-label" for="invalidCheck3">
-        Remember Me!
-    </label>
+
+<div class="custom-control custom-checkbox mb-3">
+    <input type="checkbox" class="custom-control-input" id="<%= checkboxID %>" required <%= (checkboxChecked) ? "checked" : "" %>>
+    <label class="custom-control-label"
+           for="<%= checkboxID %>"><%= checkboxLabel %></label>
+    <div class="valid-feedback"><%= checkboxOnLable %></div>
+    <div class="invalid-feedback"><%= checkboxOffLabel %></div>
 </div>
+<% if(typeof requiresRestart !== "undefined" && requiresRestart) { %>
+    <code class="mt-0">Requires a restart</code>
+<% } %>
+

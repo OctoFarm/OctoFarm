@@ -1,5 +1,5 @@
 <% let base = "./partials" %>
-<% let checkbox = base + "/octofarm-checkbox.ejs" %>
+<% let checkBox = base + "/octofarm-checkbox.ejs" %>
 <% let input = base + "/octofarm-input.ejs" %>
 
 <% let is_invalid = ""; %>
@@ -22,7 +22,7 @@
           inputLabel: "Username"
         }) %>
         <%- include(input, {
-          inputType: "text",
+          inputType: "password",
           inputID: "password",
           inputName: "password",
           is_invalid,
@@ -30,12 +30,13 @@
           inputAutoComplete: "current-password",
           inputLabel: "Password"
         }) %>
-        <%- include(checkbox, {
-          checkBoxID: "rememberMe",
-          checkBoxTitle: "Remember you login... This does not persist server reboots",
-          checkBoxText: "Remember Me!",
-          checkBoxValue: ""
-        }) -%>
+        <%- include(checkBox, {
+        checkboxID: "rememberMe",
+        checkboxChecked: false,
+        checkboxLabel: "Remember Me!",
+        checkboxOnLable: "Remembering your login details",
+        checkboxOffLabel: "No remembering your login details"
+        }) %>
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-outline-purple " formnovalidate>Login</button>
         </div>
