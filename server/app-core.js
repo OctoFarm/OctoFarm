@@ -59,8 +59,6 @@ function setupExpressServer() {
 
   const viewsPath = getViewsPath();
 
-  //TODO move this back to local builds... no point adding remote dependency for client...
-
   if (process.env.NODE_ENV === "production") {
     const { getOctoFarmUiPath } = require("@notexpectedyet/octofarm-client");
     const bundlePath = getOctoFarmUiPath();
@@ -129,6 +127,7 @@ function serveOctoFarmRoutes(app) {
 
   app.use(ensureClientServerVersion);
 
+  //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
@@ -148,7 +147,13 @@ function serveOctoFarmRoutes(app) {
     "/monitoringInfo",
     require("./routes/sse.printer-monitoring.routes.js", { page: "route" })
   ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
-  app.use("/events", require("./routes/sse.events.routes.js", { page: "route" }));
+  app.use(
+    "/events",
+    ensureAuthenticated,
+    require("./routes/sse.events.routes.js", { page: "route" })
+  );
+
+  app.use(`${AppConstants.apiRoute}/data`, require("./routes/non-specific-data.routes.js"));
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));

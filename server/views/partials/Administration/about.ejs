@@ -1,0 +1,89 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 ps-5 pe-5">
+                    <p>OctoFarm is the creation of James Mackay a bloke from the UK. It was designed after using
+                        the wonderful software Octoprint for well over a year
+                        before getting his second printer. Realising he could only
+                        control/monitor one printer from the Octoprint interface he decided
+                        to write his own implementation using the API in Octoprint. This
+                        spawned OctoFarm which is used
+                        currently for monitoring and managing multiple Octoprint attached
+                        printers. <br>If you would like to say thanks to James for designing
+                        this free and open source software package then feel free to send
+                        him a donation using the
+                        buttons on this page, or come along to one of our wonderful growing communities.</p>
+                </div>
+                <div class="col-sm-12 col-md-4">
+                    <h4>Community</h4><hr>
+                    <a type="button" class="btn btn-primary mb-2" href="https://www.facebook.com/groups/octofarm" target="_blank"><i class="fab fa-facebook-square"></i> Facebook</a><br>
+                    <a type="button" class="btn btn-outline-light mb-2" href="https://discord.gg/vjabMUn" target="_blank"><i class="fab fa-discord"></i> Discord</a><br>
+                    <a type="button" class="btn btn-light mb-2" href="https://github.com/NotExpectedYet/OctoFarm/discussions" target="_blank"><i class="fab fa-github-square"></i> Github Discussions</a><br>
+                    <a type="button" class="btn btn-secondary mb-2" href="https://www.reddit.com/r/OctoFarm/" target="_blank"><i class="fab fa-reddit"></i> Reddit</a><br>
+                    <a type="button" class="btn btn-danger mb-2" href="https://www.youtube.com/channel/UClQWO3lxmQRreJVpjTrxELA" target="_blank"><i class="fab fa-youtube"></i> Youtube</a><br>
+                    <a type="button" class="btn btn-outline-dark" href="https://octofarm.net/blog" target="_blank"><i class="fas fa-rss"></i> Blog</a>
+                </div>
+                <div class="col-sm-12 col-md-4">
+                    <h4>Sponsor Links</h4><hr>
+                    <a type="button" class="btn btn-danger mb-2" href="https://www.patreon.com/NotExpectedYet" target="_blank"><i class="fab fa-patreon"></i> Patreon</a><br>
+                    <a type="button" class="btn btn-info mb-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url" target="_blank"><i class="fab fa-paypal"></i> Paypal</a><br>
+                    <a type="button" class="btn btn-primary" href="https://buymeacoffee.com/OctoFarm" target="_blank"><i class="fas fa-mug-hot"></i> Buy Me a Coffee!</a>
+                </div>
+                <div class="col-sm-12 col-md-4">
+                    <h4>Documentation</h4><hr>
+                    <a type="button" class="btn btn-warning dark-text mb-2" href="https://docs.octofarm.net/getting-started/" target="_blank"><i class="fas fa-play-circle"></i> Getting Started</a><br>
+                    <a type="button" class="btn btn-info mb-2" href="https://docs.octofarm.net/installation/" target="_blank"><i class="fas fa-cloud-download-alt"></i> Installation</a><br>
+                    <a type="button" class="btn btn-secondary mb-2" href="https://docs.octofarm.net/guides/" target="_blank"><i class="fas fa-clipboard-list"></i> Guides</a><br>
+                    <a type="button" class="btn btn-light" href="https://github.com/OctoFarm/" target="_blank"><i class="fab fa-github"></i> Github</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 text-center">
+            <h5>Big thanks to the following Supporters!</h5><hr>
+            <div class="row" id="aboutPatreonsList">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    const patreonDataList = document.getElementById("aboutPatreonsList");
+    const aboutOctoFarmModal = document.getElementById("aboutModal");
+    const patreonTemplate = (patreon) => {
+        return `
+            <div class="col-12 col-sm-6 col-md-3 col-lg-2 text-center">
+                <li class="list-group-item">
+                    <div class="patreon-user"> <img class="patreon-img" src="${patreon.thumb}"></div>
+                    <i style="color:gold;" class="fas fa-trophy"></i>
+                        ${patreon.name}
+                    <i style="color:gold;" class="fas fa-trophy"></i>
+                </li>
+            </div>
+        `
+    }
+
+    aboutOctoFarmModal.addEventListener("show.bs.modal", async () => {
+        if(patreonDataList.innerHTML.includes("spinner")){
+            const patreon = await fetch("api/data/patreons", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+            if(patreon.ok){
+                const patreonData = await patreon.json()
+                patreonDataList.innerHTML = "";
+                patreonData.forEach(patreon => {
+                    patreonDataList.insertAdjacentHTML("beforeend", patreonTemplate(patreon))
+                })
+            }
+        }
+    })
+
+</script>

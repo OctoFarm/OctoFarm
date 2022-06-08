@@ -158,25 +158,33 @@
     </div>
 </div>
 <%- include(modal, {
-modal:{
-id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true", zIndex: 99999
-},
-bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
+    modal:{
+        id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true"
+    },
+    bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
+    })
+%>
+<%- include(modal, {
+    modal:{
+        id:"printerSelect", title:"Printer Select: "
+    },
+    bodyFile:'./PrinterManager/printerSelect.modal.ejs'
 })
 %>
 <%- include(modal, {
-modal:{
-id:"printerSelect", title:"Printer Select: "
-},
-bodyFile:'./PrinterManager/printerSelect.modal.ejs'
-})
+    modal:{
+        id:"bulkPrintSetup", title:"Multi-Print Setup: "
+    },
+    bodyFile:'./PrinterManager/bulkPrintSetup.modal.ejs'
+    })
 %>
+
 <%- include(modal, {
-modal:{
-id:"bulkPrintSetup", title:"Multi-Print Setup: "
-},
-bodyFile:'./PrinterManager/bulkPrintSetup.modal.ejs'
-})
+    modal:{
+        id:"about", title:"About OctoFarm", isBodyScrollable: "true"
+    },
+    bodyFile:'./Administration/about.ejs'
+    })
 %>
 
 </body>
