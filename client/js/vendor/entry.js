@@ -6,7 +6,7 @@ import lodash from "lodash/lodash.min";
 import jplist from "./jplist.min";
 import "./darkmode.min";
 // You can specify which plugins you need
-import { Tooltip, Toast, Popover } from "bootstrap";
+import { Modal } from "bootstrap";
 import "../../css/vendor/theme.css";
 import "@fortawesome/fontawesome-free/js/fontawesome"
 import "@fortawesome/fontawesome-free/js/solid"
@@ -20,7 +20,5 @@ module.export = {
   lodash,
   Noty,
   Sortable,
-  Tooltip,
-  Toast,
-  Popover
+  Modal
 };

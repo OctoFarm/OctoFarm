@@ -1,4 +1,5 @@
 import { reloadWindow } from "../utils/window.utils";
+import { Modal } from "bootstrap";
 
 let countDownInterval = false;
 let triggerTimeout = false;
@@ -44,22 +45,31 @@ export const drawModal = async () => {
 
   if (!triggerTimeout) {
     triggerTimeout = setTimeout(() => {
-      $("#lostServerConnection").modal("show");
+      const lostServerConnectionElement = document.getElementById(
+          "lostConnectionModal"
+      );
+      const lostServerConnectionModal = new Modal(lostServerConnectionElement)
+
+      lostServerConnectionModal.show();
       triggerTimeout = false;
     }, 5000);
   }
 };
 export const closeModal = async () => {
-  $("#lostServerConnection").modal("hide");
+  const lostServerConnectionElement = document.getElementById(
+      "lostConnectionModal"
+  );
+  const lostServerConnectionModal = new Modal(lostServerConnectionElement)
+  lostServerConnectionModal.hide();
 };
 export const setServerAlive = async (message) => {
   window.serverOffline = false;
-  const lostServerConnectionModal = document.getElementById(
-    "lostServerConnection"
+  const lostServerConnectionElement = document.getElementById(
+    "lostConnectionModal"
   );
   if (
-    lostServerConnectionModal &&
-    lostServerConnectionModal.className.includes("show")
+    lostServerConnectionElement &&
+    lostServerConnectionElement.className.includes("show")
   ) {
     // If user has login enabled then we need to refresh the session..
     let reMessage = "";
