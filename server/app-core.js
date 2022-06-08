@@ -22,8 +22,8 @@ const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
-const {ensureClientServerVersion} = require("./middleware/client-server-version");
-
+const { ensureClientServerVersion } = require("./middleware/client-server-version");
+const { ensureAuthenticated } = require("./middleware/auth");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -58,8 +58,6 @@ function setupExpressServer() {
   app.use(express.json());
 
   const viewsPath = getViewsPath();
-
-  //TODO move this back to local builds... no point adding remote dependency for client...
 
   if (process.env.NODE_ENV === "production") {
     const { getOctoFarmUiPath } = require("@notexpectedyet/octofarm-client");
@@ -126,9 +124,9 @@ async function ensureSystemSettingsInitiated() {
  * @param app
  */
 function serveOctoFarmRoutes(app) {
-
   app.use(ensureClientServerVersion);
 
+  //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
@@ -148,7 +146,13 @@ function serveOctoFarmRoutes(app) {
     "/monitoringInfo",
     require("./routes/sse.printer-monitoring.routes.js", { page: "route" })
   ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
-  app.use("/events", require("./routes/sse.events.routes.js", { page: "route" }));
+  app.use(
+    "/events",
+    ensureAuthenticated,
+    require("./routes/sse.events.routes.js", { page: "route" })
+  );
+
+  app.use(`${AppConstants.apiRoute}/data`, require("./routes/non-specific-data.routes.js"));
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));

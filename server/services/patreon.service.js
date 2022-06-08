@@ -5,7 +5,7 @@ const Logger = require("../handlers/logger");
 const logger = new Logger("OctoFarm-Server");
 
 function returnPatreonData() {
-  return patreonData;
+  return patreonData || [];
 }
 
 async function grabLatestPatreonData() {

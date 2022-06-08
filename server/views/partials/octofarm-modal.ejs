@@ -2,26 +2,19 @@
 <% if (typeof modal.isBodyScrollable !== "undefined") { %>
 <% scrollable = "modal-dialog-scrollable" %>
 <% } %>
-<% let zIndex = 1050 %>
-<% if (typeof modal.zIndex !== "undefined") { %>
-    <% zIndex = modal.zIndex %>
-<% } %>
 <% let size = "modal-xl"  %>
 <% if (typeof modal.size !== "undefined") { %>
     <% size = modal.size %>
 <% } %>
 
 <div class="modal fade" id="<%= modal.id %>Modal" tabindex="-1" role="dialog"
-     aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true" style="z-index: <%= zIndex %>;">
+     aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true">
     <div class="modal-dialog <%=size %> <%= scrollable %>" role="document">
         <div class="modal-content bg-dark text-light">
             <div class="modal-header px-3 pt-3 pb-2">
                 <span id="<%= modal.id %>Index" value="" style="display: none;"></span>
-                <h5 id="<%= modal.id %>Title"><%= modal.title %></h5>
-                <button id="<%= modal.id %>ModalBtn" type="button" class="close" data-dismiss="modal"
-                        aria-label="Close">
-                    <span class="text-white" aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="<%= modal.id %>Title"><%= modal.title %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                     <div class="row" id="<%= modal.id %>">

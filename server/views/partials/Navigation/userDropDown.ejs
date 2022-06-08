@@ -18,17 +18,13 @@
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="#"><i class="fa-solid fa-display"></i> Client Settings</a></li>
         <% if(currentUserGroup === "Administrator"){ %>
-            //TODO new system information modal
-            <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle"></i>  Information</a></li>
+            <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle"></i>  System Information</a></li>
             <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench"></i> Administration</a></li>
-            //TODO new users page
             <li><a class="dropdown-item" href="/users"><i class="fa-solid fa-users"></i> Users</a></li>
-            //TODO new logs modal
             <li><a class="dropdown-item" href="#"><i class="fa-solid fa-clipboard"></i> Logs</a></li>
         <% } %>
         <% if(currentUserGroup === "Administrator"){ %>
-            //TODO about modal
-            <li><a class="dropdown-item" href=""><i class="fa-solid fa-address-card"></i> About</a></li>
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal"><i class="fa-solid fa-address-card"></i> About</a></li>
         <% } %>
 
         <% if(serverSettings.server.loginRequired){ %>

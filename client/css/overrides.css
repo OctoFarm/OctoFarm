@@ -6,10 +6,12 @@
     --sidebar-colour: #212020;
     --octofarm-colour: #7a4cc7;
 }
+
 a {
     text-decoration: none;
 }
 
+/* COLOURS */
 .text-purple {
     color: var(--octofarm-colour);
 }
@@ -18,6 +20,7 @@ a {
     color: var(--white-colour) !important;
 }
 
+/* BUTTONS */
 .btn-outline-purple {
     color: var(--octofarm-colour);
     border-color: var(--octofarm-colour);
@@ -28,10 +31,6 @@ a {
     border-color: var(--white-colour);
 }
 
-.card {
-    opacity: 0.95 !important;
-}
-
 .btn-circle.btn-sm {
     width: 20px;
     height: 20px;
@@ -40,3 +39,27 @@ a {
     font-size: 10px;
     text-align: center;
 }
+
+/* CARD */
+.card {
+    opacity: 0.95 !important;
+}
+
+/* SCROLL BAR */
+::-webkit-scrollbar {
+  width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #303030;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
