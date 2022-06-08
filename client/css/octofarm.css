@@ -43,6 +43,15 @@ a {
 .card {
   opacity: 0.95 !important;
 }
+
+.btn-circle.btn-sm {
+  width: 20px;
+  height: 20px;
+  padding: 2px 0;
+  border-radius: 15px;
+  font-size: 10px;
+  text-align: center;
+}
 /*!*MAIN OVERRIDES*!*/
 /*html {*/
 /*  height: 100%;*/
