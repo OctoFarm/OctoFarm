@@ -1,4 +1,9 @@
-
+body {
+  position: relative;
+  margin: var(--header-height) 0 0 0;
+  padding: 0 1rem;
+  transition: 0.5s;
+}
 .header {
   width: 100%;
   height: calc(var(--header-height) + 1rem);
@@ -16,7 +21,7 @@
 .header_toggle {
   font-size: 1.5rem;
   cursor: pointer;
-  justify-content:  flex-start;
+  justify-content: flex-start;
 }
 .l-navbar {
   position: fixed;
