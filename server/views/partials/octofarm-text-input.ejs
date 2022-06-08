@@ -1,0 +1,18 @@
+<% let step = "" %>
+<% if (typeof inputStep !== "undefined") { %>
+    <% step = `step=${inputStep}` %>
+<% } %>
+<div class="vstack gap-3">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"><%= inputTag %>:</span>
+        </div>
+        <input id="<%= inputID %>" type="<%= inputType %>" class="form-control"
+               placeholder="<%= inputPlaceholder %>" aria-label="Refresh Rate"
+               value="<%= inputValue %>" <%= step %>>
+    </div>
+    <% if(typeof requiresRestart !== "undefined" && requiresRestart) { %>
+        <code class="mt-0">Requires a restart</code>
+    <% } %>
+</div>
+

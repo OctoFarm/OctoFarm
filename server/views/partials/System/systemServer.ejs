@@ -123,28 +123,7 @@
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="client-settings"
                  role="tabpanel" aria-labelledby="client-settings-list">
-                <div class="row">
-                    <div class="col-12 col-md-4">
-                        <p class="font-weight-bold">Change Background</p>
-                        <p>Click the button below to upload your background
-                            image.</p>
-                        <small>NOTE: You may need to refresh your browser cache if
-                            this doesn't apply straight away.</small>
-                        <form action="/settings/backgroundUpload"
-                              enctype="multipart/form-data" method="POST">
-                            <input class="btn bg-secondary" type="file"
-                                   name="myFile"
-                                   accept="image/jpeg,image/png,image/jpg"/>
-                            <input id="backgroundSubmit" class="btn btn-primary"
-                                   type="submit" value="Upload"
-                                   accept="image/jpeg,image/png">
-                        </form>
-                        <p> Supports <code>PNG, JPG</code></p>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <img width="100%" src="/images/bg.jpg">
-                    </div>
-                </div>
+
             </div>
             <div class="tab-pane fade" id="server-settings"
                  role="tabpanel" aria-labelledby="server-settings-list">
