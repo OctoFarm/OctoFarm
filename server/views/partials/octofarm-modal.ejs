@@ -6,28 +6,29 @@
 <% if (typeof modal.size !== "undefined") { %>
     <% size = modal.size %>
 <% } %>
+<% let centered = "" %>
+<% if (typeof modal.centered !== "undefined") { %>
+    <% centered = "modal-dialog-centered" %>
+<% } %>
 
-<div class="modal fade" id="<%= modal.id %>Modal" tabindex="-1" role="dialog"
-     aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true">
-    <div class="modal-dialog <%=size %> <%= scrollable %>" role="document">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header px-3 pt-3 pb-2">
+<div class="modal" id="<%= modal.id %>Modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="<%= modal.id %>ModalLabel">
+    <div class="modal-dialog <%=size %> <%= scrollable %> <%= centered %>">
+        <div class="modal-content">
+            <div class="modal-header">
                 <span id="<%= modal.id %>Index" value="" style="display: none;"></span>
-                <h5 class="modal-title" id="<%= modal.id %>Title"><%= modal.title %></h5>
+                <h5 class="modal-title" id="<%= modal.id %>Title"><%- modal.title %></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                    <div class="row" id="<%= modal.id %>">
-                        <% if (!bodyFile) { %>
-                            <em> This widget failed to render due to missing 'tile.bodyId' or 'bodyFile' alternative </em>
-                        <% } else { %>
-                            <%# More complex card-body content %>
-                            <%- include(bodyFile) %>
-                        <% } %>
-                </div>
+                <% if (!bodyFile) { %>
+                    <em> This widget failed to render due to missing 'tile.bodyId' or 'bodyFile' alternative </em>
+                <% } else { %>
+                    <%# More complex card-body content %>
+                    <%- include(bodyFile) %>
+                <% } %>
             </div>
-            <div id="<%= modal.id %>ModalFooter" class="modal-footer">
-
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-purple" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
