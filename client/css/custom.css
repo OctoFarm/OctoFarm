@@ -2,10 +2,10 @@
     --header-height: 2rem;
     --nav-width: 68px;
     --z-fixed: 100;
-    --octofarm-highlight-colour: #a480e5;
-    --octofarm-main-colour: #7a4cc7;
+    --octofarm-highlight-colour: #B39DDB;
+    --octofarm-main-colour: #7E57C2;
     --sidebar-colour-dark: #212020;
     --navbar-colour-dark: #313030;
-    --sidebar-colour-light: #e9ecef;
-    --navbar-colour-light: #f8f9fa;
+    --sidebar-colour-light: #E0E0E0;
+    --navbar-colour-light: #EEEEEE;
 }
