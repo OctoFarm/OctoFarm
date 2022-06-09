@@ -2,6 +2,7 @@ a {
     text-decoration: none;
 }
 
+
 /* COLOURS */
 .text-purple {
     color: var(--octofarm-main-colour) !important;
@@ -47,15 +48,22 @@ a {
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  background: var(--bs-body-color) ;
+  background: var(--navbar-colour-dark) !important;
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--navbar-colour-light) !important;
 }
+
+
+[data-bs-color-scheme=dark] ::-webkit-scrollbar-thumb {
+    background: var(--sidebar-colour-dark) !important;
+}
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--octofarm-highlight-colour) !important;
 }
+
 
 
