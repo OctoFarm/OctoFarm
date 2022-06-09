@@ -126,6 +126,7 @@ async function ensureSystemSettingsInitiated() {
  * @param app
  */
 function serveOctoFarmRoutes(app) {
+  app.use(ensureCurrentUserAndGroup);
   app.use(ensureClientServerVersion);
 
   //TODO migrate non-page routes to /api
@@ -148,11 +149,7 @@ function serveOctoFarmRoutes(app) {
     "/monitoringInfo",
     require("./routes/sse.printer-monitoring.routes.js", { page: "route" })
   ); // DEPRECATE IN FAVOR OF EVENTS, WILL TAKE SOME WORK
-  app.use(
-    "/events",
-    ensureCurrentUserAndGroup,
-    require("./routes/sse.events.routes.js", { page: "route" })
-  );
+  app.use("/events", require("./routes/sse.events.routes.js", { page: "route" }));
   app.use(
     `${AppConstants.apiRoute}/data`,
     ensureAuthenticated,
