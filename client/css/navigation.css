@@ -23,6 +23,15 @@ body {
   cursor: pointer;
   justify-content: flex-start;
 }
+
+.t-navbar {
+  background-color: var(--navbar-colour-light);
+}
+
+[data-bs-color-scheme=dark] .t-navbar {
+  background-color: var(--navbar-colour-dark);
+}
+
 .l-navbar {
   position: fixed;
   top: 0;
@@ -32,8 +41,12 @@ body {
   padding: 0.5rem 1rem 0 0;
   transition: 0.5s;
   z-index: var(--z-fixed);
-  background-color: var(--sidebar-colour);
+  background-color: var(--sidebar-colour-light);
 }
+[data-bs-color-scheme=dark] .l-navbar {
+  background-color: var(--sidebar-colour-dark);
+}
+
 .nav {
   height: 100%;
   display: flex;
@@ -76,10 +89,10 @@ body {
   transition: 0.5s;
 }
 .nav_link:hover {
-  color: var(--white-colour) !important;
+  color: var(--octofarm-highlight-colour) !important;
 }
 .nav_name:hover {
-  color: var(--white-colour) !important;
+  color: var(--octofarm-highlight-colour) !important;
 }
 .expand-nav {
   left: 0;

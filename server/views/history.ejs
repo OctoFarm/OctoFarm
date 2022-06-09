@@ -2,7 +2,7 @@
 
 <div class="row mt-3 mx-2">
   <div class="col-md-6 col-lg-3">
-    <div class="bg-dark rounded p-2 row">
+    <div class=" rounded p-2 row">
       <div class="col-md-4 col-lg-4">
         <h4 class="text-info">Total Print Time</h4>
         <h3 id="totalSparkLast" class="text-info">#</h3>
@@ -12,7 +12,7 @@
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
-    <div class="bg-dark rounded p-2 row">
+    <div class=" rounded p-2 row">
       <div class="col-md-4 col-lg-3">
         <h4 class="text-success">Success Rate</h4>
         <h3 id="successSparkLast" class="text-success">#</h3>
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
-    <div class="bg-dark rounded p-2 row">
+    <div class=" rounded p-2 row">
       <div class="col-md-4 col-lg-3">
         <h4 class="text-warning">Cancelled Rate</h4>
         <h3 id="cancelledSparkLast" class="text-warning">#</h3>
@@ -32,7 +32,7 @@
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
-    <div class="bg-dark rounded p-2 row">
+    <div class=" rounded p-2 row">
       <div class="col-md-4 col-lg-2">
         <h4 class="text-danger">Failure Rate</h4>
         <h3 id="failedSparkLast" class="text-danger">#</h3>
@@ -45,7 +45,7 @@
 
 <div class="row">
   <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-2 col-xl-2 mb-2 mb-2">
-    <div class="card text-white bg-dark h-100">
+    <div class="card text-white  h-100">
       <div class="card-header dashHeader p-0">
         <button
                 type="button"
@@ -71,7 +71,7 @@
         <button
                 title="View statistics for the currently selected period"
                 type="button"
-                class="btn btn-warning text-dark mb-2"
+                class="btn btn-warning  mb-2"
                 href="#"
                 aria-expanded="false"
                 data-toggle="modal" data-target="#costsStatistics"
@@ -103,7 +103,7 @@
     </div>
   </div>
   <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-10 col-xl-10 mb-2">
-    <div class="card text-white bg-dark h-100">
+    <div class="card text-white  h-100">
       <div class="card-header dashHeader p-0">
         <button
                 type="button"
@@ -121,7 +121,7 @@
         <div class="row">
           <div class="col-md-4 col-lg-4">
             <div class="row">
-              <div class="col-lg-12 bg-dark text-center" id="historyRange">
+              <div class="col-lg-12  text-center" id="historyRange">
                 <h5>Range</h5><hr>
                 <div class="input-group d-inline-flex">
                   <div class="input-group-prepend">
@@ -211,7 +211,7 @@
           </div>
           <div class="col-md-8 col-lg-8">
             <div class="row">
-              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historyPrinterFilters">
+              <div class="col-md-6 col-lg-4  text-center" id="historyPrinterFilters">
                 <h5>Printer</h5><hr>
                 <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
@@ -259,7 +259,7 @@
                          placeholder="Search...">
                 </div>
               </div>
-              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historyFileFilters">
+              <div class="col-md-6 col-lg-4  text-center" id="historyFileFilters">
                 <h5>File</h5><hr>
                 <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
@@ -306,7 +306,7 @@
                          placeholder="Search...">
                 </div>
               </div>
-              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historySpoolFilters">
+              <div class="col-md-6 col-lg-4  text-center" id="historySpoolFilters">
                 <h5>Spool</h5><hr>
                 <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
@@ -530,7 +530,7 @@
                 </button><hr>
                 <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
                   Cancelled
-                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ">
               <b id="cancelledCount"><%= printStatistics.cancelled %></b>
             </span>
                 </button><hr>
@@ -549,7 +549,7 @@
                 <h6>Totals</h6><hr>
                 <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
                   Print Time
-                  <span id="totalPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                  <span id="totalPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ">
                       <%= helpers.generateTime(printStatistics.totalPrintTime) %>
                     </span>
                 </button><hr>
@@ -570,7 +570,7 @@
                 <h6>Largest</h6><hr>
                 <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
                   Print Time
-                  <span id="largestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                  <span id="largestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ">
                       <%= helpers.generateTime(printStatistics.longestPrintTime) %>
                     </span>
                 </button><hr>
@@ -591,7 +591,7 @@
                 <h6>Smallest</h6><hr>
                 <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
                   Print Time
-                  <span id="smallestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                  <span id="smallestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ">
                       <%= helpers.generateTime(printStatistics.shortestPrintTime) %>
                     </span>
                 </button><hr>
@@ -612,7 +612,7 @@
                 <h6>Averages</h6><hr>
                 <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
                   Print Time
-                  <span id="averagePrintingTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                  <span id="averagePrintingTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning ">
                       <%= helpers.generateTime(printStatistics.averagePrintTime) %>
                     </span>
                 </button><hr>

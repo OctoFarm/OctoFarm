@@ -11,7 +11,7 @@
     </div>
 <% } %>
 <% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
-    <div class="alert alert-warning text-dark" role="alert">
+    <div class="alert alert-warning " role="alert">
         Your system is not running with PM2! Some commands below may not work... Please
         setup your system correctly as instructed here: <a
                 rel=”noopener” href='<%= instructionsURL %>' target='_blank'>Click Here</a>
@@ -24,7 +24,7 @@
 <% } %>
 <% let systemButtonsDisabled = false; %>
 <% if(serviceInformation?.isDockerContainer){ %>
-    <div class="alert alert-warning text-dark" role="alert">
+    <div class="alert alert-warning " role="alert">
         The "Update OctoFarm" function has been disabled due to
         Docker having it's own update mechanism
         Please check the <a
@@ -35,7 +35,7 @@
     <% systemButtonsDisabled = true; %>
 <% } %>
 <% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
-    <div class="alert alert-warning text-dark" role="alert">
+    <div class="alert alert-warning " role="alert">
         The "Update OctoFarm" function has been disabled due to not been
         able to detect the use of the pm2 process manager.
         Please re-install OctoFarm following the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
@@ -44,7 +44,7 @@
     <% systemButtonsDisabled = true; %>
 <% } %>
 <% if(!areWeGitRepo && !serviceInformation?.isDockerContainer){ %>
-    <div class="alert alert-warning text-dark" role="alert">
+    <div class="alert alert-warning " role="alert">
         The "Update OctoFarm" function has been disabled due to not been
         able to detect a git repository.
         Please check the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
@@ -315,7 +315,7 @@
                             <div class="alert alert-info small" role="alert">
                                 On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
                             </div>
-                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <div class="alert alert-warning small  <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
                             <%= disableDownDateMessage %>
                             </div>
                             <form class="was-validated">
@@ -337,7 +337,7 @@
                             On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
                             <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
                         </div>
-                        <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                        <div class="alert alert-warning small  <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
                             <%= disableDownDateMessage %>
                         </div>
                         <form class="was-validated">
@@ -362,10 +362,10 @@
                             <% if(serverSettings?.filament?.allowMultiSelect) { %>
                                 <% multiSelectOff = "" %>
                             <% }%>
-                            <div class="alert alert-warning small text-dark <%= multiSelectOff %>" role="alert">
+                            <div class="alert alert-warning small  <%= multiSelectOff %>" role="alert">
                                 Turning this off will remove all your current filament assignments.
                             </div>
-                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <div class="alert alert-warning small  <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
                                 <%= disableDownDateMessage %>
                             </div>
                             <form class="was-validated">
@@ -408,13 +408,13 @@
                                                     failing to register.</span></div>
                                             </div>
                                             <div class="col-lg-4">
-                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <div class="alert alert-warning " role="alert">
                                                 <span>You must also have all these instances
                                                     setup with a postgres database. Without this you will
                                                     not be able to select filament on every instance.</span></div>
                                             </div>
                                             <div class="col-lg-4">
-                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <div class="alert alert-warning " role="alert">
                                                 <span>Any spool within OctoFarm will be deleted
                                                     upon successful sync and replaced with those on your filament manager database...</span></div>
                                             </div>
@@ -432,7 +432,7 @@
                  aria-labelledby="server-timeout">
                 <div class="row">
                     <div class="col-12">
-                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                        <div class="alert alert-warning  " role="alert">
                             Below are some options to enable and disable certain monitoring views across the user interface.
                             <hr>
                             <b>Panel:</b> This view is OctoFarms standard view where each printer has it's own card. It allows for full control and monitoring of your farm.<br>
@@ -471,14 +471,14 @@
                     History. These options are turned on by default as it will check
                     if the thumbnail/camera url exist before actually saving.
                 </div>
-                <div class="alert alert-warning text-dark text-dark" role="alert">
+                <div class="alert alert-warning  " role="alert">
                     If your running on Docker, make sure to mount "/app/images"
                     otherwise these will not persist reboots/upgrades.
                 </div>
                 <div id="filamentManagerSetup" class="row">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Timelapse Capture</h6>
-                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                        <div class="alert alert-warning  " role="alert">
                             Timelapse must be turned on in OctoPrint for this to
                             work, then activated below. It is not turned on by
                             default and does not react to your OctoPrint setting.
@@ -542,7 +542,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Printer snapshot capture</h6>
-                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                        <div class="alert alert-warning  " role="alert">
                             Requires an active camera URL in OctoFarm.
                         </div>
                         <form class="was-validated">
@@ -576,7 +576,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Prusa/Cura slicer thumbnailcapture</h6>
-                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                        <div class="alert alert-warning  " role="alert">
                             Requires either the Prusa / Cura thumbnail plugins to be
                             installed on OctoPrint.
                         </div>
@@ -623,7 +623,7 @@
                     who would like to get more information from the data stored in
                     OctoFarm.
                 </div>
-                <div class="alert alert-warning text-dark" role="alert">
+                <div class="alert alert-warning " role="alert">
                     You must already have influxDB setup and working to be able to
                     use this feature. A restart will be required after saving the
                     settings to correctly enable.
@@ -767,7 +767,7 @@
                             Spool information will be logged everytime a print has
                             completed.
                         </div>
-                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                        <div class="alert alert-warning  " role="alert">
                             If you don't use the Filament Manager plugin or have "Downdate" settings enabled, then there
                             will be 0 grams in the "used_difference" and
                             "used_spool" fields as it is not tracked without that.

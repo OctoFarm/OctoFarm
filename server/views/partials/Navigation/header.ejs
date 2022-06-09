@@ -2,7 +2,7 @@
 <% const monitoringViews = base + '/monitoringViews.ejs' %>
 <% const userDropDown = base + '/userDropDown.ejs' %>
 
-<header class="header navbar-dark bg-dark" id="header">
+<header class="header t-navbar" id="header">
     <button type="button" class="header-toggle btn-sm btn btn-outline-purple" id="header-toggle"><i class="fa-solid fa-bars fs-5" id="header-icon"></i></button>
     <%- include(monitoringViews) -%>
     <%- include(userDropDown, { currentUserGroup }) -%>

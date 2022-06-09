@@ -19,7 +19,6 @@
             })
             %>
         </div>
-        <% systemButtonsDisabled = true; %>
     <% } %>
     <div class="col-12 col-md-6">
         <%- include(infoAlert, {
@@ -43,6 +42,7 @@
                 checkboxOffLabel: "On print complete timelapse is ignored"
                 })
                 %>
+                <hr>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
                 <%- include(checkBox, {
@@ -53,6 +53,7 @@
                 checkboxOffLabel: "On print failure timelapse is ignored"
                 })
                 %>
+                <hr>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
                 <%- include(checkBox, {
@@ -63,6 +64,7 @@
                 checkboxOffLabel: "Timelapses are not deleted from OctoPrints storage"
                 })
                 %>
+                <hr>
             </div>
         </div>
     </div>
@@ -78,7 +80,7 @@
                 Setup Your Farm!
             </button>
         </div>
-
+        <hr>
     </div>
     <div class="col-12 col-md-6">
         <%- include(infoAlert, {
@@ -97,6 +99,7 @@
                 checkboxOffLabel: "On print complete snapshot is ignored"
                 })
                 %>
+                <hr>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
                 <%- include(checkBox, {
@@ -107,6 +110,7 @@
                 checkboxOffLabel: "On print failure snapshot is ignored"
                 })
                 %>
+                <hr>
             </div>
         </div>
     </div>
@@ -128,6 +132,7 @@
                 checkboxOffLabel: "On print complete thumbnail is ignored"
                 })
                 %>
+                <hr>
             </div>
             <div class="col-12 col-md-6 col-lg-4">
                 <%- include(checkBox, {
@@ -138,6 +143,7 @@
                 checkboxOffLabel: "On print failure thumbnail is ignored"
                 })
                 %>
+                <hr>
             </div>
         </div>
     </div>

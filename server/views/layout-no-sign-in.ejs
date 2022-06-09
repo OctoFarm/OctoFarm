@@ -8,7 +8,7 @@
 <% const modal = base + '/octofarm-modal.ejs' %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-color-scheme>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -28,6 +28,7 @@
     <title><%= octoFarmPageTitle %>: <%= page %></title>
     <script src="/assets/jquery.min.js?<%= clientVersion %>"></script>
     <script src="/assets/bootbox.min.js?<%= clientVersion %>"></script>
+    <script src="/assets/darkmode.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/vendor.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/client-error.modal.min.js?<%= clientVersion %>"></script>

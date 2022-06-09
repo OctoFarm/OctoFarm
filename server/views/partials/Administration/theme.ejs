@@ -11,7 +11,7 @@
         })
         %>
     </div>
-    <div class="col-12 col-md-4 col-lg-3">
+    <div class="col-12 col-md-4 col-lg-4">
         <%- include(infoAlert, {
         title: "Application Title",
         infoID: "infoApplicationTitle",
@@ -27,6 +27,44 @@
         requiresRestart: true
         })
         %>
+        <hr>
+        <%- include(infoAlert, {
+        title: "Light or Dark Mode",
+        infoID: "infoLightOrDarkMode",
+        infoText: "The OctoFarm theme detects your systems OS dark mode settings to apply dark/light mode. Please use this to override."
+        })
+        %>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeDarkMode">
+            <label class="form-check-label" for="themeDarkMode">
+                Dark Mode
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeLightMode">
+            <label class="form-check-label" for="themeLightMode">
+               Light Mode
+            </label>
+        </div>
+        <hr>
+        <%- include(infoAlert, {
+        title: "Main Colour",
+        infoID: "infoMainColour",
+        infoText: "Replace the main colour used across the interface"
+        })
+        %>
+        <label for="mainApplicationColour" class="form-label">Color picker</label>
+        <input type="color" class="form-control form-control-color" id="mainApplicationColour" value="#7a4cc7" title="Choose your color">
+        <hr>
+        <%- include(infoAlert, {
+        title: "Main Accent Colour",
+        infoID: "infoMainAccentColou",
+        infoText: "Replace the main accent colour used across the interface"
+        })
+        %>
+        <label for="mainApplicationAccentColour" class="form-label">Color picker</label>
+        <input type="color" class="form-control form-control-color" id="mainApplicationAccentColour" value="#a480e5" title="Choose your color">
+        <hr>
     </div>
     <div class="col-12 col-md-12 col-lg-6">
         <%- include(infoAlert, {
@@ -51,17 +89,31 @@
             </div>
         </form>
         <p> Supports <code>PNG, JPG, JPEG</code></p>
+        <hr>
         <h6>Current</h6>
         <div class="ratio ratio-16x9">
           <img class="p-3" width="100%" src="/images/bg.jpg">
         </div>
     </div>
-    <div class="col-12 col-md-12 col-lg-6 d-none">
-        <%- include(infoAlert, {
-        title: "Colours",
-        infoID: "infoColours",
-        infoText: "Set the OctoFarm theme colours to your liking"
-        })
-        %>
-    </div>
 </div>
+<script>
+    const darkModeCheck = document.getElementById("themeDarkMode")
+    const lightModeCheck = document.getElementById("themeLightMode")
+
+    const darkMode = darkmode.getSavedColorScheme();
+
+    if(darkMode === "dark"){
+        darkModeCheck.checked = true;
+        lightModeCheck.checked = false;
+    }else{
+        darkModeCheck.checked = false;
+        lightModeCheck.checked = true;
+    }
+
+    darkModeCheck.onclick = function(e){
+        darkmode.setDarkMode(true);
+    }
+    lightModeCheck.onclick = function(e){
+        darkmode.setDarkMode(false);
+    }
+</script>

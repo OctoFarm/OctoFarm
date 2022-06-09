@@ -56,7 +56,7 @@
                 <%   }) %>
             </tr>
             <tr>
-                <th scope="row">Weight<span class="badge badge-light text-dark ml-2"><%= (statistics.total / 1000).toFixed(0) %>kg</span></th>
+                <th scope="row">Weight<span class="badge badge-light  ml-2"><%= (statistics.total / 1000).toFixed(0) %>kg</span></th>
                 <% statistics.materialBreakDown.forEach(used => { %>
                     <th scope="col"> <%= (used.total /1000 ).toFixed(2)%>kg</th>
                 <%   }) %>
