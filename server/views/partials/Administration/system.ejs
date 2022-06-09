@@ -4,8 +4,16 @@
 <% let checkbox = base + '/octofarm-checkbox.ejs' %>
 <% let selectBox = base + '/octofarm-select.ejs' %>
 <% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
 
 <div class="row mb-3">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Settings relating to the OctoFarm server's system. These changes are applied to the server and generally require a restart of the OctoFarm server to action."
+        })
+        %>
+    </div>
     <div class="col-12 col-md-6 col-lg-6">
         <%- include(infoAlert, {
         title: "Database Connection",
@@ -73,7 +81,7 @@
         checkboxID: "requireLogin",
         checkboxChecked: serverSettings.server.loginRequired,
         checkboxLabel: "Require a login",
-        checkboxOnLable: "Login turned on",
+        checkboxOnLabel: "Login turned on",
         checkboxOffLabel: "Login turned off",
         requiresRestart: true
         })
@@ -90,7 +98,7 @@
         checkboxID: "requireRegistration",
         checkboxChecked: serverSettings.server.registration,
         checkboxLabel: "Allow Registration",
-        checkboxOnLable: "Registration is turned on",
+        checkboxOnLabel: "Registration is turned on",
         checkboxOffLabel: "Registration is turned off",
         requiresRestart: true
         })
@@ -100,7 +108,7 @@
 <div class="row">
     <div class="col">
         <div class="d-grid gap-2">
-            <button class="btn btn-outline-success" type="button">Save Settings</button>
+            <button class="btn btn-outline-success" type="button">Save System Changes</button>
         </div>
     </div>
 </div>

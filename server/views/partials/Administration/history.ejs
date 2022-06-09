@@ -1,0 +1,145 @@
+<% let base = '..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+
+<div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Settings relating to the OctoFarm server's handling of finished prints."
+        })
+        %>
+    </div>
+    <% if(serviceInformation?.isDockerContainer){ %>
+        <div class="col-12">
+            <%- include(alert, {
+            alertType: "warning",
+            alertMessage: "If your running on Docker, make sure to mount '/app/images' otherwise these will not persist reboots/upgrades."
+            })
+            %>
+        </div>
+        <% systemButtonsDisabled = true; %>
+    <% } %>
+    <div class="col-12 col-md-6">
+        <%- include(infoAlert, {
+        title: "Timelapse Capturing",
+        infoID: "infoTimelpaseCapturing",
+        infoText: "This will capture the prints timelapse into OctoFarm when it has finished rendering. Timelapse must be setup and enabled on OctoPrint for this setting to work."
+        + "<br> This only works with the '.mp4' format for video types."
+        + " OctoPrint defaults to '.mpg'. <br> You can update this under"
+        + " 'Advanced Settings' in your OctoPrint instances 'Webcam"
+        + " & Timelapse' setting. Change the setting to 'libx264'.<br>"
+        + " Alternatively use the 'Setup Your Farm' button to apply the settings to all online instances."
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "timelapseOnComplete",
+                checkboxChecked: serverSettings.history.timelapse.onComplete,
+                checkboxLabel: "On Completion",
+                checkboxOnLabel: "On print complete timelapse will be downloaded to OctoFarm",
+                checkboxOffLabel: "On print complete timelapse is ignored"
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "timelapseOnFailure",
+                checkboxChecked: serverSettings.history.timelapse.onFailure,
+                checkboxLabel: "On Failure",
+                checkboxOnLabel: "On print failure timelapse will be downloaded to OctoFarm",
+                checkboxOffLabel: "On print failure timelapse is ignored"
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "timelapseDelete",
+                checkboxChecked: serverSettings.history.timelapse.deleteAfter,
+                checkboxLabel: "Delete from OctoPrint",
+                checkboxOnLabel: "Timelapses will be deleted once captured",
+                checkboxOffLabel: "Timelapses are not deleted from OctoPrints storage"
+                })
+                %>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <%- include(infoAlert, {
+        title: "Update OctoPrints Timelapse Settings",
+        infoID: "infoUpdateOctoPrintsSettings",
+        infoText: "This will setup OctoPrint on all online instances ready for timelapse capture. It assumes you have ffmpeg setup and installed already."
+        })
+        %>
+        <div class="d-grid gap-2">
+            <button id="setupTimelapseOctoPrint" type="button" class="btn btn-outline-purple btn-block mt-1">
+                Setup Your Farm!
+            </button>
+        </div>
+
+    </div>
+    <div class="col-12 col-md-6">
+        <%- include(infoAlert, {
+        title: "Camera Snapshot Capturing",
+        infoID: "infoSnapshotCapturing",
+        infoText: "This will use your webcam to capture a picture of your finished print into OctoFarm."
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "snapOnComplete",
+                checkboxChecked: serverSettings.history.snapshot.onComplete,
+                checkboxLabel: "On Completion",
+                checkboxOnLabel: "On print complete snapshot will be taken from your camera",
+                checkboxOffLabel: "On print complete snapshot is ignored"
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "snapOnFailure",
+                checkboxChecked: serverSettings.history.snapshot.onFailure,
+                checkboxLabel: "On Failure",
+                checkboxOnLabel: "On print failure snapshot will be taken from your camera",
+                checkboxOffLabel: "On print failure snapshot is ignored"
+                })
+                %>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <%- include(infoAlert, {
+        title: "Thumbnail Snapshot Capturing",
+        infoID: "infoThumbnailCapture",
+        infoText: "Requires the 'Thumbnail Plugin' installed on OctoPrint to work <br>"
+            + "This will download the thumbnail generated by the plugin into OctoFarm"
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "thumbOnComplete",
+                checkboxChecked: serverSettings.history.thumbnails.onComplete,
+                checkboxLabel: "On Completion",
+                checkboxOnLabel: "On print complete thumbnail will be downloaded to OctoFarm",
+                checkboxOffLabel: "On print complete thumbnail is ignored"
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <%- include(checkBox, {
+                checkboxID: "thumbOnFailure",
+                checkboxChecked: serverSettings.history.thumbnails.onFailure,
+                checkboxLabel: "On Failure",
+                checkboxOnLabel: "On print failure thumbnail will be downloaded to OctoFarm",
+                checkboxOffLabel: "On print failure thumbnail is ignored"
+                })
+                %>
+            </div>
+        </div>
+    </div>
+</div>
+

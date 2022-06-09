@@ -1,0 +1,48 @@
+<% let base = '..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+
+<% const viewNames = [
+    { name: "Panel", desc: "This view is OctoFarms standard view where each printer has it's own card. It allows for full control and monitoring of your farm"},
+    { name: "List", desc: "This view is a table view where each printer is on a row of the table. It allows for full control and status monitoring of your farm due to no camera slot" },
+    { name: "Camera", desc: "This view is similar to the panel view but has the cameras as a main focus. A bit like a NVR for your farm with full control" },
+    { name: "Group", desc: "This view will organise your printers by common groups you have assigned. This view is great for bulk grouped control over your prints, but has limited monitoring" },
+    { name: "Current Operations", desc: "This view is a cut down view with just basic print information. Great for a large status screen or keeping an eye on your farms status. There is no control and limited status." },
+    { name: "Super List", desc: "This view is a list table view combining camera/list and panel views. It allows for full monitoring and control" }
+] %>
+
+<div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Settings for which views are available to users on the client. These settings apply to all users utilising the client."
+        })
+        %>
+    </div>
+    <% Object.keys(serverSettings.monitoringViews.toJSON()).forEach((key, index) => { %>
+        <div class="col-12 col-md-4">
+            <%- include(infoAlert, {
+            title: viewNames[index].name + " View",
+            infoID: "info"+viewNames[index].name.replace(" ", ""),
+            infoText: viewNames[index].desc
+            })
+            %>
+            <%- include(checkBox, {
+            checkboxID: "requireLogin",
+            checkboxChecked: serverSettings.monitoringViews[key],
+            checkboxLabel: viewNames[index].name + " View",
+            checkboxOnLabel: viewNames[index].name + " View Enabled",
+            checkboxOffLabel: viewNames[index].name + " View Disabled"
+            })
+            %>
+        </div>
+    <% }) %>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="d-grid gap-2">
+            <button class="btn btn-outline-success" type="button">Save View Changes</button>
+        </div>
+    </div>
+</div>
