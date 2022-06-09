@@ -181,5 +181,13 @@
     })
 %>
 
+<%- include(modal, {
+    modal:{
+    id:"clientSettings", title:"Client Settings", isBodyScrollable: "true"
+    },
+    bodyFile:'./ModalContents/about.ejs'
+})
+%>
+
 
 </html>

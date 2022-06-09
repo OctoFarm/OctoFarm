@@ -30,15 +30,14 @@
           inputAutoComplete: "current-password",
           inputLabel: "Password"
         }) %>
-        <%- include(checkBox, {
-        checkboxID: "rememberMe",
-        checkboxChecked: false,
-        checkboxLabel: "Remember Me!",
-        checkboxOnLabel: "Remembering your login details",
-        checkboxOffLabel: "No remembering your login details"
-        }) %>
+        <div class="form-check">
+          <input id="rememberMe" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+          <label class="form-check-label" for="flexCheckDefault">
+            Remember Me!
+          </label>
+        </div>
         <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-outline-purple " formnovalidate>Login</button>
+          <button type="submit" value="submit" class="btn btn-outline-purple">Login</button>
         </div>
       </form>
       <p class="lead mt-4">

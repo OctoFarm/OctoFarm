@@ -1,12 +1,30 @@
 <% let base = '..' %>
 <% let infoAlert = base + '/octofarm-title-info.ejs' %>
 <% let alert = base + '/octofarm-alert.ejs' %>
+<% let textInput = base + '/octofarm-text-input.ejs' %>
 
 <div class="row">
     <div class="col-12">
         <%- include(alert, {
         alertType: "secondary",
         alertMessage: "Settings relating to the OctoFarm client theme. These changes are applied to all users utilising the client."
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(infoAlert, {
+        title: "Application Title",
+        infoID: "infoApplicationTitle",
+        infoText: "Replace 'OctoFarm' across the interface with your own custom application name"
+        })
+        %>
+        <%- include(textInput, {
+        inputID: "serverApplicationTitle",
+        inputType: "text",
+        inputTag: "Title",
+        inputPlaceholder: octoFarmPageTitle,
+        inputValue: octoFarmPageTitle,
+        requiresRestart: true
         })
         %>
     </div>
@@ -17,8 +35,6 @@
         infoText: "Click the button below to upload your background image. <br><small>You may need to refresh your browser cache if this doesn't apply straight away.</small>"
         })
         %>
-        <h5 class="font-weight-bold"></h5>
-
         <form action="/settings/backgroundUpload"
               enctype="multipart/form-data" method="POST">
             <div class="row">
