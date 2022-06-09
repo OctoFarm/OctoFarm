@@ -15,6 +15,7 @@
 octofarm.zip
 /dist/
 /server/views/assets/dist/
+/server/views/assets/custom.css
 /package/
 
 *.tgz
