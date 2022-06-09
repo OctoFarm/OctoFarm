@@ -334,13 +334,8 @@ router.get(
   ensureCurrentUserAndGroup,
   ensureAdministrator,
   async (req, res) => {
-    const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = SettingsClean.returnSystemSettings();
     const systemInformation = SystemRunner.returnInfo();
-    const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
-    let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
-    const currentUsers = await fetchUsers();
-
     res.render("administration", {
       name: req.user.name,
       userGroup: req.user.group,
@@ -349,23 +344,19 @@ router.get(
       page: "Administration",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
-      clientSettings,
       serverSettings,
       systemInformation,
       db: fetchMongoDBConnectionString(),
-      dashboardSettings: dashboardSettings,
       serviceInformation: {
         isDockerContainer: isDocker(),
         isNodemon: isNodemon(),
         isNode: isNode(),
-        isPm2: isPm2(),
-        update: softwareUpdateNotification
+        isPm2: isPm2()
       },
       currentGitBranch: await getCurrentBranch(),
       clientVersion: fetchClientVersion(),
       areWeGitRepo: checkIfWereInAGitRepo(),
       systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
-      currentUsers,
       taskManagerState: TaskManager.getTaskState()
     });
   }

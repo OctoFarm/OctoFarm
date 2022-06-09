@@ -64,8 +64,8 @@
         <%- include(selectBox, {
         selectID: "logLevelSelect",
         selectLabel: "Level",
-        selectOptions: ["Info", "Debug", "Silly"],
-        selectValue: "Info",
+        selectOptions: [ { display: "Info", value: "info" }, { display: "Debug", value: "debug" }, { display: "Silly", value: "silly" }],
+        selectValue: "info",
         requiresRestart: true
         })
         %>

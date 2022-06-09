@@ -26,7 +26,12 @@ module.exports = {
       }
     }
 
-    res.locals.currentUser = req.user;
+    res.locals.currentUser = {
+      name: req.user.name,
+      username: req.user.username,
+      group: req.user.group,
+      clientSettings: req.user.clientSettings
+    };
 
     next();
   }

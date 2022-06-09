@@ -17,7 +17,7 @@
         </div>
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header">Settings</h6></li>
-        <li><a class="dropdown-item" href="#"><i class="fa-solid fa-display text-purple"></i> Client Settings</a></li>
+        <li><a class="dropdown-item"data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client Settings</a></li>
         <% if(currentUserGroup === "Administrator"){ %>
             <li><h6 class="dropdown-header">Admin</h6></li>
             <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench text-purple"></i> Administration</a></li>
