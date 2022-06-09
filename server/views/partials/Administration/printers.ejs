@@ -1,8 +1,16 @@
 <% let base = '..' %>
 <% let infoAlert = base + '/octofarm-title-info.ejs' %>
 <% let textInput = base + '/octofarm-settings-input.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
 
 <div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Settings relating to the systems handling of the printers. These generally require a restart of the OctoFarm server to action."
+        })
+        %>
+    </div>
     <div class="col-md-12 col-lg-6">
         <%- include(infoAlert, {
         title: "Websocket Retry",
@@ -74,5 +82,12 @@
         requiresRestart: true
         })
         %>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="d-grid gap-2">
+            <button class="btn btn-outline-success" type="button">Save Printer Changes</button>
+        </div>
     </div>
 </div>
