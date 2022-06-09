@@ -4,22 +4,22 @@ a {
 
 /* COLOURS */
 .text-purple {
-    color: var(--octofarm-colour);
+    color: var(--octofarm-main-colour) !important;
 }
 
 .active-monitoring {
-    color: var(--white-colour) !important;
+    color: var(--octofarm-highlight-colour) !important;
 }
 
 /* BUTTONS */
 .btn-outline-purple {
-    color: var(--octofarm-colour);
-    border-color: var(--octofarm-colour);
+    color: var(--octofarm-main-colour) !important;
+    border-color: var(--octofarm-main-colour) !important;
 }
 
 .btn-outline-purple:hover {
-    color: var(--white-colour);
-    border-color: var(--white-colour);
+    color: var(--octofarm-highlight-colour) !important;
+    border-color: var(--octofarm-highlight-colour) !important;
 }
 
 .btn-circle.btn-sm {
@@ -32,13 +32,13 @@ a {
 }
 
 .list-group-item.active {
-    background-color: var(--octofarm-colour);
-    border-color: var(--white-colour)
+    background-color: var(--octofarm-main-colour) !important;
+    border-color: var(--octofarm-highlight-colour) !important;
 }
 
 /* CARD */
 .card {
-    opacity: 0.95 !important;
+    opacity: 0.9 !important;
 }
 
 /* SCROLL BAR */
@@ -47,7 +47,7 @@ a {
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #303030;
+  background: var(--bs-body-color) ;
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {

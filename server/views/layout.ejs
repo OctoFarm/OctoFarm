@@ -19,13 +19,13 @@
     <% monitoringSettings = serverSettings.monitoringViews %>
 <% } %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-color-scheme>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="dark light">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?<%= clientVersion %>">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?<%= clientVersion %>">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?<%= clientVersion %>">
@@ -40,6 +40,7 @@
     <title><%= octoFarmPageTitle %>: <%= page %></title>
     <script src="/assets/jquery.min.js?<%= clientVersion %>"></script>
     <script src="/assets/bootbox.min.js?<%= clientVersion %>"></script>
+    <script src="/assets/darkmode.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/vendor.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/navbar.utils.min.js?<%= clientVersion %>"></script>
     <script src="/assets/dist/client-error.modal.min.js?<%= clientVersion %>"></script>
@@ -50,7 +51,6 @@
 <%- include(header, { monitoringSettings, currentUserGroup }) -%>
 <%- include(navbar, { octoFarmPageTitle, currentUserGroup }) -%>
 <!--Container Main start-->
-
     <%- body %>
     <%- include(octofarmErrorModal) %>
 </body>
@@ -60,7 +60,7 @@
 <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
      aria-labelledby="printerManagerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content bg-dark text-light">
+        <div class="modal-content ">
             <div class="modal-header px-3 pt-3 pb-2">
                 <div id="printerSelectionWrapper" class="input-group mb-0" style="width:600px">
                     <div class="input-group-prepend">
@@ -188,6 +188,5 @@
     bodyFile:'./ModalContents/about.ejs'
 })
 %>
-
 
 </html>

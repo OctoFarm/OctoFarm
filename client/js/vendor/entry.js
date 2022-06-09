@@ -4,7 +4,6 @@ import Sortable from "./sortable";
 import { Noty } from "noty/lib/noty.min";
 import lodash from "lodash/lodash.min";
 import jplist from "./jplist.min";
-import "./darkmode.min";
 import "bootstrap";
 // You can specify which plugins you need
 import { Modal, Tooltip, Toast, Popover } from "bootstrap";

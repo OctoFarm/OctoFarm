@@ -6,7 +6,7 @@
         <% let disabledUsers = "" %>
         <% if(!serverSettings.server.loginRequired){ %>
         <% disabledUsers = "disabled=true" %>
-            <div class="alert alert-warning text-dark" role="alert">
+            <div class="alert alert-warning " role="alert">
                 The server has the login requirement turned off, the users below cannot be used.
             </div>
         <% } %>
@@ -42,7 +42,7 @@
                             <td id="userRowUserGroup-<%=user._id%>"><%= user.group %></td>
                             <td><%= user.date.toLocaleDateString() %></td>
                             <td>
-                                <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal" disabled><i class="fas fa-user-shield"></i> Reset Password</button>
+                                <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning  btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal" disabled><i class="fas fa-user-shield"></i> Reset Password</button>
                                 <button id="editUserBtn-<%=user._id%>" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userEditModal" disabled><i class="fas fa-user-edit"></i> Edit</button>
                                 <button id="deleteUserBtn-<%=user._id%>" type="button" class="btn btn-danger btn-sm" disabled><i class="fas fa-user-minus"></i> Delete</button>
                             </td>
@@ -54,7 +54,7 @@
                         <td id="userRowUserGroup-<%=user._id%>"><%= user.group %></td>
                         <td><%= user.date.toLocaleDateString() %></td>
                         <td>
-                            <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>
+                            <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning  btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>
                             <button id="editUserBtn-<%=user._id%>" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userEditModal"><i class="fas fa-user-edit"></i> Edit</button>
                             <button id="deleteUserBtn-<%=user._id%>" type="button" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i> Delete</button>
                         </td>

@@ -1,23 +1,23 @@
 <a title="Farm Dashboard" href="/dashboard" class="nav_link <%= page === 'Dashboard' && 'active-nav' %>">
     <i class="fas fa-tachometer-alt text-purple"></i>
-    <span class="nav_name text-light">Dashboard</span>
+    <span class="nav_name ">Dashboard</span>
 </a>
 <% if(currentUserGroup === "Administrator"){ %>
     <a title="Printer Management" href="/printers" class="nav_link <%= page === 'Printer Manager' && 'active-nav' %>">
         <i class="fas fa-print text-purple"></i>
-        <span class="nav_name text-light">Printers</span>
+        <span class="nav_name ">Printers</span>
     </a>
 <% } %>
 <a title="File Management" href="/filemanager" class="nav_link <%= page === 'File Manager' && 'active-nav' %>">
     <i class="fas fa-folder-open text-purple"></i>
-    <span class="nav_name text-light">File Manager</span>
+    <span class="nav_name ">File Manager</span>
 </a>
 <a title="Print History" href="/history" class="nav_link <%= page === 'History' && 'active-nav' %>">
     <i class="fa-solid fa-timeline text-purple"></i>
-    <span class="nav_name text-light">History</span>
+    <span class="nav_name ">History</span>
 </a>
 <a title="Filament Management" href="/filament" class="nav_link <%= page === 'Filament Manager' && 'active-nav' %>">
     <i class="fas fa-toilet-paper text-purple"></i>
-    <span class="nav_name text-light">Filament</span>
+    <span class="nav_name ">Filament</span>
 </a>
 
