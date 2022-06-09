@@ -3,7 +3,7 @@
         <label class="input-group-text" for="<%= selectID %>"><%= selectLabel %></label>
         <select class="form-select" id="<%= selectID %>">
             <% selectOptions.forEach(option => { %>
-                <option value="<%= option.toLowerCase().replace("/ /g", "_") %>"><%= option %></option>
+                <option value="<%= option.value %>"><%= option.display %></option>
             <% }) %>
         </select>
     </div>
@@ -13,7 +13,10 @@
 </div>
 
 <script>
-    const select = document.getElementById("<%= selectID %>")
-    const value = "<%= selectValue %>"
-    select.value = value.toLowerCase().replace("/ /g", "_")
+    (function() {
+        const select = document.getElementById("<%= selectID %>")
+        const value = "<%= selectValue %>"
+        select.value = value;
+    })();
+
 </script>

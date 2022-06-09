@@ -1,0 +1,116 @@
+<% let base = '../..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+<% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let selectBox = base + '/octofarm-select.ejs' %>
+
+<% const pageColumns = [{ display: "1", value: 12 },{ display: "2", value: 6 },{ display: "3", value: 4 },{ display: "4", value: 3 },{ display: "5", value: 5 },{ display: "6", value: 2 }] %>
+
+<div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Your monitoring view settings that tweak the display on each of the views"
+        })
+        %>
+    </div>
+    <div class="col-12">
+        <%- include(infoAlert, {
+        title: "Current Operations",
+        infoID: "infoDatabaseConnection",
+        infoText: "Current Operations is a panel at the top of the views that displays your currently active and completed prints. You can quickly see a "
+            + "minimal amount of relevant print status and restart prints."
+        })
+        %>
+        <%- include(checkBox, {
+        checkboxID: "panelCurrentOpOn",
+        checkboxChecked: currentUser.clientSettings.views.currentOperations,
+        checkboxLabel: "Current Operations Panel",
+        checkboxOnLabel: "Current Operations will be shown",
+        checkboxOffLabel: "Current Operations will not be shown"
+        })
+        %>
+        <hr>
+    </div>
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <%- include(infoAlert, {
+                title: "Hide Offline Printers",
+                infoID: "infoHideOfflinePrinters",
+                infoText: "Hide from the views any offline printers"
+                })
+                %>
+                <%- include(checkBox, {
+                checkboxID: "panelHideOffline",
+                checkboxChecked: currentUser.clientSettings.views.showOffline,
+                checkboxLabel: "Hide Offline Printers",
+                checkboxOnLabel: "Offline printer will be hidden",
+                checkboxOffLabel: "Offline printers will be shown"
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-6">
+                <%- include(infoAlert, {
+                title: "Hide Disconnected Printers",
+                infoID: "infoHideDisconnected",
+                infoText: "Hide from the views any disconnected printers"
+                })
+                %>
+                <%- include(checkBox, {
+                checkboxID: "panelHideClosed",
+                checkboxChecked: currentUser.clientSettings.views.showDisconnected,
+                checkboxLabel: "Hide Disconnected Printers",
+                checkboxOnLabel: "Disconnected printers will be hidden",
+                checkboxOffLabel: "Disconnected printer will be shown"
+                })
+                %>
+                <hr>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <%- include(infoAlert, {
+                title: "Camera View Columns",
+                infoID: "infoCameraViewColumns",
+                infoText: "Set the amount of columns your camera view will display. This only take effect on screen sizes larger than a tablet."
+                })
+                %>
+                <%- include(selectBox, {
+                selectID: "selectCameraGrid",
+                selectLabel: "Columns",
+                selectOptions: pageColumns,
+                selectValue: currentUser.clientSettings.views.cameraColumns
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-6">
+                <%- include(infoAlert, {
+                title: "Group View Columns",
+                infoID: "infoGroupViewColumns",
+                infoText: "Set the amount of columns your group view will display. This only takes effect on screen sizes larger than a tablet."
+                })
+                %>
+                <%- include(selectBox, {
+                selectID: "selectCameraGrid",
+                selectLabel: "Columns",
+                selectOptions: pageColumns,
+                selectValue: currentUser.clientSettings.views.groupColumns
+                })
+                %>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="d-grid gap-2">
+            <button class="btn btn-outline-success" type="button">Save Monitoring Changes</button>
+        </div>
+    </div>
+</div>
