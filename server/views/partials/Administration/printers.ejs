@@ -1,0 +1,78 @@
+<% let base = '..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let textInput = base + '/octofarm-settings-input.ejs' %>
+
+<div class="row">
+    <div class="col-md-12 col-lg-6">
+        <%- include(infoAlert, {
+        title: "Websocket Retry",
+        infoID: "infoWebsocketRetry",
+        infoText: "The interval in which OctoFarm will re-poll the websocket"
+            + " when it detects a lost connection during operation. It"
+            + " will re-poll at an decreasing rate until connection is re-established.<br>"
+            + "<b>Min</b>: 5 seconds (Default), <b>Max:</b> 30 seconds"
+        })
+        %>
+        <%- include(textInput, {
+        inputID: "webSocketRetry",
+        inputType: "number",
+        inputTag: "Websocket Retry",
+        inputPlaceholder: 6,
+        inputValue: serverSettings.timeout.webSocketRetry/1000,
+        inputMin: 5,
+        inputMax: 30,
+        inputStep: 1,
+        inputAppendTag: "Seconds",
+        requiresRestart: true
+        })
+        %>
+    </div>
+
+    <div class="col-md-6 col-lg-6">
+        <%- include(infoAlert, {
+        title: "API Initial Timeout",
+        infoID: "infoAPIInitialTimeout",
+        infoText: "The length of time OctoFarm will wait for a response from the "
+        + " OctoPrint API. Any request going over this will be considered offline...<br>"
+        + "<b>Min</b>: 1 second (Default: 2 seconds), <b>Max:</b> 10 seconds"
+        })
+        %>
+        <%- include(textInput, {
+        inputID: "APITimeout",
+        inputType: "number",
+        inputTag: "API Timeout",
+        inputPlaceholder: 6,
+        inputValue: serverSettings.timeout.apiTimeout/1000,
+        inputMin: 1,
+        inputMax: 10,
+        inputStep: 1,
+        inputAppendTag: "Seconds",
+        requiresRestart: true
+        })
+        %>
+    </div>
+    <div class="col-md-6 col-lg-6">
+        <%- include(infoAlert, {
+        title: "API Retry",
+        infoID: "infoAPIRetry",
+        infoText: "The interval that OctoFarm will attempt another"
+        + " connection to OctoPrint. Only really applicable if your"
+        + " printer is offline when added to the farm.<br>"
+        + "<b>Min</b>: 30 seconds (Default), <b>Max:</b> 60 seconds"
+        })
+        %>
+        <%- include(textInput, {
+        inputID: "APIRetry",
+        inputType: "number",
+        inputTag: "API Retry",
+        inputPlaceholder: 6,
+        inputValue: serverSettings.timeout.apiRetry/1000,
+        inputMin: 30,
+        inputMax: 60,
+        inputStep: 1,
+        inputAppendTag: "Seconds",
+        requiresRestart: true
+        })
+        %>
+    </div>
+</div>

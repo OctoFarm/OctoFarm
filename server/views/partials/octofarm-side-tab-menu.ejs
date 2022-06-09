@@ -3,7 +3,7 @@
         <% list.listItems.forEach((item, index) => {  %>
             <a
                 id="<%= item.id %>-list"
-                class="list-group-item list-group-item-action <%= index === 0 ? "active" : "" %>"
+                class="list-group-item list-group-item-action <%= index === 0 ? "active" : "" %> bg-purple"
                 data-bs-toggle="tab"
                 data-bs-target="#<%= item.id %>"
                 role="tab">

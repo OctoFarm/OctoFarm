@@ -1,10 +1,16 @@
+<% let base = '..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+
 <div class="row">
     <div class="col-12 col-md-12 col-lg-6">
-        <h5 class="font-weight-bold">Background</h5>
-        <p>Click the button below to upload your background
-            image.</p>
-        <small>NOTE: You may need to refresh your browser cache if
-            this doesn't apply straight away.</small>
+        <%- include(infoAlert, {
+        title: "Background",
+        infoID: "infoBackground",
+        infoText: "Click the button below to upload your background image. <br><small>You may need to refresh your browser cache if this doesn't apply straight away.</small>"
+        })
+        %>
+        <h5 class="font-weight-bold"></h5>
+
         <form action="/settings/backgroundUpload"
               enctype="multipart/form-data" method="POST">
             <div class="row">
@@ -14,16 +20,24 @@
                            accept="image/jpeg,image/png,image/jpg"/>
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 col-lg-2">
-                    <input  class="btn btn-success mt-2"
+                    <input  class="btn btn-outline-success mt-2"
                             type="submit" value="Upload"
                             accept="image/jpeg,image/png,image/jpg">
                 </div>
             </div>
         </form>
         <p> Supports <code>PNG, JPG, JPEG</code></p>
-    </div>
-    <div class="col-12 col-md-12 col-lg-6">
         <h6>Current</h6>
-        <img class="p-3" width="100%" src="/images/bg.jpg">
+        <div class="ratio ratio-16x9">
+          <img class="p-3" width="100%" src="/images/bg.jpg">
+        </div>
+    </div>
+    <div class="col-12 col-md-12 col-lg-6 d-none">
+        <%- include(infoAlert, {
+        title: "Colours",
+        infoID: "infoColours",
+        infoText: "Set the OctoFarm theme colours to your liking"
+        })
+        %>
     </div>
 </div>

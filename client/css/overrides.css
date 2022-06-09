@@ -1,12 +1,3 @@
-:root {
-    --header-height: 2rem;
-    --nav-width: 68px;
-    --z-fixed: 100;
-    --white-colour: #a480e5;
-    --sidebar-colour: #212020;
-    --octofarm-colour: #7a4cc7;
-}
-
 a {
     text-decoration: none;
 }
@@ -38,6 +29,11 @@ a {
     border-radius: 15px;
     font-size: 10px;
     text-align: center;
+}
+
+.list-group-item.active {
+    background-color: var(--octofarm-colour);
+    border-color: var(--white-colour)
 }
 
 /* CARD */
