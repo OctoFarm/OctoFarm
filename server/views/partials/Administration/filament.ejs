@@ -1,0 +1,203 @@
+<% let base = '..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+
+<% let disableDownDate = false %>
+<% let disableDownDateMessage = "" %>
+<% if (serverSettings.filamentManager){ %>
+    <% disableDownDate = true; %>
+    <% disableDownDateMessage = `Disabled due to Filament Manager Plugin` %>
+<% } %>
+
+<% let multiSelectOff = "d-none"; %>
+<% if(serverSettings?.filament?.allowMultiSelect) { %>
+    <% multiSelectOff = "" %>
+<% }%>
+
+<div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Settings relating to OctoFarms filament manager section"
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-12 col-lg-6">
+        <%- include(infoAlert, {
+        title: "Spools"
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <%- include(checkBox, {
+                checkboxID: "checkFilament",
+                checkboxChecked: serverSettings.filament.filamentCheck,
+                checkboxLabel: "Check spool is attached",
+                checkboxOnLabel: "Check spool before starting a print",
+                checkboxOffLabel: "Ignore spool before starting a print",
+                checkboxInfoText: "OctoFarm will throw a nag screen when trying to start a print without a spool attached"
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-6">
+                <%- include(checkBox, {
+                checkboxID: "hideEmptySpools",
+                checkboxChecked: serverSettings.filament.hideEmpty,
+                checkboxLabel: "Hide Empty Spools",
+                checkboxOnLabel: "Hide empty spools from the UI",
+                checkboxOffLabel: "Show empty spools from the UI",
+                checkboxInfoText: "OctoFarm will hide all empty spools from filament dropdowns and overview screens"
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="alert alert-warning small d-flex align-items-center <%= multiSelectOff %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div>Turning this off will remove all your current filament assignments</div>
+                </div>
+                <div class="alert alert-warning small d-flex align-items-center <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div><%= disableDownDateMessage %></div>
+                </div>
+                <%- include(checkBox, {
+                checkboxID: "allowMultiSelect",
+                checkboxChecked: serverSettings.filament.allowMultiSelect,
+                checkboxLabel: "Allow Multiple Selection",
+                checkboxOnLabel: "Spools can be assigned to multiple printers",
+                checkboxOffLabel: "Spools can be assigned to one printer",
+                checkboxInfoText: "Allow spools to be assigned to more than one printer",
+                checkboxDisabled: disableDownDate
+                })
+                %>
+                <hr>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-12 col-lg-6">
+        <%- include(infoAlert, {
+        title: "Automations"
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div class="alert alert-warning small d-flex align-items-center <%= multiSelectOff %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div>Turning this off will remove all your current filament assignments</div>
+                </div>
+                <div class="alert alert-warning small d-flex align-items-center <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div><%= disableDownDateMessage %></div>
+                </div>
+                <%- include(checkBox, {
+                checkboxID: "downDateSuccess",
+                checkboxChecked: serverSettings.filament.downDateSuccess,
+                checkboxLabel: "Success spool update",
+                checkboxOnLabel: "Update spools remaining grams",
+                checkboxOffLabel: "Ignore spools remaining grams",
+                checkboxInfoText: "On completion of a successful print the total grams of the print will be removed from the spool. This uses OctoPrints length calculation.",
+                checkboxDisabled: disableDownDate
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="alert alert-warning small d-flex align-items-center <%= multiSelectOff %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div>Turning this off will remove all your current filament assignments</div>
+                </div>
+                <div class="alert alert-warning small d-flex align-items-center <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <div><%= disableDownDateMessage %></div>
+                </div>
+                <%- include(checkBox, {
+                checkboxID: "downDateFailed",
+                checkboxChecked: serverSettings.filament.downDateFailed,
+                checkboxLabel: "Failed spool update",
+                checkboxOnLabel: "Update spools remaining grams",
+                checkboxOffLabel: "Ignore spools remaining grams",
+                checkboxInfoText: "On completion of a failed print the total grams of the print will be removed from the spool<br>"
+                    + "<b>Note:</b> This is a best guess calculation, it will never be accurate. It uses OctoPrints length calculation with a percentage of the print completed.",
+                checkboxDisabled: disableDownDate
+                })
+                %>
+                <hr>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-outline-success" type="button">Save Filament Manager Changes</button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Setup to enable/disable the filament manager plugin sync"
+        })
+        %>
+        <% if(!serverSettings.filamentManager){ %>
+        <%- include(alert, {
+        alertType: "info",
+        alertMessage: "Filament Manager plugin sync was originally written to support current setups utilising the plugin. If you are setting this up a-fresh to use"
+            + " with OctoFarm then it's advised you read and understand the documentation at the links below. It is not for the faint of heart!<br>"
+            + "<a class='alert-link' href='https://docs.octofarm.net/getting-started/octoprint-supported-plugins.html#filament-manager-plugin' target='_blank'>Filament Manager Plugin Support</a><br>"
+            + "<a class='alert-link' href='https://docs.octofarm.net/guides/filament-manager-installation.html' target='_blank'>Postgres Database setup and psycopg2 dependency installation</a>"
+        })
+        %>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-4">
+                <%- include(alert, {
+                alertType: "info",
+                alertMessage: "OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register."
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-12 col-lg-4">
+                <%- include(alert, {
+                alertType: "warning",
+                alertMessage: "You must also have all these instances setup with a postgres database. Without this you will not be able to select filament on every instance."
+                })
+                %>
+            </div>
+            <div class="col-12 col-md-12 col-lg-4">
+                <%- include(alert, {
+                alertType: "danger",
+                alertMessage: "Any spool within OctoFarm will be deleted upon successful sync and replaced with those on your filament manager database..."
+                })
+                %>
+            </div>
+        </div>
+        <% } %>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-6">
+                <%- include(infoAlert, {
+                title: "Quick OctoPrint Setup",
+                infoID: "infoQuickOctoPrintSetup",
+                infoText: "The button below will ask you for your postgres details and update it to all online OctoPrint instances settings"
+                })
+                %>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-warning" type="button">Setup OctoPrint Instances!</button>
+                </div>
+            </div>
+            <div class="col-12 col-md-12 col-lg-6">
+                <%- include(infoAlert, {
+                title: "OctoFarm Setup",
+                infoID: "infoSetupOctoFarmFMSync",
+                infoText: "Press the button to enable the sync. OctoFarm will run through some automated checks before allowing the sync to proceed"
+                })
+                %>
+                <div id="filamentManagerButton">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -31,7 +31,7 @@
         <%- include(infoAlert, {
         title: "Light or Dark Mode",
         infoID: "infoLightOrDarkMode",
-        infoText: "The OctoFarm theme detects your systems OS dark mode settings to apply dark/light mode. Please use this to override."
+        infoText: "Set OctoFarms theme to a dark or light mode. Will apply instantly but please don't forget to save your changes!"
         })
         %>
         <div class="form-check">
@@ -54,7 +54,7 @@
         })
         %>
         <label for="mainApplicationColour" class="form-label">Color picker</label>
-        <input type="color" class="form-control form-control-color" id="mainApplicationColour" value="#7E57C2" title="Choose your color">
+        <input type="color" class="form-control form-control-color" id="mainApplicationColour" value="<%= serverSettings.clientTheme.octofarmMainColour %>" title="Choose your color">
         <hr>
         <%- include(infoAlert, {
         title: "Main Accent Colour",
@@ -63,7 +63,7 @@
         })
         %>
         <label for="mainApplicationAccentColour" class="form-label">Color picker</label>
-        <input type="color" class="form-control form-control-color" id="mainApplicationAccentColour" value="#B39DDB" title="Choose your color">
+        <input type="color" class="form-control form-control-color" id="mainApplicationAccentColour" value="<%= serverSettings.clientTheme.octofarmHighlightColour %>" title="Choose your color">
         <hr>
         <div class="row">
             <div class="col">
@@ -107,9 +107,9 @@
     const darkModeCheck = document.getElementById("themeDarkMode")
     const lightModeCheck = document.getElementById("themeLightMode")
 
-    const darkMode = darkmode.getSavedColorScheme();
+    const currentMode = "<%= serverSettings.clientTheme.mode %>"
 
-    if(darkMode === "dark"){
+    if(currentMode === "dark"){
         darkModeCheck.checked = true;
         lightModeCheck.checked = false;
     }else{
