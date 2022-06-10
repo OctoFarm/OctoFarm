@@ -1,9 +1,23 @@
 
 <form class="was-validated">
     <div class="form-check mb-3">
-        <input type="checkbox" class="form-check-input" id="<%= checkboxID %>" required <%= (checkboxChecked) ? "checked" : "" %>>
-        <label class="form-check-label"
-               for="<%= checkboxID %>"><%= checkboxLabel %></label>
+            <input type="checkbox" class="form-check-input" id="<%= checkboxID %>" required <%= (checkboxChecked) ? "checked" : "" %>>
+            <label class="form-check-label"
+                   for="<%= checkboxID %>"><%= checkboxLabel %></label>
+            <% if(typeof checkboxInfoText !== "undefined") { %>
+                <button class="float-end btn btn-outline-info btn-sm btn-circle" type="button" data-bs-toggle="collapse" data-bs-target="#info-<%= checkboxID %>" aria-expanded="false" aria-controls="info-<%= checkboxID %>">
+                    <i class="fa-solid fa-info"></i>
+                </button>
+            <% } %>
+        <% if(typeof checkboxInfoText !== "undefined") { %>
+            <div class="collapse mt-2" id="info-<%= checkboxID %>">
+                <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <div>
+                        <i class="fa-solid fa-info me-2"></i> <%- checkboxInfoText %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
         <div class="valid-feedback"><%= checkboxOnLabel %></div>
         <div class="invalid-feedback"><%= checkboxOffLabel %></div>
     </div>

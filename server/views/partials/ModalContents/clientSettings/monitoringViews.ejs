@@ -16,10 +16,7 @@
     </div>
     <div class="col-12">
         <%- include(infoAlert, {
-        title: "Current Operations",
-        infoID: "infoDatabaseConnection",
-        infoText: "Current Operations is a panel at the top of the views that displays your currently active and completed prints. You can quickly see a "
-            + "minimal amount of relevant print status and restart prints."
+        title: "Additional Panels"
         })
         %>
         <%- include(checkBox, {
@@ -27,48 +24,39 @@
         checkboxChecked: currentUser.clientSettings.views.currentOperations,
         checkboxLabel: "Current Operations Panel",
         checkboxOnLabel: "Current Operations will be shown",
-        checkboxOffLabel: "Current Operations will not be shown"
+        checkboxOffLabel: "Current Operations will not be shown",
+        checkboxInfoText: "A panel at the top of the views that displays your currently active and completed prints. You can quickly see a "
+        + "minimal amount of relevant print status and restart prints."
         })
         %>
         <hr>
     </div>
     <div class="col-12">
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <%- include(infoAlert, {
-                title: "Hide Offline Printers",
-                infoID: "infoHideOfflinePrinters",
-                infoText: "Hide from the views any offline printers"
-                })
-                %>
-                <%- include(checkBox, {
-                checkboxID: "panelHideOffline",
-                checkboxChecked: currentUser.clientSettings.views.showOffline,
-                checkboxLabel: "Hide Offline Printers",
-                checkboxOnLabel: "Offline printer will be hidden",
-                checkboxOffLabel: "Offline printers will be shown"
-                })
-                %>
-                <hr>
-            </div>
-            <div class="col-12 col-md-6">
-                <%- include(infoAlert, {
-                title: "Hide Disconnected Printers",
-                infoID: "infoHideDisconnected",
-                infoText: "Hide from the views any disconnected printers"
-                })
-                %>
-                <%- include(checkBox, {
-                checkboxID: "panelHideClosed",
-                checkboxChecked: currentUser.clientSettings.views.showDisconnected,
-                checkboxLabel: "Hide Disconnected Printers",
-                checkboxOnLabel: "Disconnected printers will be hidden",
-                checkboxOffLabel: "Disconnected printer will be shown"
-                })
-                %>
-                <hr>
-            </div>
+        <%- include(infoAlert, {
+        title: "Hide Printer States",
+        infoID: "infoHideOfflinePrinters",
+        infoText: "Allows the hiding of certain printer states from the views. When enabled these states will be ignored completely on all of your active views."
+        })
+        %>
+        <div class="hstack gap-3">
+            <%- include(checkBox, {
+            checkboxID: "panelHideOffline",
+            checkboxChecked: currentUser.clientSettings.views.showOffline,
+            checkboxLabel: "Hide Offline Printers",
+            checkboxOnLabel: "Offline printer will be hidden",
+            checkboxOffLabel: "Offline printers will be shown"
+            })
+            %>
+            <%- include(checkBox, {
+            checkboxID: "panelHideClosed",
+            checkboxChecked: currentUser.clientSettings.views.showDisconnected,
+            checkboxLabel: "Hide Disconnected Printers",
+            checkboxOnLabel: "Disconnected printers will be hidden",
+            checkboxOffLabel: "Disconnected printer will be shown"
+            })
+            %>
         </div>
+        <hr>
     </div>
     <div class="col-12">
         <div class="row">

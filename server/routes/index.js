@@ -43,8 +43,7 @@ router.get("/", async (req, res) => {
         page: "Welcome",
         layout: "layout-no-sign-in",
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        registration,
-        serverSettings: serverSettings
+        registration
       });
     }
   }
@@ -53,7 +52,6 @@ router.get("/", async (req, res) => {
 // Dashboard Page
 router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = getDashboardStatistics();
   let dashboardSettings = req.user.clientSettings?.dashboard || getDefaultDashboardSettings();
 
@@ -67,13 +65,11 @@ router.get("/dashboard", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     helpers: prettyHelpers,
     dashboardSettings: dashboardSettings,
     dashboardStatistics: dashStatistics,
-    serverSettings,
     clientSettings: req.user.clientSettings
   });
 });
 router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const development_mode = process.env.NODE_ENV === "development";
 
   res.render("printerManagement", {
@@ -85,7 +81,6 @@ router.get("/printers", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     printerCount: printers.length,
     helpers: prettyHelpers,
     air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
-    serverSettings,
     clientSettings: req.user.clientSettings,
     development_mode
   });
@@ -108,15 +103,12 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
     helpers: prettyHelpers,
     currentOperationsCount: currentOperations.count,
     fileStatistics,
-    serverSettings,
     clientSettings: req.user.clientSettings
   });
 });
 // History Page
 router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-
-  const serverSettings = SettingsClean.returnSystemSettings();
 
   const historyCache = getHistoryCache();
 
@@ -132,7 +124,6 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
     printStatistics: statisticsClean,
     pagination: pagination,
     page: "History",
-    serverSettings,
     monthlyStatistics: historyCache.monthlyStatistics,
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     clientSettings: req.user.clientSettings
@@ -145,7 +136,6 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
-  const serverSettings = SettingsClean.returnSystemSettings();
   getPrinterManagerCache().updateGroupList();
   let printGroups = getPrinterManagerCache().returnGroupList();
   if (typeof printGroups === "undefined") {
@@ -163,7 +153,6 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     helpers: prettyHelpers,
     clientSettings: req.user.clientSettings,
     printGroups,
-    serverSettings,
     currentChanges: { currentSort, currentFilter },
     dashboardStatistics: dashStatistics
   });
@@ -171,7 +160,6 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
 // Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
@@ -192,14 +180,12 @@ router.get("/mon/camera", ensureAuthenticated, ensureCurrentUserAndGroup, async 
     helpers: prettyHelpers,
     clientSettings: req.user.clientSettings,
     printGroups,
-    serverSettings,
     currentChanges: { currentSort, currentFilter },
     dashboardStatistics: dashStatistics
   });
 });
 router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
 
   const currentSort = getSorting();
   const currentFilter = getFilter();
@@ -220,14 +206,12 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     helpers: prettyHelpers,
     clientSettings: req.user.clientSettings,
     printGroups,
-    serverSettings,
     currentChanges: { currentSort, currentFilter }
   });
 });
 // List view  Page
 router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const clientSettings = SettingsClean.returnClientSettings();
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
@@ -249,7 +233,6 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     helpers: prettyHelpers,
     clientSettings,
     printGroups,
-    serverSettings,
     currentChanges: { currentSort, currentFilter },
     dashboardStatistics: dashStatistics
   });
@@ -257,7 +240,6 @@ router.get("/mon/list", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 
 router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const dashStatistics = getDashboardStatistics();
   const currentSort = getSorting();
   const currentFilter = getFilter();
@@ -278,7 +260,6 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
     helpers: prettyHelpers,
     clientSettings: req.user.clientSettings,
     printGroups,
-    serverSettings,
     currentChanges: { currentSort, currentFilter },
     dashboardStatistics: dashStatistics
   });
@@ -286,7 +267,6 @@ router.get("/mon/combined", ensureAuthenticated, ensureCurrentUserAndGroup, asyn
 
 router.get("/mon/currentOp", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
 
   res.render("currentOperationsView", {
     name: req.user.name,
@@ -297,7 +277,6 @@ router.get("/mon/currentOp", ensureAuthenticated, ensureCurrentUserAndGroup, asy
     page: "Current Operations",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
-    serverSettings,
     clientSettings: req.user.clientSettings
   });
 });
@@ -306,7 +285,6 @@ router.get("/filament", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
   const historyStats = historyCache.generateStatistics();
 
   const printers = getPrinterStoreCache().listPrintersInformation();
-  const serverSettings = SettingsClean.returnSystemSettings();
   const statistics = FilamentClean.getStatistics();
   const spools = FilamentClean.getSpools();
   const profiles = FilamentClean.getProfiles();
@@ -319,7 +297,6 @@ router.get("/filament", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     page: "Filament Manager",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     helpers: prettyHelpers,
-    serverSettings,
     spools,
     profiles,
     statistics,
@@ -334,7 +311,6 @@ router.get(
   ensureCurrentUserAndGroup,
   ensureAdministrator,
   async (req, res) => {
-    const serverSettings = SettingsClean.returnSystemSettings();
     const systemInformation = SystemRunner.returnInfo();
     res.render("administration", {
       name: req.user.name,
@@ -344,7 +320,6 @@ router.get(
       page: "Administration",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
-      serverSettings,
       systemInformation,
       db: fetchMongoDBConnectionString(),
       serviceInformation: {
