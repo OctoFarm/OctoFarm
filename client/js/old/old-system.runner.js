@@ -1,12 +1,12 @@
-import UI from "./utils/ui.js";
-import Script from "./services/octofarm-scripts.service";
-import ClientSettings from "./pages/system/client-settings";
+import UI from "../utils/ui.js";
+import Script from "../services/octofarm-scripts.service";
+import ClientSettings from "../pages/system/client-settings";
 import {
   localStorageKeys,
   returnSaveBtn,
   serverActionsElements,
   userActionElements,
-} from "./pages/system/server.options";
+} from "../pages/system/server.options";
 import {
   checkFilamentManagerPluginState,
   checkForOctoFarmUpdates,
@@ -27,10 +27,10 @@ import {
   startUpdateTasksRunner,
   updateOctoFarmCommand,
   updateServerSettings,
-} from "./pages/system/server.actions";
-import { serverBootBoxOptions } from "./pages/system/utils/bootbox.options";
-import { removeLocalStorage } from "./services/local-storage.service";
-import { serverDatabaseKeys } from "../../server/constants/database.constants";
+} from "../pages/system/server.actions";
+import { serverBootBoxOptions } from "../pages/system/utils/bootbox.options";
+import { removeLocalStorage } from "../services/local-storage.service";
+import { serverDatabaseKeys } from "../../../server/constants/database.constants";
 
 // Setup Page
 for (const key in serverDatabaseKeys) {

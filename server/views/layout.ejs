@@ -11,8 +11,8 @@
 <% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
 <% const modal = base + '/octofarm-modal.ejs' %>
 <% let currentUserGroup = "User" %>
-<% if(typeof userGroup !== "undefined") { %>
-    <% currentUserGroup = userGroup %>
+<% if(typeof currentUser !== "undefined") { %>
+    <% currentUserGroup = currentUser.group %>
 <% } %>
 <% let monitoringSettings; %>
 <% if(typeof serverSettings !== "undefined") { %>

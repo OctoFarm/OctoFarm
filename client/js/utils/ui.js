@@ -428,4 +428,14 @@ export default class UI {
     element.scrollTop = this.elementsScrollPosition.scrollTop;
     element.scrollLeft = this.elementsScrollPosition.scrollLeft;
   }
+
+  static checkElementExists(element){
+    if(element){
+      return element;
+    }
+  }
+
+  static checkMenuIsActive(element) {
+    this.checkElementExists(element)
+  }
 }

@@ -22,10 +22,10 @@ const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
-const { ensureClientServerVersion } = require("./middleware/client-server-version");
+const { ensureClientServerInformation } = require("./middleware/server-information");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
-const { ensureServerSettings } = require("./middleware/server-settings")
+const { ensureAdministrator } = require("./middleware/auth.js");
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -127,8 +127,7 @@ async function ensureSystemSettingsInitiated() {
  */
 function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
-  app.use(ensureClientServerVersion);
-  app.use(ensureServerSettings);
+  app.use(ensureClientServerInformation);
   //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
@@ -137,7 +136,6 @@ function serveOctoFarmRoutes(app) {
     printerActionLimits,
     require("./routes/printer-manager.routes.js", { page: "route" })
   );
-  app.use("/settings", require("./routes/system-settings.routes.js", { page: "route" }));
   app.use("/filament", require("./routes/filament-manager.routes.js", { page: "route" }));
   app.use("/history", require("./routes/history.routes.js", { page: "route" }));
   app.use("/scripts", require("./routes/local-scripts-manager.routes.js", { page: "route" }));
@@ -154,6 +152,12 @@ function serveOctoFarmRoutes(app) {
     `${AppConstants.apiRoute}/data`,
     ensureAuthenticated,
     require("./routes/non-specific-data.routes.js")
+  );
+  app.use(
+    `${AppConstants.apiRoute}/administration`,
+    ensureAuthenticated,
+    ensureAdministrator,
+    require("./routes/administration.routes.js", { page: "route" })
   );
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {

@@ -313,25 +313,12 @@ router.get(
   async (req, res) => {
     const systemInformation = SystemRunner.returnInfo();
     res.render("administration", {
-      name: req.user.name,
-      userGroup: req.user.group,
-      version: process.env[AppConstants.VERSION_KEY],
-      printerCount: getPrinterStoreCache().getPrinterCount(),
       page: "Administration",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      helpers: prettyHelpers,
-      systemInformation,
       db: fetchMongoDBConnectionString(),
+      helpers: prettyHelpers,
       serviceInformation: {
-        isDockerContainer: isDocker(),
-        isNodemon: isNodemon(),
-        isNode: isNode(),
-        isPm2: isPm2()
+        isDockerContainer: isDocker()
       },
-      currentGitBranch: await getCurrentBranch(),
-      clientVersion: fetchClientVersion(),
-      areWeGitRepo: checkIfWereInAGitRepo(),
-      systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
       taskManagerState: TaskManager.getTaskState()
     });
   }

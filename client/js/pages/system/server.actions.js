@@ -783,10 +783,8 @@ async function startUpdateInfoRunner() {
 }
 
 // REFACTOR utilise the events server for this...
-function startUpdateTasksRunner() {
-  setInterval(async function updateStatus() {
-    const taskManagerState = await OctoFarmClient.get("settings/system/tasks");
-
+async function updateTaskListState() {
+    const taskManagerState = await OctoFarmClient.getSystemRunningTaskList();
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
       const { options: taskOptions } = theTask;
@@ -794,41 +792,40 @@ function startUpdateTasksRunner() {
 
       if (periodic) {
         UI.doesElementNeedUpdating(
-          theTask.firstCompletion
-            ? new Date(theTask.firstCompletion)
-                .toLocaleString()
-                .replace(",", ": ")
-            : "Not Started",
-          document.getElementById("firstExecution-" + task),
-          "innerHTML"
+            theTask.firstCompletion
+                ? new Date(theTask.firstCompletion)
+                    .toLocaleString()
+                    .replace(",", ": ")
+                : "Not Started",
+            document.getElementById("firstExecution-" + task),
+            "innerHTML"
         );
 
         UI.doesElementNeedUpdating(
-          theTask.lastExecuted
-            ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
-            : "Not Finished",
-          document.getElementById("lastExecution-" + task),
-          "innerHTML"
+            theTask.lastExecuted
+                ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
+                : "Not Finished",
+            document.getElementById("lastExecution-" + task),
+            "innerHTML"
         );
 
         UI.doesElementNeedUpdating(
-          theTask.duration
-            ? UI.generateMilisecondsTime(theTask.duration)
-            : "<i class=\"fas fa-sync fa-spin\"></i>",
-          document.getElementById("duration-" + task),
-          "innerHTML"
+            theTask.duration
+                ? UI.generateMilisecondsTime(theTask.duration)
+                : "<i class=\"fas fa-sync fa-spin\"></i>",
+            document.getElementById("duration-" + task),
+            "innerHTML"
         );
 
         UI.doesElementNeedUpdating(
-          theTask.nextRun
-            ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
-            : "First Not Completed",
-          document.getElementById("next-" + task),
-          "innerHTML"
+            theTask.nextRun
+                ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
+                : "First Not Completed",
+            document.getElementById("next-" + task),
+            "innerHTML"
         );
       }
     }
-  }, 1500);
 }
 
 function displayUserErrors(errors) {
@@ -1045,7 +1042,7 @@ export {
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
   renderSystemCharts,
-  startUpdateTasksRunner,
+  updateTaskListState,
   startUpdateInfoRunner,
   createNewUser,
   editUser,

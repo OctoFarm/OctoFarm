@@ -1,7 +1,5 @@
-<% let username = ""; %>
 <% let disableUserDropDown = "disabled"; %>
-<% if(typeof name !== "undefined"){ %>
-    <% username = name %>
+<% if(typeof currentUser !== "undefined"){ %>
     <% disableUserDropDown = ""; %>
 <% } %>
 
@@ -12,19 +10,19 @@
     <ul class="dropdown-menu">
         <div class="ps-4 pe-4 text-center">
             <p class="mb-1"><i class="far fa-user text-purple fa-2xl"></i></p>
-            <p class="mb-2"><%= username; %></p>
-            <p class="mb-1"><%= currentUserGroup; %></p>
+            <p class="mb-2"><%= currentUser.name; %></p>
+            <p class="mb-1"><%= currentUser.group; %></p>
         </div>
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header">Settings</h6></li>
         <li><a class="dropdown-item"data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client Settings</a></li>
-        <% if(currentUserGroup === "Administrator"){ %>
+        <% if(currentUser.group === "Administrator"){ %>
             <li><h6 class="dropdown-header">Admin</h6></li>
             <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench text-purple"></i> Administration</a></li>
             <li><a class="dropdown-item" href="/users"><i class="fa-solid fa-users text-purple"></i> Users</a></li>
         <% } %>
         <li><h6 class="dropdown-header">Information</h6></li>
-        <% if(currentUserGroup === "Administrator"){ %>
+        <% if(currentUser.group === "Administrator"){ %>
             <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle text-purple"></i>  System Information</a></li>
             <li><a class="dropdown-item" href="#"><i class="fa-solid fa-clipboard text-purple"></i> Logs</a></li>
         <% } %>
