@@ -26,6 +26,7 @@ const { ensureClientServerVersion } = require("./middleware/client-server-versio
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
+const { ensureServerSettings } = require("./middleware/server-settings")
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
@@ -128,7 +129,7 @@ async function ensureSystemSettingsInitiated() {
 function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
   app.use(ensureClientServerVersion);
-
+  app.use(ensureServerSettings);
   //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));

@@ -160,6 +160,43 @@ const ServerSettingsSchema = new mongoose.Schema({
       required: true,
       default: false
     }
+  },
+  clientTheme: {
+    mode: {
+      type: String,
+      required: true,
+      default: "dark"
+    },
+    octofarmHighlightColour: {
+        type: String,
+        required: true,
+        default: "#B39DDB"
+    },
+    octofarmMainColour: {
+      type: String,
+      required: true,
+      default: "#7E57C2"
+    },
+    sidebarColourDark: {
+      type: String,
+      required: true,
+      default: "#212020"
+    },
+    navbarColourDark: {
+      type: String,
+      required: true,
+      default: "#313030"
+    },
+    sidebarColourLight: {
+      type: String,
+      required: true,
+      default: "#E0E0E0"
+    },
+    navbarColourLight: {
+      type: String,
+      required: true,
+      default: "#EEEEEE"
+    }
   }
 });
 
