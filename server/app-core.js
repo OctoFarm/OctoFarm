@@ -26,7 +26,7 @@ const { ensureClientServerVersion } = require("./middleware/client-server-versio
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
-const { ensureServerSettings } = require("./middleware/server-settings")
+const { ensureAdministrator } = require("./middleware/auth.js");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
@@ -128,8 +128,7 @@ async function ensureSystemSettingsInitiated() {
  */
 function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
-  app.use(ensureClientServerVersion);
-  app.use(ensureServerSettings);
+  app.use(ensureClientServerInformation);
   //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
@@ -138,7 +137,6 @@ function serveOctoFarmRoutes(app) {
     printerActionLimits,
     require("./routes/printer-manager.routes.js", { page: "route" })
   );
-  app.use("/settings", require("./routes/system-settings.routes.js", { page: "route" }));
   app.use("/filament", require("./routes/filament-manager.routes.js", { page: "route" }));
   app.use("/history", require("./routes/history.routes.js", { page: "route" }));
   app.use("/scripts", require("./routes/local-scripts-manager.routes.js", { page: "route" }));
@@ -155,6 +153,12 @@ function serveOctoFarmRoutes(app) {
     `${AppConstants.apiRoute}/data`,
     ensureAuthenticated,
     require("./routes/non-specific-data.routes.js")
+  );
+  app.use(
+    `${AppConstants.apiRoute}/administration`,
+    ensureAuthenticated,
+    ensureAdministrator,
+    require("./routes/administration.routes.js", { page: "route" })
   );
 
   app.use(`${AppConstants.apiRoute}/data`, require("./routes/non-specific-data.routes.js"));

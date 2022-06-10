@@ -1,6 +1,5 @@
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
 const { fetchFirstAdministrator } = require("../services/users.service");
-const { fetchClientVersion } = require("../app-env");
 
 module.exports = {
   async ensureCurrentUserAndGroup(req, res, next) {
@@ -27,10 +26,10 @@ module.exports = {
     }
 
     res.locals.currentUser = {
-      name: req.user.name,
-      username: req.user.username,
-      group: req.user.group,
-      clientSettings: req.user.clientSettings
+      name: req.user?.name,
+      username: req.user?.username,
+      group: req.user?.group,
+      clientSettings: req.user?.clientSettings
     };
 
     next();

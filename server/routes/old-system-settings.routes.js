@@ -128,66 +128,6 @@ router.post(
   }
 );
 
-router.get(
-  "/server/delete/database/:databaseName",
-  ensureAuthenticated,
-  ensureAdministrator,
-  validateParamsMiddleware(S_VALID.DATABASE_NAME),
-  async (req, res) => {
-    const databaseName = req.paramString("databaseName");
-    getPrinterManagerCache().killAllConnections();
-    if (databaseName === "EverythingDB") {
-      await ServerSettingsDB.deleteMany({});
-      await ClientSettingsDB.deleteMany({});
-      await HistoryDB.deleteMany({});
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
-      await RoomDataDB.deleteMany({});
-      await UserDB.deleteMany({});
-      await PrintersDB.deleteMany({});
-      await AlertsDB.deleteMany({});
-      await GcodeDB.deleteMany({});
-      res.send({
-        message: "Successfully deleted databases, server will restart..."
-      });
-      logger.info("Database completely wiped.... Restarting server...");
-      await SystemCommands.rebootOctoFarm();
-    } else if (databaseName === "FilamentDB") {
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
-      logger.info("Successfully deleted Filament database.... Restarting server...");
-      await SystemCommands.rebootOctoFarm();
-    } else if (databaseNamesList.includes(databaseName)) {
-      await eval(databaseName).deleteMany({});
-    } else {
-      logger.error("Unknown DB Name", databaseName);
-    }
-    res.send({
-      message: `Successfully deleted ${databaseName}, server will restart...`
-    });
-    logger.info(databaseName + " successfully deleted.... Restarting server...");
-    await SystemCommands.rebootOctoFarm();
-  }
-);
-router.get(
-  "/server/get/database/:databaseName",
-  ensureAuthenticated,
-  ensureAdministrator,
-  validateParamsMiddleware(S_VALID.DATABASE_NAME),
-  async (req, res) => {
-    const databaseName = req.paramString("databaseName");
-    logger.info("Client requests export of " + databaseName);
-    const returnedObjects = [];
-    if (databaseName === "FilamentDB") {
-      returnedObjects.push(await ProfilesDB.find({}));
-      returnedObjects.push(await SpoolsDB.find({}));
-    } else if (databaseNamesList.includes(databaseName)) {
-      returnedObjects.push(await eval(databaseName).find({}));
-    }
-    logger.info("Returning to client database object: " + databaseName);
-    res.send({ databases: returnedObjects });
-  }
-);
 router.post("/server/restart", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   let serviceRestarted = false;
   try {
@@ -430,12 +370,6 @@ router.get("/system/info", ensureAuthenticated, (req, res) => {
   TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
   const systemInformation = SystemRunner.returnInfo(true);
   res.send(systemInformation);
-});
-
-router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  const taskManagerState = TaskManager.getTaskState();
-
-  res.send(taskManagerState);
 });
 
 router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);

@@ -108,6 +108,37 @@ export default class OctoFarmClient {
   static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
   static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
 
+  static administrationRoute = `${this.base}/administration`
+  static systemRunningTasksRoute = `${this.administrationRoute}/tasks`
+
+  static async #get(path) {
+    const url = new URL(path, window.location.origin).href;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  static async #post(path, data) {
+    const url = new URL(path, window.location.origin).href;
+    return axios.post(url, data).then((res) => {
+      return res.data;
+    });
+  }
+
+  static async #delete(path) {
+    const url = new URL(path, window.location.origin).href;
+    return axios.delete(url).then((res) => {
+      return res.data;
+    });
+  }
+
+  static async #patch(path, data) {
+    const url = new URL(path, window.location.origin).href;
+    return axios.patch(url, data).then((res) => {
+      return res.data;
+    });
+  }
+
   static validatePath(pathname) {
     if (!pathname) {
       const newURL = new URL(path, window.location.origin);
@@ -124,18 +155,18 @@ export default class OctoFarmClient {
     const body = {
       i: id,
     };
-    return this.post(`${this.printerRoute}/printerInfo/`, body);
+    return this.#post(`${this.printerRoute}/printerInfo/`, body);
   }
 
   static async getPrinterName() {
-    return this.get(this.generatePrinterNameRoute);
+    return this.#get(this.generatePrinterNameRoute);
   }
 
   static async forceReconnect(id) {
     const data = {
       id,
     };
-    return this.post(this.forceReconnectRoute, data);
+    return this.#post(this.forceReconnectRoute, data);
   }
 
   static async listPrinters(disabled = false, showFullList = false) {
@@ -149,104 +180,104 @@ export default class OctoFarmClient {
       path += "?fullList=true";
     }
 
-    return this.post(path);
+    return this.#post(path);
   }
 
   static async disablePrinter(idList) {
     const body = {
       idList,
     };
-    return this.post(`${this.disablePrinterRoute}`, body);
+    return this.#post(`${this.disablePrinterRoute}`, body);
   }
 
   static async enablePrinter(idList) {
     const body = {
       idList,
     };
-    return this.post(`${this.enablePrinterRoute}`, body);
+    return this.#post(`${this.enablePrinterRoute}`, body);
   }
 
   static async refreshPrinterSettings(id) {
     const body = {
       i: id,
     };
-    return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
+    return this.#post(`${this.printerRoute}/updatePrinterSettings`, body);
   }
 
   static async generateLogDump() {
-    return this.post(`${this.logsRoute}/generateLogDump`, {});
+    return this.#post(`${this.logsRoute}/generateLogDump`, {});
   }
 
   static async deleteLogFile(filename) {
-    return this.delete(`${this.logsRoute}/${filename}`);
+    return this.#delete(`${this.logsRoute}/${filename}`);
   }
 
   static async clearOldLogs() {
-    return this.delete(`${this.logsRoute}/clear-old`);
+    return this.#delete(`${this.logsRoute}/clear-old`);
   }
 
   static async getHistoryStatistics() {
-    return this.get("history/statisticsData");
+    return this.#get("history/statisticsData");
   }
 
   static async getClientSettings() {
-    return this.get("settings/client/get");
+    return this.#get("settings/client/get");
   }
 
   static async getServerSettings() {
-    return this.get(`${this.serverSettingsRoute}/get`);
+    return this.#get(`${this.serverSettingsRoute}/get`);
   }
 
   static async getSelectedFilament(id) {
-    return this.get(`${this.selectedFilamentRoute}/${id}`);
+    return this.#get(`${this.selectedFilamentRoute}/${id}`);
   }
 
   static async setPrinterSteps(id, newSteps) {
-    return this.post("printers/stepChange", {
+    return this.#post("printers/stepChange", {
       printer: id,
       newSteps,
     });
   }
 
   static async getUser(id) {
-    return this.get(`${this.userRoute}/${id}`);
+    return this.#get(`${this.userRoute}/${id}`);
   }
 
   static async createNewUser(user) {
-    return this.post(`${this.userRoute}`, user);
+    return this.#post(`${this.userRoute}`, user);
   }
 
   static async editUser(id, user) {
-    return this.patch(`${this.userRoute}/${id}`, user);
+    return this.#patch(`${this.userRoute}/${id}`, user);
   }
 
   static async deleteUser(id) {
-    return this.delete(`${this.userRoute}/${id}`);
+    return this.#delete(`${this.userRoute}/${id}`);
   }
 
   static async resetUserPassword(id, password) {
-    return this.patch(`${this.userRoute}/${id}`, password);
+    return this.#patch(`${this.userRoute}/${id}`, password);
   }
 
   static async getFilamentStatistics() {
-    return this.get(this.filamentStatistics);
+    return this.#get(this.filamentStatistics);
   }
 
   static async getFilamentSpools() {
-    return this.get(this.filamentSpools);
+    return this.#get(this.filamentSpools);
   }
 
   static async getFilamentProfiles() {
-    return this.get(this.filamentProfiles);
+    return this.#get(this.filamentProfiles);
   }
 
   static async updateServerSettings(settingsObject) {
     //REFACTOR: should be patch not post
-    return this.post(this.updateSettingsRoute, settingsObject);
+    return this.#post(this.updateSettingsRoute, settingsObject);
   }
 
   static async restartServer() {
-    return this.post(`${this.serverSettingsRoute}/restart`, {});
+    return this.#post(`${this.serverSettingsRoute}/restart`, {});
   }
 
   static async getCustomGcode(id) {
@@ -254,43 +285,43 @@ export default class OctoFarmClient {
     if (id) {
       url = `${url}/${id}`;
     }
-    return this.get(url);
+    return this.#get(url);
   }
 
   static async getOctoPrintUniqueFolders() {
-    return this.get(`${this.printerRoute}/listUniqueFolders`);
+    return this.#get(`${this.printerRoute}/listUniqueFolders`);
   }
 
   static getCurrentOpState() {
-    return this.get("client/currentOpSorting");
+    return this.#get("client/currentOpSorting");
   }
 
   static getHealthChecks() {
-    return this.get(this.healthCheckRoute);
+    return this.#get(this.healthCheckRoute);
   }
 
   static getFarmOverview() {
-    return this.get(this.farmOverviewRoute);
+    return this.#get(this.farmOverviewRoute);
   }
 
   static getConnectionOverview() {
-    return this.get(this.connectionOverviewRoute);
+    return this.#get(this.connectionOverviewRoute);
   }
   static async sendError(error) {
     try {
-      await this.post(this.fireLogToServerRoute, error);
+      await this.#post(this.fireLogToServerRoute, error);
     } catch (e) {
       console.error(e.toString());
     }
   }
 
   static updateCurrentOpState({ iterie, order }) {
-    return this.post("client/currentOpSorting", { iterie, order });
+    return this.#post("client/currentOpSorting", { iterie, order });
   }
 
   static async updateActiveControlUser(id) {
     try {
-      await this.patch(`${this.updateActiveUserRoute}/${id}`);
+      await this.#patch(`${this.updateActiveUserRoute}/${id}`);
     } catch (e) {
       console.error("Unable to update active control user!", e.toString());
     }
@@ -298,37 +329,13 @@ export default class OctoFarmClient {
 
   static async updateUserActionsLog(id, body) {
     try {
-      await this.post(`${this.updateUserActionsLogRoute}/${id}`, body);
+      await this.#post(`${this.updateUserActionsLogRoute}/${id}`, body);
     } catch (e) {
       console.error("Unable to update user actions log!", e.toString());
     }
   }
 
-  static async get(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async post(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.post(url, data).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async delete(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.delete(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async patch(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.patch(url, data).then((res) => {
-      return res.data;
-    });
+  static async getSystemRunningTaskList(){
+    return this.#get(this.systemRunningTasksRoute);
   }
 }
