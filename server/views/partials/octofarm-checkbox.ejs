@@ -1,7 +1,13 @@
-
 <form class="was-validated">
     <div class="form-check mb-3">
-            <input type="checkbox" class="form-check-input" id="<%= checkboxID %>" required <%= (checkboxChecked) ? "checked" : "" %>>
+            <input
+                    type="checkbox"
+                    class="form-check-input"
+                    id="<%= checkboxID %>"
+                    required
+                    <%= (checkboxChecked) ? "checked" : "" %>
+                    <%= (typeof checkboxDisabled !== "undefined" && checkboxDisabled) ? "disabled" : "" %>
+            >
             <label class="form-check-label"
                    for="<%= checkboxID %>"><%= checkboxLabel %></label>
             <% if(typeof checkboxInfoText !== "undefined") { %>
