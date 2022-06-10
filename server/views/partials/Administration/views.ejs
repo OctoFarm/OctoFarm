@@ -22,18 +22,13 @@
     </div>
     <% Object.keys(serverSettings.monitoringViews.toJSON()).forEach((key, index) => { %>
         <div class="col-12 col-md-4">
-            <%- include(infoAlert, {
-            title: viewNames[index].name + " View",
-            infoID: "info"+viewNames[index].name.replace(" ", ""),
-            infoText: viewNames[index].desc
-            })
-            %>
             <%- include(checkBox, {
-            checkboxID: "requireLogin",
+            checkboxID: key,
             checkboxChecked: serverSettings.monitoringViews[key],
             checkboxLabel: viewNames[index].name + " View",
             checkboxOnLabel: viewNames[index].name + " View Enabled",
-            checkboxOffLabel: viewNames[index].name + " View Disabled"
+            checkboxOffLabel: viewNames[index].name + " View Disabled",
+            checkboxInfoText: viewNames[index].desc
             })
             %>
             <hr>

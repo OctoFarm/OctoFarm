@@ -19,7 +19,7 @@
     <% monitoringSettings = serverSettings.monitoringViews %>
 <% } %>
 <!DOCTYPE html>
-<html lang="en" data-bs-color-scheme>
+<html lang="en" data-bs-color-scheme="<%= serverSettings.clientTheme.mode %>">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -31,7 +31,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?<%= clientVersion %>">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg?<%= clientVersion %>" color="#5bbad5">
-    <link rel="stylesheet" href="/assets/dist/custom.css?<%= clientVersion %>"/>
+    <style>
+        :root {
+            --header-height: 2rem;
+            --nav-width: 68px;
+            --z-fixed: 100;
+            --octofarm-highlight-colour: <%= serverSettings.clientTheme.octofarmHighlightColour %>;
+            --octofarm-main-colour: <%= serverSettings.clientTheme.octofarmMainColour %>;
+            --sidebar-colour-dark: <%= serverSettings.clientTheme.sidebarColourDark %>;
+            --navbar-colour-dark: <%= serverSettings.clientTheme.navbarColourDark %>;
+            --sidebar-colour-light: <%= serverSettings.clientTheme.sidebarColourLight %>;
+            --navbar-colour-light: <%= serverSettings.clientTheme.navbarColourLight %>;
+        }
+    </style>
     <link rel="stylesheet" href="/assets/dist/vendor.css?<%= clientVersion %>"/>
     <link rel="stylesheet" href="/assets/dist/navigation.css?<%= clientVersion %>"/>
     <link rel="stylesheet" href="/assets/dist/overrides.css?<%= clientVersion %>"/>

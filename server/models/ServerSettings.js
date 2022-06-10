@@ -168,9 +168,9 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: "dark"
     },
     octofarmHighlightColour: {
-        type: String,
-        required: true,
-        default: "#B39DDB"
+      type: String,
+      required: true,
+      default: "#B39DDB"
     },
     octofarmMainColour: {
       type: String,
