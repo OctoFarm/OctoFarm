@@ -25,6 +25,7 @@ const { sanitizeString } = require("./utils/sanitize-utils");
 const { ensureClientServerVersion } = require("./middleware/client-server-version");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
+const { ensureServerSettings } = require("./middleware/server-settings")
 
 const logger = new Logger("OctoFarm-Server");
 
@@ -127,7 +128,7 @@ async function ensureSystemSettingsInitiated() {
 function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
   app.use(ensureClientServerVersion);
-
+  app.use(ensureServerSettings);
   //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
