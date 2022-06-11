@@ -465,7 +465,9 @@ class WebSocketClient {
 
     const timeSinceLastMessage = this.#lastPingMessage - this.#lastMessage.getTime();
 
-    if (timeSinceLastMessage > this.deadWebsocketTimeout) {
+    const isPrinterActive = getPrinterStoreCache().isPrinterActive(this.id);
+
+    if (isPrinterActive && timeSinceLastMessage > this.deadWebsocketTimeout) {
       logger.error(
         `It's been over ${
           this.deadWebsocketTimeout * 1000
@@ -475,35 +477,37 @@ class WebSocketClient {
           deadTimeout: this.deadWebsocketTimeout
         }
       );
-      this.reconnect();
+      this.terminate();
+    } else {
+      const registerPongCheck = setTimeout(() => {
+        if (
+            this.#pingPongTimer + this.#currentMessageMSRate <
+            Math.abs(this.#lastPingMessage - this.#lastPongMessage)
+        ) {
+          logger.error("Ping hasn't received a pong!", {
+            lastPingMessage: this.#lastPingMessage,
+            lastPongMessage: this.#lastPongMessage,
+            time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
+          });
+          PrinterTicker.addIssue(
+              new Date(),
+              this.url,
+              "Didn't receive a pong from client, reconnecting!",
+              "Offline",
+              this.id
+          );
+          ConnectionMonitorService.updateOrAddResponse(
+              this.url,
+              REQUEST_TYPE.WEBSOCKET,
+              REQUEST_KEYS.TOTAL_PING_PONG
+          );
+          this.terminate();
+          clearTimeout(registerPongCheck);
+        }
+      }, 1000);
     }
 
-    const registerPongCheck = setTimeout(() => {
-      if (
-        this.#pingPongTimer + this.#currentMessageMSRate <
-        Math.abs(this.#lastPingMessage - this.#lastPongMessage)
-      ) {
-        logger.error("Ping hasn't received a pong!", {
-          lastPingMessage: this.#lastPingMessage,
-          lastPongMessage: this.#lastPongMessage,
-          time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
-        });
-        PrinterTicker.addIssue(
-          new Date(),
-          this.url,
-          "Didn't receive a pong from client, reconnecting!",
-          "Offline",
-          this.id
-        );
-        ConnectionMonitorService.updateOrAddResponse(
-          this.url,
-          REQUEST_TYPE.WEBSOCKET,
-          REQUEST_KEYS.TOTAL_PING_PONG
-        );
-        this.terminate();
-        clearTimeout(registerPongCheck);
-      }
-    }, 1000);
+
   }
 
   close() {
