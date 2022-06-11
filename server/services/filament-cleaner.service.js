@@ -94,6 +94,7 @@ class FilamentCleanerService {
     const currentSettings = SettingsClean.returnSystemSettings();
     const { filament } = currentSettings;
     const { hideEmpty } = filament;
+
     const createList = [this.noSpoolOptions];
     spools.forEach((spool) => {
       let profileId = _.findIndex(profiles, function (o) {
@@ -103,10 +104,34 @@ class FilamentCleanerService {
       const index = _.findIndex(selected, function (o) {
         return o.toString() === spool._id.toString();
       });
-      if (profileId >= 0) {
-        const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
 
-        if (!hideEmpty && !amountLeft < 1) {
+      if (profileId < 0) {
+        logger.error("Unable to match profile to spool!", spool);
+      }
+
+      if (profileId >= 0) {
+        const amountLeft = parseInt(spool.spools.weight) - parseInt(spool.spools.used);
+
+        logger.info("Seeings for spool", {
+          hideEmpty,
+          amountLeft
+        });
+
+        console.log("Seeings for spool", {
+          hideEmpty,
+          amountLeft
+        });
+
+        let showSpool = true;
+
+        if (hideEmpty && amountLeft < 1) {
+          // spool should hide
+          showSpool = false;
+        }
+
+        console.log(showSpool)
+
+        if (showSpool) {
           createList.push({
             spoolID: spool._id,
             spoolName: spool.spools.name,
