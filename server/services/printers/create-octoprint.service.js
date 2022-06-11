@@ -524,7 +524,7 @@ class OctoPrintPrinter {
     this.#db.update(record);
   }
 
-  async enablePrinter(force = false) {
+  async enablePrinter(force = true) {
     // Setup initial client stuff, database, api
     this.enabling = true;
     if (this.disabled) {
