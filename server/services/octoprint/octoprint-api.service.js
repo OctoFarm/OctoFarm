@@ -2,8 +2,8 @@
 
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_SERVICE_API);
 
 const ConnectionMonitorService = require("../connection-monitor.service");
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");

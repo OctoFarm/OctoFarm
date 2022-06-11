@@ -9,9 +9,10 @@ const envUtils = require("../utils/env.utils");
 const { AppConstants } = require("../constants/app.constants");
 const { fetchMongoDBConnectionString } = require("../app-env");
 const { SystemCommands } = require("../services/server-commands.service.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
 const router = express.Router();
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_DATABASE_ISSUE);
 
 function validateMongoURL(mongoURL) {
   const mongoString = mongoURL.toLowerCase();

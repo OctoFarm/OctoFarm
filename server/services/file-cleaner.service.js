@@ -2,11 +2,12 @@
 
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const { getMaintenanceCosts, getElectricityCosts } = require("../utils/print-cost.util");
 
 const { getDefaultFileCleanStatistics } = require("../constants/cleaner.constants");
 
-const logger = new Logger("OctoFarm-InformationCleaning");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILE_CLEANER);
 const cleanFileList = [];
 const fileStatistics = getDefaultFileCleanStatistics();
 

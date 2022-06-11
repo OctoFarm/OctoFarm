@@ -1,0 +1,82 @@
+const LOGGER_ROUTE_KEYS = {
+  SERVER_CORE: "Server-Core",
+  SERVER_ENVIRONMENT: "Server-Env",
+  SERVER_FALLBACK: "Server-Fallback",
+  SERVER_APP: "Server-App",
+  SERVER_TASKS: "Server-Tasks",
+  SERVER_CLIENT: "Server-Client",
+  MIDDLEWARE_MORGAN: "Middleware-Morgan",
+  MIDDLEWARE_PASSPORT: "Middleware-Passport",
+  MIDDLEWARE_VALIDATION: "Middleware-Validation",
+  ROUTE_DATABASE_ISSUE: "Route-Database-Issue",
+  ROUTE_FILAMENT_MANAGER: "Route-Filament-Manager",
+  ROUTE_LOCAL_SCRIPTS: "Route-Local-Scripts",
+  ROUTE_NODEJS_ISSUE: "Route-NodeJS-Issue",
+  ROUTE_PRINTER_MANAGER: "Route-Printer-Manager",
+  ROUTE_SSE_OLD: "Route-SSE-Old",
+  ROUTE_SYSTEM_SETTINGS: "Route-System",
+  ROUTE_USERS: "Route-Users",
+  SERVICE_CPU_PROFILE: "Service-CPU-Profiling",
+  SERVICE_OP_ERROR_CAPTURE: "Service-OP-Error-Capture",
+  SERVICE_EVENT_EMITER: "Service-Event-Emiter",
+  SERVICE_FARM_INFORMATION: "Service-Farm-Information",
+  SERVICE_FARM_PI: "Service-Farm-Pi",
+  SERVICE_FILAMENT_CLEANER: "Service-Filament-Cleaner",
+  SERVICE_FILE_CLEANER: "Service-File-Cleaner",
+  SERVICE_GITHUB_CLIENT: "Service-Github-Client",
+  SERVICE_HISTORY_CAPTURE: "Service-History-Capture",
+  SERVICE_HISTORY_CLEANER: "Service-History-Cleaner",
+  SERVICE_INFLUX_CLEANER: "Service-Influx-Cleaner",
+  SERVICE_INFLUX_EXPORT: "Service-Influx-Export",
+  SERVICE_JOB_CLEANER: "Service-Job-Cleaner",
+  SERVICE_LOCAL_SCRIPT: "Service-Local-Script",
+  SERVICE_SERVER_UPDATE: "Service-Server-Update",
+  SERVICE_AUTO_DISCOVERY: "Service-Auto-Discovery",
+  SERVICE_PATREON: "Service-Patreon",
+  SERVICE_PRINTER_MANAGER: "Service-Printer-Manager",
+  SERVICE_PRINTER_STATISTICS: "Service-Printer-Statistics",
+  SERVICE_PRINTER: "Service-Printer",
+  SERVICE_SERVER_SCRIPTS: "Service-Server-Scripts",
+  SERVICE_SERVER_LOGS: "Service-Server-Logs",
+  SERVICE_SSE: "Service-SSE",
+  SERVICE_SYSTEM_INFORMATION: "Service-System-Information",
+  SERVICE_SYSTEM_CONTROL: "Service-System-Control",
+  SERVICE_TASK_MANAGER: "Service-Task-Manager",
+  SERVICE_USER_ACTIONS: "Service-User-Actions",
+  SERVICE_VERSION_PATCHES: "Service-Version-Patches",
+  SERVICE_OCTOPRINT: "Service-OctoPrint",
+  SERVICE_PRINTER_DATABASE: "Service-Printer-Database",
+  STORE_HEALTH_CHECKS: "Store-Health-Checks",
+  STORE_PRINTERS: "Store-Printers",
+  OP_SERVICE_API: "OP-Service-API",
+  OP_SERVICE_WEBSOCKET: "OP-Service-Websocket",
+  OP_SERVICE_WEBSOCKET_MESSAGES: "OP-Service-Websocket-Messages",
+  OP_STORE_PLUGIN_LIST: "OP-Store-Plugin-List",
+  OP_UTIL_FILAMENT_MANAGER_PLUGIN: "OP-Util-Filament-Manager-Plugin",
+  OP_UTIL_EVENTS: "OP-Util-Events",
+  OP_UTIL_PLUGINS: "OP-Util-Plugins",
+  OP_UTIL_WEBSOCKET_HELPER: "OP-Util-Websocket-Helper",
+  UTILS_BENCHMARK: "Utils-Benchmark",
+  UTILS_ENV_LOGGER: "Utils-Env",
+  UTILS_ZIP: "Utils-Zip"
+};
+
+const LOGGER_FILES = {
+  SYSTEM: "OctoFarm.System",
+  API: "OctoFarm.Access",
+  CLIENT: "OctoFarm.Client",
+  PRINTER_OCTOPRINT: "OctoFarm.Printer.OctoPrint"
+};
+
+const logRouteToFileMap = {
+  [LOGGER_ROUTE_KEYS.SERVER_CORE]: "",
+  "OctoFarm-Environment": "",
+  "OctoFarm-Fallback-Server": "",
+  "OctoFarm-TaskManager": ""
+};
+
+module.exports = {
+  LOGGER_ROUTE_KEYS,
+  LOGGER_FILES,
+  logRouteToFileMap
+}

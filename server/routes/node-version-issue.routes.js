@@ -2,9 +2,10 @@ const express = require("express");
 const Logger = require("../handlers/logger");
 const isDocker = require("is-docker");
 const { AppConstants } = require("../constants/app.constants");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
 const router = express.Router();
-const logger = new Logger("OctoFarm-Fallback-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_NODEJS_ISSUE);
 
 const isPm2Safe =
   "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;

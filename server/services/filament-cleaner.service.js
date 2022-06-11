@@ -6,8 +6,8 @@ const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-
-const logger = new Logger("OctoFarm-InformationCleaning");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILAMENT_CLEANER);
 
 let spoolsClean = [];
 let profilesClean = [];

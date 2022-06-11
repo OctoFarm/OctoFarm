@@ -12,8 +12,9 @@ const { returnCurrentOrdering } = require("./current-operations-order.service");
 const { getHeatMap, heatMapping } = require("./farm-information.service");
 const { PrinterClean } = require("./printer-cleaner.service");
 const Logger = require("../handlers/logger");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_PRINTER_STATISTICS);
 
 const dashboardStatistics = getDefaultDashboardStatisticsObject();
 const currentOperations = getEmptyOperationsObject();

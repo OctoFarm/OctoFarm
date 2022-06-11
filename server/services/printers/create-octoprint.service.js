@@ -33,8 +33,8 @@ const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
 const { JobClean } = require("../job-cleaner.service");
 const { MESSAGE_TYPES } = require("../../constants/sse.constants");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_OCTOPRINT);
 
 class OctoPrintPrinter {
   //OctoFarm state

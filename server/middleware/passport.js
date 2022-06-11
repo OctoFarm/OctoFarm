@@ -3,8 +3,9 @@ const bcrypt = require("bcryptjs");
 const RememberMeStrategy = require("passport-remember-me").Strategy;
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.MIDDLEWARE_PASSPORT);
 
 module.exports = function (passport) {
   passport.use(

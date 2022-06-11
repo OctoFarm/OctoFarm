@@ -5,8 +5,9 @@ const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
 const { getCurrentOperations } = require("../services/printer-statistics.service");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_SSE_OLD);
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
 let clientId = 0;

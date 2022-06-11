@@ -13,8 +13,9 @@ const { FileClean } = require("./file-cleaner.service");
 const { generatePrinterStatistics } = require("../services/printer-statistics.service");
 const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket-helpers.utils");
 const { SettingsClean } = require("./settings-cleaner.service");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-PrinterControlManagerService");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_PRINTER_MANAGER);
 
 class PrinterManagerService {
   #printerGroupList = [];

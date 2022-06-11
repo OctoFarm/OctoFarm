@@ -8,7 +8,9 @@ const { AppConstants } = require("./constants/app.constants");
 
 const Logger = require("./handlers/logger.js");
 const { status, up } = require("migrate-mongo");
-const logger = new Logger("OctoFarm-Environment", false);
+const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_ENVIRONMENT, false);
 
 // Constants and definition
 const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";

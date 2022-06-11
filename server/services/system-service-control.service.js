@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SYSTEM_CONTROL);
 const { TaskManager } = require("./task-manager.service");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 

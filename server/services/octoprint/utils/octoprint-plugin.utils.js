@@ -2,7 +2,8 @@ const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
 const PluginLogs = require("../../../models/PluginLogs");
 const Logger = require("../../../handlers/logger");
-const logger = new Logger("OctoFarm-OctoPrint-Messages");
+const { LOGGER_ROUTE_KEYS } = require("../../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_UTIL_PLUGINS);
 
 const defaultWOLSubnetMask = "255.255.255.0";
 

@@ -10,7 +10,8 @@ const {
   checkConnectionsMatchRetrySettings
 } = require("../services/printer-health-checks.service");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-HealthChecks");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.STORE_HEALTH_CHECKS);
 
 let printerHealthChecks = [];
 
