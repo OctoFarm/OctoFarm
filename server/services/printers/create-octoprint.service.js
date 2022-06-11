@@ -534,54 +534,65 @@ class OctoPrintPrinter {
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
     const testingTheWaters = await this.testTheApiWaters();
+
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
 
     // testing the waters responded with status code, setup for reconnect...
-    if (typeof testingTheWaters === "number") {
-      if (testingTheWaters === 408) {
-        // Failed to find the printer on the high seas, fail and don't reconnect user iteraction required...
-        const timeout = {
-          hostState: "Timeout!",
-          hostDescription: "Printer timed out, will attempt reconnection..."
-        };
-        this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
-        this.reconnectAPI();
-        return "Failed to test the waters! Please check the connection log";
-      } else if (testingTheWaters === 503 || testingTheWaters === 502) {
-        const unavailable = {
-          hostState: "Unavailable!",
-          hostDescription: "Printer is unavailable, will attempt reconnection..."
-        };
-        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        this.reconnectAPI();
-        return "Failed because of octoprint server error!";
-      } else if (testingTheWaters === 404) {
-        const unavailable = {
-          hostState: "Not Found!",
-          hostDescription:
-            "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
-        };
-        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Failed because octoprint is unavailable";
-      } else if (testingTheWaters === 403) {
-        const unavailable = {
-          hostState: "Forbidden!",
-          hostDescription:
-            "Could not establish authentication... please check your API key and try again!"
-        };
-        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Failed because octoprint forbid OctoFarm!";
-      } else {
-        const unavailable = {
-          hostState: "Hard Fail!",
-          hostDescription:
-            "Something is seriously wrong... please check all settings! will not attempt reconnect..."
-        };
-        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
-        return "Failed due to unknown causes";
+    if (testingTheWaters !== true) {
+      switch (testingTheWaters) {
+        case 408:
+          // Failed to find the printer on the high seas, fail and don't reconnect user iteraction required...
+          const timeout = {
+            hostState: "Timeout!",
+            hostDescription: "Printer timed out, will attempt reconnection..."
+          };
+          this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
+          this.reconnectAPI();
+          return "Failed to test the waters! Please check the connection log";
+        case 503:
+          const unavailable = {
+            hostState: "Service Unavailable!",
+            hostDescription: "Printer is unavailable, will attempt reconnection..."
+          };
+          this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+          this.reconnectAPI();
+          return "Failed because of octoprint server error!";
+        case 502:
+          const badGateway = {
+            hostState: "Bad Gateway!",
+            hostDescription: "Printer is unavailable, will attempt reconnection..."
+          };
+          this.setAllPrinterStates(PRINTER_STATES(badGateway).SHUTDOWN);
+          this.reconnectAPI();
+          return "Failed because of octoprint server error!";
+        case 404:
+          const notFound = {
+            hostState: "Not Found!",
+            hostDescription:
+              "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
+          };
+          this.setAllPrinterStates(PRINTER_STATES(notFound).SHUTDOWN);
+          return "Failed because octoprint is unavailable";
+        case 403:
+          const forbidden = {
+            hostState: "Forbidden!",
+            hostDescription:
+              "Could not establish authentication... please check your API key and try again!"
+          };
+          this.setAllPrinterStates(PRINTER_STATES(forbidden).SHUTDOWN);
+          return "Failed because octoprint forbid OctoFarm!";
+        default:
+          const unknown = {
+            hostState: "Hard Fail!",
+            hostDescription:
+              "Something is seriously wrong... please check all settings! will not attempt reconnect..."
+          };
+          this.setAllPrinterStates(PRINTER_STATES(unknown).SHUTDOWN);
+          return "Failed due to unknown causes";
       }
     }
+
     this.setHostState(PRINTER_STATES().HOST_ONLINE);
 
     // Grab user list, current user and passively login to the client, Fail to Shutdown
