@@ -53,7 +53,7 @@
     "lodash": "^4.17.21",
     "lookpath": "^1.2.2",
     "luxon": "^2.3.1",
-    "marked": "^4.0.12",
+    "marked": "^4.0.16",
     "migrate-mongo": "^9.0.0",
     "mjpeg-decoder": "^1.0.3",
     "mongoose": "^6.3.5",
