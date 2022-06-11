@@ -174,9 +174,11 @@ class FilamentCleanerService {
     const total = [];
     const price = [];
     for (const element of spools) {
-      used.push(parseFloat(element.used));
-      total.push(parseFloat(element.weight));
-      price.push(parseFloat(element.price));
+      if (element.used <= element.weight) {
+        used.push(parseFloat(element.used));
+        total.push(parseFloat(element.weight));
+        price.push(parseFloat(element.price));
+      }
       const profInd = _.findIndex(profiles, function (o) {
         return o._id.toString() === element.profile.toString();
       });
@@ -184,9 +186,12 @@ class FilamentCleanerService {
         const index = _.findIndex(materialBreak, function (o) {
           return o.name === profiles[profInd].material;
         });
-        materialBreak[index].weight.push(parseFloat(element.weight));
-        materialBreak[index].used.push(parseFloat(element.used));
-        materialBreak[index].price.push(parseFloat(element.price));
+        if (element.used <= element.weight) {
+          materialBreak[index].weight.push(parseFloat(element.weight));
+          materialBreak[index].used.push(parseFloat(element.used));
+          materialBreak[index].price.push(parseFloat(element.price));
+        }
+
       }
     }
 
