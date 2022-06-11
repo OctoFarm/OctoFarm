@@ -195,6 +195,7 @@ class WebSocketClient {
             stateColour: mapStateToCategory("Offline"),
             stateDescription: "Printer connection was closed. Will not reconnect automatically!"
           });
+          logger.error("Socket purposefully closed... not reconnecting! Code 1000"+reason);
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the server implementation.
           PrinterTicker.addIssue(
@@ -210,6 +211,7 @@ class WebSocketClient {
             stateDescription: "Printer connection was closed. Will reconnect shortly!"
           });
           this.reconnect(code);
+          logger.error("Socket Abnormally closed by server... reconnecting! Code 1006 - "+reason);
           debugger;
           break;
         default:
@@ -227,6 +229,7 @@ class WebSocketClient {
             stateDescription: "Printer connection was closed. Will reconnect shortly!"
           });
           debugger;
+          logger.error(`Socket Abnormally closed... reconnecting! Code: ${code} - ${reason}`);
           this.reconnect(code);
           break;
       }
@@ -485,7 +488,6 @@ class WebSocketClient {
           lastPongMessage: this.#lastPongMessage,
           time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
         });
-        clearTimeout(registerPongCheck);
         PrinterTicker.addIssue(
           new Date(),
           this.url,
@@ -499,6 +501,7 @@ class WebSocketClient {
           REQUEST_KEYS.TOTAL_PING_PONG
         );
         this.terminate();
+        clearTimeout(registerPongCheck);
       }
     }, 1000);
   }
