@@ -303,6 +303,11 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
       restartRequired = true;
     }
 
+
+    if (checked[0].filament) {
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
+    }
+
     if (checked[0].filament.allowMultiSelect === false) {
       const spoolList = FilamentClean.getSpools();
       spoolList.forEach((spool) => {
