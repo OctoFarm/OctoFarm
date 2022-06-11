@@ -195,7 +195,7 @@ class WebSocketClient {
             stateColour: mapStateToCategory("Offline"),
             stateDescription: "Printer connection was closed. Will not reconnect automatically!"
           });
-          logger.error("Socket purposefully closed... not reconnecting! Code 1000"+reason);
+          logger.error("Socket purposefully closed... not reconnecting! Code 1000" + reason);
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the server implementation.
           PrinterTicker.addIssue(
@@ -211,7 +211,7 @@ class WebSocketClient {
             stateDescription: "Printer connection was closed. Will reconnect shortly!"
           });
           this.reconnect(code);
-          logger.error("Socket Abnormally closed by server... reconnecting! Code 1006 - "+reason);
+          logger.error("Socket Abnormally closed by server... reconnecting! Code 1006 - " + reason);
           debugger;
           break;
         default:
@@ -481,8 +481,8 @@ class WebSocketClient {
     } else {
       const registerPongCheck = setTimeout(() => {
         if (
-            this.#pingPongTimer + this.#currentMessageMSRate <
-            Math.abs(this.#lastPingMessage - this.#lastPongMessage)
+          this.#pingPongTimer + this.#currentMessageMSRate <
+          Math.abs(this.#lastPingMessage - this.#lastPongMessage)
         ) {
           logger.error("Ping hasn't received a pong!", {
             lastPingMessage: this.#lastPingMessage,
@@ -490,24 +490,22 @@ class WebSocketClient {
             time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
           });
           PrinterTicker.addIssue(
-              new Date(),
-              this.url,
-              "Didn't receive a pong from client, reconnecting!",
-              "Offline",
-              this.id
+            new Date(),
+            this.url,
+            "Didn't receive a pong from client, reconnecting!",
+            "Offline",
+            this.id
           );
           ConnectionMonitorService.updateOrAddResponse(
-              this.url,
-              REQUEST_TYPE.WEBSOCKET,
-              REQUEST_KEYS.TOTAL_PING_PONG
+            this.url,
+            REQUEST_TYPE.WEBSOCKET,
+            REQUEST_KEYS.TOTAL_PING_PONG
           );
           this.terminate();
           clearTimeout(registerPongCheck);
         }
       }, 1000);
     }
-
-
   }
 
   close() {
