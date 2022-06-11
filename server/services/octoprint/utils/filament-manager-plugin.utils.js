@@ -1,6 +1,6 @@
 const Logger = require("../../../handlers/logger.js");
-
-const logger = new Logger("OctoFarm-FilamentManager");
+const { LOGGER_ROUTE_KEYS } = require("../../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_UTIL_FILAMENT_MANAGER_PLUGIN);
 const fetch = require("node-fetch");
 const { findIndex } = require("lodash");
 const Spool = require("../../../models/Filament.js");

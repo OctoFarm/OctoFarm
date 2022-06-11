@@ -1,5 +1,6 @@
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Events");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_EVENT_EMITER);
 const { eventListConstants, EVENT_ID_MAP } = require("../constants/event.constants");
 
 // TODO should only register is one is setup in alerts

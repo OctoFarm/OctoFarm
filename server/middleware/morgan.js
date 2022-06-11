@@ -2,8 +2,9 @@ const morgan = require("morgan");
 
 const Logger = require("../handlers/logger");
 const { AppConstants } = require("../constants/app.constants");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger(LOGGER_ROUTE_KEYS.MIDDLEWARE_MORGAN);
 
 const morganMiddleware = morgan(
   function (tokens, req, res) {

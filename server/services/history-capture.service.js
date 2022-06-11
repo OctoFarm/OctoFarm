@@ -17,8 +17,9 @@ const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 const { sleep } = require("../utils/promise.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getInfluxCleanerCache } = require("../cache/influx-export.cache");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-HistoryCollection");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CAPTURE);
 
 const routeBase = "../images/historyCollection";
 const PATHS = {

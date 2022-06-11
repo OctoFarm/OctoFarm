@@ -22,10 +22,10 @@ const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
-const {ensureClientServerVersion} = require("./middleware/client-server-version");
+const { ensureClientServerVersion } = require("./middleware/client-server-version");
+const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 
-
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 

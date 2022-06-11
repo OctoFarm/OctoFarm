@@ -57,14 +57,15 @@ const {
   capturePluginManagerData,
   captureThrottlePluginData,
   captureResourceMonitorData,
-  captureDisplayLayerProgress
+  captureDisplayLayerProgress,
+  captureUpdatingData
 } = require("./utils/octoprint-plugin.utils");
 
 const Logger = require("../../handlers/logger");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
-
-const logger = new Logger("OctoFarm-OctoPrint-Messages");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_SERVICE_WEBSOCKET_MESSAGES);
 
 const loggedMissingPlugins = {};
 
@@ -301,6 +302,9 @@ class OctoprintWebsocketMessageService {
     const type = OP_EM.parseOctoPrintPluginType(data);
 
     switch (header) {
+      case OP_WS_PLUGIN_KEYS.softwareupdate:
+        captureUpdatingData(printerID, data);
+        break;
       case OP_WS_PLUGIN_KEYS.pluginmanager:
         capturePluginManagerData(printerID, type, data);
         break;

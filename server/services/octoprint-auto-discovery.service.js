@@ -2,8 +2,9 @@ const ssdp = require("node-upnp-ssdp");
 const fetch = require("node-fetch");
 const parseString = require("xml2js").parseString;
 const Logger = require("../handlers/logger.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_AUTO_DISCOVERY);
 let discoveredDevices = [];
 
 ssdp.on("DeviceFound", (res) => {

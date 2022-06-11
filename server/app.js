@@ -33,8 +33,11 @@ if (!!majorVersion && majorVersion < 14) {
   } = require("./app-core");
 
   const mongoose = require("mongoose");
+
+  const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
   const Logger = require("./handlers/logger.js");
-  const logger = new Logger("OctoFarm-Server");
+
+  const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_APP);
 
   const octoFarmServer = setupExpressServer();
 

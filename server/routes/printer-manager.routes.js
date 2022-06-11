@@ -4,8 +4,9 @@ const router = express.Router();
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const { ensureCurrentUserAndGroup } = require("../middleware/users");
 const Logger = require("../handlers/logger.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_PRINTER_MANAGER);
 
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 

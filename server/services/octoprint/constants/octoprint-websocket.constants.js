@@ -105,6 +105,7 @@ const OP_WS_MSG_KEYS = {
 
 const OP_WS_PLUGIN_KEYS = {
   pluginmanager: "pluginmanager",
+  softwareUpdate: "softwareupdate",
   klipper: "klipper",
   displayLayerProgress: "DisplayLayerProgress",
   softwareupdate: "softwareupdate",

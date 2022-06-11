@@ -13,8 +13,8 @@ const ConnectionMonitorService = require("../../services/connection-monitor.serv
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_SERVICE_WEBSOCKET);
 
 const ENDPOINT = "/sockjs/websocket";
 
@@ -34,6 +34,7 @@ class WebSocketClient {
   #currentMessageMSRate = 0;
   #lastPingMessage = 0;
   #lastPongMessage = 0;
+  #lastWebsocketMessage = 0;
   #onMessage = undefined;
   autoReconnectInterval = undefined; // ms
   reconnectTimeout = false;
@@ -49,6 +50,7 @@ class WebSocketClient {
   throttleBase = 500;
   upperThrottleHysteresis = 250;
   lowerThrottleHysteresis = 450;
+  deadWebsocketTimeout = 2 * 60000;
 
   constructor(
     webSocketURL = undefined,
@@ -105,11 +107,13 @@ class WebSocketClient {
 
     this.#instance.on("unexpected-response", (err) => {
       logger.error(`${this.url}: Unexpected Response!`, JSON.stringify(err));
+      this.terminate();
     });
 
-    // this.#instance.on("isPaused", () => {
-    //   console.log("Paused websocket?");
-    // });
+    this.#instance.on("isPaused", () => {
+      logger.error(`${this.url}: Websocket Paused!`);
+      this.reconnect();
+    });
 
     this.#instance.on("open", () => {
       ConnectionMonitorService.updateOrAddResponse(
@@ -191,6 +195,7 @@ class WebSocketClient {
             stateColour: mapStateToCategory("Offline"),
             stateDescription: "Printer connection was closed. Will not reconnect automatically!"
           });
+          logger.error("Socket purposefully closed... not reconnecting! Code 1000" + reason);
           break;
         case 1006: //Close Code 1006 is a special code that means the connection was closed abnormally (locally) by the server implementation.
           PrinterTicker.addIssue(
@@ -206,6 +211,7 @@ class WebSocketClient {
             stateDescription: "Printer connection was closed. Will reconnect shortly!"
           });
           this.reconnect(code);
+          logger.error("Socket Abnormally closed by server... reconnecting! Code 1006 - " + reason);
           debugger;
           break;
         default:
@@ -223,6 +229,7 @@ class WebSocketClient {
             stateDescription: "Printer connection was closed. Will reconnect shortly!"
           });
           debugger;
+          logger.error(`Socket Abnormally closed... reconnecting! Code: ${code} - ${reason}`);
           this.reconnect(code);
           break;
       }
@@ -456,32 +463,49 @@ class WebSocketClient {
 
     this.#lastPingMessage = Date.now();
 
-    const registerPongCheck = setTimeout(() => {
-      if (
-        this.#pingPongTimer + this.#currentMessageMSRate <
-        Math.abs(this.#lastPingMessage - this.#lastPongMessage)
-      ) {
-        logger.debug("Ping hasn't received a pong!", {
-          lastPingMessage: this.#lastPingMessage,
-          lastPongMessage: this.#lastPongMessage,
-          time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
-        });
-        clearTimeout(registerPongCheck);
-        PrinterTicker.addIssue(
-          new Date(),
-          this.url,
-          "Didn't receive a pong from client, reconnecting!",
-          "Offline",
-          this.id
-        );
-        ConnectionMonitorService.updateOrAddResponse(
-          this.url,
-          REQUEST_TYPE.WEBSOCKET,
-          REQUEST_KEYS.TOTAL_PING_PONG
-        );
-        this.terminate();
-      }
-    }, 1000);
+    const timeSinceLastMessage = this.#lastPingMessage - this.#lastMessage.getTime();
+
+    const isPrinterActive = getPrinterStoreCache().isPrinterActive(this.id);
+
+    if (isPrinterActive && timeSinceLastMessage > this.deadWebsocketTimeout) {
+      logger.error(
+        `It's been over ${
+          this.deadWebsocketTimeout * 1000
+        }m since last websocket message... forcing reconnect`,
+        {
+          timeSinceLastMessage,
+          deadTimeout: this.deadWebsocketTimeout
+        }
+      );
+      this.terminate();
+    } else {
+      const registerPongCheck = setTimeout(() => {
+        if (
+          this.#pingPongTimer + this.#currentMessageMSRate <
+          Math.abs(this.#lastPingMessage - this.#lastPongMessage)
+        ) {
+          logger.error("Ping hasn't received a pong!", {
+            lastPingMessage: this.#lastPingMessage,
+            lastPongMessage: this.#lastPongMessage,
+            time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
+          });
+          PrinterTicker.addIssue(
+            new Date(),
+            this.url,
+            "Didn't receive a pong from client, reconnecting!",
+            "Offline",
+            this.id
+          );
+          ConnectionMonitorService.updateOrAddResponse(
+            this.url,
+            REQUEST_TYPE.WEBSOCKET,
+            REQUEST_KEYS.TOTAL_PING_PONG
+          );
+          this.terminate();
+          clearTimeout(registerPongCheck);
+        }
+      }, 1000);
+    }
   }
 
   close() {
@@ -492,13 +516,6 @@ class WebSocketClient {
   terminate() {
     logger.debug(`${this.url} requested to terminate the websocket...`);
     this.#instance.terminate();
-  }
-
-  getState() {
-    return {
-      state: WS_STATE[this.#instance.readyState],
-      desc: WS_DESC[this.#instance.readyState]
-    };
   }
 
   killAllConnectionsAndListeners() {
@@ -517,6 +534,7 @@ class WebSocketClient {
   }
 
   resetSocketConnection(newURL, newSession, currentUser) {
+    logger.http("Resetting socket connection...");
     this.url = newURL;
     this.sessionKey = newSession;
     this.currentUser = currentUser;

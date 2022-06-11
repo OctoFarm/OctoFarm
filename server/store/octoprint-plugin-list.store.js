@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
-
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_STORE_PLUGIN_LIST);
 
 const DEFAULT_PLUGIN_REPOSITORY = "https://plugins.octoprint.org/plugins.json";
 const DEFAULT_PLUGIN_NOTICES = "https://plugins.octoprint.org/notices.json";

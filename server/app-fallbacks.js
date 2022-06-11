@@ -8,7 +8,9 @@ const path = require("path");
 
 const Logger = require("./handlers/logger.js");
 const exceptionHandler = require("./exceptions/exception.handler");
-const logger = new Logger("OctoFarm-Fallback-Server");
+const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_FALLBACK);
+
 const { fetchSuperSecretKey } = require("./app-env");
 
 function setupFallbackExpressServer() {

@@ -2,11 +2,12 @@
 
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const { getMaintenanceCosts, getElectricityCosts } = require("../utils/print-cost.util");
 
 const { getDefaultFileCleanStatistics } = require("../constants/cleaner.constants");
 
-const logger = new Logger("OctoFarm-InformationCleaning");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILE_CLEANER);
 const cleanFileList = [];
 const fileStatistics = getDefaultFileCleanStatistics();
 
@@ -133,6 +134,7 @@ class FileCleanerService {
         sortedFileList.push(sortedFile);
       }
     }
+
     return {
       fileList: sortedFileList,
       filecount: sortedFileList.length || 0,
@@ -243,6 +245,7 @@ class FileCleanerService {
     for (let u = 0; u < units.length; u++) {
       if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
         if (filamentSelection[u] === "SKIP") {
+          //Skip
         } else if (typeof filamentSelection[u] !== "undefined" && filamentSelection[u] !== null) {
           let newUnit = units[u].split(" / ");
           newUnit = newUnit[1].replace("g", "");
