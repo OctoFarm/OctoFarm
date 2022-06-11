@@ -57,7 +57,8 @@ const {
   capturePluginManagerData,
   captureThrottlePluginData,
   captureResourceMonitorData,
-  captureDisplayLayerProgress
+  captureDisplayLayerProgress,
+  captureUpdatingData
 } = require("./utils/octoprint-plugin.utils");
 
 const Logger = require("../../handlers/logger");
@@ -301,6 +302,9 @@ class OctoprintWebsocketMessageService {
     const type = OP_EM.parseOctoPrintPluginType(data);
 
     switch (header) {
+      case OP_WS_PLUGIN_KEYS.softwareupdate:
+        captureUpdatingData(printerID, data);
+        break;
       case OP_WS_PLUGIN_KEYS.pluginmanager:
         capturePluginManagerData(printerID, type, data);
         break;

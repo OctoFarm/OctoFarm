@@ -32,7 +32,7 @@ class PrinterCleanerService {
       .limit(720);
     const pluginManagerLogs = await PluginLogs.find({
       printerID: farmPrinter._id,
-      pluginDisplay: "Plugin Manager"
+      pluginDisplay: { $ne: "OctoKlipper" }
     })
       .sort({ _id: 1 })
       .limit(1000);
