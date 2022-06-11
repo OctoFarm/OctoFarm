@@ -48,7 +48,7 @@
     "flatted": "^3.2.5",
     "helmet": "^5.0.2",
     "influx": "^5.9.3",
-    "is-docker": "2.2.1",
+    "is-docker": "3.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "lookpath": "^1.2.2",
