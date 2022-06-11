@@ -134,6 +134,7 @@ class FileCleanerService {
         sortedFileList.push(sortedFile);
       }
     }
+
     return {
       fileList: sortedFileList,
       filecount: sortedFileList.length || 0,
@@ -244,6 +245,7 @@ class FileCleanerService {
     for (let u = 0; u < units.length; u++) {
       if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
         if (filamentSelection[u] === "SKIP") {
+          //Skip
         } else if (typeof filamentSelection[u] !== "undefined" && filamentSelection[u] !== null) {
           let newUnit = units[u].split(" / ");
           newUnit = newUnit[1].replace("g", "");

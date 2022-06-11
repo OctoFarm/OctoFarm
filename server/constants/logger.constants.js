@@ -135,4 +135,4 @@ module.exports = {
   LOGGER_ROUTE_KEYS,
   LOGGER_FILES,
   logRouteToFileMap
-}
+};
