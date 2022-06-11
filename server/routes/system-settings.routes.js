@@ -291,6 +291,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
+    const hideEmptyChanges = actualOnline.filament.hideEmpty !== sentOnline.filament.hideEmpty;
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -303,8 +304,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
       restartRequired = true;
     }
 
-
-    if (checked[0].filament) {
+    if (hideEmptyChanges) {
       TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
