@@ -983,7 +983,7 @@ class OctoPrintPrinter {
     let versionCheck = await this.#api.getVersion(true).catch((e) => {
       logger.http("Hard failure on version check", e.toString());
       return {
-        status: e.toString()
+        status: e
       };
     });
     const globalStatusCode = checkApiStatusResponse(versionCheck);
@@ -1010,7 +1010,7 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Successfully found printer on the high sea!", "Complete");
       return true;
     } else {
-      logger.http("Failed to acquire version data..." + versionCheck);
+      logger.error("Failed to acquire version data..." + versionCheck.toString());
       if (this.#retryNumber === 0) {
         this.#apiPrinterTickerWrap(
           "Failed to find printer on the high sea! marking offline...",
