@@ -1,5 +1,6 @@
 const winston = require("winston");
 const { AppConstants } = require("../constants/app.constants");
+const { logRouteToFileMap } = require("../constants/logger.constants")
 
 const dtFormat = new Intl.DateTimeFormat("en-GB", {
   timeStyle: "medium",
@@ -103,7 +104,7 @@ class LoggerService {
               new winston.transports.File({
                 level: logFilterLevel,
                 format: prettyPrintMyLogs,
-                filename: `../logs/OctoFarm.log`,
+                filename: `../logs/${logRouteToFileMap[this.route]}.log`,
                 maxsize: 5242880,
                 maxFiles: 3
               })
