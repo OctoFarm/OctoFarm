@@ -105,11 +105,13 @@ class WebSocketClient {
 
     this.#instance.on("unexpected-response", (err) => {
       logger.error(`${this.url}: Unexpected Response!`, JSON.stringify(err));
+      this.reconnect(err);
     });
 
-    // this.#instance.on("isPaused", () => {
-    //   console.log("Paused websocket?");
-    // });
+    this.#instance.on("isPaused", () => {
+      logger.error(`${this.url}: Websocket Paused!`);
+      this.reconnect();
+    });
 
     this.#instance.on("open", () => {
       ConnectionMonitorService.updateOrAddResponse(
@@ -461,7 +463,7 @@ class WebSocketClient {
         this.#pingPongTimer + this.#currentMessageMSRate <
         Math.abs(this.#lastPingMessage - this.#lastPongMessage)
       ) {
-        logger.debug("Ping hasn't received a pong!", {
+        logger.error("Ping hasn't received a pong!", {
           lastPingMessage: this.#lastPingMessage,
           lastPongMessage: this.#lastPongMessage,
           time: Math.abs(this.#lastPingMessage - this.#lastPongMessage)
@@ -494,13 +496,6 @@ class WebSocketClient {
     this.#instance.terminate();
   }
 
-  getState() {
-    return {
-      state: WS_STATE[this.#instance.readyState],
-      desc: WS_DESC[this.#instance.readyState]
-    };
-  }
-
   killAllConnectionsAndListeners() {
     this.reconnectingIn = 0;
     getPrinterStoreCache().updatePrinterLiveValue(this.id, {
@@ -517,6 +512,7 @@ class WebSocketClient {
   }
 
   resetSocketConnection(newURL, newSession, currentUser) {
+    logger.http("Resetting socket connection...")
     this.url = newURL;
     this.sessionKey = newSession;
     this.currentUser = currentUser;
