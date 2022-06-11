@@ -2,7 +2,8 @@ const { time, fsSize } = require("systeminformation");
 const os = require("os");
 const process = require("process");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SYSTEM_INFORMATION);
 const { farmPiStatus } = require("./farmpi-detection.service");
 const { getCPULoadAVG } = require("./cpu-profiling.service");
 

@@ -1,6 +1,7 @@
 const os = require("os");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_CPU_PROFILE);
 
 //Create function to get CPU information
 function cpuAverage() {

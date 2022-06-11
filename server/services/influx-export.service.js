@@ -2,9 +2,10 @@
 
 const Influx = require("influx");
 const { SettingsClean } = require("./settings-cleaner.service.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_INFLUX_EXPORT);
 
 let db = null;
 

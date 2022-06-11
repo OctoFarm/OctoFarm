@@ -71,7 +71,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param recursive
    */
   async getFiles(recursive = false) {
-    return this.get(apiFiles(recursive)).catch((e) => {
+    return this.get(apiFiles(recursive), this.#amendedTimeout).catch((e) => {
       return e;
     });
   }

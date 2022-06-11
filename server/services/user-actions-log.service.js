@@ -2,8 +2,8 @@ const UserAction = require("../models/userActionsLog");
 const Logger = require("../handlers/logger");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { cloneObject, convertStatusToColour } = require("../utils/mapping.utils");
-
-const logger = new Logger("OctoFarm-UserActions");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_USER_ACTIONS);
 
 const last100Actions = [];
 

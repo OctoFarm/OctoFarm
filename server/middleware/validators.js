@@ -2,10 +2,10 @@ const nodeInputValidator = require("node-input-validator");
 const { ValidationException } = require("../exceptions/runtime.exceptions");
 const { databaseNamesList } = require("../constants/database.constants");
 const mongoose = require("mongoose");
-
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger");
 const path = require("path");
-const logger = new Logger("OctoFarm-Validation");
+const logger = new Logger(LOGGER_ROUTE_KEYS.MIDDLEWARE_VALIDATION);
 
 const errorMessage = (req) => {
   return `Invalid body input detected in ${req.protocol}://${req.get("host")}${req.originalUrl}`;

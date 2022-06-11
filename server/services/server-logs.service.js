@@ -8,7 +8,8 @@ const {
 } = require("./system-information-text-generator.service.js");
 const { generateTodayTextString } = require("../utils/date.utils");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Server");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SERVER_LOGS);
 
 const logFolder = getLogsPath();
 
