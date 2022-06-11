@@ -34,6 +34,7 @@ class WebSocketClient {
   #currentMessageMSRate = 0;
   #lastPingMessage = 0;
   #lastPongMessage = 0;
+  #lastWebsocketMessage = 0;
   #onMessage = undefined;
   autoReconnectInterval = undefined; // ms
   reconnectTimeout = false;
@@ -49,6 +50,7 @@ class WebSocketClient {
   throttleBase = 500;
   upperThrottleHysteresis = 250;
   lowerThrottleHysteresis = 450;
+  deadWebsocketTimeout = 2 * 60000;
 
   constructor(
     webSocketURL = undefined,
@@ -458,6 +460,21 @@ class WebSocketClient {
 
     this.#lastPingMessage = Date.now();
 
+    const timeSinceLastMessage = this.#lastPingMessage - this.#lastMessage.getTime();
+
+    if (timeSinceLastMessage > this.deadWebsocketTimeout) {
+      logger.error(
+        `It's been over ${
+          this.deadWebsocketTimeout * 1000
+        }m since last websocket message... forcing reconnect`,
+        {
+          timeSinceLastMessage,
+          deadTimeout: this.deadWebsocketTimeout
+        }
+      );
+      this.reconnect();
+    }
+
     const registerPongCheck = setTimeout(() => {
       if (
         this.#pingPongTimer + this.#currentMessageMSRate <
@@ -512,7 +529,7 @@ class WebSocketClient {
   }
 
   resetSocketConnection(newURL, newSession, currentUser) {
-    logger.http("Resetting socket connection...")
+    logger.http("Resetting socket connection...");
     this.url = newURL;
     this.sessionKey = newSession;
     this.currentUser = currentUser;
