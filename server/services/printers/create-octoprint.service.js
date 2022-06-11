@@ -1649,6 +1649,10 @@ class OctoPrintPrinter {
     return this.resetSocketConnection();
   }
 
+  setPrinterToSearching(){
+    this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
+  }
+
   resetConnectionInformation(force = false) {
     if (!!this?.#api) {
       this.#api.updateConnectionInformation(this.printerURL, this.apikey);

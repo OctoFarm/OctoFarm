@@ -52,6 +52,7 @@ class PrinterManagerService {
     for (let id of enableList) {
       const printer = getPrinterStoreCache().getPrinter(id);
       printer.enabling = false;
+      printer.setPrinterToSearching();
       this.#enablePrintersQueue.push(id);
     }
   }
