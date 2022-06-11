@@ -118,6 +118,10 @@ class TaskManagerService {
     await handler();
     taskState.duration = Date.now() - taskState.started;
 
+    if (taskState.duration < 1) {
+      taskState.duration = 1;
+    }
+
     if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
       logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
