@@ -27,7 +27,6 @@ const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
 const { ensureAdministrator } = require("./middleware/auth.js");
 
-const logger = new Logger("OctoFarm-Server");
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
