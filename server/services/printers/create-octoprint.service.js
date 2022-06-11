@@ -588,7 +588,7 @@ class OctoPrintPrinter {
     const initialApiCheck = await this.initialApiCheckSequence();
 
     const apiCheckFail = initialApiCheck.map((check) => {
-      return check.value === 900;
+      return check.value !== true;
     });
 
     // Global api heck triggered, fail with no reconnect
@@ -620,15 +620,22 @@ class OctoPrintPrinter {
     });
     // User list fail... reconnect same as others, probably network at this stage.
     if (initialApiCheckValues.includes(true)) {
-      this.setPrinterState(PRINTER_STATES().SHUTDOWN);
+      const valueTrigger = {
+        state: "Initial Scan Failure",
+        stateDescription: "Unable to fully check initial scan... please consult logs!"
+      };
+      this.setPrinterState(PRINTER_STATES(valueTrigger).SHUTDOWN);
+      logger.error("Unable to check printer states... check logs", initialApiCheck);
       return "Failed due to possible network issues...";
     }
 
     // Grab required api data, fail to shutdown... should not continue without this data...
     const requiredApiCheck = await this.#requiredApiSequence(force);
+
     const requiredApiCheckValues = requiredApiCheck.map((check) => {
-      return typeof check.value === "number";
+      return check.value !== true;
     });
+
     if (requiredApiCheckValues.includes(true)) {
       const requiredAPIFail = {
         state: "API Fail!",
