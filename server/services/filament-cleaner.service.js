@@ -112,24 +112,17 @@ class FilamentCleanerService {
       if (profileId >= 0) {
         const amountLeft = parseInt(spool.spools.weight) - parseInt(spool.spools.used);
 
-        logger.info("Seeings for spool", {
-          hideEmpty,
-          amountLeft
-        });
-
-        console.log("Seeings for spool", {
+        logger.debug("Seeings for spool", {
           hideEmpty,
           amountLeft
         });
 
         let showSpool = true;
 
-        if (hideEmpty && amountLeft < 1) {
+        if (!hideEmpty && amountLeft < 1) {
           // spool should hide
           showSpool = false;
         }
-
-        console.log(showSpool)
 
         if (showSpool) {
           createList.push({
