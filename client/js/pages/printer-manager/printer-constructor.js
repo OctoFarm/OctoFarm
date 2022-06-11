@@ -192,7 +192,10 @@ export class PrintersManagement {
           1000,
           "Clicked"
         );
-        document.getElementById(`printerCard-${printer.printerId}`).remove();
+        const printerCard = document.getElementById(`printerCard-${printer.printerId}`);
+        if(!!printerCard){
+         printerCard.remove()
+        }
       });
     } else {
       deletingAlert.close();

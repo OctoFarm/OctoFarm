@@ -12,7 +12,8 @@ const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
 const { JobClean } = require("../services/job-cleaner.service");
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.STORE_PRINTERS);
 
 class PrinterStore {
   #printersList = undefined;

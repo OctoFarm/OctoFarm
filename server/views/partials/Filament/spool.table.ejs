@@ -15,7 +15,15 @@
     </tr>
 <% }else{ %>
 <% spools.forEach(spool => { %>
-    <% if(!hideEmpty && (spool.weight - spool.used) > 1){ %>
+    <%  const amountLeft = parseInt(spool.weight) - parseInt(spool.used); %>
+
+    <%  let showSpool = true; %>
+
+    <% if (hideEmpty && amountLeft < 1) { %>
+        <% showSpool = false; %>
+    <% } %>
+
+    <% if(showSpool){ %>
     <tr>
         <th style="display: none;"> </th>
         <th><i class="fas fa-toilet-paper"></i></th>

@@ -1,8 +1,9 @@
 const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../constants/app.constants");
 const { getGithubReleasesPromise } = require("./github-client.service");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SERVER_UPDATE);
 let lastSuccessfulReleaseCheckMoment = null;
 let latestReleaseKnown = null;
 let lastReleaseCheckFailed = null;

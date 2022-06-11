@@ -1,7 +1,8 @@
 const { writePoints } = require("./influx-export.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-Influx-Export");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_INFLUX_CLEANER);
 const { getHistoryCache } = require("../cache/history.cache");
 const { SettingsClean } = require("./settings-cleaner.service.js");
 

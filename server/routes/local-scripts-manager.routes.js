@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 // User Modal
 const Logger = require("../handlers/logger.js");
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_LOCAL_SCRIPTS);
 const Alerts = require("../models/Alerts.js");
 
 const script = require("../services/local-scripts.service.js");

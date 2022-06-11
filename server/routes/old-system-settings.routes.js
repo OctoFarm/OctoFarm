@@ -13,9 +13,10 @@ const UserDB = require("../models/User.js");
 const PrintersDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger.js");
-const logger = new Logger("OctoFarm-API");
-const clientLogger = new Logger("OctoFarm-Client");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_SYSTEM_SETTINGS);
+const clientLogger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CLIENT);
 const multer = require("multer");
 const { isEqual } = require("lodash");
 const { SettingsClean } = require("../services/settings-cleaner.service.js");
@@ -230,6 +231,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
+    const hideEmptyChanges = actualOnline.filament.hideEmpty !== sentOnline.filament.hideEmpty;
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -240,6 +242,10 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
 
     if ([serverChanges, timeoutChanges].includes(false)) {
       restartRequired = true;
+    }
+
+    if (hideEmptyChanges) {
+      TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
     if (checked[0].filament.allowMultiSelect === false) {

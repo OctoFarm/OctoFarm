@@ -19,8 +19,9 @@ const {
 } = require("../services/users.service");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-API");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_USERS);
 
 // Login Page
 router.get("/login", async (_req, res) => {

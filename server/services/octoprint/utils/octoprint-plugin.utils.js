@@ -2,12 +2,12 @@ const { getPrinterStoreCache } = require("../../../cache/printer-store.cache");
 const { PrinterTicker } = require("../../printer-connection-log.service");
 const PluginLogs = require("../../../models/PluginLogs");
 const Logger = require("../../../handlers/logger");
-const logger = new Logger("OctoFarm-OctoPrint-Messages");
+const { LOGGER_ROUTE_KEYS } = require("../../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_UTIL_PLUGINS);
 
 const defaultWOLSubnetMask = "255.255.255.0";
 
 const addOctoPrintLogWrapper = (id, message, state, plugin) => {
-  //TODO save to a database, and add more plugins!
   const today = new Date();
 
   const log = {
@@ -143,7 +143,7 @@ const captureKlipperPluginData = (id, data) => {
     return;
   }
 
-  if(payload.includes("Standby")){
+  if (payload.includes("Standby")) {
     getPrinterStoreCache().updatePrinterLiveValue(id, {
       klipperState: "warning"
     });
@@ -330,6 +330,74 @@ const captureDisplayLayerProgress = (id, data) => {
   getPrinterStoreCache().updatePrinterLiveValue(id, { layerData: data });
 };
 
+const captureUpdatingData = (id, data) => {
+  logger.info("Updating data", JSON.stringify(data));
+
+  const { data: currentData, type } = data;
+  if (type === "updating") {
+    addOctoPrintLogWrapper(
+      id,
+      `OctoPrint Update requested! Version ${currentData?.version}`,
+      "Active",
+      "Update Manager"
+    );
+    addOctoPrintIssueWrapper(
+      id,
+      `OctoPrint Update requested! Version ${currentData?.version}`,
+      "Active"
+    );
+  }
+
+  if (type === "loglines") {
+    if (!!currentData?.loglines && currentData.loglines.length > 0) {
+      console.log(currentData.loglines);
+      currentData.loglines.forEach((line) => {
+        console.log(line);
+        if (line.stream === "call" || line.stream === "message") {
+          addOctoPrintLogWrapper(id, line.line, "Active", "Update Manager");
+        }
+        if (line.stream === "stdout") {
+          addOctoPrintLogWrapper(id, line.line, "Complete", "Update Manager");
+        }
+        if (line.stream === "stderr") {
+          addOctoPrintLogWrapper(id, line.line, "Offline", "Update Manager");
+          addOctoPrintIssueWrapper(id, line.line, "Offline");
+        }
+        if (line.line.includes("Successfully installed")) {
+          addOctoPrintLogWrapper(id, line.line, "Complete", "Update Manager");
+          addOctoPrintIssueWrapper(id, line.line, "Complete");
+        }
+        if (line.line.includes("Successfully built")) {
+          addOctoPrintLogWrapper(id, line.line, "Active", "Update Manager");
+          addOctoPrintIssueWrapper(id, line.line, "Active");
+        }
+        if (line.line.includes("Uninstalling")) {
+          addOctoPrintLogWrapper(id, line.line, "Offline", "Update Manager");
+          addOctoPrintIssueWrapper(id, line.line, "Offline");
+        }
+        if (line.line.includes("Processing")) {
+          addOctoPrintLogWrapper(id, line.line, "Active", "Update Manager");
+          addOctoPrintIssueWrapper(id, line.line, "Active");
+        }
+      });
+    }
+  }
+
+  if (type === "update_failed") {
+    addOctoPrintLogWrapper(
+      id,
+      `OctoPrint Update failed! Version ${currentData?.version} Reason: ${currentData?.reason}`,
+      "Offline",
+      "Update Manager"
+    );
+    addOctoPrintIssueWrapper(
+      id,
+      `OctoPrint Update failed! Version ${currentData?.version} Reason: ${currentData?.reason}`,
+      "Offline"
+    );
+  }
+};
+
 module.exports = {
   testAndCollectPSUControlPlugin,
   testAndCollectCostPlugin,
@@ -337,5 +405,6 @@ module.exports = {
   capturePluginManagerData,
   captureThrottlePluginData,
   captureResourceMonitorData,
-  captureDisplayLayerProgress
+  captureDisplayLayerProgress,
+  captureUpdatingData
 };

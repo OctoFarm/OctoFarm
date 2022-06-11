@@ -6,8 +6,8 @@ const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-
-const logger = new Logger("OctoFarm-InformationCleaning");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILAMENT_CLEANER);
 
 let spoolsClean = [];
 let profilesClean = [];
@@ -94,6 +94,7 @@ class FilamentCleanerService {
     const currentSettings = SettingsClean.returnSystemSettings();
     const { filament } = currentSettings;
     const { hideEmpty } = filament;
+
     const createList = [this.noSpoolOptions];
     spools.forEach((spool) => {
       let profileId = _.findIndex(profiles, function (o) {
@@ -103,10 +104,27 @@ class FilamentCleanerService {
       const index = _.findIndex(selected, function (o) {
         return o.toString() === spool._id.toString();
       });
-      if (profileId >= 0) {
-        const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
 
-        if (!hideEmpty && !amountLeft < 1) {
+      if (profileId < 0) {
+        logger.error("Unable to match profile to spool!", spool);
+      }
+
+      if (profileId >= 0) {
+        const amountLeft = parseInt(spool.spools.weight) - parseInt(spool.spools.used);
+
+        logger.debug("Seeings for spool", {
+          hideEmpty,
+          amountLeft
+        });
+
+        let showSpool = true;
+
+        if (!hideEmpty && amountLeft < 1) {
+          // spool should hide
+          showSpool = false;
+        }
+
+        if (showSpool) {
           createList.push({
             spoolID: spool._id,
             spoolName: spool.spools.name,
@@ -156,9 +174,11 @@ class FilamentCleanerService {
     const total = [];
     const price = [];
     for (const element of spools) {
-      used.push(parseFloat(element.used));
-      total.push(parseFloat(element.weight));
-      price.push(parseFloat(element.price));
+      if (element.used <= element.weight) {
+        used.push(parseFloat(element.used));
+        total.push(parseFloat(element.weight));
+        price.push(parseFloat(element.price));
+      }
       const profInd = _.findIndex(profiles, function (o) {
         return o._id.toString() === element.profile.toString();
       });
@@ -166,9 +186,12 @@ class FilamentCleanerService {
         const index = _.findIndex(materialBreak, function (o) {
           return o.name === profiles[profInd].material;
         });
-        materialBreak[index].weight.push(parseFloat(element.weight));
-        materialBreak[index].used.push(parseFloat(element.used));
-        materialBreak[index].price.push(parseFloat(element.price));
+        if (element.used <= element.weight) {
+          materialBreak[index].weight.push(parseFloat(element.weight));
+          materialBreak[index].used.push(parseFloat(element.used));
+          materialBreak[index].price.push(parseFloat(element.price));
+        }
+
       }
     }
 
