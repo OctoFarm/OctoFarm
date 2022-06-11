@@ -1,7 +1,8 @@
 const fetch = require("node-fetch");
 const Logger = require("../handlers/logger");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
-const logger = new Logger("OctoFarm-Server");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_GITHUB_CLIENT);
 
 async function getGithubReleasesPromise() {
   const connected = await fetch("https://github.com", {

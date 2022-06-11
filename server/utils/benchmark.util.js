@@ -1,6 +1,6 @@
 const Logger = require("../handlers/logger.js");
-
-const logger = new Logger("OctoFarm-Server");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.UTILS_BENCHMARK);
 
 /**
  * Timing benchmark function, DO NOT USE IN PRODUCTION - just use it once and remove after.

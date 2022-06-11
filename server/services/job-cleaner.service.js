@@ -6,7 +6,8 @@ const { getElectricityCosts, getMaintenanceCosts } = require("../utils/print-cos
 const { HistoryClean } = require("./history-cleaner.service.js");
 const { floatOrZero } = require("../utils/number.util");
 const Logger = require("../handlers/logger");
-const logger = new Logger("OctoFarm-InformationCleaning");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_JOB_CLEANER);
 
 const cleanJobs = [];
 

@@ -19,10 +19,11 @@ const { sortCurrentOperations } = require("./services/printer-statistics.service
 const { initFarmInformation } = require("./services/farm-information.service");
 const { notifySubscribers } = require("./services/server-side-events.service");
 const { MESSAGE_TYPES } = require("./constants/sse.constants");
+const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 
 const Logger = require("./handlers/logger");
 const { SettingsClean } = require("./services/settings-cleaner.service");
-const logger = new Logger("OctoFarm-TaskManager");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_TASKS);
 
 const I_AM_ALIVE = () => {
   notifySubscribers("iAmAlive", MESSAGE_TYPES.AM_I_ALIVE, {

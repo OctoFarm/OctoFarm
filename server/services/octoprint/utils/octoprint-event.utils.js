@@ -8,8 +8,8 @@ const { parseOutIPAddress } = require("../../../utils/url.utils");
 const { HistoryCaptureService } = require("../../history-capture.service.js");
 const { matchRemoteAddressToOctoFarm } = require("../../../utils/find-predicate.utils");
 const { ErrorCaptureService } = require("../../error-capture.service");
-
-const logger = new Logger("OctoFarm-OctoPrint-Messages");
+const { LOGGER_ROUTE_KEYS } = require("../../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_UTIL_EVENTS);
 
 const tickerWrapper = (id, state, message) => {
   PrinterTicker.addIssue(new Date(), getPrinterStoreCache().getPrinterURL(id), message, state, id);

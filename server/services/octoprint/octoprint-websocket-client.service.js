@@ -13,8 +13,8 @@ const ConnectionMonitorService = require("../../services/connection-monitor.serv
 const { REQUEST_TYPE, REQUEST_KEYS } = require("../../constants/connection-monitor.constants");
 const { getPrinterStoreCache } = require("../../cache/printer-store.cache");
 const { mapStateToCategory } = require("../printers/utils/printer-state.utils");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.OP_SERVICE_WEBSOCKET);
 
 const ENDPOINT = "/sockjs/websocket";
 

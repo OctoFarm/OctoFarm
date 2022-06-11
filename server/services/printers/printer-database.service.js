@@ -1,7 +1,7 @@
 const printerModel = require("../../models/Printer");
 const Logger = require("../../handlers/logger");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_PRINTER_DATABASE);
 
 class PrinterDatabaseService {
   #id;

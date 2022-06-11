@@ -103,7 +103,7 @@ class LoggerService {
               new winston.transports.File({
                 level: logFilterLevel,
                 format: prettyPrintMyLogs,
-                filename: `../logs/${route}.log`,
+                filename: `../logs/OctoFarm.log`,
                 maxsize: 5242880,
                 maxFiles: 3
               })

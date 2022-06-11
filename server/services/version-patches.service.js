@@ -3,8 +3,8 @@ const Logger = require("../handlers/logger");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { PRINTER_CATEGORIES } = require("./printers/constants/printer-categories.constants");
 const { attachProfileToSpool } = require("../utils/spool.utils");
-
-const logger = new Logger("OctoFarm-State");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_VERSION_PATCHES);
 
 const patchPrinterValues = async (printer) => {
   patchSortIndex(printer);

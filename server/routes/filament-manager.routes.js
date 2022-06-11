@@ -10,10 +10,11 @@ const ServerSettings = require("../models/ServerSettings.js");
 const settingsClean = require("../services/settings-cleaner.service.js");
 
 const { SettingsClean } = settingsClean;
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
 const Logger = require("../handlers/logger.js");
 
-const logger = new Logger("OctoFarm-FilamentManager");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_FILAMENT_MANAGER);
 
 const filamentClean = require("../services/filament-cleaner.service.js");
 

@@ -17,6 +17,7 @@ const { toTimeFormat } = require("../utils/time.util");
 const { last12Month } = require("../utils/date.utils");
 const { orderBy } = require("lodash");
 const { SettingsClean } = require("./settings-cleaner.service");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 let logger;
 
 class HistoryCleanerService {
@@ -32,7 +33,7 @@ class HistoryCleanerService {
 
   constructor(enableFileLogging = false, logLevel = "warn") {
     this.historyService = historyService;
-    this.logger = new Logger("OctoFarm-InformationCleaning", enableFileLogging, logLevel);
+    this.logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CLEANER, enableFileLogging, logLevel);
     this.enableLogging = enableFileLogging || false;
   }
 

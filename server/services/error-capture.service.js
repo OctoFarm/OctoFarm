@@ -4,7 +4,8 @@ const Logger = require("../handlers/logger.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { sleep } = require("../utils/promise.utils");
 const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
-const logger = new Logger("OctoFarm-HistoryCollection");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_OP_ERROR_CAPTURE);
 
 const routeBase = "../images/historyCollection";
 const PATHS = {

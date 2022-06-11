@@ -1,8 +1,8 @@
 const Logger = require("../handlers/logger.js");
 const { JobValidationException } = require("../exceptions/job.exceptions");
 const { ToadScheduler, SimpleIntervalJob, AsyncTask } = require("toad-scheduler");
-
-const logger = new Logger("OctoFarm-TaskManagerService");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_TASK_MANAGER);
 
 /**
  * Manage immediate or delayed tasks and recurring jobs.
