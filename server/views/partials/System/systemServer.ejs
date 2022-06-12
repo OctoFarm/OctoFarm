@@ -235,29 +235,6 @@
                             a server restart</small>
                         <hr>
                     </div>
-
-                    <div class="col-md-6 col-lg-6">
-                        <p class="font-weight-bold">API Initial Timeout</p>
-                        <p>The length of time OctoFarm will wait for a response from the OctoPrint API. Any request going over this will be considered offline...</p>
-                        <p><b>Min</b>: 1 second (Default: 2 seconds), <b>Max:</b> 10 seconds
-                        </p>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">API Timeout:</span>
-                            </div>
-                            <input id="APITimeout" type="number"
-                                   class="form-control" placeholder="6"
-                                   aria-label="Refresh Rate"
-                                   value="<%= serverSettings.timeout.apiTimeout/1000 %>" min="1" max="10" step="0.5">
-                            <div class="input-group-append">
-                                <span class="input-group-text">Seconds</span>
-                            </div>
-
-                        </div>
-                        <small id="emailHelp" class="form-text text-muted">Requires
-                            a server restart</small>
-                        <hr>
-                    </div>
                     <div class="col-md-6 col-lg-6">
                         <p class="font-weight-bold">API Retry</p>
                         <p>The interval that OctoFarm will attempt another
