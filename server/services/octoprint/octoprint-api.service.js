@@ -72,7 +72,6 @@ async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = und
 }
 
 class OctoprintApiService {
-  timeout = undefined;
   printerURL = undefined;
   apikey = undefined;
   #currentTimeout = 10000;
