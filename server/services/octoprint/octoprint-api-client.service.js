@@ -30,8 +30,6 @@ const apiTimelapse = (unrendered = true) =>
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
 class OctoprintApiClientService extends OctoprintApiService {
-  #amendedTimeout = 10000;
-
   constructor(printerURL, apikey, timeoutSettings) {
     super(printerURL, apikey, timeoutSettings);
   }
@@ -55,7 +53,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getSettings() {
-    return this.get(apiSettingsPart, this.#amendedTimeout).catch((e) => {
+    return this.get(apiSettingsPart).catch((e) => {
       return e;
     });
   }
@@ -71,7 +69,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param recursive
    */
   async getFiles(recursive = false) {
-    return this.get(apiFiles(recursive), this.#amendedTimeout).catch((e) => {
+    return this.get(apiFiles(recursive)).catch((e) => {
       return e;
     });
   }
@@ -128,13 +126,13 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getSoftwareUpdateCheck(force = false) {
-    return this.get(apiSoftwareUpdateCheck(force), this.#amendedTimeout).catch((e) => {
+    return this.get(apiSoftwareUpdateCheck(force)).catch((e) => {
       return e;
     });
   }
 
   async getUsers() {
-    return this.get(apiUsers, this.#amendedTimeout).catch((e) => {
+    return this.get(apiUsers).catch((e) => {
       return e;
     });
   }
