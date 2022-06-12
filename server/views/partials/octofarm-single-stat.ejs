@@ -1,0 +1,25 @@
+<div class="alert alert-<%= statType %> text-center" role="alert">
+    <div class="vstack gap-<%= statSpacing %>">
+        <i class="<%= statIcon %> fa-2xl"></i>
+        <h5 class="mb-0"><%= statTitle %></h5>
+
+            <% if(typeof statLink !== "undefined"){ %>
+            <h5>
+                <a title="OctoFarm current version, will take you to github releases page"
+                   class="alert-link"
+                   rel=”noopener”
+                   href="<%= statLink.url %>"
+                   target="_blank">
+                    <%= statLink.title %>
+                </a>
+            </h5>
+          <%  } %>
+        <% if(typeof statInformation !== "undefined"){ %>
+            <h5>
+                <%= statInformation %>
+            </h5>
+        <%  } %>
+
+    </div>
+
+</div>

@@ -1,4 +1,14 @@
+<% let base = '..' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+
 <div id="systemTasksTable" class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "OctoFarms recurring task register"
+        })
+        %>
+    </div>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <table class="table-hover table table-striped table-bordered table-responsive">
             <thead>

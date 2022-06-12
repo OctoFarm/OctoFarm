@@ -18,6 +18,7 @@ const {
   getDashboardStatistics,
   getCurrentOperations
 } = require("../services/printer-statistics.service");
+const { getLatestReleaseNotes } = require("../services/github-client.service");
 const { SystemRunner } = require("../services/system-information.service");
 const { fetchUsers } = require("../services/users.service");
 const { fetchMongoDBConnectionString, fetchClientVersion } = require("../app-env");
@@ -310,16 +311,18 @@ router.get(
   ensureAuthenticated,
   ensureCurrentUserAndGroup,
   ensureAdministrator,
-  async (req, res) => {
-    const systemInformation = SystemRunner.returnInfo();
+  async (_req, res) => {
+    const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+    const latestReleaseNotes = getLatestReleaseNotes();
+
     res.render("administration", {
       page: "Administration",
-      db: fetchMongoDBConnectionString(),
       helpers: prettyHelpers,
+      taskManagerState: TaskManager.getTaskState(),
       serviceInformation: {
-        isDockerContainer: isDocker()
+        update: softwareUpdateNotification
       },
-      taskManagerState: TaskManager.getTaskState()
+      latestReleaseNotes
     });
   }
 );
