@@ -75,13 +75,11 @@ class OctoprintApiService {
   timeout = undefined;
   printerURL = undefined;
   apikey = undefined;
-  #currentTimeout = 2000;
+  #currentTimeout = 10000;
 
-  constructor(printerURL, apikey, timeoutSettings) {
-    this.timeout = timeoutSettings;
+  constructor(printerURL, apikey) {
     this.printerURL = printerURL;
     this.apikey = apikey;
-    this.#currentTimeout = timeoutSettings.apiTimeout;
   }
 
   updateConnectionInformation(printerURL, apikey) {
@@ -117,13 +115,11 @@ class OctoprintApiService {
   /**
    * Acquire a GET resource
    * @param route
-   * @param amendTimeout
    * @returns {Promise<unknown>}
    */
-  async get(route, amendTimeout = 0) {
+  async get(route) {
     const url = new URL(route, this.printerURL).href;
-    const amendedTimeout = this.#currentTimeout + amendTimeout;
-    return fetchApiTimeout(url, "GET", this.apikey, amendedTimeout).catch((e) => {
+    return fetchApiTimeout(url, "GET", this.apikey).catch((e) => {
       return e;
     });
   }
