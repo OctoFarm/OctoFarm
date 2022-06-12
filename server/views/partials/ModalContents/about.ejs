@@ -22,7 +22,7 @@
                     <a type="button" class="btn btn-light mb-2" href="https://github.com/NotExpectedYet/OctoFarm/discussions" target="_blank"><i class="fab fa-github-square"></i> Github Discussions</a><br>
                     <a type="button" class="btn btn-secondary mb-2" href="https://www.reddit.com/r/OctoFarm/" target="_blank"><i class="fab fa-reddit"></i> Reddit</a><br>
                     <a type="button" class="btn btn-danger mb-2" href="https://www.youtube.com/channel/UClQWO3lxmQRreJVpjTrxELA" target="_blank"><i class="fab fa-youtube"></i> Youtube</a><br>
-                    <a type="button" class="btn btn-outline-dark" href="https://octofarm.net/blog" target="_blank"><i class="fas fa-rss"></i> Blog</a>
+                    <a type="button" class="btn btn-outline-light" href="https://octofarm.net/blog" target="_blank"><i class="fas fa-rss"></i> Blog</a>
                 </div>
                 <div class="col-sm-12 col-md-4">
                     <h4>Sponsor Links</h4><hr>
@@ -51,38 +51,4 @@
         </div>
     </div>
 </div>
-<script>
-    const patreonDataList = document.getElementById("aboutPatreonsList");
-    const aboutOctoFarmModal = document.getElementById("aboutModal");
-    const patreonTemplate = (patreon) => {
-        return `
-            <div class="col-12 col-sm-6 col-md-3 col-lg-3 text-center">
-                <li class="list-group-item">
-                    <div class="patreon-user"> <img class="patreon-img" src="${patreon.thumb}"></div>
-                    <i style="color:gold;" class="fas fa-trophy"></i>
-                        ${patreon.name}
-                    <i style="color:gold;" class="fas fa-trophy"></i>
-                </li>
-            </div>
-        `
-    }
-
-    aboutOctoFarmModal.addEventListener("show.bs.modal", async () => {
-        if(patreonDataList.innerHTML.includes("spinner")){
-            const patreon = await fetch("api/data/patreons", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-            })
-            if(patreon.ok){
-                const patreonData = await patreon.json()
-                patreonDataList.innerHTML = "";
-                patreonData.forEach(patreon => {
-                    patreonDataList.insertAdjacentHTML("beforeend", patreonTemplate(patreon))
-                })
-            }
-        }
-    })
-
-</script>
+<script src="/assets/dist/about.modal.min.js?<%= clientVersion %>"></script>
