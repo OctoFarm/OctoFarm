@@ -83,32 +83,6 @@ axios.interceptors.response.use(
 // REFACTOR: this could end up getting big, consider splitting it.
 // Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
-  static base = "/api";
-  // static printerRoute = "/printers";
-  // static disablePrinterRoute = this.printerRoute + "/disable";
-  // static enablePrinterRoute = this.printerRoute + "/enable";
-  // static generatePrinterNameRoute =
-  //   this.printerRoute + "/generate_printer_name";
-  // static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
-  // static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
-  // static printerStepChangeRoute = this.printerRoute + "/stepChange";
-  // static forceReconnectRoute = this.printerRoute + "/forceReconnect";
-  // static serverSettingsRoute = "/settings/server";
-  // static clientSettingsRoute = "/settings/client";
-  // static filamentRoute = `/filament`;
-  // static filamentStatistics = `${this.filamentRoute}/get/statistics`;
-  // static filamentProfiles = `${this.filamentRoute}/get/profile`;
-  // static filamentSpools = `${this.filamentRoute}/get/filament`;
-  // static logsRoute = `${this.serverSettingsRoute}/logs`;
-  // static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
-  // static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`;
-  // static userRoute = `/users/users`;
-  // static healthCheckRoute = `${this.printerRoute}/healthChecks`;
-  // static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
-  // static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
-  // static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
-
-
 
   static async #get(path) {
     const url = new URL(path, window.location.origin).href;
@@ -146,6 +120,34 @@ export default class OctoFarmClient {
       });
     }
   }
+
+  static base = "/api";
+  // static printerRoute = "/printers";
+  // static disablePrinterRoute = this.printerRoute + "/disable";
+  // static enablePrinterRoute = this.printerRoute + "/enable";
+  // static generatePrinterNameRoute =
+  //   this.printerRoute + "/generate_printer_name";
+  // static updateUserActionsLogRoute = this.printerRoute + "/logUserPrintAction";
+  // static updateActiveUserRoute = this.printerRoute + "/updateActiveUser";
+  // static printerStepChangeRoute = this.printerRoute + "/stepChange";
+  // static forceReconnectRoute = this.printerRoute + "/forceReconnect";
+  // static serverSettingsRoute = "/settings/server";
+  // static clientSettingsRoute = "/settings/client";
+  // static filamentRoute = `/filament`;
+  // static filamentStatistics = `${this.filamentRoute}/get/statistics`;
+  // static filamentProfiles = `${this.filamentRoute}/get/profile`;
+  // static filamentSpools = `${this.filamentRoute}/get/filament`;
+  // static logsRoute = `${this.serverSettingsRoute}/logs`;
+  // static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  // static fireLogToServerRoute = `${this.clientSettingsRoute}/logs`;
+  // static userRoute = `/users/users`;
+  // static healthCheckRoute = `${this.printerRoute}/healthChecks`;
+  // static farmOverviewRoute = `${this.printerRoute}/farmOverview`;
+  // static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
+  // static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
+
+
+
 
   // General Data Calls
   static generalDataRoute = `${this.base}/data`;
