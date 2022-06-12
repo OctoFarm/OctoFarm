@@ -354,7 +354,6 @@ async function updateServerSettings() {
     },
     timeout: {
       webSocketRetry: settingsElements.timeout.webSocketRetry.value * 1000,
-      apiTimeout: settingsElements.timeout.apiTimeout.value * 1000,
       apiRetry: settingsElements.timeout.apiRetry.value * 1000,
     },
     filament: {
