@@ -39,30 +39,6 @@
 
     <div class="col-md-6 col-lg-6">
         <%- include(infoAlert, {
-        title: "API Initial Timeout",
-        infoID: "infoAPIInitialTimeout",
-        infoText: "The length of time OctoFarm will wait for a response from the "
-        + " OctoPrint API. Any request going over this will be considered offline...<br>"
-        + "<b>Min</b>: 1 second (Default: 2 seconds), <b>Max:</b> 10 seconds"
-        })
-        %>
-        <%- include(textInput, {
-        inputID: "APITimeout",
-        inputType: "number",
-        inputTag: "API Timeout",
-        inputPlaceholder: 6,
-        inputValue: serverSettings.timeout.apiTimeout/1000,
-        inputMin: 1,
-        inputMax: 10,
-        inputStep: 1,
-        inputAppendTag: "Seconds",
-        requiresRestart: true
-        })
-        %>
-        <hr>
-    </div>
-    <div class="col-md-6 col-lg-6">
-        <%- include(infoAlert, {
         title: "API Retry",
         infoID: "infoAPIRetry",
         infoText: "The interval that OctoFarm will attempt another"
@@ -90,7 +66,7 @@
 <div class="row">
     <div class="col">
         <div class="d-grid gap-2">
-            <button class="btn btn-outline-success" type="button">Save Printer Changes</button>
+            <button class="btn btn-outline-success" type="button" id="save-printer-changes">Save Printer Changes</button>
         </div>
     </div>
 </div>
