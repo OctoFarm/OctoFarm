@@ -1,14 +1,8 @@
 name: Docker Monolithic
 on:
   pull_request:
-  push:
-    tags:
-      - '*'
-    branches:
-      - 'master'
-      - 'development'
   workflow_run:
-    workflows: [ Release Development Version, Release Master Version ]
+    workflows: [ Release Master Version ]
     types:
       - completed
 jobs:
@@ -20,8 +14,6 @@ jobs:
         run: |
           if ${{ github.ref == 'refs/heads/master' }} == true; then
             echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
-          elif ${{ github.ref == 'refs/heads/development' }} == true; then
-            echo 'TAG_EDGE=monolithic-dev' >> $GITHUB_ENV
           fi
 
       - name: Docker meta
