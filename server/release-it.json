@@ -4,7 +4,8 @@
     "commit": true,
     "tag": true,
     "push": true,
-    "requireCleanWorkingDir": false
+    "requireCleanWorkingDir": false,
+    "tagName": "${version}"
   },
   "npm": {
     "publish": false
@@ -15,7 +16,7 @@
   },
   "plugins": {
     "@release-it/conventional-changelog": {
-      "infile": "../CHANGELOG.md",
+      "infile": "CHANGELOG.md",
       "header": "# :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:",
       "preset": {
         "name": "conventionalcommits",
