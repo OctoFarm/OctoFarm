@@ -1,3 +1,6 @@
+<% let base = '..' %>
+<% let loading = base + '/octofarm-loading.ejs' %>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12 text-center">
@@ -42,11 +45,7 @@
         <div class="col-lg-12 text-center">
             <h5>Big thanks to the following Supporters!</h5><hr>
             <div class="row" id="aboutPatreonsList">
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
+                <%- include(loading) %>
             </div>
         </div>
     </div>

@@ -20,12 +20,12 @@
     <div class="col-12 col-md-12 col-lg-6">
         <div class="d-grid gap-2">
             <button title="Performs a check for latest updates of OctoFarm"
-                    id="checkUpdatesForOctoFarmBtn" type="button"
+                    id="check-updates" type="button"
                     class="btn btn-outline-info ml-3 float-right btn-lg">
                 <i class="fa-solid fa-arrows-rotate"></i> Check for Update
             </button>
             <button title="Performs an update command on OctoFarm to the latest version"
-                    id="updateOctoFarmBtn" type="button"
+                    id="update-octofarm" type="button"
                     class="btn btn-outline-success ml-3 float-right btn-lg"
                     disabled>
                 <i class="fa-solid fa-download"></i> Update OctoFarm
@@ -89,8 +89,8 @@
 <div class="row">
     <div class="col-12">
         <% if(Object.keys(latestReleaseNotes).length !== 0){ %>
-            <h3> Latest Release Notes </h3><hr><br>
-            <%- helpers.replaceGithubIcons( latestReleaseNotes.body) %>
+            <h3> Current Release Notes </h3><hr><br>
+            <%- helpers.replaceGithubIcons(latestReleaseNotes.body) %>
         <% } %>
     </div>
 </div>
