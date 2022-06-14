@@ -5,6 +5,10 @@
 <% const updateURL = "https://docs.octofarm.net/getting-started/octofarm-updating.html" %>
 <% const installationURL = "https://docs.octofarm.net/installation/" %>
 
+<% let updateDisabled = "disabled"; %>
+
+<% if( serviceInformation?.update?.update_available ) { updateDisabled = "" } %>
+
 <% if(systemInformation?.warnings?.status){ %>
     <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
         <%= systemInformation.warnings?.message; %>
@@ -68,7 +72,7 @@
         <button title="Performs an update command on OctoFarm to the latest version"
                 id="updateOctoFarmBtn" type="button"
                 class="btn btn-success ml-3 float-right btn-lg"
-                disabled>
+                <% updateDisabled %>>
             <i class="fas fa-thumbs-up"></i> Update OctoFarm
         </button>
     </div>
