@@ -2,6 +2,18 @@
 <% if (typeof inputStep !== "undefined") { %>
     <% step = `step=${inputStep}` %>
 <% } %>
+<% let maxText = "" %>
+<% if (typeof maxLength !== "undefined"){ %>
+    <% maxText = `maxLength=${maxLength}` %>
+<% } %>
+<% let minNumber = "" %>
+<% if (typeof minValue !== "undefined"){ %>
+    <% maxText = `min=${minValue}` %>
+<% } %>
+<% let maxNumber = "" %>
+<% if (typeof maxValue !== "undefined"){ %>
+    <% maxNumber = `max=${maxValue}` %>
+<% } %>
 <div class="vstack gap-3">
     <div class="input-group">
         <div class="input-group-prepend">
@@ -9,7 +21,7 @@
         </div>
         <input id="<%= inputID %>" type="<%= inputType %>" class="form-control"
                placeholder="<%= inputPlaceholder %>" aria-label="Refresh Rate"
-               value="<%= inputValue %>" <%= step %>>
+               value="<%= inputValue %>" <%= step %> <%= maxText %> <%= minNumber %> <%= maxNumber %>>
     </div>
     <% if(typeof requiresRestart !== "undefined" && requiresRestart) { %>
         <code class="mt-0">Requires a restart</code>
