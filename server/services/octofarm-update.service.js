@@ -29,7 +29,7 @@ function findGithubRelease(releases, prerelease = false, tag_name = null) {
  */
 async function syncLatestOctoFarmRelease(includePrereleases = false) {
   const packageVersion = process.env[AppConstants.VERSION_KEY];
-
+  console.log(packageVersion);
   await getGithubReleasesPromise()
     .then((githubReleases) => {
       airGapped = !githubReleases;

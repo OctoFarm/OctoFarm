@@ -25,7 +25,8 @@ const { SystemCommands } = require("../services/server-commands.service.js");
 const { fetchUsers } = require("../services/users.service");
 const {
   checkReleaseAndLogUpdate,
-  getUpdateNotificationIfAny
+  getUpdateNotificationIfAny,
+  syncLatestOctoFarmRelease
 } = require("../services/octofarm-update.service.js");
 const { getPrinterManagerCache } = require("../cache/printer-manager.cache");
 const { getImagesPath, getLogsPath } = require("../utils/system-paths.utils");
@@ -231,7 +232,8 @@ router.post(
     }
   }
 );
-router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, (req, res) => {
+router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  await syncLatestOctoFarmRelease(false);
   checkReleaseAndLogUpdate();
   const softwareUpdateNotification = getUpdateNotificationIfAny();
   res.send(softwareUpdateNotification);

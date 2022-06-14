@@ -522,7 +522,7 @@ async function checkForOctoFarmUpdates() {
   }
 
   const updateCheck = await OctoFarmClient.get(
-    "settings/server/update/octofarm"
+    "settings/server/update/check"
   );
 
   if (updateCheck?.air_gapped) {
@@ -541,6 +541,7 @@ async function checkForOctoFarmUpdates() {
       5000,
       "Clicked"
     );
+    document.getElementById("updateOctoFarmBtn").disabled = false;
   } else {
     UI.createAlert(
       "warning",
