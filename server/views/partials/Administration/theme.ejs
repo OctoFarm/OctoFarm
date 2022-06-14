@@ -2,6 +2,12 @@
 <% let infoAlert = base + '/octofarm-title-info.ejs' %>
 <% let alert = base + '/octofarm-alert.ejs' %>
 <% let textInput = base + '/octofarm-text-input.ejs' %>
+<% let hideDark = "" %>
+<% let hideLight = "d-none" %>
+<% if(serverSettings.clientTheme.mode !== "dark"){ %>
+<%  hideDark = "d-none" %>
+<%  hideLight = "" %>
+<% } %>
 
 <div class="row">
     <div class="col-12">
@@ -11,60 +17,104 @@
         })
         %>
     </div>
-    <div class="col-12 col-md-4 col-lg-4">
-        <%- include(infoAlert, {
-        title: "Application Title",
-        infoID: "infoApplicationTitle",
-        infoText: "Replace 'OctoFarm' across the interface with your own custom application name"
-        })
-        %>
-        <%- include(textInput, {
-        inputID: "serverApplicationTitle",
-        inputType: "text",
-        inputTag: "Title",
-        inputPlaceholder: octoFarmPageTitle,
-        inputValue: octoFarmPageTitle,
-        requiresRestart: true
-        })
-        %>
-        <hr>
-        <%- include(infoAlert, {
-        title: "Light or Dark Mode",
-        infoID: "infoLightOrDarkMode",
-        infoText: "Set OctoFarms theme to a dark or light mode. Will apply instantly but please don't forget to save your changes!"
-        })
-        %>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeDarkMode">
-            <label class="form-check-label" for="themeDarkMode">
-                Dark Mode
-            </label>
+    <div class="col-12 col-md-12 col-lg-6">
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-6">
+                <%- include(infoAlert, {
+                title: "Application Title",
+                infoID: "infoApplicationTitle",
+                infoText: "Replace 'OctoFarm' across the interface with your own custom application name"
+                })
+                %>
+                <%- include(textInput, {
+                inputID: "serverApplicationTitle",
+                inputType: "text",
+                inputTag: "Title",
+                inputPlaceholder: octoFarmPageTitle,
+                inputValue: octoFarmPageTitle,
+                requiresRestart: true
+                })
+                %>
+                <hr>
+            </div>
+            <div class="col-12 col-md-12 col-lg-6">
+                <%- include(infoAlert, {
+                title: "Light or Dark Mode",
+                infoID: "infoLightOrDarkMode",
+                infoText: "Set OctoFarms theme to a dark or light mode."
+                })
+                %>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeDarkMode">
+                    <label class="form-check-label" for="themeDarkMode">
+                        Dark Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeLightMode">
+                    <label class="form-check-label" for="themeLightMode">
+                        Light Mode
+                    </label>
+                </div>
+                <hr>
+            </div>
         </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="flexRadioDefault" id="themeLightMode">
-            <label class="form-check-label" for="themeLightMode">
-               Light Mode
-            </label>
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-6">
+                <%- include(infoAlert, {
+                title: "Main Colour",
+                infoID: "infoMainColour",
+                infoText: "Replace the main colour used across the interface"
+                })
+                %>
+                <input style="width:100%;"  type="color" class="form-control form-control-color" id="mainApplicationColour" value="<%= serverSettings.clientTheme.octofarmMainColour %>" title="Choose your color">
+                <hr>
+                <%- include(infoAlert, {
+                title: "Main Accent Colour",
+                infoID: "infoMainAccentColour",
+                infoText: "Replace the main accent colour used across the interface"
+                })
+                %>
+                <input style="width:100%;"  type="color" class="form-control form-control-color" id="mainApplicationAccentColour" value="<%= serverSettings.clientTheme.octofarmHighlightColour %>" title="Choose your color">
+                <hr>
+            </div>
+            <div id="darkNavSelector" class="col-12 col-md-12 col-lg-6 <%= hideDark %>">
+                <%- include(infoAlert, {
+                title: "Dark Navbar Colour",
+                infoID: "infoSidebarColourDark",
+                infoText: "Replace the sidebar colour on the interface"
+                })
+                %>
+                <input style="width:100%;" type="color" class="form-control form-control-color" id="sidebarColourDark" value="<%= serverSettings.clientTheme.navbarColourDark %>" title="Choose your color">
+                <hr>
+                <%- include(infoAlert, {
+                title: "Dark Sidebar Colour",
+                infoID: "replace the navbar colour on the interface",
+                infoText: "Replace the main accent colour used across the interface"
+                })
+                %>
+                <input style="width:100%;"  type="color" class="form-control form-control-color" id="navbarColourDark" value="<%= serverSettings.clientTheme.sidebarColourDark %>" title="Choose your color">
+                <hr>
+            </div>
+            <div id="lightNavSelector" class="col-12 col-md-12 col-lg-6 <%= hideLight %>">
+                <%- include(infoAlert, {
+                title: "Light Navbar Colour",
+                infoID: "infoSidebarColourLight",
+                infoText: "Replace the sidebar colour on the interface"
+                })
+                %>
+                <input style="width:100%;" type="color" class="form-control form-control-color" id="sidebarColourLight" value="<%= serverSettings.clientTheme.navbarColourLight %>" title="Choose your color">
+                <hr>
+                <%- include(infoAlert, {
+                title: "Light Sidebar Colour",
+                infoID: "replace the navbar colour on the interface",
+                infoText: "Replace the main accent colour used across the interface"
+                })
+                %>
+                <input style="width:100%;"  type="color" class="form-control form-control-color" id="navbarColourLight" value="<%= serverSettings.clientTheme.navbarColourDark %>" title="Choose your color">
+                <hr>
+            </div>
         </div>
-        <hr>
-        <%- include(infoAlert, {
-        title: "Main Colour",
-        infoID: "infoMainColour",
-        infoText: "Replace the main colour used across the interface"
-        })
-        %>
-        <label for="mainApplicationColour" class="form-label">Color picker</label>
-        <input type="color" class="form-control form-control-color" id="mainApplicationColour" value="<%= serverSettings.clientTheme.octofarmMainColour %>" title="Choose your color">
-        <hr>
-        <%- include(infoAlert, {
-        title: "Main Accent Colour",
-        infoID: "infoMainAccentColou",
-        infoText: "Replace the main accent colour used across the interface"
-        })
-        %>
-        <label for="mainApplicationAccentColour" class="form-label">Color picker</label>
-        <input type="color" class="form-control form-control-color" id="mainApplicationAccentColour" value="<%= serverSettings.clientTheme.octofarmHighlightColour %>" title="Choose your color">
-        <hr>
         <div class="row">
             <div class="col">
                 <div class="d-grid gap-2">
@@ -104,8 +154,15 @@
     </div>
 </div>
 <script>
-    const darkModeCheck = document.getElementById("themeDarkMode")
-    const lightModeCheck = document.getElementById("themeLightMode")
+    const darkNavSelector = document.getElementById("darkNavSelector");
+    const lightNavSelector = document.getElementById("lightNavSelector");
+    const toggleNavSelector = () => {
+        darkNavSelector.classList.toggle("d-none");
+        lightNavSelector.classList.toggle("d-none");
+    }
+
+    const darkModeCheck = document.getElementById("themeDarkMode");
+    const lightModeCheck = document.getElementById("themeLightMode");
 
     const currentMode = "<%= serverSettings.clientTheme.mode %>"
 
@@ -118,9 +175,9 @@
     }
 
     darkModeCheck.onclick = function(e){
-        darkmode.setDarkMode(true);
+        toggleNavSelector();
     }
     lightModeCheck.onclick = function(e){
-        darkmode.setDarkMode(false);
+        toggleNavSelector();
     }
 </script>

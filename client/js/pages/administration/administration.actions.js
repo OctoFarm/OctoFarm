@@ -1,5 +1,5 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
-import { grabSystemPageSettingsValues } from "./administration.helpers";
+import { grabSystemPageSettingsValues, grabThemePageSettingsValues } from "./administration.helpers";
 import { handleServerResponse } from "../../utils/server-response.utils";
 import e from "../../utils/elements";
 
@@ -51,6 +51,12 @@ export const updateTaskListState = async () => {
 export const saveSystemSettings = async () => {
     const newSystemSettings = grabSystemPageSettingsValues();
     handleServerResponse(await OctoFarmClient.saveNewSystemSettings(newSystemSettings), "Successfully saved your system settings!")
+}
+
+export const saveThemeSettings = async () => {
+    const newSystemSettings = grabThemePageSettingsValues();
+    console.log(newSystemSettings)
+    handleServerResponse(await OctoFarmClient.saveNewThemeSettings(newSystemSettings), "Successfully saved your theme settings!")
 }
 
 export const restartOctoFarmServer = () => {

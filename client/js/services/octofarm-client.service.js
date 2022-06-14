@@ -162,6 +162,7 @@ export default class OctoFarmClient {
   static systemRunningTasksRoute = `${this.administrationRoute}/tasks`;
   static saveSettingsRoute = `${this.administrationRoute}/settings`;
   static saveSystemSettingsRoute = `${this.saveSettingsRoute}/system`;
+  static saveThemeSettingsRoute = `${this.saveSettingsRoute}/theme`;
 
   static async getSystemRunningTaskList(){
     return this.#get(this.systemRunningTasksRoute);
@@ -169,6 +170,10 @@ export default class OctoFarmClient {
 
   static async saveNewSystemSettings(data){
     return this.#patch(this.saveSystemSettingsRoute, data);
+  }
+
+  static async saveNewThemeSettings(data){
+    return this.#patch(this.saveThemeSettingsRoute, data);
   }
 
   // static async getPrinter(id) {

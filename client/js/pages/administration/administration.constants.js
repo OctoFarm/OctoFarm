@@ -30,3 +30,15 @@ export const SYSTEM_SETTINGS_IDS = {
     logLevelSelect: "logLevelSelect"
 }
 
+export const THEME_SETTINGS_IDS = {
+    serverApplicationTitle: "serverApplicationTitle",
+    themeDarkMode: "themeDarkMode",
+    themeLightMode: "themeLightMode",
+    mainApplicationColour: "mainApplicationColour",
+    mainApplicationAccentColour: "mainApplicationAccentColour",
+    sidebarColourDark: "sidebarColourDark",
+    navbarColourDark: "navbarColourDark",
+    sidebarColourLight: "sidebarColourLight",
+    navbarColourLight: "navbarColourLight"
+}
+

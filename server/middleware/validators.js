@@ -89,7 +89,12 @@ function getExtendedValidator() {
   nodeInputValidator.extend("valid_log_level", ({ value, args }) => {
     const validLogLevels = ["info", "debug", "silly"];
     return validLogLevels.includes(value);
-  })
+  });
+
+  nodeInputValidator.extend("dark_or_light", ({ value, args }) => {
+    const validLogLevels = ["dark", "light"];
+    return validLogLevels.includes(value);
+  });
 
   return nodeInputValidator;
 }
