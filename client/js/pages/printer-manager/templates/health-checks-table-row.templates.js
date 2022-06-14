@@ -125,64 +125,6 @@ const returnBootBox = (
   });
 };
 
-const returnNetworkConnection = (issues) => {
-  const { apiResponses } = issues;
-
-  let html = "";
-
-  if (apiResponses.length < 1) {
-    return `
-        No connection has ever been established
-      `;
-  }
-
-  const urlSplit = apiResponses[0].url.split("/");
-  const printerURL = urlSplit[0] + "//" + urlSplit[2];
-  const pClean = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
-
-  let totalInitial = 0;
-
-  apiResponses.forEach((issue) => {
-    const endPoint = issue.url.includes("api")
-      ? issue.url.replace(printerURL + "/" + urlSplit[3] + "/", "")
-      : issue.url.replace(printerURL + "/plugin/", "");
-
-    if (totalInitial !== 1) {
-      totalInitial = issue.initialTimeout ? 0 : 1;
-    }
-
-    html += `
-        <small>${endPoint}: ${returnButton(
-      issue.initialTimeout,
-      "<i class=\"fas fa-history\"></i>",
-      E.NETWORK + endPoint + pClean + "timeout",
-      VALID_TIMEOUT("Initial")
-    )} </small>`;
-  });
-
-  return `
-    <a class="btn btn-sm btn-outline-info mb-1"  data-toggle="collapse" href="#${
-      E.NETWORK + pClean
-    }CollapseTimeout" role="button" aria-expanded="false" aria-controls="${
-    E.NETWORK + pClean
-  }CollapseTimeout">
-    ${printerURL} 
-    </a><br>
-    ${returnButton(
-      totalInitial < 1,
-      "<i class=\"fas fa-history\"></i>",
-      E.NETWORK + pClean + "initial",
-      VALID_TIMEOUT("All Initial")
-    )}
-    <div class="collapse" id="${E.NETWORK + pClean}CollapseTimeout">
-      <div class="card card-body">
-      ${html} 
-      </div>
-    </div>
-
-`;
-};
-
 const returnHistoryCamera = (pClean, history) => {
   return `
     ${returnButton(
@@ -322,9 +264,7 @@ export function returnHealthCheckRow(check) {
        VALID_API("Plugin Updates")
      )}
           </td>
-          <td>
-          ${returnNetworkConnection(check.connectionIssues)}
-          </td>
+
           <td>
           ${returnButton(
             check.connectionChecks.baud,
@@ -628,70 +568,6 @@ export function addHealthCheckListeners(check) {
         );
       });
   }
-  const apiSettingsWarning =
-    "This will not really effect OctoFarms operations much. It will however effect the user experience as messages may not arrive in the expected time or initial scans of offline printers could take to long to resolve.";
-  const { apiResponses } = check.connectionIssues;
-  if (apiResponses.length < 1) {
-    return false;
-  }
-
-  const timeoutResponseInfo = (setting) => {
-    return `
-    Your ${setting} is too high for the response times...
-    `;
-  };
-
-  const timeoutResponseFix = (response, settings) => {
-    return `
-    The endpoint is responding, on average, in ${
-      response ? response : ""
-    }ms <br> Your settings are currently: ${
-      settings ? settings : ""
-    }ms and are under by ${response - settings}ms.
-    `;
-  };
-
-  let totalInitial = 0;
-  let totalCutOff = 0;
-
-  const urlSplit = apiResponses[0].url.split("/");
-
-  const printerURL = urlSplit[0] + "//" + urlSplit[2];
-  const pCleanURL = printerURL.replace(/[^\w\-]+/g, "-").toLowerCase();
-
-  if (apiResponses.length > 1) {
-    apiResponses.forEach((issue) => {
-      const endPoint = issue.url.includes("api")
-        ? issue.url.replace(printerURL + "/" + urlSplit[3] + "/", "")
-        : issue.url.replace(printerURL + "/plugin/", "");
-
-      totalInitial += issue.initialTimeout ? 1 : 0;
-
-      totalCutOff += issue.initialTimeout ? 1 : 0;
-      document
-        .getElementById(E.NETWORK + endPoint + pCleanURL + "timeout")
-        .addEventListener("click", () => {
-          returnBootBox(
-            timeoutResponseInfo("timeout"),
-            timeoutResponseFix(
-              issue.responsesAverage,
-              issue.timeoutSettings.apiTimeout
-            ),
-            apiSettingsWarning
-          );
-        });
-    });
-  }
-
-  document
-    .getElementById(E.NETWORK + pCleanURL + "initial")
-    .addEventListener("click", () => {
-      returnBootBox(
-        "One of your endpoints isn't responding by the time you have setup in your initial timeout",
-        "Click the blue button containing your printer url to investigate the specific endpoint further.",
-        apiSettingsWarning
-      );
-    });
 }
 
 export function returnFarmOverviewTableRow(
