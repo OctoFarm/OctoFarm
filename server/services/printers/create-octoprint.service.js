@@ -1649,7 +1649,7 @@ class OctoPrintPrinter {
     return this.resetSocketConnection(true);
   }
 
-  setPrinterToSearching(){
+  setPrinterToSearching() {
     this.setAllPrinterStates(PRINTER_STATES().SEARCHING);
   }
 
@@ -1848,7 +1848,7 @@ class OctoPrintPrinter {
     };
 
     const progress = {
-      completion: null,
+      completion: 0,
       filepos: null,
       printTime: null,
       printTimeLeft: null,
