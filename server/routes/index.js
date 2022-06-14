@@ -18,13 +18,10 @@ const {
   getDashboardStatistics,
   getCurrentOperations
 } = require("../services/printer-statistics.service");
-const { getLatestReleaseNotes } = require("../services/github-client.service");
-const { SystemRunner } = require("../services/system-information.service");
-const { fetchUsers } = require("../services/users.service");
-const { fetchMongoDBConnectionString, fetchClientVersion } = require("../app-env");
-const isDocker = require("is-docker");
-const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
-const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
+const {
+  getLatestReleaseNotes,
+  getFutureReleaseNote
+} = require("../services/github-client.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -314,7 +311,7 @@ router.get(
   async (_req, res) => {
     const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
     const latestReleaseNotes = getLatestReleaseNotes();
-
+    const futureReleaseNotes = getFutureReleaseNote();
     res.render("administration", {
       page: "Administration",
       helpers: prettyHelpers,
@@ -323,6 +320,7 @@ router.get(
         update: softwareUpdateNotification
       },
       latestReleaseNotes,
+      futureReleaseNotes,
       mongoURI: process.env[AppConstants.MONGO_KEY],
       portNumber: process.env[AppConstants.OCTOFARM_PORT_KEY],
       logLevel: process.env[AppConstants.LOG_LEVEL]
