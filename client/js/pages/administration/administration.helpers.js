@@ -16,7 +16,6 @@ export const grabThemePageSettingsValues = () => {
     if(!e.grabChecked(e.get(THEME_SETTINGS_IDS.themeDarkMode))){
         mode = "light";
     }
-    console.log(e.get(THEME_SETTINGS_IDS.navbarColourDark))
     return {
         mode: mode,
         navbarColourDark: e.grabValueOrPlaceholder(e.get(THEME_SETTINGS_IDS.navbarColourDark)),
