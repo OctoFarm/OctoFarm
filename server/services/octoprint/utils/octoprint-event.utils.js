@@ -107,6 +107,9 @@ const captureConnected = (id, data) => {
     });
 };
 const captureDisconnecting = (id, data) => {
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    websocket_throttle: 1
+  });
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "disconnecting", undefined)
     .then((res) => {
       logger.info("Successfully checked disconnecting script", res);
@@ -118,6 +121,9 @@ const captureDisconnecting = (id, data) => {
     });
 };
 const captureDisconnected = (id, data) => {
+  getPrinterStoreCache().updatePrinterLiveValue(id, {
+    websocket_throttle: 1
+  });
   ScriptRunner.check(getPrinterStoreCache().getPrinter(id), "disconnected", undefined)
     .then((res) => {
       logger.info("Successfully checked disconnected script", res);
