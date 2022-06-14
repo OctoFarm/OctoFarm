@@ -621,7 +621,9 @@ class HistoryCaptureService {
         await Spool.findById(currentSpool._id)
           .then((spool) => {
             const currentUsed = parseFloat(spool.spools.used);
+            logger.warning("Previous spool amount", currentUsed);
             spool.spools.used = currentUsed + parseFloat(currentGram);
+            logger.warning("New spool amount", spool.spools.used);
             spool.markModified("spools.used");
             spool
               .save()
