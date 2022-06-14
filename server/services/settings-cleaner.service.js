@@ -32,7 +32,7 @@ class SettingsCleanerService {
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {
-        return o._id.toString() == id.toString();
+        return o._id.toString() === id.toString();
       });
       return clientClean[settingsIndex];
     } else {
@@ -88,6 +88,13 @@ class SettingsCleanerService {
         });
       }
     }
+  }
+
+  static async saveServerSettings(newSettings) {
+    const serverSettings = await ServerSettingsDB.find({});
+    serverSettings[0].server = { ...newSettings };
+    await serverSettings[0].save();
+    systemClean = serverSettings[0];
   }
 }
 

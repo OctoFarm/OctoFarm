@@ -22,3 +22,11 @@ export const SETUP_OCTOPRINT_BTN_IDS = {
     setupHistorySnapshot: "setup-op-history-snapshot",
 }
 
+export const SYSTEM_SETTINGS_IDS = {
+    loginRequired: "requireLogin",
+    registration: "requireRegistration",
+    serverDatabaseURI: "serverDatabaseURI",
+    serverPortNumber: "serverPortNumber",
+    logLevelSelect: "logLevelSelect"
+}
+

@@ -4,7 +4,7 @@ const MONGO_KEY = "MONGO";
 const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
 const NON_NPM_MODE_KEY = "NON_NPM_MODE";
 const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
-const LOG_LEVEL = "LOG_LEVEL";
+const LOG_LEVEL_KEY = "LOG_LEVEL";
 const NODE_ENV_KEY = "NODE_ENV";
 const SUPER_SECRET_KEY = "SUPER_SECRET_KEY";
 
@@ -97,7 +97,7 @@ class AppConstants {
   }
 
   static get LOG_LEVEL() {
-    return LOG_LEVEL;
+    return LOG_LEVEL_KEY;
   }
 
   static get SUPER_SECRET_KEY() {

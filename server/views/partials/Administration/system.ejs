@@ -26,7 +26,7 @@
         inputType: "text",
         inputTag: "Mongo URI",
         inputPlaceholder: "mongodb://127.0.0.1:27017/octofarm",
-        inputValue: "mongodb://127.0.0.1:27017/octofarm",
+        inputValue: mongoURI,
         requiresRestart: true
         })
         %>
@@ -40,12 +40,12 @@
             })
         %>
         <%- include(textInput, {
-                inputID: "serverDatabaseURI",
+                inputID: "serverPortNumber",
                 inputType: "number",
                 inputTag: "Port",
                 inputStep: 1,
                 inputPlaceholder: "4000",
-                inputValue: "4000",
+                inputValue: portNumber,
                 requiresRestart: true
             })
         %>
@@ -65,7 +65,7 @@
         selectID: "logLevelSelect",
         selectLabel: "Level",
         selectOptions: [ { display: "Info", value: "info" }, { display: "Debug", value: "debug" }, { display: "Silly", value: "silly" }],
-        selectValue: "info",
+        selectValue: logLevel,
         requiresRestart: true
         })
         %>
