@@ -18,6 +18,7 @@ const { sleep } = require("../utils/promise.utils");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { getInfluxCleanerCache } = require("../cache/influx-export.cache");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const { FilamentClean } = require("../services/filament-cleaner.service");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CAPTURE);
 
@@ -617,50 +618,54 @@ class HistoryCaptureService {
           currentSpool,
           completionRatio
         );
-        await Spool.findById(currentSpool._id).then((spool) => {
-          const currentUsed = parseFloat(spool.spools.used);
-          spool.spools.used = currentUsed + parseFloat(currentGram);
-          spool.markModified("spools.used");
-          spool
-            .save()
-            .then((res) => {
-              logger.info("Successfully downdated spool data!", res);
-            })
-            .catch((e) => {
-              logger.error("Unable to update spool data!", e);
-            });
-          currentSpool.spools.used = currentUsed + parseFloat(currentGram);
-          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
-            currentSpool,
-            {
-              printerName: this.#printerName,
-              printerID: this.#printerID,
-              printerGroup: this.#printerGroup
-            },
-            {
-              printerName: this.#printerName,
-              printerID: this.#printerID,
-              printerGroup: this.#printerGroup,
-              costSettings: this.#costSettings,
-              success: this.#success,
-              reason: this.#reason,
-              fileName: this.#fileName,
-              filePath: this.#filePath,
-              startDate: this.#startDate,
-              endDate: this.#endDate,
-              printTime: this.#printTime,
-              filamentSelection: this.#filamentSelection,
-              job: this.#job,
-              notes: this.#notes,
-              snapshot: this.#snapshot,
-              timelapse: this.#timelapse,
-              thumbnail: this.#thumbnail,
-              resends: this.#resends,
-              activeControlUser: this.#activeControlUser
-            },
-            currentGram
-          );
-        });
+        await Spool.findById(currentSpool._id)
+          .then((spool) => {
+            const currentUsed = parseFloat(spool.spools.used);
+            spool.spools.used = currentUsed + parseFloat(currentGram);
+            spool.markModified("spools.used");
+            spool
+              .save()
+              .then((res) => {
+                logger.info("Successfully downdated spool data!", res);
+              })
+              .catch((e) => {
+                logger.error("Unable to update spool data!", e);
+              });
+            currentSpool.spools.used = currentUsed + parseFloat(currentGram);
+            getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+              currentSpool,
+              {
+                printerName: this.#printerName,
+                printerID: this.#printerID,
+                printerGroup: this.#printerGroup
+              },
+              {
+                printerName: this.#printerName,
+                printerID: this.#printerID,
+                printerGroup: this.#printerGroup,
+                costSettings: this.#costSettings,
+                success: this.#success,
+                reason: this.#reason,
+                fileName: this.#fileName,
+                filePath: this.#filePath,
+                startDate: this.#startDate,
+                endDate: this.#endDate,
+                printTime: this.#printTime,
+                filamentSelection: this.#filamentSelection,
+                job: this.#job,
+                notes: this.#notes,
+                snapshot: this.#snapshot,
+                timelapse: this.#timelapse,
+                thumbnail: this.#thumbnail,
+                resends: this.#resends,
+                activeControlUser: this.#activeControlUser
+              },
+              currentGram
+            );
+          })
+          .finally(async () => {
+            await FilamentClean.start();
+          });
       } else {
         logger.error("Unable to downdate spool weight, non selected...");
       }
