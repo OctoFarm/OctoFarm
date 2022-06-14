@@ -8,5 +8,15 @@ module.exports = {
     logLevel: ["required", "string", "valid_log_level"],
     loginRequired: ["required", "boolean"],
     registration: ["required", "boolean"]
+  },
+  THEME_SETTINGS: {
+    mode: ["required", "string", "dark_or_light"],
+    navbarColourDark: ["required", "string", "hexColor"],
+    navbarColourLight: ["required", "string", "hexColor"],
+    octofarmHighlightColour: ["required", "string", "hexColor"],
+    octofarmMainColour: ["required", "string", "hexColor"],
+    sidebarColourDark: ["required", "string", "hexColor"],
+    sidebarColourLight: ["required", "string", "hexColor"],
+    applicationTitle: ["required", "string", "maxLength:30"]
   }
 };

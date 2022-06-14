@@ -17,6 +17,10 @@ class SettingsCleanerService {
     return systemClean;
   }
 
+  static returnServerSettings() {
+    return systemClean.server;
+  }
+
   static returnTimeoutSettings() {
     return systemClean.timeout;
   }
@@ -93,6 +97,13 @@ class SettingsCleanerService {
   static async saveServerSettings(newSettings) {
     const serverSettings = await ServerSettingsDB.find({});
     serverSettings[0].server = { ...newSettings };
+    await serverSettings[0].save();
+    systemClean = serverSettings[0];
+  }
+
+  static async saveClientThemeSettings(newSettings) {
+    const serverSettings = await ServerSettingsDB.find({});
+    serverSettings[0].clientTheme = { ...newSettings };
     await serverSettings[0].save();
     systemClean = serverSettings[0];
   }
