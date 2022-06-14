@@ -50,7 +50,7 @@ class WebSocketClient {
   throttleBase = 500;
   upperThrottleHysteresis = 250;
   lowerThrottleHysteresis = 450;
-  deadWebsocketTimeout = 2 * 60000;
+  deadWebsocketTimeout = 30000;
 
   constructor(
     webSocketURL = undefined,
