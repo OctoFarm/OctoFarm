@@ -160,9 +160,15 @@ export default class OctoFarmClient {
   // Administraition Calls
   static administrationRoute = `${this.base}/administration`;
   static systemRunningTasksRoute = `${this.administrationRoute}/tasks`;
+  static saveSettingsRoute = `${this.administrationRoute}/settings`;
+  static saveSystemSettingsRoute = `${this.saveSettingsRoute}/system`;
 
   static async getSystemRunningTaskList(){
     return this.#get(this.systemRunningTasksRoute);
+  }
+
+  static async saveNewSystemSettings(data){
+    return this.#patch(this.saveSystemSettingsRoute, data);
   }
 
   // static async getPrinter(id) {

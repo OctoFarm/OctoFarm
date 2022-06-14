@@ -58,10 +58,6 @@ const localStorageKeys = {
 };
 
 const settingsElements = {
-  server: {
-    loginRequired: document.getElementById("requireLogin"),
-    registration: document.getElementById("requireRegistration"),
-  },
   timeout: {
     webSocketRetry: document.getElementById("webSocketRetry"),
     apiTimeout: document.getElementById("APITimeout"),

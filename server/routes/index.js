@@ -322,7 +322,10 @@ router.get(
       serviceInformation: {
         update: softwareUpdateNotification
       },
-      latestReleaseNotes
+      latestReleaseNotes,
+      mongoURI: process.env[AppConstants.MONGO_KEY],
+      portNumber: process.env[AppConstants.OCTOFARM_PORT_KEY],
+      logLevel: process.env[AppConstants.LOG_LEVEL]
     });
   }
 );

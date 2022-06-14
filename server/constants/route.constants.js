@@ -1,12 +1,16 @@
-const ADMINISTRATION = {
+const ADMINISTRATION_BASE = {
   TASKS: "/tasks",
-  SETTINGS: "/settings",
-  SYSTEM: this.SETTINGS + "/system",
-  THEME: this.SETTINGS + "/theme",
-  PRINTERS: this.SETTINGS + "/printer",
-  VIEWS: this.SETTINGS + "/views",
-  HISTORY: this.SETTINGS + "/history",
-  FILAMENT: this.SETTINGS + "/filament"
+  SETTINGS: "/settings"
+};
+
+const ADMINISTRATION = {
+  SYSTEM: ADMINISTRATION_BASE.SETTINGS + "/system",
+  THEME: ADMINISTRATION_BASE.SETTINGS + "/theme",
+  PRINTERS: ADMINISTRATION_BASE.SETTINGS + "/printer",
+  VIEWS: ADMINISTRATION_BASE.SETTINGS + "/views",
+  HISTORY: ADMINISTRATION_BASE.SETTINGS + "/history",
+  FILAMENT: ADMINISTRATION_BASE.SETTINGS + "/filament",
+  INFLUX: ADMINISTRATION_BASE.SETTINGS + "/influx"
 };
 
 const DATA = {
@@ -14,6 +18,7 @@ const DATA = {
 };
 
 module.exports = {
+  ADMINISTRATION_BASE,
   ADMINISTRATION,
   DATA
 };

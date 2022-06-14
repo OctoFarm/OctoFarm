@@ -5,8 +5,8 @@ import { Noty } from "noty/lib/noty.min";
 import lodash from "lodash/lodash.min";
 import jplist from "./jplist.min";
 import "bootstrap";
-// You can specify which plugins you need
-import { Modal, Tooltip, Toast, Popover } from "bootstrap";
+import "noty/lib/noty.css"
+import "../../css/vendor/bootstrap-v4.css";
 import "../../css/vendor/theme.css";
 import "@fortawesome/fontawesome-free/js/fontawesome"
 import "@fortawesome/fontawesome-free/js/solid"
@@ -19,9 +19,5 @@ module.export = {
   jplist,
   lodash,
   Noty,
-  Sortable,
-  Tooltip,
-  Toast,
-  Popover,
-  Modal
+  Sortable
 };

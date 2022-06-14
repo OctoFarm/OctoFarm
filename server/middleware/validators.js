@@ -82,6 +82,15 @@ function getExtendedValidator() {
     return value !== path.basename(value);
   });
 
+  nodeInputValidator.extend("validate_mongo_url", async ({ value, args }) => {
+    return validateMongoURL(value);
+  });
+
+  nodeInputValidator.extend("valid_log_level", ({ value, args }) => {
+    const validLogLevels = ["info", "debug", "silly"];
+    return validLogLevels.includes(value);
+  })
+
   return nodeInputValidator;
 }
 
@@ -118,10 +127,10 @@ function validateBodyMiddleware(rules) {
 }
 
 function dealWithError(e, req, res) {
-  logger.error(errorMessage(req), e);
+  logger.error(errorMessage(req), e.toString());
   res.statusCode = 400;
-  res.statusMessage = e;
-  return res.send(e);
+  res.statusMessage = e.toString();
+  return res.send({ issue: e.toString() });
 }
 
 function validateParamsMiddleware(rules) {
