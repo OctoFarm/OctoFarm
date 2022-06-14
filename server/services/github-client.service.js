@@ -4,10 +4,12 @@ const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const { AppConstants } = require("../constants/app.constants");
 const currentServerVersion = process.env[AppConstants.VERSION_KEY];
 const marked = require("marked");
+const semver = require("semver");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_GITHUB_CLIENT);
 
 let latestReleaseNotes = {};
+let futureReleaseNotes = [];
 
 async function getGithubReleasesPromise() {
   const connected = await fetch("https://github.com", {
@@ -31,20 +33,44 @@ async function getGithubReleasesPromise() {
   }).then(async (res) => {
     const data = await res.json();
     saveLatestReleaseNotes(data);
+    saveFutureReleaseNotes(data);
     logger.debug(`Received ${data.length} releases from github.`);
     return data;
   });
 }
 
-const saveLatestReleaseNotes = (releases) => {
+const isAPILimitReached = (releases) => {
   if (releases?.message) {
     if (releases.message.includes("API rate limit")) {
       latestReleaseNotes = {
         name: "API Rate Limit Exceeded",
         body: "API Rate limit has been exceeded for your IP... unable to grab release notes!"
       };
-      return;
+      return true;
     }
+  }
+  return false;
+};
+
+const saveFutureReleaseNotes = (releases) => {
+  if (isAPILimitReached(releases)) {
+    return false;
+  }
+  const filteredReleaseNotes = releases.filter((release) =>
+    semver.satisfies(release.tag_name, "> " + currentServerVersion)
+  );
+
+  for (const release of filteredReleaseNotes) {
+    futureReleaseNotes.push({
+      name: release.name,
+      body: marked.parse(release.body)
+    });
+  }
+};
+
+const saveLatestReleaseNotes = (releases) => {
+  if (isAPILimitReached(releases)) {
+    return false;
   }
 
   const filteredReleaseNotes = releases.filter((release) =>
@@ -61,7 +87,12 @@ const getLatestReleaseNotes = () => {
   return latestReleaseNotes;
 };
 
+const getFutureReleaseNote = () => {
+  return futureReleaseNotes;
+};
+
 module.exports = {
   getGithubReleasesPromise,
-  getLatestReleaseNotes
+  getLatestReleaseNotes,
+  getFutureReleaseNote
 };
