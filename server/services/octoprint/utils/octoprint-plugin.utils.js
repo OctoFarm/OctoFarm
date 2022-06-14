@@ -350,9 +350,7 @@ const captureUpdatingData = (id, data) => {
 
   if (type === "loglines") {
     if (!!currentData?.loglines && currentData.loglines.length > 0) {
-      console.log(currentData.loglines);
       currentData.loglines.forEach((line) => {
-        console.log(line);
         if (line.stream === "call" || line.stream === "message") {
           addOctoPrintLogWrapper(id, line.line, "Active", "Update Manager");
         }
