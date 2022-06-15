@@ -170,10 +170,15 @@ function checkReleaseAndLogUpdate() {
   }
 }
 
+function isAirGapped() {
+  return airGapped;
+}
+
 module.exports = {
   getGithubReleasesPromise,
   syncLatestOctoFarmRelease,
   getUpdateNotificationIfAny,
   getLastReleaseSyncState,
-  checkReleaseAndLogUpdate
+  checkReleaseAndLogUpdate,
+  isAirGapped
 };
