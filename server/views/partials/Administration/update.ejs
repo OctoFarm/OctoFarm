@@ -18,15 +18,15 @@
         %>
     </div>
     <div class="col-12 col-md-12 col-lg-6">
-        <div class="d-grid gap-2">
+        <div class="d-grid gap-2 mb-1">
             <button title="Performs a check for latest updates of OctoFarm"
                     id="check-updates" type="button"
-                    class="btn btn-outline-info ml-3 float-right btn-lg">
+                    class="btn btn-outline-info float-right btn-lg">
                 <i class="fa-solid fa-arrows-rotate"></i> Check for Update
             </button>
             <button title="Performs an update command on OctoFarm to the latest version"
                     id="update-octofarm" type="button"
-                    class="btn btn-outline-success ml-3 float-right btn-lg"
+                    class="btn btn-outline-success float-right btn-lg"
                     disabled>
                 <i class="fa-solid fa-download"></i> Update OctoFarm
             </button>
@@ -87,17 +87,18 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-12 col-lg-6">
         <% if(Object.keys(latestReleaseNotes).length !== 0){ %>
             <h3> Current Release Notes </h3><hr><br>
             <%- helpers.replaceGithubIcons(latestReleaseNotes.body) %>
         <% } %>
     </div>
     <% if(futureReleaseNotes.length > 0){ %>
-    <div class="col-12 col-md-6">
-        <h3> Future Release Notes </h3><hr><br>
+    <div class="col-12 col-md-12 col-lg-6">
+        <h3> Latest Version Release Notes </h3><hr><br>
         <% futureReleaseNotes.forEach(release => { %>
             <%- helpers.replaceGithubIcons(release.body) %>
+            <hr>
         <% }) %>
     </div>
     <% } %>

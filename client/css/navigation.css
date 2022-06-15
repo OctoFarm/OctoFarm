@@ -134,3 +134,6 @@ body {
   display: none;
   transition: 0.5s;
 }
+.alert-badge {
+  left: 150% !important;
+}

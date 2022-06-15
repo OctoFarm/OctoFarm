@@ -1,4 +1,4 @@
-import {getButtonLoaderTemplate} from "../templates/loaders.template";
+import { getButtonLoaderTemplate } from "../templates/loaders.template";
 
 export default class e {
     static get(element_id){

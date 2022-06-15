@@ -2,6 +2,7 @@ import OctoFarmClient from "../../services/octofarm-client.service";
 import { grabSystemPageSettingsValues, grabThemePageSettingsValues } from "./administration.helpers";
 import { handleServerResponse } from "../../utils/server-response.utils";
 import e from "../../utils/elements";
+import UI from "../../utils/ui";
 
 export const updateTaskListState = async () => {
     const taskManagerState = await OctoFarmClient.getSystemRunningTaskList();
@@ -12,36 +13,36 @@ export const updateTaskListState = async () => {
 
         if (periodic) {
             e.doesElementNeedUpdating(
+                e.get("firstExecution-" + task),
                 theTask.firstCompletion
                     ? new Date(theTask.firstCompletion)
                         .toLocaleString()
                         .replace(",", ": ")
                     : "Not Started",
-                document.getElementById("firstExecution-" + task),
                 "innerHTML"
             );
 
             e.doesElementNeedUpdating(
+                e.get("lastExecution-" + task),
                 theTask.lastExecuted
                     ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
                     : "Not Finished",
-                document.getElementById("lastExecution-" + task),
                 "innerHTML"
             );
 
             e.doesElementNeedUpdating(
+                e.get("duration-" + task),
                 theTask.duration
                     ? UI.generateMilisecondsTime(theTask.duration)
                     : "<i class=\"fas fa-sync fa-spin\"></i>",
-                document.getElementById("duration-" + task),
                 "innerHTML"
             );
 
             e.doesElementNeedUpdating(
+                e.get("next-" + task),
                 theTask.nextRun
                     ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
                     : "First Not Completed",
-                document.getElementById("next-" + task),
                 "innerHTML"
             );
         }

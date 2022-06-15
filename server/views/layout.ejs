@@ -200,5 +200,22 @@
 })
 %>
 
+<% if(currentUserGroup === "Administrator") { %>
+    <%- include(modal, {
+    modal:{
+    id:"informationLogs", title:"System Logs", isBodyScrollable: "true"
+    },
+    bodyFile:'./ModalContents/systemLogs.ejs'
+    })
+    %>
+    <%- include(modal, {
+    modal:{
+    id:"informationSystem", title:"System Information", isBodyScrollable: "true"
+    },
+    bodyFile:'./ModalContents/systemInformation.ejs'
+    })
+    %>
+<% } %>
+
 
 </html>

@@ -1,4 +1,4 @@
-<div class="header_user_menu btn-group btn-group-sm">
+<div class="btn-group btn-group-sm">
     <button type="button" class="btn btn-outline-purple dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
         <i class="fa-solid fa-user"></i>
     </button>
@@ -10,7 +10,8 @@
         </div>
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header">Settings</h6></li>
-        <li><a class="dropdown-item"data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client</a></li>
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#userSettingsModal"><i class="fa-solid fa-display text-purple"></i> User</a></li>
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client</a></li>
         <% if(currentUser.group === "Administrator"){ %>
             <li><h6 class="dropdown-header">Admin</h6></li>
             <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench text-purple"></i> Administration</a></li>
@@ -19,8 +20,8 @@
         <% } %>
         <li><h6 class="dropdown-header">Information</h6></li>
         <% if(currentUser.group === "Administrator"){ %>
-            <li><a class="dropdown-item" href="#"><i class="fas fa-info-circle text-purple"></i>  System</a></li>
-            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-clipboard text-purple"></i> Logs</a></li>
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#informationSystemModal"><i class="fas fa-info-circle text-purple"></i>  System</a></li>
+            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#informationLogsModal"><i class="fa-solid fa-clipboard text-purple"></i> Logs</a></li>
         <% } %>
         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal"><i class="fa-solid fa-address-card text-purple"></i> About</a></li>
         <% if(serverSettings.server.loginRequired){ %>
