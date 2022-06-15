@@ -14,7 +14,7 @@ const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_ENVIRONMENT, false);
 
 // Constants and definition
 const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";
-const deprecatedConfigFolder = "../middleware";
+const deprecatedConfigFolder = "../config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
 const exec = require("child_process").exec;

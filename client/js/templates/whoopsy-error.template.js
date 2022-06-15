@@ -7,17 +7,16 @@ const cleanErrorResponseObject = (errors) => {
 }
 
 
-export const getWhoopsyErrorTemplate = (code, status, message) => {
+export const getWhoopsyErrorTemplate = (message) => {
     const cleanMessage = cleanErrorResponseObject(JSON.parse(message))
     return `
-        <div class="hstack gap-2">
-          <img width="45%" src="/images/toasty.jpg?<%= clientVersion %>"/>
-          <div class="vstack gap-1">
-              <b>(${status}) ${code.toLowerCase()}</b>
-              <small>${cleanMessage}</small>     
-           </div>
-
+        <div class="row">
+            <div class="col-4 text-center">
+                 <img width="90%" src="/images/toasty.jpg?<%= clientVersion %>"/>
+            </div>
+            <div class="col-8">
+                <small>${cleanMessage}</small>    
+            </div>
         </div>
-     
     `
 }
