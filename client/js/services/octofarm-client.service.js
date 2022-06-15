@@ -151,9 +151,14 @@ export default class OctoFarmClient {
   // General Data Calls
   static generalDataRoute = `${this.base}/data`;
   static patreonDataListRoute = `${this.generalDataRoute}/patreons`
+  static systemInformationRoute = `${this.generalDataRoute}/system-info`
 
   static async getPatreonDataList(){
     return this.#get(this.patreonDataListRoute);
+  }
+
+  static async getSystemInformation(){
+    return this.#get(this.systemInformationRoute);
   }
 
   // Administraition Calls

@@ -14,7 +14,8 @@ const ADMINISTRATION = {
 };
 
 const DATA = {
-  PATREONS: "/patreons"
+  PATREONS: "/patreons",
+  SYSTEM_INFO: "/system-info"
 };
 
 module.exports = {

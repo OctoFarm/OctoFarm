@@ -141,48 +141,6 @@ class SystemRunner {
     }
     return results;
   }
-  /**
-   * Call and collect quite heavy system information queries
-   * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
-   */
-  static async querySystemInfo() {
-    try {
-      await this.queryWithFreshCurrentProcess();
-      const { benchResults, queryResults } = await this.queryStaticBench();
-
-      //This maybe related to node 13.12.0 possibly. Issue #341.
-      const systemDisk = queryResults.fileSize[0];
-      let warnings = this.getDiskWarnings(systemDisk);
-
-      systemInformationService = {
-        cpuCurrentSpeed: queryResults.cpuCurrentSpeed,
-        cpuLoad: queryResults.cpuLoad,
-        memoryInfo: queryResults.memoryInfo,
-        sysUptime: queryResults.sysUptime,
-        processUptime: queryResults.processUptime,
-        // Custom data
-        warnings,
-        osInfo: {
-          arch: process.arch,
-          distro: `${os.type()} ${os.release()} (${os.platform()})`
-        },
-        systemDisk,
-        currentProcess: systemInformationService.currentProcess,
-        benchmarkTimes: benchResults,
-        networkIpAddresses: this.getIpAddressList()
-      };
-
-      if (farmPiStatus()) {
-        systemInformationService.osInfo.distro = `Ubuntu (FarmPi ${farmPiStatus()})`;
-      }
-
-      return systemInformationService;
-    } catch (e) {
-      logger.error("Some system information has failed to generate:", e.message);
-
-      return false;
-    }
-  }
 }
 
 module.exports = {
