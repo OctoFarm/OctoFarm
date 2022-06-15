@@ -19,6 +19,9 @@ export const handleServerResponse = (response, action) => {
         return true;
     }
 
-    createSuccessToast({ message: action })
+    if(!!response){
+        createSuccessToast({ message: action })
+    }
+
     return true;
 }

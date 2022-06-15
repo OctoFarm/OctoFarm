@@ -2,6 +2,8 @@ import axios from "axios";
 import { ApplicationError } from "../exceptions/application-error.handler";
 import { HTTPError } from "../exceptions/octofarm-api.exceptions";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import { createErrorToast } from "../utils/toast";
+import {getWhoopsyErrorTemplate} from "../templates/whoopsy-error.template";
 
 //REFACTOR move out to utility file
 const prettyPrintStatusError = (errorString) => {
@@ -49,11 +51,8 @@ axios.interceptors.response.use(
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST, {
-          message: `${HTTPError.BAD_REQUEST.message}: ${prettyPrintStatusError(
-            error.response.data
-          )}`,
-        });
+        createErrorToast({ message: getWhoopsyErrorTemplate(error.code, error.response.status, error.response.statusText) })
+        break;
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
       case 403:
@@ -87,28 +86,28 @@ export default class OctoFarmClient {
   static async #get(path) {
     const url = new URL(path, window.location.origin).href;
     return axios.get(url).then((res) => {
-      return res.data;
+      return res?.data;
     });
   }
 
   static async #post(path, data) {
     const url = new URL(path, window.location.origin).href;
     return axios.post(url, data).then((res) => {
-      return res.data;
+      return res?.data;
     });
   }
 
   static async #delete(path) {
     const url = new URL(path, window.location.origin).href;
     return axios.delete(url).then((res) => {
-      return res.data;
+      return res?.data;
     });
   }
 
   static async #patch(path, data) {
     const url = new URL(path, window.location.origin).href;
     return axios.patch(url, data).then((res) => {
-      return res.data;
+      return res?.data;
     });
   }
 

@@ -134,8 +134,8 @@ function validateBodyMiddleware(rules) {
 function dealWithError(e, req, res) {
   logger.error(errorMessage(req), e.toString());
   res.statusCode = 400;
-  res.statusMessage = e.toString();
-  return res.send({ issue: e.toString() });
+  res.statusMessage = JSON.stringify(e.errors);
+  return res.send();
 }
 
 function validateParamsMiddleware(rules) {
