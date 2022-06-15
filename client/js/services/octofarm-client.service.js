@@ -51,7 +51,7 @@ axios.interceptors.response.use(
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
-        createErrorToast({ message: getWhoopsyErrorTemplate(error.code, error.response.status, error.response.statusText) })
+        createErrorToast({ message: getWhoopsyErrorTemplate(error?.response?.statusText ? error.response.statusText : "Unknown Error Response!") })
         break;
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
