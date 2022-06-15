@@ -1,9 +1,373 @@
 <% let base = '..' %>
 <% let loading = base + '/octofarm-loading.ejs' %>
+<% let singleStat = base + '/octofarm-single-stat.ejs' %>
+
+<% const releasesURL = "https://github.com/OctoFarm/OctoFarm/releases/tag/" %>
+<% const npmURL = "https://www.npmjs.com/package/@notexpectedyet/octofarm-client" %>
+
+
+<div class="row">
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "success",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Internet connection",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Powered By nodejs",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Running Under docker / pm2",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Node Environment",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-3 text-center">
+        Usage donut
+        <div id="cpuUsageDonut"></div>
+    </div>
+    <div class="col-3 text-center">
+        Memory Donut
+        <div id="memoryUsageDonut"></div>
+    </div>
+    <div class="col-6 text-center">
+        System history
+        <div id="historicUsageGraph"></div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "success",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "OctoFarm Uptime",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Current Client Version",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Current Server Version",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "System Timezone",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "success",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "System Uptime",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Operating System",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "System Architecture",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+        <%- include(singleStat, {
+        statType: "info",
+        statSpacing: "1",
+        statIcon: "fas fa-code-branch fa-xl",
+        statTitle: "Disk Usage",
+        statLink: {
+        url: "",
+        title: ""
+        }
+        })
+        %>
+    </div>
+</div>
+<% if(typeof systemInformation !== "undefined" && Object.keys(systemInformation).length > 0 && Object.keys(serviceInformation).length > 0){ %>
+    <div class="row">
+        <div class="col-3 text-center">
+            <div id="cpuUsageDonut"></div>
+        </div>
+        <div class="col-3 text-center">
+            <div id="memoryUsageDonut"></div>
+        </div>
+        <div class="col-6 text-center">
+            <div id="historicUsageGraph"></div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="row">
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-34">
+                    <% if(serviceInformation?.air_gapped){ %>
+                        <p class=" mb-0"><i class="fas fa-heartbeat text-danger"></i> Farm is
+                            currently air gapped</p>
+                        <small class="text-warning">Please note some features may not work as intended</small>
+                    <% }else{ %>
+                        <p class=""><i class="fas fa-heart text-success"></i> Farm is connected to the
+                            internet</p>
+                    <% } %>
+                </div>
+                <% if(serviceInformation?.isNode){ %>
+                    <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                        <p class="">Powered by <i class="fab fa-node text-success"></i></p>
+                    </div>
+                <% } %>
+                <% if(serviceInformation?.isDockerContainer){ %>
+                    <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                        <p class=""><i class="fab fa-docker text-info"></i> Running under docker</p>
+                    </div>
+                <% } %>
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                    <% if(serviceInformation?.isPm2){ %>
+                        <p class=""><i class="far fa-eye text-info"></i> Running under pm2</p>
+                    <% } %>
+                    <% if(serviceInformation?.isNodemon){ %>
+                        <p class=""><i class="far fa-eye text-info"></i> Running under nodemon</p>
+                    <% } %>
+                </div>
+                <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                    <% if(areWeGitRepo){ %>
+                        <p class=""><i class="fab fa-github text-success"></i> Detected git repository</p>
+                    <% }else{ %>
+                        <p class=""><i class="fab fa-github text-danger"></i> Couldn't detect git</p>
+                    <%   } %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="row">
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-hourglass-half"></i> OctoFarm Uptime: <br>
+                    <span class="" id="processUpdate" style="font-size:0.8rem;">
+                               <%= helpers.generateTime(systemInformation.uptime); %>
+                        </span>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-code-branch"></i> Current Client Version: <a
+                            title="OctoFarm current version, will take you to github releases page"
+                            class=""
+                            rel=”noopener”
+                            href="<%= npmURL %>"
+                            target="_blank"><br><%= clientVersion %></a>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-code-branch"></i> Current Server Version: <a
+                            title="OctoFarm current version, will take you to github releases page"
+                            class=""
+                            rel=”noopener”
+                            href="<%= releasesURL + serviceInformation?.update?.current_version %>"
+                            target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <% if(!serviceInformation?.update?.latestReleaseKnown){ %>
+                        <i class="fas fa-code-branch"></i> Latest Server Version: <a
+                                title="OctoFarm latest version, will take you to github releases page"
+                                class=""
+                                rel=”noopener”
+                                href="<%= releasesURL + serviceInformation?.update?.current_version %>"
+                                target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
+                    <% }else{ %>
+                        <i class="fas fa-code-branch"></i> Latest Version:
+                        <a title="OctoFarm latest version, will take you to github releases page"
+                           class=""
+                           rel=”noopener”
+                           href="<%= serviceInformation?.update?.latestReleaseKnown.html_url; %>"
+                           target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown.name; %>
+                            <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
+                        </a>
+                    <% } %>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-code-branch"></i> GitHub Branch: <a
+                            title="OctoFarm current version, will take you to github releases page"
+                            class=""
+                            rel=”noopener”
+                            target="_blank"><br><%= currentGitBranch?.current ? currentGitBranch.current : "Not a repository"; %></a>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-code-branch"></i> Node Environment: <a
+                            title="OctoFarm current version, will take you to github releases page"
+                            class=""
+                            rel=”noopener”
+                            target="_blank"><br><%= systemEnvironment; %></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="row">
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-hourglass-half"></i> System Uptime: <br><span
+                            class="" id="systemUptime" style="font-size:0.8rem;">
+                                        <%= helpers.generateTime(systemInformation.osUptime); %>
+                                    </span>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-server"></i> OS: <br><span class=""
+                                                                id="systemArch"
+                                                                style="font-size:0.8rem;">
+                                        <%= systemInformation.distro; %>
+                                    </span>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="fas fa-bullseye"></i> System Architecture: <br><span
+                            class="" id="systemArch" style="font-size:0.8rem;">
+                                            <%= systemInformation.architecture; %>
+                                        </span>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
+                    <i class="fas fa-hdd"></i> Main Disk:
+                    <b><%= systemInformation?.systemDisk?.mount; %></b><br>
+                    <b>Disk Partition: </b>
+                    <%= systemInformation?.systemDisk?.fs; %><br>
+                    <span class="" id="systemHardDrive" style="font-size:0.8rem;">
+                                          <%= helpers.generateBytes(systemInformation?.systemDisk?.used); %>  /  <%= helpers.generateBytes(systemInformation?.systemDisk?.size); %> |  <%= systemInformation?.systemDisk?.use?.toFixed(2); %>%
+                                    </span>
+                </div>
+                <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                    <i class="far fa-clock"></i> Timezone: <br>
+                    <span class="" id="timeZone" style="font-size:0.8rem;">
+                                         <%= systemInformation?.timezoneName; %> (<%= systemInformation?.timezone; %>)
+                                </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <% if(userGroup === "Administrator"){ %>
+        <div id="activeUsersRow" class="row">
+            <div class="col-lg-12">
+                <h5>Active Sessions: <span id="activeUserCount"><i class="fa-solid fa-spinner fa-spin"></i></span></h5>
+                <div id="activeUserListContainer" class="text-center row">
+                    <div class="col-lg-12">
+                        <i class="fa-solid fa-spinner fa-spin"></i><br> Loading Active Sessions List...
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+<% }else{ %>
+<div class="row">
+    <div class="col-12 text-center">
+        <h5> It seems the required information for this page could not be found...  </h5>
+        <h5>Is OctoFarm still booting? Please refresh if so.</h5>
+        <h5>If the issue persists then please log an issue on our github!</h5>
+    </div>
+    <% } %>
 
 <div class="container-fluid">
     <div class="row">
 
     </div>
 </div>
-<!--<script src="/assets/dist/about.modal.min.js?<%= clientVersion %>"></script>-->
+<script src="/assets/dist/system-information.modal.min.js?<%= clientVersion %>"></script>
