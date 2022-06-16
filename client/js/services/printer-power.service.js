@@ -42,6 +42,23 @@ export default class PrinterPowerService {
     return powerStatus;
   }
 
+  static updateTimer(id, isPoweredOn, checkTime = 10000){
+    if (!this.timer[id]) {
+      this.timer[id] = {
+        isPoweredOn,
+        checkTime
+      };
+      return;
+    }
+    if(checkTime < 10000){
+      this.timer[id].checkTime = this.timer[id].checkTime + checkTime;
+    }
+    if(checkTime === 10000){
+      this.timer[id].checkTime = checkTime;
+    }
+    this.timer[id].isPoweredOn = isPoweredOn
+  }
+
   static async revealPowerButtons(printer) {
     if (printer.disabled) {
       return;
@@ -85,18 +102,11 @@ export default class PrinterPowerService {
     const powerBadge = document.getElementById(`powerState-${printer._id}`);
 
     if (canDetectPowerState) {
-      if (!this.timer[printer._id]) {
-        this.timer[printer._id] = {
-          isPoweredOn: false,
-          checkTime: 10000,
-        };
-      }
+      PrinterPowerService.updateTimer(printer._id, false)
       if (this.timer[printer._id].checkTime >= 10000) {
-        this.timer[printer._id].checkTime = 0;
-        this.timer[printer._id].isPoweredOn =
-          await PrinterPowerService.printerIsPoweredOn(printer);
+        PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
       }
-      this.timer[printer._id].checkTime = this.timer[printer._id] + 500;
+      PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer), 500)
       UI.removeDisplayNoneFromElement(powerBadge);
       if (!this.timer[printer._id].isPoweredOn) {
         if (!powerBadge.classList.contains("text-danger")) {
@@ -203,7 +213,7 @@ export default class PrinterPowerService {
       .getElementById(`printerPowerOn-${printer._id}`)
       .addEventListener("click", async (e) => {
         e.target.disabled = true;
-        await this.sendPowerCommandForPrinter(
+        await PrinterPowerService.sendPowerCommandForPrinter(
           printer,
           printer.powerSettings.powerOnURL,
           printer.powerSettings.powerOnCommand,
@@ -258,9 +268,7 @@ export default class PrinterPowerService {
       );
     }
     await UI.delay(2000);
-    this.timer[printer._id].isPoweredOn = await this.printerIsPoweredOn(
-      printer
-    );
+    PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
     return post;
   }
 }
