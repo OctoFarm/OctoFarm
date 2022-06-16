@@ -1,6 +1,6 @@
 import OctoFarmClient from "../../services/octofarm-client.service";
 import ApexCharts from "apexcharts";
-import { dashboardOptions } from "../charts/dashboard.options";
+import { dashboardOptions } from "../charts/chart.options";
 import {
   materialsFilterList,
   materialsListTableRow,

@@ -22,7 +22,7 @@ import {
   getFirstDayOfLastMonth,
 } from "./utils/date.utils";
 import Litepicker from "litepicker";
-import { dashboardOptions } from "./pages/charts/dashboard.options";
+import { dashboardOptions } from "./pages/charts/chart.options";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {

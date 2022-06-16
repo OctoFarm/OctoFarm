@@ -1,5 +1,5 @@
 import ApexCharts from "apexcharts";
-import { dashboardOptions } from "./dashboard.options";
+import { dashboardOptions } from "./chart.options";
 
 const chartIds = {
   hourlyTotalTemperatureChart: "#hourlyTotalTemperatureChart",
@@ -24,22 +24,21 @@ let environmentDataChart,
  * Render a chart by ID and providing chart options - safely skipping if the chart is not found
  * @param elementId
  * @param options
- * @param {{currentUtilisation: string, currentActivity: string, farmTemperature: string, daysActivityHeatmap: string}|string} elementId
+ * @param elementId
  * @param {*} options
  */
-async function renderChart(elementId, options) {
-  const chartContainerElement = document.querySelector(elementId);
+export async function renderChart(element, options) {
+  const chartContainerElement = element;
   if (chartContainerElement) {
     const chartElement = new ApexCharts(chartContainerElement, options);
     await chartElement.render();
-
     return chartElement;
   } else {
-    console.debug("chart element", elementId, "not found");
+    console.debug("chart element", element, "not found");
   }
 }
 
-function updateChartSeries(chartElement, data) {
+export function updateChartSeries(chartElement, data) {
   if (!chartElement) {
     console.debug("chartelement was not found but data was pushed");
     return;

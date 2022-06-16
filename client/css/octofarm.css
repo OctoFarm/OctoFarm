@@ -563,35 +563,22 @@
 /*  width: 20% !important;*/
 /*  float: left !important;*/
 /*}*/
-/*@media (min-width: 768px) {*/
-/*  .modal-xl {*/
-/*    max-width: 95% !important;*/
-/*  }*/
-/*}*/
-/*@media (min-width: 992px) {*/
-/*  .modal-xl {*/
-/*    max-width: 90% !important;*/
-/*  }*/
-/*  .sticky-table {*/
-/*    min-width:100px;*/
-/*    position: sticky;*/
-/*    top: 0px;*/
-/*    z-index: 1000;*/
-/*  }*/
+@media (min-width: 768px) {
+  .modal-xxl {
+    max-width: 95% !important;
+  }
+}
+@media (min-width: 992px) {
+  .modal-xxl {
+    max-width: 90% !important;
+  }
+}
 
-/*}*/
-
-/*@media (min-width: 1200px) {*/
-/*  .modal-xl {*/
-/*    max-width: 85% !important;*/
-/*  }*/
-/*  .sticky-table {*/
-/*    min-width:100px;*/
-/*    position: sticky;*/
-/*    top: 0;*/
-/*    z-index: 1000;*/
-/*  }*/
-/*}*/
+@media (min-width: 1200px) {
+  .modal-xxl {
+    max-width: 85% !important;
+  }
+}
 
 /*.carousel-item {*/
 /*  height: 100vh;*/
