@@ -132,47 +132,6 @@ const webcamChecks = (cameraURL, camSettings) => {
   return results;
 };
 
-const checkConnectionsMatchRetrySettings = (printerURL) => {
-  // check if current settings are causing high retry counts...
-  const connectionLogs = returnConnectionLogs(printerURL);
-
-  const logs = [];
-
-  const { timeout } = SettingsClean.returnSystemSettings();
-
-  if (connectionLogs?.connections) {
-    for (const log of connectionLogs.connections) {
-      if (!log.url.includes("/sockjs/websocket")) {
-        logs.push({
-          url: log.url,
-          responseTimes: log.log.lastResponseTimes
-        });
-      }
-    }
-  }
-
-  const responses = [];
-
-  for (const log of logs) {
-    if (log.responseTimes.length === 0) {
-      log.responseTimes = [0];
-    }
-    const responsesAverage = log?.responseTimes?.reduce((a, b) => a + b) / log.responseTimes.length;
-    if (responsesAverage) {
-      responses.push({
-        url: log.url,
-        initialTimeout: responsesAverage < timeout.apiTimeout + 1000,
-        responsesAverage: responsesAverage,
-        timeoutSettings: timeout
-      });
-    }
-  }
-
-  return {
-    apiResponses: responses
-  };
-};
-
 module.exports = {
   apiChecksOptional,
   apiChecksRequired,
@@ -180,6 +139,5 @@ module.exports = {
   printerConnectionCheck,
   profileChecks,
   webcamChecks,
-  printerChecks,
-  checkConnectionsMatchRetrySettings
+  printerChecks
 };

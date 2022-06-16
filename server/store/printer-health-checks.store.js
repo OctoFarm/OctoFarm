@@ -50,8 +50,7 @@ const updatePrinterHealthChecks = async () => {
           printer.connectionOptions
         ),
         profileChecks: profileChecks(printer.currentProfile),
-        webcamChecks: webcamChecks(printer.camURL, printer?.otherSettings?.webCamSettings),
-        connectionIssues: checkConnectionsMatchRetrySettings(currentURL.host)
+        webcamChecks: webcamChecks(printer.camURL, printer?.otherSettings?.webCamSettings)
       };
       logger.debug("Printer checked", { printer: printer.printerURL });
       checkAndUpdatePrinterFlag(printer._id, printerCheck);
@@ -91,14 +90,8 @@ const checkAndUpdatePrinterFlag = (id, checks) => {
   const { ffmpegPath, ffmpegVideoCodex, timelapseEnabled } = historySetup;
   if (!ffmpegPath || !ffmpegVideoCodex || !timelapseEnabled) healthChecksPass = false;
 
-  const { apiResponses } = checks.connectionIssues;
-
   const log_throttle = {};
   const log_timeout = {};
-
-  apiResponses.forEach((res) => {
-    if (!res.initialTimeout) healthChecksPass = false;
-  });
 
   logger.debug("Results: ", {
     printer: { printerURL, webSocketURL, cameraURL, match },
