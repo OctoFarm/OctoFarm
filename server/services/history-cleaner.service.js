@@ -21,7 +21,6 @@ const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 let logger;
 
 class HistoryCleanerService {
-  // Might seem weird, but this is V2 prep-work
   historyService = null;
   enableLogging = false;
   logger = logger;
@@ -33,7 +32,11 @@ class HistoryCleanerService {
 
   constructor(enableFileLogging = false, logLevel = "warn") {
     this.historyService = historyService;
-    this.logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CLEANER, enableFileLogging, logLevel);
+    this.logger = new Logger(
+      LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CLEANER,
+      enableFileLogging,
+      logLevel
+    );
     this.enableLogging = enableFileLogging || false;
   }
 
