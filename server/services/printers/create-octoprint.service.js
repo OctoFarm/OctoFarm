@@ -22,6 +22,10 @@ const {
   checkHighestSupportedOctoPrint,
   checkLowestSupportedOctoPrint
 } = require("../../utils/compatibility.utils");
+const {
+  parseAllOctoPrintUsers,
+  findCurrentUserForOctoFarmConnection
+} = require("../octoprint/utils/octoprint-api-helpers.utils");
 const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
@@ -906,22 +910,16 @@ class OctoPrintPrinter {
       return false;
     });
 
-    console.log("USER CHECK", usersCheck);
-
     let globalStatusCode = checkApiStatusResponse(usersCheck);
-
-    console.log("STATUS CHECK", globalStatusCode);
 
     if (globalStatusCode === 200) {
       const userJson = await usersCheck.json();
 
       const userList = userJson.users;
 
-      console.log("USER LIST", userList);
-      console.log("LIST EMPTY", isEmpty(userList));
+      //If user list is empty then we can assume that an admin user is only one available.
+      //Patch for OctoPrint < 1.4.2.
       if (isEmpty(userList)) {
-        //If user list is empty then we can assume that an admin user is only one available.
-        //Only relevant for OctoPrint < 1.4.2.
         this.currentUser = "admin";
         if (!this.userList.includes(this.currentUser)) {
           this.userList.push(this.currentUser);
@@ -935,29 +933,13 @@ class OctoPrintPrinter {
         return true;
       }
 
-      //If the userList isn't empty then we need to parse out the users and search for octofarm user.
-      for (let currentUser of userList) {
-        console.log("CURRENT USER", currentUser);
+      //If the userList isn't empty then we need to parse out the users names.
+      this.userList = parseAllOctoPrintUsers(userList);
 
-        console.log("NAME INCLUDES", currentUser.name.toLowerCase().includes("octofarm"));
-
-        if (!!currentUser.admin) {
-          if (!this.userList.includes(this.currentUser)) {
-            this.userList.push(currentUser.name);
-          }
-          // Look for OctoFarm user and skip the rest, if not use the first admin we find
-          if (currentUser.name.toLowerCase().includes("octofarm")) {
-            this.currentUser = currentUser.name;
-            this.#db.update({ currentUser: this.currentUser });
-            // Continue to collect the rest of the users...
-            continue;
-          }
-          // If no octofarm user then collect the rest for user choice in ui.
-          if (!this?.currentUser) {
-            // We should not override the database value to allow users to update it.
-            this.currentUser = currentUser.name;
-          }
-        }
+      // If there is no current user then find one from the list...
+      // Also check if user list contains current user and update if not...
+      if (!this?.currentUser || !this.userList.includes(this.currentUser)) {
+        this.currentUser = findCurrentUserForOctoFarmConnection(this.userList);
       }
 
       this.#apiPrinterTickerWrap(
@@ -967,6 +949,11 @@ class OctoPrintPrinter {
       );
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       this.onboarding.userApi = true;
+      console.log("FINALY", {
+        currentUser: this.currentUser,
+        userList: this.userList,
+        onoarding: this.onboarding
+      });
       this.#db.update({
         currentUser: this.currentUser,
         userList: this.userList,
