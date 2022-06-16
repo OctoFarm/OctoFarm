@@ -156,13 +156,13 @@ class WebSocketClient {
           REQUEST_KEYS.LAST_RESPONSE,
           ConnectionMonitorService.calculateTimer(this.#lastMessage, timeDifference)
         );
-
         this.#currentMessageMSRate = timeDifference - this.#lastMessage;
 
         this.checkMessageSpeed(this.#currentMessageMSRate);
 
-        this.#messageNumber++;
         this.#lastMessage = ConnectionMonitorService.startTimer();
+
+        this.#messageNumber++;
       }
 
       this.#onMessage(this.id, data);
@@ -323,13 +323,18 @@ class WebSocketClient {
       this.throttleRateMeasurements.shift();
     }
     this.throttleRateMeasurements.push(ms);
-
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
-    if (ms > throttleLimit + (this.throttleBase + this.upperThrottleHysteresis)) {
+    const averageThrottleMeasurements =
+      this.throttleRateMeasurements.reduce((a, b) => a + b, 0) /
+      this.throttleRateMeasurements.length;
+    if (
+      averageThrottleMeasurements >
+      throttleLimit + (this.throttleBase + this.upperThrottleHysteresis)
+    ) {
       logger.debug(`Messages coming in slow at: ${ms}ms throttling connection speed...`);
       this.increaseMessageThrottle(ms);
     } else if (this.currentThrottleRate > 1) {
-      const maxProcessingLimit = Math.max.apply(null, this.throttleRateMeasurements);
+      const maxProcessingLimit = averageThrottleMeasurements;
       const lowerProcessingLimit =
         (this.currentThrottleRate - 1) * (this.throttleBase + this.lowerThrottleHysteresis);
       if (maxProcessingLimit < lowerProcessingLimit) {
@@ -463,7 +468,8 @@ class WebSocketClient {
 
     this.#lastPingMessage = Date.now();
 
-    const timeSinceLastMessage = this.#lastPingMessage - this.#lastMessage.getTime();
+    const timeSinceLastMessage =
+      this.#lastPingMessage - this.#lastMessage?.getTime() ? this.#lastMessage.getTime() : 0;
 
     const isPrinterActive = getPrinterStoreCache().isPrinterActive(this.id);
 
@@ -477,7 +483,7 @@ class WebSocketClient {
           deadTimeout: this.deadWebsocketTimeout
         }
       );
-      this.terminate();
+      this.reconnect();
     } else {
       const registerPongCheck = setTimeout(() => {
         if (
@@ -501,10 +507,10 @@ class WebSocketClient {
             REQUEST_TYPE.WEBSOCKET,
             REQUEST_KEYS.TOTAL_PING_PONG
           );
-          this.terminate();
+          this.reconnect();
           clearTimeout(registerPongCheck);
         }
-      }, 1000);
+      }, 2000);
     }
   }
 
