@@ -4,7 +4,7 @@ import {
   dataLabelBackground,
   defaultLoadingText,
   defaultTheme,
-} from "./chart.options";
+} from "./chart.constants";
 import Calc from "../../utils/calc";
 
 export const toFixedTempCelciusFormatter = (value) => {

@@ -2,13 +2,18 @@ import OctoFarmClient from "./services/octofarm-client.service";
 import { getSingleStatTemplate } from "./templates/bootstrap.templates";
 import Calc from "./utils/calc"
 import e from "./utils/elements";
+import {renderChart, updateChartSeries} from "./pages/charts/charts.manager";
+import { systemCPUDonutOptions } from "./pages/charts/chart.options";
 
 const systemInformationModal = document.getElementById("informationSystemModal");
-const updateInterval = 20000;
+const updateInterval = 5000;
 const releasesURL = "https://github.com/OctoFarm/OctoFarm/releases/tag/";
 const npmURL = "https://www.npmjs.com/package/@notexpectedyet/octofarm-client";
 let interval;
 let elements;
+let cpuDonut;
+let memoryDonut;
+let cpuMemoryChart;
 
 const grabSystemElements = () => {
     return {
@@ -30,13 +35,18 @@ const grabSystemElements = () => {
     }
 }
 
-
-const updatePageData = async () => {
+const captureElementsIfNotAlready = () => {
     if(!elements){
         elements = grabSystemElements();
     }
-    const { clientVersion, serverVersion, serviceInformation, systemEnvironment, systemInformation } = await OctoFarmClient.getSystemInformation();
+}
 
+const grabSystemInformation = async () => {
+    return OctoFarmClient.getSystemInformation();
+}
+
+const updatePageData = async ({ clientVersion, serverVersion, serviceInformation, systemEnvironment, systemInformation }) => {
+    captureElementsIfNotAlready();
 
     const internetConnected = {
         additionalInformation: "Internet <br> Connected",
@@ -90,21 +100,19 @@ const updatePageData = async () => {
     }
 
     elements.nodeEnvironment.innerHTML = getSingleStatTemplate(environment);
-    // elements.cpuDonut.innerHTML = getSingleStatTemplate();
-    // elements.memoryDonut.innerHTML = getSingleStatTemplate();
-    // elements.historyUsageGraph.innerHTML = getSingleStatTemplate();
 
     elements.octofarmUptime.innerHTML = getSingleStatTemplate({
         additionalInformation: `OctoFarm Uptime <br> ${Calc.generateTime(systemInformation?.uptime)}`,
         icon: "fa-solid fa-hourglass"
     });
     elements.clientVersion.innerHTML = getSingleStatTemplate({
-        linkTitle: `Client Version <br> v${clientVersion}`,
+        statSpacing: 1,
+        linkTitle: `Client Version <br>v${clientVersion}`,
         link: npmURL,
         icon: "fa-solid fa-code-branch"
     });
     elements.serverVersion.innerHTML = getSingleStatTemplate({
-        linkTitle: `Server Version <br> v${serverVersion}`,
+        linkTitle: `Server Version <br>v${serverVersion}`,
         link: `${releasesURL}${serverVersion}`,
         icon: "fa-solid fa-code-branch"
     });
@@ -130,11 +138,35 @@ const updatePageData = async () => {
     });
 }
 
+const updateCharts = async ({ systemInformation }) => {
+    const { cpuLoadHistory, memoryLoadHistory } = systemInformation;
+    captureElementsIfNotAlready();
+
+    if(!cpuDonut){
+        systemCPUDonutOptions.series = [cpuLoadHistory[cpuLoadHistory.length - 1].y]
+        cpuDonut = await renderChart(elements.cpuDonut, systemCPUDonutOptions);
+        return;
+    }
+    updateChartSeries(cpuDonut, [cpuLoadHistory[cpuLoadHistory.length - 1].y]);
+
+    if(!memoryDonut){
+        systemCPUDonutOptions.series = [memoryLoadHistory[memoryLoadHistory.length - 1].y]
+        memoryDonut = await renderChart(elements.memoryDonut, systemCPUDonutOptions);
+        return;
+    }
+    updateChartSeries(cpuDonut, [cpuLoadHistory[cpuLoadHistory.length - 1].y]);
+
+}
+
 systemInformationModal.addEventListener("show.bs.modal", async () => {
-    await updatePageData();
+    const systemInformation = await grabSystemInformation();
+    await updatePageData(systemInformation);
+    await updateCharts(systemInformation);
     if(!interval){
         interval = setInterval(async () => {
-            await updatePageData();
+            const systemInformation = await grabSystemInformation();
+            await updatePageData(systemInformation);
+            await updateCharts(systemInformation);
         }, updateInterval)
     }
 })

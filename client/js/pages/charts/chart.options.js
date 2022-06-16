@@ -1,167 +1,598 @@
-import { toFixedFormatter } from "./chart.utils";
+import {
+  clippedPercentageFormatter,
+  defaultBackground,
+  defaultChartDimensions,
+  defaultChartWidth,
+  defaultDarkColor,
+  defaultDataLabelBackground,
+  enableAnimations,
+  fullChartDimensions,
+  getDefaultWeightDataLabelFormat,
+  getHiddenToolTempRepeated,
+  getToolTempSeries,
+  loadingText,
+  noopFormatter,
+  noZoom,
+  showStroke,
+  showToolbar,
+  theme,
+  toFixedWeightGramFormatter,
+  tooltipDataPointFormatter,
+  valueToLocaleDateStringFormatter,
+  valueToLocaleTimeStringFormatter,
+} from "./chart.utils";
+import {
+  defaultEnvironmentalYAxisAnnotations,
+  defaultHeatmapColorScaleOptions,
+  defaultTheme,
+  environmentalDataColors,
+  farmTempColors,
+  historyColors,
+  rainBow,
+  succesCountSeries,
+  successRateSeries,
+  utilisationConnectionColors,
+  utilisationConnectionLabels,
+  xAxisConnectionCategories,
+} from "./chart.constants";
+import UI from "../../utils/ui";
 
-export const actualToolSeriesName = "Actual Tool";
-export const defaultTheme = "dark";
-export const defaultLoadingText = "No Data to Display!";
-export const darkColor = "#303030";
-export const xAxisConnectionCategories = [
-  "Active",
-  "Complete",
-  "Idle",
-  "Disconnected",
-  "Offline",
-];
-export const utilisationConnectionLabels = ["Active", "Idle", "Offline"];
-export const farmTempColors = [
-  "#fcc329",
-  "#ff1500",
-  "#009cff",
-  "#ff1800",
-  "#37ff00",
-  "#ff1800",
-];
-export const utilisationConnectionColors = ["#00bc8c", "#444", "#e74c3c"];
-export const historyColors = ["#00bc8c", "#e74c3c", "#f39c12"];
-export const rainBow = () => [
-  "#ff0000",
-  "#ff8400",
-  "#ffd500",
-  "#88ff00",
-  "#00ff88",
-  "#00b7ff",
-  "#4400ff",
-  "#8000ff",
-  "#ff00f2",
-];
-export const environmentalDataColors = [
-  "#ff1500",
-  "#324bca",
-  "#caa932",
-  "#49ca32",
-];
-
-export const dataLabelBackground = {
-  enabled: true,
-  foreColor: "#000",
-  padding: 1,
-  borderRadius: 2,
-  borderWidth: 1,
-  borderColor: "#fff",
-  opacity: 0.9,
-};
-
-export function succesCountSeries(show = true) {
-  return {
-    title: {
-      text: "Count",
-    },
-    seriesName: "Success",
+const optionsHourlyTemperature = {
+  chart: {
+    type: "line",
+    id: "realtime",
+    ...defaultChartDimensions(),
+    ...enableAnimations(false),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
+  },
+  colors: farmTempColors,
+  stroke: {
+    curve: "smooth",
+    width: 2,
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  yaxis: [getToolTempSeries("Temp"), ...getHiddenToolTempRepeated(5)],
+  xaxis: {
+    type: "datetime",
     labels: {
-      formatter: toFixedFormatter,
+      formatter: valueToLocaleTimeStringFormatter,
     },
-    show,
-  };
-}
-export function successRateSeries(show = true) {
-  return {
-    title: {
-      text: "Success Rate",
-    },
-    seriesName: "Success",
-    labels: {
-      formatter: toFixedFormatter,
-    },
-    show,
-  };
-}
-
-export const defaultHeatmapColorScaleOptions = {
-  shadeIntensity: 0.5,
-  radius: 0,
-  useFillColorAsStroke: true,
-  colorScale: {
-    ranges: [
-      {
-        from: 0,
-        to: 1,
-        name: "none",
-        color: "#848484",
-      },
-      {
-        from: 2,
-        to: 25,
-        name: "low",
-        color: "#375a7f",
-      },
-      {
-        from: 26,
-        to: 60,
-        name: "medium",
-        color: "#f39c12",
-      },
-      {
-        from: 61,
-        to: 75,
-        name: "high",
-        color: "#00bc8c",
-      },
-      {
-        from: 76,
-        to: 100,
-        name: "extreme",
-        color: "#e74c3c",
-      },
-    ],
   },
 };
+const optionsWeeklyUtilisationPerDayHeatMap = {
+  chart: {
+    type: "heatmap",
+    id: "realtime",
+    ...defaultChartDimensions(),
+    animations: {
+      enabled: true,
+      easing: "linear",
+      dynamicAnimation: {
+        speed: 1000,
+      },
+    },
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
+  },
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  dataLabels: {
+    enabled: true,
+    formatter: clippedPercentageFormatter,
+    style: {
+      fontSize: "14px",
+      fontFamily: "Helvetica, Arial, sans-serif",
+      fontWeight: "bold",
+      colors: ["#000000"],
+    },
+  },
+  stroke: {
+    show: true,
+    curve: "smooth",
+    lineCap: "butt",
+    colors: [defaultDarkColor()],
+    width: 2,
+    dashArray: 0,
+  },
+  plotOptions: {
+    heatmap: {
+      ...defaultHeatmapColorScaleOptions,
+    },
+  },
+  legend: {
+    markers: {
+      offsetX: 0,
+      offsetY: 0,
+    },
+  },
+  tooltip: {
+    y: {
+      formatter: clippedPercentageFormatter,
+    },
+  },
+  xaxis: {
+    reversed: true,
+  },
+};
+const currentStatusChartOptions = {
+  series: [],
+  chart: {
+    type: "bar",
+    ...defaultChartWidth(),
+    height: "85%",
+    ...showToolbar(false),
+    ...enableAnimations(false),
+    ...defaultBackground(),
+  },
+  ...theme(),
+  ...loadingText(),
+  plotOptions: {
+    bar: {
+      horizontal: true,
+    },
+  },
+  dataLabels: {
+    enabled: false,
+    formatter: noopFormatter,
+  },
+  xaxis: {
+    categories: xAxisConnectionCategories,
+  },
+  tooltip: {
+    theme: defaultTheme,
+    x: {
+      show: false,
+    },
+    y: {
+      title: {
+        formatter: tooltipDataPointFormatter,
+      },
+    },
+  },
+};
 
-export const defaultEnvironmentalYAxisAnnotations = [
-  {
-    y: 0,
-    y2: 50,
-    yAxisIndex: 3,
-    borderColor: "#24571f",
-    fillColor: "#133614",
+const optionsUtilisation = {
+  chart: {
+    type: "donut",
+    ...fullChartDimensions(),
+    ...enableAnimations(true),
+    background: defaultBackground(),
   },
-  {
-    y: 51,
-    y2: 100,
-    yAxisIndex: 3,
-    borderColor: "#457a24",
-    fillColor: "#31561a",
+  ...theme(),
+  plotOptions: {
+    pie: {
+      expandOnClick: false,
+      dataLabels: {
+        offset: 10,
+        minAngleToShowLabel: 15,
+      },
+    },
   },
-  {
-    y: 101,
-    y2: 150,
-    yAxisIndex: 3,
-    borderColor: "#7a6f24",
-    fillColor: "#564f1a",
+  ...showStroke(false),
+  tooltip: {
+    y: {
+      formatter: clippedPercentageFormatter,
+    },
   },
-  {
-    y: 151,
-    y2: 200,
-    yAxisIndex: 3,
-    borderColor: "#5c3421",
-    fillColor: "#3b3015",
+  ...loadingText,
+  dataLabels: {
+    enabled: false,
   },
-  {
-    y: 201,
-    y2: 250,
-    yAxisIndex: 3,
-    borderColor: "#5c2121",
-    fillColor: "#3b1515",
+  series: [],
+  labels: utilisationConnectionLabels,
+  colors: utilisationConnectionColors,
+  legend: {
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: "bottom",
+    horizontalAlign: "center",
+    floating: false,
+    fontSize: "11px",
+    fontFamily: "Helvetica, Arial",
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    offsetX: -25,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false,
+    },
+    markers: {
+      width: 9,
+      height: 9,
+      strokeWidth: 0,
+      strokeColor: "#fff",
+      fillColors: undefined,
+      radius: 1,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0,
+    },
+    itemMargin: {
+      horizontal: 1,
+      vertical: 0,
+    },
+    onItemClick: {
+      toggleDataSeries: false,
+    },
+    onItemHover: {
+      highlightDataSeries: false,
+    },
   },
-  {
-    y: 251,
-    y2: 350,
-    yAxisIndex: 3,
-    borderColor: "#37215c",
-    fillColor: "#23153b",
+};
+
+const filamentUsageOverTimeChartOptions = {
+  chart: {
+    type: "line",
+    ...defaultChartWidth(),
+    height: "250px",
+    stacked: true,
+    ...enableAnimations(true),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
   },
-  {
-    y: 350,
-    yAxisIndex: 3,
-    borderColor: "#280000",
-    fillColor: "#000000",
+  dataLabels: {
+    enabled: true,
+    background: defaultDataLabelBackground(),
+    formatter: toFixedWeightGramFormatter,
   },
-];
+  colors: rainBow(),
+  stroke: {
+    width: 2,
+    curve: "smooth",
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  // Set dynamically
+  yaxis: [
+    {
+      title: {
+        text: "Weight",
+      },
+      labels: {
+        formatter: toFixedWeightGramFormatter,
+      },
+    },
+  ],
+  xaxis: {
+    type: "datetime",
+    labels: {
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
+};
+const printCompletionByDayChartOptions = {
+  chart: {
+    type: "line",
+    ...defaultChartWidth(),
+    height: "250px",
+    ...enableAnimations(true),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
+  },
+  colors: historyColors,
+  dataLabels: {
+    enabled: true,
+    background: defaultDataLabelBackground(),
+  },
+  stroke: {
+    width: 4,
+    curve: "smooth",
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  yaxis: [
+    succesCountSeries(true),
+    succesCountSeries(false),
+    succesCountSeries(false),
+  ],
+  xaxis: {
+    type: "category",
+    labels: {
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
+};
+const printSuccessRatePerDay = {
+  chart: {
+    type: "bar",
+    stacked: true,
+    stackType: "100%",
+    ...defaultChartWidth(),
+    height: "250px",
+    ...enableAnimations(true),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
+  },
+  colors: historyColors,
+  dataLabels: {
+    enabled: true,
+    background: defaultDataLabelBackground(),
+  },
+  stroke: {
+    width: 4,
+    curve: "smooth",
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  yaxis: [
+    successRateSeries(true),
+    successRateSeries(false),
+    successRateSeries(false),
+  ],
+  xaxis: {
+    type: "category",
+    labels: {
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
+};
+
+const filamentUsageByDayChartOptions = {
+  chart: {
+    type: "bar",
+    ...defaultChartWidth(),
+    height: "250px",
+    stacked: true,
+    stroke: {
+      show: true,
+      curve: "smooth",
+      lineCap: "butt",
+      width: 1,
+      dashArray: 0,
+    },
+    ...enableAnimations(true),
+    plotOptions: {
+      bar: {
+        horizontal: false,
+      },
+    },
+    ...showToolbar(false),
+    ...noZoom(),
+    background: defaultBackground(),
+  },
+  dataLabels: getDefaultWeightDataLabelFormat(),
+  colors: rainBow(),
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  yaxis: [
+    {
+      title: {
+        text: "Weight",
+      },
+      labels: {
+        formatter: toFixedWeightGramFormatter,
+      },
+    },
+  ],
+  xaxis: {
+    type: "category",
+    labels: {
+      formatter: valueToLocaleDateStringFormatter,
+    },
+  },
+};
+
+const environmentalDataChartOptions = {
+  chart: {
+    type: "line",
+    id: "realtime",
+    ...defaultChartDimensions(),
+    ...enableAnimations(false),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground(),
+  },
+  colors: environmentalDataColors,
+  stroke: {
+    curve: "smooth",
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  // set dynamically by code
+  // yaxis: availableStats,
+  xaxis: {
+    type: "datetime",
+    labels: {
+      formatter: valueToLocaleTimeStringFormatter,
+    },
+  },
+  annotations: {
+    position: "front",
+    yaxis: defaultEnvironmentalYAxisAnnotations,
+  },
+};
+
+const historySparkLineOptions = {
+  series: [
+    {
+      data: [],
+    },
+  ],
+  chart: {
+    type: "line",
+    width: "100%",
+    height: 85,
+    sparkline: {
+      enabled: true,
+    },
+    zoom: {
+      enabled: false,
+    },
+    background: "#303030",
+  },
+
+  theme: {
+    mode: "dark",
+  },
+  noData: {
+    text: "No Data to Display",
+  },
+  colors: ["#3498db"],
+  tooltip: {
+    fixed: {
+      enabled: false,
+    },
+    x: {
+      show: true,
+      formatter: "",
+    },
+    y: {
+      formatter: function (value) {
+        return UI.generateTime(value);
+      },
+      title: {
+        formatter: () => "",
+      },
+    },
+    marker: {
+      show: false,
+    },
+  },
+};
+
+export const systemCPUAndMemoryChartOptions = {
+  series: [],
+  chart: {
+    id: "realtime",
+    type: "line",
+    ...defaultChartDimensions(),
+    ...enableAnimations(false),
+    ...defaultBackground(),
+    ...showToolbar(false),
+    ...noZoom(),
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  stroke: {
+    curve: "smooth",
+  },
+  title: {
+    text: "System CPU and Memory Usage History",
+    align: "center",
+  },
+  markers: {
+    size: 0,
+  },
+  xaxis: {
+    type: "datetime",
+  },
+  yaxis: {
+    max: 100,
+  },
+  legend: {
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: "bottom",
+    horizontalAlign: "center",
+    floating: false,
+    fontSize: "14px",
+    fontFamily: "Helvetica, Arial",
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    customLegendItems: [],
+    offsetX: 0,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false,
+    },
+    markers: {
+      width: 12,
+      height: 12,
+      strokeWidth: 0,
+      strokeColor: "#fff",
+      fillColors: undefined,
+      radius: 12,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0,
+    },
+    itemMargin: {
+      horizontal: 5,
+      vertical: 0,
+    },
+    onItemClick: {
+      toggleDataSeries: true,
+    },
+    onItemHover: {
+      highlightDataSeries: true,
+    },
+  },
+};
+export const systemCPUDonutOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    ...enableAnimations(false),
+    ...defaultBackground(),
+    ...showToolbar(false),
+    ...noZoom(),
+  },
+  title: {
+    text: "Current System CPU Usage (%)",
+    align: "center",
+  },
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  labels: ["CPU (%)"],
+};
+export const systemMemoryDonutOptions = {
+  chart: {
+    height: 350,
+    type: "radialBar",
+    ...enableAnimations(false),
+    ...defaultBackground(),
+    ...showToolbar(false),
+    ...noZoom(),
+  },
+  title: {
+    text: "Current System Memory Usage (%)",
+    align: "center",
+  },
+  theme: {
+    mode: "dark",
+  },
+  noData: {
+    text: loadingText,
+  },
+  series: [],
+  labels: ["Memory (%)"],
+};
+
