@@ -938,7 +938,7 @@ class OctoPrintPrinter {
 
       // If there is no current user then find one from the list...
       // Also check if user list contains current user and update if not...
-      if (!this?.currentUser || !this.userList.includes(this.currentUser)) {
+      if (!this?.currentUser) {
         this.currentUser = findCurrentUserForOctoFarmConnection(this.userList);
       }
 
@@ -949,11 +949,6 @@ class OctoPrintPrinter {
       );
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().API, "success", true);
       this.onboarding.userApi = true;
-      console.log("FINALY", {
-        currentUser: this.currentUser,
-        userList: this.userList,
-        onoarding: this.onboarding
-      });
       this.#db.update({
         currentUser: this.currentUser,
         userList: this.userList,
