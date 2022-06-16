@@ -28,7 +28,7 @@ const defaultWebsocketOptions = {
 class WebSocketClient {
   #messageNumber = 0;
   #retryNumber = 0;
-  #lastMessage = Date.now();
+  #lastMessage = new Date();
   #instance = undefined;
   #pingPongTimer = 15000;
   #currentMessageMSRate = 0;
@@ -468,8 +468,7 @@ class WebSocketClient {
 
     this.#lastPingMessage = Date.now();
 
-    const timeSinceLastMessage =
-      this.#lastPingMessage - this.#lastMessage?.getTime() ? this.#lastMessage.getTime() : 0;
+    const timeSinceLastMessage = this.#lastPingMessage - this.#lastMessage.getTime();
 
     const isPrinterActive = getPrinterStoreCache().isPrinterActive(this.id);
 
