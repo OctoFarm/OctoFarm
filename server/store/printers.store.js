@@ -363,18 +363,14 @@ class PrinterStore {
   }
 
   shouldPrinterBeReceivingData(id) {
+    const dataStates = ["Idle", "Active", "Complete"];
     const printer = this.#findMePrinter(id);
     const {
       printerState: {
         colour: { category }
       }
     } = printer;
-    return (
-      category === "Disconnected" ||
-      category === "Idle" ||
-      category === "Active" ||
-      category === "Complete"
-    );
+    return dataStates.includes(category);
   }
 
   getDisabledPluginsList(id) {
