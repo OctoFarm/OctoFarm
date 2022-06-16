@@ -46,7 +46,24 @@ for (const key in serverDatabaseKeys) {
             serverDatabaseKeys[key]
           } database...`
         );
-        await nukeDatabases(`${serverDatabaseKeys[key]}DB`, e);
+        bootbox.confirm({
+          message: "This will destroy all data in your database... ARE YOU SURE?",
+          buttons: {
+            confirm: {
+              label: "Yes",
+              className: "btn-success"
+            },
+            cancel: {
+              label: "No",
+              className: "btn-danger"
+            }
+          },
+          callback: async function (result) {
+            if(result){
+              await nukeDatabases(`${serverDatabaseKeys[key]}DB`, e);
+            }
+          }
+        });
         alert.close();
       });
     }
