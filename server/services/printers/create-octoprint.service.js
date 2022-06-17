@@ -508,8 +508,8 @@ class OctoPrintPrinter {
     throw new Error("No websocket to reconnect!");
   }
 
-  async throttleWebSocket(seconds) {
-    this.#ws.throttle(seconds);
+  throttleWebSocket(seconds) {
+    this.#ws.forceUpdateThrottleRate(seconds);
   }
 
   async reScanAPI(force) {

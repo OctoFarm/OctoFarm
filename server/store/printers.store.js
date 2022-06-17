@@ -585,6 +585,11 @@ class PrinterStore {
     }
   }
 
+  resetThrottleRate(id) {
+    const printer = this.#findMePrinter(id);
+    return printer.throttleWebSocket(1);
+  }
+
   async forceReconnectPrinter(id) {
     const printer = this.#findMePrinter(id);
     return printer.forceReconnect();
