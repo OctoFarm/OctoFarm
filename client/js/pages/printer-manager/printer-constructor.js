@@ -117,14 +117,14 @@ export class PrintersManagement {
       });
     document
       .getElementById(`saveButton-${newPrintersIndex}`)
-      .addEventListener("click", (event) => {
-        PrintersManagement.savePrinter(event.target);
+      .addEventListener("click", async (event) => {
+        await PrintersManagement.savePrinter(event.target);
       });
     newPrintersIndex++;
   }
 
   static async importPrinters() {
-    return function (e) {
+    return async function (e) {
       const theBytes = e.target.result; // .split('base64,')[1];
       // Initial JSON validation
       if (Validate.JSON(theBytes)) {
@@ -156,7 +156,8 @@ export class PrintersManagement {
           if (typeof newPrinter.apikey !== "undefined") {
             printer.apikey = newPrinter.apikey;
           }
-          PrintersManagement.addPrinter(printer);
+          await UI.delay(3000);
+          await PrintersManagement.addPrinter(printer);
         }
         UI.createAlert(
           "success",
