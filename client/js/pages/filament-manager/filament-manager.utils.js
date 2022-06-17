@@ -193,7 +193,7 @@ export const loadPageStatistics = async () => {
   <tr>
 
       <td >Remaining <span class="badge badge-success ml-2">${
-      (statistics.total - statistics.used / 1000 ).toFixed(2)
+      ((statistics.total - statistics.used) / 1000 ).toFixed(2)
       }kg</span></td>
       ${remainingBreakdown}
   </tr>

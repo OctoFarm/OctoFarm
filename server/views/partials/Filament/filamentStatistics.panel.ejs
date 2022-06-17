@@ -44,7 +44,7 @@
             </thead>
             <tbody id="filamentOverviewTable">
             <tr>
-                <td scope="row">Remaining <span class="badge badge-success ml-2"><%= (statistics.total - statistics.used / 1000 ).toFixed(2)%>kg</span></td>
+                <td scope="row">Remaining <span class="badge badge-success ml-2"><%= ((statistics.total - statistics.used) / 1000 ).toFixed(2)%>kg</span></td>
                 <% statistics.materialBreakDown.forEach(used => { %>
                     <th scope="col"><%= ((used.total - used.used) / 1000).toFixed(0) %>kg</th>
                 <%   }) %>
