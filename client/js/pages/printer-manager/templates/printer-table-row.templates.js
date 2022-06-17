@@ -49,7 +49,7 @@ const returnAlerts = (id, printerURL) => {
     </button>
     <a title="CORS is not enable on OctoPrint!"
             type="button"
-            class="tag btn btn-outline-info btn-sm d-none"
+            class="tag btn btn-outline-danger btn-sm d-none"
             id="corsIssue-${id}" 
             target="_blank"
             href="${printerURL}"
