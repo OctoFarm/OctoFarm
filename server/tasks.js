@@ -18,6 +18,7 @@ const { FileClean } = require("./services/file-cleaner.service");
 const { sortCurrentOperations } = require("./services/printer-statistics.service");
 const { initFarmInformation } = require("./services/farm-information.service");
 const { notifySubscribers } = require("./services/server-side-events.service");
+const { fetchClientVersion } = require("./app-env");
 const { MESSAGE_TYPES } = require("./constants/sse.constants");
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 
@@ -38,6 +39,7 @@ const INITIALISE_SYSTEM_CACHE = async () => {
   await getEventEmitterCache();
   await initHistoryCache();
   await getInfluxCleanerCache();
+  fetchClientVersion();
 };
 
 const INITIALISE_PRINTERS = async () => {

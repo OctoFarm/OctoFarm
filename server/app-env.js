@@ -17,8 +17,8 @@ const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-en
 const deprecatedConfigFolder = "../middleware";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
-const clientPackageJsonPath = path.join(__dirname, "../client/package.json");
-const clientPackageJson = require(clientPackageJsonPath);
+const exec = require("child_process").exec;
+let currentClientVersion;
 const dotEnvPath = path.join(__dirname, "../.env");
 
 /**
@@ -363,7 +363,15 @@ function isEnvProd() {
  * @returns {string} Client version number #.#.#
  */
 function fetchClientVersion() {
-  return clientPackageJson.version;
+  if (!currentClientVersion) {
+    exec("npm view @notexpectedyet/octofarm-client version", function (err, stdout, stderr) {
+      if (err) {
+        logger.error("Failed to grab client version!", err.toString());
+      }
+      currentClientVersion = stdout;
+    });
+  }
+  return currentClientVersion;
 }
 
 function fetchSuperSecretKey() {
