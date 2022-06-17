@@ -57,7 +57,7 @@ class SystemCommands {
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
   static async checkIfOctoFarmNeedsUpdatingAndUpdate(clientResponse, force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.
-    let isThisAGitRepo = await checkIfWereInAGitRepo();
+    let isThisAGitRepo = checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
       clientResponse.statusTypeForUser = "warning";
       clientResponse.message = "Not a git repository, user intervention required!";
@@ -113,23 +113,8 @@ class SystemCommands {
     // Branch is not up to date and we do not have any modified files... we can continue
     await pullLatestRepository(force.forcePull);
 
-    // Check to see if npm packages are missing and if so install them...
-    const missingPackagesList = await returnListOfMissingPackages();
-    // If we have missing packages alert the user and wait for their response, if response given then install missing deps.
-    if (missingPackagesList.length > 0) {
-      if (!force?.doWeInstallPackages) {
-        clientResponse.statusTypeForUser = "warning";
-        clientResponse.message =
-          "<span class='text-warning'>You have missing dependencies that are required, Do you want to update these? </span><br><br>" +
-          "<b class='text-success'>Confirm:</b> This option will install the missing local dependencies and continue the upgrade process<br><br>" +
-          "<b class='text-danger'>Cancel:</b> This option will cancel the update process and not install the required dependencies. No update will run and manual intervention by the user is required. <br><br>";
-        return clientResponse;
-      } else {
-        for (let i = 0; i > missingPackagesList.length; i++) {
-          await installNpmDependency(missingPackagesList[i]);
-        }
-      }
-    }
+    //Always install new dependency set for update
+    await installNpmDependency();
 
     // Everything went well, enjoy the tasty updates!
     clientResponse.haveWeSuccessfullyUpdatedOctoFarm = true;

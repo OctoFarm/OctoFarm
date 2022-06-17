@@ -21,9 +21,9 @@ async function returnListOfMissingPackages() {
   }
 }
 
-async function installNpmDependency(dependency) {
+async function installNpmDependency() {
   try {
-    await exec(`npm install ${dependency}`);
+    await exec("npm ci");
   } catch (e) {
     throw `Error running installation command | ${e}`;
   }
