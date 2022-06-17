@@ -1,6 +1,6 @@
-# Changelog
+# Old-Changelog
 
-All notable changes to this project will be documented in this file.
+Currently the changelog now resides in server/CHANGELOG.md or view the releases page. This is for both client and server, these will soon be split into two.
 
 ## [v1.2.3]
 
