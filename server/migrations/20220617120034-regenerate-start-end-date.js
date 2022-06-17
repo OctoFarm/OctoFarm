@@ -2,12 +2,16 @@ const doesDateEqualEpoch = function (date) {
   if (!date) {
     return true;
   }
-  return date === new Date("1970-01-01Z00:00:00:000");
+  return new Date(date) < new Date("1980-01-01T00:00:00.000+00:00");
 };
 
 const generateStartDate = function (endDate, printTime) {
   const printTimeDateObj = new Date(printTime * 1000);
-  return endDate.getTime() - printTimeDateObj.getTime();
+  return new Date(endDate.getTime() - printTimeDateObj.getTime());
+};
+
+const isObject = function (id) {
+  return typeof id === "object";
 };
 
 module.exports = {
@@ -20,7 +24,7 @@ module.exports = {
         const dbCollection = db.collection("histories");
 
         await dbCollection.find({}).forEach(function (data) {
-          if (doesDateEqualEpoch(data?.printHistory?.startDate)) {
+          if (isObject(data._id) && doesDateEqualEpoch(data?.printHistory?.startDate)) {
             dbCollection.findOneAndUpdate(
               { _id: data._id },
               {
@@ -33,7 +37,7 @@ module.exports = {
               }
             );
           }
-          if (doesDateEqualEpoch(data?.printHistory?.endDate)) {
+          if (isObject(data._id) && doesDateEqualEpoch(data?.printHistory?.endDate)) {
             dbCollection.findOneAndUpdate(
               { _id: data._id },
               {
