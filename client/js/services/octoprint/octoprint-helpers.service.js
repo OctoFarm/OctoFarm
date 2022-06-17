@@ -1,27 +1,29 @@
 import OctoFarmClient from "../octofarm-client.service";
 import OctoPrintClient from "./octoprint-client.service";
 import UI from "../../utils/ui";
-import {canWeTurnOnThePrinter} from "../../utils/octofarm.utils";
+import { canWeTurnOnThePrinter } from "../../utils/octofarm.utils";
 import PrinterPowerService from "../printer-power.service";
 
 const powerOnPrinterSequence = async (printer) => {
   const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
   //TODO enable quick connect setting for this to be enabled or disabled...
   if (canPowerOnThePrinter) {
-    const post = await PrinterPowerService.sendPowerCommandForPrinter(
-        printer,
-        printer.powerSettings.powerOnURL,
-        printer.powerSettings.powerOnCommand,
-        "power on"
-    );
-    // Should be long enough for the printer to boot up.
-    // TODO also make customisable
-    const body = {
-      action: "Printer: power on",
-      status: post.status,
-    };
-    await OctoFarmClient.updateUserActionsLog(printer._id, body);
-    await UI.delay(3000);
+    if(!await PrinterPowerService.printerIsPoweredOn(printer)){
+      const post = await PrinterPowerService.sendPowerCommandForPrinter(
+          printer,
+          printer.powerSettings.powerOnURL,
+          printer.powerSettings.powerOnCommand,
+          "power on"
+      );
+      // Should be long enough for the printer to boot up.
+      // TODO also make customisable
+      const body = {
+        action: "Printer: power on",
+        status: post.status,
+      };
+      await OctoFarmClient.updateUserActionsLog(printer._id, body);
+      await UI.delay(3000);
+    }
   }
 }
 
