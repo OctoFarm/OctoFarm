@@ -292,7 +292,11 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const actualOnline = JSON.parse(JSON.stringify(checked[0]));
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
+    console.log(serverChanges);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
+    console.log(actualOnline.filament);
+    console.log(sentOnline.filament);
+    const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
     const hideEmptyChanges = actualOnline.filament.hideEmpty !== sentOnline.filament.hideEmpty;
 
     checked[0].server = sentOnline.server;
@@ -310,7 +314,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
       TaskManager.forceRunTask("FILAMENT_CLEAN_TASK");
     }
 
-    if (checked[0].filament.allowMultiSelect === false) {
+    if (!filamentChanges && checked[0].filament.allowMultiSelect === false) {
       const spoolList = FilamentClean.getSpools();
       spoolList.forEach((spool) => {
         getPrinterStoreCache().deattachSpoolFromAllPrinters(`${spool._id}`);
