@@ -148,15 +148,15 @@ export const loadPageStatistics = async () => {
   pageElements.filamentSpoolsActiveTotals.innerHTML =
     statistics.activeSpoolCount;
   const usedPercent = ((statistics.used / statistics.total) * 100).toFixed(0);
-  pageElements.filamentUsedProgress.innerHTML = isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
-  pageElements.filamentUsedProgress.style.width = isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
+  pageElements.filamentUsedProgress.innerHTML = !isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
+  pageElements.filamentUsedProgress.style.width = !isNaN(usedPercent) ? usedPercent + "%" : 0 + "%";
   const remainingPercent = (
     ((statistics.total - statistics.used) / statistics.total) *
     100
   ).toFixed(0);
-  pageElements.filamentRemainingProgress.innerHTML = isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
-  pageElements.filamentRemainingProgress.style.width = isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
-
+  pageElements.filamentRemainingProgress.innerHTML = !isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
+  pageElements.filamentRemainingProgress.style.width = !isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
+  console.log(isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%")
   let headerBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
     headerBreakdown += `<th scope="col">${used.name}</th>`;
