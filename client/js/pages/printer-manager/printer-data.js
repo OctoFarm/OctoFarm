@@ -215,7 +215,7 @@ function corsWarningCheck(printer) {
       alertsLogMesssageBox,
       createAlertsLogString({
         id: "corsCheck-" + printer._id,
-        name: "Cors is not enabled!",
+        name: "Cors is not enabled! Please enable, restart OctoPrint and force reconnect your printer! Manage -> Force Reconnect...",
         printerName: printer.printerName,
         colour: "Offline",
       })

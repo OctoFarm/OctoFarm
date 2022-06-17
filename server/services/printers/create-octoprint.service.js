@@ -652,10 +652,16 @@ class OctoPrintPrinter {
     });
 
     if (requiredApiCheckValues.includes(true)) {
-      const requiredAPIFail = {
+      let requiredAPIFail = {
         state: "API Fail!",
         stateDescription: "Required API Checks have failed... attempting reconnect..."
       };
+      if (!this.corsCheck) {
+        requiredAPIFail = {
+          state: "CORS NOT ENABLED!",
+          stateDescription: "Cors not enabled, setting offline!"
+        };
+      }
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
       return "Failed due to missing required values!";
     }
@@ -1244,6 +1250,9 @@ class OctoPrintPrinter {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
       this.#db.update({ onboarding: this.onboarding });
+      if (!this.corsCheck) {
+        return false;
+      }
       return true;
     } else {
       logger.http("Failed to acquire settings data..." + settingsCheck);
