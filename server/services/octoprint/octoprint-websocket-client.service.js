@@ -359,6 +359,11 @@ class WebSocketClient {
     );
   }
 
+  forceUpdateThrottleRate(rate) {
+    this.currentThrottleRate = rate;
+    this.sendThrottle();
+  }
+
   sendThrottle() {
     logger.silly("Throttling websocket connection to: " + this.currentThrottleRate);
     getPrinterStoreCache().updatePrinterLiveValue(this.id, {
