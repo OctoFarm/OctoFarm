@@ -51,7 +51,7 @@ jobs:
             - 'server/services/**'
             - 'server/store/**'
             - 'server/utils/**'
-            - 'server/views/**'   
+            - 'server/views/**'
             client:
             - 'client/**'
       # Install node v16 to use.
@@ -78,6 +78,16 @@ jobs:
         with:
           time: '30s'
 
+
+      # Run the server release sequence
+      - name: server build and release
+        if: steps.filter.outputs.server == 'true'
+        run: |
+          cd ./server
+          git status
+          npm ci --no-optional
+          npm run release
+
       # Update Server Package with latest client package
       - name: update server client version
         if: steps.filter.outputs.client == 'true'
@@ -96,12 +106,3 @@ jobs:
           commit_author: James Mackay <online@notexpectedyet.com>
           ## This action should only ever commit these two files!
           file_pattern: server/package*.json client/package*.json
-
-      # Run the server release sequence
-      - name: server build and release
-        if: steps.filter.outputs.server == 'true'
-        run: |
-          cd ./server
-          git status
-          npm ci --no-optional
-          npm run release
