@@ -2,6 +2,7 @@ import {
   clippedPercentageFormatter,
   defaultBackground,
   defaultChartDimensions,
+  defaultDonutDimensions,
   defaultChartWidth,
   defaultDarkColor,
   defaultDataLabelBackground,
@@ -495,10 +496,6 @@ export const systemCPUAndMemoryChartOptions = {
   stroke: {
     curve: "smooth",
   },
-  title: {
-    text: "System CPU and Memory Usage History",
-    align: "center",
-  },
   markers: {
     size: 0,
   },
@@ -557,42 +554,30 @@ export const systemCPUAndMemoryChartOptions = {
 };
 export const systemCPUDonutOptions = {
   chart: {
-    height: 350,
+    ...defaultDonutDimensions(),
     type: "radialBar",
     ...enableAnimations(false),
     ...defaultBackground(),
     ...showToolbar(false),
     ...noZoom(),
-  },
-  title: {
-    text: "Current System CPU Usage (%)",
-    align: "center",
   },
   ...theme(),
   ...loadingText(),
   series: [],
-  labels: ["CPU (%)"],
+  labels: ["CPU (%)"]
 };
 export const systemMemoryDonutOptions = {
   chart: {
-    height: 350,
+    ...defaultDonutDimensions(),
     type: "radialBar",
     ...enableAnimations(false),
     ...defaultBackground(),
     ...showToolbar(false),
     ...noZoom(),
   },
-  title: {
-    text: "Current System Memory Usage (%)",
-    align: "center",
-  },
-  theme: {
-    mode: "dark",
-  },
-  noData: {
-    text: loadingText,
-  },
+  ...theme(),
+  ...loadingText(),
   series: [],
-  labels: ["Memory (%)"],
+  labels: ["Memory (%)"]
 };
 

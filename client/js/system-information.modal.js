@@ -3,7 +3,7 @@ import { getSingleStatTemplate } from "./templates/bootstrap.templates";
 import Calc from "./utils/calc"
 import e from "./utils/elements";
 import {renderChart, updateChartSeries} from "./pages/charts/charts.manager";
-import { systemCPUDonutOptions } from "./pages/charts/chart.options";
+import { systemCPUDonutOptions, systemMemoryDonutOptions, systemCPUAndMemoryChartOptions } from "./pages/charts/chart.options";
 
 const systemInformationModal = document.getElementById("informationSystemModal");
 const updateInterval = 5000;
@@ -142,29 +142,59 @@ const updateCharts = async ({ systemInformation }) => {
     const { cpuLoadHistory, memoryLoadHistory } = systemInformation;
     captureElementsIfNotAlready();
 
+    await updateCPUChart(cpuLoadHistory);
+
+    await updateMemoryChart(memoryLoadHistory);
+
+    await updateCPUMemoryGraph(cpuLoadHistory, memoryLoadHistory);
+
+}
+
+const updateCPUChart = async (cpuLoadHistory) => {
     if(!cpuDonut){
         systemCPUDonutOptions.series = [cpuLoadHistory[cpuLoadHistory.length - 1].y]
         cpuDonut = await renderChart(elements.cpuDonut, systemCPUDonutOptions);
         return;
     }
-    updateChartSeries(cpuDonut, [cpuLoadHistory[cpuLoadHistory.length - 1].y]);
+    await updateChartSeries(cpuDonut, [cpuLoadHistory[cpuLoadHistory.length - 1].y]);
+}
 
+const updateMemoryChart = async (memoryLoadHistory) => {
     if(!memoryDonut){
-        systemCPUDonutOptions.series = [memoryLoadHistory[memoryLoadHistory.length - 1].y]
-        memoryDonut = await renderChart(elements.memoryDonut, systemCPUDonutOptions);
+        systemMemoryDonutOptions.series = [memoryLoadHistory[memoryLoadHistory.length - 1].y]
+        memoryDonut = await renderChart(elements.memoryDonut, systemMemoryDonutOptions);
         return;
     }
-    updateChartSeries(cpuDonut, [cpuLoadHistory[cpuLoadHistory.length - 1].y]);
+    await updateChartSeries(memoryDonut, [memoryLoadHistory[memoryLoadHistory.length - 1].y]);
 
 }
 
+const updateCPUMemoryGraph = async (cpuLoadHistory, memoryLoadHistory) => {
+    const dataSeriesForCharts = [
+        {
+            name: "Memory",
+            data: memoryLoadHistory,
+        },
+        {
+            name: "CPU",
+            data: cpuLoadHistory,
+        },
+    ];
+    if(!cpuMemoryChart){
+        systemCPUAndMemoryChartOptions.series = dataSeriesForCharts
+        cpuMemoryChart = await renderChart(elements.historyUsageGraph, systemCPUAndMemoryChartOptions);
+        return;
+    }
+    await updateChartSeries(cpuMemoryChart, dataSeriesForCharts);
+}
+
 systemInformationModal.addEventListener("show.bs.modal", async () => {
-    const systemInformation = await grabSystemInformation();
+    let systemInformation = await grabSystemInformation();
     await updatePageData(systemInformation);
     await updateCharts(systemInformation);
     if(!interval){
         interval = setInterval(async () => {
-            const systemInformation = await grabSystemInformation();
+            systemInformation = await grabSystemInformation();
             await updatePageData(systemInformation);
             await updateCharts(systemInformation);
         }, updateInterval)
@@ -176,5 +206,17 @@ systemInformationModal.addEventListener("hide.bs.modal", () => {
         clearInterval(interval);
         interval = null;
         elements = null;
+        if(!!cpuDonut){
+            cpuDonut.destroy();
+        }
+        if(!!memoryDonut){
+            memoryDonut.destroy();
+        }
+        if(!!cpuMemoryChart){
+            cpuMemoryChart.destroy();
+        }
+        cpuDonut = null;
+        memoryDonut = null;
+        cpuMemoryChart = null;
     }
 })
