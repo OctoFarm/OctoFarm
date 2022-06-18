@@ -124,7 +124,14 @@ export function fullChartDimensions() {
 export function defaultChartDimensions() {
   return {
     ...defaultChartWidth(),
-    height: "90%",
+    height: 250,
+  };
+}
+
+export function defaultDonutDimensions() {
+  return {
+    ...defaultChartWidth(),
+    height: 300,
   };
 }
 
