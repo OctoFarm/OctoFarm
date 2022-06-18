@@ -72,15 +72,22 @@ class Logs {
 
   /**
    * Generates a downloadable "*.zip" file containing all system  logs.
-   * @returns {Promise<string>}
+   * @returns {Promise<{msg: string, zipDumpPath: string, status: string}>}
    */
   static async generateOctoFarmLogDump() {
+    const zipDumpResponse = {
+      status: "error",
+      msg: "Unable to generate zip file, please check logs for more information.",
+      zipDumpPath: ""
+    };
     const fileList = [];
 
     // Generate nice text file of system information
     const octofarmInformationTxt = await generateOctoFarmSystemInformationTxt();
     if (!octofarmInformationTxt) {
-      throw new Error("Couldn't generate octofarms_information.txt file...");
+      zipDumpResponse.msg =
+        "Failed to generate system information text please check logs for more information";
+      return zipDumpResponse;
     }
 
     fileList.push(octofarmInformationTxt);
@@ -98,8 +105,15 @@ class Logs {
         fileList.push(logFile);
       }
     });
-    // Create the zip file and return the path.
-    return createZipFile(`octofarm_dump-${generateTodayTextString()}.zip`, fileList);
+
+    zipDumpResponse.zipDumpPath = createZipFile(
+      `octofarm_dump-${generateTodayTextString()}.zip`,
+      fileList
+    );
+    zipDumpResponse.status = "success";
+    zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
+
+    return zipDumpResponse;
   }
 }
 
