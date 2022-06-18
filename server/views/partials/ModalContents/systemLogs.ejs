@@ -3,7 +3,65 @@
 
 <div class="container-fluid">
     <div class="row">
+        <div class="col-12 col-md-3">
+            <button
+                    title="Log dump will generate a tidy .zip package containing your logs and system information"
+                    id="log-generate-dump-btn"
+                    type="button"
+                    class="btn btn-info"
+                    href="#"
+                    aria-expanded="false"
+            >
+                <i class="fas fa-file-archive"></i> Log Dump
+            </button>
 
+        </div>
+        <div class="col-12 col-md-6">
+            <button
+                    title="Download your generated log dump"
+                    id="log-download-dump-btn"
+                    type="button"
+                    class="btn btn-success d-none"
+                    href="#"
+                    aria-expanded="false"
+            >
+                <i class="fas fa-file-download"></i> Download Log Dump
+            </button>
+        </div>
+        <div class="col-12 col-md-3 text-end">
+            <button
+                    title="Clean up logs older than 5 days"
+                    id="log-clear-log-btn"
+                    type="button"
+                    class="btn btn-warning  float-right"
+                    href="#"
+                    aria-expanded="false"
+            >
+                <i class="fas fa-broom "></i> House Keeping
+            </button>
+        </div>
     </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table class="table-hover table table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">File Name</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Last Modified</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody id="log-list-table">
+                </tbody>
+            </table>
+            <div id="log-loading">
+                <%- include(loading) %>
+            </div>
+        </div>
+    </div>
+
 </div>
-<!--<script src="/assets/dist/about.modal.min.js?<%= clientVersion %>"></script>-->
+<script src="/assets/dist/log.modal.min.js?<%= clientVersion %>"></script>

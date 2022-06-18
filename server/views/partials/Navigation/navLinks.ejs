@@ -2,12 +2,10 @@
     <i class="fas fa-tachometer-alt text-purple"></i>
     <span class="nav_name ">Dashboard</span>
 </a>
-<% if(currentUserGroup === "Administrator"){ %>
-    <a title="Printer Management" href="/printers" class="nav_link <%= page === 'Printer Manager' && 'active-nav' %>">
-        <i class="fas fa-print text-purple"></i>
-        <span class="nav_name ">Printers</span>
-    </a>
-<% } %>
+<a title="Job Management" href="/jobs" class="nav_link <%= page === 'File Manager' && 'active-nav' %>">
+    <i class="fa-solid fa-briefcase text-purple"></i>
+    <span class="nav_name ">Jobs</span>
+</a>
 <a title="File Management" href="/filemanager" class="nav_link <%= page === 'File Manager' && 'active-nav' %>">
     <i class="fas fa-folder-open text-purple"></i>
     <span class="nav_name ">File Manager</span>
@@ -20,4 +18,10 @@
     <i class="fas fa-toilet-paper text-purple"></i>
     <span class="nav_name ">Filament</span>
 </a>
+<% if(currentUserGroup === "Administrator"){ %>
+    <a title="Printer Management" href="/printers" class="nav_link <%= page === 'Printer Manager' && 'active-nav' %>">
+        <i class="fas fa-print text-purple"></i>
+        <span class="nav_name ">Printers</span>
+    </a>
+<% } %>
 

@@ -106,7 +106,7 @@ class Logs {
       }
     });
 
-    zipDumpResponse.zipDumpPath = createZipFile(
+    zipDumpResponse.zipDumpPath = await createZipFile(
       `octofarm_dump-${generateTodayTextString()}.zip`,
       fileList
     );

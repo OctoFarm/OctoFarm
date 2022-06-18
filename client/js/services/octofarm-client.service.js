@@ -3,7 +3,7 @@ import { ApplicationError } from "../exceptions/application-error.handler";
 import { HTTPError } from "../exceptions/octofarm-api.exceptions";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 import { createErrorToast } from "../utils/toast";
-import {getWhoopsyErrorTemplate} from "../templates/whoopsy-error.template";
+import { getWhoopsyErrorTemplate } from "../templates/whoopsy-error.template";
 
 //REFACTOR move out to utility file
 const prettyPrintStatusError = (errorString) => {
@@ -145,9 +145,6 @@ export default class OctoFarmClient {
   // static connectionOverviewRoute = `${this.printerRoute}/connectionOverview`;
   // static selectedFilamentRoute = `${this.printerRoute}/selectedFilament`;
 
-
-
-
   // General Data Calls
   static generalDataRoute = `${this.base}/data`;
   static patreonDataListRoute = `${this.generalDataRoute}/patreons`
@@ -178,6 +175,27 @@ export default class OctoFarmClient {
 
   static async saveNewThemeSettings(data){
     return this.#patch(this.saveThemeSettingsRoute, data);
+  }
+
+  // Logs calls
+  static logsRoute = `${this.base}/logs`;
+  static generateLogsRoute = `${this.logsRoute}/log_dump`;
+  static houseKeepLogsRoute = `${this.logsRoute}/house_keep`;
+
+  static async getSystemLogsList(){
+    return this.#get(this.logsRoute);
+  }
+  static async downloadSystemLog(logName){
+    return window.open(`${this.logsRoute}/${logName}`);
+  }
+  static async deleteSystemLog(logName) {
+    return this.#delete(`${this.logsRoute}/${logName}`);
+  }
+  static async generateLogDump(){
+    return this.#post(this.generateLogsRoute)
+  }
+  static async houseKeepLogs(){
+    return this.#delete(this.houseKeepLogsRoute);
   }
 
   // static async getPrinter(id) {
