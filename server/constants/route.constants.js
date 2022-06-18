@@ -18,8 +18,14 @@ const DATA = {
   SYSTEM_INFO: "/system-info"
 };
 
+const LOGS = {
+  LOG_DUMP: "/log_dump",
+  HOUSE_KEEP: "/house_keep"
+};
+
 module.exports = {
   ADMINISTRATION_BASE,
   ADMINISTRATION,
-  DATA
+  DATA,
+  LOGS
 };
