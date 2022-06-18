@@ -4,13 +4,13 @@
     </button>
     <ul class="dropdown-menu">
         <div class="ps-4 pe-4 text-center">
-            <p class="mb-1"><i class="far fa-user text-purple fa-2xl"></i></p>
+            <p class="mb-1"><i class="far fa-user text-purple fa-2xl m-3"></i></p>
             <p class="mb-2"><%= currentUser.name; %></p>
             <p class="mb-1"><%= currentUser.group; %></p>
         </div>
         <li><hr class="dropdown-divider"></li>
         <li><h6 class="dropdown-header">Settings</h6></li>
-        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#userSettingsModal"><i class="fa-solid fa-display text-purple"></i> User</a></li>
+        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#userSettingsModal"><i class="far fa-user text-purple text-purple"></i> User</a></li>
         <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client</a></li>
         <% if(currentUser.group === "Administrator"){ %>
             <li><h6 class="dropdown-header">Admin</h6></li>

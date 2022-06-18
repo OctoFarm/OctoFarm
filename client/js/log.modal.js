@@ -16,7 +16,7 @@ const generateLogDump = async () => {
    e.appendLoader(generateLogDumpBtn);
    const logDumpResponse = await OctoFarmClient.generateLogDump();
 
-   if(!!logDumpResponse){
+   if(!logDumpResponse){
        e.removeLoader(generateLogDumpBtn);
        return;
    }
@@ -28,6 +28,7 @@ const generateLogDump = async () => {
       return;
    }
 
+  zipDumpPath = logDumpResponse.zipDumpPath;
   createSuccessToast({ message: logDumpResponse.msg });
   downloadLogDumpBtn.classList.remove("d-none");
   e.removeLoader(generateLogDumpBtn);
