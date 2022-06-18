@@ -156,6 +156,12 @@ function serveOctoFarmRoutes(app) {
     require("./routes/non-specific-data.routes.js")
   );
   app.use(
+    `${AppConstants.apiRoute}/logs`,
+    ensureAuthenticated,
+    ensureAdministrator,
+    require("./routes/logs.routes.js", { page: "route" })
+  );
+  app.use(
     `${AppConstants.apiRoute}/administration`,
     ensureAuthenticated,
     ensureAdministrator,
