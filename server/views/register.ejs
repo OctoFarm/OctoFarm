@@ -5,7 +5,6 @@
 <% let password_invalid = ""; %>
 <% let username_invalid = ""; %>
 <% if(typeof errors !== "undefined"){ %>
-  <% console.log(errors) %>
   <% errors.forEach(error => { %>
     <% if(error.msg.includes("Password")) {  %>
       <% password_invalid = "is-invalid" %>
@@ -31,7 +30,7 @@
           alertMessage: "This will create your first administrator user for OctoFarm. Subsquent user registrations will be considered 'User' groups"
         })%>
       <% } %>
-      <form action="/users/register" method="POST">
+      <form action="/register" method="POST">
         <%- include(input, {
           inputType: "name",
           inputID: "name",
@@ -76,7 +75,7 @@
         </div>
       </form>
       <% if(userCount !== 0){ %>
-        <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
+        <p class="lead mt-4">Have An Account? <a href="/login">Login</a></p>
       <% } %>
     </div>
   </div>

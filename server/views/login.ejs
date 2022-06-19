@@ -12,7 +12,7 @@
     <div class="card card-body">
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt text-purple"></i> Login</h1>
       <%- include('./partials/messages') %>
-      <form action="/users/login" method="POST" class="needs-validation">
+      <form action="/login" method="POST" class="needs-validation">
         <%- include(input, {
           inputType: "text",
           inputID: "username",
@@ -43,7 +43,7 @@
       </form>
       <p class="lead mt-4">
         <% if(registration){ %> No Account?
-        <a href="/users/register">Register</a>
+        <a href="/register">Register</a>
         <% } %>
       </p>
     </div>
