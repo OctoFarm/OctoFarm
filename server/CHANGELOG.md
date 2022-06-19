@@ -1,5 +1,26 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.2.10](https://github.com/OctoFarm/OctoFarm/compare/1.2.9...1.2.10) (2022-06-19)
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** correct typos on printer manager hover hints fixed [#1101](https://github.com/OctoFarm/OctoFarm/issues/1101) ([0d3a3f3](https://github.com/OctoFarm/OctoFarm/commit/0d3a3f3159caba2c26a5bafcb618ae031f5c293a))
+* **client:** file manager would fail to load subsequent printers without current profile key ([3951e66](https://github.com/OctoFarm/OctoFarm/commit/3951e66cd219f1019d9ea025ee18c743ec117572))
+* **client:** fix power action on printer manager so it opens modal fixed [#1097](https://github.com/OctoFarm/OctoFarm/issues/1097) ([480bb94](https://github.com/OctoFarm/OctoFarm/commit/480bb94c7a1c9bb60a353330a0fc73ffd933a7f0))
+* **client:** fix update octofarm button so it runs restart command after update fixed [#1094](https://github.com/OctoFarm/OctoFarm/issues/1094) ([3e3aced](https://github.com/OctoFarm/OctoFarm/commit/3e3acedfd42d38c1fb37579fd52e12ad9b9f49f8))
+* **client:** usage bar would reset to 0 on page load ([8d2a086](https://github.com/OctoFarm/OctoFarm/commit/8d2a0860f231d40896ff7daf2461546475e41d2b))
+
+
+### :persevere: Code Refactors :persevere:
+
+* **client:** if no octofarm user is availble from history record display op user ([5eb0234](https://github.com/OctoFarm/OctoFarm/commit/5eb02340f80ae9a5ec1b32ba76e6d8e777b3bb4e))
+* **main:** add note to changelog about new location of changelog ([04c19f7](https://github.com/OctoFarm/OctoFarm/commit/04c19f7dd66c2255e41489d1e2c87d61703d566a))
+* **server:** always install dependencies with automated updater ([6ac7593](https://github.com/OctoFarm/OctoFarm/commit/6ac759366b902d63522d5f365e98ddd59d47d136))
+* **server:** replace fetch client command to check installed package not package.json ([752d0eb](https://github.com/OctoFarm/OctoFarm/commit/752d0ebd4d0519998ac53edd0a906172090bb6a6))
+* **server:** send history data to client ([32dba46](https://github.com/OctoFarm/OctoFarm/commit/32dba4668e4aba524aaa2fe8056c289874747986))
+* **server:** wait for stable websocket before checking if connection is in the toilet ([64928f2](https://github.com/OctoFarm/OctoFarm/commit/64928f26c0cd95976ab51db36baef0498f52d3ca))
+
 ### [1.2.9](https://github.com/OctoFarm/OctoFarm/compare/1.2.8...1.2.9) (2022-06-17)
 
 
