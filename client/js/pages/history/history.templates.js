@@ -1,5 +1,16 @@
 import UI from "../../utils/ui";
 
+const drawActiveUser = (record) => {
+  const noUser = "Unknown";
+  let userTemplate = record?.activeControlUser ? record.activeControlUser : noUser;
+
+  if(userTemplate === noUser){
+    userTemplate = `OctoPrint: ${record?.job?.user ? record.job.user : noUser }`
+  }
+
+  return userTemplate
+}
+
 export const returnHistoryTableRow = function (record) {
   const spoolType = [];
   if (!!record?.spools) {
@@ -32,11 +43,7 @@ export const returnHistoryTableRow = function (record) {
             ${record.printer}
           </td>
           <td>
-            ${
-              record?.activeControlUser
-                ? record.activeControlUser
-                : "No user logged"
-            }
+            ${drawActiveUser(record)}
           </td>
           <td title="${record.file.path.replace(/_/g, " ")}">
             ${record.file.name.replace(/_/g, " ")}
