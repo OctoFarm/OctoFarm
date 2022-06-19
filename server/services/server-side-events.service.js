@@ -30,7 +30,9 @@ const addClientConnection = (req, res) => {
   const client = {
     id,
     res,
-    user: JSON.parse(JSON.stringify(req?.user))
+    user: JSON.parse(JSON.stringify(req?.user)),
+    endpoint: req.url ? JSON.parse(JSON.stringify(req.url)) : "unknown endpoint",
+    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
   };
   clientList.push(client);
 
@@ -65,7 +67,9 @@ const listActiveClients = (_req, res) => {
     return {
       connectionDate: client.id,
       userName: client?.user?.name ? client.user.name : UNKNOWN_USER,
-      group: client.user.group
+      group: client.user.group,
+      endpoint: client.endpoint,
+      ip: client.ip
     };
   });
   return res.json(currentActiveClientList);
