@@ -184,7 +184,7 @@ export default function currentOperationsService(
     currentOperationsCount?.offline ? "Offline: " + currentOperationsCount.offline : "Offline: " + 0;
 
   document.getElementById("farmProgress").innerHTML =
-    currentOperationsCount?.farmProgress ? currentOperationsCount.farmProgress : 0 + "%";
+    currentOperationsCount?.farmProgress ? currentOperationsCount.farmProgress + "%" : 0 + "%";
   document.getElementById(
     "farmProgress"
   ).style = `width: ${currentOperationsCount?.farmProgress ? currentOperationsCount.farmProgress : 0}%`;

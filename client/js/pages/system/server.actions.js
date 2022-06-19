@@ -468,7 +468,6 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     "settings/server/update/octofarm",
     updateData
   );
-  console.log(updateOctoFarm)
   // Local changes are detected, question whether we overwrite or cancel..
   if (
     updateOctoFarm.message.includes(
