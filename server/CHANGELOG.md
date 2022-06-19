@@ -1,5 +1,18 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.2.11](https://github.com/OctoFarm/OctoFarm/compare/1.2.10...1.2.11) (2022-06-19)
+
+
+### :persevere: Code Refactors :persevere:
+
+* **client:** display users ip address in active sessions ([8e7e178](https://github.com/OctoFarm/OctoFarm/commit/8e7e178bd1eda84ea537975269183b2027f37815))
+* **server:** capture client endpoint and ip ([f9f8c5b](https://github.com/OctoFarm/OctoFarm/commit/f9f8c5bdbdf26ec81216476da3b1d95116134f21))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** add in missing percent unit for current operations progress bar ([74cdee8](https://github.com/OctoFarm/OctoFarm/commit/74cdee8b70ced25ed5c9c33f325fd949e698f402))
+
 ### [1.2.10](https://github.com/OctoFarm/OctoFarm/compare/1.2.9...1.2.10) (2022-06-19)
 
 
