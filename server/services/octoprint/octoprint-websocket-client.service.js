@@ -46,7 +46,7 @@ class WebSocketClient {
   reconnectingIn = 0;
   currentThrottleRate = 1;
   throttleRateMeasurements = [];
-  throttleRateMeasurementsSize = 10;
+  throttleRateMeasurementsSize = 20;
   throttleBase = 500;
   upperThrottleHysteresis = 250;
   lowerThrottleHysteresis = 450;
@@ -323,6 +323,11 @@ class WebSocketClient {
       this.throttleRateMeasurements.shift();
     }
     this.throttleRateMeasurements.push(ms);
+
+
+    if (this.throttleRateMeasurements.length < 10) {
+      return;
+    }
     const throttleLimit = this.currentThrottleRate * this.throttleBase;
     const averageThrottleMeasurements =
       this.throttleRateMeasurements.reduce((a, b) => a + b, 0) /
