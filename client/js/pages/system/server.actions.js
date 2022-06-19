@@ -468,7 +468,7 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     "settings/server/update/octofarm",
     updateData
   );
-
+  console.log(updateOctoFarm)
   // Local changes are detected, question whether we overwrite or cancel..
   if (
     updateOctoFarm.message.includes(
@@ -483,23 +483,7 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     );
     return;
   }
-  // Local changes are detected, question whether we overwrite or cancel..
-  if (
-    updateOctoFarm.message.includes(
-      "You have missing dependencies that are required, Do you want to update these?"
-    )
-  ) {
-    bootbox.confirm();
-    return;
-  }
 
-  UI.createAlert(
-    `${updateOctoFarm?.statusTypeForUser}`,
-    `${updateOctoFarm?.message}`,
-    0,
-    "clicked"
-  );
-  UI.removeLoaderFromElementInnerHTML(updateOctoFarmBtn);
 
   if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
     UI.createAlert(
@@ -509,7 +493,16 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
       "Clicked"
     );
     await restartOctoFarmServer();
+    return;
   }
+
+  UI.createAlert(
+      `${updateOctoFarm?.statusTypeForUser}`,
+      `${updateOctoFarm?.message}`,
+      0,
+      "clicked"
+  );
+  UI.removeLoaderFromElementInnerHTML(updateOctoFarmBtn);
 }
 
 async function checkForOctoFarmUpdates() {
