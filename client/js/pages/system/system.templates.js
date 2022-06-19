@@ -1,7 +1,6 @@
 import Calc from "../../utils/calc";
 
 export const activeUserListRowTemplate = (user) => {
-    console.log(user)
   return `
       <div class="col-sm-12 col-md-4 col-lg-2">
         <div class="card text-white bg-dark mb-3">
