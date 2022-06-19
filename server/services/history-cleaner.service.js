@@ -90,7 +90,8 @@ class HistoryCleanerService {
       ? {
           actualPrintTime: printTime,
           estimatedPrintTime: job.estimatedPrintTime,
-          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000
+          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000,
+          user: job?.user ? job.user : "No OP User"
         }
       : null;
   }
