@@ -1,6 +1,3 @@
-<% const base = '../' %>
-<% const modal = base + '/octofarm-modal.ejs' %>
-
 <div class="row">
     <div class="col-12">
         <% let disabledUsers = "" %>
@@ -67,24 +64,3 @@
     </div>
 </div>
 
-<%- include(modal, {
-modal:{
-id:"usersResetPassword", title:"Reset Password", size: "modal-sm"
-},
-bodyFile:'./System/UserModals/userResetPassword.ejs'
-})
-%>
-<%- include(modal, {
-modal:{
-id:"userEdit", title:"Edit User", size: "modal-sm"
-},
-bodyFile:'./System/UserModals/userEdit.ejs'
-})
-%>
-<%- include(modal, {
-modal:{
-id:"userCreate", title:"Create User", size: "modal-sm"
-},
-bodyFile:'./System/UserModals/userCreate.ejs'
-})
-%>

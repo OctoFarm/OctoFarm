@@ -1,0 +1,32 @@
+<% let base = '../..' %>
+<% let infoAlert = base + '/octofarm-title-info.ejs' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+<% let checkBox = base + '/octofarm-checkbox.ejs' %>
+<% let selectBox = base + '/octofarm-select.ejs' %>
+
+<div class="row">
+    <div class="col-12">
+        <%- include(alert, {
+        alertType: "secondary",
+        alertMessage: "Your monitoring view settings that tweak the display on each of the views"
+        })
+        %>
+    </div>
+    <div class="col-12">
+        <%- include(infoAlert, {
+        title: "Additional Panels"
+        })
+        %>
+        <%- include(checkBox, {
+        checkboxID: "panelCurrentOpOn",
+        checkboxChecked: currentUser.clientSettings.views.currentOperations,
+        checkboxLabel: "Current Operations Panel",
+        checkboxOnLabel: "Current Operations will be shown",
+        checkboxOffLabel: "Current Operations will not be shown",
+        checkboxInfoText: "A panel at the top of the views that displays your currently active and completed prints. You can quickly see a "
+        + "minimal amount of relevant print status and restart prints."
+        })
+        %>
+        <hr>
+    </div>
+</div>

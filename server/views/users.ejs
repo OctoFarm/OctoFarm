@@ -1,0 +1,40 @@
+<!--// Settings Panel-->
+<% const base = './partials' %>
+<% const card = base + '/octofarm-card.ejs' %>
+<% const modal = base + '/octofarm-modal.ejs' %>
+
+<div class="row">
+    <div class="col-lg-12 h-100">
+        <%- include(card, {
+        tile:{
+        id:"userMenu",i:"fa-users-between-lines",title:"User Manager",class:"col-lg-12",
+        },
+        bodyFile:'./Users/usersMenu.ejs'
+        })
+        %>
+    </div>
+</div>
+
+
+<%- include(modal, {
+modal:{
+id:"usersResetPassword", title:"Reset Password", size: "modal-sm"
+},
+bodyFile:'./Users/UserModals/userResetPassword.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"userEdit", title:"Edit User", size: "modal-sm"
+},
+bodyFile:'./Users/UserModals/userEdit.ejs'
+})
+%>
+<%- include(modal, {
+modal:{
+id:"userCreate", title:"Create User", size: "modal-sm"
+},
+bodyFile:'./Users/UserModals/userCreate.ejs'
+})
+%>
+<!--<script src="/assets/dist/users.runner.min.js?<%= clientVersion %>" type="module"></script>-->
