@@ -132,7 +132,6 @@ function serveOctoFarmRoutes(app) {
   app.use(ensureClientServerInformation);
   //TODO migrate non-page routes to /api
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
     "/printers",
     printerActionLimits,
@@ -166,6 +165,12 @@ function serveOctoFarmRoutes(app) {
     ensureAuthenticated,
     ensureAdministrator,
     require("./routes/administration.routes.js", { page: "route" })
+  );
+  app.use(
+    `${AppConstants.apiRoute}/users`,
+    ensureAuthenticated,
+    ensureAdministrator,
+    require("./routes/users.routes.js", { page: "route" })
   );
 
   if (process.env[AppConstants.NODE_ENV_KEY] === "development") {
