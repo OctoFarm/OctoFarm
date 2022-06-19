@@ -1,0 +1,38 @@
+<% const base = "../.." %>
+<% const input = base + "/octofarm-input.ejs" %>
+<% const selectBox = base + "/octofarm-select.ejs" %>
+
+<div class="row">
+    <div id="userEditMessage" class="col-12">
+
+    </div>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "name",
+        inputID: "editName",
+        inputName: "name",
+        inputPlaceholder: "Enter Name",
+        inputAutoComplete: "name",
+        inputLabel: "New Name",
+        }) %>
+    </div>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "username",
+        inputID: "editUserName",
+        inputName: "username",
+        inputPlaceholder: "New Username",
+        inputAutoComplete: "name",
+        inputLabel: "Username",
+        }) %>
+    </div>
+    <div class="col-12 mb-3">
+        <%- include(selectBox, {
+        selectID: "editGroup",
+        selectLabel: "Group",
+        selectOptions: allowedUserGroups,
+        selectValue: "user"
+        })
+        %>
+    </div>
+</div>
