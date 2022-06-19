@@ -22,6 +22,13 @@ const {
   getLatestReleaseNotes,
   getFutureReleaseNote
 } = require("../services/github-client.service");
+const { fetchUsers } = require("../services/users.service");
+const passport = require("passport");
+const { UserTokenService } = require("../services/authentication/user-token.service");
+const User = require("../models/User");
+const ClientSettings = require("../models/ClientSettings");
+const bcrypt = require("bcryptjs");
+const ServerSettingsDB = require("../models/ServerSettings");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -304,6 +311,24 @@ router.get("/filament", ensureAuthenticated, ensureCurrentUserAndGroup, async (r
 });
 
 router.get(
+  "/users",
+  ensureAuthenticated,
+  ensureCurrentUserAndGroup,
+  ensureAdministrator,
+  async (_req, res) => {
+    res.render("users", {
+      page: "Users",
+      helpers: prettyHelpers,
+      userList: await fetchUsers(),
+      allowedUserGroups: [
+        { display: "Administrator", value: "administrator" },
+        { display: "User", value: "user" }
+      ]
+    });
+  }
+);
+
+router.get(
   "/administration",
   ensureAuthenticated,
   ensureCurrentUserAndGroup,
@@ -327,5 +352,191 @@ router.get(
     });
   }
 );
+
+// Login Page
+router.get("/login", async (_req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  res.render("login", {
+    layout: "layout-no-sign-in",
+    page: "Login",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    registration: serverSettings.server.registration,
+    serverSettings: serverSettings
+  });
+});
+
+// Login Handle
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    // Dont add or we wont reach remember_me cookie successRedirect: "/dashboard",
+    failureRedirect: "/login",
+    failureFlash: true
+  }),
+  async function (req, res, next) {
+    const prevSession = req.session;
+    req.session.regenerate((err) => {
+      logger.error("Unable to regenerate session!", err);
+      Object.assign(req.session, prevSession);
+    });
+
+    if (!req.body.remember_me) {
+      return next();
+    }
+    await UserTokenService.issueTokenWithDone(req.user, function (err, token) {
+      if (err) {
+        return next(err);
+      }
+
+      res.cookie("remember_me", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 604800000
+      });
+      return next();
+    });
+  },
+  (_req, res) => {
+    res.redirect("/dashboard");
+  }
+);
+
+// Register Page
+router.get("/register", async (_req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    layout: "layout-no-sign-in",
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: serverSettings,
+    userCount: currentUsers.length
+  });
+});
+
+// Register Handle
+router.post("/register", async (req, res) => {
+  const name = req.bodyString("name");
+  const username = req.bodyString("username");
+  const password = req.bodyString("password");
+  const password2 = req.bodyString("password2");
+
+  const errors = [];
+
+  const serverSettings = SettingsClean.returnSystemSettings();
+  let currentUsers = await fetchUsers(true);
+
+  // Check required fields
+  if (!name || !username || !password || !password2) {
+    errors.push({ msg: "Please fill in all fields..." });
+  }
+
+  // Check passwords match
+  if (password !== password2) {
+    errors.push({ msg: "Passwords do not match..." });
+  }
+
+  // Password at least 6 characters
+  if (password.length < 6) {
+    errors.push({ msg: "Password should be at least 6 characters..." });
+  }
+
+  if (errors.length > 0) {
+    res.render("register", {
+      page: "Login",
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      registration: serverSettings.server.registration,
+      serverSettings: serverSettings,
+      errors,
+      name,
+      username,
+      password,
+      password2,
+      userCount: currentUsers.length
+    });
+  } else {
+    // Validation Passed
+    User.findOne({ username }).then((currentUser) => {
+      if (currentUser) {
+        // User exists
+        errors.push({ msg: "Username is already registered" });
+        res.render("register", {
+          page: "Login",
+          octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+          registration: serverSettings.server.registration,
+          serverSettings: serverSettings,
+          errors,
+          name,
+          username,
+          password,
+          password2,
+          userCount: currentUsers.length
+        });
+      } else {
+        // Check if first user that's created.
+        User.find({}).then(async (userList) => {
+          let userGroup;
+          if (userList.length < 1) {
+            userGroup = "Administrator";
+          } else {
+            userGroup = "User";
+          }
+          const userSettings = new ClientSettings();
+          await userSettings.save();
+          await SettingsClean.start();
+          const newUser = new User({
+            name,
+            username,
+            password,
+            group: userGroup,
+            clientSettings: userSettings._id
+          });
+          // Hash Password
+          bcrypt.genSalt(10, (error, salt) =>
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) {
+                logger.error("Unable to generate bycrpt hash!!", err);
+                throw err;
+              }
+              // Set password to hashed
+              newUser.password = hash;
+              // Save new User
+              newUser
+                .save()
+                .then(async () => {
+                  if (userList.length < 1) {
+                    const currentSettings = await ServerSettingsDB.find({});
+                    currentSettings[0].server.registration = false;
+                    currentSettings[0].markModified("server.registration");
+                    currentSettings[0].save();
+                    await SettingsClean.start();
+                  }
+                  req.flash("success_msg", "You are now registered and can login");
+                  res.redirect("/login");
+                })
+                .catch((theError) => {
+                  logger.error("Couldn't save user to database!", theError);
+                })
+                .finally(async () => {
+                  await fetchUsers(true);
+                });
+            })
+          );
+        });
+      }
+    });
+  }
+});
+
+// Logout Handle
+router.get("/logout", (req, res) => {
+  req.logout();
+  req.flash("success_msg", "You are logged out");
+  res.redirect("/login");
+});
 
 module.exports = router;
