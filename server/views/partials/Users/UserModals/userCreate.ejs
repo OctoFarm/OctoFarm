@@ -1,0 +1,58 @@
+<% const base = "../.." %>
+<% const input = base + "/octofarm-input.ejs" %>
+<% const selectBox = base + "/octofarm-select.ejs" %>
+
+<div class="row">
+    <div id="userCreateMessage" class="col-12">
+
+    </div>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "name",
+        inputID: "createName",
+        inputName: "name",
+        inputPlaceholder: "Enter Name",
+        inputAutoComplete: "name",
+        inputLabel: "New Name",
+        }) %>
+    </div>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "username",
+        inputID: "createUserName",
+        inputName: "username",
+        inputPlaceholder: "Enter Username",
+        inputAutoComplete: "name",
+        inputLabel: "Username",
+        }) %>
+    </div>
+    <div class="col-12 mb-3">
+        <%- include(selectBox, {
+        selectID: "createGroup",
+        selectLabel: "Group",
+        selectOptions: allowedUserGroups,
+        selectValue: "user"
+        })
+        %>
+    </div>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "password",
+        inputID: "createPassword",
+        inputName: "password",
+        inputPlaceholder: "Password",
+        inputAutoComplete: "new-password",
+        inputLabel: "Password",
+        }) %>
+    </div><br>
+    <div class="col-12">
+        <%- include(input, {
+        inputType: "password",
+        inputID: "createPassword2",
+        inputName: "password2",
+        inputPlaceholder: "Confirm Password",
+        inputAutoComplete: "new-password",
+        inputLabel: "Confirm Password",
+        }) %>
+    </div>
+</div>
