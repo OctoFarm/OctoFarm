@@ -225,6 +225,28 @@ export const noFilesToShow = () => {
     `;
 };
 
+export const printerProfileTemplate = (printer) => {
+    let defaultProfileString = "<i class=\"fas fa-cube\"></i> Couldn't find profile";
+
+    const { currentProfile } = printer;
+
+    if(!!currentProfile){
+        defaultProfileString = `<b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm`
+    }
+
+    return `
+    <small class="pt-2 float-left">
+        ${defaultProfileString}
+    </small>
+    <br><!--Fix for firefox-->
+    <small class="pt-2 pb-2 float-left"><i class="fas fa-pen"></i> <b>Extruders:</b>
+       ${printer.currentProfile.extruder.count}
+       <b>Nozzle Size:</b> 
+       ${printer.currentProfile.extruder.nozzleDiameter}mm
+    </small>
+    `
+}
+
 export const printerTemplate = (printer, storageWarning, extruderList) => {
   return `
           <a
@@ -259,16 +281,8 @@ export const printerTemplate = (printer, storageWarning, extruderList) => {
                 <div class="row">
 
                 </div>
-                  <small class="pt-2 float-left"
-                  ><i class="fas fa-cube"></i> <b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm</small
-                ><br><!--Fix for firefox-->
-                <small class="pt-2 pb-2 float-left"
-                  ><i class="fas fa-pen"></i> <b>Extruders:</b>
-                  ${printer.currentProfile.extruder.count}
-                  <b>Nozzle Size:</b> 
-                  ${printer.currentProfile.extruder.nozzleDiameter}mm</small
-                >
-                                ${extruderList}
+                ${printerProfileTemplate(printer)}
+                ${extruderList}
               </div>
             </div>
           </a>
