@@ -8,7 +8,6 @@ const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const {
   getDashboardStatistics,
-  getCurrentOperations,
   generateDashboardStatistics
 } = require("../services/printer-statistics.service");
 
@@ -44,7 +43,6 @@ router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async functi
 async function sendData() {
   await generateDashboardStatistics();
 
-  const currentOperations = getCurrentOperations();
   const dashStatistics = getDashboardStatistics();
   const printerInformation = getPrinterStoreCache().listPrintersInformation();
 
@@ -66,7 +64,6 @@ async function sendData() {
 
     const infoDrop = {
       printerInformation,
-      currentOperations,
       dashStatistics,
       dashboardSettings
     };
