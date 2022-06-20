@@ -1,5 +1,21 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+## [1.3.0](https://github.com/OctoFarm/OctoFarm/compare/1.2.11...1.3.0) (2022-06-20)
+
+
+### :persevere: Code Refactors :persevere:
+
+* **client:** allow filament, history, file manager and printers to display current op ([7aae27a](https://github.com/OctoFarm/OctoFarm/commit/7aae27aeebc9296304b55209cebf78b9885cad87))
+* **client:** update client current operations when event triggered from server ([393a649](https://github.com/OctoFarm/OctoFarm/commit/393a6499de6eff21e7801dd8ee8b3201a41214a6))
+* **server:** create self contained current operations service ([cece76b](https://github.com/OctoFarm/OctoFarm/commit/cece76b16f51e80d4a0ee0717c7594ccb71f0bba))
+* **server:** update mongodb schema to support current operations on various pages ([1019d76](https://github.com/OctoFarm/OctoFarm/commit/1019d768b28d743fc7871f820d71de31dc9a393c))
+* **server:** utilise events service when current operations is generated ([c52255b](https://github.com/OctoFarm/OctoFarm/commit/c52255bf4addf8cef800a838b2b7f0b8132365d2))
+
+
+### :stars: New Features :stars:
+
+* **client:** allow user to add current operations to printers, history, file and filament manager ([b5bddea](https://github.com/OctoFarm/OctoFarm/commit/b5bddea47ab6cc2cf7256db99f828ec1eff87724))
+
 ### [1.2.11](https://github.com/OctoFarm/OctoFarm/compare/1.2.10...1.2.11) (2022-06-19)
 
 
