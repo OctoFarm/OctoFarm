@@ -4,6 +4,11 @@
 <% let modal = base + '/octofarm-modal.ejs' %>
 
 <div class="row">
+    <% if(clientSettings.filamentManager.currentOperations){%> <%-
+    include('./partials/currentOperations.ejs') %>
+    <% }%>
+</div>
+<div class="row">
     <div class="col-sm-12 col-md-4 col-lg-2">
         <%- include(card, {
             tile:{

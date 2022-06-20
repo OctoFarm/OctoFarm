@@ -1,6 +1,10 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
-
-<div class="row mt-3 mx-2">
+<div class="row">
+  <% if(clientSettings.history.currentOperations){%> <%-
+  include('./partials/currentOperations.ejs') %>
+  <% }%>
+</div>
+<div class="row">
   <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
       <div class="col-md-4 col-lg-4">
