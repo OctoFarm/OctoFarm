@@ -6,6 +6,8 @@ const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_CURRENT_OPERATIONS);
 const _ = require("lodash");
+const { notifySubscribers } = require("../services/server-side-events.service");
+const { MESSAGE_TYPES } = require("../constants/sse.constants");
 
 const currentOperations = getEmptyOperationsObject();
 
@@ -101,6 +103,7 @@ const sortCurrentOperations = async () => {
     const iterie = [currentIterie];
     const order = [currentOrder];
     currentOperations.operations = _.orderBy(operations, iterie, order);
+    notifySubscribers("currentOperations", MESSAGE_TYPES.CURRENT_OPERATIONS, currentOperations);
   } catch (err) {
     logger.error(`Current Operations issue: ${err}`);
   }
