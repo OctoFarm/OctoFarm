@@ -11,6 +11,26 @@
                id="system-dashboard-list" data-toggle="list"
                href="#system-dashboard" role="tab" aria-controls="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="system-dashboard-list" data-toggle="list"
+               href="#system-printer-manager" role="tab" aria-controls="dashboard"><i class="fas fa-print"></i> Printers</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="system-dashboard-list" data-toggle="list"
+               href="#system-file-manager" role="tab" aria-controls="dashboard"><i class="fas fa-folder-open"></i> File Manager</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="system-dashboard-list" data-toggle="list"
+               href="#system-history" role="tab" aria-controls="dashboard"><i class="fas fa-history"></i> History</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="system-dashboard-list" data-toggle="list"
+               href="#system-filament-manager" role="tab" aria-controls="dashboard"><i class="fas fa-toilet-paper"></i> Filament Manager</a>
+        </li>
     </ul>
 
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
@@ -432,7 +452,102 @@
                 </div>
 
             </div>
-
+            <div class="tab-pane fade" id="system-printer-manager" role="tabpanel"
+                 aria-labelledby="dashboard-monitoring-list">
+                <h4>Printer Manager Visibility</h4><hr>
+                <p>Enable and disable different parts of the UI on the Printer Manager page.</p>
+                <div class="row">
+                    <div class="col-3">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="printerManagerCurrentOp" required>
+                                <label class="custom-control-label"
+                                       for="printerManagerCurrentOp">Current
+                                    Operations</label>
+                                <div class="valid-feedback">Current Operations will
+                                    be shown on printer manager.
+                                </div>
+                                <div class="invalid-feedback">Current Operations
+                                    will not be shown on printer manager.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="system-file-manager" role="tabpanel"
+                 aria-labelledby="dashboard-monitoring-list">
+                <h4>File Manager Visibility</h4><hr>
+                <p>Enable and disable different parts of the UI on File Manager page.</p>
+                <div class="row">
+                    <div class="col-3">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="fileManagerCurrentOp" required>
+                                <label class="custom-control-label"
+                                       for="fileManagerCurrentOp">Current
+                                    Operations</label>
+                                <div class="valid-feedback">Current Operations will
+                                    be shown on file manager.
+                                </div>
+                                <div class="invalid-feedback">Current Operations
+                                    will not be shown on file manager.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="system-history" role="tabpanel"
+                 aria-labelledby="dashboard-monitoring-list">
+                <h4>History Visibility</h4><hr>
+                <p>Enable and disable different parts of the UI on the History page.</p>
+                <div class="row">
+                    <div class="col-3">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="historyCurrentOp" required>
+                                <label class="custom-control-label"
+                                       for="historyCurrentOp">Current
+                                    Operations</label>
+                                <div class="valid-feedback">Current Operations will
+                                    be shown on history.
+                                </div>
+                                <div class="invalid-feedback">Current Operations
+                                    will not be shown on history.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="system-filament-manager" role="tabpanel"
+                 aria-labelledby="dashboard-monitoring-list">
+                <h4>Filament Manager Visibility</h4><hr>
+                <p>Enable and disable different parts of the UI on Filament Manager page.</p>
+                <div class="row">
+                    <div class="col-3">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="filamentManagerCurrentOp" required>
+                                <label class="custom-control-label"
+                                       for="filamentManagerCurrentOp">Current
+                                    Operations</label>
+                                <div class="valid-feedback">Current Operations will
+                                    be shown on filament manager.
+                                </div>
+                                <div class="invalid-feedback">Current Operations
+                                    will not be shown on filament manager.
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

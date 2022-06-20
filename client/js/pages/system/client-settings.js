@@ -12,6 +12,10 @@ export default class ClientSettings {
       clientSettings.views.showOffline;
     document.getElementById("panelHideClosed").checked =
       clientSettings.views.showDisconnected;
+    document.getElementById("printerManagerCurrentOp").checked = clientSettings.printerManager.currentOperations;
+    document.getElementById("fileManagerCurrentOp").checked = clientSettings.fileManager.currentOperations;
+    document.getElementById("historyCurrentOp").checked = clientSettings.history.currentOperations;
+    document.getElementById("filamentManagerCurrentOp").checked = clientSettings.filamentManager.currentOperations;
 
     if (clientSettings.views.cameraColumns) {
       document.getElementById("selectCameraGrid").value =
@@ -77,7 +81,6 @@ export default class ClientSettings {
         cameraColumns: document.getElementById("selectCameraGrid").value,
         groupColumns: document.getElementById("selectGroupGrid").value,
       },
-
       dashboard: {
         defaultLayout: [
           { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },
@@ -149,6 +152,18 @@ export default class ClientSettings {
           timeAndDate: document.getElementById("dateAndTime").checked,
         },
       },
+      printerManager: {
+        currentOperations: document.getElementById("printerManagerCurrentOp").checked
+      },
+      fileManager: {
+        currentOperations: document.getElementById("fileManagerCurrentOp").checked
+      },
+      history: {
+        currentOperations: document.getElementById("historyCurrentOp").checked
+      },
+      filamentManager: {
+        currentOperations: document.getElementById("filamentManagerCurrentOp").checked
+      }
     };
     await OctoFarmClient.post("settings/client/update", opts);
     UI.createAlert("success", "Client settings updated", 3000, "clicked");
