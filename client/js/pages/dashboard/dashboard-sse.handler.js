@@ -1,23 +1,13 @@
 import { DashUpdate } from "./dashboard.updater";
 import UI from "../../utils/ui";
-import currentOperationsPanelRunner from "../../current-operations-panel.runner";
 
 export const workerURL = "/dashboardInfo/get/";
 
 //REFACTOR move over the proper SSE Handler... no need for it to have it's own.
 export async function dashboardSSEventHandler(data) {
   if (data) {
-    const currentOperationsData = data.currentOperations;
-    const printerInfo = data.printerInformation;
     const dashboard = data.dashStatistics;
     const dashboardSettings = data.dashboardSettings;
-    if (dashboardSettings.farmActivity.currentOperations) {
-      currentOperationsPanelRunner(
-        currentOperationsData.operations,
-        currentOperationsData.count,
-        printerInfo
-      );
-    }
 
     DashUpdate.farmInformation(
       dashboard.timeEstimates,

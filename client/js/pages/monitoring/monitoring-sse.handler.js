@@ -1,4 +1,3 @@
-import currentOperationsPanelRunner from "../../current-operations-panel.runner";
 import { getViewType, setMonitoringPrinterInfo } from "./monitoring-view.state";
 import { initMonitoring } from "./monitoring.updater";
 
@@ -19,13 +18,5 @@ export async function monitoringSSEventHandler(data) {
     }
 
     await initMonitoring(printerInfo, data.clientSettings, getViewType());
-    if (data.clientSettings.views.currentOperations) {
-      const currentOperationsData = data.currentOperations;
-      currentOperationsPanelRunner(
-        currentOperationsData.operations,
-        currentOperationsData.count,
-        printerInfo
-      );
-    }
   }
 }

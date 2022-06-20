@@ -1,6 +1,7 @@
 import { asyncParse, debounce } from "./utils/sse.utils";
 import { MESSAGE_TYPES } from "../../server/constants/sse.constants";
 import { updateLiveFileInformation } from "./pages/file-manager/file-manager-sse.handler";
+import currentOperationsPanelService from "./services/current-operations-panel.service";
 import {
   triggerCountDownTimer,
   drawModal,
@@ -103,6 +104,11 @@ function setupEventSource() {
 
     if (type === MESSAGE_TYPES.FILE_UPDATE) {
       await updateLiveFileInformation(id, message);
+    }
+
+    if (type === MESSAGE_TYPES.CURRENT_OPERATIONS){
+     const { operations, count } = message;
+     await currentOperationsPanelService(operations, count);
     }
   };
   evtSource.onopen = function (e) {
