@@ -151,6 +151,34 @@ const ClientSettingsSchema = new mongoose.Schema({
       required: true,
       default: 4
     }
+  },
+  fileManager: {
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  },
+  printerManager: {
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  },
+  filamentManager: {
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
+  },
+  history: {
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
   }
 });
 
