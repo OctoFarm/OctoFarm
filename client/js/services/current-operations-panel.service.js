@@ -141,7 +141,7 @@ export default function currentOperationsPanelService(
   currentOperations,
   currentOperationsCount
 ) {
-  const currentOperationsPanel = document.getElementById("currentOperations");
+  const currentOperationsPanel = document.getElementById("currentOperationsPanel");
   if(!currentOperationsPanel){
       return;
   }
