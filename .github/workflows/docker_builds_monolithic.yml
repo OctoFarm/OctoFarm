@@ -1,6 +1,5 @@
 name: Docker Monolithic
 on:
-  pull_request:
   workflow_run:
     workflows: [ Release Master Version ]
     types:

@@ -22,7 +22,11 @@ const swaggerOptions = require("./middleware/swagger");
 const { AppConstants } = require("./constants/app.constants");
 const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
-const { ensureClientServerVersion } = require("./middleware/client-server-version");
+const { ensureClientServerInformation } = require("./middleware/server-information");
+const { ensureAuthenticated } = require("./middleware/auth");
+const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
+const { ensureAdministrator } = require("./middleware/auth.js");
+
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
