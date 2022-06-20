@@ -4,7 +4,6 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
-const { getCurrentOperations } = require("../services/printer-statistics.service");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_SSE_OLD);
@@ -100,8 +99,6 @@ async function sendData() {
     logger.error("Unable to clean and write information to influx database!", e.toString());
   }
 
-  const currentOperations = getCurrentOperations();
-
   let printersInformation = getPrinterStoreCache().listPrintersInformationForMonitoringViews();
 
   printersInformation = await filterMe(printersInformation);
@@ -120,7 +117,6 @@ async function sendData() {
     }
     const infoDrop = {
       printersInformation: printersInformation,
-      currentOperations: currentOperations,
       printerControlList: printerControlList,
       clientSettings: clientSettings
     };

@@ -1,6 +1,6 @@
 import { DashUpdate } from "./dashboard.updater";
 import UI from "../../utils/ui";
-import currentOperationsService from "../../services/current-operations.service";
+import currentOperationsPanelRunner from "../../current-operations-panel.runner";
 
 export const workerURL = "/dashboardInfo/get/";
 
@@ -12,7 +12,7 @@ export async function dashboardSSEventHandler(data) {
     const dashboard = data.dashStatistics;
     const dashboardSettings = data.dashboardSettings;
     if (dashboardSettings.farmActivity.currentOperations) {
-      currentOperationsService(
+      currentOperationsPanelRunner(
         currentOperationsData.operations,
         currentOperationsData.count,
         printerInfo

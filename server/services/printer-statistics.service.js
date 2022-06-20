@@ -5,10 +5,9 @@ const { checkNested, checkNestedIndex, sumValuesGroupByDate } = require("../util
 const RoomData = require("../models/RoomData");
 const {
   getDefaultDashboardStatisticsObject,
-  getEmptyOperationsObject,
   getEmptyToolTemperatureArray
 } = require("../constants/cleaner.constants");
-const { returnCurrentOrdering } = require("./current-operations-order.service");
+const { getCurrentOperations } = require("./current-operations.service");
 const { getHeatMap, heatMapping } = require("./farm-information.service");
 const { PrinterClean } = require("./printer-cleaner.service");
 const Logger = require("../handlers/logger");
@@ -17,7 +16,6 @@ const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_PRINTER_STATISTICS);
 
 const dashboardStatistics = getDefaultDashboardStatisticsObject();
-const currentOperations = getEmptyOperationsObject();
 const currentHistoryTemp = getEmptyToolTemperatureArray();
 
 let heatMapCounter = 17280;
@@ -25,9 +23,7 @@ let heatMapCounter = 17280;
 const getDashboardStatistics = () => {
   return dashboardStatistics;
 };
-const getCurrentOperations = () => {
-  return currentOperations;
-};
+
 const getCurrentHistoryTemp = () => {
   return currentHistoryTemp;
 };
@@ -250,6 +246,7 @@ const generatePrinterStatistics = async (id) => {
 
 const generateDashboardStatistics = async () => {
   const historyStats = getHistoryCache().statisticsClean;
+  const currentOperations = getCurrentOperations();
 
   dashboardStatistics.currentUtilisation = [
     {
@@ -672,84 +669,9 @@ const generateDashboardStatistics = async () => {
     });
 };
 
-const sortCurrentOperations = async () => {
-  const farmPrinters = getPrinterStoreCache().listPrintersInformation();
-  const complete = [];
-  const active = [];
-  const idle = [];
-  const offline = [];
-  const disconnected = [];
-  const progress = [];
-  const operations = [];
+const generatePrinterHeatMap = async () => {
   try {
-    for (let i = 0; i < farmPrinters.length; i++) {
-      const printer = farmPrinters[i];
-      if (typeof printer !== "undefined") {
-        const name = printer.printerName;
-
-        if (typeof printer.printerState !== "undefined") {
-          if (printer.printerState.colour.category === "Idle") {
-            idle.push(printer._id);
-          }
-          if (printer.printerState.colour.category === "Offline") {
-            offline.push(printer._id);
-          }
-          if (printer.printerState.colour.category === "Disconnected") {
-            disconnected.push(printer._id);
-          }
-        }
-
-        if (typeof printer.printerState !== "undefined" && printer.currentJob != null) {
-          let id = printer._id;
-          id = id.toString();
-          if (printer.printerState.colour.category === "Complete") {
-            complete.push(printer._id);
-            progress.push(printer.currentJob.progress);
-            operations.push({
-              index: id,
-              sortIndex: printer.sortIndex,
-              name,
-              progress: Math.floor(printer.currentJob.progress),
-              progressColour: "success",
-              timeRemaining: printer.currentJob.printTimeRemaining,
-              fileName: printer.currentJob.fileDisplay
-            });
-          }
-
-          if (
-            printer.printerState.colour.category === "Active" &&
-            typeof printer.currentJob !== "undefined"
-          ) {
-            active.push(printer._id);
-            progress.push(printer.currentJob.progress);
-            operations.push({
-              index: id,
-              sortIndex: printer.sortIndex,
-              name,
-              progress: Math.floor(printer.currentJob.progress),
-              progressColour: "warning",
-              timeRemaining: printer.currentJob.printTimeRemaining,
-              fileName: printer.currentJob.fileDisplay
-            });
-          }
-        }
-      }
-    }
-
-    const actProg = progress.reduce((a, b) => a + b, 0);
-
-    currentOperations.count.farmProgress = Math.floor(actProg / progress.length);
-
-    if (isNaN(currentOperations.count.farmProgress)) {
-      currentOperations.count.farmProgress = 0;
-    }
-    if (currentOperations.count.farmProgress === 100) {
-      currentOperations.count.farmProgressColour = "success";
-    } else {
-      currentOperations.count.farmProgressColour = "warning";
-    }
-    // 17280
-
+    const currentOperations = getCurrentOperations();
     if (heatMapCounter >= 17280) {
       await heatMapping(
         currentOperations.count.complete,
@@ -762,18 +684,6 @@ const sortCurrentOperations = async () => {
     } else {
       heatMapCounter += 1728;
     }
-
-    currentOperations.count.printerCount = farmPrinters.length;
-    currentOperations.count.complete = complete.length;
-    currentOperations.count.active = active.length;
-    currentOperations.count.offline = offline.length;
-    currentOperations.count.idle = idle.length;
-    currentOperations.count.disconnected = disconnected.length;
-
-    const { currentIterie, currentOrder } = returnCurrentOrdering();
-    const iterie = [currentIterie];
-    const order = [currentOrder];
-    currentOperations.operations = _.orderBy(operations, iterie, order);
   } catch (err) {
     logger.error(`Current Operations issue: ${err}`);
   }
@@ -782,7 +692,7 @@ const sortCurrentOperations = async () => {
 module.exports = {
   generatePrinterStatistics,
   generateDashboardStatistics,
-  sortCurrentOperations,
+  generatePrinterHeatMap,
   getDashboardStatistics,
   getCurrentOperations,
   getCurrentHistoryTemp

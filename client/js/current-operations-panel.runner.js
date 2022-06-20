@@ -1,6 +1,6 @@
-import Calc from "../utils/calc.js";
-import OctoPrintClient from "./octoprint/octoprint-client.service.js";
-import OctoFarmClient from "./octofarm-client.service";
+import Calc from "./utils/calc.js";
+import OctoPrintClient from "./services/octoprint/octoprint-client.service.js";
+import OctoFarmClient from "./services/octofarm-client.service";
 
 let printers = [];
 const resetFile = function (id) {
@@ -158,7 +158,7 @@ if (currentOperationsSorting) {
     });
 }
 
-export default function currentOperationsService(
+export default function currentOperationsPanelRunner(
   currentOperations,
   currentOperationsCount,
   printerInfo

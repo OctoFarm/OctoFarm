@@ -15,7 +15,8 @@ const {
 } = require("./store/octoprint-plugin-list.store");
 const { getInfluxCleanerCache } = require("./cache/influx-export.cache");
 const { FileClean } = require("./services/file-cleaner.service");
-const { sortCurrentOperations } = require("./services/printer-statistics.service");
+const { sortCurrentOperations } = require("./services/current-operations.service");
+const { generatePrinterHeatMap } = require("./services/printer-statistics.service");
 const { initFarmInformation } = require("./services/farm-information.service");
 const { notifySubscribers } = require("./services/server-side-events.service");
 const { fetchClientVersion } = require("./app-env");
@@ -53,6 +54,10 @@ const START_PRINTER_ADD_QUEUE = async () => {
 const SORT_CURRENT_OPERATIONS = async () => {
   const printerList = getPrinterStoreCache().listPrintersInformation();
   await sortCurrentOperations(printerList);
+};
+
+const GENERATE_PRINTER_HEAT_MAP = async () => {
+  await generatePrinterHeatMap();
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -161,6 +166,7 @@ class OctoFarmTasks {
     TaskStart(INIT_FARM_INFORMATION, TaskPresets.RUNONCE),
     TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE),
     TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
+    TaskStart(GENERATE_PRINTER_HEAT_MAP, TaskPresets.PERIODIC_1000MS),
     TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
