@@ -1,36 +1,15 @@
-import Calc from "./utils/calc.js";
-import OctoPrintClient from "./services/octoprint/octoprint-client.service.js";
-import OctoFarmClient from "./services/octofarm-client.service";
+import Calc from "../utils/calc.js";
+import OctoPrintClient from "./octoprint/octoprint-client.service.js";
+import OctoFarmClient from "./octofarm-client.service";
 
-let printers = [];
-const resetFile = function (id) {
-  const i = _.findIndex(printers, function (o) {
-    return o._id === id;
-  });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "load");
+const resetFile = async function (id) {
+  const printer = await OctoFarmClient.getPrinter(id);
+  await OctoPrintClient.file(printer, printer.currentJob.filePath, "load");
 };
-const rePrint = function (id) {
-  const i = _.findIndex(printers, function (o) {
-    return o._id === id;
-  });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "print");
+const rePrint = async function (id) {
+    const printer = await OctoFarmClient.getPrinter(id);
+    await OctoPrintClient.file(printer, printer.currentJob.filePath, "print");
 };
-const currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
-currentHarvest.forEach((harvest) => {
-  harvest.addEventListener("click", () => {
-    const id = harvest.id.split("-");
-    resetFile(id[1]);
-  });
-});
-const currentRestartPrint = document.querySelectorAll(
-  "[id^='restartCurrentPrint-']"
-);
-currentRestartPrint.forEach((harvest) => {
-  harvest.addEventListener("click", () => {
-    const id = harvest.id.split("-");
-    rePrint(id[1]);
-  });
-});
 const currentOperationsSorting = document.getElementById(
   "currentOperationsSort"
 );
@@ -158,12 +137,15 @@ if (currentOperationsSorting) {
     });
 }
 
-export default function currentOperationsPanelRunner(
+export default function currentOperationsPanelService(
   currentOperations,
-  currentOperationsCount,
-  printerInfo
+  currentOperationsCount
 ) {
-  printers = printerInfo;
+  const currentOperationsPanel = document.getElementById("currentOperations");
+  if(!currentOperationsPanel){
+      return;
+  }
+
   if (!currentOperations || currentOperations.length === 0) {
     const currentCards = document.querySelectorAll("[id^='coCard-']");
     currentCards.forEach((card) => {
@@ -308,19 +290,13 @@ export default function currentOperationsPanelRunner(
               );
               document
                   .getElementById("currentHarvest-" + current.index)
-                  .addEventListener("click", () => {
-                      const id = document
-                          .getElementById("currentHarvest-" + current.index)
-                          .id.split("-");
-                      resetFile(id[1]);
+                  .addEventListener("click", async () => {
+                      await resetFile(current.index);
                   });
               document
                   .getElementById("restartCurrentPrint-" + current.index)
-                  .addEventListener("click", () => {
-                      const id = document
-                          .getElementById("restartCurrentPrint-" + current.index)
-                          .id.split("-");
-                      rePrint(id[1]);
+                  .addEventListener("click", async () => {
+                      await rePrint(current.index);
                   });
           }
 
