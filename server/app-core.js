@@ -24,6 +24,12 @@ const { fetchSuperSecretKey } = require("./app-env");
 const { sanitizeString } = require("./utils/sanitize-utils");
 const { ensureClientServerVersion } = require("./middleware/client-server-version");
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+const { ensureAuthenticated } = require("./middleware/auth");
+const { validateParamsMiddleware } = require("./middleware/validators");
+const { proxyOctoPrintClientRequests } = require("./middleware/octoprint-proxy");
+const { proxyMjpegStreamRequests } = require("./middleware/camera-proxy");
+
+const M_VALID = require("./constants/validate-mongo.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
@@ -129,7 +135,18 @@ function serveOctoFarmRoutes(app) {
   app.use(ensureClientServerVersion);
 
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/camera", require("./routes/mjpeg-proxy.routes", { page: "route" }));
+  app.use(
+    "/camera/:id",
+    ensureAuthenticated,
+    validateParamsMiddleware(M_VALID.MONGO_ID),
+    proxyMjpegStreamRequests
+  );
+  app.use(
+    "/octoprint/:id/:item(*)",
+    ensureAuthenticated,
+    validateParamsMiddleware(M_VALID.MONGO_ID),
+    proxyOctoPrintClientRequests
+  );
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
     "/printers",
