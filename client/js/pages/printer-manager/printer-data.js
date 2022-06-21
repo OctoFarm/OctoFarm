@@ -207,26 +207,6 @@ function checkIfPrinterConnectionThrottled(printer) {
   UI.addDisplayNoneToElement(printerConnectionThrottled);
 }
 
-function corsWarningCheck(printer) {
-  const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
-  if (!printer.corsCheck) {
-    updateLogLine(
-      "corsCheck-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "corsCheck-" + printer._id,
-        name: "Cors is not enabled! Please enable, restart OctoPrint and force reconnect your printer! Manage -> Force Reconnect...",
-        printerName: printer.printerName,
-        colour: "Offline",
-      })
-    );
-    UI.removeDisplayNoneFromElement(corsAlert);
-  } else {
-    removeLogLine({ id: "corsCheck-" + printer._id });
-    UI.addDisplayNoneToElement(corsAlert);
-  }
-}
-
 function setupReconnectingIn(printer) {
   const { reconnectingIn, _id } = printer;
   const printerReScanButton = document.getElementById(
@@ -527,8 +507,6 @@ function updatePrinterRow(printer) {
       checkIfRestartRequired(printer);
 
       checkIfMultiUserIssueFlagged(printer);
-
-      corsWarningCheck(printer);
 
       //TODO make this work with ALL registered events, and only when the even is registered...
       //checkIfPrinterHasEvents(printer);
