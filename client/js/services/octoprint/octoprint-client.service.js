@@ -17,13 +17,9 @@ export default class OctoPrintClient {
 
   static get(printer, item) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/${item}`;
+    const url = `/octoprint/${printer._id}/${item}`;
     return fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
     }).catch((e) => {
       console.error(e);
       return e;
@@ -32,13 +28,9 @@ export default class OctoPrintClient {
 
   static postNOAPI(printer, item, data) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/${item}`;
+    const url = `/octoprint/${printer._id}/${item}`;
     return fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
       body: JSON.stringify(data),
     }).catch((e) => {
       console.error(e);
@@ -48,13 +40,9 @@ export default class OctoPrintClient {
 
   static post(printer, item, data) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/${item}`;
+    const url = `/octoprint/${printer._id}/api/${item}`;
     return fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
       body: JSON.stringify(data),
     }).catch((e) => {
       console.error(e);
@@ -64,12 +52,9 @@ export default class OctoPrintClient {
 
   static folder(printer, item, data) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/files/${item}`;
+    const url = `/octoprint/${printer._id}/api/files/${item}`;
     return fetch(url, {
       method: "POST",
-      headers: {
-        "X-Api-Key": printer.apikey,
-      },
       body: data,
     }).catch((e) => {
       console.error(e);
@@ -79,16 +64,25 @@ export default class OctoPrintClient {
 
   static async delete(printer, item) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/${item}`;
+    const url = `/octoprint/${printer._id}/api/${item}`;
     return fetch(url, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
     }).catch((e) => {
       console.error(e);
       return e;
+    });
+  }
+
+  static async getLogs(printer, item){
+    this.validatePrinter(printer);
+    const url = `/octoprint/${printer._id}/${item}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+        Range: "bytes=-500000",
+      },
     });
   }
 
@@ -461,12 +455,16 @@ export default class OctoPrintClient {
     }
   }
 
-  static async power(printer, url, action, command) {
+  static async sendPowerCommand(printer, url, command, action) {
+    const { printerName } = printer;
     if (url.includes("[PrinterURL]")) {
-      url = url.replace("[PrinterURL]", printer.printerURL);
+      url = url.replace("[PrinterURL]", "");
     }
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
+    }
+    if(url.includes("/api/")){
+      url = url.replace("/api/", "")
     }
 
     const body = {
@@ -474,33 +472,15 @@ export default class OctoPrintClient {
       command,
     };
 
+    let post;
+
     if (typeof command === "undefined" || command.length === 0) {
       try {
-        const post = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey,
-          },
-        });
+        post = await OctoPrintClient.get(printer, url);
 
         body.status = post.status;
 
         await OctoFarmClient.updateUserActionsLog(printer._id, body);
-
-        if (post.status !== 200 || post.status !== 204) {
-          UI.createAlert(
-            "error",
-            `${printer.printerName}: Could not complete ${action}`,
-            3000
-          );
-        } else {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: Successfully completed ${action}`,
-            3000
-          );
-        }
       } catch (e) {
         UI.createAlert(
           "error",
@@ -513,30 +493,9 @@ export default class OctoPrintClient {
       }
     } else {
       try {
-        const post = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey,
-          },
-          body: command,
-        });
+        post = await OctoPrintClient.post(printer, url, JSON.parse(command));
         body.status = post.status;
         await OctoFarmClient.updateUserActionsLog(printer._id, body);
-
-        if (post.status !== 200 || post.status !== 204) {
-          UI.createAlert(
-            "error",
-            `${printer.printerName}: Could not complete ${action}`,
-            3000
-          );
-        } else {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: Successfully completed ${action}`,
-            3000
-          );
-        }
       } catch (e) {
         UI.createAlert(
           "error",
@@ -548,25 +507,39 @@ export default class OctoPrintClient {
         throw new ApplicationError(errorObject);
       }
     }
+
+    if (!post?.ok) {
+      UI.createAlert(
+          "error",
+          `${printerName}: Failed to complete ${action}<br> Status: ${post.statusText}`,
+          3000,
+          "Clicked"
+      );
+    } else {
+      UI.createAlert(
+          "success",
+          `${printerName}: Successfully ${action}!`,
+          3000,
+          "Clicked"
+      );
+    }
+
     return "done";
   }
 
   static async getPowerStatus(printer, url, command) {
     if (url.includes("[PrinterURL]")) {
-      url = url.replace("[PrinterURL]", printer.printerURL);
+      url = url.replace("[PrinterURL]", "");
     }
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
+    if(url.includes("/api/")){
+      url = url.replace("/api/", "");
+    }
     if (!!command && command.length === 0) {
       try {
-        let post = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey,
-          },
-        });
+        let post = await OctoPrintClient.get(printer, url);
         let status = false;
         if (post?.status === 200 || post?.status === 204) {
           status = await post.json();
@@ -582,14 +555,7 @@ export default class OctoPrintClient {
       }
     } else {
       try {
-        const post = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey,
-          },
-          body: command,
-        });
+        let post = await OctoPrintClient.post(printer, url, JSON.parse(command));
         let status = false;
         if (post?.status === 200 || post?.status === 204) {
           status = await post.json();
