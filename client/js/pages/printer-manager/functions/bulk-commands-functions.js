@@ -319,7 +319,7 @@ function fileUpload(file) {
     if (file.print) {
       formData.append("print", true);
     }
-    const url = `${printerInfo.printerURL}/api/files/local`;
+    const url = `/octoprint/${printerInfo._id}/api/files/local`;
     const xhr = new XMLHttpRequest();
     file = file.file;
     xhr.open("POST", url);
