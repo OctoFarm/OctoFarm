@@ -1502,7 +1502,7 @@ class OctoPrintPrinter {
       force = true;
     }
 
-    if (this?.fileList?.fileList?.length === 0 || force) {
+    if (force || this?.fileList?.fileList?.length === 0) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
         logger.http("Failed Aquire files data", e.toString());
         return false;
