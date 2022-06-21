@@ -11,6 +11,9 @@ const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const {
+  generateOctoFarmCameraURL
+} = require("../services/printers/utils/camera-url-generation.utils");
 const { JobClean } = require("../services/job-cleaner.service");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const logger = new Logger(LOGGER_ROUTE_KEYS.STORE_PRINTERS);
@@ -547,7 +550,7 @@ class PrinterStore {
           oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
-          camURL: newPrinterInfo.camURL
+          camURL: generateOctoFarmCameraURL(newPrinterInfo)
         });
 
         if (
