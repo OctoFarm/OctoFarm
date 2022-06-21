@@ -353,14 +353,9 @@ export default class PrinterLogsService {
     });
   }
   static async parseOctoPrintLogs(printer, url) {
-    const octoPrintLogCall = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-        Range: "bytes=-500000",
-      },
-    });
+    console.log(url)
+    url = url.replace(printer.printerURL+"/", "")
+    const octoPrintLogCall = await OctoPrintClient.getLogs(printer, url)
 
     if (octoPrintLogCall?.ok) {
       const octoPrintLogBlob = await octoPrintLogCall.blob();

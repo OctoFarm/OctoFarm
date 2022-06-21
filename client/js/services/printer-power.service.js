@@ -42,7 +42,7 @@ export default class PrinterPowerService {
     return powerStatus;
   }
 
-  static updateTimer(id, isPoweredOn, checkTime = 10000){
+  static updateTimer(id, isPoweredOn, checkTime = 0){
     if (!this.timer[id]) {
       this.timer[id] = {
         isPoweredOn,
@@ -50,13 +50,17 @@ export default class PrinterPowerService {
       };
       return;
     }
+
+    this.timer[id].isPoweredOn = isPoweredOn
+    if(checkTime === 0){
+      this.timer[id].checkTime = 0;
+      return;
+    }
+
     if(checkTime < 10000){
       this.timer[id].checkTime = this.timer[id].checkTime + checkTime;
+      return;
     }
-    if(checkTime === 10000){
-      this.timer[id].checkTime = checkTime;
-    }
-    this.timer[id].isPoweredOn = isPoweredOn
   }
 
   static async revealPowerButtons(printer) {
@@ -102,11 +106,27 @@ export default class PrinterPowerService {
     const powerBadge = document.getElementById(`powerState-${printer._id}`);
 
     if (canDetectPowerState) {
-      PrinterPowerService.updateTimer(printer._id, false)
-      if (this.timer[printer._id].checkTime >= 10000) {
-        PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
+      if(!this.timer[printer._id]){
+        let isPoweredOn;
+        try{
+          isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer)
+        }catch(e){
+          console.error("Failed power grab", e.toString())
+        }
+        PrinterPowerService.updateTimer(printer._id, isPoweredOn)
       }
-      PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer), 500)
+      if (this.timer[printer._id].checkTime >= 10000) {
+        let isPoweredOn;
+        try{
+          isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer)
+        }catch(e){
+          console.error("Failed power grab", e.toString())
+        }
+        PrinterPowerService.updateTimer(printer._id, isPoweredOn)
+      }else{
+        PrinterPowerService.updateTimer(printer._id, this.timer[printer._id].isPoweredOn, 500)
+      }
+
       UI.removeDisplayNoneFromElement(powerBadge);
       if (!this.timer[printer._id].isPoweredOn) {
         if (!powerBadge.classList.contains("text-danger")) {
@@ -224,51 +244,9 @@ export default class PrinterPowerService {
   }
 
   static async sendPowerCommandForPrinter(printer, url, command, action) {
-    const { apikey, printerName } = printer;
-
-    if (url.includes("[PrinterURL]")) {
-      url = url.replace("[PrinterURL]", printer.printerURL);
-    }
-    if (url.includes("[PrinterAPI]")) {
-      url = url.replace("[PrinterAPI]", printer.apikey);
-    }
-
-    let post;
-    if (!!command || command.length !== 0) {
-      post = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": apikey,
-        },
-        body: command,
-      });
-    } else {
-      post = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
-      });
-    }
-    if (!post?.ok) {
-      UI.createAlert(
-        "error",
-        `${printerName}: Failed to complete ${action}<br> Status: ${post.statusText}`,
-        3000,
-        "Clicked"
-      );
-    } else {
-      UI.createAlert(
-        "success",
-        `${printerName}: Successfully ${action}!`,
-        3000,
-        "Clicked"
-      );
-    }
+    const post = await OctoPrintClient.sendPowerCommand(printer, url, command, action);
     await UI.delay(2000);
-    PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
+    PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer), 0)
     return post;
   }
 }
