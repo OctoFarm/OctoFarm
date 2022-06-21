@@ -126,10 +126,10 @@ async function ensureSystemSettingsInitiated() {
  * @param app
  */
 function serveOctoFarmRoutes(app) {
-
   app.use(ensureClientServerVersion);
 
   app.use("/", require("./routes/index", { page: "route" }));
+  app.use("/camera", require("./routes/mjpeg-proxy.routes", { page: "route" }));
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
     "/printers",
