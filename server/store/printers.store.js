@@ -104,7 +104,7 @@ class PrinterStore {
         printerURL: printer.printerURL,
         webSocketURL: printer.webSocketURL,
         apikey: printer.apikey,
-        camURL: printer.camURL,
+        camURL: printer.clientCamURL,
         group: printer.group,
         category: printer.category,
         hostState: printer.hostState,

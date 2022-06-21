@@ -5,7 +5,7 @@ const generateOctoFarmCameraURL = (printer) => {
     return "";
   }
 
-  if (!!camURL && !!_id) {
+  if (!!_id) {
     printer.clientCamURL = "/camera/" + _id;
   }
 
