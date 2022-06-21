@@ -159,7 +159,6 @@ class OctoPrintPrinter {
   pluginsListDisabled = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
-  corsCheck = true;
   settingsApi = undefined;
   settingsFeature = undefined;
   settingsFolder = undefined;
@@ -251,7 +250,6 @@ class OctoPrintPrinter {
       pluginsListDisabled,
       octoPrintUpdate,
       octoPrintPluginUpdates,
-      corsCheck,
       settingsApi,
       settingsFeature,
       settingsFolder,
@@ -341,9 +339,6 @@ class OctoPrintPrinter {
     }
     if (!!octoPrintPluginUpdates) {
       this.octoPrintPluginUpdates = octoPrintPluginUpdates;
-    }
-    if (!!corsCheck) {
-      this.corsCheck = corsCheck;
     }
     if (!!settingsApi) {
       this.settingsApi = settingsApi;
@@ -658,12 +653,6 @@ class OctoPrintPrinter {
         state: "API Fail!",
         stateDescription: "Required API Checks have failed... attempting reconnect..."
       };
-      if (!this.corsCheck) {
-        requiredAPIFail = {
-          state: "CORS NOT ENABLED!",
-          stateDescription: "Cors not enabled, setting offline!"
-        };
-      }
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
       return "Failed due to missing required values!";
     }
@@ -1199,7 +1188,6 @@ class OctoPrintPrinter {
     if (globalStatusCode === 200) {
       const { api, feature, folder, plugins, scripts, serial, server, system, webcam, appearance } =
         await settingsCheck.json();
-      this.corsCheck = api.allowCrossOrigin;
       this.settingsApi = api;
       this.settingsFeature = feature;
       this.settingsFolder = folder;
@@ -1233,7 +1221,6 @@ class OctoPrintPrinter {
         settingsAppearance: this.settingsAppearance,
         costSettings: this.costSettings,
         powerSettings: this.powerSettings,
-        corsCheck: api.allowCrossOrigin,
         settingsApi: api,
         settingsFeature: feature,
         settingsFolder: folder,
@@ -1252,9 +1239,6 @@ class OctoPrintPrinter {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
       this.#db.update({ onboarding: this.onboarding });
-      if (!this.corsCheck) {
-        return false;
-      }
       return true;
     } else {
       logger.http("Failed to acquire settings data..." + settingsCheck);
