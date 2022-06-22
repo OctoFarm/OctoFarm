@@ -156,7 +156,6 @@ export class PrintersManagement {
           if (typeof newPrinter.apikey !== "undefined") {
             printer.apikey = newPrinter.apikey;
           }
-          await UI.delay(3000);
           await PrintersManagement.addPrinter(printer);
         }
         UI.createAlert(

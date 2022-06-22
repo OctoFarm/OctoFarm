@@ -38,7 +38,7 @@ const addOctoPrintIssueWrapper = (id, message, state) => {
 
 const testAndCollectCostPlugin = (id, currentSettings, plugins) => {
   if (currentSettings?.default === true) {
-    if (plugins["costestimation"]) {
+    if (!!plugins["costestimation"]) {
       const costSettings = {
         powerConsumption: plugins["costestimation"].powerConsumption,
         electricityCosts: plugins["costestimation"].costOfElectricity,
@@ -69,58 +69,52 @@ const testAndCollectCostPlugin = (id, currentSettings, plugins) => {
 };
 
 const testAndCollectPSUControlPlugin = (id, currentSettings, plugins) => {
-  if (plugins["psucontrol"]) {
-    const costSettings = {
-      powerConsumption: plugins["costestimation"].powerConsumption,
-      electricityCosts: plugins["costestimation"].costOfElectricity,
-      purchasePrice: plugins["costestimation"].priceOfPrinter,
-      estimateLifespan: plugins["costestimation"].lifespanOfPrinter,
-      maintenanceCosts: plugins["costestimation"].maintenanceCosts
-    };
-    const pluginData = JSON.stringify(costSettings);
-    addOctoPrintLogWrapper(
-      id,
-      "PSU Control plugin found and settings applied: " + pluginData,
-      "Success",
-      "PSU Control"
-    );
-    return {
-      powerOnCommand: '{"command":"turnPSUOn"}',
-      powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerOffCommand: '{"command":"turnPSUOff"}',
-      powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerToggleCommand: '{"command":"togglePSU"}',
-      powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-      powerStatusCommand: '{"command":"getPSUState"}',
-      powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
-      wol: {
-        enabled: false,
-        ip: defaultWOLSubnetMask,
-        packets: "3",
-        port: "9",
-        interval: "100",
-        MAC: ""
-      }
-    };
-  } else {
-    return {
-      powerOnCommand: "",
-      powerOnURL: "",
-      powerOffCommand: "",
-      powerOffURL: "",
-      powerToggleCommand: "",
-      powerToggleURL: "",
-      powerStatusCommand: "",
-      powerStatusURL: "",
-      wol: {
-        enabled: false,
-        ip: defaultWOLSubnetMask,
-        packets: "3",
-        port: "9",
-        interval: "100",
-        MAC: ""
-      }
-    };
+  if (currentSettings?.default === true) {
+    if (!!plugins["psucontrol"]) {
+      addOctoPrintLogWrapper(
+        id,
+        "PSU Control plugin found and settings applied",
+        "Success",
+        "PSU Control"
+      );
+      return {
+        powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+        powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
+        powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+        powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
+        powerStatusCommand: "{\"command\":\"getPSUState\"}",
+        powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+        wol: {
+          enabled: false,
+          ip: defaultWOLSubnetMask,
+          packets: "3",
+          port: "9",
+          interval: "100",
+          MAC: ""
+        }
+      };
+    } else {
+      return {
+        powerOnCommand: "",
+        powerOnURL: "",
+        powerOffCommand: "",
+        powerOffURL: "",
+        powerToggleCommand: "",
+        powerToggleURL: "",
+        powerStatusCommand: "",
+        powerStatusURL: "",
+        wol: {
+          enabled: false,
+          ip: defaultWOLSubnetMask,
+          packets: "3",
+          port: "9",
+          interval: "100",
+          MAC: ""
+        }
+      };
+    }
+  }else{
+    return currentSettings;
   }
 };
 

@@ -132,6 +132,7 @@ class OctoPrintPrinter {
     maintenanceCosts: 0.25
   };
   powerSettings = {
+    default: true,
     powerOnCommand: "",
     powerOnURL: "",
     powerOffCommand: "",
@@ -1184,7 +1185,6 @@ class OctoPrintPrinter {
     });
 
     const globalStatusCode = checkApiStatusResponse(settingsCheck);
-
     if (globalStatusCode === 200) {
       const { api, feature, folder, plugins, scripts, serial, server, system, webcam, appearance } =
         await settingsCheck.json();
@@ -1199,23 +1199,17 @@ class OctoPrintPrinter {
       this.settingsWebcam = webcam;
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
-      if (!force) {
-        if (this.camURL.length === 0) {
-          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
-        }
-        this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
-        this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
-        if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
-          this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
-            appearance,
-            this.printerURL
-          );
-        }
+      if (this.camURL.length === 0) {
+        this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
+      }
+      this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
+      this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
+      if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
+        this.settingsAppearance.name = PrinterClean.grabOctoPrintName(appearance, this.printerURL);
       }
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
       }
-
       this.#db.update({
         camURL: generateOctoFarmCameraURL(this),
         settingsAppearance: this.settingsAppearance,
