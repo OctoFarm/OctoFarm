@@ -463,6 +463,9 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
+    if(url.includes(printer.printerURL)){
+      url = url.replace(printer.printerURL, "")
+    }
     if(url.includes("/api/")){
       url = url.replace("/api/", "")
     }
@@ -533,6 +536,9 @@ export default class OctoPrintClient {
     }
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
+    }
+    if(url.includes(printer.printerURL)){
+      url = url.replace(printer.printerURL, "")
     }
     if(url.includes("/api/")){
       url = url.replace("/api/", "");
