@@ -59,11 +59,8 @@ export const updateProfileDrop = async () => {
       const profileID = _.findIndex(profiles, function (o) {
         return o._id === spools[spool].profile;
       });
-      drop.className = `form-control ${profiles[profileID]?.material.replace(
-        / /g,
-        "_"
-      )}`;
-      spoolsMaterialText[index].innerHTML = `${profiles[profileID]?.material}`;
+      drop.className = `form-control ${profiles[profileID]?.material.toLowerCase().replace(/ /g, "_").replace(/[^\w\s]/gi, "_")}`;
+      spoolsMaterialText[index].innerHTML = `${profiles[profileID]?.material.toLowerCase().replace(/ /g, "_").replace(/[^\w\s]/gi, "_")}`;
     }
   });
   //Fix for not updating main spool list with correct information, not skipping fo shizzle
@@ -91,6 +88,7 @@ export const updateProfileDrop = async () => {
       text.innerHTML = `${profiles[profileID]?.material}`;
     }
   });
+
 };
 export const updatePrinterDrops = async () => {
   const { spools } = await OctoFarmClient.getFilamentSpools();

@@ -156,7 +156,6 @@ export const loadPageStatistics = async () => {
   ).toFixed(0);
   pageElements.filamentRemainingProgress.innerHTML = !isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
   pageElements.filamentRemainingProgress.style.width = !isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%";
-  console.log(isNaN(remainingPercent) ? remainingPercent + "%" : 0 + "%")
   let headerBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
     headerBreakdown += `<th scope="col">${used.name}</th>`;
