@@ -7,10 +7,7 @@ import { printStartSequence } from "./octoprint-helpers.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
-    if (!printer.apikey) {
-      throw new Error("Api key not provided");
-    }
-    if (!printer.printerURL) {
+    if (!printer._id) {
       throw new Error("Printer URL not provided");
     }
   }
