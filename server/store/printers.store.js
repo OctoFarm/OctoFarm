@@ -513,7 +513,7 @@ class PrinterStore {
       }
 
       // Check for group change...
-      if (!!newPrinterInfo?.group && oldPrinter.group !== newPrinterInfo.group) {
+      if (oldPrinter.group !== newPrinterInfo.group) {
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
