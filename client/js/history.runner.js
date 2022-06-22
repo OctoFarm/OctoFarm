@@ -804,10 +804,13 @@ class History {
       }
     });
     let totalPrintCountList = statistics.map((stat) => {
+      const complete = stat?.statistics?.completed ? stat.statistics.completed : 0;
+      const failed = stat?.statistics?.failed ? stat.statistics.failed : 0;
+      const cancelled = stat?.statistics?.cancelled ? stat.statistics.cancelled : 0;
       const calculation =
-        stat.statistics.complete +
-        stat.statistics.failed +
-        stat.statistics.cancelled;
+        complete +
+        failed +
+        cancelled;
       if (isNaN(calculation)) {
         return 0;
       } else {
@@ -839,7 +842,7 @@ class History {
         },
         background: "#303030",
       },
-      colors: ["#00bc8c", "#e74c3c", "#f39c12", "#12d1f3"],
+      colors: ["#12d1f3", "#00bc8c", "#e74c3c", "#f39c12"],
       dataLabels: {
         enabled: true,
         background: {
@@ -923,7 +926,7 @@ class History {
             },
           },
           show: false,
-        },
+        }
       ],
       xaxis: {
         categories: monthArray,
@@ -938,6 +941,7 @@ class History {
     }
 
     this.monthlyCompetionByDay.updateSeries([
+      { name: "Total Count", data: totalPrintCountList },
       {
         name: "Success Count",
         data: successCountList,
@@ -950,7 +954,6 @@ class History {
         name: "Cancelled Count",
         data: cancelledCountList,
       },
-      { name: "Total Count", data: totalPrintCountList },
     ]);
 
     const sparkOptions = dashboardOptions.historySparkLineOptions;
@@ -1477,20 +1480,21 @@ class History {
       } else {
         statesFailed.push(1);
       }
-      console.log("NEW RECORD")
-      console.log("PRINTER COST", record.printerCost);
+      const costPerHourSafe = record.costPerHour ? parseFloat(record.costPerHour) : 0
       printTimeTotal.push(parseFloat(record.printTime));
       filamentUsageGrams.push(parseFloat(record.totalWeight));
       filamentUsageLength.push(parseFloat(record.totalLength));
       filamentCost.push(parseFloat(record.spoolCost));
       printerCostTotal.push(parseFloat(record.printerCost));
       fullCostTotal.push(parseFloat(record.totalCost));
-      costPerHour.push(parseFloat(record.costPerHour));
-    });
+      if(!isNaN(costPerHourSafe)){
+        costPerHour.push(costPerHourSafe);
+      }
 
+    });
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
-    const avgHourCost = totalHourCost / costPerHour.length;
+    const avgHourCost = !isNaN(totalHourCost) ? totalHourCost : 0 / costPerHour.length;
 
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
