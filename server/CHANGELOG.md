@@ -1,5 +1,34 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+## [1.4.0](https://github.com/OctoFarm/OctoFarm/compare/1.3.0...1.4.0) (2022-06-22)
+
+
+### :persevere: Code Refactors :persevere:
+
+* **server:** create /camera/ endpoint to proxy cameras through ([8f0e89a](https://github.com/OctoFarm/OctoFarm/commit/8f0e89a11ef8cd3a27873f2fd7b3342d9a5eedb7))
+* **server:** create /octoprint/ endpoint to proxy all octoprint requests through ([c4e17f7](https://github.com/OctoFarm/OctoFarm/commit/c4e17f7bbb7ccfc7d9f8eda04b85b86470520b46))
+* **server:** create convert service from camURL => clientCamURL for camera proxy ([31b162a](https://github.com/OctoFarm/OctoFarm/commit/31b162a18d0dc716de96b47c2d7538143a7653af))
+* **server:** remove CORS check and warning no longer needed ([5875e81](https://github.com/OctoFarm/OctoFarm/commit/5875e8125a152d16703175f53852be3d8bf3344e))
+
+
+### :stars: New Features :stars:
+
+* **client:** redirect all octoprint commands through the octofarm proxy ([9a16b5c](https://github.com/OctoFarm/OctoFarm/commit/9a16b5cff05b440ab67295e01236568f52b9ae35))
+* **server:** proxy cameras through octofarm server ([cec5c85](https://github.com/OctoFarm/OctoFarm/commit/cec5c85a78a7ba35c4f7c84d10488b2dcd7fce06))
+* **server:** redirect all file uploads through the octofarm proxy ([b5dfeb2](https://github.com/OctoFarm/OctoFarm/commit/b5dfeb2d106f4dc8f8b1f91f51a4e36c106bea4c))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** fix filtering on filament spool manager table closes [#1106](https://github.com/OctoFarm/OctoFarm/issues/1106) ([1d07e4a](https://github.com/OctoFarm/OctoFarm/commit/1d07e4a7d7ebe25a2cffcd4cfa7392ab77d121df))
+* **client:** fix history state graph total count not generating closes [#1104](https://github.com/OctoFarm/OctoFarm/issues/1104) ([41ecfa4](https://github.com/OctoFarm/OctoFarm/commit/41ecfa4a0d6822f7cd1c4e823068ccee823cb52e))
+* **client:** fix storage used warning not using storage used for calculation closes [#1108](https://github.com/OctoFarm/OctoFarm/issues/1108) ([95d9835](https://github.com/OctoFarm/OctoFarm/commit/95d98351aed332cbb2ab64345183b50d9bb041d0))
+* **client:** history printer cost total not calculating correctly ([e9241f5](https://github.com/OctoFarm/OctoFarm/commit/e9241f58898902e23eae88a904c0f51f6c7bcaa6))
+* **client:** ignore used spools in filament spool manager total table count ([1efa012](https://github.com/OctoFarm/OctoFarm/commit/1efa012e8492dcef6f8d7a5dc2ea969fb570e9b6))
+* **server:** allow inputting blank group name in printer edit closes [#1096](https://github.com/OctoFarm/OctoFarm/issues/1096) ([439cf67](https://github.com/OctoFarm/OctoFarm/commit/439cf67d7aaa6aef466b031bff768e3b54a645b6))
+* **server:** fix initial grab of supported plugin data and octoprint name ([ff67914](https://github.com/OctoFarm/OctoFarm/commit/ff6791491d00353cbef604c799f10f25290c6efb))
+* **server:** grab installed client version from package-lock fixed [#1107](https://github.com/OctoFarm/OctoFarm/issues/1107) ([873dd9c](https://github.com/OctoFarm/OctoFarm/commit/873dd9c2f4aab26e8e4262aff9e075bd0e304f55))
+
 ## [1.3.0](https://github.com/OctoFarm/OctoFarm/compare/1.2.11...1.3.0) (2022-06-20)
 
 
