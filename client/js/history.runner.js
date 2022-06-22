@@ -1315,32 +1315,32 @@ class History {
         const sp = Object.keys(spool)[0];
         const spoolSelector = returnBigFilamentSelectorTemplate(i);
         toolsArray.push(sp);
-        viewTable.insertAdjacentHTML(
-          "beforeend",
-          `
+          viewTable.insertAdjacentHTML(
+              "beforeend",
+              `
           <tr>
               <td>
                 ${spoolSelector}
               </td>
               <td>
-              ${spool[sp].volume}m3
+              ${spool[sp]?.volume ? spool[sp]?.volume : 0}m3
               </td>
               <td>
-              ${spool[sp].length}m
+              ${spool[sp]?.length ? spool[sp]?.length : 0}m
               </td>
               <td>
-                 ${spool[sp].weight}g
+                 ${spool[sp]?.weight ? spool[sp]?.weight : 0}g
               </td>
               <td>
-                 ${spool[sp].cost}
+                 ${spool[sp]?.cost ? spool[sp]?.cost : 0}
               </td>
               </tr>
           </tr>
         `
-        );
+          );
         await drawHistoryDropDown(
-          document.getElementById(`tool-${i}-bigFilamentSelect`),
-          spool[sp].spoolId
+            document.getElementById(`tool-${i}-bigFilamentSelect`),
+            spool[sp]?.spoolId ? spool[sp]?.spoolId : false
         );
       }
       viewTable.insertAdjacentHTML(
