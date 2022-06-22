@@ -1477,14 +1477,15 @@ class History {
       } else {
         statesFailed.push(1);
       }
-
-      printTimeTotal.push(parseInt(record.printTime));
-      filamentUsageGrams.push(parseInt(record.totalWeight));
-      filamentUsageLength.push(parseInt(record.totalLength));
-      filamentCost.push(parseInt(record.spoolCost));
-      printerCostTotal.push(parseInt(record.printerCost));
-      fullCostTotal.push(parseInt(record.totalCost));
-      costPerHour.push(parseInt(record.costPerHour));
+      console.log("NEW RECORD")
+      console.log("PRINTER COST", record.printerCost);
+      printTimeTotal.push(parseFloat(record.printTime));
+      filamentUsageGrams.push(parseFloat(record.totalWeight));
+      filamentUsageLength.push(parseFloat(record.totalLength));
+      filamentCost.push(parseFloat(record.spoolCost));
+      printerCostTotal.push(parseFloat(record.printerCost));
+      fullCostTotal.push(parseFloat(record.totalCost));
+      costPerHour.push(parseFloat(record.costPerHour));
     });
 
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
@@ -1515,14 +1516,11 @@ class History {
       .reduce((a, b) => a + b, 0)
       .toFixed(2)}g`;
     ELEMENTS.filamentCostTotal.innerHTML = filamentCost
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.printerCostTotal.innerHTML = printerCostTotal
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.totalCost.innerHTML = fullCostTotal
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.averageCostPerHour.innerHTML = avgHourCost.toFixed(2);
   }
 }
