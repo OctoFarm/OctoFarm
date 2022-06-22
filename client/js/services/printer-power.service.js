@@ -115,6 +115,7 @@ export default class PrinterPowerService {
         }
         PrinterPowerService.updateTimer(printer._id, isPoweredOn)
       }
+      console.log(new Date(), this.timer[printer._id].checkTime)
       if (this.timer[printer._id].checkTime >= 10000) {
         let isPoweredOn;
         try{
