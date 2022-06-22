@@ -115,14 +115,16 @@ export default class PrinterPowerService {
         }
         PrinterPowerService.updateTimer(printer._id, isPoweredOn)
       }
+      console.log(new Date(), this.timer[printer._id].checkTime)
       if (this.timer[printer._id].checkTime >= 10000) {
         let isPoweredOn;
         try{
           isPoweredOn = await PrinterPowerService.printerIsPoweredOn(printer)
+          PrinterPowerService.updateTimer(printer._id, isPoweredOn)
         }catch(e){
+          PrinterPowerService.updateTimer(printer._id, false)
           console.error("Failed power grab", e.toString())
         }
-        PrinterPowerService.updateTimer(printer._id, isPoweredOn)
       }else{
         PrinterPowerService.updateTimer(printer._id, this.timer[printer._id].isPoweredOn, 500)
       }
