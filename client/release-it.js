@@ -79,7 +79,7 @@ module.exports = {
     tag: true,
     push: true,
     requireCleanWorkingDir: false,
-    tagName: "client ${version}"
+    tagName: "client-${version}"
   },
   npm: {
     publish: true,
