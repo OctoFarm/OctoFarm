@@ -46,18 +46,18 @@ module.exports = {
       // Handles everything else
       redirectedRequest.pipe(res);
     }
-    pipe.on("error", function () {
+    redirectedRequest.on("error", function () {
       logger.error("Error pipe broken for mjpeg stream");
     });
     //client quit normally
-    req.on("end", function () {
+    redirectedRequest.on("end", function () {
       logger.info("Pipe ended on octoprint proxy");
-      pipe.end();
+      redirectedRequest.end();
     });
     //client quit unexpectedly
-    req.on("close", function () {
+    redirectedRequest.on("close", function () {
       logger.warning("Pipe unexpectedly ended on octoprint proxy");
-      pipe.end();
+      redirectedRequest.end();
     });
   }
 };
