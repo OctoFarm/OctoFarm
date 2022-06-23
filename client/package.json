@@ -30,8 +30,7 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
-    "@semantic-release/commit-analyzer": "^9.0.2",
-    "@semantic-release/npm": "^9.0.1",
+    "@release-it/conventional-changelog": "^5.0.0",
     "apexcharts": "^3.35.0",
     "axios": "^0.21.1",
     "before-build-webpack": "^0.2.11",
