@@ -130,7 +130,8 @@ class PrinterStore {
         activeControlUser: printer.activeControlUser,
         fullyScanned: printer?.onboarding?.fullyScanned,
         klipperState: printer?.klipperState,
-        printerPowerState: printer?.printerPowerState
+        printerPowerState: printer?.printerPowerState,
+        storage: printer?.storage
       };
     });
 
