@@ -54,9 +54,8 @@ class Manager {
     for (const [index, printer] of onlinePrinterList.entries()) {
       let storageWarning = "";
       if (printer?.storage) {
-        const storageUsed = printer.storage.total - printer.storage.free;
         const percentRemain =
-          (storageUsed * 100) / printer.storage.total;
+          (printer.storage.free * 100) / printer.storage.total;
         if (percentRemain <= 10) {
           storageWarning = `<button type="button" class="btn btn-outline-danger text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(

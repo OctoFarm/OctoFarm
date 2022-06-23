@@ -163,7 +163,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getTimelapses(unrendered = true) {
-    return this.get(apiTimelapse(unrendered), true).catch((e) => {
+    return this.get(apiTimelapse(unrendered)).catch((e) => {
       return e;
     });
   }
@@ -176,6 +176,18 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async postSettings(data) {
     return this.post(apiSettings, data).catch((e) => {
+      return e;
+    });
+  }
+
+  async postPrinterPowerState(url, data) {
+    return this.post(url, data).catch((e) => {
+      return e;
+    });
+  }
+
+  async getPrinterPowerState(url) {
+    return this.get(url).catch((e) => {
       return e;
     });
   }
