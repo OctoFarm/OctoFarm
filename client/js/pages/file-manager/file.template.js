@@ -1,5 +1,4 @@
 import Calc from "../../utils/calc";
-import OctoPrintClient from "../../services/octoprint/octoprint-client.service";
 
 const getSpinnerElement = () => {
   return "<i class=\"fa-solid fa-circle-notch fa-spin\"></i>";
