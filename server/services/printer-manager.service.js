@@ -412,6 +412,16 @@ class PrinterManagerService {
       });
     return "Killed Current Connections";
   }
+
+  async checkPrinterPowerStates() {
+    const printers = getPrinterStoreCache().listPrinters();
+    for (const printer of printers) {
+      if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
+        await printer.acquirePrinterPowerState();
+      }
+
+    }
+  }
 }
 
 module.exports = PrinterManagerService;

@@ -245,7 +245,7 @@ export default class PrinterPowerService {
 
   static async sendPowerCommandForPrinter(printer, url, command, action) {
     const post = await OctoPrintClient.sendPowerCommand(printer, url, command, action);
-    await UI.delay(2000);
+    await UI.delay(1000);
     PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer), 0)
     return post;
   }
