@@ -4,6 +4,13 @@
 
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### :persevere: Code Refactors :persevere:
+* **server:** added in logging for camera and octoprint proxy (https://github.com/OctoFarm/OctoFarm/pull/1118/commits/63a715b4f480a68eb5856c95ead0f43998cc0a0c)
+* **server:** move client side power checking to server(https://github.com/OctoFarm/OctoFarm/pull/1118/commits/1f0020ded2a47dcc22278296883f2deb52ccb70c) https://github.com/OctoFarm/OctoFarm/issues/1117
+
+### :hammer: Bug Fixes :hammer:
+* **server:** server wan't sending storage information to client ([aba0109](https://github.com/OctoFarm/OctoFarm/pull/1118/commits/aba010998851123aad62c0e738b1f5ff6d83e4c6))
+
 ## [1.4.0](https://github.com/OctoFarm/OctoFarm/compare/1.3.0...1.4.0) (2022-06-22)
 
 

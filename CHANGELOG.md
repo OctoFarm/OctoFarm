@@ -1,8 +1,8 @@
 # SERVER CHANGELOG
-[Server changelog](https://github.com/OctoFarm/OctoFarm/blob/master/client/CHANGELOG.md)
+[Server changelog](https://github.com/OctoFarm/OctoFarm/blob/master/server/CHANGELOG.md)
 
 # CLIENT CHANGELOG
-[Client Changelog](https://github.com/OctoFarm/OctoFarm/blob/master/server/CHANGELOG.md)
+[Client Changelog](https://github.com/OctoFarm/OctoFarm/blob/master/client/CHANGELOG.md)
 
 # OLD CHANGELOG
 
