@@ -13,7 +13,8 @@ module.exports = {
     skipChecks: true
   },
   github: {
-    release: false,
+    release: true,
+    releaseName: "Release Client ${version}"
   },
   plugins: {
     "@release-it/conventional-changelog": {
