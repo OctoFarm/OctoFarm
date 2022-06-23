@@ -1,19 +1,4 @@
 module.exports = {
-  git: {
-    commitMessage: "chore(release): server release v${version}",
-    commit: true,
-    tag: true,
-    push: true,
-    requireCleanWorkingDir: false,
-    tagName: "${version}"
-  },
-  npm: {
-    publish: false
-  },
-  github: {
-    release: true,
-    releaseName: "Release ${version}"
-  },
   plugins: {
     "@release-it/conventional-changelog": {
       infile: "CHANGELOG.md",
@@ -87,5 +72,20 @@ module.exports = {
         ]
       }
     }
+  },
+  git: {
+    commitMessage: "chore(release): server release v${version}",
+    commit: true,
+    tag: true,
+    push: true,
+    requireCleanWorkingDir: false,
+    tagName: "${version}"
+  },
+  npm: {
+    publish: false
+  },
+  github: {
+    release: true,
+    releaseName: "Release ${version}"
   }
 };
