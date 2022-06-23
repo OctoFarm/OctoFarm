@@ -15,14 +15,13 @@ export const returnHistoryTableRow = function (record) {
   const spoolType = [];
   if (!!record?.spools) {
     record.spools.forEach((tool, index) => {
-      spoolType.push(
-        index +
-          ": " +
-          tool["tool" + index].type +
-          " - " +
-          tool["tool" + index].weight +
-          "g"
-      );
+      const weight = tool["tool" + index]?.weight ? tool["tool" + index]?.weight : false
+      const type =  tool["tool" + index]?.type ? tool["tool" + index]?.type : false
+      let spoolString = "Unknown Spool";
+      if(!!weight && !!type){
+       spoolString = index + ": " + type + " - " + weight + "g";
+      }
+      spoolType.push(spoolString);
     });
   } else {
     spoolType.push("0: No Spool<br>");

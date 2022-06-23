@@ -721,12 +721,12 @@ export default class FileManagerService {
       });
       // Show empty or filled list
       if (currentFileList.length > 0) {
-        currentFileList.forEach((file) => {
+        for(const file of currentFileList){
           fileElem.insertAdjacentHTML(
-            "beforeend",
-            getFileTemplate(file, printerURL, id)
+              "beforeend",
+              getFileTemplate(file, printerURL, id)
           );
-        });
+        }
       } else {
         fileElem.insertAdjacentHTML("beforeend", noFilesToShow());
       }

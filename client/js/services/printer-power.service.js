@@ -84,7 +84,6 @@ export default class PrinterPowerService {
       "printerPowerOn-" + printer._id
     );
 
-
     const powerBadge = document.getElementById(`powerState-${printer._id}`);
     if (canDetectPowerState) {
       PrinterPowerService.updatePrinterPowerState(printer.printerPowerState, powerBadge);
