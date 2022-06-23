@@ -2,7 +2,6 @@ const parseOctoPrintPowerResponse = (response) => {
   let powerStatus = false;
 
   if (!!response) {
-    console.log(response)
     powerStatus = response[Object.keys(response)[0]];
     // Patches for string based state response tasmota/tplink plugins
 
