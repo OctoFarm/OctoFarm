@@ -1311,10 +1311,13 @@ class History {
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
-      for (const [i, spool] of current.spools.entries()) {
-        const sp = Object.keys(spool)[0];
-        const spoolSelector = returnBigFilamentSelectorTemplate(i);
-        toolsArray.push(sp);
+      console.log(!!current?.spools)
+      // current.spools = null
+      if(!!current?.spools){
+        for (const [i, spool] of current.spools.entries()) {
+          const sp = Object.keys(spool)[0];
+          const spoolSelector = returnBigFilamentSelectorTemplate(i);
+          toolsArray.push(sp);
           viewTable.insertAdjacentHTML(
               "beforeend",
               `
@@ -1338,11 +1341,43 @@ class History {
           </tr>
         `
           );
+          console.log(spool[sp].spoolId)
+          await drawHistoryDropDown(
+              document.getElementById(`tool-${i}-bigFilamentSelect`),
+              spool[sp]?.spoolId
+          );
+        }
+      }else{
+        const spoolSelector = returnBigFilamentSelectorTemplate(0);
+        viewTable.insertAdjacentHTML(
+            "beforeend",
+            `
+          <tr>
+              <td>
+                ${spoolSelector}
+              </td>
+              <td>
+              0m3
+              </td>
+              <td>
+              0m
+              </td>
+              <td>
+              0g
+              </td>
+              <td>
+               0
+              </td>
+              </tr>
+          </tr>
+        `
+        );
         await drawHistoryDropDown(
-            document.getElementById(`tool-${i}-bigFilamentSelect`),
-            spool[sp]?.spoolId ? spool[sp]?.spoolId : false
+            document.getElementById(`tool-0-bigFilamentSelect`),
+            0
         );
       }
+
       viewTable.insertAdjacentHTML(
         "beforeend",
         `
