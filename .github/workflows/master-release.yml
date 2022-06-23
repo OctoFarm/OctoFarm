@@ -40,7 +40,6 @@ jobs:
           filters: |
             server:
             - 'server/*.js'
-            - 'server/*.json'
             - 'server/cache/**'
             - 'server/constants/**'
             - 'server/exceptions/**'
