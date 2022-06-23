@@ -1,5 +1,10 @@
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const request = require("request");
+const Logger = require("../handlers/logger");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+
+const logger = new Logger(LOGGER_ROUTE_KEYS.MIDDLEWARE_OCTOPRINT_PROXY);
+
 module.exports = {
   async proxyOctoPrintClientRequests(req, res) {
     const id = req.paramString("id");
@@ -41,5 +46,18 @@ module.exports = {
       // Handles everything else
       redirectedRequest.pipe(res);
     }
+    pipe.on("error", function () {
+      logger.error("Error pipe broken for mjpeg stream");
+    });
+    //client quit normally
+    req.on("end", function () {
+      logger.info("Pipe ended on octoprint proxy");
+      pipe.end();
+    });
+    //client quit unexpectedly
+    req.on("close", function () {
+      logger.warning("Pipe unexpectedly ended on octoprint proxy");
+      pipe.end();
+    });
   }
 };
