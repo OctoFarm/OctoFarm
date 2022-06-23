@@ -27,6 +27,11 @@ const {
   findCurrentUserForOctoFarmConnection
 } = require("../octoprint/utils/octoprint-api-helpers.utils");
 const { generateOctoFarmCameraURL } = require("./utils/camera-url-generation.utils");
+const {
+  createPrinterPowerURL,
+  parseOctoPrintPowerResponse,
+  canWeDetectPrintersPowerState
+} = require("../octoprint/utils/printer-power-plugins.utils");
 const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
@@ -131,6 +136,7 @@ class OctoPrintPrinter {
     estimateLifespan: 43800,
     maintenanceCosts: 0.25
   };
+  printerPowerState;
   powerSettings = {
     default: true,
     powerOnCommand: "",
@@ -1711,6 +1717,36 @@ class OctoPrintPrinter {
       this.acquireOctoPrintSystemData(force),
       this.acquireOctoPrintSettingsData(force)
     ]);
+  }
+
+  async acquirePrinterPowerState() {
+    const { powerStatusURL, powerStatusCommand } = this.powerSettings;
+
+    if (!canWeDetectPrintersPowerState(powerStatusURL)) {
+      return;
+    }
+
+    const powerURL = createPrinterPowerURL(powerStatusURL);
+    let powerReturnState;
+    if (!!powerStatusCommand && powerStatusCommand.length === 0) {
+      powerReturnState = await this.#api.getPrinterPowerState(powerURL).catch((e) => {
+        logger.http("Failed Aquire profile data", e.toString());
+        return 900;
+      });
+    } else {
+      powerReturnState = await this.#api
+        .postPrinterPowerState(powerURL, JSON.parse(powerStatusCommand))
+        .catch((e) => {
+          logger.http("Failed Aquire profile data", e.toString());
+          return 900;
+        });
+    }
+
+    if (powerReturnState.ok) {
+      this.printerPowerState = parseOctoPrintPowerResponse(await powerReturnState.json());
+    }
+
+    return this.printerPowerState;
   }
 
   killApiTimeout() {

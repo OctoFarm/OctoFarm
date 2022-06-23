@@ -1,6 +1,10 @@
-# Old-Changelog
+# SERVER CHANGELOG
+[Server changelog](https://github.com/OctoFarm/OctoFarm/blob/master/client/CHANGELOG.md)
 
-Currently the changelog now resides in server/CHANGELOG.md or view the releases page. This is for both client and server, these will soon be split into two.
+# CLIENT CHANGELOG
+[Client Changelog](https://github.com/OctoFarm/OctoFarm/blob/master/server/CHANGELOG.md)
+
+# OLD CHANGELOG
 
 ## [v1.2.3]
 

@@ -160,7 +160,6 @@ class HistoryCleanerService {
         ? filamentSelection[keyIndex]
         : filamentSelection;
       const metric = filament[key];
-
       if (metric !== null) {
         let completionRatio = success ? 1.0 : printPercentage / 100;
 
