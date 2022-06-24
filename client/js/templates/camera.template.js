@@ -4,7 +4,7 @@ const hideMe = "d-none";
 
 export const drawCamera = (id, { url, flipV, flipH, rotate90, hidden }) => {
   return `<img
-
+        loading="lazy"
         class="camImg ${hidden ? hideMe : ""}"
         id="camera-${id}"
         width="100%"

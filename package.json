@@ -58,6 +58,7 @@
   "dependencies": {
     "@commitlint/cli": "^16.2.4",
     "@commitlint/config-conventional": "^16.2.4",
+    "mjpeg-camera": "^2.0.1",
     "ws": "^8.8.0"
   }
 }

@@ -29,6 +29,17 @@ class SettingsCleanerService {
     return systemClean.filament.allowMultiSelect;
   }
 
+  static isProxyCamerasEnabled() {
+    return systemClean?.cameras?.proxyEnabled;
+  }
+
+  static returnCameraSettings() {
+    return {
+      updateInterval: systemClean.cameras.updateInterval,
+      aspectRatio: systemClean.cameras.aspectRatio
+    };
+  }
+
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {

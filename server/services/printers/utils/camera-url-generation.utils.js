@@ -1,7 +1,11 @@
-const { getRandomInt } = require("../../../utils/random.util");
+const { SettingsClean } = require("../../settings-cleaner.service");
 
-const generateOctoFarmCameraURL = (printer) => {
+const generateOctoFarmCameraURL = (printer, live) => {
   const { camURL, _id } = printer;
+
+  if (SettingsClean.isProxyCamerasEnabled()) {
+    return camURL;
+  }
 
   if (camURL.length === 0) {
     return "";
@@ -10,7 +14,8 @@ const generateOctoFarmCameraURL = (printer) => {
   if (!_id) {
     return "";
   }
-  return `/camera/${_id}?${getRandomInt(1000000, 9999999)}`;
+
+  return `/camera/${_id}`;
 };
 
 module.exports = {
