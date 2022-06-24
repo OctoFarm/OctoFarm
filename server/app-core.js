@@ -26,6 +26,7 @@ const { ensureClientServerVersion } = require("./middleware/client-server-versio
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
 const { ensureAuthenticated } = require("./middleware/auth");
 const { validateParamsMiddleware } = require("./middleware/validators");
+const { proxyOctoPrintClientRequests } = require("./middleware/octoprint-proxy");
 
 const M_VALID = require("./constants/validate-mongo.constants");
 
@@ -139,9 +140,10 @@ function serveOctoFarmRoutes(app) {
     require("./routes/camera-proxy.routes.js", { page: "route" })
   );
   app.use(
-    "/octoprint",
-    ensureAuthenticated,
-    require("./routes/octoprint-proxy.routes.js", { page: "route" })
+      "/octoprint/:id/:item(*)",
+      ensureAuthenticated,
+      validateParamsMiddleware(M_VALID.MONGO_ID),
+      proxyOctoPrintClientRequests
   );
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
