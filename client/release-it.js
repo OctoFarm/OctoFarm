@@ -21,17 +21,17 @@ module.exports = {
           },
           {
             type: "refactor",
-            section: ":persevere: Code Refactors :persevere:",
+            section: ":dash: Code Improvements :dash:",
             hidden: false
           },
           {
             type: "perf",
-            section: ":dash: Performance Boosts :dash:",
+            section: ":dash: Code Improvements :dash:",
             hidden: false
           },
           {
             type: "test",
-            section: ":link: Tests Implemented :link:",
+            section: ":link: Testing Updated :link:",
             hidden: false
           },
           {
@@ -40,17 +40,7 @@ module.exports = {
             hidden: false
           },
           {
-            type: "database",
-            section: ":scroll: Database Changes :scroll:",
-            hidden: false
-          },
-          {
-            type: "security",
-            section: ":key: Security Improvements :key:",
-            hidden: false
-          },
-          {
-            type: "removed",
+            type: "revert",
             section: ":x: Removed :x:",
             hidden: false
           },
@@ -65,9 +55,9 @@ module.exports = {
             hidden: true
           },
           {
-            type: "dependency",
-            section: ":curly_loop: Dependency Hell! :curly_loop:",
-            hidden: true
+            type: "style",
+            section: ":curly_loop: UI :curly_loop:",
+            hidden: false
           }
         ]
       }
