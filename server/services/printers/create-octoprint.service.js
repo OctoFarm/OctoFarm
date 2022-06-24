@@ -26,7 +26,6 @@ const {
   parseAllOctoPrintUsers,
   findCurrentUserForOctoFarmConnection
 } = require("../octoprint/utils/octoprint-api-helpers.utils");
-const { generateOctoFarmCameraURL } = require("./utils/camera-url-generation.utils");
 const {
   createPrinterPowerURL,
   parseOctoPrintPowerResponse,
@@ -215,7 +214,7 @@ class OctoPrintPrinter {
     this.apikey = printer.apikey;
     this.printerURL = printer.printerURL;
     this.webSocketURL = printer.webSocketURL;
-    this.camURL = generateOctoFarmCameraURL(printer);
+    this.camURL = printer.camURL;
     this.category = printer.category;
     this.group = printer.group;
     this.settingsAppearance = printer.settingsAppearance;
@@ -1217,7 +1216,7 @@ class OctoPrintPrinter {
         this.settingsAppearance.color = appearance.color;
       }
       this.#db.update({
-        camURL: generateOctoFarmCameraURL(this),
+        camURL: this.camURL,
         settingsAppearance: this.settingsAppearance,
         costSettings: this.costSettings,
         powerSettings: this.powerSettings,

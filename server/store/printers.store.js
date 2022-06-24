@@ -105,7 +105,7 @@ class PrinterStore {
         printerURL: printer.printerURL,
         webSocketURL: printer.webSocketURL,
         apikey: printer.apikey,
-        camURL: printer.clientCamURL,
+        camURL: generateOctoFarmCameraURL(printer),
         group: printer.group,
         category: printer.category,
         hostState: printer.hostState,
@@ -553,7 +553,7 @@ class PrinterStore {
           oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
-          camURL: generateOctoFarmCameraURL(newPrinterInfo)
+          camURL: newPrinterInfo.camURL
         });
 
         if (
