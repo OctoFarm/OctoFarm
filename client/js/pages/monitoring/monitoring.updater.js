@@ -492,11 +492,6 @@ async function updateState(printer, clientSettings, view, index) {
   elements.terminal.disabled = isOffline;
   elements.job.disabled = !isPrintingOrComplete;
 
-  if(elements.camera){
-    elements.camera.src = printer.camURL;
-  }
-
-
   UI.doesElementNeedUpdating(
     printer.printerState.state,
     elements.state,
