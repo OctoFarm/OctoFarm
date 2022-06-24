@@ -39,7 +39,12 @@ jobs:
         with:
           filters: |
             server:
-            - 'server/*.js'
+            - 'server/app.js'
+            - 'server/app-core.js'
+            - 'server/app-env.js'
+            - 'server/app-fallbacks.js'
+            - 'server/migrate-mongo-config.js'
+            - 'server/tasks.js'
             - 'server/cache/**'
             - 'server/constants/**'
             - 'server/exceptions/**'
@@ -53,7 +58,10 @@ jobs:
             - 'server/utils/**'
             - 'server/views/**'
             client:
-            - 'client/**'
+            - 'client/index.js'
+            - 'client/webpack.config.js'
+            - 'client/css/**'
+            - 'client/js/**'
       # Install node v16 to use.
       - name: Use Node
         uses: actions/setup-node@v2
