@@ -1,5 +1,12 @@
 # :octopus: :octopus: OctoFarm's Client Changelog :octopus: :octopus:
 
+### [1.4.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.0...client-1.4.1) (2022-06-24)
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** filament manager wouldn't load all spools on subsequent printers closes [#1127](https://github.com/OctoFarm/OctoFarm/issues/1127) ([3d5ae43](https://github.com/OctoFarm/OctoFarm/commit/3d5ae439e321d0ed1be591c5f7c029cc1dfbf429))
+
 ## 1.4.0 (2022-06-23)
 
 
