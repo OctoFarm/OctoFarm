@@ -1,5 +1,12 @@
 # :octopus: :octopus: OctoFarm's Server Changelog :octopus: :octopus:
 
+### [1.4.3](https://github.com/OctoFarm/OctoFarm/compare/1.4.2...1.4.3) (2022-06-24)
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **server:** fix octoprint proxy 404 ([4753109](https://github.com/OctoFarm/OctoFarm/commit/4753109ea4bca981cc955a129a700071b8327761))
+
 ### [1.4.2](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.1...1.4.2) (2022-06-24)
 
 ### :x: Removed :x:
