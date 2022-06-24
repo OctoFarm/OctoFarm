@@ -7,12 +7,10 @@ const generateOctoFarmCameraURL = (printer) => {
     return "";
   }
 
-  if (!!_id) {
-    //printer.clientCamURL = `/camera/${_id}?${getRandomInt(1000000, 9999999)}`;
-    printer.clientCamURL = camURL;
+  if (!_id) {
+    return "";
   }
-
-  return camURL;
+  return `/camera/${_id}?${getRandomInt(1000000, 9999999)}`;
 };
 
 module.exports = {
