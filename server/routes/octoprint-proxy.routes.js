@@ -1,12 +1,20 @@
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const express = require("express");
+const router = express.Router();
 const request = require("request");
+const { ensureAuthenticated } = require("../middleware/auth");
+const { getPrinterStoreCache } = require("../cache/printer-store.cache");
+const { validateParamsMiddleware } = require("../middleware/validators");
+const M_VALID = require("../constants/validate-mongo.constants");
+
 const Logger = require("../handlers/logger");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_CAMERA_PROXY);
 
-const logger = new Logger(LOGGER_ROUTE_KEYS.MIDDLEWARE_OCTOPRINT_PROXY);
-
-module.exports = {
-  async proxyOctoPrintClientRequests(req, res) {
+router.get(
+  "/:id/:item(*)",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  (req, res) => {
     const id = req.paramString("id");
     const item = req.paramString("item");
     const { printerURL, apikey } = getPrinterStoreCache().getPrinter(id);
@@ -60,4 +68,6 @@ module.exports = {
       redirectedRequest.end();
     });
   }
-};
+);
+
+module.exports = router;

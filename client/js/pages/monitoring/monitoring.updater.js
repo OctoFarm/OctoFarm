@@ -40,7 +40,7 @@ import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import {
   fillMiniFilamentDropDownList,
-  findMiniFilamentDropDownsSelect,
+  findMiniFilamentDropDownsSelect, returnDropDownList,
 } from "../../services/printer-filament-selector.service";
 import {checkKlipperState} from "../../services/octoprint/checkKlipperState.actions";
 
@@ -50,6 +50,8 @@ let printerManagerModal = document.getElementById("printerManagerModal");
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 let printerArea = document.getElementById("printerArea");
 let actionButtonsInitialised;
+
+let spoolDropDownList;
 
 document.getElementById("filterStates").addEventListener("change", (e) => {
   printerArea.innerHTML = "";
@@ -212,6 +214,7 @@ async function addListeners(printer) {
       doubleClickFullScreen(e.target);
     });
   }
+
   if (!!printer?.currentProfile) {
     for (let i = 0; i < printer.currentProfile?.extruder?.count; i++) {
       const miniFilamentDropdownSelect = findMiniFilamentDropDownsSelect(
@@ -221,7 +224,8 @@ async function addListeners(printer) {
       await fillMiniFilamentDropDownList(
         miniFilamentDropdownSelect,
         printer,
-        i
+        i,
+        spoolDropDownList
       );
     }
   }
@@ -1343,6 +1347,9 @@ export async function initMonitoring(printers, clientSettings, view) {
             "panel-" + printers[p]._id
           );
           if (!printerPanel) {
+            if(!spoolDropDownList){
+              spoolDropDownList = await returnDropDownList()
+            }
             if (view === "panel") {
               let printerHTML = drawPanelView(printers[p], clientSettings);
               printerArea.insertAdjacentHTML("beforeend", printerHTML);
