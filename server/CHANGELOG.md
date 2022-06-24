@@ -2,6 +2,10 @@
 
 ### [1.4.2](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.1...1.4.2) (2022-06-24)
 
+### :x: Removed :x:
+
+* **server:** mjpeg proxy whilst i can figure out 4 stream limit](https://github.com/OctoFarm/OctoFarm/pull/1128/commits/0470db95ef9c322f0a23769b23ac497b1268b66c)
+
 ### [1.4.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.0...1.4.1) (2022-06-23)
 
 ### :persevere: Code Refactors :persevere:
