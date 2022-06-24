@@ -79,25 +79,24 @@ export async function returnDropDownList() {
 export async function fillMiniFilamentDropDownList(
   element,
   printer,
-  toolIndex
+  toolIndex,
+  dropDownList
 ) {
-  await redrawMiniFilamentDropDownList(element, printer, toolIndex);
+  await redrawMiniFilamentDropDownList(element, printer, toolIndex, dropDownList);
   element.addEventListener("change", async (event) => {
     await selectFilament([`${printer._id}-${toolIndex}`], event.target.value);
-    await redrawMiniFilamentDropDownList(element, printer, toolIndex);
+    await redrawMiniFilamentDropDownList(element, printer, toolIndex, dropDownList);
   });
 }
 
-async function redrawMiniFilamentDropDownList(element, printer, toolIndex) {
+async function redrawMiniFilamentDropDownList(element, printer, toolIndex, filamentDropDown) {
   element.innerHTML = "";
-  const filamentDropDown = await returnDropDownList();
   const { allowMultiSelectIsEnabled } =
     await isFilamentManagerPluginSyncEnabled();
   element.insertAdjacentHTML(
     "beforeend",
     '<option value="0">No Spool</option>'
   );
-  filamentDropDown.shift();
   filamentDropDown.forEach((spool) => {
     element.insertAdjacentHTML(
       "beforeend",
@@ -118,8 +117,10 @@ async function redrawFilamentDropDownList(element, printer, toolIndex) {
   const filamentDropDown = await returnDropDownList();
   const { allowMultiSelectIsEnabled } =
     await isFilamentManagerPluginSyncEnabled();
-  element.insertAdjacentHTML("beforeend", filamentDropDown[0]);
-  filamentDropDown.shift();
+  element.insertAdjacentHTML(
+      "beforeend",
+      '<option value="0">No Spool</option>'
+  );
   filamentDropDown.forEach((spool) => {
     element.insertAdjacentHTML(
       "beforeend",
@@ -138,8 +139,10 @@ async function redrawFilamentDropDownList(element, printer, toolIndex) {
 export async function drawHistoryDropDown(element, selectedID) {
   element.innerHTML = "";
   const filamentDropDown = await returnDropDownList();
-  element.insertAdjacentHTML("beforeend", filamentDropDown[0]);
-  filamentDropDown.shift();
+  element.insertAdjacentHTML(
+      "beforeend",
+      '<option value="0">No Spool</option>'
+  );
   filamentDropDown.forEach((spool) => {
     element.insertAdjacentHTML("beforeend", dropDownListTemplate(spool, true));
   });
