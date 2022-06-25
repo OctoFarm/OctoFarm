@@ -231,6 +231,9 @@ export function returnPrinterTableRow(printer) {
         <td class="align-middle">
             <span id="printerURL-${printer._id}"></span>
         </td>
+        <td class="align-middle">
+            <span id="printerOctoPrintUser-${printer._id}"></span>
+        </td>
                 <td class="align-middle">
             <small>
                 <span data-title="${printer.hostState.desc}" id="hostBadge-${
@@ -262,11 +265,14 @@ export function returnPrinterTableRow(printer) {
                 </span>
             </small>
         </td>
+
         <td class="align-middle" id="printerGroup-${printer._id}"></td>
-                <td class="align-middle" id="printerActionBtns-${printer._id}">
+         <td class="align-middle">
+            <span id="printerControlUser-${printer._id}"></span>
+        </td>
+        <td class="align-middle" id="printerActionBtns-${printer._id}">
 
         </td>
-
         <td class="align-middle" id="printerManageBtns-${printer._id}">
             ${returnPrinterManageDropDown(printer._id, printer.disabled)}
         </td>
