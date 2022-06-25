@@ -292,12 +292,11 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const actualOnline = JSON.parse(JSON.stringify(checked[0]));
 
     const serverChanges = isEqual(actualOnline.server, sentOnline.server);
-    console.log(serverChanges);
     const timeoutChanges = isEqual(actualOnline.timeout, sentOnline.timeout);
-    console.log(actualOnline.filament);
-    console.log(sentOnline.filament);
     const filamentChanges = isEqual(actualOnline.filament, sentOnline.filament);
     const hideEmptyChanges = actualOnline.filament.hideEmpty !== sentOnline.filament.hideEmpty;
+    const cameraUpdateIntervalChanges =
+      parseInt(actualOnline.cameras.updateInterval) === parseInt(sentOnline.cameras.updateInterval);
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -305,8 +304,9 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].history = sentOnline.history;
     checked[0].influxExport = sentOnline.influxExport;
     checked[0].monitoringViews = sentOnline.monitoringViews;
+    checked[0].cameras = sentOnline.cameras;
 
-    if ([serverChanges, timeoutChanges].includes(false)) {
+    if ([serverChanges, timeoutChanges, cameraUpdateIntervalChanges].includes(false)) {
       restartRequired = true;
     }
 
@@ -344,7 +344,6 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
         checked[0].markModified("influxExport");
       }
     }
-
     await checked[0].save().then(() => {
       SettingsClean.start();
     });

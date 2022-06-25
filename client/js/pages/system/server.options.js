@@ -111,6 +111,11 @@ const settingsElements = {
     currentOperations: document.getElementById("monitoring-currentOperations"),
     combined: document.getElementById("monitoring-combined"),
   },
+  cameras: {
+    aspectRatio: document.getElementById("cameraAspectRatio"),
+    proxyEnabled: document.getElementById("cameraProxyActive"),
+    updateInterval: document.getElementById("cameraUpdateInterval")
+  }
 };
 
 function returnSaveBtn() {
