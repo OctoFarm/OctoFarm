@@ -85,6 +85,7 @@ class PrinterStore {
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
         activeControlUser: printer.activeControlUser,
+        currentUser: printer.currentUser,
         fullyScanned: printer?.onboarding?.fullyScanned,
         klipperState: printer?.klipperState,
         printerPowerState: printer?.printerPowerState
