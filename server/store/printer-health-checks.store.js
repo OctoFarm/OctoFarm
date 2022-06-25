@@ -6,8 +6,7 @@ const {
   websocketChecks,
   printerConnectionCheck,
   profileChecks,
-  webcamChecks,
-  checkConnectionsMatchRetrySettings
+  webcamChecks
 } = require("../services/printer-health-checks.service");
 const Logger = require("../handlers/logger");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
@@ -29,7 +28,7 @@ const returnPrinterHealthChecks = (force = false) => {
 };
 
 const updatePrinterHealthChecks = async () => {
-  const farmPrinters = getPrinterStoreCache().listPrintersInformation();
+  const farmPrinters = getPrinterStoreCache().listPrintersUntouchedData();
   printerHealthChecks = [];
   logger.warning(`Found ${farmPrinters.length} to health check.`);
   for (const printer of farmPrinters) {
