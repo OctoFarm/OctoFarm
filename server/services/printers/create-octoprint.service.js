@@ -1775,7 +1775,7 @@ class OctoPrintPrinter {
     });
     if (fileIndex > -1 && !!fileInformation) {
       this.notifySubscribersOfFileInformationChange(fullPath, fileIndex, {
-        printerURL: this.printerURL
+        printerID: this._id
       });
     }
   }
