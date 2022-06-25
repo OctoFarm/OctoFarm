@@ -1,5 +1,36 @@
 # :octopus: :octopus: OctoFarm's Client Changelog :octopus: :octopus:
 
+## [1.5.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.1...client-1.5.0) (2022-06-25)
+
+
+### :dash: Code Improvements :dash:
+
+* **client:** allow views with cameras to update webcam snapshot on demand ([a3fb638](https://github.com/OctoFarm/OctoFarm/commit/a3fb6386675b0e858a1825018481afb519061d28))
+
+
+### :stars: New Features :stars:
+
+* **client:** client can activate/deactive camera proxy, default is deactivated ([edaa208](https://github.com/OctoFarm/OctoFarm/commit/edaa208b4dc6c68a85ff264c5d2931a62e8ecb50))
+* **client:** global display option for camera aspect ratio deafult,1x1,4x3,16x9 ([8cdac70](https://github.com/OctoFarm/OctoFarm/commit/8cdac70b00e6c51e78b870c801261b4316020c98))
+* **client:** show current OctoPrint and Active Control users on Printer Manager ([20a40a1](https://github.com/OctoFarm/OctoFarm/commit/20a40a1b80a7eb5129e5921366ba5d0f0e209228))
+
+
+### :curly_loop: UI :curly_loop:
+
+* **client:** fix incorrect message on bulk shutdown,reboot of octoprint host ([32e07be](https://github.com/OctoFarm/OctoFarm/commit/32e07bee7d72a1c5a099a49564d284132e074ed3))
+
+
+### :x: Removed :x:
+
+* **client:** cost and filament usage sort option for now closes [#1138](https://github.com/OctoFarm/OctoFarm/issues/1138) ([5bb9eff](https://github.com/OctoFarm/OctoFarm/commit/5bb9eff752139bbf2b43c3417566426a5d73d857))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** bulk printer control not using proxy url if set ([0b310e5](https://github.com/OctoFarm/OctoFarm/commit/0b310e5cd9a0679606c3256da8cc1af2a227c41e))
+* **client:** error on updating file thumbnail through octoprint proxy ([9367d7f](https://github.com/OctoFarm/OctoFarm/commit/9367d7f40de26111a8e26608ed25fb262a440a28))
+* **client:** showing "done" when in fact its 0 seconds ([cd69f19](https://github.com/OctoFarm/OctoFarm/commit/cd69f190736ecf1fdc3fb4e242e3d9c1a7635288))
+
 ### [1.4.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.0...client-1.4.1) (2022-06-24)
 
 
