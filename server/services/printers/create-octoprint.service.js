@@ -823,12 +823,17 @@ class OctoPrintPrinter {
   async #requiredApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering required API data. Forced Scan: " + force);
     this.#apiPrinterTickerWrap("Gathering required API data.", "Info", " Forced Scan: " + force);
-    return Promise.allSettled([
+    const stateCall = await this.acquireOctoPrintStateData(force);
+
+    const bulkCall = await Promise.allSettled([
       this.acquireOctoPrintSettingsData(force),
       this.acquireOctoPrintSystemData(force),
-      this.acquireOctoPrintProfileData(force),
-      this.acquireOctoPrintStateData(force)
+      this.acquireOctoPrintProfileData(force)
     ]);
+
+    bulkCall.push({ status: "fulfilled", value: stateCall });
+
+    return bulkCall;
   }
   async #optionalApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering optional API data. Forced Scan: " + force);
@@ -1091,7 +1096,6 @@ class OctoPrintPrinter {
   async acquireOctoPrintProfileData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
-
     if (!force && this.onboarding.profileApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
       return true;
@@ -1108,6 +1112,7 @@ class OctoPrintPrinter {
       this.#db.update({
         profiles: profiles
       });
+
       if (!!this?.profiles && !!this?.current) {
         this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
       }
@@ -1149,10 +1154,6 @@ class OctoPrintPrinter {
         current: current,
         options: options
       });
-
-      if (!!this?.profiles && !!this?.current) {
-        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
-      }
 
       if (!!this?.current) {
         this.currentConnection = PrinterClean.sortConnection(this.current);
@@ -1716,6 +1717,7 @@ class OctoPrintPrinter {
       this.acquireOctoPrintSystemData(force),
       this.acquireOctoPrintSettingsData(force)
     ]);
+    await this.cleanPrintersInformation();
   }
 
   async acquirePrinterPowerState() {
