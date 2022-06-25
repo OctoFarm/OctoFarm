@@ -2,8 +2,17 @@
 
 ## [1.5.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.0...1.5.0) (2022-06-25)
 
-### [1.4.3](https://github.com/OctoFarm/OctoFarm/compare/1.4.2...1.4.3) (2022-06-24)
+### :dash: Code Improvements :dash:
 
+* **server:** [send current octoprint user to printer manager](https://github.com/OctoFarm/OctoFarm/pull/1132/commits/13d62ab38f93ce832b9fe8800b35f8d1ab586b4a)
+
+### :stars: New Features :stars:
+* **server:** [proxy mjpeg stream to client](https://github.com/OctoFarm/OctoFarm/pull/1132/commits/2d107eb85f688a026131c478be2f97236405aadf)
+
+### :hammer: Bug Fixes :hammer:
+* **server:** [not saving Estimated Life Span settings for printer cost settings](https://github.com/OctoFarm/OctoFarm/pull/1132/commits/7c65250f4d75dd3ca9ae218f92c5c18ee0d0d2aa)
+
+### [1.4.3](https://github.com/OctoFarm/OctoFarm/compare/1.4.2...1.4.3) (2022-06-24)
 
 ### :hammer: Bug Fixes :hammer:
 
