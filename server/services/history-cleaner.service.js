@@ -443,7 +443,7 @@ class HistoryCleanerService {
     const sortedTopPrinterList = [];
     Object.entries(groupedPrinterList).forEach(([key, value]) => {
       const sumOfPrintTime = value.reduce((sum, currentValue) => {
-        return sum + currentValue.printTime;
+        return sum + currentValue?.printTime ? currentValue.printTime : 0;
       }, 0);
       const sumOfPrints = value.reduce((sum) => {
         return sum + 1;
@@ -487,7 +487,7 @@ class HistoryCleanerService {
     const sortedTopFilesList = [];
     Object.entries(groupedFilesList).forEach(([key, value]) => {
       const sumOfPrintTime = value.reduce((sum, currentValue) => {
-        return sum + currentValue.printTime;
+        return sum + currentValue?.printTime ? currentValue.printTime : 0;
       }, 0);
       const sumOfPrints = value.reduce((sum) => {
         return sum + 1;
