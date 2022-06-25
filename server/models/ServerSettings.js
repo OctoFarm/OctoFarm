@@ -170,7 +170,7 @@ const ServerSettingsSchema = new mongoose.Schema({
     aspectRatio: {
       type: String,
       required: true,
-      default: "16x9"
+      default: "0"
     },
     updateInterval: {
       type: Number,

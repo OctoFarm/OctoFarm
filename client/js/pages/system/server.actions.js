@@ -402,8 +402,12 @@ async function updateServerSettings() {
         settingsElements.monitoringViews.currentOperations.checked,
       combined: settingsElements.monitoringViews.combined.checked,
     },
+    cameras: {
+      aspectRatio: settingsElements.cameras.aspectRatio.value,
+      proxyEnabled: settingsElements.cameras.proxyEnabled.checked,
+      updateInterval: settingsElements.cameras.updateInterval.value * 1000
+    }
   };
-
   const previousSettings = await OctoFarmClient.get("settings/server/get");
   if (
     previousSettings.filament.allowMultiSelect === true &&
