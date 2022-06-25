@@ -85,6 +85,9 @@ function updatePrinterInfo(printer) {
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
 
+  const octoPrintUser = document.getElementById(`printerOctoPrintUser-${printer._id}`);
+  const printerControlUser = document.getElementById(`printerControlUser-${printer._id}`);
+
   const printerSortIndex = document.getElementById(
     `printerSortIndex-${printer._id}`
   );
@@ -109,6 +112,8 @@ function updatePrinterInfo(printer) {
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 
+  UI.doesElementNeedUpdating(printer?.currentUser ? printer.currentUser : "No User", octoPrintUser, "innerHTML")
+  UI.doesElementNeedUpdating(printer?.activeControlUser ? printer.activeControlUser : "No User", printerControlUser, "innerHTML")
   printerGroup.innerHTML = printer.group;
 }
 
