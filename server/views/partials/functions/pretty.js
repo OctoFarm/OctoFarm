@@ -1,9 +1,8 @@
 const _ = require("lodash");
 
 const bytes = function (a, b) {
-  let string = "";
   if (a === undefined || isNaN(a) || a === null) {
-    return (string = "No File Estimate");
+    return "No File Estimate";
   } else {
     if (0 == a) return "0 Bytes";
     const c = 1024,
@@ -53,7 +52,7 @@ const generateTime = function (seconds) {
       }
     }
     if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
-      string = string.replace("0s", "Done");
+      string = string.replace("0s", seconds + "s");
     }
   }
 
