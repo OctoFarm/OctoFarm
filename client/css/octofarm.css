@@ -3,6 +3,21 @@ html {
   height: 100%;
 }
 
+.sixteen-by-nine {
+  object-fit: cover;
+  aspect-ratio: 16/9;
+}
+
+.four-by-three {
+  object-fit: cover;
+  aspect-ratio: 4/3;
+}
+
+.one-by-one {
+  object-fit: cover;
+  aspect-ratio: 1/1;
+}
+
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;

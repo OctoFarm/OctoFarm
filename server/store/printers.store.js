@@ -1,6 +1,7 @@
 const { findIndex } = require("lodash");
 const { ScriptRunner } = require("../services/local-scripts.service");
 const { PrinterTicker } = require("../services/printer-connection-log.service");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
@@ -132,7 +133,8 @@ class PrinterStore {
         fullyScanned: printer?.onboarding?.fullyScanned,
         klipperState: printer?.klipperState,
         printerPowerState: printer?.printerPowerState,
-        storage: printer?.storage
+        storage: printer?.storage,
+        aspectRatio: SettingsClean.returnCameraSettings().aspectRatio
       };
     });
 
