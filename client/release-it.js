@@ -65,7 +65,7 @@ module.exports = {
   },
   git: {
     commitMessage: "chore(release): client release v${version}",
-    commit: false,
+    commit: true,
     tag: true,
     push: false,
     requireCleanWorkingDir: false,
