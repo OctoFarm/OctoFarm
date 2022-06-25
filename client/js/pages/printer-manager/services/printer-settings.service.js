@@ -210,6 +210,7 @@ class PrinterSettingsService {
   }
 
   static setupCostTab() {
+    console.log(currentPrinter.costSettings)
     document.getElementById("psPrinterCost").innerHTML = `
           <div class="col-6">
                  <h5>Operating Costs</h5>
@@ -253,6 +254,7 @@ class PrinterSettingsService {
                         What did you buy your printer for?
                     </small>
                   </div>
+                 
                   <div class="form-group">
                     <label for="psEstimatedLifespan">Estimated Life Span</label>
                          <div class="input-group mb-2">

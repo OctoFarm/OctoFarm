@@ -718,7 +718,7 @@ class PrinterStore {
       powerConsumption,
       electricityCosts,
       purchasePrice,
-      estimatedLifeSpan,
+      estimateLifespan,
       maintenanceCosts
     } = costSettings;
 
@@ -726,7 +726,7 @@ class PrinterStore {
       !!powerConsumption ||
       !!electricityCosts ||
       !!purchasePrice ||
-      !!estimatedLifeSpan ||
+      !!estimateLifespan ||
       !!maintenanceCosts
     ) {
       const costSettingsNew = {
@@ -739,8 +739,8 @@ class PrinterStore {
         ...(!!purchasePrice
           ? { purchasePrice }
           : { purchasePrice: originalPrinter.costSettings.purchasePrice }),
-        ...(!!estimatedLifeSpan
-          ? { estimateLifespan: estimatedLifeSpan }
+        ...(!!estimateLifespan
+          ? { estimateLifespan: estimateLifespan }
           : { estimateLifespan: originalPrinter.costSettings.estimateLifespan }),
         ...(!!maintenanceCosts
           ? { maintenanceCosts }
