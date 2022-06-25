@@ -164,6 +164,7 @@ class PrinterStore {
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
         fullyScanned: printer?.onboarding?.fullyScanned,
+        camURL: generateOctoFarmCameraURL(printer),
         fileList: FileClean.generate(
           printer.fileList,
           printer.selectedFilament,
