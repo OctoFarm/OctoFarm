@@ -1011,10 +1011,10 @@
                                 <label class="input-group-text" for="cameraAspectRatio">Aspect Ratio</label>
                             </div>
                             <select class="custom-select" id="cameraAspectRatio">
-                                <option value="0">Stream Default</option>
-                                <option value="1x1">1x1</option>
-                                <option value="4x3">4x3</option>
-                                <option value="16x9">16x9</option>
+                                <option value="0" <%= serverSettings.cameras.aspectRatio === "0" ? "selected" : "" %>>Stream Default</option>
+                                <option value="1x1" <%= serverSettings.cameras.aspectRatio === "1x1" ? "selected" : "" %>>1x1</option>
+                                <option value="4x3" <%= serverSettings.cameras.aspectRatio === "4x3" ? "selected" : "" %>>4x3</option>
+                                <option value="16x9" <%= serverSettings.cameras.aspectRatio === "16x9" ? "selected" : "" %>>16x9</option>
                             </select>
                         </div>
                     </div>

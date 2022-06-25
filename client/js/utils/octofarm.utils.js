@@ -114,6 +114,7 @@ export function imageOrCamera(printer, doNotDisplay = false) {
         flipV,
         flipH,
         rotate90,
+        aspectRatio: printer.aspectRatio
       });
     } else {
       if (
