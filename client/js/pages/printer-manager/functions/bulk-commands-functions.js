@@ -848,7 +848,7 @@ export async function bulkOctoPrintControlCommand() {
     if (printer.camURL && printer.camURL.length !== 0) {
       cameraBlock += `
         <div class="col-lg-3">
-            <img alt="Printer Camera Stream" width="100%" src="${printer.camURL}">
+            <img id="printerCameraControl-${printer._id}" alt="Printer Camera Stream" width="100%" src="${printer.camURL}">
         </div>
         `;
     }
