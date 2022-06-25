@@ -37,7 +37,7 @@ const { sanitizeString } = require("../utils/sanitize-utils");
 const { databaseNamesList } = require("../constants/database.constants");
 const { TaskManager } = require("../services/task-manager.service");
 const { SystemRunner } = require("../services/system-information.service");
-const { listActiveClients } = require("../services/server-side-events.service");
+const { listActiveClientsRes } = require("../services/server-side-events.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { FilamentClean } = require("../services/filament-cleaner.service");
 
@@ -438,7 +438,7 @@ router.get("/system/tasks", ensureAuthenticated, ensureAdministrator, async (req
   res.send(taskManagerState);
 });
 
-router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClients);
+router.get("/system/activeUsers", ensureAuthenticated, ensureAdministrator, listActiveClientsRes);
 
 router.post("/client/logs", ensureAuthenticated, async (req, res) => {
   const { code, message, name, statusCode, type, color, developerMessage } = req.body;

@@ -3,7 +3,7 @@ const { SettingsClean } = require("../../settings-cleaner.service");
 const generateOctoFarmCameraURL = (printer, live) => {
   const { camURL, _id } = printer;
 
-  if (SettingsClean.isProxyCamerasEnabled()) {
+  if (!SettingsClean.isProxyCamerasEnabled()) {
     return camURL;
   }
 

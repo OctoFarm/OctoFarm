@@ -38,7 +38,7 @@ export function updateLiveFileInformation(id, data) {
       // Handle extra keys / information, usually plugins...
       const { additionalInformation } = data;
       if (!!additionalInformation) {
-        updateFileThumbnail(id, thumbnail, additionalInformation.printerURL);
+        updateFileThumbnail(id, thumbnail, additionalInformation.printerID);
       }
     }
   }
