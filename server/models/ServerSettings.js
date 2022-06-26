@@ -161,6 +161,23 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: false
     }
   },
+  cameras: {
+    proxyEnabled: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    aspectRatio: {
+      type: String,
+      required: true,
+      default: "0"
+    },
+    updateInterval: {
+      type: Number,
+      required: true,
+      default: 10000
+    }
+  },
   clientTheme: {
     mode: {
       type: String,

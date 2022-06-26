@@ -114,6 +114,7 @@ export function imageOrCamera(printer, doNotDisplay = false) {
         flipV,
         flipH,
         rotate90,
+        aspectRatio: printer.aspectRatio
       });
     } else {
       if (
@@ -351,8 +352,6 @@ export function canWeTurnOnThePrinter(printer) {
   return !!powerOnCommand || powerOnCommand !== "";
 }
 
-export function canWeDetectPrintersPowerState(printer) {
-  const { powerSettings: { powerStatusCommand } = {} } = printer || {};
-
-  return !!powerStatusCommand || powerStatusCommand !== "";
+export function canWeDetectPrintersPowerState(powerStatusURL) {
+  return !!powerStatusURL || powerStatusURL.length === 0;
 }

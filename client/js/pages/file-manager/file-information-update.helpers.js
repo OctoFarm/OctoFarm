@@ -70,13 +70,14 @@ export const updateFileUploadDate = (id, uploadDate) => {
   }
 };
 
-export const updateFileThumbnail = (id, thumbnail, printerURL) => {
+export const updateFileThumbnail = (id, thumbnail, printerID) => {
   if (!id) {
     return;
   }
-  if (!!thumbnail && !!printerURL) {
+  console.log(printerID)
+  if (!!thumbnail && !!printerID) {
     const fileThumbnail = document.getElementById(`fileThumbnail-${id}`);
-    const thumbnailURL = `${printerURL}/${thumbnail}`;
+    const thumbnailURL = `/octoprint/${printerID}/${thumbnail}`;
     const thumbnailElement = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
     UI.doesElementNeedUpdating(thumbnailElement, fileThumbnail, "innerHTML");
   }

@@ -85,6 +85,9 @@ function updatePrinterInfo(printer) {
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
 
+  const octoPrintUser = document.getElementById(`printerOctoPrintUser-${printer._id}`);
+  const printerControlUser = document.getElementById(`printerControlUser-${printer._id}`);
+
   const printerSortIndex = document.getElementById(
     `printerSortIndex-${printer._id}`
   );
@@ -109,6 +112,8 @@ function updatePrinterInfo(printer) {
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
 
+  UI.doesElementNeedUpdating(printer?.currentUser ? printer.currentUser : "No User", octoPrintUser, "innerHTML")
+  UI.doesElementNeedUpdating(printer?.activeControlUser ? printer.activeControlUser : "No User", printerControlUser, "innerHTML")
   printerGroup.innerHTML = printer.group;
 }
 
@@ -205,26 +210,6 @@ function checkIfPrinterConnectionThrottled(printer) {
     return;
   }
   UI.addDisplayNoneToElement(printerConnectionThrottled);
-}
-
-function corsWarningCheck(printer) {
-  const corsAlert = document.getElementById(`corsIssue-${printer._id}`);
-  if (!printer.corsCheck) {
-    updateLogLine(
-      "corsCheck-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "corsCheck-" + printer._id,
-        name: "Cors is not enabled! Please enable, restart OctoPrint and force reconnect your printer! Manage -> Force Reconnect...",
-        printerName: printer.printerName,
-        colour: "Offline",
-      })
-    );
-    UI.removeDisplayNoneFromElement(corsAlert);
-  } else {
-    removeLogLine({ id: "corsCheck-" + printer._id });
-    UI.addDisplayNoneToElement(corsAlert);
-  }
 }
 
 function setupReconnectingIn(printer) {
@@ -527,8 +512,6 @@ function updatePrinterRow(printer) {
       checkIfRestartRequired(printer);
 
       checkIfMultiUserIssueFlagged(printer);
-
-      corsWarningCheck(printer);
 
       //TODO make this work with ALL registered events, and only when the even is registered...
       //checkIfPrinterHasEvents(printer);

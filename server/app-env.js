@@ -17,6 +17,8 @@ const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-en
 const deprecatedConfigFolder = "../config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
+const packageLockPath = path.join(__dirname, "package-lock.json");
+const packageLockFile = require(packageLockPath);
 const exec = require("child_process").exec;
 let currentClientVersion;
 const dotEnvPath = path.join(__dirname, "../.env");
@@ -364,12 +366,11 @@ function isEnvProd() {
  */
 function fetchClientVersion() {
   if (!currentClientVersion) {
-    exec("npm view @notexpectedyet/octofarm-client version", function (err, stdout, stderr) {
-      if (err) {
-        logger.error("Failed to grab client version!", err.toString());
-      }
-      currentClientVersion = stdout;
-    });
+    currentClientVersion =
+      packageLockFile?.dependencies["@notexpectedyet/octofarm-client"]?.version || "unknown";
+    if (currentClientVersion === "unknown") {
+      logger.error("Unable to parse package-lock file... please check installation!");
+    }
   }
   return currentClientVersion;
 }

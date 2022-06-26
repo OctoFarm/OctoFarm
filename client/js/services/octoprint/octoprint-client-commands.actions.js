@@ -152,6 +152,11 @@ export async function disconnectPrinterFromOctoPrint(printer) {
 }
 
 export async function sendPowerCommandToOctoPrint(printer, powerCommand) {
+  let returnMessage = "Your OctoPrint instance will " + powerCommand;
+  const hostTerm = ["reboot", "shutdown"];
+  if(hostTerm.includes(powerCommand)){
+    returnMessage = "Your OctoPrint host will " + powerCommand;
+  }
   if (printer.printerState.colour.category !== "Active") {
     let post = await OctoPrintClient.systemNoConfirm(printer, powerCommand);
     await UI.delay(1000);
@@ -159,7 +164,7 @@ export async function sendPowerCommandToOctoPrint(printer, powerCommand) {
       if (post.status === 204) {
         return {
           status: bulkActionsStates.SUCCESS,
-          message: "Your OctoPrint instance will " + powerCommand,
+          message: returnMessage,
         };
       } else {
         return {

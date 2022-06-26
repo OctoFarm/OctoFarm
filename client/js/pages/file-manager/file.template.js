@@ -1,7 +1,7 @@
 import Calc from "../../utils/calc";
 
 const getSpinnerElement = () => {
-  return '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+  return "<i class=\"fa-solid fa-circle-notch fa-spin\"></i>";
 };
 
 export const getFolderTemplate = (folder, id) => {
@@ -59,9 +59,9 @@ export const getFileTemplate = (file, printerURL, id) => {
   }
 
   let thumbnail =
-    '<span class="text-center"><i class="fas fa-file-code fa-2x"></i></span>';
+    "<span class=\"text-center\"><i class=\"fas fa-file-code fa-2x\"></i></span>";
   if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
-    const thumbnailURL = `${printerURL}/${file.thumbnail}`;
+    const thumbnailURL = `/octoprint/${id}/${file.thumbnail}`;
     thumbnail = `<span class="text-center"><img src='${thumbnailURL}' width="100%" alt="thumbnail"></span>`;
   }
   let fileDate = new Date(file.uploadDate * 1000);

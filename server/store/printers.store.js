@@ -1,6 +1,7 @@
 const { findIndex } = require("lodash");
 const { ScriptRunner } = require("../services/local-scripts.service");
 const { PrinterTicker } = require("../services/printer-connection-log.service");
+const { SettingsClean } = require("../services/settings-cleaner.service");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const Logger = require("../handlers/logger");
@@ -11,6 +12,9 @@ const { attachProfileToSpool } = require("../utils/spool.utils");
 const { TaskManager } = require("../services/task-manager.service");
 const { FileClean } = require("../services/file-cleaner.service");
 const { getEventEmitterCache } = require("../cache/event-emitter.cache");
+const {
+  generateOctoFarmCameraURL
+} = require("../services/printers/utils/camera-url-generation.utils");
 const { JobClean } = require("../services/job-cleaner.service");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const logger = new Logger(LOGGER_ROUTE_KEYS.STORE_PRINTERS);
@@ -82,8 +86,10 @@ class PrinterStore {
         connectionOptions: printer.connectionOptions,
         powerSettings: printer.powerSettings,
         activeControlUser: printer.activeControlUser,
+        currentUser: printer.currentUser,
         fullyScanned: printer?.onboarding?.fullyScanned,
-        klipperState: printer?.klipperState
+        klipperState: printer?.klipperState,
+        printerPowerState: printer?.printerPowerState
       };
     });
 
@@ -101,7 +107,7 @@ class PrinterStore {
         printerURL: printer.printerURL,
         webSocketURL: printer.webSocketURL,
         apikey: printer.apikey,
-        camURL: printer.camURL,
+        camURL: generateOctoFarmCameraURL(printer),
         group: printer.group,
         category: printer.category,
         hostState: printer.hostState,
@@ -125,7 +131,10 @@ class PrinterStore {
         resends: printer.resends,
         activeControlUser: printer.activeControlUser,
         fullyScanned: printer?.onboarding?.fullyScanned,
-        klipperState: printer?.klipperState
+        klipperState: printer?.klipperState,
+        printerPowerState: printer?.printerPowerState,
+        storage: printer?.storage,
+        aspectRatio: SettingsClean.returnCameraSettings().aspectRatio
       };
     });
 
@@ -155,11 +164,41 @@ class PrinterStore {
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
         fullyScanned: printer?.onboarding?.fullyScanned,
+        camURL: generateOctoFarmCameraURL(printer),
         fileList: FileClean.generate(
           printer.fileList,
           printer.selectedFilament,
           printer.costSettings
         )
+      });
+    });
+
+    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
+  }
+
+  listPrintersUntouchedData(disabled = false, onlyDisabled = false) {
+    let returnList = [];
+    if (onlyDisabled) {
+      this.#printersList.forEach((printer) => {
+        if (printer?.disabled) {
+          returnList.push(JSON.parse(JSON.stringify(printer)));
+        }
+      });
+    } else {
+      this.#printersList.forEach((printer) => {
+        if (disabled) {
+          returnList.push(JSON.parse(JSON.stringify(printer)));
+        } else {
+          if (!printer.disabled) {
+            returnList.push(JSON.parse(JSON.stringify(printer)));
+          }
+        }
+      });
+    }
+    //CLEAN FILES
+    returnList = returnList.map((printer) => {
+      return Object.assign(printer, {
+        fullyScanned: printer?.onboarding?.fullyScanned
       });
     });
 
@@ -510,7 +549,7 @@ class PrinterStore {
       }
 
       // Check for group change...
-      if (!!newPrinterInfo?.group && oldPrinter.group !== newPrinterInfo.group) {
+      if (oldPrinter.group !== newPrinterInfo.group) {
         const loggerMessage = `Changed group from ${oldPrinter.group} to ${newPrinterInfo.group}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -679,7 +718,7 @@ class PrinterStore {
       powerConsumption,
       electricityCosts,
       purchasePrice,
-      estimatedLifeSpan,
+      estimateLifespan,
       maintenanceCosts
     } = costSettings;
 
@@ -687,7 +726,7 @@ class PrinterStore {
       !!powerConsumption ||
       !!electricityCosts ||
       !!purchasePrice ||
-      !!estimatedLifeSpan ||
+      !!estimateLifespan ||
       !!maintenanceCosts
     ) {
       const costSettingsNew = {
@@ -700,8 +739,8 @@ class PrinterStore {
         ...(!!purchasePrice
           ? { purchasePrice }
           : { purchasePrice: originalPrinter.costSettings.purchasePrice }),
-        ...(!!estimatedLifeSpan
-          ? { estimateLifespan: estimatedLifeSpan }
+        ...(!!estimateLifespan
+          ? { estimateLifespan: estimateLifespan }
           : { estimateLifespan: originalPrinter.costSettings.estimateLifespan }),
         ...(!!maintenanceCosts
           ? { maintenanceCosts }

@@ -804,10 +804,13 @@ class History {
       }
     });
     let totalPrintCountList = statistics.map((stat) => {
+      const complete = stat?.statistics?.completed ? stat.statistics.completed : 0;
+      const failed = stat?.statistics?.failed ? stat.statistics.failed : 0;
+      const cancelled = stat?.statistics?.cancelled ? stat.statistics.cancelled : 0;
       const calculation =
-        stat.statistics.complete +
-        stat.statistics.failed +
-        stat.statistics.cancelled;
+        complete +
+        failed +
+        cancelled;
       if (isNaN(calculation)) {
         return 0;
       } else {
@@ -839,7 +842,7 @@ class History {
         },
         background: "#303030",
       },
-      colors: ["#00bc8c", "#e74c3c", "#f39c12", "#12d1f3"],
+      colors: ["#12d1f3", "#00bc8c", "#e74c3c", "#f39c12"],
       dataLabels: {
         enabled: true,
         background: {
@@ -923,7 +926,7 @@ class History {
             },
           },
           show: false,
-        },
+        }
       ],
       xaxis: {
         categories: monthArray,
@@ -938,6 +941,7 @@ class History {
     }
 
     this.monthlyCompetionByDay.updateSeries([
+      { name: "Total Count", data: totalPrintCountList },
       {
         name: "Success Count",
         data: successCountList,
@@ -950,7 +954,6 @@ class History {
         name: "Cancelled Count",
         data: cancelledCountList,
       },
-      { name: "Total Count", data: totalPrintCountList },
     ]);
 
     const sparkOptions = dashboardOptions.historySparkLineOptions;
@@ -1308,38 +1311,71 @@ class History {
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
       const toolsArray = [];
-      for (const [i, spool] of current.spools.entries()) {
-        const sp = Object.keys(spool)[0];
-        const spoolSelector = returnBigFilamentSelectorTemplate(i);
-        toolsArray.push(sp);
-        viewTable.insertAdjacentHTML(
-          "beforeend",
-          `
+      if(!!current?.spools){
+        for (const [i, spool] of current.spools.entries()) {
+          const sp = Object.keys(spool)[0];
+          const spoolSelector = returnBigFilamentSelectorTemplate(i);
+          toolsArray.push(sp);
+          viewTable.insertAdjacentHTML(
+              "beforeend",
+              `
           <tr>
               <td>
                 ${spoolSelector}
               </td>
               <td>
-              ${spool[sp].volume}m3
+              ${spool[sp]?.volume ? spool[sp]?.volume : 0}m3
               </td>
               <td>
-              ${spool[sp].length}m
+              ${spool[sp]?.length ? spool[sp]?.length : 0}m
               </td>
               <td>
-                 ${spool[sp].weight}g
+                 ${spool[sp]?.weight ? spool[sp]?.weight : 0}g
               </td>
               <td>
-                 ${spool[sp].cost}
+                 ${spool[sp]?.cost ? spool[sp]?.cost.toFixed(2) : 0}
+              </td>
+              </tr>
+          </tr>
+        `
+          );
+          await drawHistoryDropDown(
+              document.getElementById(`tool-${i}-bigFilamentSelect`),
+              spool[sp]?.spoolId
+          );
+        }
+      }else{
+        const spoolSelector = returnBigFilamentSelectorTemplate(0);
+        toolsArray.push(0);
+        viewTable.insertAdjacentHTML(
+            "beforeend",
+            `
+          <tr>
+              <td>
+                ${spoolSelector}
+              </td>
+              <td>
+              0m3
+              </td>
+              <td>
+              0m
+              </td>
+              <td>
+              0g
+              </td>
+              <td>
+               0
               </td>
               </tr>
           </tr>
         `
         );
         await drawHistoryDropDown(
-          document.getElementById(`tool-${i}-bigFilamentSelect`),
-          spool[sp].spoolId
+            document.getElementById(`tool-0-bigFilamentSelect`),
+            0
         );
       }
+
       viewTable.insertAdjacentHTML(
         "beforeend",
         `
@@ -1357,7 +1393,7 @@ class History {
         ${current.totalWeight.toFixed(2)}g
         </td>
         <td>
-        ${current.spoolCost}
+        ${current.spoolCost.toFixed(2)}
         </td>
         </tr>
       `
@@ -1477,19 +1513,21 @@ class History {
       } else {
         statesFailed.push(1);
       }
+      const costPerHourSafe = record.costPerHour ? parseFloat(record.costPerHour) : 0
+      printTimeTotal.push(parseFloat(record.printTime));
+      filamentUsageGrams.push(parseFloat(record.totalWeight));
+      filamentUsageLength.push(parseFloat(record.totalLength));
+      filamentCost.push(parseFloat(record.spoolCost));
+      printerCostTotal.push(parseFloat(record.printerCost));
+      fullCostTotal.push(parseFloat(record.totalCost));
+      if(!isNaN(costPerHourSafe)){
+        costPerHour.push(costPerHourSafe);
+      }
 
-      printTimeTotal.push(parseInt(record.printTime));
-      filamentUsageGrams.push(parseInt(record.totalWeight));
-      filamentUsageLength.push(parseInt(record.totalLength));
-      filamentCost.push(parseInt(record.spoolCost));
-      printerCostTotal.push(parseInt(record.printerCost));
-      fullCostTotal.push(parseInt(record.totalCost));
-      costPerHour.push(parseInt(record.costPerHour));
     });
-
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
-    const avgHourCost = totalHourCost / costPerHour.length;
+    const avgHourCost = !isNaN(totalHourCost) ? totalHourCost : 0 / costPerHour.length;
 
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
@@ -1515,14 +1553,11 @@ class History {
       .reduce((a, b) => a + b, 0)
       .toFixed(2)}g`;
     ELEMENTS.filamentCostTotal.innerHTML = filamentCost
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.printerCostTotal.innerHTML = printerCostTotal
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.totalCost.innerHTML = fullCostTotal
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+      .reduce((a, b) => a + b, 0).toFixed(2);
     ELEMENTS.averageCostPerHour.innerHTML = avgHourCost.toFixed(2);
   }
 }

@@ -5,7 +5,6 @@ function isValidHttpUrl(string) {
   } catch (e) {
     return false;
   }
-
   return url.protocol === "http:" || url.protocol === "https:";
 }
 

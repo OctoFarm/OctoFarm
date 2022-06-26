@@ -26,6 +26,11 @@ const {
   parseAllOctoPrintUsers,
   findCurrentUserForOctoFarmConnection
 } = require("../octoprint/utils/octoprint-api-helpers.utils");
+const {
+  createPrinterPowerURL,
+  parseOctoPrintPowerResponse,
+  canWeDetectPrintersPowerState
+} = require("../octoprint/utils/printer-power-plugins.utils");
 const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
@@ -69,6 +74,7 @@ class OctoPrintPrinter {
   apikey = undefined;
   webSocketURL = undefined;
   camURL = "";
+  clientCamURL = "";
   settingsAppearance = undefined;
   // Always database
   _id = undefined;
@@ -129,7 +135,9 @@ class OctoPrintPrinter {
     estimateLifespan: 43800,
     maintenanceCosts: 0.25
   };
+  printerPowerState;
   powerSettings = {
+    default: true,
     powerOnCommand: "",
     powerOnURL: "",
     powerOffCommand: "",
@@ -157,7 +165,6 @@ class OctoPrintPrinter {
   pluginsListDisabled = undefined;
   octoPrintUpdate = undefined;
   octoPrintPluginUpdates = undefined;
-  corsCheck = true;
   settingsApi = undefined;
   settingsFeature = undefined;
   settingsFolder = undefined;
@@ -249,7 +256,6 @@ class OctoPrintPrinter {
       pluginsListDisabled,
       octoPrintUpdate,
       octoPrintPluginUpdates,
-      corsCheck,
       settingsApi,
       settingsFeature,
       settingsFolder,
@@ -339,9 +345,6 @@ class OctoPrintPrinter {
     }
     if (!!octoPrintPluginUpdates) {
       this.octoPrintPluginUpdates = octoPrintPluginUpdates;
-    }
-    if (!!corsCheck) {
-      this.corsCheck = corsCheck;
     }
     if (!!settingsApi) {
       this.settingsApi = settingsApi;
@@ -656,12 +659,6 @@ class OctoPrintPrinter {
         state: "API Fail!",
         stateDescription: "Required API Checks have failed... attempting reconnect..."
       };
-      if (!this.corsCheck) {
-        requiredAPIFail = {
-          state: "CORS NOT ENABLED!",
-          stateDescription: "Cors not enabled, setting offline!"
-        };
-      }
       this.setPrinterState(PRINTER_STATES(requiredAPIFail).SHUTDOWN);
       return "Failed due to missing required values!";
     }
@@ -826,12 +823,17 @@ class OctoPrintPrinter {
   async #requiredApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering required API data. Forced Scan: " + force);
     this.#apiPrinterTickerWrap("Gathering required API data.", "Info", " Forced Scan: " + force);
-    return Promise.allSettled([
+    const stateCall = await this.acquireOctoPrintStateData(force);
+
+    const bulkCall = await Promise.allSettled([
       this.acquireOctoPrintSettingsData(force),
       this.acquireOctoPrintSystemData(force),
-      this.acquireOctoPrintProfileData(force),
-      this.acquireOctoPrintStateData(force)
+      this.acquireOctoPrintProfileData(force)
     ]);
+
+    bulkCall.push({ status: "fulfilled", value: stateCall });
+
+    return bulkCall;
   }
   async #optionalApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering optional API data. Forced Scan: " + force);
@@ -1094,7 +1096,6 @@ class OctoPrintPrinter {
   async acquireOctoPrintProfileData(force = false) {
     this.#apiPrinterTickerWrap("Acquiring state data", "Info");
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().STATE, "warning");
-
     if (!force && this.onboarding.profileApi) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
       return true;
@@ -1111,6 +1112,7 @@ class OctoPrintPrinter {
       this.#db.update({
         profiles: profiles
       });
+
       if (!!this?.profiles && !!this?.current) {
         this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
       }
@@ -1153,10 +1155,6 @@ class OctoPrintPrinter {
         options: options
       });
 
-      if (!!this?.profiles && !!this?.current) {
-        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
-      }
-
       if (!!this?.current) {
         this.currentConnection = PrinterClean.sortConnection(this.current);
       }
@@ -1193,11 +1191,9 @@ class OctoPrintPrinter {
     });
 
     const globalStatusCode = checkApiStatusResponse(settingsCheck);
-
     if (globalStatusCode === 200) {
       const { api, feature, folder, plugins, scripts, serial, server, system, webcam, appearance } =
         await settingsCheck.json();
-      this.corsCheck = api.allowCrossOrigin;
       this.settingsApi = api;
       this.settingsFeature = feature;
       this.settingsFolder = folder;
@@ -1209,29 +1205,22 @@ class OctoPrintPrinter {
       this.settingsWebcam = webcam;
 
       //These should not run ever again if this endpoint is forcibly updated. They are for initial scan only.
-      if (!force) {
-        if (this.camURL.length === 0) {
-          this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
-        }
-        this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
-        this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
-        if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
-          this.settingsAppearance.name = PrinterClean.grabOctoPrintName(
-            appearance,
-            this.printerURL
-          );
-        }
+      if (this.camURL.length === 0) {
+        this.camURL = acquireWebCamData(this.camURL, this.printerURL, webcam.streamUrl);
+      }
+      this.costSettings = testAndCollectCostPlugin(this._id, this.costSettings, plugins);
+      this.powerSettings = testAndCollectPSUControlPlugin(this._id, this.powerSettings, plugins);
+      if (this.settingsAppearance.name === "Grabbing from OctoPrint...") {
+        this.settingsAppearance.name = PrinterClean.grabOctoPrintName(appearance, this.printerURL);
       }
       if (this.settingsAppearance.color !== appearance.color) {
         this.settingsAppearance.color = appearance.color;
       }
-
       this.#db.update({
         camURL: this.camURL,
         settingsAppearance: this.settingsAppearance,
         costSettings: this.costSettings,
         powerSettings: this.powerSettings,
-        corsCheck: api.allowCrossOrigin,
         settingsApi: api,
         settingsFeature: feature,
         settingsFolder: folder,
@@ -1250,9 +1239,6 @@ class OctoPrintPrinter {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
       this.#db.update({ onboarding: this.onboarding });
-      if (!this.corsCheck) {
-        return false;
-      }
       return true;
     } else {
       logger.http("Failed to acquire settings data..." + settingsCheck);
@@ -1516,7 +1502,7 @@ class OctoPrintPrinter {
       force = true;
     }
 
-    if (this?.fileList?.fileList?.length === 0 || force) {
+    if (force || this?.fileList?.fileList?.length === 0) {
       const filesCheck = await this.#api.getFiles(true, true).catch((e) => {
         logger.http("Failed Aquire files data", e.toString());
         return false;
@@ -1731,6 +1717,37 @@ class OctoPrintPrinter {
       this.acquireOctoPrintSystemData(force),
       this.acquireOctoPrintSettingsData(force)
     ]);
+    await this.cleanPrintersInformation();
+  }
+
+  async acquirePrinterPowerState() {
+    const { powerStatusURL, powerStatusCommand } = this.powerSettings;
+
+    if (!canWeDetectPrintersPowerState(powerStatusURL)) {
+      return;
+    }
+
+    const powerURL = createPrinterPowerURL(powerStatusURL);
+    let powerReturnState;
+    if (!!powerStatusCommand && powerStatusCommand.length === 0) {
+      powerReturnState = await this.#api.getPrinterPowerState(powerURL).catch((e) => {
+        logger.http("Failed Aquire profile data", e.toString());
+        return 900;
+      });
+    } else {
+      powerReturnState = await this.#api
+        .postPrinterPowerState(powerURL, JSON.parse(powerStatusCommand))
+        .catch((e) => {
+          logger.http("Failed Aquire profile data", e.toString());
+          return 900;
+        });
+    }
+
+    if (powerReturnState.ok) {
+      this.printerPowerState = parseOctoPrintPowerResponse(await powerReturnState.json());
+    }
+
+    return this.printerPowerState;
   }
 
   killApiTimeout() {
@@ -1760,7 +1777,7 @@ class OctoPrintPrinter {
     });
     if (fileIndex > -1 && !!fileInformation) {
       this.notifySubscribersOfFileInformationChange(fullPath, fileIndex, {
-        printerURL: this.printerURL
+        printerID: this._id
       });
     }
   }

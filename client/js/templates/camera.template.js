@@ -2,10 +2,25 @@
 //The camera template isn't very robust, doesn't support multiple stream types, not a custom overlay / full screen option.
 const hideMe = "d-none";
 
-export const drawCamera = (id, { url, flipV, flipH, rotate90, hidden }) => {
+export const drawCamera = (id, { url, flipV, flipH, rotate90, hidden, aspectRatio }) => {
+  let changeAspect = "";
+  switch(aspectRatio) {
+    case("16x9"):
+      changeAspect = " sixteen-by-nine";
+      break;
+    case("4x3"):
+      changeAspect = " four-by-three";
+      break;
+    case("1x1"):
+      changeAspect = " one-by-one";
+      break;
+    default:
+      break;
+  }
+
   return `<img
         loading="lazy"
-        class="camImg ${hidden ? hideMe : ""}"
+        class="camImg ${hidden ? hideMe : ""}${changeAspect}"
         id="camera-${id}"
         width="100%"
         style="transform: ${flipH} ${flipV} ${rotate90}"

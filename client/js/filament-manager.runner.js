@@ -54,9 +54,14 @@ function updateTotals(filtered) {
   const used = [];
 
   filtered.forEach((row) => {
-    price.push(parseInt(row.getElementsByClassName("price")[0].innerHTML));
-    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerHTML));
-    used.push(parseInt(row.getElementsByClassName("used")[0].innerHTML));
+    const spoolUsed = parseInt(row.getElementsByClassName("grams")[0].innerHTML);
+    const spoolWeight = parseInt(row.getElementsByClassName("weight")[0].innerHTML)
+    if(spoolUsed <= spoolWeight){
+      price.push(parseInt(row.getElementsByClassName("price")[0].innerHTML));
+      weight.push(parseInt(row.getElementsByClassName("weight")[0].innerHTML));
+      used.push(parseInt(row.getElementsByClassName("grams")[0].innerHTML));
+    }
+
   });
   const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
   const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);

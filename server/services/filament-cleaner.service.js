@@ -19,8 +19,6 @@ let dropDownList = {
 };
 
 class FilamentCleanerService {
-  static noSpoolOptions = '<option value="0">No Spool Selected</option>';
-
   static getSpools() {
     return spoolsClean;
   }
@@ -95,7 +93,7 @@ class FilamentCleanerService {
     const { filament } = currentSettings;
     const { hideEmpty } = filament;
 
-    const createList = [this.noSpoolOptions];
+    const createList = [];
     spools.forEach((spool) => {
       let profileId = _.findIndex(profiles, function (o) {
         return o._id.toString() === spool.spools.profile.toString();

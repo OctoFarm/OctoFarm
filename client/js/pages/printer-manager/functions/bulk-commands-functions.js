@@ -319,7 +319,7 @@ function fileUpload(file) {
     if (file.print) {
       formData.append("print", true);
     }
-    const url = `${printerInfo.printerURL}/api/files/local`;
+    const url = `/octoprint/${printerInfo._id}/api/files/local`;
     const xhr = new XMLHttpRequest();
     file = file.file;
     xhr.open("POST", url);
@@ -848,7 +848,7 @@ export async function bulkOctoPrintControlCommand() {
     if (printer.camURL && printer.camURL.length !== 0) {
       cameraBlock += `
         <div class="col-lg-3">
-            <img alt="Printer Camera Stream" width="100%" src="${printer.camURL}">
+            <img id="printerCameraControl-${printer._id}" alt="Printer Camera Stream" width="100%" src="${printer.camURL}">
         </div>
         `;
     }

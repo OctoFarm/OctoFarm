@@ -28,6 +28,10 @@ const { ensureCurrentUserAndGroup } = require("./middleware/users.js");
 const { ensureAdministrator } = require("./middleware/auth.js");
 
 const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+const { validateParamsMiddleware } = require("./middleware/validators");
+const { proxyOctoPrintClientRequests } = require("./middleware/octoprint-proxy");
+
+const M_VALID = require("./constants/validate-mongo.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_CORE);
 
@@ -131,7 +135,21 @@ function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
   app.use(ensureClientServerInformation);
   //TODO migrate non-page routes to /api
+  app.use(ensureClientServerVersion);
+
   app.use("/", require("./routes/index", { page: "route" }));
+  app.use(
+    "/camera",
+    ensureAuthenticated,
+    require("./routes/camera-proxy.routes.js", { page: "route" })
+  );
+  app.use(
+      "/octoprint/:id/:item(*)",
+      ensureAuthenticated,
+      validateParamsMiddleware(M_VALID.MONGO_ID),
+      proxyOctoPrintClientRequests
+  );
+  app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
     "/printers",
     printerActionLimits,

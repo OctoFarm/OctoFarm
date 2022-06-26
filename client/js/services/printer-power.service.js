@@ -10,10 +10,9 @@ import {
   printerIsPrinting,
 } from "../utils/octofarm.utils";
 import OctoPrintClient from "./octoprint/octoprint-client.service";
+import OctoFarmClient from "./octofarm-client.service";
 
 export default class PrinterPowerService {
-  static timer = {};
-
   static async printerIsPoweredOn(printer) {
     let powerStatus = false;
 
@@ -39,24 +38,9 @@ export default class PrinterPowerService {
 
     }
 
-    return powerStatus;
-  }
+    await OctoFarmClient.post("/printers/overridepower/" + printer._id, { printerPowerState: powerStatus })
 
-  static updateTimer(id, isPoweredOn, checkTime = 10000){
-    if (!this.timer[id]) {
-      this.timer[id] = {
-        isPoweredOn,
-        checkTime
-      };
-      return;
-    }
-    if(checkTime < 10000){
-      this.timer[id].checkTime = this.timer[id].checkTime + checkTime;
-    }
-    if(checkTime === 10000){
-      this.timer[id].checkTime = checkTime;
-    }
-    this.timer[id].isPoweredOn = isPoweredOn
+    return powerStatus;
   }
 
   static async revealPowerButtons(printer) {
@@ -99,27 +83,10 @@ export default class PrinterPowerService {
     const turnOnThePrinterButton = document.getElementById(
       "printerPowerOn-" + printer._id
     );
-    const powerBadge = document.getElementById(`powerState-${printer._id}`);
 
+    const powerBadge = document.getElementById(`powerState-${printer._id}`);
     if (canDetectPowerState) {
-      PrinterPowerService.updateTimer(printer._id, false)
-      if (this.timer[printer._id].checkTime >= 10000) {
-        PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
-      }
-      PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer), 500)
-      UI.removeDisplayNoneFromElement(powerBadge);
-      if (!this.timer[printer._id].isPoweredOn) {
-        if (!powerBadge.classList.contains("text-danger")) {
-          powerBadge.classList.add("text-danger");
-          powerBadge.classList.remove("text-success");
-        }
-      }
-      if (this.timer[printer._id].isPoweredOn) {
-        if (!powerBadge.classList.contains("text-success")) {
-          powerBadge.classList.add("text-success");
-          powerBadge.classList.remove("text-danger");
-        }
-      }
+      PrinterPowerService.updatePrinterPowerState(printer.printerPowerState, powerBadge);
     }
 
     if (canShutdownThePrinter) {
@@ -127,7 +94,7 @@ export default class PrinterPowerService {
         shutdownPrinterButton.disabled = isPrinting || canDetectPowerState;
       } else {
         shutdownPrinterButton.disabled =
-          isPrinting || !this.timer[printer._id].isPoweredOn;
+          isPrinting || !printer.printerPowerState;
       }
 
       UI.removeDisplayNoneFromElement(shutdownPrinterButton);
@@ -138,7 +105,7 @@ export default class PrinterPowerService {
         turnOnThePrinterButton.disabled = isPrinting || canDetectPowerState;
       } else {
         turnOnThePrinterButton.disabled =
-          isPrinting || this.timer[printer._id].isPoweredOn;
+          isPrinting || printer.printerPowerState;
       }
 
       UI.removeDisplayNoneFromElement(turnOnThePrinterButton);
@@ -223,52 +190,30 @@ export default class PrinterPowerService {
       });
   }
 
+  static updatePrinterPowerState(state, powerBadge) {
+    if(typeof state === "undefined"){
+      return;
+    }
+    UI.removeDisplayNoneFromElement(powerBadge);
+    if (!state) {
+      if (!powerBadge.classList.contains("text-danger")) {
+        powerBadge.classList.add("text-danger");
+        powerBadge.classList.remove("text-success");
+      }
+    }
+    if (state) {
+      if (!powerBadge.classList.contains("text-success")) {
+        powerBadge.classList.add("text-success");
+        powerBadge.classList.remove("text-danger");
+      }
+    }
+  }
+
   static async sendPowerCommandForPrinter(printer, url, command, action) {
-    const { apikey, printerName } = printer;
-
-    if (url.includes("[PrinterURL]")) {
-      url = url.replace("[PrinterURL]", printer.printerURL);
-    }
-    if (url.includes("[PrinterAPI]")) {
-      url = url.replace("[PrinterAPI]", printer.apikey);
-    }
-
-    let post;
-    if (!!command || command.length !== 0) {
-      post = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": apikey,
-        },
-        body: command,
-      });
-    } else {
-      post = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
-      });
-    }
-    if (!post?.ok) {
-      UI.createAlert(
-        "error",
-        `${printerName}: Failed to complete ${action}<br> Status: ${post.statusText}`,
-        3000,
-        "Clicked"
-      );
-    } else {
-      UI.createAlert(
-        "success",
-        `${printerName}: Successfully ${action}!`,
-        3000,
-        "Clicked"
-      );
-    }
-    await UI.delay(2000);
-    PrinterPowerService.updateTimer(printer._id, await PrinterPowerService.printerIsPoweredOn(printer))
+    const post = await OctoPrintClient.sendPowerCommand(printer, url, command, action);
+    await UI.delay(1000);
+    const powerBadge = document.getElementById(`powerState-${printer._id}`);
+    PrinterPowerService.updatePrinterPowerState(await PrinterPowerService.printerIsPoweredOn(printer), powerBadge);
     return post;
   }
 }

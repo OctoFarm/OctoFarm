@@ -137,6 +137,10 @@ const PING_PONG_CHECK = async () => {
   await getPrinterManagerCache().websocketKeepAlive();
 };
 
+const CHECK_PRINTERS_POWER_STATES = async () => {
+  await getPrinterManagerCache().checkPrinterPowerStates();
+}
+
 /**
  * @param task
  * @param preset
@@ -169,6 +173,7 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_HEAT_MAP, TaskPresets.PERIODIC_1000MS),
     TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+    TaskStart(CHECK_PRINTERS_POWER_STATES, TaskPresets.PERIODIC, 30000),
     TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),

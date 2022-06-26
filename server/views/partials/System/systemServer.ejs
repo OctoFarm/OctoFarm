@@ -121,7 +121,12 @@
                role="tab" aria-controls="listview"><i class="fas fa-database"></i>
                 InfluxDB Export</a>
         </li>
-
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-camera-list" data-toggle="list" href="#server-camera"
+               role="tab" aria-controls="listview"><i class="fa-solid fa-camera"></i>
+                Cameras</a>
+        </li>
     </ul>
     <div class="col-12">
         <div class="tab-content" id="nav-tabContent">
@@ -920,6 +925,77 @@
                             </div>
                         </form>
 
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-camera" role="tabpanel"
+                 aria-labelledby="server-influx-list">
+                <h5>Global Camera Settings</h5>
+                <hr>
+                <div class="alert alert-secondary" role="alert">
+                    These settings apply to all of the camera feed within OctoFarm.
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h5>Proxy</h5>
+                        <hr>
+                        <div class="alert alert-info" role="alert">
+                            OctoFarm can proxy all of your camera's through it's server. This is great for reverse proxy setups, or setups where your OctoPrint's are not accessible from the network your on.
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <form class="was-validated">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input"
+                                               id="cameraProxyActive" required <%= (serverSettings.cameras.proxyEnabled) ? "checked" : "" %>>
+                                        <label class="custom-control-label"
+                                               for="cameraProxyActive">Activated?</label>
+                                        <div class="valid-feedback">Camera Proxy is enabled
+                                        </div>
+                                        <div class="invalid-feedback">Camera Proxy is disabled
+                                        </div>
+                                    </div>
+                                </form>
+
+                            <h5 class="font-weight-bold">Update Interval</h5>
+                            <hr>
+                            <p>The interval in which OctoFarm will capture a frame from your camera. (only applies to the proxy)</p>
+
+                            <p><b>Min</b>: 1 seconds, <b>Max:</b> 10 seconds (Default)
+                            </p>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Interval:</span>
+                                </div>
+                                <input id="cameraUpdateInterval" type="number"
+                                       class="form-control" placeholder="6"
+                                       aria-label="Refresh Rate"
+                                       value="<%= serverSettings.cameras.updateInterval/1000 %>" min="1" max="10" step="0.5">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Seconds</span>
+                                </div>
+
+                            </div>
+                            <small id="helpProxy" class="form-text text-muted">Requires
+                                a server restart</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <h5>Display</h5>
+                        <hr>
+                        <p>The aspect ratio OctoFarm will display the cameras in. (Applies to all camera streams)</p>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="cameraAspectRatio">Aspect Ratio</label>
+                            </div>
+                            <select class="custom-select" id="cameraAspectRatio">
+                                <option value="0" <%= serverSettings.cameras.aspectRatio === "0" ? "selected" : "" %>>Stream Default</option>
+                                <option value="1x1" <%= serverSettings.cameras.aspectRatio === "1x1" ? "selected" : "" %>>1x1</option>
+                                <option value="4x3" <%= serverSettings.cameras.aspectRatio === "4x3" ? "selected" : "" %>>4x3</option>
+                                <option value="16x9" <%= serverSettings.cameras.aspectRatio === "16x9" ? "selected" : "" %>>16x9</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

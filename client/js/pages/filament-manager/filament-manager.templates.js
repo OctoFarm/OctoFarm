@@ -12,7 +12,7 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
   return `
     <tr data-jplist-item id="spoolList-${spool._id}" class="jpSpoolItem">
         <th style="display: none;">${spool._id}</th>
-        <th scope="row"><input class="form-control name" type="text" placeholder="${
+        <th scope="row"><span class="d-none name">${spool.name}</span><input class="form-control" type="text" placeholder="${
           spool.name
         }" disabled></th>
         <td>
@@ -34,10 +34,10 @@ export const spoolsManagerTableRow = (spool, allowMultiSelectIsEnabled) => {
         }</span><input class="form-control" type="number" step="1" placeholder="${
     spool.weight
   }" disabled></td>
-        <td><span class="d-none used">${
+        <td><span class="d-none grams">${
           spool.used
         }</span><input class="form-control" type="number" step="1" placeholder="${
-    spool.used
+    spool.weight - spool.used
   }" disabled></td>
         <td><input class="form-control" type="number" step="any" placeholder="${
           spool.tempOffset || 0
@@ -121,10 +121,7 @@ export const profileManagerTableRow = (profile) => {
 
 export const materialsFilterList = (material) => {
   return `
-      <option href="#" data-path=".${material}">${material.replace(
-    /_/g,
-    " "
-  )}</option>
+      <option href="#" data-path=".${material.toLowerCase().replace(/ /g, "_").replace(/[^\w\s]/gi, "_")}">${material}</option>
     `;
 };
 

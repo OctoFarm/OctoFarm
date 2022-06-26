@@ -39,8 +39,12 @@ jobs:
         with:
           filters: |
             server:
-            - 'server/*.js'
-            - 'server/api/**'
+            - 'server/app.js'
+            - 'server/app-core.js'
+            - 'server/app-env.js'
+            - 'server/app-fallbacks.js'
+            - 'server/migrate-mongo-config.js'
+            - 'server/tasks.js'
             - 'server/cache/**'
             - 'server/constants/**'
             - 'server/exceptions/**'
@@ -54,7 +58,10 @@ jobs:
             - 'server/utils/**'
             - 'server/views/**'
             client:
-            - 'client/**'
+            - 'client/index.js'
+            - 'client/webpack.config.js'
+            - 'client/css/**'
+            - 'client/js/**'
       # Install node v16 to use.
       - name: Use Node
         uses: actions/setup-node@v2
@@ -72,7 +79,6 @@ jobs:
           npm run build
           npm run release
           cd ../
-
       # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
       - name: Wait for npm to update package...
         if: steps.filter.outputs.client == 'true'
@@ -80,19 +86,21 @@ jobs:
         with:
           time: '30s'
 
+
+      # Run the server release sequence
+      - name: server build and release
+        if: steps.filter.outputs.server == 'true'
+        run: |
+          cd ./server
+          git status
+          npm ci --no-optional
+          npm run release
+
       # Update Server Package with latest client package
       - name: update server client version
         if: steps.filter.outputs.client == 'true'
         run: npm install @notexpectedyet/octofarm-client@latest --save
         working-directory: ./server
-
-      # Commit changes to the current development repository
-      - name: get-client-current-version
-        if: steps.filter.outputs.client == 'true'
-        id: client-package-version
-        uses: martinbeentjes/npm-get-version-action@main
-        with:
-          path: client
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
@@ -106,12 +114,3 @@ jobs:
           commit_author: James Mackay <online@notexpectedyet.com>
           ## This action should only ever commit these two files!
           file_pattern: server/package*.json client/package*.json
-
-      # Run the server release sequence
-      - name: server build and release
-        if: steps.filter.outputs.server == 'true'
-        run: |
-          cd ./server
-          git status
-          npm ci --no-optional
-          npm run release

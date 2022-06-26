@@ -56,17 +56,17 @@ class Manager {
       if (printer?.storage) {
         const percentRemain =
           (printer.storage.free * 100) / printer.storage.total;
-        if (percentRemain > 90) {
+        if (percentRemain <= 10) {
           storageWarning = `<button type="button" class="btn btn-outline-danger text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
                                      0
-                                   )}% Space Left</button>`;
+                                   )}% Space Remains</button>`;
         }
-        if (percentRemain > 80) {
+        if (percentRemain <= 20) {
           storageWarning = `<button type="button" class="btn btn-outline-warning text-left disabled btn-sm"
                                    style="pointer-events: none" disabled>${percentRemain.toFixed(
                                      0
-                                   )}% Space Left</button>`;
+                                   )}% Space Remains</button>`;
         }
       }
 

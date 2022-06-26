@@ -2,9 +2,9 @@ module.exports = {
   plugins: {
     "@release-it/conventional-changelog": {
       infile: "CHANGELOG.md",
-      header: "# :octopus: :octopus: OctoFarm's Server Changelog :octopus: :octopus:",
+      header: "# :octopus: :octopus: OctoFarm's Client Changelog :octopus: :octopus:",
       parserOpts: {
-        headerPattern: "^(\\w*)(?:\\((server*)\\))?\\: (.*)$"
+        headerPattern: "^(\\w*)(?:\\((client*)\\))?\\: (.*)$"
       },
       preset: {
         name: "conventionalcommits",
@@ -53,24 +53,31 @@ module.exports = {
             type: "chore",
             section: ":curly_loop: What a drag! :curly_loop:",
             hidden: true
+          },
+          {
+            type: "style",
+            section: ":curly_loop: UI :curly_loop:",
+            hidden: false
           }
         ]
       }
     }
   },
   git: {
-    commitMessage: "chore(release): server release v${version}",
+    commitMessage: "chore(release): client release v${version}",
     commit: true,
     tag: true,
-    push: true,
+    push: false,
     requireCleanWorkingDir: false,
-    tagName: "${version}"
+    tagName: "client-${version}"
   },
   npm: {
-    publish: false
+    publish: true,
+    publishPath: ".",
+    skipChecks: true
   },
   github: {
     release: true,
-    releaseName: "Release ${version}"
+    releaseName: "Release Client ${version}"
   }
 };

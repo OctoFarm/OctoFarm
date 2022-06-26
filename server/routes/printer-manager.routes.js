@@ -535,4 +535,16 @@ router.post(
   }
 );
 
+router.post(
+  "/overridepower/:id",
+  ensureAuthenticated,
+  validateParamsMiddleware(M_VALID.MONGO_ID),
+  async (req, res) => {
+    const printerID = req.paramString("id");
+    const powerState = req.body;
+    await getPrinterStoreCache().updatePrinterLiveValue(printerID, powerState);
+    res.sendStatus(204);
+  }
+);
+
 module.exports = router;

@@ -62,7 +62,7 @@ const removeClient = (id) => {
   clientList = clientList.filter((client) => client.id !== id);
 };
 
-const listActiveClients = (_req, res) => {
+const listActiveClientsRes = (_req, res) => {
   const currentActiveClientList = clientList.map((client) => {
     return {
       connectionDate: client.id,
@@ -73,6 +73,9 @@ const listActiveClients = (_req, res) => {
     };
   });
   return res.json(currentActiveClientList);
+};
+const listActiveClientsCount = () => {
+  return clientList.length;
 };
 /**
  *
@@ -101,5 +104,6 @@ const notifySubscribers = (id, type, message, printerInfo = undefined) => {
 module.exports = {
   addClientConnection,
   notifySubscribers,
-  listActiveClients
+  listActiveClientsRes,
+  listActiveClientsCount
 };
