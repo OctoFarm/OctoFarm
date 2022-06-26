@@ -22,7 +22,7 @@ const {
   getLatestReleaseNotes,
   getFutureReleaseNote
 } = require("../services/github-client.service");
-const { fetchUsers } = require("../services/users.service");
+const { fetchUsers } = require("../api/users.api.js");
 const passport = require("passport");
 const { UserTokenService } = require("../services/authentication/user-token.service");
 const User = require("../models/User");
@@ -319,10 +319,12 @@ router.get(
     res.render("users", {
       page: "Users",
       helpers: prettyHelpers,
+
       userList: await fetchUsers(),
       allowedUserGroups: [
         { display: "Administrator", value: "administrator" },
-        { display: "User", value: "user" }
+        { display: "User", value: "user" },
+        { display: "View", value: "view" }
       ]
     });
   }

@@ -62,7 +62,7 @@ module.exports = {
     commitMessage: "chore(release): server release v${version}",
     commit: true,
     tag: true,
-    push: true,
+    push: false,
     requireCleanWorkingDir: false,
     tagName: "${version}"
   },

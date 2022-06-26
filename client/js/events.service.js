@@ -30,7 +30,7 @@ const reconnectFunc = debounce(
 );
 
 function setupEventSource() {
-  evtSource = new EventSource("/events");
+  evtSource = new EventSource(`/events?page=${encodeURIComponent(window.location.pathname)}`);
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
     if (type === MESSAGE_TYPES.AM_I_ALIVE) {

@@ -1,26 +1,18 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs");
-const passport = require("passport");
-const ClientSettings = require("../models/ClientSettings.js");
-const { AppConstants } = require("../constants/app.constants");
-const { SettingsClean } = require("../services/settings-cleaner.service");
-const ServerSettingsDB = require("../models/ServerSettings.js");
-
 const User = require("../models/User.js");
-const { UserTokenService } = require("../services/authentication/user-token.service");
-const { ensureAuthenticated, ensureAdministrator } = require("../middleware/auth");
 const {
   fetchUsers,
   createUser,
   deleteUser,
   resetPassword,
   editUser
-} = require("../services/users.service");
+} = require("../api/users.api.js");
 const { validateParamsMiddleware } = require("../middleware/validators");
 const M_VALID = require("../constants/validate-mongo.constants");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const Logger = require("../handlers/logger");
+const { listActiveClientsRes } = require("../services/server-side-events.service");
 const logger = new Logger(LOGGER_ROUTE_KEYS.ROUTE_USERS);
 
 // New user
@@ -59,5 +51,7 @@ router.delete("/:id", validateParamsMiddleware(M_VALID.MONGO_ID), async (req, re
   const id = req.paramString("id");
   res.send(await deleteUser(id));
 });
+
+router.get("/sessions", listActiveClientsRes);
 
 module.exports = router;

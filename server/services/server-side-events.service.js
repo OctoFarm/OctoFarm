@@ -31,8 +31,9 @@ const addClientConnection = (req, res) => {
     id,
     res,
     user: JSON.parse(JSON.stringify(req?.user)),
-    endpoint: req.url ? JSON.parse(JSON.stringify(req.url)) : "unknown endpoint",
-    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+    endpoint: req.query || false,
+    forwaredAddress: req.headers["x-forwarded-for"] || false,
+    ip: req.socket.remoteAddress || false
   };
   clientList.push(client);
 

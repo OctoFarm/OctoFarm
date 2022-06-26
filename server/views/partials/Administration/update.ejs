@@ -87,21 +87,27 @@
     </div>
 </div>
 <div class="row">
+    <% if(futureReleaseNotes.length > 0){ %>
+        <div class="col-12 col-md-12 col-lg-12">
+            <h3> Latest Version Release Notes </h3><hr><br>
+            <% futureReleaseNotes.forEach(release => { %>
+                <%- helpers.replaceGithubIcons(release.body) %>
+                <hr>
+            <% }) %>
+        </div>
+    <% } %>
     <div class="col-12 col-md-12 col-lg-6">
-        <% if(Object.keys(latestReleaseNotes).length !== 0){ %>
-            <h3> Current Release Notes </h3><hr><br>
-            <%- helpers.replaceGithubIcons(latestReleaseNotes.body) %>
+        <% if(Object.keys(latestReleaseNotes.server).length !== 0){ %>
+            <h3> Current Server Release Notes </h3><hr><br>
+            <%- helpers.replaceGithubIcons(latestReleaseNotes.server.body) %>
         <% } %>
     </div>
-    <% if(futureReleaseNotes.length > 0){ %>
     <div class="col-12 col-md-12 col-lg-6">
-        <h3> Latest Version Release Notes </h3><hr><br>
-        <% futureReleaseNotes.forEach(release => { %>
-            <%- helpers.replaceGithubIcons(release.body) %>
-            <hr>
-        <% }) %>
+        <% if(Object.keys(latestReleaseNotes.client).length !== 0){ %>
+            <h3> Current Client Release Notes </h3><hr><br>
+            <%- helpers.replaceGithubIcons(latestReleaseNotes.client.body) %>
+        <% } %>
     </div>
-    <% } %>
 </div>
 <script>
 

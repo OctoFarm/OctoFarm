@@ -1,0 +1,33 @@
+<% let base = '..' %>
+<% let alert = base + '/octofarm-alert.ejs' %>
+
+<div class="row">
+    <div class="col-12">
+        <div id="usersSessionTable" class="row">
+            <div class="col-12">
+                <%- include(alert, {
+                alertType: "secondary",
+                alertMessage: "Active Sessions on your OctoFarm instance"
+                })
+                %>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 table-responsive">
+                <table class="table-hover table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">IP</th>
+                        <th scope="col">Page</th>
+                        <th scope="col">Session Start</th>
+                        <th scope="col">Time Active</th>
+                    </tr>
+                    </thead>
+                    <tbody id="currentActiveUserSessionTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

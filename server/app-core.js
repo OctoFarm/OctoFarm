@@ -135,7 +135,6 @@ function serveOctoFarmRoutes(app) {
   app.use(ensureCurrentUserAndGroup);
   app.use(ensureClientServerInformation);
   //TODO migrate non-page routes to /api
-  app.use(ensureClientServerVersion);
 
   app.use("/", require("./routes/index", { page: "route" }));
   app.use(
@@ -144,10 +143,10 @@ function serveOctoFarmRoutes(app) {
     require("./routes/camera-proxy.routes.js", { page: "route" })
   );
   app.use(
-      "/octoprint/:id/:item(*)",
-      ensureAuthenticated,
-      validateParamsMiddleware(M_VALID.MONGO_ID),
-      proxyOctoPrintClientRequests
+    "/octoprint/:id/:item(*)",
+    ensureAuthenticated,
+    validateParamsMiddleware(M_VALID.MONGO_ID),
+    proxyOctoPrintClientRequests
   );
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(

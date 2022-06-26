@@ -126,6 +126,8 @@ const replaceGithubIcons = (text) => {
     .replace(/:boom:/g, '<i class="fa-solid fa-bomb text-purple"></i>')
     .replace(/:scroll:/g, '<i class="fa-solid fa-arrow-rotate-left text-purple"></i>')
     .replace(/:key:/g, '<i class="fa-solid fa-key text-purple"></i>')
+    .replace(/:curly_loop:/g, '<i class="fa-solid fa-display text-purple"></i>')
+    .replace(/:x:/g, '<i class="fa-solid fa-xmark text-purple"></i>')
     .replace(/server:/g, '<i class="fa-solid fa-server text-purple"></i>')
     .replace(/client:/g, '<i class="fa-solid fa-display text-purple"></i>');
 };

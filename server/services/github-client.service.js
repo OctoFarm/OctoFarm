@@ -2,7 +2,9 @@ const fetch = require("node-fetch");
 const Logger = require("../handlers/logger");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
 const { AppConstants } = require("../constants/app.constants");
+const { fetchClientVersion } = require("../app-env");
 const currentServerVersion = process.env[AppConstants.VERSION_KEY];
+const currentClientVersion = fetchClientVersion();
 const marked = require("marked");
 const semver = require("semver");
 
@@ -73,13 +75,24 @@ const saveLatestReleaseNotes = (releases) => {
     return false;
   }
 
-  const filteredReleaseNotes = releases.filter((release) =>
-    release.tag_name.includes(currentServerVersion)
+  const filteredReleaseNotes = releases.filter(
+    (release) => release.tag_name === currentServerVersion
+  );
+
+  const clientFilteredReleaseNotes = releases.filter(
+    (release) => release.tag_name === `client-${currentClientVersion}`
   );
 
   latestReleaseNotes = {
-    name: filteredReleaseNotes[0].name,
-    body: marked.parse(filteredReleaseNotes[0].body)
+    client: {
+      name: clientFilteredReleaseNotes[0].name,
+      body: marked.parse(clientFilteredReleaseNotes[0].body)
+    },
+    server: {
+      name: filteredReleaseNotes[0].name,
+      body: marked.parse(filteredReleaseNotes[0].body)
+    }
+
   };
 };
 
