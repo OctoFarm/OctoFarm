@@ -1,11 +1,12 @@
 import UI from "../utils/ui.js";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../exceptions/application-error.handler";
+import { version } from "../../package.json";
 
 let worker = null;
 let savedWorkerEventFunction = null;
 let currentFileURL = null;
-const workerResource = "/assets/dist/sse.client.min.js";
+const workerResource = `/assets/dist/sse.client.${version}.min.js`;
 
 function webWorkerFunction(url, workerEventFunction) {
   worker = new Worker(workerResource);

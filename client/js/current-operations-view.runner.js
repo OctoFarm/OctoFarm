@@ -10,9 +10,9 @@ setViewType("current-ops");
 createClientSSEWorker(monitoringWorkerURL, async function (data) {
   if (!!data) {
     currentOperationsView(
-      data.currentOperations.operations,
-      data.currentOperations.count,
-      data.printersInformation
+      data.currentOperations?.operations,
+      data.currentOperations?.count,
+      data?.printersInformation
     );
   }
 });

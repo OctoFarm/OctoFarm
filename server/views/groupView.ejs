@@ -6,8 +6,8 @@
         <div id="printerArea" class="row">
         </div>
     </div>
-    <script src="/assets/dist/group-view.runner.min.js?<%= clientVersion %>" type="module"></script>
-    <script src="/assets/dist/bulk-action-commands.functions.min.js?<%= clientVersion %>" type="module"></script>
+    <script src="/assets/dist/group-view.runner.<%= clientVersion %>.min.js" type="module"></script>
+    <script src="/assets/dist/bulk-action-commands.<%= clientVersion %>.functions.min.js" type="module"></script>
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>
 <% } %>
