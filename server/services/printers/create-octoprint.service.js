@@ -943,7 +943,6 @@ class OctoPrintPrinter {
 
       //If the userList isn't empty then we need to parse out the users names.
       this.userList = parseAllOctoPrintUsers(userList);
-
       // If there is no current user then find one from the list...
       // Also check if user list contains current user and update if not...
       if (!this?.currentUser) {

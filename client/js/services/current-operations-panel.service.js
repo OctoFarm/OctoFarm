@@ -14,6 +14,9 @@ const currentOperationsSorting = document.getElementById(
   "currentOperationsSort"
 );
 
+const currentOperationsPage = window.location.pathname === "/mon/currentOp"
+
+
 if (currentOperationsSorting) {
   OctoFarmClient.getCurrentOpState()
     .then((res) => {
@@ -241,12 +244,19 @@ export default function currentOperationsPanelService(
               progress.innerHTML = current.progress + "%";
               progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
           } else {
+              let cardClass = "card card-block text-white bg-secondary d-inline-block  text-truncate";
+              let cardStyle = "min-width: 200px; max-width: 200px;";
+              if(currentOperationsPage){
+                  cardClass = "col-sm-12 col-md-4 col-lg-3 col-xl-2 card card-block text-white bg-secondary d-inline-block  text-truncate";
+                  cardStyle = "";
+              }
+
               document.getElementById("currentOperationsBody").insertAdjacentHTML(
                   "beforeend",
                   `
                 <div id="coCard-${current.index}"
-                class="card card-block text-white bg-secondary d-inline-block  text-truncate"
-                style="min-width: 200px; max-width: 200px;"
+                class="${cardClass}"
+                style="${cardStyle}"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">
                      ${current.name}</div>
