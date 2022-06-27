@@ -17,10 +17,12 @@ const findCurrentUserForOctoFarmConnection = (userList) => {
     // First check if we have "octofarm" user...
     if (user.toLowerCase() === "octofarm") {
       selectedUser = user;
+      break;
     }
     // Second check if we have an octofarm based user...
     if (user.toLowerCase().includes("octofarm")) {
       selectedUser = user;
+      break;
     }
   }
 
