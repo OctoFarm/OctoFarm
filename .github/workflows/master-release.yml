@@ -76,7 +76,6 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
           git status
-          npm run build
           npm run release
           cd ../
       # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
