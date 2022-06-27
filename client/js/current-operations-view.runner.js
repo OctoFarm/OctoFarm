@@ -1,21 +1,5 @@
 import Calc from "./utils/calc.js";
 import OctoPrintClient from "./services/octoprint/octoprint-client.service.js";
-import { createClientSSEWorker } from "./services/client-worker.service";
-import { setViewType } from "./pages/monitoring/monitoring-view.state";
-
-// REFACTOR move over to see.client
-export const monitoringWorkerURL = "/monitoringInfo/get/";
-
-setViewType("current-ops");
-createClientSSEWorker(monitoringWorkerURL, async function (data) {
-  if (!!data) {
-    currentOperationsView(
-      data.currentOperations?.operations,
-      data.currentOperations?.count,
-      data?.printersInformation
-    );
-  }
-});
 
 let printers = [];
 const resetFile = function (id) {
