@@ -52,13 +52,16 @@ class SystemRunner {
   static profileMemoryUsagePercent() {
     const used = os.freemem();
     const total = os.totalmem();
-
     if (systemInformationService.totalMemory !== 0) {
-      const memoryPercent = Math.round((100 * used) / total) / 100;
-      logger.debug("Current Memory Usage", { memoryPercent });
+      const memoryPercent = (100 * used) / total;
+      let memoryRounded = memoryPercent;
+      if (!isNaN(memoryPercent)) {
+        memoryRounded = memoryPercent.toFixed(0);
+      }
+      logger.debug("Current Memory Usage", { memoryRounded });
       memoryUsageHistory.push({
         x: new Date(),
-        y: memoryPercent
+        y: memoryRounded
       });
       if (memoryUsageHistory.length >= 300) {
         memoryUsageHistory.shift();
