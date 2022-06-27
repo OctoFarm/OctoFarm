@@ -12,7 +12,8 @@ const clientJSFolder = basePath + "/js/";
 const clientCSSFolder = basePath + "/css/";
 const dirContents = fs.readdirSync(clientJSFolder, { withFileTypes: true });
 const dirCssContents = fs.readdirSync(clientCSSFolder, { withFileTypes: true });
-
+const packageJsonPath = path.join(__dirname, "package.json");
+const packageJsonVersion = require(packageJsonPath).version;
 // Target
 const insideBasePath = "../server/views/assets/";
 const buildDirProd = "./dist/";
@@ -44,7 +45,7 @@ module.exports = (env, options) => {
   return {
     entry: webpackEntries,
     output: {
-      filename: "[name].min.js",
+      filename: `[name].${packageJsonVersion}.min.js`,
       path: fullDir,
     },
     externals: {
@@ -108,7 +109,7 @@ module.exports = (env, options) => {
       }),
       new MiniCssExtractPlugin({
         // filename: dirCssContents[0].name,
-        chunkFilename: "[id].css",
+        chunkFilename: `[id].${packageJsonVersion}.css`,
       }),
       new WebpackBeforeBuildPlugin(
         function (stats, callback) {

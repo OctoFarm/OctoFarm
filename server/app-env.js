@@ -19,7 +19,6 @@ const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
 const packageJsonPath = path.join(__dirname, "package.json");
 const packageLockPath = path.join(__dirname, "package-lock.json");
 const packageLockFile = require(packageLockPath);
-const exec = require("child_process").exec;
 let currentClientVersion;
 const dotEnvPath = path.join(__dirname, "../.env");
 

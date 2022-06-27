@@ -79,5 +79,8 @@ module.exports = {
   github: {
     release: true,
     releaseName: "Release Client ${version}"
+  },
+  hooks: {
+    "after:bump": "npm run build"
   }
 };
