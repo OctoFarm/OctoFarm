@@ -33,7 +33,7 @@ const I_AM_ALIVE = () => {
   });
 };
 
-const INITIALISE_PRINTERS = async () => {
+const INITIALISE_PRINTERS_TASK = async () => {
   await getPrinterManagerCache();
   await getPrinterStoreCache();
   await getEventEmitterCache();
@@ -159,7 +159,7 @@ function TaskStart(task, preset, milliseconds = 0) {
 class OctoFarmTasks {
   static SYSTEM_STARTUP_TASKS = TaskStart(SERVER_BOOT_TASK, TaskPresets.RUNONCE);
 
-  static PRINTER_INITIALISE_TASK = TaskStart(INITIALISE_PRINTERS, TaskPresets.RUNONCE);
+  static PRINTER_INITIALISE_TASK = TaskStart(INITIALISE_PRINTERS_TASK, TaskPresets.RUNONCE);
 
   static RECURRING_BOOT_TASKS = [
     TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_DAY),
