@@ -785,10 +785,7 @@ function startUpdateTasksRunner() {
 
     for (const task in taskManagerState) {
       const theTask = taskManagerState[task];
-      const { options: taskOptions } = theTask;
-      const { periodic } = taskOptions;
 
-      if (periodic) {
         UI.doesElementNeedUpdating(
           theTask.firstCompletion
             ? new Date(theTask.firstCompletion)
@@ -810,7 +807,7 @@ function startUpdateTasksRunner() {
         UI.doesElementNeedUpdating(
           theTask.duration
             ? UI.generateMilisecondsTime(theTask.duration)
-            : "<i class=\"fas fa-sync fa-spin\"></i>",
+            : theTask.nextRun ? "<1ms" : "Not Run Yet",
           document.getElementById("duration-" + task),
           "innerHTML"
         );
@@ -823,7 +820,6 @@ function startUpdateTasksRunner() {
           "innerHTML"
         );
       }
-    }
   }, 1500);
 }
 

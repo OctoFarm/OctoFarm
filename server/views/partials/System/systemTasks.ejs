@@ -1,5 +1,37 @@
 <div id="systemTasksTable" class="row">
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <h5>Startup Tasks</h5>
+        <table class="table-hover table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">Task Name</th>
+                <th scope="col">Interval</th>
+                <th scope="col">First Execution</th>
+                <th scope="col">Last Execution</th>
+                <th scope="col">Duration</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% for(const task in taskManagerState) { %>
+                <% const currentTask = taskManagerState[task]  %>
+                <% let taskName = task.replace(/_/g, " ") %>
+                <% taskName = taskName.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ')%>
+                <% if(!currentTask.options.periodic){ %>
+                    <tr>
+                        <th scope="row"><%= taskName %></th>
+                        <td><%= (currentTask.options.periodic) ? helpers.generateMilisecondsTime(currentTask.options.milliseconds) : 'No Interval' %></td>
+                        <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Started" %></td>
+                        <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
+                        <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
+                    </tr>
+                <% } %>
+
+            <%     } %>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <h5>Recurring Tasks</h5>
         <table class="table-hover table table-dark">
             <thead>
             <tr>
@@ -22,7 +54,7 @@
                         <td><%= (currentTask.options.periodic) ? helpers.generateMilisecondsTime(currentTask.options.milliseconds) : 'No Interval' %></td>
                         <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Started" %></td>
                         <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
-                        <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
+                        <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : ''  %></td>
                         <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "First Not Completed" %></td>
                     </tr>
                 <% } %>
