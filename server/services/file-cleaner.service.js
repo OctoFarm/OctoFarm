@@ -30,12 +30,7 @@ class FileCleanerService {
     const folderCount = [];
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
     for (const printer of farmPrinters) {
-      let fileList = JSON.parse(JSON.stringify(printer.fileList));
-      fileList = FileCleanerService.generate(
-        fileList,
-        printer.selectedFilament,
-        printer.costSettings
-      );
+      const fileList = JSON.parse(JSON.stringify(printer.fileList));
 
       if (!!printer.storage) {
         const device = {
@@ -48,7 +43,6 @@ class FileCleanerService {
       if (!!fileList) {
         for (let i = 0; i < fileList?.fileList?.length; i++) {
           const file = fileList.fileList[i];
-          console.log(file);
           if (!isNaN(file.fileSize)) {
             fileSizes.push(file.fileSize);
           }
