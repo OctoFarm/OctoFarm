@@ -109,15 +109,15 @@ function printerQuickConnected(id) {
   connectBtn.innerHTML = "<i class=\"fas fa-toggle-on\"></i>";
   connectBtn.classList.remove("btn-danger");
   connectBtn.classList.add("btn-success");
-  connectBtn.title = "Quickly bring your printer online! Power -> Connect";
+  connectBtn.title = "Quickly take your printer offline! Disconnect -> Power Off";
 }
 function printerQuickDisconnected(id) {
   let connectBtn = document.getElementById("printerQuickConnect-" + id);
   connectBtn.innerHTML = "<i class=\"fas fa-toggle-off\"></i>";
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
-  connectBtn.title =
-    "Quickly take your printer offline! Disconnect -> Power Off";
+  connectBtn.title ="Quickly bring your printer online! Power -> Connect";
+    ;
 }
 
 function groupInit(printers) {
