@@ -28,7 +28,7 @@ const returnPrinterHealthChecks = (force = false) => {
 };
 
 const updatePrinterHealthChecks = async () => {
-  const farmPrinters = getPrinterStoreCache().listPrintersUntouchedData();
+  const farmPrinters = getPrinterStoreCache().listPrintersInformation();
   printerHealthChecks = [];
   logger.warning(`Found ${farmPrinters.length} to health check.`);
   for (const printer of farmPrinters) {

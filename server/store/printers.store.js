@@ -164,41 +164,11 @@ class PrinterStore {
     returnList = returnList.map((printer) => {
       return Object.assign(printer, {
         fullyScanned: printer?.onboarding?.fullyScanned,
-        camURL: generateOctoFarmCameraURL(printer),
         fileList: FileClean.generate(
           printer.fileList,
           printer.selectedFilament,
           printer.costSettings
         )
-      });
-    });
-
-    return returnList.sort((a, b) => a.sortIndex - b.sortIndex);
-  }
-
-  listPrintersUntouchedData(disabled = false, onlyDisabled = false) {
-    let returnList = [];
-    if (onlyDisabled) {
-      this.#printersList.forEach((printer) => {
-        if (printer?.disabled) {
-          returnList.push(JSON.parse(JSON.stringify(printer)));
-        }
-      });
-    } else {
-      this.#printersList.forEach((printer) => {
-        if (disabled) {
-          returnList.push(JSON.parse(JSON.stringify(printer)));
-        } else {
-          if (!printer.disabled) {
-            returnList.push(JSON.parse(JSON.stringify(printer)));
-          }
-        }
-      });
-    }
-    //CLEAN FILES
-    returnList = returnList.map((printer) => {
-      return Object.assign(printer, {
-        fullyScanned: printer?.onboarding?.fullyScanned
       });
     });
 
