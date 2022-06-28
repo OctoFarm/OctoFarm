@@ -419,7 +419,6 @@ class PrinterManagerService {
       if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
         await printer.acquirePrinterPowerState();
       }
-
     }
   }
 }

@@ -48,7 +48,7 @@ class FileCleanerService {
       if (!!fileList) {
         for (let i = 0; i < fileList?.fileList?.length; i++) {
           const file = fileList.fileList[i];
-
+          console.log(file);
           if (!isNaN(file.fileSize)) {
             fileSizes.push(file.fileSize);
           }

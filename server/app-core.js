@@ -113,7 +113,6 @@ function setupExpressServer() {
  */
 async function ensureSystemSettingsInitiated() {
   logger.info("Checking Server Settings...");
-
   await ServerSettingsDB.find({}).catch((e) => {
     if (e.message.includes("command find requires authentication")) {
       throw new Error("Database authentication failed.");
@@ -140,10 +139,10 @@ function serveOctoFarmRoutes(app) {
     require("./routes/camera-proxy.routes.js", { page: "route" })
   );
   app.use(
-      "/octoprint/:id/:item(*)",
-      ensureAuthenticated,
-      validateParamsMiddleware(M_VALID.MONGO_ID),
-      proxyOctoPrintClientRequests
+    "/octoprint/:id/:item(*)",
+    ensureAuthenticated,
+    validateParamsMiddleware(M_VALID.MONGO_ID),
+    proxyOctoPrintClientRequests
   );
   app.use("/users", require("./routes/users.routes.js", { page: "route" }));
   app.use(
@@ -190,6 +189,11 @@ function serveOctoFarmRoutes(app) {
 async function serveOctoFarmNormally(app, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Starting OctoFarm server tasks...");
+
+    TaskManager.registerJobOrTask(OctoFarmTasks.SYSTEM_STARTUP_TASKS);
+
+    TaskManager.registerJobOrTask(OctoFarmTasks.PRINTER_INITIALISE_TASK);
+
     for (let task of OctoFarmTasks.RECURRING_BOOT_TASKS) {
       TaskManager.registerJobOrTask(task);
     }
