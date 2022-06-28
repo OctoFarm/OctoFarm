@@ -297,6 +297,8 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     const hideEmptyChanges = actualOnline.filament.hideEmpty !== sentOnline.filament.hideEmpty;
     const cameraUpdateIntervalChanges =
       parseInt(actualOnline.cameras.updateInterval) === parseInt(sentOnline.cameras.updateInterval);
+    const cameraProxyChanges =
+      actualOnline.cameras.proxyEnabled === sentOnline.cameras.proxyEnabled;
 
     checked[0].server = sentOnline.server;
     checked[0].timeout = sentOnline.timeout;
@@ -306,7 +308,11 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
     checked[0].monitoringViews = sentOnline.monitoringViews;
     checked[0].cameras = sentOnline.cameras;
 
-    if ([serverChanges, timeoutChanges, cameraUpdateIntervalChanges].includes(false)) {
+    if (
+      [serverChanges, timeoutChanges, cameraUpdateIntervalChanges, cameraProxyChanges].includes(
+        false
+      )
+    ) {
       restartRequired = true;
     }
 
