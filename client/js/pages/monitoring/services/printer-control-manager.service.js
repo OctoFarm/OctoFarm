@@ -100,7 +100,7 @@ export default class PrinterControlManagerService {
                     <h5>Camera</h5><hr>
                     <div class="row">
                        <div class="col-12">
-                          ${imageOrCamera(printer)}
+                          ${imageOrCamera(printer, undefined, "Modal")}
                         </div>
                     </div>
                   </span>

@@ -80,7 +80,7 @@ export default class PrinterTerminalManagerService {
           <div class="row">
                 <div class="col-sm-12 col-md-4 col-lg-3 text-center">
                 <h5>Camera</h5><hr>
-                    ${imageOrCamera(printer)}
+                    ${imageOrCamera(printer, undefined, "Modal")}
                </div>
               
                 <div class="col-sm-12 col-md-8 col-lg-9 text-center">

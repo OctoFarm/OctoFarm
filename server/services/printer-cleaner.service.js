@@ -261,10 +261,8 @@ class PrinterCleanerService {
   }
 
   static sortProfile(profile, current) {
-    if (typeof profile !== "undefined") {
-      if (typeof current !== "undefined") {
-        return profile[current.printerProfile];
-      }
+    if (!!profile && !!current) {
+      return profile[current.printerProfile];
     } else {
       return null;
     }

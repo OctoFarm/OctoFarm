@@ -3,6 +3,10 @@ export const updateCameraImage = (printerID, cameraURL) => {
     if(!!currentCameraElement){
         currentCameraElement.src = cameraURL;
     }
+    const currentCameraModalElement = document.getElementById(`cameraModal-${printerID}`)
+    if(!!currentCameraModalElement){
+        currentCameraModalElement.src = cameraURL;
+    }
     const printerCameraControlElements = document.querySelectorAll("*[id^=\"printerCameraControl\"]");
     if(printerCameraControlElements.length > 0){
         const elementToUpdate = _.findIndex(printerCameraControlElements, function(o) {

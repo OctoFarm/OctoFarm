@@ -1101,20 +1101,21 @@ class OctoPrintPrinter {
     }
 
     let profileCheck = await this.#api.getPrinterProfiles(true).catch((e) => {
-      logger.http("Failed Aquire profile data", e.toString());
+      logger.http("Failed Acquire profile data", e.toString());
       return false;
     });
     const globalStatusCode = checkApiStatusResponse(profileCheck);
     if (globalStatusCode === 200) {
       const { profiles } = await profileCheck.json();
       this.profiles = profiles;
+      if (!!this?.current) {
+        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+      }
+
       this.#db.update({
         profiles: profiles
       });
 
-      if (!!this?.profiles && !!this?.current) {
-        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
-      }
       this.#apiPrinterTickerWrap("Acquired profile data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PROFILE, "success", true);
 
@@ -1156,6 +1157,10 @@ class OctoPrintPrinter {
 
       if (!!this?.current) {
         this.currentConnection = PrinterClean.sortConnection(this.current);
+      }
+
+      if (!!this?.current && !!this.profiles) {
+        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
       }
 
       if (!!this?.options) {
@@ -1897,8 +1902,6 @@ class OctoPrintPrinter {
     this.gcodeScripts = PrinterClean.sortGCODE(this.settingsScripts);
 
     this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
-
-    this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
 
     this.currentJob = JobClean.generate(
       this.job,

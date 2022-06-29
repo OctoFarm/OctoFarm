@@ -95,7 +95,7 @@ export function checkGroupColumns(clientSettings) {
  * @param doNotDisplay
  * @returns {string}
  */
-export function imageOrCamera(printer, doNotDisplay = false) {
+export function imageOrCamera(printer, doNotDisplay = false, modal = "") {
   if (doNotDisplay) {
     return "";
   }
@@ -114,7 +114,8 @@ export function imageOrCamera(printer, doNotDisplay = false) {
         flipV,
         flipH,
         rotate90,
-        aspectRatio: printer.aspectRatio
+        aspectRatio: printer.aspectRatio,
+        modal
       });
     } else {
       if (
@@ -126,6 +127,8 @@ export function imageOrCamera(printer, doNotDisplay = false) {
           flipV,
           flipH,
           rotate90,
+          aspectRatio: printer.aspectRatio,
+          modal
         });
       } else {
         return drawCamera(printer._id, {
@@ -133,6 +136,8 @@ export function imageOrCamera(printer, doNotDisplay = false) {
           flipV,
           flipH,
           rotate90,
+          aspectRatio: printer.aspectRatio,
+          modal
         });
       }
     }
@@ -146,6 +151,8 @@ export function imageOrCamera(printer, doNotDisplay = false) {
         flipV,
         flipH,
         rotate90,
+        aspectRatio: printer.aspectRatio,
+        modal
       });
     } else {
       hidden = true;
@@ -155,6 +162,8 @@ export function imageOrCamera(printer, doNotDisplay = false) {
         flipH,
         rotate90,
         hidden,
+        aspectRatio: printer.aspectRatio,
+        modal
       });
     }
   }

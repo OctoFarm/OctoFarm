@@ -35,13 +35,12 @@ const I_AM_ALIVE = () => {
 
 const INITIALISE_PRINTERS_TASK = async () => {
   await getPrinterManagerCache();
+  await getPrinterManagerCache().initialisePrinters();
+  await getPrinterManagerCache().updateStateCounters();
   await getPrinterStoreCache();
   await getEventEmitterCache();
   await initHistoryCache();
   await getInfluxCleanerCache();
-  await getPrinterManagerCache().initialisePrinters();
-  await getPrinterManagerCache().updateStateCounters();
-  await updatePrinterHealthChecks(true);
   await initFarmInformation();
   await generatePrinterHeatMap();
   await FilamentClean.start();
@@ -52,6 +51,9 @@ const INITIALISE_PRINTERS_TASK = async () => {
   FileClean.statistics(pList);
   await sortCurrentOperations(pList);
   await getPrinterManagerCache().startPrinterEnableQueue();
+  setTimeout(async () => {
+    await updatePrinterHealthChecks(true);
+  }, 10000);
 };
 
 const SERVER_BOOT_TASK = async () => {
