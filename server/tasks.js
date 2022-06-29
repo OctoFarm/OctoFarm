@@ -37,36 +37,43 @@ const INITIALISE_PRINTERS_TASK = async () => {
   await getPrinterManagerCache();
   await getPrinterManagerCache().initialisePrinters();
   await getPrinterManagerCache().updateStateCounters();
-  await getPrinterStoreCache();
-  await getEventEmitterCache();
-  await initHistoryCache();
-  await getInfluxCleanerCache();
-  await initFarmInformation();
-  await generatePrinterHeatMap();
-  await FilamentClean.start();
-  await getHistoryCache().generateMonthlyStats();
-  await getPrinterManagerCache().generatePrintersStatisticsCache();
-  await getPrinterManagerCache().generatePrintersControlDropList();
+  await Promise.allSettled([
+    await getPrinterStoreCache(),
+    await getEventEmitterCache(),
+    await initHistoryCache(),
+    await getInfluxCleanerCache()
+  ]);
   const pList = getPrinterStoreCache().listPrintersInformation();
-  FileClean.statistics(pList);
-  await sortCurrentOperations(pList);
-  await getPrinterManagerCache().startPrinterEnableQueue();
+  await Promise.allSettled([
+    await initFarmInformation(),
+    await generatePrinterHeatMap(),
+    await FilamentClean.start(),
+    await getHistoryCache().generateMonthlyStats(),
+    await getPrinterManagerCache().generatePrintersStatisticsCache(),
+    await getPrinterManagerCache().generatePrintersControlDropList(),
+    FileClean.statistics(pList),
+    await sortCurrentOperations(pList),
+    await getPrinterManagerCache().startPrinterEnableQueue()
+  ]);
+
   setTimeout(async () => {
     await updatePrinterHealthChecks(true);
-  }, 10000);
+  }, 5000);
 };
 
 const SERVER_BOOT_TASK = async () => {
-  await SystemRunner.initialiseSystemInformation();
-  await detectFarmPi();
-  await SystemRunner.profileCPUUsagePercent();
-  SystemRunner.profileMemoryUsagePercent();
-  await grabLatestPatreonData();
-  await updatePluginNoticesStore();
-  await updatePluginStore();
-  await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-    softwareUpdateChecker.checkReleaseAndLogUpdate();
-  });
+  await Promise.allSettled([
+    await SystemRunner.initialiseSystemInformation(),
+    await detectFarmPi(),
+    await SystemRunner.profileCPUUsagePercent(),
+    SystemRunner.profileMemoryUsagePercent(),
+    await grabLatestPatreonData(),
+    await updatePluginNoticesStore(),
+    await updatePluginStore(),
+    await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
+      softwareUpdateChecker.checkReleaseAndLogUpdate();
+    })
+  ]);
 };
 
 const SORT_CURRENT_OPERATIONS = async () => {
@@ -178,8 +185,8 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
     TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     TaskStart(CHECK_PRINTERS_POWER_STATES, TaskPresets.PERIODIC, 30000),
-    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_DAY),
-    TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.PERIODIC_1000MS),
+    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_600000MS),
+    TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.PERIODIC_600000MS),
     TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
     TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.PERIODIC, 30000),
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
