@@ -823,15 +823,16 @@ class OctoPrintPrinter {
   async #requiredApiSequence(force = false) {
     logger.info(this.printerURL + ": Gathering required API data. Forced Scan: " + force);
     this.#apiPrinterTickerWrap("Gathering required API data.", "Info", " Forced Scan: " + force);
-    const stateCall = await this.acquireOctoPrintStateData(force);
-
     const bulkCall = await Promise.allSettled([
       this.acquireOctoPrintSettingsData(force),
       this.acquireOctoPrintSystemData(force),
-      this.acquireOctoPrintProfileData(force)
+      this.acquireOctoPrintProfileData(force),
+      this.acquireOctoPrintStateData(force)
     ]);
 
-    bulkCall.push({ status: "fulfilled", value: stateCall });
+    if (force || (!this.currentProfile && !!this?.current && !!this?.profiles)) {
+      this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
+    }
 
     return bulkCall;
   }
@@ -1108,9 +1109,6 @@ class OctoPrintPrinter {
     if (globalStatusCode === 200) {
       const { profiles } = await profileCheck.json();
       this.profiles = profiles;
-      if (!!this?.current) {
-        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
-      }
 
       this.#db.update({
         profiles: profiles
@@ -1157,10 +1155,6 @@ class OctoPrintPrinter {
 
       if (!!this?.current) {
         this.currentConnection = PrinterClean.sortConnection(this.current);
-      }
-
-      if (!!this?.current && !!this.profiles) {
-        this.currentProfile = PrinterClean.sortProfile(this.profiles, this.current);
       }
 
       if (!!this?.options) {
