@@ -316,7 +316,7 @@ const loadPrintersJobStatus = (printer) => {
           <span id="cameraRow">  
             <div class="row">
                <div class="col-12">
-                    ${imageOrCamera(printer, hideCamera)}
+                    ${imageOrCamera(printer, hideCamera, "Modal")}
                 </div>
             </div>
           </span>
