@@ -2,6 +2,20 @@
 
 ### [1.5.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.1...1.5.1) (2022-06-29)
 
+:hammer: Bug Fixes :hammer:
+* **server:** memory rounding issue causing incorrect percentage to display (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/df6d624637c3c0420dcfbbb747768c799404ea06)
+* **server:** Not using correct information for generating file information states, closes #1145 (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/136ac0a732b05cacbbb89c8c14f98324d34fe5d6)
+* **server:** Editing printers showed backend url not user inputted, closes #1142 (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/a1b031be156a5e53d56f977ca619d2d5358188a7)
+* **server:** Not correctly dealing with database and captured printer profile information, closes #1102 (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/cb1439538eee092dd7dd475f918ee54451f441c9)
+* **server:** server connection failing when user not an "octofarm" derivative, closes #1141 (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/3d42f495ab6c2f63148e5a3ee692cfe23b4856df)
+
+:dash: Code Improvements :dash:
+* **server:** make sure to break out of user loop if no octofarm derivative user found (https://github.com/OctoFarm/OctoFarm/pull/1149#:~:text=make%20sure%20to,%E2%80%A6designation%20found)
+  …designation found
+* **server:** Make camera proxy enabling restart required, closes #1148 (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/c51ea07add6c60f987e215a286fe93c907fe431c)
+* **server:** better re-organise system tasks so they're safer and more consistently run (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/41a2ebd0d728ca598bfaa7584a78c3f7d3cb1beb)
+* **server:** improve server boot task completion time (https://github.com/OctoFarm/OctoFarm/pull/1149/commits/f003f50964e96b262a6537f9cdafd270c956418c)
+
 ## [1.5.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.0...1.5.0) (2022-06-25)
 
 ### :dash: Code Improvements :dash:
