@@ -450,7 +450,7 @@ function grabGroupElements(group) {
   }
 }
 
-async function updateState(printer, clientSettings, view, index) {
+function updateState(printer, clientSettings, view, index) {
   //Grab elements on page
   const elements = grabElements(printer);
   if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
@@ -1300,7 +1300,58 @@ async function updateGroupState(printers, clientSettings, view) {
   }
 }
 
+const drawPrinterPanels = (view, printers, clientSettings) => {
+  const notDrawnPrinters = printers.filter(p => {
+    return !document.getElementById("panel-" + p._id)
+  });
+
+  notDrawnPrinters.map(p => {
+      if(printerIsAvailableToView(p)) {
+        let printerHTML;
+        if (view === "panel") {
+          printerHTML = drawPanelView(p, clientSettings);
+        } else if (view === "list") {
+          printerHTML = drawListView(p, clientSettings);
+        } else if (view === "camera") {
+          printerHTML = drawCameraView(p, clientSettings);
+        } else if (view === "combined") {
+          printerHTML = drawCombinedView(p, clientSettings);
+        }
+        printerArea.insertAdjacentHTML("beforeend", printerHTML);
+        //Setup Action Buttons
+        actionButtonInit(
+            p,
+            `printerActionBtns-${p._id}`
+        );
+        //Add page listeners
+        addListeners(p).catch(e => {
+          console.error(e)
+        })
+        //Grab elements
+        grabElements(p);
+        //Initialise Drag and Drop
+        dragAndDropEnable(document.getElementById("panel-" + p._id), p);
+      }
+  });
+}
+
+const updatePrinterPanels = (view, printers, clientSettings) => {
+  const drawnPrinters = printers.filter(p => {
+    return document.getElementById("panel-" + p._id)
+  });
+
+  drawnPrinters.map((p, index) => {
+    if (!dragCheck()) {
+      updateState(p, clientSettings, view, index);
+    }
+  });
+
+}
+
 export async function initMonitoring(printers, clientSettings, view) {
+  if(!spoolDropDownList){
+    spoolDropDownList = await returnDropDownList()
+  }
   // Check if printer manager modal is opened
   switch (printerManagerModal.classList.contains("show")) {
     case true:
@@ -1341,58 +1392,8 @@ export async function initMonitoring(printers, clientSettings, view) {
         }
         return;
       }
-      for (let p = 0; p < printers.length; p++) {
-        if (printerIsAvailableToView(printers[p])) {
-          let printerPanel = document.getElementById(
-            "panel-" + printers[p]._id
-          );
-          if (!printerPanel) {
-            if(!spoolDropDownList){
-              spoolDropDownList = await returnDropDownList()
-            }
-            if (view === "panel") {
-              let printerHTML = drawPanelView(printers[p], clientSettings);
-              printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            } else if (view === "list") {
-              let printerHTML = drawListView(printers[p], clientSettings);
-              printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            } else if (view === "camera") {
-              let printerHTML = drawCameraView(printers[p], clientSettings);
-              printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            } else if (view === "combined") {
-              let printerHTML = drawCombinedView(printers[p], clientSettings);
-              printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            } else {
-              console.error(
-                "printerPanel could not determine view type to update",
-                view
-              );
-              const errorObject = ClientErrors.SILENT_ERROR;
-              errorObject.message = `Monitoring Updater - ${e}`;
-              throw new ApplicationError(errorObject);
-            }
-            printerPanel = document.getElementById(
-                "panel-" + printers[p]._id
-            );
-            //Setup Action Buttons
-            await actionButtonInit(
-                printers[p],
-                `printerActionBtns-${printers[p]._id}`
-            );
-            //Add page listeners
-            await addListeners(printers[p]);
-            //Grab elements
-            await grabElements(printers[p]);
-            //Initialise Drag and Drop
-            await dragAndDropEnable(printerPanel, printers[p]);
-
-          } else {
-            if (!dragCheck()) {
-                await updateState(printers[p], clientSettings, view, p);
-            }
-          }
-        }
-      }
+      drawPrinterPanels(view, printers, clientSettings);
+      updatePrinterPanels(view, printers, clientSettings);
       break;
   }
 }
