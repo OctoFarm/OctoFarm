@@ -12,7 +12,6 @@ const parseAllOctoPrintUsers = (userList) => {
 
 const findCurrentUserForOctoFarmConnection = (userList) => {
   let selectedUser;
-
   for (const user of userList) {
     // First check if we have "octofarm" user...
     if (user.toLowerCase() === "octofarm") {
@@ -25,12 +24,10 @@ const findCurrentUserForOctoFarmConnection = (userList) => {
       break;
     }
   }
-
   //fall back to first user in list as no user could be found
   if (!selectedUser) {
     selectedUser = userList[0];
   }
-
   return selectedUser;
 };
 
