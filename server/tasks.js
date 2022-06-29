@@ -58,7 +58,7 @@ const INITIALISE_PRINTERS_TASK = async () => {
 
   setTimeout(async () => {
     await updatePrinterHealthChecks(true);
-  }, 5000);
+  }, 10000);
 };
 
 const SERVER_BOOT_TASK = async () => {
