@@ -1,5 +1,26 @@
 # :octopus: :octopus: OctoFarm's Client Changelog :octopus: :octopus:
 
+### [1.5.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.0...client-1.5.1) (2022-06-29)
+
+
+### :curly_loop: UI :curly_loop:
+
+* **client:** add restart required text to camera proxy enable ([d1d6dec](https://github.com/OctoFarm/OctoFarm/commit/d1d6dec3d4ed16f4c197fe22c14630d385fd3aae))
+* **client:** fix incorrect hover description for quick connect states, closes [#1143](https://github.com/OctoFarm/OctoFarm/issues/1143) ([00191a1](https://github.com/OctoFarm/OctoFarm/commit/00191a15968b3d91633d9806efd0240d2c3b1d83))
+* **client:** improve display of task list in system ([0a3fa4c](https://github.com/OctoFarm/OctoFarm/commit/0a3fa4c08611fe2c94540c0585b45119bc557450))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** current operations page would not load due to service change ([b5f26be](https://github.com/OctoFarm/OctoFarm/commit/b5f26bef20e4356a5feb9eb8d46834984f65f4ad))
+* **client:** updating cameras inside modals when proxy is enabled, closes [#1152](https://github.com/OctoFarm/OctoFarm/issues/1152) ([90915ae](https://github.com/OctoFarm/OctoFarm/commit/90915ae6ffcddc6c5f62ae2c34dc3363740b40b9))
+
+
+### :dash: Code Improvements :dash:
+
+* **client:** improve cache busting without relying on ?version, closes [#1147](https://github.com/OctoFarm/OctoFarm/issues/1147) ([a1d4844](https://github.com/OctoFarm/OctoFarm/commit/a1d48448e65bcc9deff7f5a2ef646e116295c5c9))
+* **client:** improve loading speed of views, closes [#1146](https://github.com/OctoFarm/OctoFarm/issues/1146) ([68a3c4e](https://github.com/OctoFarm/OctoFarm/commit/68a3c4ed552c22780c71675c44bfe0e3e757d2f8))
+
 ## [1.5.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.4.1...client-1.5.0) (2022-06-25)
 
 
