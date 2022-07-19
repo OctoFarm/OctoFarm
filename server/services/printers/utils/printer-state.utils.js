@@ -5,6 +5,9 @@ const mapStateToCategory = (state) => {
   if (state === "Paused") {
     return { name: "warning text-dark", category: "Idle" };
   }
+  if (state === "Printing from SD") {
+    return { name: "warning text-dark", category: "Active" };
+  }
   if (state === "Printing") {
     return { name: "warning text-dark", category: "Active" };
   }
@@ -45,15 +48,15 @@ const mapStateToCategory = (state) => {
     return { name: "danger", hex: "#2e0905", category: "Error!" };
   }
   if (state === "Setting Up") {
-    return { name: "info text-dark", hex: "#2e0905", category: "Searching..." };
+    return { name: "info text-dark", hex: "#2e0905", category: "Info" };
   }
   if (state === "Searching...") {
-    return { name: "info text-dark", hex: "#2e0905", category: "Searching..." };
+    return { name: "info text-dark", hex: "#2e0905", category: "Info" };
   }
   if (state === "Disabled") {
     return { name: "dark", hex: "#2e0905", category: "Disabled" };
   }
-  return { name: "warning text-dark", hex: "#583c0e", category: "Idle" };
+  return { name: "warning text-dark", hex: "#583c0e", category: "Active" };
 };
 
 module.exports = {
