@@ -9,6 +9,7 @@ import {
 } from "../../../utils/octofarm.utils";
 import ApexCharts from "apexcharts";
 import UI from "../../../utils/ui";
+import {setupModalSwitcher} from "./modal-switcher.service";
 
 let chart = null;
 let chartTimer = 0;
@@ -388,6 +389,7 @@ const loadPrintersJobStatus = (printer) => {
         </div>
 
     `;
+  setupModalSwitcher("info", printer);
 };
 
 const updateCurrentJobStatus = (printer, elements) => {

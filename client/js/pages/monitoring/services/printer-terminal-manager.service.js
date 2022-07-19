@@ -14,6 +14,7 @@ import {
 } from "../../../utils/octofarm.utils";
 import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../../exceptions/application-error.handler";
+import {setupModalSwitcher} from "./modal-switcher.service";
 
 let currentIndex = 0;
 
@@ -136,6 +137,7 @@ export default class PrinterTerminalManagerService {
                 </div>
             </div>
             `;
+      setupModalSwitcher("terminal", printer);
       await CustomGenerator.generateButtons(printer);
 
       return true;

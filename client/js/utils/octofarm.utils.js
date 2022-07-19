@@ -216,7 +216,7 @@ export function printerIsOffline(printer) {
 
 export function printerIsSearching(printer) {
   const category = getPrinterCategory(printer);
-  return category === "Searching...";
+  return category === "Info";
 }
 
 /**
