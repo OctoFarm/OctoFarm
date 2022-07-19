@@ -13,6 +13,7 @@ import {
 import { closePrinterManagerModalIfOffline } from "../../../utils/octofarm.utils";
 import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../../exceptions/application-error.handler";
+import {setupModalSwitcher} from "./modal-switcher.service";
 
 let currentIndex = 0;
 let currentPrinter = null;
@@ -154,6 +155,7 @@ export default class PrinterFileManagerService {
 
           </div>
             `;
+      setupModalSwitcher("file", printer);
       await FileManagerSortingService.loadSort(printer._id);
     } catch (e) {
       UI.createAlert(

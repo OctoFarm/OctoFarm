@@ -22,6 +22,7 @@ import {
 } from "../../../services/printer-filament-selector.service";
 import { ClientErrors } from "../../../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../../../exceptions/application-error.handler";
+import {setupModalSwitcher} from "./modal-switcher.service";
 
 let currentIndex = 0;
 
@@ -236,11 +237,10 @@ export default class PrinterControlManagerService {
                 </div>  
             </div>
       `;
-
+      setupModalSwitcher("control", printer);
       const printerToolTemps = document.getElementById("pmToolTemps");
       document.getElementById("pmOtherTemps").innerHTML = "";
       printerToolTemps.innerHTML = "";
-
       if (
         typeof printer.currentProfile !== "undefined" &&
         printer.currentProfile !== null
