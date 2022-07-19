@@ -34,6 +34,10 @@ class OctoprintApiClientService extends OctoprintApiService {
     super(printerURL, apikey, timeoutSettings);
   }
 
+  async grabInformation(api) {
+    return super.get(api);
+  }
+
   static validatePrinter(printer) {
     if (!printer.apikey || !printer.printerURL) {
       throw printerValidationErrorMessage;
