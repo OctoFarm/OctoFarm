@@ -36,8 +36,6 @@ import {
 } from "../../utils/octofarm.utils";
 import { initialiseCurrentJobPopover } from "./services/printer-current-job.service";
 import { returnMinimalLayerDataDisplay } from "../../services/octoprint/octoprint-display-layer-plugin.service";
-import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
-import { ApplicationError } from "../../exceptions/application-error.handler";
 import {
   fillMiniFilamentDropDownList,
   findMiniFilamentDropDownsSelect, returnDropDownList,
@@ -1305,7 +1303,7 @@ const drawPrinterPanels = (view, printers, clientSettings) => {
     return !document.getElementById("panel-" + p._id)
   });
 
-  notDrawnPrinters.map(p => {
+  notDrawnPrinters.forEach(p => {
       if(printerIsAvailableToView(p)) {
         let printerHTML;
         if (view === "panel") {
@@ -1317,6 +1315,7 @@ const drawPrinterPanels = (view, printers, clientSettings) => {
         } else if (view === "combined") {
           printerHTML = drawCombinedView(p, clientSettings);
         }
+
         printerArea.insertAdjacentHTML("beforeend", printerHTML);
         //Setup Action Buttons
         actionButtonInit(
@@ -1340,7 +1339,7 @@ const updatePrinterPanels = (view, printers, clientSettings) => {
     return document.getElementById("panel-" + p._id)
   });
 
-  drawnPrinters.map((p, index) => {
+  drawnPrinters.forEach((p, index) => {
     if (!dragCheck()) {
       updateState(p, clientSettings, view, index);
     }
