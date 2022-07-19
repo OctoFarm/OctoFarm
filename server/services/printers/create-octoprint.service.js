@@ -41,6 +41,7 @@ const { PrinterClean } = require("../printer-cleaner.service");
 const printerModel = require("../../models/Printer");
 const { FileClean } = require("../file-cleaner.service");
 const { JobClean } = require("../job-cleaner.service");
+const apiConfig = require("../octoprint/constants/octoprint-api-config.constants");
 const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_OCTOPRINT);
@@ -542,6 +543,29 @@ class OctoPrintPrinter {
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
     const testingTheWaters = await this.testTheApiWaters();
 
+    if (this._id === "62bc1faa7f36abdfa4697631") {
+      const { testingTheWaters, requiredApiCheckSequence, optionalApiCheckSequence } = apiConfig;
+
+      const testingTheWatersCalls = testingTheWaters.map((call) => {
+        return this.grabInformationFromDevice(call);
+      });
+
+      // const requiredApiCheckSequenceCalls = requiredApiCheckSequence.map((call) => {
+      //   return async function () {
+      //     return this.grabInformationFromDevice(call);
+      //   };
+      // });
+      //
+      // const optionalApiCheckSequenceCalls = optionalApiCheckSequence.map((call) => {
+      //   return this.grabInformationFromDevice(call);
+      // });
+
+      const testingTheWatersResults = await Promise.allSettled(testingTheWatersCalls);
+
+      // await this.grabInformationFromDevice(testingTheWaters[0]);
+      return;
+    }
+
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
 
@@ -673,6 +697,28 @@ class OctoPrintPrinter {
     await this.#optionalApiSequence(force);
 
     return "Successfully enabled printer...";
+  }
+
+  async grabInformationFromDevice({
+    api = undefined,
+    tickerMessage = "",
+    apiCheck = "",
+    captureDataKeys = []
+  }) {
+    if (!api) {
+      throw new Error("API Endpoint required!");
+    }
+
+    console.log(api);
+
+    const apiCall = await this.#api.grabInformation(api);
+
+    console.log(apiCall);
+
+    const jsonResponse = await apiCall.json();
+
+    console.log(jsonResponse);
+    return jsonResponse;
   }
 
   async getSessionkey() {
