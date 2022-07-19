@@ -41,6 +41,7 @@ import {
   findMiniFilamentDropDownsSelect, returnDropDownList,
 } from "../../services/printer-filament-selector.service";
 import {checkKlipperState} from "../../services/octoprint/checkKlipperState.actions";
+import {isInViewport} from "../../utils/window.utils";
 
 let elems = [];
 let groupElems = [];
@@ -1340,7 +1341,7 @@ const updatePrinterPanels = (view, printers, clientSettings) => {
   });
 
   drawnPrinters.forEach((p, index) => {
-    if (!dragCheck()) {
+    if (!dragCheck() && isInViewport(document.getElementById("panel-" + p._id))) {
       updateState(p, clientSettings, view, index);
     }
   });
