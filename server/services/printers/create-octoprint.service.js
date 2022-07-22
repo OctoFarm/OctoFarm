@@ -7,7 +7,7 @@ const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.consta
 const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client.service");
 const { SettingsClean } = require("../settings-cleaner.service");
 const PrinterDatabaseService = require("./printer-database.service");
-const { isEmpty, assign, findIndex } = require("lodash");
+const { isEmpty, assign, findIndex, pick } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
 const {
   acquireWebCamData,
@@ -541,30 +541,48 @@ class OctoPrintPrinter {
 
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
-    const testingTheWaters = await this.testTheApiWaters();
-
     if (this._id === "62bc1faa7f36abdfa4697631") {
       const { testingTheWaters, requiredApiCheckSequence, optionalApiCheckSequence } = apiConfig;
-
+      if (this.#retryNumber === 0) {
+        this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
+      }
       const testingTheWatersCalls = testingTheWaters.map((call) => {
         return this.grabInformationFromDevice(call);
       });
-
-      // const requiredApiCheckSequenceCalls = requiredApiCheckSequence.map((call) => {
-      //   return async function () {
-      //     return this.grabInformationFromDevice(call);
-      //   };
-      // });
-      //
-      // const optionalApiCheckSequenceCalls = optionalApiCheckSequence.map((call) => {
-      //   return this.grabInformationFromDevice(call);
-      // });
+      const requiredApiCheckSequenceCalls = requiredApiCheckSequence.map((call) => {
+        return this.grabInformationFromDevice(call);
+      });
+      const optionalApiCheckSequenceCalls = optionalApiCheckSequence.map((call) => {
+        return this.grabInformationFromDevice(call);
+      });
 
       const testingTheWatersResults = await Promise.allSettled(testingTheWatersCalls);
+      const testedTheWaters = this.handleTestingTheWatersResults(testingTheWatersResults);
 
-      // await this.grabInformationFromDevice(testingTheWaters[0]);
-      return;
+      if (testedTheWaters !== true) {
+        //Printer failed initial check... kill with fire
+        return testedTheWaters;
+      }
+
+      const requiredApiCheckSequenceResults = await Promise.allSettled(
+        requiredApiCheckSequenceCalls
+      );
+
+      const
+      console.log(requiredApiCheckSequenceResults);
+
+      //
+
+      //
+
+      //
+      // const optionalApiCheckSequenceResults = await Promise.allSettled(
+      //   optionalApiCheckSequenceCalls
+      // );
+      return true;
     }
+
+    const testingTheWaters = await this.testTheApiWaters();
 
     // Check testingTheWatersResponse... needs to react to status codes...
     logger.debug(this.printerURL + ": Tested the high seas with a value of - ", testingTheWaters);
@@ -699,26 +717,153 @@ class OctoPrintPrinter {
     return "Successfully enabled printer...";
   }
 
+  handleRequiredDataResults(results){
+    const mappedDataValues = results.map((r) => {
+      let { data, apiCheck, tickerMessage, status } = r.value;
+      return {
+        status,
+        data,
+        apiCheck,
+        tickerMessage
+      };
+    });
+  }
+
+  handleTestingTheWatersResults(results) {
+    const mappedDataValues = results.map((r) => {
+      let { data, apiCheck, tickerMessage, status } = r.value;
+      return {
+        status,
+        data,
+        apiCheck,
+        tickerMessage
+      };
+    });
+
+    for (const value of mappedDataValues) {
+      const { status, data, apiCheck, tickerMessage } = value;
+      const key = "server";
+
+      const currentStatus = this.checkStatusNumber(status);
+
+      if (currentStatus !== true) {
+        return currentStatus;
+      }
+
+      if (this.#retryNumber === 0) {
+        this.#apiPrinterTickerWrap("Printer found on the high seas!", "Complete");
+      }
+      if (data.hasOwnProperty(key)) {
+        this.octoPrintVersion = data[key];
+        this.#db.update({
+          octoPrintVersion: data[key]
+        });
+        this.#apiPrinterTickerWrap(`Acquired ${tickerMessage}`, "Complete");
+
+        if (!!apiCheck) {
+          this.#apiChecksUpdateWrap(apiCheck, "success");
+        }
+      }
+    }
+
+    return true;
+  }
+
+  checkStatusNumber(status) {
+    switch (status) {
+      case 200:
+        this.setHostState(PRINTER_STATES().HOST_ONLINE);
+        return true;
+      case 201:
+        this.setHostState(PRINTER_STATES().HOST_ONLINE);
+        return true;
+      case 408:
+        // Failed to find the printer on the high seas, fail and don't reconnect user iteraction required...
+        const timeout = {
+          hostState: "Timeout!",
+          hostDescription: "Printer timed out, will attempt reconnection..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(timeout).SHUTDOWN);
+        this.reconnectAPI();
+        return "Failed to test the waters! Please check the connection log";
+      case 503:
+        const unavailable = {
+          hostState: "Service Unavailable!",
+          hostDescription: "Printer is unavailable, will attempt reconnection..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unavailable).SHUTDOWN);
+        this.reconnectAPI();
+        return "Failed because of octoprint server error!";
+      case 502:
+        const badGateway = {
+          hostState: "Bad Gateway!",
+          hostDescription: "Printer is unavailable, will attempt reconnection..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(badGateway).SHUTDOWN);
+        this.reconnectAPI();
+        return "Failed because of octoprint server error!";
+      case 404:
+        const notFound = {
+          hostState: "Not Found!",
+          hostDescription:
+            "Couldn't find endpoint... please check your URL! will not attempt reconnect..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(notFound).SHUTDOWN);
+        return "Failed because octoprint is unavailable";
+      case 403:
+        const forbidden = {
+          hostState: "Forbidden!",
+          hostDescription:
+            "Could not establish authentication... please check your API key and try again!"
+        };
+        this.setAllPrinterStates(PRINTER_STATES(forbidden).SHUTDOWN);
+        return "Failed because octoprint forbid OctoFarm!";
+      default:
+        const unknown = {
+          hostState: "Hard Fail!",
+          hostDescription:
+            "Something is seriously wrong... please check all settings! will not attempt reconnect..."
+        };
+        this.setAllPrinterStates(PRINTER_STATES(unknown).SHUTDOWN);
+        return "Failed due to unknown causes";
+    }
+  }
+
   async grabInformationFromDevice({
     api = undefined,
     tickerMessage = "",
-    apiCheck = "",
+    apiCheck = undefined,
     captureDataKeys = []
   }) {
     if (!api) {
       throw new Error("API Endpoint required!");
     }
+    this.#apiPrinterTickerWrap(`Acquiring ${tickerMessage}`, "Info");
 
-    console.log(api);
+    if (!!apiCheck) {
+      this.#apiChecksUpdateWrap(apiCheck, "warning");
+    }
 
     const apiCall = await this.#api.grabInformation(api);
-
-    console.log(apiCall);
+    if (!apiCall.ok) {
+      return {
+        status: apiCall.status,
+        data: {}
+      };
+    }
 
     const jsonResponse = await apiCall.json();
+    // Say yes on the ticker
 
-    console.log(jsonResponse);
-    return jsonResponse;
+    // Grab the required keys
+    const pickedObject = pick(jsonResponse, captureDataKeys);
+
+    return {
+      apiCheck,
+      tickerMessage,
+      status: apiCall.status,
+      data: pickedObject
+    };
   }
 
   async getSessionkey() {
