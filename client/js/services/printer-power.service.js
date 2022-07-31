@@ -194,19 +194,22 @@ export default class PrinterPowerService {
     if(typeof state === "undefined"){
       return;
     }
-    UI.removeDisplayNoneFromElement(powerBadge);
-    if (!state) {
-      if (!powerBadge.classList.contains("text-danger")) {
-        powerBadge.classList.add("text-danger");
-        powerBadge.classList.remove("text-success");
+    if(!!powerBadge){
+      UI.removeDisplayNoneFromElement(powerBadge);
+      if (!state) {
+        if (!powerBadge.classList.contains("text-danger")) {
+          powerBadge.classList.add("text-danger");
+          powerBadge.classList.remove("text-success");
+        }
+      }
+      if (state) {
+        if (!powerBadge.classList.contains("text-success")) {
+          powerBadge.classList.add("text-success");
+          powerBadge.classList.remove("text-danger");
+        }
       }
     }
-    if (state) {
-      if (!powerBadge.classList.contains("text-success")) {
-        powerBadge.classList.add("text-success");
-        powerBadge.classList.remove("text-danger");
-      }
-    }
+
   }
 
   static async sendPowerCommandForPrinter(printer, url, command, action) {
