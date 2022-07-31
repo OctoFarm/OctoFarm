@@ -103,18 +103,21 @@ const checkIfDatabaseCanBeConnected = async function (printers) {
 
   for (const printer of printers) {
     const pluginSettings = await getFilamentManagerPluginSettings(printer);
-    const { database } = pluginSettings;
-    let databaseCheck = await fetch(`${printer.printerURL}/plugin/filamentmanager/database/test`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      },
-      body: JSON.stringify({ config: database })
-    });
-    if (!databaseCheck.ok) {
-      unconnectedDatabases.push({ url: printer.printerURL });
+    if(!!pluginSettings){
+      const { database } = pluginSettings;
+      let databaseCheck = await fetch(`${printer.printerURL}/plugin/filamentmanager/database/test`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey
+        },
+        body: JSON.stringify({ config: database })
+      });
+      if (!databaseCheck.ok) {
+        unconnectedDatabases.push({ url: printer.printerURL });
+      }
     }
+
   }
 
   return unconnectedDatabases;

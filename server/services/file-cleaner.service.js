@@ -115,7 +115,7 @@ class FileCleanerService {
           failed: file.failed,
           last: file.last,
           expectedPrintTime: file.time,
-          filamentLength: file.length,
+          filamentLength: file?.length || 0,
           printCost,
           electricityCosts,
           maintenanceCosts
@@ -125,13 +125,15 @@ class FileCleanerService {
           sortedFile.filamentLength
         );
         sortedFile.toolCosts = FileCleanerService.getCost(selectedFilament, sortedFile.toolUnits);
-        sortedFileList.push(sortedFile);
+        if (!!file?.date && typeof file.date === "number") {
+          sortedFileList.push(sortedFile);
+        }
       }
     }
 
     return {
       fileList: sortedFileList,
-      filecount: sortedFileList.length || 0,
+      filecount: sortedFileList?.length || 0,
       folderList: fileList?.folderList || [],
       folderCount: fileList?.folderList.length || 0
     };
