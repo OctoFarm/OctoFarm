@@ -9,6 +9,7 @@ module.exports = {
     async proxyOctoPrintClientRequests(req, res) {
         const id = req.paramString("id");
         const item = req.paramString("item");
+
         const { printerURL, apikey } = getPrinterStoreCache().getPrinter(id);
         let redirectedRequest;
 
