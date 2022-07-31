@@ -528,11 +528,6 @@ class OctoPrintPrinter {
     }
   }
 
-  async updatePrinterRecord(record) {
-    logger.debug(this.printerURL + ": updating printer with new record: ", record);
-    this.#db.update(record);
-  }
-
   async enablePrinter(force = true) {
     this.enabling = true;
     if (this.disabled) {
@@ -541,118 +536,99 @@ class OctoPrintPrinter {
 
     await this.setupClient();
     // Test the waters call (ping to check if host state alive), Fail to Shutdown
-    if (this._id === "629b011635a53473656842cb") {
-      const { requiredApiCheckSequence, optionalApiCheckSequence } = apiConfig;
-      if (this.#retryNumber === 0) {
-        this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
-      }
 
-      const pingTestResults = await pingTestHost(this.printerURL);
-
-      if (pingTestResults <= 0) {
-        const failedHighSeas = {
-          hostState: "Offline",
-          hostDescription: "Failed to test the waters! Cannot find host on the high seas!"
-        };
-        this.setAllPrinterStates(PRINTER_STATES(failedHighSeas).SHUTDOWN);
-        this.reconnectAPI();
-        return "Failed to test the waters! Cannot find host on the high seas!";
-      }
-      if (this.#retryNumber === 0) {
-        this.#apiPrinterTickerWrap("Printer found on the high seas!", "Complete");
-        this.#apiPrinterTickerWrap("Attempting API access", "Active");
-      }
-      const requiredPromises = [];
-      requiredApiCheckSequence.forEach((call) => {
-        if (force) {
-          const thisFunction = this.grabInformationFromDevice(call);
-          requiredPromises.push(thisFunction);
-        }
-      });
-
-      await Promise.allSettled(requiredPromises);
-      //Check global API Key
-      const keyCheck = this.settingsApi.key === this.apikey;
-      if (keyCheck) {
-        const globalAPICheck = {
-          state: "Global API Fail!",
-          stateDescription:
-            "Global api key detected... please use application / user generated key!"
-        };
-        this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
-        this.#apiPrinterTickerWrap(globalAPICheck.stateDescription, "Offline");
-        logger.error(globalAPICheck.stateDescription);
-        return globalAPICheck.stateDescription; //Global API Key fail
-      }
-
-      this.#apiPrinterTickerWrap("Passed Global API key check", "Complete");
-      logger.info("Passed Global API key check!");
-
-      // Check user and user list...
-      const userListCheck = this.userList.length > 0;
-      if (!userListCheck) {
-        const userListKeyCheck = {
-          state: "User List Fail!",
-          stateDescription:
-            "Unable to find any users for OctoPrint, please try a forced reconnect..."
-        };
-        this.setPrinterState(PRINTER_STATES(userListKeyCheck).SHUTDOWN);
-        this.#apiPrinterTickerWrap(userListKeyCheck.stateDescription, "Offline");
-        logger.error(userListKeyCheck.stateDescription);
-        return userListKeyCheck.stateDescription; //Global API Key fail
-      }
-
-      this.#apiPrinterTickerWrap("Passed User List check", "Complete");
-      logger.info("Passed User List check!");
-
-      const currentUserCheck = !!this.currentUser;
-      if (!currentUserCheck) {
-        const currentUserKeyCheck = {
-          state: "Current User Fail!",
-          stateDescription:
-            "Unable to grab current user from OctoPrint, please try setting a user from user list..."
-        };
-        this.setPrinterState(PRINTER_STATES(currentUserKeyCheck).SHUTDOWN);
-        this.#apiPrinterTickerWrap(currentUserKeyCheck.stateDescription, "Offline");
-        logger.error(currentUserKeyCheck.stateDescription);
-        return currentUserKeyCheck.stateDescription; //Global API Key fail
-      }
-
-      //Clean settings data...
-      this.cleanPrintersInformation();
-
-      this.onboarding.fullyScanned = true;
-
-      this.#db.update({ onboarding: this.onboarding });
-
-      // Get a session key
-      await this.#setupWebsocket();
-
-      //Grab optional api data
-      const optionalPromises = [];
-      optionalApiCheckSequence.forEach((call) => {
-        if (force) {
-          const thisFunction = this.grabInformationFromDevice(call);
-          optionalPromises.push(thisFunction);
-        }
-      });
-
-      await Promise.allSettled(optionalPromises);
-
-      return "Successfully enabled printer...";
+    const { requiredApiCheckSequence, optionalApiCheckSequence } = apiConfig;
+    if (this.#retryNumber === 0) {
+      this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
     }
-  }
 
-  unmapResults(results) {
-    return results.map((r) => {
-      let { data, apiCheck, tickerMessage, status } = r.value;
-      return {
-        status,
-        data,
-        apiCheck,
-        tickerMessage
+    const pingTestResults = await pingTestHost(this.printerURL);
+
+    if (pingTestResults <= 0) {
+      const failedHighSeas = {
+        hostState: "Offline",
+        hostDescription: "Failed to test the waters! Cannot find host on the high seas!"
       };
+      this.setAllPrinterStates(PRINTER_STATES(failedHighSeas).SHUTDOWN);
+      this.reconnectAPI();
+      return "Failed to test the waters! Cannot find host on the high seas!";
+    }
+    if (this.#retryNumber === 0) {
+      this.#apiPrinterTickerWrap("Printer found on the high seas!", "Complete");
+      this.#apiPrinterTickerWrap("Attempting API access", "Active");
+    }
+    const requiredPromises = [];
+    requiredApiCheckSequence.forEach((call) => {
+        const thisFunction = this.grabInformationFromDevice(call);
+        requiredPromises.push(thisFunction);
     });
+
+    await Promise.allSettled(requiredPromises);
+    //Check global API Key
+    const keyCheck = this.settingsApi.key === this.apikey;
+    if (keyCheck) {
+      const globalAPICheck = {
+        state: "Global API Fail!",
+        stateDescription: "Global api key detected... please use application / user generated key!"
+      };
+      this.setPrinterState(PRINTER_STATES(globalAPICheck).SHUTDOWN);
+      this.#apiPrinterTickerWrap(globalAPICheck.stateDescription, "Offline");
+      logger.error(globalAPICheck.stateDescription);
+      return globalAPICheck.stateDescription; //Global API Key fail
+    }
+
+    this.#apiPrinterTickerWrap("Passed Global API key check", "Complete");
+    logger.info("Passed Global API key check!");
+
+    // Check user and user list...
+    const userListCheck = this.userList.length > 0;
+    if (!userListCheck) {
+      const userListKeyCheck = {
+        state: "User List Fail!",
+        stateDescription: "Unable to find any users for OctoPrint, please try a forced reconnect..."
+      };
+      this.setPrinterState(PRINTER_STATES(userListKeyCheck).SHUTDOWN);
+      this.#apiPrinterTickerWrap(userListKeyCheck.stateDescription, "Offline");
+      logger.error(userListKeyCheck.stateDescription);
+      return userListKeyCheck.stateDescription; //Global API Key fail
+    }
+
+    this.#apiPrinterTickerWrap("Passed User List check", "Complete");
+    logger.info("Passed User List check!");
+
+    const currentUserCheck = !!this.currentUser;
+    if (!currentUserCheck) {
+      const currentUserKeyCheck = {
+        state: "Current User Fail!",
+        stateDescription:
+          "Unable to grab current user from OctoPrint, please try setting a user from user list..."
+      };
+      this.setPrinterState(PRINTER_STATES(currentUserKeyCheck).SHUTDOWN);
+      this.#apiPrinterTickerWrap(currentUserKeyCheck.stateDescription, "Offline");
+      logger.error(currentUserKeyCheck.stateDescription);
+      return currentUserKeyCheck.stateDescription; //Global API Key fail
+    }
+
+    //Clean settings data...
+    this.cleanPrintersInformation();
+
+    this.onboarding.fullyScanned = true;
+
+    this.#db.update({ onboarding: this.onboarding });
+
+    // Get a session key
+    await this.#setupWebsocket();
+
+    //Grab optional api data
+    const optionalPromises = [];
+    optionalApiCheckSequence.forEach((call) => {
+        const thisFunction = this.grabInformationFromDevice(call);
+        optionalPromises.push(thisFunction);
+    });
+
+    await Promise.allSettled(optionalPromises);
+
+    return "Successfully enabled printer...";
   }
 
   checkStatusNumber(status) {
@@ -1139,52 +1115,6 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Failed to acquire settings data", "Offline", settingsCheck);
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "danger", true);
       return globalStatusCode;
-    }
-  }
-
-  async acquireOctoPrintSystemInfoData(force = false) {
-    if (!checkSystemInfoAPIExistance(this.octoPrintVersion)) {
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
-      return false;
-    }
-    this.#apiPrinterTickerWrap("Acquiring system information data", "Info");
-    this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "warning");
-
-    if (!this?.octoPrintSystemInfo || force) {
-      let systemInfoCheck = await this.#api.getSystemInfo(true).catch((e) => {
-        logger.http("Failed Aquire System Info data", e.toString());
-        return false;
-      });
-
-      const globalStatusCode = checkApiStatusResponse(systemInfoCheck);
-
-      if (globalStatusCode === 200) {
-        const { systeminfo } = await systemInfoCheck.json();
-        this.octoPrintSystemInfo = systeminfo;
-        this.#db.update({
-          octoPrintSystemInfo: systeminfo
-        });
-        this.#apiPrinterTickerWrap("Acquired system information data!", "Complete");
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success", true);
-        return true;
-      } else {
-        logger.http("Failed to acquire system info data..." + systemInfoCheck);
-        this.#apiPrinterTickerWrap(
-          "Failed to acquire system information plugin data",
-          "Offline",
-          systemInfoCheck
-        );
-        this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "danger", true);
-        return globalStatusCode;
-      }
-    } else {
-      this.#apiPrinterTickerWrap(
-        "System information data acquired previously... skipped!",
-        "Complete"
-      );
-      this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SYSTEM_INFO, "success");
-      // Call was skipped as we have data or not forced
-      return true;
     }
   }
 

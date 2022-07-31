@@ -328,7 +328,7 @@ module.exports = {
     },
     {
       api: apiPluginPiSupport,
-      tickerMessage: "OctoPrint's file lists",
+      tickerMessage: "OctoPrint's pi information",
       apiCheck: ALLOWED_SYSTEM_CHECKS().OCTOPI,
       captureDataKeys: new Map([["octoPi", "octoPi"]]),
       dataRetrievalFunction: basicDataRetrievalFunction

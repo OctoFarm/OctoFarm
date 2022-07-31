@@ -138,29 +138,6 @@ blkOctoPrintSettingsUpdateBtn.addEventListener("click", async () => {
   );
 });
 
-const reSyncAPIBtn = document.getElementById("reSyncAPI");
-reSyncAPIBtn.addEventListener("click", async () => {
-  bootbox.dialog({
-    title: "Update Information from all API endpoints",
-    message:
-      "<p class=\"alert alert-info text-dark\" role=\"alert\">This will do a force update of all OctoFarm's data it holds on OctoPrint from it's API</p>"
-        + "<p class=\"alert alert-warning text-dark\" role=\"alert\">This does not affect any connections between OctoFarm and OctoPrint</p>",
-    size: "large",
-    buttons: {
-      force: {
-        label: "ReScan",
-        className: "btn-danger text-dark",
-        callback: async function () {
-          await reSyncAPI(true);
-        },
-      },
-      cancel: {
-        label: "Cancel",
-        className: "btn-secondary",
-      },
-    },
-  });
-});
 
 const reSyncSockets = document.getElementById("reSyncSockets");
 reSyncSockets.addEventListener("click", async () => {
