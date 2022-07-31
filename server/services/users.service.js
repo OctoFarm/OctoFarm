@@ -1,5 +1,6 @@
 const User = require("../models/User.js");
 const ClientSettings = require("../models/ClientSettings.js");
+const { SettingsClean } = require("../services/settings-cleaner.service")
 const bcrypt = require("bcryptjs");
 const { findIndex } = require("lodash");
 
@@ -93,6 +94,7 @@ async function createUser({
   if (errors.length === 0) {
     try {
       await userSettings.save();
+      await SettingsClean.start();
     } catch (e) {
       errors.push({ msg: "Failed to save new user settings: " + e });
     }
