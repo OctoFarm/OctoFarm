@@ -43,7 +43,7 @@ class SettingsCleanerService {
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {
-        return o._id.toString() == id.toString();
+        return o._id.toString() === id.toString();
       });
       return clientClean[settingsIndex];
     } else {
