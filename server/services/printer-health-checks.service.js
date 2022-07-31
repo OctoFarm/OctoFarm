@@ -28,7 +28,8 @@ const apiChecksRequired = (checks) => {
     return false;
   }
   return {
-    userCheck: checks.api.status === "success", //Required
+    versionCheck: checks.version.status === "success", //Required
+    userCheck: checks.users.status === "success", //Required
     stateCheck: checks.profile.status === "success", //Required
     profileCheck: checks.profile.status === "success", //Required
     settingsCheck: checks.settings.status === "success", //Required
