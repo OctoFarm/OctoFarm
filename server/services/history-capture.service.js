@@ -259,6 +259,7 @@ class HistoryCaptureService {
             `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`,
             element.spools
           );
+          return;
         }
         const response = await this.#printerAPIConnector.getPluginFilamentManagerFilament(
           filamentID
@@ -274,52 +275,52 @@ class HistoryCaptureService {
             `Spool database entity by ID '${spoolID}' not found. Cant update filament.`,
             element
           );
-          const profileID = JSON.stringify(spoolEntity.spools.profile);
-          spoolEntity.spools = {
-            name: sp.spool.name,
-            profile: profileID,
-            price: sp.spool.cost,
-            weight: sp.spool.weight,
-            used: sp.spool.used,
-            tempOffset: sp.spool.temp_offset,
-            fmID: sp.spool.id
-          };
-          logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity.spools}`);
-          spoolEntity.markModified("spools");
-          await spoolEntity.save();
-          getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
-            element,
-            {
-              printerName: this.#printerName,
-              printerID: this.#printerID,
-              printerGroup: this.#printerGroup
-            },
-            {
-              printerName: this.#printerName,
-              printerID: this.#printerID,
-              printerGroup: this.#printerGroup,
-              costSettings: this.#costSettings,
-              success: this.#success,
-              reason: this.#reason,
-              fileName: this.#fileName,
-              filePath: this.#filePath,
-              startDate: this.#startDate,
-              endDate: this.#endDate,
-              printTime: this.#printTime,
-              filamentSelection: this.#filamentSelection,
-              job: this.#job,
-              notes: this.#notes,
-              snapshot: this.#snapshot,
-              timelapse: this.#timelapse,
-              thumbnail: this.#thumbnail,
-              resends: this.#resends,
-              activeControlUser: this.#activeControlUser
-            },
-            element.spools.used - spoolEntity.spools.used
-          );
-          returnSpools.push(spoolEntity);
+          return;
         }
-        return;
+        const profileID = spoolEntity.spools.profile;
+        spoolEntity.spools = {
+          name: sp.spool.name,
+          profile: profileID,
+          price: sp.spool.cost,
+          weight: sp.spool.weight,
+          used: sp.spool.used,
+          tempOffset: sp.spool.temp_offset,
+          fmID: sp.spool.id
+        };
+        logger.info(`${this.#printerURL}: updating... spool status ${spoolEntity._id}`);
+        spoolEntity.markModified("spools");
+        await spoolEntity.save();
+        getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
+          element,
+          {
+            printerName: this.#printerName,
+            printerID: this.#printerID,
+            printerGroup: this.#printerGroup
+          },
+          {
+            printerName: this.#printerName,
+            printerID: this.#printerID,
+            printerGroup: this.#printerGroup,
+            costSettings: this.#costSettings,
+            success: this.#success,
+            reason: this.#reason,
+            fileName: this.#fileName,
+            filePath: this.#filePath,
+            startDate: this.#startDate,
+            endDate: this.#endDate,
+            printTime: this.#printTime,
+            filamentSelection: this.#filamentSelection,
+            job: this.#job,
+            notes: this.#notes,
+            snapshot: this.#snapshot,
+            timelapse: this.#timelapse,
+            thumbnail: this.#thumbnail,
+            resends: this.#resends,
+            activeControlUser: this.#activeControlUser
+          },
+          element.spools.used - spoolEntity.spools.used
+        );
+        returnSpools.push(spoolEntity);
       }
     }
 

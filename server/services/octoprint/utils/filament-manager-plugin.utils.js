@@ -242,7 +242,7 @@ const filamentManagerReSync = async function () {
     const octofarmProfileId = await Profile.findOne({ "profile.index": sp.profile.id });
     if (oldSpool !== null) {
       logger.info("Updating Spool: ", spool);
-      const bedOffset = JSON.parse(JSON.stringify(oldSpool.spools.bedOffset));
+      const bedOffset = oldSpool.spools.bedOffset;
       oldSpool.spools = spool;
       oldSpool.spools.bedOffset = bedOffset;
       oldSpool.spools.profile = octofarmProfileId._id;

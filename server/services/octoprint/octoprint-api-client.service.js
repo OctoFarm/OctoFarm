@@ -24,7 +24,7 @@ const apiPluginManagerRepository1_6_0 = apiBase + "/plugin/pluginmanager";
 const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
-const apiPluginFilamentManagerSpecificSpool = apiBase + "/plugin/filamentmanager/spools";
+const apiPluginFilamentManagerSpecificSpool = "/plugin/filamentmanager/spools";
 const apiTimelapse = (unrendered = true) =>
   apiBase + "/timelapse" + (unrendered ? "?unrendered=true" : "");
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
@@ -58,12 +58,6 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getSettings() {
     return this.get(apiSettingsPart).catch((e) => {
-      return e;
-    });
-  }
-
-  async getVersion() {
-    return this.get(apiVersion).catch((e) => {
       return e;
     });
   }
@@ -155,7 +149,10 @@ class OctoprintApiClientService extends OctoprintApiService {
       throw OPClientErrors.filamentIDNotANumber;
     }
     const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
-    return this.get(getURL, false).catch((e) => {
+
+    console.log(getURL)
+
+    return this.get(getURL).catch((e) => {
       return e;
     });
   }
