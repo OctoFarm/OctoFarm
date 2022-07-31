@@ -1283,9 +1283,9 @@ class PrinterSettingsService {
     pageElements.mainPage.socket.className = `btn btn-${currentPrinter.webSocketState.colour} mb-1 btn-block`;
 
     pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-users"></i> <b>Users Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.api.date
+      currentPrinter.systemChecks.scanning.users.date
     )}`;
-    pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.api.status} mb-1 btn-block`;
+    pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.users.status} mb-1 btn-block`;
     pageElements.connectPage.filesCheck.innerHTML = `<i class="fas fa-file-code"></i> <b>Files Check</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.scanning.files.date
     )}`;

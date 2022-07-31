@@ -2,7 +2,8 @@ const ALLOWED_SYSTEM_CHECKS = () => {
   return Object.assign(
     {},
     {
-      API: "api",
+      VERSION: "version",
+      USERS: "users",
       FILES: "files",
       STATE: "state",
       PROFILE: "profile",
@@ -10,7 +11,8 @@ const ALLOWED_SYSTEM_CHECKS = () => {
       SYSTEM: "system",
       SYSTEM_INFO: "systemInfo",
       PLUGINS: "plugins",
-      UPDATES: "updates"
+      UPDATES: "updates",
+      OCTOPI: "octopi"
     }
   );
 };
@@ -19,7 +21,11 @@ const systemChecks = () => {
     {},
     {
       scanning: {
-        api: {
+        version: {
+          status: "danger",
+          date: null
+        },
+        users: {
           status: "danger",
           date: null
         },
@@ -52,6 +58,10 @@ const systemChecks = () => {
           date: null
         },
         updates: {
+          status: "danger",
+          date: null
+        },
+        octopi: {
           status: "danger",
           date: null
         }
