@@ -177,15 +177,6 @@ function returnPrinterManageDropDown(id, disabled) {
                 <i class="fas fa-file-alt text-primary"></i> Logs
             </button>
             <hr>
-            <h6 class="dropdown-header">OctoPrint</h6>
-            <button  title="ReScan your printers API"
-                 id="printerAPIReScan-${id}"
-                 type="button"
-                 class="btn dropdown-item"
-                >
-                <i class="fa-solid fa-info text-info"></i> Update Information
-            </button>
-            <hr>
             <h6 class="dropdown-header">Other</h6>
              <button title="View individual Printer Statistics"
                      id="printerStatistics-${id}"
