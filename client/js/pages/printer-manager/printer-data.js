@@ -47,6 +47,16 @@ const ignoredHostStatesForAPIErrors = [
   "Error!",
   "Operational",
 ];
+
+const triggerAPIIssues = [
+  "version",
+  "users",
+  "state",
+  "profile",
+  "settings",
+  "system",
+];
+
 function updatePrinterState(printer) {
   const hostBadge = document.getElementById(`hostBadge-${printer._id}`);
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
@@ -441,14 +451,14 @@ function checkForApiErrors(printer) {
       !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)
     ) {
       let apiErrors = 0;
-      for (const key in printer.systemChecks) {
+      for (const key in printer.systemChecks.scanning) {
+
         if (printer.systemChecks.scanning.hasOwnProperty(key)) {
-          if (printer.systemChecks.scanning[key].status !== "success") {
+          if (triggerAPIIssues.includes(key) && printer.systemChecks.scanning[key].status !== "success") {
             apiErrors = apiErrors + 1;
           }
         }
       }
-
       if (apiErrors > 0) {
         removeLogLine({ id: "apiIssue-" + printer._id });
         UI.removeDisplayNoneFromElement(apiErrorTag);
