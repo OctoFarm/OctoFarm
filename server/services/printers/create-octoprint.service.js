@@ -559,11 +559,13 @@ class OctoPrintPrinter {
     }
     const requiredPromises = [];
     requiredApiCheckSequence.forEach((call) => {
-        const thisFunction = this.grabInformationFromDevice(call);
-        requiredPromises.push(thisFunction);
+      const thisFunction = this.grabInformationFromDevice(call);
+      requiredPromises.push(thisFunction);
     });
 
-    await Promise.allSettled(requiredPromises);
+    const response = await Promise.allSettled(requiredPromises);
+
+    console.log(response);
     //Check global API Key
     const keyCheck = this.settingsApi.key === this.apikey;
     if (keyCheck) {
@@ -622,8 +624,8 @@ class OctoPrintPrinter {
     //Grab optional api data
     const optionalPromises = [];
     optionalApiCheckSequence.forEach((call) => {
-        const thisFunction = this.grabInformationFromDevice(call);
-        optionalPromises.push(thisFunction);
+      const thisFunction = this.grabInformationFromDevice(call);
+      optionalPromises.push(thisFunction);
     });
 
     await Promise.allSettled(optionalPromises);
@@ -708,17 +710,14 @@ class OctoPrintPrinter {
     }
 
     const apiCall = await this.#api.grabInformation(api);
+
     if (!apiCall.ok) {
-      return {
-        status: apiCall.status,
-        data: {}
-      };
-    }
+      this.#apiPrinterTickerWrap(`Failed to acquire ${tickerMessage}`, "Offline");
 
-    const statusCheck = this.checkStatusNumber(apiCall.status);
-
-    if (statusCheck !== true) {
-      return;
+      if (!!apiCheck) {
+        this.#apiChecksUpdateWrap(apiCheck, "danger");
+      }
+      return apiCall.status;
     }
 
     const jsonResponse = await apiCall.json();
@@ -735,7 +734,7 @@ class OctoPrintPrinter {
       if (!!apiCheck) {
         this.#apiChecksUpdateWrap(apiCheck, "success");
       }
-      return;
+      return apiCall.status;
     }
 
     this.#apiPrinterTickerWrap(`Failed to acquire ${tickerMessage}`, "Offline");
@@ -743,6 +742,8 @@ class OctoPrintPrinter {
     if (!!apiCheck) {
       this.#apiChecksUpdateWrap(apiCheck, "danger");
     }
+
+    return apiCall.status;
   }
 
   async getSessionkey() {

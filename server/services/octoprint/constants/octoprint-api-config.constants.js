@@ -46,7 +46,6 @@ const basicDataRetrievalFunction = (data, captureKeys, printer, database) => {
 
 const settingsRetrievalFunction = (data, captureKeys, printer, database) => {
   const oldAppearance = Object.assign({}, printer.settingsAppearance);
-
   for (const [key, value] of captureKeys) {
     if (data.hasOwnProperty(key)) {
       printer[value] = data[key];
@@ -234,6 +233,10 @@ const filesRetrievalFunction = (data, _captureKeys, printer, database) => {
   return true;
 };
 
+const testOctoPi = (data, _captureKeys, printer, database) => {
+  console.log(data, _captureKeys);
+};
+
 module.exports = {
   requiredApiCheckSequence: [
     {
@@ -328,10 +331,10 @@ module.exports = {
     },
     {
       api: apiPluginPiSupport,
-      tickerMessage: "OctoPrint's pi information",
+      tickerMessage: "OctoPrint's host pi information",
       apiCheck: ALLOWED_SYSTEM_CHECKS().OCTOPI,
-      captureDataKeys: new Map([["octoPi", "octoPi"]]),
-      dataRetrievalFunction: basicDataRetrievalFunction
+      captureDataKeys: new Map([["octopi", "octoPi"]]),
+      dataRetrievalFunction: testOctoPi
     }
   ]
 };
