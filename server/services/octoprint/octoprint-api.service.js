@@ -32,43 +32,47 @@ async function fetchApi(url, method, apikey, bodyData = undefined) {
 
 async function fetchApiTimeout(url, method, apikey, fetchTimeout, bodyData = undefined) {
   const startTime = ConnectionMonitorService.startTimer();
-  return promiseTimeout(fetchTimeout, fetchApi(url, method, apikey, bodyData))
-    .then((res) => {
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.SUCCESS_RESPONSE
-      );
-      return res;
-    })
-    .catch((e) => {
-      logger.http("Promise timeout threw an error!", {
-        error: e.toString(),
-        url,
-        method,
-        bodyData
-      });
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.FAILED_RESPONSE
-      );
-      const endTime = ConnectionMonitorService.stopTimer();
-      ConnectionMonitorService.updateOrAddResponse(
-        url,
-        REQUEST_TYPE[method],
-        REQUEST_KEYS.LAST_RESPONSE,
-        ConnectionMonitorService.calculateTimer(startTime, endTime)
-      );
-      return e;
+  let promise;
+  try {
+    promise = await promiseTimeout(fetchTimeout, fetchApi(url, method, apikey, bodyData));
+
+    if (!promise.ok) {
+      throw new Error(`Response not ok! Status: ${promise.status}`);
+    }
+
+    const endTime = ConnectionMonitorService.stopTimer();
+    ConnectionMonitorService.updateOrAddResponse(
+      url,
+      REQUEST_TYPE[method],
+      REQUEST_KEYS.LAST_RESPONSE,
+      ConnectionMonitorService.calculateTimer(startTime, endTime)
+    );
+    ConnectionMonitorService.updateOrAddResponse(
+      url,
+      REQUEST_TYPE[method],
+      REQUEST_KEYS.SUCCESS_RESPONSE
+    );
+  } catch (e) {
+    logger.http("Promise timeout threw an error!", {
+      error: e.toString(),
+      url,
+      method,
+      bodyData
     });
+    ConnectionMonitorService.updateOrAddResponse(
+      url,
+      REQUEST_TYPE[method],
+      REQUEST_KEYS.FAILED_RESPONSE
+    );
+    const endTime = ConnectionMonitorService.stopTimer();
+    ConnectionMonitorService.updateOrAddResponse(
+      url,
+      REQUEST_TYPE[method],
+      REQUEST_KEYS.LAST_RESPONSE,
+      ConnectionMonitorService.calculateTimer(startTime, endTime)
+    );
+  }
+  return promise;
 }
 
 class OctoprintApiService {
@@ -94,9 +98,7 @@ class OctoprintApiService {
    */
   async post(route, data) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "POST", this.apikey, this.#currentTimeout, data).catch((e) => {
-      return e;
-    });
+    return fetchApiTimeout(url, "POST", this.apikey, this.#currentTimeout, data);
   }
 
   /**
@@ -106,9 +108,7 @@ class OctoprintApiService {
    */
   async delete(route) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "DELETE", this.apikey, this.#currentTimeout).catch((e) => {
-      return e;
-    });
+    return fetchApiTimeout(url, "DELETE", this.apikey, this.#currentTimeout);
   }
 
   /**
@@ -118,9 +118,7 @@ class OctoprintApiService {
    */
   async get(route) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, this.#currentTimeout).catch((e) => {
-      return e;
-    });
+    return fetchApiTimeout(url, "GET", this.apikey, this.#currentTimeout);
   }
 
   /**
@@ -131,9 +129,7 @@ class OctoprintApiService {
    */
   patch(route, data) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "PATCH", this.apikey, this.#currentTimeout, data).catch((e) => {
-      return e;
-    });
+    return fetchApiTimeout(url, "PATCH", this.apikey, this.#currentTimeout, data);
   }
 }
 

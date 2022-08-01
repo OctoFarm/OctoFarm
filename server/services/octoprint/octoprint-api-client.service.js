@@ -35,7 +35,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async grabInformation(api) {
-    return super.get(api);
+    return this.get(api);
   }
 
   static validatePrinter(printer) {
@@ -45,21 +45,15 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async postPrinter(route, data) {
-    return super.post(route, data).catch((e) => {
-      return e;
-    });
+    return this.post(route, data);
   }
 
   async deletePrinter(route) {
-    return super.delete(route).catch((e) => {
-      return e;
-    });
+    return this.delete(route);
   }
 
   async getSettings() {
-    return this.get(apiSettingsPart).catch((e) => {
-      return e;
-    });
+    return this.get(apiSettingsPart);
   }
 
   /**
@@ -67,9 +61,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param recursive
    */
   async getFiles(recursive = false) {
-    return this.get(apiFiles(recursive)).catch((e) => {
-      return e;
-    });
+    return this.get(apiFiles(recursive));
   }
 
   /**
@@ -78,27 +70,19 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @returns {}
    */
   async getFile(path) {
-    return this.get(apiFile(path)).catch((e) => {
-      return e;
-    });
+    return this.get(apiFile(path));
   }
 
   async deleteFile(path) {
-    return this.deletePrinter(apiFile(path)).catch((e) => {
-      return e;
-    });
+    return this.deletePrinter(apiFile(path));
   }
 
   async getConnection() {
-    return this.get(apiConnection).catch((e) => {
-      return e;
-    });
+    return this.get(apiConnection);
   }
 
   async getPrinterProfiles() {
-    return this.get(apiPrinterProfiles).catch((e) => {
-      return e;
-    });
+    return this.get(apiPrinterProfiles);
   }
 
   async getPluginManager(octoPrintVersion = undefined) {
@@ -106,39 +90,19 @@ class OctoprintApiClientService extends OctoprintApiService {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
-    return this.get(route).catch((e) => {
-      return e;
-    });
-  }
-
-  async getSystemInfo() {
-    return this.get(apiSystemInfo).catch((e) => {
-      return e;
-    });
+    return this.get(route);
   }
 
   async getSystemCommands() {
-    return this.get(apiSystemCommands).catch((e) => {
-      return e;
-    });
+    return this.get(apiSystemCommands);
   }
 
   async getSoftwareUpdateCheck(force = false) {
-    return this.get(apiSoftwareUpdateCheck(force)).catch((e) => {
-      return e;
-    });
-  }
-
-  async getUsers() {
-    return this.get(apiUsers).catch((e) => {
-      return e;
-    });
+    return this.get(apiSoftwareUpdateCheck(force));
   }
 
   async getPluginPiSupport() {
-    return this.get(apiPluginPiSupport).catch((e) => {
-      return e;
-    });
+    return this.get(apiPluginPiSupport);
   }
 
   async getPluginFilamentManagerFilament(filamentID) {
@@ -150,47 +114,31 @@ class OctoprintApiClientService extends OctoprintApiService {
     }
     const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
 
-    console.log(getURL)
-
-    return this.get(getURL).catch((e) => {
-      return e;
-    });
+    return this.get(getURL);
   }
 
   async login(passive = true) {
-    return this.postPrinter(apiLogin(passive), {}, false).catch((e) => {
-      return e;
-    });
+    return this.postPrinter(apiLogin(passive), {}, false);
   }
 
   async getTimelapses(unrendered = true) {
-    return this.get(apiTimelapse(unrendered)).catch((e) => {
-      return e;
-    });
+    return this.get(apiTimelapse(unrendered));
   }
 
   async patchProfile(data, profileID) {
-    return this.patch(apiProfiles + profileID, data).catch((e) => {
-      return e;
-    });
+    return this.patch(apiProfiles + profileID, data);
   }
 
   async postSettings(data) {
-    return this.post(apiSettings, data).catch((e) => {
-      return e;
-    });
+    return this.post(apiSettings, data);
   }
 
   async postPrinterPowerState(url, data) {
-    return this.post(url, data).catch((e) => {
-      return e;
-    });
+    return this.post(url, data);
   }
 
   async getPrinterPowerState(url) {
-    return this.get(url).catch((e) => {
-      return e;
-    });
+    return this.get(url);
   }
 }
 
