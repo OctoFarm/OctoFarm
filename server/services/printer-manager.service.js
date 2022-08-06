@@ -416,7 +416,10 @@ class PrinterManagerService {
   async checkPrinterPowerStates() {
     const printers = getPrinterStoreCache().listPrinters();
     for (const printer of printers) {
-      if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
+      if (
+        (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") ||
+        printer?.printerState?.colour?.category !== "Info"
+      ) {
         await printer.acquirePrinterPowerState();
       }
     }
