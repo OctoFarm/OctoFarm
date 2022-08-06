@@ -91,7 +91,8 @@ class PrinterStore {
         fullyScanned: printer?.onboarding?.fullyScanned,
         klipperState: printer?.klipperState,
         printerPowerState: printer?.printerPowerState,
-        lastConnectionStatus: printer?.lastConnectionStatus
+        lastConnectionStatus: printer?.lastConnectionStatus,
+        quickConnectSettings: printer.quickConnectSettings
       };
     });
 
@@ -137,7 +138,8 @@ class PrinterStore {
         klipperState: printer?.klipperState,
         printerPowerState: printer?.printerPowerState,
         storage: printer?.storage,
-        aspectRatio: SettingsClean.returnCameraSettings().aspectRatio
+        aspectRatio: SettingsClean.returnCameraSettings().aspectRatio,
+        quickConnectSettings: printer.quickConnectSettings
       };
     });
 
@@ -659,8 +661,10 @@ class PrinterStore {
       profile,
       profileID,
       gcode,
-      other
+      other,
+      quickConnectSettings
     } = settings;
+
     const { index } = printer;
     const originalPrinter = this.#findMePrinter(index);
 
@@ -984,6 +988,38 @@ class PrinterStore {
       });
 
       newOctoPrintSettings.webcam = settingsWebcam;
+    }
+
+    const { connectPrinter, powerPrinter, connectAfterPowerTimeout, powerAfterDisconnectTimeout } =
+      quickConnectSettings;
+
+    if (
+      !!connectPrinter ||
+      !!powerPrinter ||
+      !!connectAfterPowerTimeout ||
+      !!powerAfterDisconnectTimeout
+    ) {
+      const quickConnectSettingsNew = {
+        ...(typeof connectPrinter === "boolean"
+          ? { connectPrinter }
+          : { connectPrinter: originalPrinter.quickConnectSettings.connectPrinter }),
+        ...(typeof powerPrinter === "boolean"
+          ? { powerPrinter }
+          : { powerPrinter: originalPrinter.quickConnectSettings.powerPrinter }),
+        ...(!!connectAfterPowerTimeout
+          ? { connectAfterPowerTimeout }
+          : {
+              connectAfterPowerTimeout:
+                originalPrinter.quickConnectSettings.connectAfterPowerTimeout
+            }),
+        ...(!!powerAfterDisconnectTimeout
+          ? { powerAfterDisconnectTimeout }
+          : {
+              powerAfterDisconnectTimeout:
+                originalPrinter.quickConnectSettings.powerAfterDisconnectTimeout
+            })
+      };
+      this.updatePrinterDatabase(index, { quickConnectSettings: quickConnectSettingsNew });
     }
 
     originalPrinter.cleanPrintersInformation();

@@ -118,11 +118,24 @@ const systemCommands = () => {
   );
 };
 
+const quickConnectCommands = () => {
+  return Object.assign(
+    {},
+    {
+      connectPrinter: true,
+      powerPrinter: true,
+      preHeat: false,
+      connectAfterPowerTimeout: 5000,
+      powerAfterDisconnectTimeout: 3000
+    }
+  );
+};
+
 module.exports = {
   systemChecks,
   tempTriggersDefaults,
   systemCommands,
   webCamSettings,
-
+  quickConnectCommands,
   ALLOWED_SYSTEM_CHECKS
 };

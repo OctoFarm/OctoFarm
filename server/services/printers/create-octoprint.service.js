@@ -1,5 +1,6 @@
 const {
   systemChecks,
+  quickConnectCommands,
   tempTriggersDefaults,
   ALLOWED_SYSTEM_CHECKS
 } = require("./constants/printer-defaults.constants");
@@ -7,7 +8,7 @@ const { PRINTER_STATES, CATEGORIES } = require("./constants/printer-state.consta
 const { OctoprintApiClientService } = require("../octoprint/octoprint-api-client.service");
 const { SettingsClean } = require("../settings-cleaner.service");
 const PrinterDatabaseService = require("./printer-database.service");
-const { isEmpty, assign, findIndex, pick } = require("lodash");
+const { assign, findIndex, pick } = require("lodash");
 const { checkApiStatusResponse } = require("../../utils/api.utils");
 const {
   acquireWebCamData,
@@ -23,16 +24,10 @@ const {
   checkLowestSupportedOctoPrint
 } = require("../../utils/compatibility.utils");
 const {
-  parseAllOctoPrintUsers,
-  findCurrentUserForOctoFarmConnection
-} = require("../octoprint/utils/octoprint-api-helpers.utils");
-const {
   createPrinterPowerURL,
   parseOctoPrintPowerResponse,
   canWeDetectPrintersPowerState
 } = require("../octoprint/utils/printer-power-plugins.utils");
-const { promiseTimeout } = require("../../utils/promise.utils");
-const { pingTestHost } = require("../printers/utils/ping-test.utils");
 const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
 const WebSocketClient = require("../octoprint/octoprint-websocket-client.service");
@@ -88,6 +83,7 @@ class OctoPrintPrinter {
   _id = undefined;
   // Always default
   systemChecks = systemChecks();
+  quickConnectSettings = quickConnectCommands();
   // Always OP
   sessionKey = undefined;
   //Overridden by database
@@ -248,6 +244,7 @@ class OctoPrintPrinter {
       userList,
       selectedFilament,
       octoPrintVersion,
+      quickConnectSettings,
       octoPi,
       tempTriggers,
       feedRate,
@@ -317,6 +314,11 @@ class OctoPrintPrinter {
     if (!!feedRate) {
       this.feedRate = feedRate;
     }
+
+    if (!!quickConnectSettings) {
+      this.quickConnectSettings = quickConnectSettings;
+    }
+
     if (!!flowRate) {
       this.flowRate = flowRate;
     }
@@ -646,7 +648,7 @@ class OctoPrintPrinter {
 
     await Promise.allSettled(optionalPromises);
 
-    this.#apiPrinterTickerWrap("Printer fully enabled!", "Complete");
+    this.#apiPrinterTickerWrap("Printer enabled!", "Complete");
 
     return "Successfully enabled printer...";
   }
