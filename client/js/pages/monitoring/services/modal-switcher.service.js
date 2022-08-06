@@ -20,8 +20,8 @@ const printerControlsTemplate = (page, printer) => {
     return `
         <div id="modalSwitcher" class="row">
             <div class="col-lg-3"></div>
-            <div class="col-lg-6 text-center my-2">
-               <div class="btn-group btn-block" role="group" aria-label="Basic example">
+            <div class="col-lg-6 text-center mb-2 mt-0">
+               <div class="btn-group btn-group-sm btn-block" role="group" aria-label="Basic example">
                  <button id="modalSwitcherInfo" type="button" class="btn btn-outline-info ${(page === "info") ? active : ""}" ${disabledJobInfo}><i class="fa-solid fa-circle-info"></i></button>
                  <button id="modalSwitcherFiles" type="button" class="btn btn-outline-warning ${(page === "file") ? active : ""}" ${disabledFiles}><i class="fas fa-file-code"></i></button>
                  <button id="modalSwitcherControl" type="button" class="btn btn-outline-success ${(page === "control") ? active : ""}" ${disabledControl}><i class="fas fa-print"></i></button>

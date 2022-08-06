@@ -524,13 +524,13 @@ a.notyet {
 
 /*Terminal*/
 .temperatureMessage {
-  background-color:#583c0e;
+  color:#f39c12;
 }
 .sdMessage {
-  background-color:#262626;
+  color:#3498db;
 }
 .waitMessage {
-  background-color:#2e0905;
+  color:#e74c3c;
 }
 label {
   cursor: pointer;
