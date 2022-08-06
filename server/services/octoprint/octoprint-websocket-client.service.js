@@ -324,7 +324,6 @@ class WebSocketClient {
     }
     this.throttleRateMeasurements.push(ms);
 
-
     if (this.throttleRateMeasurements.length < 10) {
       return;
     }
@@ -474,6 +473,11 @@ class WebSocketClient {
   ping() {
     getPrinterStoreCache().updateWebsocketState(this.id, PRINTER_STATES().WS_PONGING);
     logger.silly(this.url + ": Pinging client");
+
+    if (this.#instance.readyState !== 1) {
+      return;
+    }
+
     this.#instance.ping();
 
     this.#lastPingMessage = Date.now();
