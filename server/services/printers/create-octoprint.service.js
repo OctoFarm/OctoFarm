@@ -31,6 +31,7 @@ const {
   parseOctoPrintPowerResponse,
   canWeDetectPrintersPowerState
 } = require("../octoprint/utils/printer-power-plugins.utils");
+const { promiseTimeout } = require("../../utils/promise.utils");
 const { pingTestHost } = require("../printers/utils/ping-test.utils");
 const { notifySubscribers } = require("../../services/server-side-events.service");
 const softwareUpdateChecker = require("../../services/octofarm-update.service");
@@ -57,6 +58,10 @@ class OctoPrintPrinter {
   enabling = false;
   versionNotSupported = false;
   versionNotChecked = false;
+  lastConnectionStatus = {
+    state: "Active",
+    message: ""
+  };
   healthChecksPass = true;
   onboarding = undefined;
   activeControlUser = null;
@@ -444,6 +449,10 @@ class OctoPrintPrinter {
    *@params endpoint
    */
   #apiPrinterTickerWrap(message, state, additional = "") {
+    this.lastConnectionStatus = {
+      state,
+      message: `${message} ${additional}`
+    };
     PrinterTicker.addIssue(
       new Date(),
       this.printerURL,
@@ -542,9 +551,16 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Testing the high sea!", "Active");
     }
 
-    const pingTestResults = await pingTestHost(this.printerURL);
+    const pingTestResults = await this.#api.pingTest(this.printerURL);
 
-    if (pingTestResults <= 0) {
+    const statusCheck = this.checkStatusNumber(pingTestResults?.status);
+    if (statusCheck !== true) {
+      if (this.#retryNumber === 0) {
+        this.#apiPrinterTickerWrap(
+          "Failed to find the host on the high seas! Marking offline...",
+          "Offline"
+        );
+      }
       const failedHighSeas = {
         hostState: "Offline",
         hostDescription: "Failed to test the waters! Cannot find host on the high seas!"
@@ -557,15 +573,14 @@ class OctoPrintPrinter {
       this.#apiPrinterTickerWrap("Printer found on the high seas!", "Complete");
       this.#apiPrinterTickerWrap("Attempting API access", "Active");
     }
+
     const requiredPromises = [];
     requiredApiCheckSequence.forEach((call) => {
-      const thisFunction = this.grabInformationFromDevice(call);
-      requiredPromises.push(thisFunction);
+      requiredPromises.push(this.grabInformationFromDevice(call));
     });
 
-    const response = await Promise.allSettled(requiredPromises);
+    await Promise.allSettled(requiredPromises);
 
-    console.log(response);
     //Check global API Key
     const keyCheck = this.settingsApi.key === this.apikey;
     if (keyCheck) {
@@ -629,6 +644,8 @@ class OctoPrintPrinter {
     });
 
     await Promise.allSettled(optionalPromises);
+
+    this.#apiPrinterTickerWrap("Printer fully enabled!", "Complete");
 
     return "Successfully enabled printer...";
   }
@@ -711,13 +728,13 @@ class OctoPrintPrinter {
 
     const apiCall = await this.#api.grabInformation(api);
 
-    if (!apiCall.ok) {
+    if (!apiCall?.ok) {
       this.#apiPrinterTickerWrap(`Failed to acquire ${tickerMessage}`, "Offline");
 
       if (!!apiCheck) {
         this.#apiChecksUpdateWrap(apiCheck, "danger");
       }
-      return apiCall.status;
+      return apiCall?.status ? apiCall.status : 408;
     }
 
     const jsonResponse = await apiCall.json();
@@ -831,6 +848,10 @@ class OctoPrintPrinter {
       "Offline",
       this._id
     );
+    this.lastConnectionStatus = {
+      state: "Offline",
+      message: "Printer disabled"
+    };
     return "Printer successfully disabled...";
   }
 

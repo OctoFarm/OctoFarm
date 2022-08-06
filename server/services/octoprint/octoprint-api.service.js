@@ -114,11 +114,12 @@ class OctoprintApiService {
   /**
    * Acquire a GET resource
    * @param route
+   * @param timeout
    * @returns {Promise<unknown>}
    */
-  async get(route) {
+  async get(route, timeout = this.#currentTimeout) {
     const url = new URL(route, this.printerURL).href;
-    return fetchApiTimeout(url, "GET", this.apikey, this.#currentTimeout);
+    return fetchApiTimeout(url, "GET", this.apikey, timeout);
   }
 
   /**
