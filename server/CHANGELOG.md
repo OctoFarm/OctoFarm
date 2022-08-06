@@ -1,5 +1,7 @@
 # :octopus: :octopus: OctoFarm's Server Changelog :octopus: :octopus:
 
+## [1.6.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.6.0...1.6.0) (2022-08-06)
+
 ### [1.5.1](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.1...1.5.1) (2022-06-29)
 
 :hammer: Bug Fixes :hammer:
