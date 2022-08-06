@@ -1,7 +1,7 @@
 import OctoFarmClient from "../octofarm-client.service";
 import OctoPrintClient from "./octoprint-client.service";
 import UI from "../../utils/ui";
-import { canWeTurnOnThePrinter } from "../../utils/octofarm.utils";
+import { canWeTurnOnThePrinter, canWeTurnOffThePrinter } from "../../utils/octofarm.utils";
 import PrinterPowerService from "../printer-power.service";
 
 const powerOnPrinterSequence = async (printer) => {
@@ -22,7 +22,30 @@ const powerOnPrinterSequence = async (printer) => {
         status: post.status,
       };
       await OctoFarmClient.updateUserActionsLog(printer._id, body);
-      await UI.delay(3000);
+      await UI.delay(5000);
+    }
+  }
+}
+
+const powerOffPrinterSequence = async (printer) => {
+  const canPowerOffThePrinter = canWeTurnOffThePrinter(printer);
+  //TODO enable quick connect setting for this to be enabled or disabled...
+  if (canPowerOffThePrinter) {
+    if(await PrinterPowerService.printerIsPoweredOn(printer)){
+      const post = await PrinterPowerService.sendPowerCommandForPrinter(
+          printer,
+          printer.powerSettings.powerOffURL,
+          printer.powerSettings.powerOffCommand,
+          "power off"
+      );
+      // Should be long enough for the printer to boot up.
+      // TODO also make customisable
+      const body = {
+        action: "Printer: power off",
+        status: post.status,
+      };
+      await OctoFarmClient.updateUserActionsLog(printer._id, body);
+      await UI.delay(2000);
     }
   }
 }
@@ -58,6 +81,8 @@ export const disconnectPrinterSequenceNoConfirm = async (printer) => {
       status: post.status,
     };
     await OctoFarmClient.updateUserActionsLog(printer._id, body);
+    await UI.delay(3000);
+    await powerOffPrinterSequence(printer);
     return post?.status;
 }
 
