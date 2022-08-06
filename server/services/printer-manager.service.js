@@ -25,13 +25,13 @@ class PrinterManagerService {
   #printerEnableTimer = 5000;
   #enablePrintersQueue = [];
 
-  loadPrinterTimeoutSettingss() {
+  loadPrinterTimeoutSettings() {
     const { timeout } = SettingsClean.returnSystemSettings();
     this.#offlineAPIRetry = timeout.apiRetry;
   }
 
   async initialisePrinters() {
-    this.loadPrinterTimeoutSettingss();
+    this.loadPrinterTimeoutSettings();
     // Grab printers from database
     const pList = await PrinterService.list();
     logger.info("Initialising " + pList.length + " printers");
@@ -105,7 +105,7 @@ class PrinterManagerService {
     }, this.#printerEnableTimer);
   }
 
-  async handlePrinterEnableQueue(batchSize = 10) {
+  async handlePrinterEnableQueue(batchSize = 20) {
     const enablePrinterQueueBatch = async () => {
       const queueLength = this.#enablePrintersQueue.length;
       for (let i = 0; i < queueLength; i += batchSize) {

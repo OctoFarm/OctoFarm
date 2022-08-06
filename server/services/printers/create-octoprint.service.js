@@ -273,13 +273,19 @@ class OctoPrintPrinter {
       core,
       octoPrintSystemInfo,
       printerFirmware,
-      activeControlUser
+      activeControlUser,
+      printerName
     } = printer;
     this._id = _id.toString();
     //Only update the below if received from database, otherwise is required from scans.
     if (!!onboarding) {
       this.onboarding = onboarding;
     }
+
+    if (!!settingsAppearance) {
+      this.settingsAppearance = settingsAppearance;
+    }
+
     if (!!currentUser) {
       this.currentUser = currentUser;
     }
@@ -437,8 +443,8 @@ class OctoPrintPrinter {
       );
     }
 
-    if (!!settingsAppearance) {
-      this.printerName = PrinterClean.grabPrinterName(settingsAppearance, this.printerURL);
+    if (!!printerName) {
+      this.printerName = printerName;
     }
 
     if (!!activeControlUser) {
@@ -1129,7 +1135,7 @@ class OctoPrintPrinter {
 
       this.gcodeScripts = PrinterClean.sortGCODE(scripts);
       this.otherSettings = PrinterClean.sortOtherSettings(this.tempTriggers, webcam, server);
-      this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
+
       this.#apiPrinterTickerWrap("Acquired settings data!", "Complete");
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().SETTINGS, "success", true);
       this.onboarding.settingsApi = true;
@@ -1745,8 +1751,6 @@ class OctoPrintPrinter {
     this.connectionOptions = PrinterClean.sortOptions(this.options);
 
     this.gcodeScripts = PrinterClean.sortGCODE(this.settingsScripts);
-
-    this.printerName = PrinterClean.grabPrinterName(this.settingsAppearance, this.printerURL);
 
     this.currentJob = JobClean.generate(
       this.job,

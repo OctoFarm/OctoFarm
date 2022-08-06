@@ -438,9 +438,7 @@ class PrinterStore {
           oldPrinter._id
         );
         this.updatePrinterDatabase(newPrinterInfo._id, {
-          settingsAppearance: {
-            name: newPrinterInfo.settingsAppearance.name
-          }
+          printerName: newPrinterInfo.settingsAppearance.name
         });
 
         if (

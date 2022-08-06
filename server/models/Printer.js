@@ -22,6 +22,10 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false // !
   },
+  printerName: {
+    type: String,
+    required: false
+  },
   sortIndex: {
     type: Number,
     required: false
