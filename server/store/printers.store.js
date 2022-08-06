@@ -89,7 +89,8 @@ class PrinterStore {
         currentUser: printer.currentUser,
         fullyScanned: printer?.onboarding?.fullyScanned,
         klipperState: printer?.klipperState,
-        printerPowerState: printer?.printerPowerState
+        printerPowerState: printer?.printerPowerState,
+        lastConnectionStatus: printer?.lastConnectionStatus
       };
     });
 

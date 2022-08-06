@@ -34,6 +34,10 @@ class OctoprintApiClientService extends OctoprintApiService {
     super(printerURL, apikey, timeoutSettings);
   }
 
+  async pingTest() {
+    return this.get("/", 5000);
+  }
+
   async grabInformation(api) {
     return this.get(api);
   }
