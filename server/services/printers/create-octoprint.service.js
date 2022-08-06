@@ -46,6 +46,7 @@ const { JobClean } = require("../job-cleaner.service");
 const apiConfig = require("../octoprint/constants/octoprint-api-config.constants");
 const { MESSAGE_TYPES } = require("../../constants/sse.constants");
 const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const { FilamentClean } = require("../filament-cleaner.service");
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_OCTOPRINT);
 
 class OctoPrintPrinter {
@@ -1836,6 +1837,10 @@ class OctoPrintPrinter {
 
     this.#db.update({ fileList: this.fileList });
     return deletedList;
+  }
+
+  clearSelectedSpools() {
+    FilamentClean.removeSelectedSpoolsFromList(this.selectedFilament);
   }
 }
 
