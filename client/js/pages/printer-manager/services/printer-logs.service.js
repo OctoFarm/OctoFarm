@@ -353,7 +353,6 @@ export default class PrinterLogsService {
     });
   }
   static async parseOctoPrintLogs(printer, url) {
-    console.log(url)
     url = url.replace(printer.printerURL+"/", "")
     const octoPrintLogCall = await OctoPrintClient.getLogs(printer, url)
 

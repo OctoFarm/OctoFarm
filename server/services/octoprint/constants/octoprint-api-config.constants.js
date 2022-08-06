@@ -75,15 +75,15 @@ const settingsRetrievalFunction = (data, captureKeys, printer, database) => {
     data["plugins"]
   );
 
-  if (oldAppearance.name === "Grabbing from OctoPrint...") {
+  if (printer.printerName.length === 0 && oldAppearance.name === "Grabbing from OctoPrint...") {
     printer.settingsAppearance.name = PrinterClean.grabOctoPrintName(
       data["appearance"],
       printer.printerURL
     );
-  } else if (oldAppearance.name.length > 0) {
+    printer.printerName = printer.settingsAppearance.name;
+  } else if (printer.printerName.length === 0 && oldAppearance.name.length > 0) {
     printer.settingsAppearance.name = oldAppearance.name;
-  } else {
-    printer.settingsAppearance.name = data["appearance"].name;
+    printer.printerName = printer.settingsAppearance.name;
   }
 
   if (printer.settingsAppearance.color !== data["appearance"].color) {
@@ -94,7 +94,8 @@ const settingsRetrievalFunction = (data, captureKeys, printer, database) => {
     camURL: printer.camURL,
     settingsAppearance: printer.settingsAppearance,
     costSettings: printer.costSettings,
-    powerSettings: printer.powerSettings
+    powerSettings: printer.powerSettings,
+    printerName: printer.printerName
   });
 
   return true;
