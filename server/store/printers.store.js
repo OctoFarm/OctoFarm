@@ -375,7 +375,7 @@ class PrinterStore {
         colour: { category }
       }
     } = printer;
-    return category === "Active";
+    return category === "Active" || category === "Complete";
   }
 
   shouldPrinterBeReceivingData(id) {
