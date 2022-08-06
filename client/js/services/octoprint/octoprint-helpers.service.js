@@ -6,7 +6,6 @@ import PrinterPowerService from "../printer-power.service";
 
 const powerOnPrinterSequence = async (printer) => {
   const canPowerOnThePrinter = canWeTurnOnThePrinter(printer);
-  //TODO enable quick connect setting for this to be enabled or disabled...
   if (canPowerOnThePrinter) {
     if(!await PrinterPowerService.printerIsPoweredOn(printer)){
       const post = await PrinterPowerService.sendPowerCommandForPrinter(
@@ -15,21 +14,18 @@ const powerOnPrinterSequence = async (printer) => {
           printer.powerSettings.powerOnCommand,
           "power on"
       );
-      // Should be long enough for the printer to boot up.
-      // TODO also make customisable
       const body = {
         action: "Printer: power on",
         status: post.status,
       };
       await OctoFarmClient.updateUserActionsLog(printer._id, body);
-      await UI.delay(5000);
+      await UI.delay(printer.quickConnectSettings.connectAfterPowerTimeout);
     }
   }
 }
 
 const powerOffPrinterSequence = async (printer) => {
   const canPowerOffThePrinter = canWeTurnOffThePrinter(printer);
-  //TODO enable quick connect setting for this to be enabled or disabled...
   if (canPowerOffThePrinter) {
     if(await PrinterPowerService.printerIsPoweredOn(printer)){
       const post = await PrinterPowerService.sendPowerCommandForPrinter(
@@ -38,52 +34,64 @@ const powerOffPrinterSequence = async (printer) => {
           printer.powerSettings.powerOffCommand,
           "power off"
       );
-      // Should be long enough for the printer to boot up.
-      // TODO also make customisable
       const body = {
         action: "Printer: power off",
         status: post.status,
       };
       await OctoFarmClient.updateUserActionsLog(printer._id, body);
-      await UI.delay(2000);
+      await UI.delay(printer.quickConnectSettings.powerAfterDisconnectTimeout);
     }
   }
 }
 
 export const connectPrinterSequence = async (printer) => {
-  await powerOnPrinterSequence(printer);
-  const data = {
-    command: "connect",
-    port: printer?.connectionOptions?.portPreference ? printer.connectionOptions.portPreference : "AUTO",
-    baudrate: printer?.connectionOptions?.baudratePreference ? parseInt(printer.connectionOptions.baudratePreference) : 0,
-    printerProfile: printer?.connectionOptions?.printerProfilePreference ? printer.connectionOptions.printerProfilePreference : "_default",
-  };
-  let post = await OctoPrintClient.post(printer, "connection", data);
-  const body = {
-    action: "Printer: connected",
-    status: post?.status,
-  };
-  await OctoFarmClient.updateUserActionsLog(printer._id, body);
-  return post?.status;
+  if(printer.quickConnectSettings.powerPrinter){
+    await powerOnPrinterSequence(printer);
+  }
+
+  if(printer.quickConnectSettings.connectPrinter){
+    const data = {
+      command: "connect",
+      port: printer?.connectionOptions?.portPreference ? printer.connectionOptions.portPreference : "AUTO",
+      baudrate: printer?.connectionOptions?.baudratePreference ? parseInt(printer.connectionOptions.baudratePreference) : 0,
+      printerProfile: printer?.connectionOptions?.printerProfilePreference ? printer.connectionOptions.printerProfilePreference : "_default",
+    };
+
+    let post = await OctoPrintClient.post(printer, "connection", data);
+    const body = {
+      action: "Printer: connected",
+      status: post?.status,
+    };
+    await OctoFarmClient.updateUserActionsLog(printer._id, body);
+    return post?.status;
+  }
+  return 204;
 }
 
 export const disconnectPrinterSequenceNoConfirm = async (printer) => {
-    let data = {
-      command: "disconnect",
-    };
-    let post = await OctoPrintClient.post(
-        printer,
-        "connection",
-        data
-    );
-    const body = {
-      action: "Printer: disconnected",
-      status: post.status,
-    };
-    await OctoFarmClient.updateUserActionsLog(printer._id, body);
-    await UI.delay(3000);
-    await powerOffPrinterSequence(printer);
-    return post?.status;
+    let post = {
+      status: 204
+    }
+    if(printer.quickConnectSettings.connectPrinter) {
+      let data = {
+        command: "disconnect",
+      };
+      post = await OctoPrintClient.post(
+          printer,
+          "connection",
+          data
+      );
+      const body = {
+        action: "Printer: disconnected",
+        status: post.status,
+      };
+      await OctoFarmClient.updateUserActionsLog(printer._id, body);
+    }
+    if(printer.quickConnectSettings.powerPrinter){
+      await powerOffPrinterSequence(printer);
+    }
+
+    return post?.status ? post.status : 200;
 }
 
 export const printStartSequence = async (printer) => {

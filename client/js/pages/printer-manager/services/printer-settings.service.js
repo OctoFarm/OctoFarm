@@ -131,6 +131,16 @@ class PrinterSettingsService {
 
     const profileDropDown = document.getElementById("psDefaultProfile");
 
+    const quickConnectEnabled = document.getElementById("psQuickConnect");
+    const quickPowerEnabled = document.getElementById("psQuickPower");
+    const connectTimeout = document.getElementById("psQuickConnectTimeout");
+    const powerTimeout = document.getElementById("psQuickPowerTimeout");
+
+    quickConnectEnabled.checked = currentPrinter.quickConnectSettings.connectPrinter;
+    quickPowerEnabled.checked = currentPrinter.quickConnectSettings.powerPrinter;
+    connectTimeout.value = currentPrinter.quickConnectSettings.connectAfterPowerTimeout / 1000;
+    powerTimeout.value = currentPrinter.quickConnectSettings.powerAfterDisconnectTimeout / 1000;
+
     if (printerOnline) {
       pageElements.mainPage.offlineMessage.innerHTML = "";
       currentPrinter.connectionOptions.baudrates.forEach((baud) => {
@@ -992,6 +1002,13 @@ class PrinterSettingsService {
         systemShutdown: UI.getValueOrPlaceHolder(
           document.getElementById("psSystemShutdown")
         ),
+      },
+      quickConnectSettings: {
+        connectPrinter: document.getElementById("psQuickConnect").checked,
+        powerPrinter: document.getElementById("psQuickPower").checked,
+        preHeat: false,
+        connectAfterPowerTimeout: UI.getValueOrPlaceHolder(document.getElementById("psQuickConnectTimeout")) * 1000,
+        powerAfterDisconnectTimeout: UI.getValueOrPlaceHolder(document.getElementById("psQuickPowerTimeout")) * 1000
       },
       powerCommands: {
         powerOnCommand: UI.getValueOrPlaceHolder(
