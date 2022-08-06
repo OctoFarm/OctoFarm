@@ -78,7 +78,7 @@ export function updateLogLine(id, messageBox, string) {
 
 export function createConnectionLogString(data) {
   const date = new Date(data.date).toLocaleString();
-  return `<div id="${data.id}" style="width: 100%; font-size:11px;" class="text-left ${data.state} text-wrap"> ${date} | ${data.printer} | ${data.message}</div>`;
+  return `<div id="${data.id}" style="width: 100%; font-size:11px;" class="text-left text${data.state} text-wrap"> ${date} | ${data.printer} | ${data.message}</div>`;
 }
 
 export function createActionsLogString(data) {
@@ -87,13 +87,13 @@ export function createActionsLogString(data) {
     data.id
   }" style="width: 100%; font-size:11px;" class="text-left ${
     data.state
-  } text-wrap ${data?.status}"> ${date} | ${
+  } text-wrap text${data?.status}"> ${date} | ${
     data.currentUser
   } | ${data.printerName.slice(0, 6)}... | ${data.action}</div>`;
 }
 
 export function createAlertsLogString(data) {
-  return `<div id="${data.id}" style="width: 100%; font-size:11px;" class="text-left ${data.colour} text-wrap"><i class="pl-2 fas fa-exclamation-triangle"></i> ${data.printerName} | ${data.name}</div>`;
+  return `<div id="${data.id}" style="width: 100%; font-size:11px;" class="text-left text${data.colour} text-wrap"><i class="pl-2 fas fa-exclamation-triangle"></i> ${data.printerName} | ${data.name}</div>`;
 }
 
 export function removeLogLine(data) {

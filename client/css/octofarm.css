@@ -171,23 +171,23 @@ li {
   color: #262626;
 }
 .textActive {
-  color: #6b5103;
+  color: #f39c12;
 }
 
 .textOffline {
-  color: #721c24;
+  color: #e74c3c;
 }
 
 .textClosed {
-  color: #721c24;
+  color: #e74c3c;
 }
 
 .textComplete {
-  color: #155724;
+  color: #00bc8c;
 }
 
 .textInfo {
-  color: #004085;
+  color: #3498db;
 }
 
 .text-offline {

@@ -267,7 +267,9 @@ export function returnPrinterTableRow(printer) {
         <td class="align-middle" id="printerManageBtns-${printer._id}">
             ${returnPrinterManageDropDown(printer._id, printer.disabled)}
         </td>
-
+        <td class="align-middle" id="printerLastStatus-${printer._id}">
+            
+        </td>
         <td class="align-middle" id="printerAlertsBtns-${printer._id}">
             ${returnAlerts(printer._id, printer.printerURL)}
         </td>
@@ -340,7 +342,8 @@ export function returnDisabledPrinterTableRow(printer) {
         <td class="align-middle" id="printerManageBtns-${printer._id}">
             ${returnPrinterManageDropDown(printer._id, printer.disabled)}
         </td>
-
+        <td class="align-middle" id="printerLastStatus-${printer._id}">
+        </td>
         <td class="align-middle" id="printerAlertsBtns-${printer._id}">
                ${returnAlerts(printer._id, printer.printerURL)}
         </td>

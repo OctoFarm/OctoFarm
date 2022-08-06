@@ -443,7 +443,7 @@ function checkIfOverheatingPi(printer) {
 function checkForApiErrors(printer) {
   if (
     printer.hostState.colour.category !== "Offline" &&
-    printer.hostState.colour.category !== "Searching..."
+    printer.hostState.colour.category !== "Info"
   ) {
     const apiErrorTag = document.getElementById(
       `scanningIssues-${printer._id}`
