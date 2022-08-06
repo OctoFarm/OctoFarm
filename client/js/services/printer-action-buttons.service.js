@@ -117,7 +117,6 @@ function printerQuickDisconnected(id) {
   connectBtn.classList.remove("btn-success");
   connectBtn.classList.add("btn-danger");
   connectBtn.title ="Quickly bring your printer online! Power -> Connect";
-    ;
 }
 
 function groupInit(printers) {
@@ -322,7 +321,7 @@ function addEventListeners(printer) {
   document
     .getElementById(`printerQuickConnect-${printer._id}`)
     .addEventListener("click", async (e) => {
-      e.disabled = true;
+      e.target.disabled = true;
       if (
         document
           .getElementById("printerQuickConnect-" + printer._id)
@@ -357,7 +356,7 @@ function addEventListeners(printer) {
       }else{
         // Disconnect Printer Sequence
         bootbox.confirm({
-          message: "Are you sure you want to disconnect your printer?",
+          message: "Are you sure you want to shutdown your printer?",
           buttons: {
             confirm: {
               label: "Yes",

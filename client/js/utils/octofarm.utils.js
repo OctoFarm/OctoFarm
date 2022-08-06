@@ -361,6 +361,12 @@ export function canWeTurnOnThePrinter(printer) {
   return !!powerOnCommand || powerOnCommand !== "";
 }
 
+export function canWeTurnOffThePrinter(printer) {
+  const { powerSettings: { powerOffCommand } = {} } = printer || {};
+
+  return !!powerOffCommand || powerOffCommand !== "";
+}
+
 export function canWeDetectPrintersPowerState(powerStatusURL) {
   return !!powerStatusURL || powerStatusURL.length === 0;
 }
