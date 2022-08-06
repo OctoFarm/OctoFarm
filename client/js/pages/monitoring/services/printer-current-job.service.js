@@ -501,7 +501,7 @@ const updateCurrentJobStatus = (printer, elements) => {
   elements.pmUserPrinting.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${
     printer?.activeControlUser
       ? printer.activeControlUser
-      : "No user registered"
+      : "OctoPrint: " + printer.currentUser
   }`;
 
   if (typeof printer.currentJob === "undefined") {

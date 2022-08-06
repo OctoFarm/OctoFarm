@@ -107,6 +107,7 @@ class PrinterStore {
         printerName: printer.printerName,
         printerURL: printer.printerURL,
         webSocketURL: printer.webSocketURL,
+        currentUser: printer.currentUser,
         apikey: printer.apikey,
         camURL: generateOctoFarmCameraURL(printer),
         group: printer.group,
