@@ -17,6 +17,7 @@ const {
 } = require("../services/printers/utils/camera-url-generation.utils");
 const { JobClean } = require("../services/job-cleaner.service");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+
 const logger = new Logger(LOGGER_ROUTE_KEYS.STORE_PRINTERS);
 
 class PrinterStore {
@@ -207,6 +208,8 @@ class PrinterStore {
 
   async deletePrinter(id) {
     const printer = this.#findMePrinter(id);
+    //Remove all spools
+    await printer.clearSelectedSpools();
     //Kill all printer connections
     await printer.killAllConnections();
     //Remove from database

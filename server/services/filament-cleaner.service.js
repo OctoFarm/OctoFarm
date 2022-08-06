@@ -7,6 +7,7 @@ const Profiles = require("../models/Profiles.js");
 const { SettingsClean } = require("./settings-cleaner.service");
 const { getPrinterStoreCache } = require("../cache/printer-store.cache");
 const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const { findIndex } = require("lodash");
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILAMENT_CLEANER);
 
 let spoolsClean = [];
@@ -86,6 +87,20 @@ class FilamentCleanerService {
     FilamentCleanerService.createPrinterList();
     await FilamentCleanerService.dropDownList(spools, profiles, selectedFilamentList);
     logger.info("Filament information cleaned and ready for consumption...");
+  }
+
+  static removeSelectedSpoolsFromList(selectedFilament) {
+    selectedFilament.forEach((filament) => {
+      const currentSpool = findIndex(selectedFilamentList, function (o) {
+        return o === filament._id.toString();
+      });
+      if (currentSpool > -1) {
+        selectedFilamentList.splice(currentSpool, 1);
+      }
+    });
+    FilamentCleanerService.start().catch((e) => {
+      logger.error("Unable to clean filament", e.toString());
+    });
   }
 
   static dropDownList(spools, profiles, selected) {
@@ -189,7 +204,6 @@ class FilamentCleanerService {
           materialBreak[index].used.push(parseFloat(element.used));
           materialBreak[index].price.push(parseFloat(element.price));
         }
-
       }
     }
 
