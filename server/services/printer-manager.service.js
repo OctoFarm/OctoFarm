@@ -133,7 +133,7 @@ class PrinterManagerService {
     for (const printer of printersList) {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
-      if (!disabled && category !== "Offline" && category !== "Searching...") {
+      if (!disabled && category !== "Offline" && category !== "Info") {
         printer.ping();
       }
     }
