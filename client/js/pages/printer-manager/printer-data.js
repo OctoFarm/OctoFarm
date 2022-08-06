@@ -94,6 +94,7 @@ function updatePrinterInfo(printer) {
   const printName = document.getElementById(`name-${printer._id}`);
   const printerURL = document.getElementById(`printerURL-${printer._id}`);
   const webButton = document.getElementById(`printerWeb-${printer._id}`);
+  const lastStatusElm = document.getElementById(`printerLastStatus-${printer._id}`);
 
   const octoPrintUser = document.getElementById(`printerOctoPrintUser-${printer._id}`);
   const printerControlUser = document.getElementById(`printerControlUser-${printer._id}`);
@@ -104,6 +105,8 @@ function updatePrinterInfo(printer) {
   const printerGroup = document.getElementById(`printerGroup-${printer._id}`);
 
   let printerName = "<i class=\"fa-solid fa-arrows-spin fa-spin\"></i>";
+
+  lastStatusElm.innerHTML = `<span class="text${printer.lastConnectionStatus.state}">${printer.lastConnectionStatus.message}</span>`;
 
   if (
     printer?.printerName &&
@@ -459,21 +462,25 @@ function checkForApiErrors(printer) {
           }
         }
       }
+
       if (apiErrors > 0) {
-        removeLogLine({ id: "apiIssue-" + printer._id });
+        updateLogLine(
+            "apiIssue-" + printer._id,
+            alertsLogMesssageBox,
+            createAlertsLogString({
+              id: "apiIssue-" + printer._id,
+              name: "API Scan has issues!",
+              printerName: printer.printerName,
+              colour: "Offline",
+            })
+        );
         UI.removeDisplayNoneFromElement(apiErrorTag);
+      }else{
+        removeLogLine({ id: "apiIssue-" + printer._id });
+        UI.addDisplayNoneToElement(apiErrorTag);
       }
     } else {
-      updateLogLine(
-        "apiIssue-" + printer._id,
-        alertsLogMesssageBox,
-        createAlertsLogString({
-          id: "apiIssue-" + printer._id,
-          name: "API Scan has issues!",
-          printerName: printer.printerName,
-          colour: "Offline",
-        })
-      );
+      removeLogLine({ id: "apiIssue-" + printer._id });
       UI.addDisplayNoneToElement(apiErrorTag);
     }
   }
