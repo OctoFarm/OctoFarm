@@ -57,6 +57,55 @@
                     </button>
                 </div>
             </div>
+            <div id="psCurrentConnection" class="row">
+
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="apiCheck"><i class="fas fa-users"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="stateCheck"><i
+                                        class="fas fa-info-circle"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="settingsCheck"><i
+                                        class="fas fa-cog"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="systemInfoCheck"><i class="fas fa-question-circle"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="updatesCheck"><i class="fas fa-wrench"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="filesCheck"><i
+                                        class="fas fa-file-code"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="profileCheck"><i
+                                        class="fas fa-id-card"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="systemCheck"><i
+                                        class="fas fa-server"></i></button>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3">
+                            <button disabled
+                                    class="btn btn-danger mb-1 btn-block" id="pluginsCheck"><i class="fas fa-plug"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <h5>Serial Defaults</h5>
             <hr>
             <p id="portNotAvailableMessage"></p>
@@ -76,54 +125,62 @@
 
                 </div>
             </div>
-            <div id="psCurrentConnection" class="row">
+            <h5>Quick Connect Settings</h5>
+            <hr>
+            <div id="quickConnectionSettings" class="row">
+                <div class="col-12">
+                    Set your quick connection button settings.<br>
 
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                    <h5>API Status</h5>
-                    <hr>
-                    <div class="row">
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="apiCheck"><i class="fas fa-users"></i></button>
+                    <b>Connected/Disconnect: </b> When this is enabled the button will attempt to establish a connection between OctoPrint and your Printer.<br>
+                    <b>Power On/Off: </b>  When this is enabled the button will try and power your printer On, before connect attempt and off after a disconnect attempt.<br>
+                    <code>Requires an OctoPrint power plugin and power tab setting up to toggle printers power!</code>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <form class="was-validated">
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="psQuickConnect" required>
+                            <label class="custom-control-label" for="psQuickConnect">Connect/Disconnect</label>
+                            <div class="valid-feedback">Will try to connect/disconnect</div>
+                            <div class="invalid-feedback">Will skip connect/disconnect</div>
                         </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="stateCheck"><i
-                                        class="fas fa-info-circle"></i></button>
+                    </form>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-4">
+                    <form class="was-validated">
+                        <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="psQuickPower" required>
+                            <label class="custom-control-label" for="psQuickPower">Power On/Off</label>
+                            <div class="valid-feedback">Will try to power on/off printer</div>
+                            <div class="invalid-feedback">Will skip powering on/off printer</div>
                         </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="settingsCheck"><i
-                                        class="fas fa-cog"></i></button>
+                    </form>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="form-group">
+                        <label for="psQuickConnectTimeout">Connect after power timeout</label>
+                        <div class="input-group mb-2">
+                            <input type="number" class="form-control" id="psQuickConnectTimeout" placeholder="5000" step="1">
+                            <div class="input-group-append">
+                                <div class="input-group-text">Seconds</div>
+                            </div>
                         </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="systemInfoCheck"><i class="fas fa-question-circle"></i></button>
+                        <small class="form-text text-muted">
+                            The time between attempting to power your printer on after a successful connection attempt.
+                        </small>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="form-group">
+                        <label for="psQuickPowerTimeout">Power after disconnect timeout</label>
+                        <div class="input-group mb-2">
+                            <input type="number" class="form-control" id="psQuickPowerTimeout" placeholder="3000" step="1">
+                            <div class="input-group-append">
+                                <div class="input-group-text">Seconds</div>
+                            </div>
                         </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="updatesCheck"><i class="fas fa-wrench"></i></button>
-                        </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="filesCheck"><i
-                                        class="fas fa-file-code"></i></button>
-                        </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="profileCheck"><i
-                                        class="fas fa-id-card"></i></button>
-                        </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="systemCheck"><i
-                                        class="fas fa-server"></i></button>
-                        </div>
-                        <div class="col-sm-12 col-md-2 col-lg-4">
-                            <button
-                                    class="btn btn-danger mb-1 btn-block" id="pluginsCheck"><i class="fas fa-plug"></i>
-                            </button>
-                        </div>
+                        <small class="form-text text-muted">
+                            The time between attempting to disconnect your printer after a successful power off attempt.
+                        </small>
                     </div>
                 </div>
             </div>

@@ -233,6 +233,10 @@ const PrinterSchema = new mongoose.Schema({
   activeControlUser: {
     type: String,
     required: false
+  },
+  quickConnectSettings: {
+    type: Object,
+    required: false
   }
 });
 
