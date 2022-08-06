@@ -370,7 +370,6 @@ function addEventListeners(printer) {
           callback: async function (result) {
             if(result){
               const status = await disconnectPrinterSequenceNoConfirm(printer);
-              console.log("RESP", status)
               if (!!status) {
                 if (status === 204) {
                   UI.createAlert(
