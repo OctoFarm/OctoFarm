@@ -78,36 +78,13 @@ export default class PrinterTerminalManagerService {
       filamentManager = serverSettings.filamentManager;
       //Load tools
       document.getElementById("printerControls").innerHTML = `
-          <div class="row">
-                <div class="col-sm-12 col-md-4 col-lg-3 text-center">
-                <h5>Camera</h5><hr>
-                    ${imageOrCamera(printer, undefined, "Modal")}
-               </div>
-              
-                <div class="col-sm-12 col-md-8 col-lg-9 text-center">
-                        <h5>Custom Gocde Scripts</h5><hr>
-                        <div id="customGcodeCommandsArea" class="col-lg-12 text-center"></div>
-                </div>
 
-          </div>
           <div class="row">
-                <div class="col-12">
-                    <center>
-                        <h5>Terminal</h5>
-                    </center>
-                    <hr>
-                </div>
-                </div>
-                <div class="row">
-                 <div id="terminal" class="terminal-window bg-secondary">
-                  </div>
-                    <div class="input-group">
-                      <textarea id="terminalInput" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon2"></textarea>
-                      <div class="input-group-append">
-                        <button class="btn btn-secondary" id="terminalInputBtn" type="submit">Send</button>
-                      </div>
-                    </div>
-                    <form class="was-validated">
+            <div class="col-sm-12 col-md-4 col-lg-3 text-center">
+              <h5>Camera</h5><hr>
+              ${imageOrCamera(printer, undefined, "Modal")}
+              <h5 class="mt-1">Filters</h5><hr>
+              <form class="was-validated">
                       <div class="custom-control custom-checkbox mb-3">
                         <input 
                         type="checkbox" class="custom-control-input" id="tempMessages" required checked>
@@ -116,26 +93,40 @@ export default class PrinterTerminalManagerService {
                         <div class="invalid-feedback">Not showing temperature messages</div>
                       </div>
                       </form>
-                      <form class="was-validated">
-                       <div class="custom-control custom-checkbox mb-3">
-                        <input
-                        type="checkbox" class="custom-control-input" id="sdMessages" required checked>
-                        <label class="custom-control-label" for="sdMessages">SD Messages</label>
-                        <div class="valid-feedback">Showing sd messages</div>
-                        <div class="invalid-feedback">Not showing sd messages</div>
-                      </div>
-                      </form>
-                      <form class="was-validated">
-                      <div class="custom-control custom-checkbox mb-3">
-                        <input
-                        type="checkbox" class="custom-control-input" id="waitMessages" required checked>
-                        <label class="custom-control-label" for="waitMessages">Wait Responses</label>
-                        <div class="valid-feedback">Showing wait responses</div>
-                        <div class="invalid-feedback">Not showing wait responses</div>
-                      </div>
-                      </form>
-                </div>
+              <form class="was-validated">
+               <div class="custom-control custom-checkbox mb-3">
+                <input
+                type="checkbox" class="custom-control-input" id="sdMessages" required checked>
+                <label class="custom-control-label" for="sdMessages">SD Messages</label>
+                <div class="valid-feedback">Showing sd messages</div>
+                <div class="invalid-feedback">Not showing sd messages</div>
+              </div>
+              </form>
+              <form class="was-validated">
+              <div class="custom-control custom-checkbox mb-3">
+                <input
+                type="checkbox" class="custom-control-input" id="waitMessages" required checked>
+                <label class="custom-control-label" for="waitMessages">Wait Responses</label>
+                <div class="valid-feedback">Showing wait responses</div>
+                <div class="invalid-feedback">Not showing wait responses</div>
+              </div>
+                </form>
+              <h5 class="mt-1">Custom Gocde Scripts</h5><hr>
+              <div id="customGcodeCommandsArea" class="col-lg-12 text-center"></div>    
             </div>
+            <div class="col-sm-12 col-md-8 col-lg-9 text-center">
+               <h5>Terminal</h5>
+               <hr>
+               <div id="terminal" class="terminal-window bg-secondary text-left"></div>
+              <div class="input-group">
+                <textarea id="terminalInput" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon2"></textarea>
+                <div class="input-group-append">
+                  <button class="btn btn-secondary" id="terminalInputBtn" type="submit">Send</button>
+                </div>
+              </div>
+            </div>
+          
+          </div>
             `;
       setupModalSwitcher("terminal", printer);
       await CustomGenerator.generateButtons(printer);
@@ -370,7 +361,7 @@ export default class PrinterTerminalManagerService {
           elements.terminal.terminalWindow.insertAdjacentHTML(
             "beforeend",
             `
-          <div id="logLine${l}" class="logLine">${printer.terminal[l]}</div>
+          <div id="logLine${l}" class="logLine text-light">${printer.terminal[l]}</div>
         `
           );
         }
