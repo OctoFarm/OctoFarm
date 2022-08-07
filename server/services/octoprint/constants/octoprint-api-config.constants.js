@@ -75,15 +75,22 @@ const settingsRetrievalFunction = (data, captureKeys, printer, database) => {
     data["plugins"]
   );
 
-  if (printer.printerName.length === 0 && oldAppearance.name === "Grabbing from OctoPrint...") {
-    printer.settingsAppearance.name = PrinterClean.grabOctoPrintName(
-      data["appearance"],
-      printer.printerURL
-    );
-    printer.printerName = printer.settingsAppearance.name;
-  } else if (printer.printerName.length === 0 && oldAppearance.name.length > 0) {
-    printer.settingsAppearance.name = oldAppearance.name;
-    printer.printerName = printer.settingsAppearance.name;
+  console.log(oldAppearance);
+
+  if (oldAppearance.name.length !== 0) {
+    printer.printerName = PrinterClean.grabOctoPrintName(oldAppearance, printer.printerURL);
+  }
+
+  if (!printer?.printerName || printer.printerName.length === 0) {
+    printer.printerName = PrinterClean.grabOctoPrintName(data["appearance"], printer.printerURL);
+  }
+
+  if (printer.printerName.length === 0) {
+    printer.printerName = PrinterClean.grabOctoPrintName(oldAppearance, printer.printerURL);
+  }
+
+  if (printer.printerName === "Grabbing from OctoPrint...") {
+    printer.printerName = PrinterClean.grabOctoPrintName(data["appearance"], printer.printerURL);
   }
 
   if (printer.settingsAppearance.color !== data["appearance"].color) {

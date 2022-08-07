@@ -105,7 +105,7 @@ class PrinterManagerService {
     }, this.#printerEnableTimer);
   }
 
-  async handlePrinterEnableQueue(batchSize = 20) {
+  async handlePrinterEnableQueue(batchSize = 10) {
     const enablePrinterQueueBatch = async () => {
       const queueLength = this.#enablePrintersQueue.length;
       for (let i = 0; i < queueLength; i += batchSize) {
