@@ -21,7 +21,7 @@ async function updateBtnOnClick(printerID) {
       const n = plugin.releaseNotesURL.lastIndexOf("/");
       const version = plugin.releaseNotesURL.substring(n + 1);
       pluginsToUpdate.push({
-        text: `${plugin.displayName} - Update to ${version}`,
+        text: `${plugin.displayName} - Updating to ${version}`,
         value: plugin.id,
       });
       displayNameList.push(plugin.displayName);
