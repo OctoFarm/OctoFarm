@@ -1,7 +1,7 @@
 import UI from "../utils/ui.js";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 import { ApplicationError } from "../exceptions/application-error.handler";
-import packageJson from "../../package.json";
+import packageJson from "../../../package.json";
 
 let worker = null;
 let savedWorkerEventFunction = null;
