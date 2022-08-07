@@ -2,7 +2,7 @@ module.exports = {
   plugins: {
     "@release-it/conventional-changelog": {
       infile: "CHANGELOG.md",
-      header: "# :octopus: :octopus: OctoFarm's Server Changelog :octopus: :octopus:",
+      header: "# :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:",
       preset: {
         name: "conventionalcommits",
         types: [
