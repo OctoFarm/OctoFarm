@@ -12,11 +12,11 @@ const clientJSFolder = basePath + "/js/";
 const clientCSSFolder = basePath + "/css/";
 const dirContents = fs.readdirSync(clientJSFolder, { withFileTypes: true });
 const dirCssContents = fs.readdirSync(clientCSSFolder, { withFileTypes: true });
-const packageJsonPath = path.join(__dirname, "package.json");
+const packageJsonPath = path.join(__dirname, "../package.json");
 const packageJsonVersion = require(packageJsonPath).version;
+
 // Target
 const insideBasePath = "../server/views/assets/";
-const buildDirProd = "./dist/";
 const buildDirDev = insideBasePath + "dist/";
 
 const webpackEntries = fromPairs(
@@ -40,7 +40,7 @@ webpackEntries["bootstrap"] = "bootstrap/dist/js/bootstrap.bundle";
 
 module.exports = (env, options) => {
   const isProd = options.mode === "production";
-  const chosenBuildDir = isProd ? buildDirProd : buildDirDev;
+  const chosenBuildDir = isProd ? buildDirDev : buildDirDev;
   const fullDir = path.resolve(__dirname, chosenBuildDir);
   return {
     entry: webpackEntries,

@@ -3,9 +3,6 @@ module.exports = {
     "@release-it/conventional-changelog": {
       infile: "CHANGELOG.md",
       header: "# :octopus: :octopus: OctoFarm's Server Changelog :octopus: :octopus:",
-      parserOpts: {
-        headerPattern: "^(\\w*)(?:\\((server*)\\))?\\: (.*)$"
-      },
       preset: {
         name: "conventionalcommits",
         types: [
@@ -47,7 +44,7 @@ module.exports = {
           {
             type: "ci",
             section: ":curly_loop: Continuous Integrations :curly_loop:",
-            hidden: true
+            hidden: false
           },
           {
             type: "chore",
@@ -59,7 +56,7 @@ module.exports = {
     }
   },
   git: {
-    commitMessage: "chore(release): server release v${version}",
+    commitMessage: "chore(release): octofarm release v${version}",
     commit: true,
     tag: true,
     push: true,
