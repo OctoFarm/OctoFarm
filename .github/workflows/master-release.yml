@@ -9,8 +9,8 @@ on:
       - "client/package.json"
       - "server/package-lock.json"
       - "client/package-lock.json"
-      - "client/dist"
-      - "server/views/assets/dist"
+      - "package.json"
+      - "package-lock.json"
 
 jobs:
   master-version-release:
@@ -66,7 +66,15 @@ jobs:
       - name: Use Node
         uses: actions/setup-node@v2
         with:
-          node-version: "16.15.0"
+          node-version: "16.16.0"
+
+      # Run the server release sequence
+      - name: server build and release
+        if: steps.filter.outputs.server == 'true'
+        run: |
+          git status
+          npm ci --no-optional
+          npm run release
 
       # Run the client release sequence
       - name: client build
@@ -76,30 +84,8 @@ jobs:
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
           git status
-          npm run release
+          npm run build
           cd ../
-      # Wait for 30 seconds just to make sure npm has new package. Not always needed but on the off chance I don't have to re-run the action!
-      - name: Wait for npm to update package...
-        if: steps.filter.outputs.client == 'true'
-        uses: whatnick/wait-action@master
-        with:
-          time: '30s'
-
-
-      # Run the server release sequence
-      - name: server build and release
-        if: steps.filter.outputs.server == 'true'
-        run: |
-          cd ./server
-          git status
-          npm ci --no-optional
-          npm run release
-
-      # Update Server Package with latest client package
-      - name: update server client version
-        if: steps.filter.outputs.client == 'true'
-        run: npm install @notexpectedyet/octofarm-client@latest --save
-        working-directory: ./server
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
@@ -107,7 +93,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
-          commit_message: "ci(main) - update client v${{ steps.client-package-version.outputs.current-version }} [skip ci]"
+          commit_message: "ci(main) - release [skip ci]"
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>

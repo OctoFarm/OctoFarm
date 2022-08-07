@@ -1,6 +1,6 @@
 {
   "name": "octofarm-entry",
-  "version": "1.0.1",
+  "version": "1.6.0",
   "main": "server/app.js",
   "scripts": {
     "start": "cd server && npm run start",
@@ -15,7 +15,9 @@
     "dev-client": "cd client && npm run dev",
     "setup-dev": "npm run install-server && npm run install-client",
     "update-octofarm": "git pull && npm run install-server && pm2 restart OctoFarm",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "release-it --ci --config release-it.js",
+    "release:dry": "release-it --dry-run --ci --config release-it.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
     "@babel/plugin-transform-runtime": "^7.13.9",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.16.11",
+    "@release-it/conventional-changelog": "^5.0.0",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-ejs-js": "^0.1.0",
@@ -36,7 +39,8 @@
     "eslint-plugin-promise": "^4.3.1",
     "eslint-plugin-standard": "^4.1.0",
     "husky": "^8.0.0",
-    "prettier": "^2.6.0"
+    "prettier": "^2.6.0",
+    "release-it": "^15.2.0"
   },
   "pkg": {
     "scripts": [

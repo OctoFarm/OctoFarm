@@ -1,13 +1,11 @@
 {
-  "name": "@notexpectedyet/octofarm-client",
+  "name": "octofarm-client",
   "version": "1.6.0",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
     "webpack": "webpack",
-    "dev": "webpack --watch",
-    "release": "release-it --ci --config release-it.js",
-    "release:dry": "release-it --dry-run --ci --config release-it.js"
+    "dev": "webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -30,7 +28,6 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
-    "@release-it/conventional-changelog": "^5.0.0",
     "apexcharts": "^3.35.0",
     "axios": "^0.21.1",
     "before-build-webpack": "^0.2.11",
@@ -48,7 +45,6 @@
     "mini-css-extract-plugin": "^1.6.0",
     "noty": "^3.2.0-beta",
     "path": "^0.12.7",
-    "release-it": "^15.0.0",
     "semantic-release": "^19.0.2",
     "source-map-loader": "^2.0.1",
     "webpack": "5.36.2",
