@@ -70,13 +70,14 @@ jobs:
 
       # Run the server release sequence
       - name: server build and release
+        if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
         run: |
           npm ci --no-optional
           npm run release
 
       # Run the client release sequence
       - name: client build
-        if: steps.filter.outputs.client == 'true'
+        if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
         run: |
           rm -Rf ../server/views/assets/dist
           cd ./client
@@ -88,6 +89,7 @@ jobs:
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
+        if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master

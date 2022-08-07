@@ -21,7 +21,7 @@ const {
 } = require("../services/printer-statistics.service");
 const { SystemRunner } = require("../services/system-information.service");
 const { fetchUsers } = require("../services/users.service");
-const { fetchMongoDBConnectionString, fetchClientVersion } = require("../app-env");
+const { fetchMongoDBConnectionString } = require("../app-env");
 const isDocker = require("is-docker");
 const { isNodemon, isNode, isPm2 } = require("../utils/env.utils");
 const { getCurrentBranch, checkIfWereInAGitRepo } = require("../utils/git.utils");
