@@ -60,12 +60,12 @@ const returnBootBox = (
   let fixTemplate = "";
   if (!!info) {
     infoTemplate = `
-    <div class="alert alert-info" role="alert">
+    <div class="alert text-info" role="alert">
         <div class="row"> <!-- add no-gutters to make it narrower -->
             <div class="col-auto align-self-start"> <!-- or align-self-center -->
-                <i class="fas fa-info-circle fa-2x textInfo"></i>  
+                <i class="fas fa-info-circle fa-2x"></i>  
             </div>
-            <div class="col textInfo">
+            <div class="col">
                <h5><b>Issue:</b></h5>
                ${info}
             </div>                    
@@ -75,12 +75,12 @@ const returnBootBox = (
   }
   if (!!warning) {
     warningTemplate = `
-        <div class="alert alert-warning" role="alert">
+        <div class="alert text-warning" role="alert">
         <div class="row"> <!-- add no-gutters to make it narrower -->
             <div class="col-auto align-self-start"> <!-- or align-self-center -->
-                <i class="fas fa-exclamation-triangle fa-2x textActive"></i>
+                <i class="fas fa-exclamation-triangle fa-2x"></i>
             </div>
-            <div class="col textActive">
+            <div class="col">
                <h5><b>Warning:</b></h5>
                ${warning}
             </div>                    
@@ -90,12 +90,12 @@ const returnBootBox = (
   }
   if (!!danger) {
     dangerTemplate = `
-        <div class="alert alert-danger" role="alert">
+        <div class="alert text-danger" role="alert">
         <div class="row"> <!-- add no-gutters to make it narrower -->
             <div class="col-auto align-self-start"> <!-- or align-self-center -->
-                <i class="fas fa-skull-crossbones fa-2x textOffline"></i> 
+                <i class="fas fa-skull-crossbones fa-2x"></i> 
             </div>
-            <div class="col textOffline">
+            <div class="col">
                   <h5><b>Danger:</b></h5>
                ${danger}
             </div>                    
@@ -105,12 +105,12 @@ const returnBootBox = (
   }
   if (!!fix) {
     fixTemplate = `
-        <div class="alert alert-success" role="alert">
+        <div class="alert text-success" role="alert">
         <div class="row"> <!-- add no-gutters to make it narrower -->
             <div class="col-auto align-self-start"> <!-- or align-self-center -->
-                <i class="fas fa-wrench textComplete fa-2x"></i>
+                <i class="fas fa-wrench fa-2x"></i>
             </div>
-            <div class="col textComplete">
+            <div class="col">
                 <h5><b>How to fix:</b></h5>
                ${fix}
             </div>                    
