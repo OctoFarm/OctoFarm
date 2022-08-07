@@ -3,7 +3,6 @@
 /server/middleware/db.js
 **/logs/
 **/.clinic/
-**/dist/
 .env
 **/docker-compose.yml
 **/.build
