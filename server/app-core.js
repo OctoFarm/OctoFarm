@@ -64,14 +64,6 @@ function setupExpressServer() {
 
   const viewsPath = getViewsPath();
 
-  //TODO move this back to local builds... no point adding remote dependency for client...
-
-  if (process.env.NODE_ENV === "production") {
-    const { getOctoFarmUiPath } = require("@notexpectedyet/octofarm-client");
-    const bundlePath = getOctoFarmUiPath();
-    app.use("/assets/dist", express.static(bundlePath));
-  }
-
   app.set("views", viewsPath);
   app.set("view engine", "ejs");
   app.use(expressLayouts);

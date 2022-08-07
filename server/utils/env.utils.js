@@ -77,7 +77,7 @@ function verifyPackageJsonRequirements(rootPath) {
     if (!packageName) {
       logger.error("X Could not find 'name' property in package.json file. Aborting OctoFarm.");
       return false;
-    } else if (packageName.toLowerCase() !== "octofarm") {
+    } else if (packageName.toLowerCase() !== "octofarm-server") {
       logger.error(
         `X property 'name' in package.json file didnt equal 'octofarm' (found: ${packageName.toLowerCase()}). Aborting OctoFarm.`
       );
