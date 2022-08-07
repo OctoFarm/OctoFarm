@@ -530,9 +530,6 @@ function updatePrinterRow(printer) {
 
       checkIfMultiUserIssueFlagged(printer);
 
-      //TODO make this work with ALL registered events, and only when the even is registered...
-      //checkIfPrinterHasEvents(printer);
-
       checkIfUnderVoltagedPi(printer);
 
       checkIfOverheatingPi(printer);
