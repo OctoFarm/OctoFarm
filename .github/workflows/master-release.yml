@@ -75,19 +75,6 @@ jobs:
           npm ci --no-optional
           npm run release
 
-      # Run the client release sequence
-      - name: client build
-        if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
-        run: |
-          rm -Rf ../server/views/assets/dist
-          cd ./client
-          npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
-          npm ci --no-optional
-          npm run build
-          git add .
-          cd ../
-          git status
-
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
         if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
