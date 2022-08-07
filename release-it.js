@@ -69,5 +69,8 @@ module.exports = {
   github: {
     release: true,
     releaseName: "Release ${version}"
+  },
+  hooks: {
+    "after:bump": ["rm -Rf ./server/views/assets/dist", "cd ./client", "npm ci --no-optional", "npm run build", "git add ."],
   }
 };
