@@ -1,5 +1,18 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.6.2](https://github.com/OctoFarm/OctoFarm/compare/1.6.1...1.6.2) (2022-08-07)
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** fix building of sse client ([#1183](https://github.com/OctoFarm/OctoFarm/issues/1183)) ([1b733b3](https://github.com/OctoFarm/OctoFarm/commit/1b733b3754e244ef791144f1d8ed6a100fad9854))
+
+
+### :curly_loop: Continuous Integrations :curly_loop:
+
+* **client:** make sure client build is committed after build ([aa5c10c](https://github.com/OctoFarm/OctoFarm/commit/aa5c10ce5cfb8882a9df1f3cfe880f0ef9da76fd))
+* **main:** make sure to commit client to build ([29703ab](https://github.com/OctoFarm/OctoFarm/commit/29703ab58fc63772eb75b3e77dbf573d19513c14))
+
 ### [1.6.1](https://github.com/OctoFarm/OctoFarm/compare/1.6.0...1.6.1) (2022-08-07)
 
 
