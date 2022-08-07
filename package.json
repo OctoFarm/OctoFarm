@@ -1,6 +1,6 @@
 {
   "name": "octofarm",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "main": "server/app.js",
   "scripts": {
     "start": "cd server && npm run start",

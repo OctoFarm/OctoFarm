@@ -1,3 +1,18 @@
+# :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
+
+### [1.6.1](https://github.com/OctoFarm/OctoFarm/compare/1.6.0...1.6.1) (2022-08-07)
+
+
+### :curly_loop: Continuous Integrations :curly_loop:
+
+* **main:** allow distribution folder for client to be commited ([04cb94e](https://github.com/OctoFarm/OctoFarm/commit/04cb94e69d42e51de599d512f21d92ee10563004))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **server:** fix printer name issue with database migration from old value, closes [#1176](https://github.com/OctoFarm/OctoFarm/issues/1176) [#1179](https://github.com/OctoFarm/OctoFarm/issues/1179) [#1180](https://github.com/OctoFarm/OctoFarm/issues/1180) [#1178](https://github.com/OctoFarm/OctoFarm/issues/1178) ([90e8456](https://github.com/OctoFarm/OctoFarm/commit/90e84560be1b41648ba2c8fbfb853a2b50db4941))
+* **server:** make sure printer name is generated properly if OP name is blank ([235f07c](https://github.com/OctoFarm/OctoFarm/commit/235f07cee2860e069e3a156b1a720cd795ad5abb))
+
 ## [1.6.0](https://github.com/OctoFarm/OctoFarm/compare/client-1.5.1...client-1.6.0) (2022-08-06)
 
 
