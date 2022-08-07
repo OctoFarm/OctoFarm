@@ -1,5 +1,12 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.6.4](https://github.com/OctoFarm/OctoFarm/compare/1.6.3...1.6.4) (2022-08-07)
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **server:** make sure name isn't regenerated when exists ([#1186](https://github.com/OctoFarm/OctoFarm/issues/1186)) ([77259e3](https://github.com/OctoFarm/OctoFarm/commit/77259e3f52d50c77e67a0522367e793338866d2e))
+
 ### [1.6.3](https://github.com/OctoFarm/OctoFarm/compare/1.6.2...1.6.3) (2022-08-07)
 
 
