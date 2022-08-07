@@ -13,6 +13,7 @@
     "install-client": "cd client && npm ci",
     "dev-server": "cd server && npm run dev",
     "dev-client": "cd client && npm run dev",
+    "build-client": "cd client && npm ci && npm run build",
     "setup-dev": "npm run install-server && npm run install-client",
     "update-octofarm": "git pull && npm run install-server && pm2 restart OctoFarm",
     "prepare": "husky install",
