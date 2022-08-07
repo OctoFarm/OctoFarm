@@ -70,9 +70,7 @@ jobs:
 
       # Run the server release sequence
       - name: server build and release
-        if: steps.filter.outputs.server == 'true'
         run: |
-          git status
           npm ci --no-optional
           npm run release
 
@@ -84,15 +82,12 @@ jobs:
           cd ./client
           npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
           npm ci --no-optional
-          git status
           npm run build
-          git add --all
-          git commit -m "chore(client): build client for dist"
           cd ../
+          git status
 
         ## commit to repo, and prep pre-release
       - name: commit-changes-made
-        if: steps.filter.outputs.client == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
@@ -100,5 +95,3 @@ jobs:
           commit_user_name: NotExpectedYet
           commit_user_email: online@notexpectedyet.com
           commit_author: James Mackay <online@notexpectedyet.com>
-          ## This action should only ever commit these two files!
-          file_pattern: server/package*.json client/package*.json
