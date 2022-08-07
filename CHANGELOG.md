@@ -1,5 +1,12 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.6.5](https://github.com/OctoFarm/OctoFarm/compare/1.6.4...1.6.5) (2022-08-07)
+
+
+### :curly_loop: Continuous Integrations :curly_loop:
+
+* **main:** run client builds as part of release it after bump hook ([#1187](https://github.com/OctoFarm/OctoFarm/issues/1187)) ([9f8c6ef](https://github.com/OctoFarm/OctoFarm/commit/9f8c6ef268a2b37508236756f24d97302600da72))
+
 ### [1.6.4](https://github.com/OctoFarm/OctoFarm/compare/1.6.3...1.6.4) (2022-08-07)
 
 
