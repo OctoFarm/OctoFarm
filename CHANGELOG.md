@@ -1,5 +1,12 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.6.3](https://github.com/OctoFarm/OctoFarm/compare/1.6.2...1.6.3) (2022-08-07)
+
+
+### :curly_loop: Continuous Integrations :curly_loop:
+
+* **main:** yet again force client and server builds ([#1185](https://github.com/OctoFarm/OctoFarm/issues/1185)) ([7846dc5](https://github.com/OctoFarm/OctoFarm/commit/7846dc50ca3ef0fc5d0739d8537218d285a623e2))
+
 ### [1.6.2](https://github.com/OctoFarm/OctoFarm/compare/1.6.1...1.6.2) (2022-08-07)
 
 
