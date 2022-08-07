@@ -1,5 +1,5 @@
 {
-  "name": "octofarm-entry",
+  "name": "octofarm",
   "version": "1.6.0",
   "main": "server/app.js",
   "scripts": {

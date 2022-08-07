@@ -75,8 +75,6 @@ const settingsRetrievalFunction = (data, captureKeys, printer, database) => {
     data["plugins"]
   );
 
-  console.log(oldAppearance);
-
   if (oldAppearance.name.length !== 0) {
     printer.printerName = PrinterClean.grabOctoPrintName(oldAppearance, printer.printerURL);
   }
