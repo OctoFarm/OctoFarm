@@ -71,6 +71,6 @@ module.exports = {
     releaseName: "Release ${version}"
   },
   hooks: {
-    "after:bump": ["rm -Rf ./server/views/assets/dist", "cd ./client", "npm ci --no-optional", "npm run build", "git add ."],
+    "after:bump": ["rm -Rf ./server/views/assets/dist", "npm run build-client", "git add ."],
   }
 };
