@@ -50,7 +50,7 @@ async function initNewGraphs() {
   let yAxisSeries = [];
 
   if(!!filamentUsageOverTime){
-    filamentUsageOverTime.forEach((usage, index) => {
+    filamentUsageOverTime.forEach((_usage, index) => {
       let obj = null;
       if (index === 0) {
         obj = {

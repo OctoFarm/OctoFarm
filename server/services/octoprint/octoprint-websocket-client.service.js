@@ -115,7 +115,7 @@ class WebSocketClient {
       this.reconnect();
     });
 
-    this.#instance.on("open", () => {
+    this.#instance.on("open", async () => {
       ConnectionMonitorService.updateOrAddResponse(
         this.url,
         REQUEST_TYPE.WEBSOCKET,
@@ -133,7 +133,7 @@ class WebSocketClient {
       getPrinterStoreCache().updatePrinterState(this.id, PRINTER_STATES().PRINTER_TENTATIVE);
       this.#retryNumber = 0;
       this.autoReconnectInterval = this.systemSettings.timeout.webSocketRetry;
-      this.sendAuth();
+      await this.sendAuth();
       this.sendThrottle();
     });
 
@@ -302,7 +302,7 @@ class WebSocketClient {
     });
   }
 
-  sendAuth() {
+  async sendAuth() {
     logger.debug("Authenticating the websocket for user: " + this.currentUser);
     PrinterTicker.addIssue(
       new Date(),
@@ -311,6 +311,7 @@ class WebSocketClient {
       "Active",
       this.id
     );
+    this.sessionKey = await getPrinterStoreCache().getNewSessionKey(this.id);
     this.send(
       JSON.stringify({
         auth: `${this.currentUser}:${this.sessionKey}`
@@ -462,7 +463,6 @@ class WebSocketClient {
       clearTimeout(this.reconnectTimeout);
       this.reconnectTimeout = false;
       this.currentThrottleRate = 1;
-      this.sessionKey = await getPrinterStoreCache().getNewSessionKey(this.id);
       if (!this?.sessionKey) {
         this.resetSocketConnection(this.url, this.sessionKey, this.currentUser);
         return;
