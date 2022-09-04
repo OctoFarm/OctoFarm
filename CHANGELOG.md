@@ -1,5 +1,32 @@
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
+### [1.6.6](https://github.com/OctoFarm/OctoFarm/compare/1.6.5...1.6.6) (2022-09-04)
+
+
+### :x: Removed :x:
+
+* **server:** tidy up some unneeded logging ([a527121](https://github.com/OctoFarm/OctoFarm/commit/a527121ed1aeec44584b497f9bc85811b9bf2bc9))
+
+
+### :hammer: Bug Fixes :hammer:
+
+* **client:** current operations wasn't updating finish time ([2b54563](https://github.com/OctoFarm/OctoFarm/commit/2b5456305074be2d22e919c637077afe6073b0aa))
+* **client:** don't allow graph generation without data ([3fe697c](https://github.com/OctoFarm/OctoFarm/commit/3fe697c99f6dcd1d21d591d3953e517dd1159316)), closes [#1193](https://github.com/OctoFarm/OctoFarm/issues/1193)
+* **server:** failing to parse octopi json data ([8ae5ede](https://github.com/OctoFarm/OctoFarm/commit/8ae5ede13372f9e7e11639390697d4cb20d858c7))
+* **server:** force re-auth for socket ([6fcabb3](https://github.com/OctoFarm/OctoFarm/commit/6fcabb36391bb14ae6ce5999f1d58d0b66ca0fcd)), closes [#1163](https://github.com/OctoFarm/OctoFarm/issues/1163)
+* **server:** octopi information retrieval ([78bda4d](https://github.com/OctoFarm/OctoFarm/commit/78bda4dcce4b55e160a4b77533907ce5b571a180))
+* **server:** refactored filament manager sync ([2cec91a](https://github.com/OctoFarm/OctoFarm/commit/2cec91acb7d957188353e98571ef52994b7fd7a9)), closes [#1194](https://github.com/OctoFarm/OctoFarm/issues/1194)
+
+
+### :dash: Code Improvements :dash:
+
+* **client:** add correct placeholder value for connect/disconnect after power settings ([43aef08](https://github.com/OctoFarm/OctoFarm/commit/43aef08e7df59c1f980d1b811477398366dbf25c))
+* **client:** add in helper notification for connection sequence ([5896c2f](https://github.com/OctoFarm/OctoFarm/commit/5896c2face11cf38e6fba84745b6cc470a56f426))
+* **client:** refactor informaiton generation ([e9174ab](https://github.com/OctoFarm/OctoFarm/commit/e9174ab71e25f81d0c76ce83d7552e07dbfcdfae))
+* **client:** update correct command example for psu control state ([c1a9317](https://github.com/OctoFarm/OctoFarm/commit/c1a931745576716b19d17acc04904f781383d93b))
+* **server:** always grab session key before authenticating websocket ([429cbc4](https://github.com/OctoFarm/OctoFarm/commit/429cbc43d417cbd7a6fb25bec6103a90184a1ff5))
+* **server:** disregard offline/setting up printers on health checks ([6831755](https://github.com/OctoFarm/OctoFarm/commit/68317554a557bfe6fef691103a174b67c8d85225))
+
 ### [1.6.5](https://github.com/OctoFarm/OctoFarm/compare/1.6.4...1.6.5) (2022-08-07)
 
 
