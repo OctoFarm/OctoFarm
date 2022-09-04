@@ -107,7 +107,7 @@ class WebSocketClient {
 
     this.#instance.on("unexpected-response", (err) => {
       logger.error(`${this.url}: Unexpected Response!`, JSON.stringify(err));
-      this.terminate();
+      this.reconnect();
     });
 
     this.#instance.on("isPaused", () => {

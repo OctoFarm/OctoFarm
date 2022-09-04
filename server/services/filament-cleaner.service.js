@@ -86,7 +86,6 @@ class FilamentCleanerService {
     );
     FilamentCleanerService.createPrinterList();
     await FilamentCleanerService.dropDownList(spools, profiles, selectedFilamentList);
-    logger.info("Filament information cleaned and ready for consumption...");
   }
 
   static removeSelectedSpoolsFromList(selectedFilament) {
