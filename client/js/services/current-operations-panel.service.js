@@ -188,7 +188,7 @@ export default function currentOperationsPanelService(
           let futureTimeString = new Date(
               currentDate + current.timeRemaining * 1000
           ).toTimeString();
-          futureTimeString = futureTimeString.substring(0, 8);
+          futureTimeString = futureTimeString.substring(0, 5);
           const dateComplete = futureDateString + ": " + futureTimeString;
           const finishedPrint = `<button id='currentHarvest-${current.index}' type='button' title="Clear your finished print from current operations" class='tag btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
           const restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' title="Restart your current selected print" class='tag btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`;
@@ -240,6 +240,7 @@ export default function currentOperationsPanelService(
               );
               document.getElementById("currentTime-" + current.index).innerHTML =
                   Calc.generateTime(current.timeRemaining);
+              document.getElementById("futureDate-" + current.index).innerHTML = dateComplete
               progress.style = `width: ${current.progress}%`;
               progress.innerHTML = current.progress + "%";
               progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
