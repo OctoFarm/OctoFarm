@@ -113,7 +113,7 @@ const testAndCollectPSUControlPlugin = (id, currentSettings, plugins) => {
         }
       };
     }
-  }else{
+  } else {
     return currentSettings;
   }
 };
@@ -264,7 +264,7 @@ const captureThrottlePluginData = (id, data) => {
   let octoPi = {};
 
   if (!!printerOctoPiData) {
-    octoPi = JSON.stringify(JSON.parse(printerOctoPiData));
+    octoPi = JSON.parse(JSON.stringify(printerOctoPiData));
   } else {
     return;
   }
