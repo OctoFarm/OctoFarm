@@ -246,7 +246,7 @@ const piSupportRetrievalFunction = (data, _captureKeys, printer, database) => {
 
   database.update({
     octoPi: printer.octoPi
-  })
+  });
 
   return true;
 };
@@ -348,7 +348,7 @@ module.exports = {
       tickerMessage: "OctoPrint's host pi information",
       apiCheck: ALLOWED_SYSTEM_CHECKS().OCTOPI,
       captureDataKeys: new Map([
-          ["default_password", ""],
+        ["default_password", ""],
         ["model", ""],
         ["model_unrecommended", ""],
         ["throttle_check_enabled", ""],

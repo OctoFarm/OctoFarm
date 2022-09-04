@@ -21,7 +21,7 @@ let printerHealthChecks = [];
  */
 const returnPrinterHealthChecks = (force = false) => {
   if (force) {
-    logger.info("Running printer health check.", { force });
+    logger.debug("Running printer health check.", { force });
     updatePrinterHealthChecks().then();
   }
   return printerHealthChecks;
@@ -30,7 +30,6 @@ const returnPrinterHealthChecks = (force = false) => {
 const updatePrinterHealthChecks = async () => {
   const farmPrinters = getPrinterStoreCache().listPrintersInformation();
   printerHealthChecks = [];
-  logger.warning(`Found ${farmPrinters.length} to health check.`);
   for (const printer of farmPrinters) {
     if (
       printer.printerState.colour.category !== "Offline" &&
@@ -47,9 +46,7 @@ const updatePrinterHealthChecks = async () => {
         apiChecksRequired: apiChecksRequired(printer.systemChecks.scanning),
         apiChecksOptional: apiChecksOptional(printer.systemChecks.scanning),
         websocketChecks: websocketChecks(currentURL.host),
-        connectionChecks: printerConnectionCheck(
-          printer.connectionOptions
-        ),
+        connectionChecks: printerConnectionCheck(printer.connectionOptions),
         profileChecks: profileChecks(printer.currentProfile),
         webcamChecks: webcamChecks(printer.camURL, printer?.otherSettings?.webCamSettings)
       };
