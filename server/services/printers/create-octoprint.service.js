@@ -19,11 +19,6 @@ const {
   testAndCollectPSUControlPlugin
 } = require("../octoprint/utils/octoprint-plugin.utils");
 const {
-  checkSystemInfoAPIExistance,
-  checkHighestSupportedOctoPrint,
-  checkLowestSupportedOctoPrint
-} = require("../../utils/compatibility.utils");
-const {
   createPrinterPowerURL,
   parseOctoPrintPowerResponse,
   canWeDetectPrintersPowerState
@@ -662,8 +657,6 @@ class OctoPrintPrinter {
   checkStatusNumber(status) {
     switch (status) {
       case 200:
-        this.setHostState(PRINTER_STATES().HOST_ONLINE);
-        return true;
       case 201:
         this.setHostState(PRINTER_STATES().HOST_ONLINE);
         return true;
