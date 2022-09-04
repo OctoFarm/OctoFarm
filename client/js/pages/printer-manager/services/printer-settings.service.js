@@ -140,6 +140,8 @@ class PrinterSettingsService {
     quickPowerEnabled.checked = currentPrinter.quickConnectSettings.powerPrinter;
     connectTimeout.value = currentPrinter.quickConnectSettings.connectAfterPowerTimeout / 1000;
     powerTimeout.value = currentPrinter.quickConnectSettings.powerAfterDisconnectTimeout / 1000;
+    connectTimeout.placeholder = currentPrinter.quickConnectSettings.connectAfterPowerTimeout / 1000;
+    powerTimeout.placeholder = currentPrinter.quickConnectSettings.powerAfterDisconnectTimeout / 1000;
 
     if (printerOnline) {
       pageElements.mainPage.offlineMessage.innerHTML = "";
