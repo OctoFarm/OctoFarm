@@ -19,56 +19,75 @@ import {
 async function updateHistoryGraphs() {
   let historyStatistics = await OctoFarmClient.getHistoryStatistics();
 
-  let historyGraphData = historyStatistics.history.historyByDay;
-  let filamentUsageByDay = historyStatistics.history.totalByDay;
-  let filamentUsageOverTime = historyStatistics.history.usageOverTime;
+  let historyGraphData = historyStatistics?.history?.historyByDay;
+  let filamentUsageByDay = historyStatistics?.history?.totalByDay;
+  let filamentUsageOverTime = historyStatistics?.history?.usageOverTime;
 
-  await ChartsManager.updateFilamentOverTimeChartSeries(filamentUsageOverTime);
-  await ChartsManager.updateFilamentUsageByDayChartSeries(filamentUsageByDay);
-  await ChartsManager.updatePrintCompletionByDaySeries(historyGraphData);
+  if(!!historyGraphData){
+    await ChartsManager.updatePrintCompletionByDaySeries(historyGraphData);
+  }
+
+  if(!!filamentUsageByDay){
+    await ChartsManager.updateFilamentUsageByDayChartSeries(filamentUsageByDay);
+  }
+
+  if(!!filamentUsageOverTime){
+    await ChartsManager.updateFilamentOverTimeChartSeries(filamentUsageOverTime);
+  }
+
+
+
 }
 
 async function initNewGraphs() {
   await ChartsManager.renderDefaultCharts();
 
   let historyStatistics = await OctoFarmClient.getHistoryStatistics();
-
-  let printCompletionByDay = historyStatistics.history.historyByDay;
-  let filamentUsageByDay = historyStatistics.history.totalByDay;
-  let filamentUsageOverTime = historyStatistics.history.usageOverTime;
+  let printCompletionByDay = historyStatistics?.history?.historyByDay;
+  let filamentUsageByDay = historyStatistics?.history?.totalByDay;
+  let filamentUsageOverTime = historyStatistics?.history?.usageOverTime;
 
   let yAxisSeries = [];
-  filamentUsageOverTime.forEach((usage, index) => {
-    let obj = null;
-    if (index === 0) {
-      obj = {
-        title: {
-          text: "Weight",
-        },
-        seriesName: filamentUsageOverTime[0]?.name,
-        labels: {
-          formatter: toFixedWeightGramFormatter,
-        },
-      };
-    } else {
-      obj = {
-        show: false,
-        seriesName: filamentUsageOverTime[0]?.name,
-        labels: {
-          formatter: toFixedWeightGramFormatter,
-        },
-      };
-    }
-    yAxisSeries.push(obj);
-  });
-  await ChartsManager.renderFilamentUsageOverTimeChart(
-    filamentUsageOverTime,
-    yAxisSeries
-  );
 
-  const yAxis = [getUsageWeightSeries("Weight", filamentUsageByDay[0]?.name)];
-  await ChartsManager.renderFilamentUsageByDayChart(filamentUsageByDay, yAxis);
-  await ChartsManager.renderPrintCompletionByDay(printCompletionByDay);
+  if(!!filamentUsageOverTime){
+    filamentUsageOverTime.forEach((usage, index) => {
+      let obj = null;
+      if (index === 0) {
+        obj = {
+          title: {
+            text: "Weight",
+          },
+          seriesName: filamentUsageOverTime[0]?.name,
+          labels: {
+            formatter: toFixedWeightGramFormatter,
+          },
+        };
+      } else {
+        obj = {
+          show: false,
+          seriesName: filamentUsageOverTime[0]?.name,
+          labels: {
+            formatter: toFixedWeightGramFormatter,
+          },
+        };
+      }
+      yAxisSeries.push(obj);
+    });
+    await ChartsManager.renderFilamentUsageOverTimeChart(
+        filamentUsageOverTime,
+        yAxisSeries
+    );
+  }
+
+  if(!!filamentUsageByDay){
+    const yAxis = [getUsageWeightSeries("Weight", filamentUsageByDay[0]?.name)];
+    await ChartsManager.renderFilamentUsageByDayChart(filamentUsageByDay, yAxis);
+  }
+
+  if(!!printCompletionByDay){
+    await ChartsManager.renderPrintCompletionByDay(printCompletionByDay);
+  }
+
 }
 
 createClientSSEWorker(workerURL, dashboardSSEventHandler);
