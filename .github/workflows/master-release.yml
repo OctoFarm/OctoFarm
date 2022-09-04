@@ -74,14 +74,3 @@ jobs:
         run: |
           npm ci --no-optional
           npm run release
-
-        ## commit to repo, and prep pre-release
-      - name: commit-changes-made
-        if: steps.filter.outputs.client == 'true' || steps.filter.outputs.server == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          branch: master
-          commit_message: "chore(main): release client build"
-          commit_user_name: NotExpectedYet
-          commit_user_email: online@notexpectedyet.com
-          commit_author: James Mackay <online@notexpectedyet.com>
