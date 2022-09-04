@@ -389,6 +389,7 @@ class WebSocketClient {
   }
 
   reconnect(e) {
+    logger.error("Reconnecting websocket...", e);
     getPrinterStoreCache().resetJob(this.id);
     if (this.#retryNumber < 1) {
       PrinterTicker.addIssue(
@@ -463,7 +464,7 @@ class WebSocketClient {
       this.currentThrottleRate = 1;
       this.sessionKey = await getPrinterStoreCache().getNewSessionKey(this.id);
       if (!this?.sessionKey) {
-        this.reconnect("No session key!");
+        this.resetSocketConnection(this.url, this.sessionKey, this.currentUser);
         return;
       }
       this.open();
@@ -496,7 +497,7 @@ class WebSocketClient {
           deadTimeout: this.deadWebsocketTimeout
         }
       );
-      this.reconnect();
+      this.reconnect("Websocket considered dead, attempting to reconnect...");
     } else {
       const registerPongCheck = setTimeout(() => {
         if (
@@ -520,7 +521,7 @@ class WebSocketClient {
             REQUEST_TYPE.WEBSOCKET,
             REQUEST_KEYS.TOTAL_PING_PONG
           );
-          this.reconnect();
+          this.reconnect("Didn't receive a pong from the client... reconnecting!");
           clearTimeout(registerPongCheck);
         }
       }, 2000);
@@ -553,7 +554,7 @@ class WebSocketClient {
   }
 
   resetSocketConnection(newURL, newSession, currentUser) {
-    logger.http("Resetting socket connection...");
+    logger.http("Resetting socket connection...", newURL, newSession, currentUser);
     this.url = newURL;
     this.sessionKey = newSession;
     this.currentUser = currentUser;

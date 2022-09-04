@@ -818,8 +818,10 @@ class OctoPrintPrinter {
 
     const session = await this.getSessionkey();
 
-    if (!session) return;
-
+    if (!session) {
+      logger.error("No session key found!", session);
+      return;
+    }
     this.#ws = new WebSocketClient(
       this.webSocketURL,
       this._id,
@@ -900,20 +902,18 @@ class OctoPrintPrinter {
 
   async acquireOctoPrintSessionKey() {
     this.#apiPrinterTickerWrap("Attempting passive login", "Active");
-    const passiveLogin = await this.#api.login(true).catch((e) => {
-      logger.http("Failed passive login", e.toString());
-      return false;
-    });
-
+    const passiveLogin = await this.#api.login(true);
+    logger.warning("Passive login results: ", passiveLogin);
     const globalStatusCode = checkApiStatusResponse(passiveLogin);
     if (globalStatusCode === 200) {
       const sessionJson = await passiveLogin.json();
-
+      logger.warning("Session json", sessionJson);
       this.sessionKey = sessionJson.session;
       this.#apiPrinterTickerWrap("Passive login was successful!", "Complete");
       return this.sessionKey;
     } else {
       logger.http("Passive login failed..." + passiveLogin);
+      logger.error("Passive login failed..." + globalStatusCode);
       this.#apiPrinterTickerWrap("Passive login failed...", "Offline", globalStatusCode);
       return globalStatusCode;
     }

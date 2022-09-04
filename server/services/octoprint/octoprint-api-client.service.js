@@ -122,7 +122,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async login(passive = true) {
-    return this.postPrinter(apiLogin(passive), {}, false);
+    return this.postPrinter(apiLogin(passive), {});
   }
 
   async getTimelapses(unrendered = true) {

@@ -136,8 +136,14 @@ class OctoprintWebsocketMessageService {
     captureConnectedData(printerID, data);
   }
   static handleReAuthData(printerID, data) {
-    logger.error(printerID + "RE_AUTH DATA RECEIVED", data);
+    logger.warning("Re-auth required for socket!", data);
+    if (!!data?.reauthRequired) {
+      logger.info("Re-authenticating web socket");
+      const printer = getPrinterStoreCache().getPrinter(printerID);
+      printer.reConnectWebsocket();
+    }
   }
+
   static handleCurrentData(printerID, data) {
     setWebsocketAlive(printerID);
     const { current } = data;
