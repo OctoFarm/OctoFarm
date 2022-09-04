@@ -65,7 +65,7 @@ const websocketChecks = (printerURL) => {
   return logs;
 };
 
-const printerConnectionCheck = (currentConnection, connectionOptions) => {
+const printerConnectionCheck = (connectionOptions) => {
   const connectionDefaults = {
     baud: false,
     port: false,
