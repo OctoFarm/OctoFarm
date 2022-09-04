@@ -149,6 +149,8 @@ export async function setupFilamentManagerReSyncBtn() {
     resyncBtn.addEventListener("click", async () => {
       UI.addLoaderToElementsInnerHTML(resyncBtn);
       const post = await OctoFarmClient.post("filament/filamentManagerReSync");
+      console.log("HELLO")
+      console.log(post)
       if (post.errors.length === 0) {
         UI.createAlert(
           "success",

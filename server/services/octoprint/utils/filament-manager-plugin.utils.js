@@ -165,7 +165,6 @@ const assignSpoolToOctoPrint = async function (spoolId, printers) {
 
 const filamentManagerReSync = async function () {
   const errors = [];
-
   let printer = findFirstOnlinePrinter();
   if (printer === null) {
     errors.push("Cannot find online printer to update records!");
@@ -185,7 +184,6 @@ const filamentManagerReSync = async function () {
       "X-Api-Key": printer.apikey
     }
   });
-
   // Make sure filament manager responds...
   if (spools.status !== 200 || profiles.status !== 200) {
     errors.push("Unable to contact printer for spools and profiles!");
@@ -212,10 +210,11 @@ const filamentManagerReSync = async function () {
       material: pr.material
     };
     const oldProfile = await Profile.findOne({ "profile.index": pr.id });
-    if (oldProfile !== null) {
+
+    if (!!oldProfile) {
       logger.info("Updating Profile: ", profile);
       oldProfile.profile = profile;
-      oldProfile.markModified("profile");
+      await oldProfile.markModified("profile");
       await oldProfile.save();
       updatedProfiles.push(P);
     } else {
@@ -240,13 +239,13 @@ const filamentManagerReSync = async function () {
     };
     const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
     const octofarmProfileId = await Profile.findOne({ "profile.index": sp.profile.id });
-    if (oldSpool !== null) {
+    if (!!oldSpool) {
       logger.info("Updating Spool: ", spool);
       const bedOffset = oldSpool.spools.bedOffset;
       oldSpool.spools = spool;
       oldSpool.spools.bedOffset = bedOffset;
       oldSpool.spools.profile = octofarmProfileId._id;
-      oldSpool.markModified("spools");
+      await oldSpool.markModified("spools");
       await oldSpool.save();
       updatedSpools.push(S);
     } else {
