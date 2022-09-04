@@ -26,11 +26,13 @@ function sanitizeURL(url) {
 }
 
 function parseOutIPAddress(string) {
-  const r = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
+  if (!!string) {
+    const r = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
 
-  const t = string.match(r);
+    const t = string.match(r);
 
-  return t[0];
+    return t[0];
+  }
 }
 
 function convertHttpUrlToWebsocket(url) {
