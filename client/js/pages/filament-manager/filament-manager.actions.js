@@ -183,7 +183,7 @@ export const addProfile = async (manufacturer, material, density, diameter) => {
     diameter: diameter.value,
   };
   let post = await OctoFarmClient.post("filament/save/profile", opts);
-  if (post && post.errors.length === 0) {
+  if (post && post?.errors.length === 0) {
     UI.createMessage(
       {
         type: "success",
@@ -197,7 +197,7 @@ export const addProfile = async (manufacturer, material, density, diameter) => {
     diameter.value = 1.75;
     await reRenderPageInformation();
   } else {
-    printErrors(post.errors);
+    printErrors(post?.errors);
   }
 };
 
