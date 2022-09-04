@@ -1299,40 +1299,38 @@ async function updateGroupState(printers, clientSettings, view) {
   }
 }
 
-const drawPrinterPanels = (view, printers, clientSettings) => {
+const drawPrinterPanels = async (view, printers, clientSettings) => {
   const notDrawnPrinters = printers.filter(p => {
     return !document.getElementById("panel-" + p._id)
   });
 
-  notDrawnPrinters.forEach(p => {
-      if(printerIsAvailableToView(p)) {
-        let printerHTML;
-        if (view === "panel") {
-          printerHTML = drawPanelView(p, clientSettings);
-        } else if (view === "list") {
-          printerHTML = drawListView(p, clientSettings);
-        } else if (view === "camera") {
-          printerHTML = drawCameraView(p, clientSettings);
-        } else if (view === "combined") {
-          printerHTML = drawCombinedView(p, clientSettings);
-        }
-
-        printerArea.insertAdjacentHTML("beforeend", printerHTML);
-        //Setup Action Buttons
-        actionButtonInit(
-            p,
-            `printerActionBtns-${p._id}`
-        );
-        //Add page listeners
-        addListeners(p).catch(e => {
-          console.error(e)
-        })
-        //Grab elements
-        grabElements(p);
-        //Initialise Drag and Drop
-        dragAndDropEnable(document.getElementById("panel-" + p._id), p);
+  for(const p of notDrawnPrinters){
+    if(printerIsAvailableToView(p)) {
+      let printerHTML;
+      if (view === "panel") {
+        printerHTML = drawPanelView(p, clientSettings);
+      } else if (view === "list") {
+        printerHTML = drawListView(p, clientSettings);
+      } else if (view === "camera") {
+        printerHTML = drawCameraView(p, clientSettings);
+      } else if (view === "combined") {
+        printerHTML = drawCombinedView(p, clientSettings);
       }
-  });
+
+      printerArea.insertAdjacentHTML("beforeend", printerHTML);
+      //Setup Action Buttons
+      actionButtonInit(
+          p,
+          `printerActionBtns-${p._id}`
+      );
+      //Add page listeners
+      await addListeners(p);
+      //Grab elements
+      grabElements(p);
+      //Initialise Drag and Drop
+      dragAndDropEnable(document.getElementById("panel-" + p._id), p);
+    }
+  }
 }
 
 const updatePrinterPanels = (view, printers, clientSettings) => {
@@ -1340,11 +1338,11 @@ const updatePrinterPanels = (view, printers, clientSettings) => {
     return document.getElementById("panel-" + p._id)
   });
 
-  drawnPrinters.forEach((p, index) => {
+  for(const p of drawnPrinters){
     if (!dragCheck() && isInViewport(document.getElementById("panel-" + p._id))) {
-      updateState(p, clientSettings, view, index);
+      updateState(p, clientSettings, view, p.sortIndex);
     }
-  });
+  }
 
 }
 
@@ -1392,7 +1390,7 @@ export async function initMonitoring(printers, clientSettings, view) {
         }
         return;
       }
-      drawPrinterPanels(view, printers, clientSettings);
+      await drawPrinterPanels(view, printers, clientSettings);
       updatePrinterPanels(view, printers, clientSettings);
       break;
   }
