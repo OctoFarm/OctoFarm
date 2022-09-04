@@ -239,8 +239,16 @@ const filesRetrievalFunction = (data, _captureKeys, printer, database) => {
   return true;
 };
 
-const testOctoPi = (data, _captureKeys, printer, database) => {
-  console.log(data, _captureKeys);
+const piSupportRetrievalFunction = (data, _captureKeys, printer, database) => {
+  const octoPi = data;
+
+  printer.octoPi = octoPi;
+
+  database.update({
+    octoPi: printer.octoPi
+  })
+
+  return true;
 };
 
 module.exports = {
@@ -339,8 +347,17 @@ module.exports = {
       api: apiPluginPiSupport,
       tickerMessage: "OctoPrint's host pi information",
       apiCheck: ALLOWED_SYSTEM_CHECKS().OCTOPI,
-      captureDataKeys: new Map([["octopi", "octoPi"]]),
-      dataRetrievalFunction: testOctoPi
+      captureDataKeys: new Map([
+          ["default_password", ""],
+        ["model", ""],
+        ["model_unrecommended", ""],
+        ["throttle_check_enabled", ""],
+        ["throttle_check_functional", ""],
+        ["throttle_enabled", ""],
+        ["throttle_functional", ""],
+        ["throttle_state", ""]
+      ]),
+      dataRetrievalFunction: piSupportRetrievalFunction
     }
   ]
 };
