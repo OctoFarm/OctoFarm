@@ -45,10 +45,10 @@ const powerOffPrinterSequence = async (printer) => {
 }
 
 export const connectPrinterSequence = async (printer) => {
+  const alert = UI.createAlert("warning", "Attempting connect sequence! please wait...", 0, "clicked");
   if(printer.quickConnectSettings.powerPrinter){
     await powerOnPrinterSequence(printer);
   }
-
   if(printer.quickConnectSettings.connectPrinter){
     const data = {
       command: "connect",
@@ -63,8 +63,10 @@ export const connectPrinterSequence = async (printer) => {
       status: post?.status,
     };
     await OctoFarmClient.updateUserActionsLog(printer._id, body);
+    alert.close();
     return post?.status;
   }
+  alert.close();
   return 204;
 }
 

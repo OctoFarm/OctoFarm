@@ -32,7 +32,10 @@ const updatePrinterHealthChecks = async () => {
   printerHealthChecks = [];
   logger.warning(`Found ${farmPrinters.length} to health check.`);
   for (const printer of farmPrinters) {
-    if (printer.printerState.colour.category !== "Offline" && printer.printerState.colour.category !== "Info") {
+    if (
+      printer.printerState.colour.category !== "Offline" &&
+      printer.printerState.colour.category !== "Info"
+    ) {
       logger.debug("Checking printer", { printer: printer.printerURL });
       const currentURL = new URL(printer.printerURL);
 
