@@ -73,7 +73,7 @@ Feel free to join any of the OctoFarm communities or follow OctoFarms progress o
 
 ## Getting Started
 
-Before installing it is best to read the getting started documents here:
+Before installing, it is best to read the getting started documents here:
 [Getting Started](https://docs.octofarm.net/getting-started/)
 
 ## Installation Production
