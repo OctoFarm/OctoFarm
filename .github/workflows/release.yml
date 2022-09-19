@@ -1,0 +1,32 @@
+name: release
+
+on:
+  push:
+    branches:
+      - master
+#      - development - not used for now
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: James Mackay
+          GIT_AUTHOR_EMAIL: online@notexpectedyet.com
+          GIT_COMMITTER_NAME: James Mackay
+          GIT_COMMITTER_EMAIL: online@notexpectedyet.com
+        run: npx semantic-release
