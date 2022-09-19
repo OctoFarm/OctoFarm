@@ -19,7 +19,8 @@
     "setup-dev": "npm run install-server && npm run install-client",
     "update-octofarm": "git pull && npm run install-server && pm2 restart OctoFarm",
     "prepare": "husky install",
-    "bump": "npm version $VERSION --no-git-tag-version --allow-same-version && cd ./server && npm version $VERSION --no-git-tag-version --allow-same-version && cd ../client && npm version $VERSION --no-git-tag-version --allow-same-version"
+    "bump": "npm version $VERSION --no-git-tag-version --allow-same-version && cd ./server && npm version $VERSION --no-git-tag-version --allow-same-version && cd ../client && npm version $VERSION --no-git-tag-version --allow-same-version",
+    "build": "cd client && npm install && npm run build"
   },
   "repository": {
     "type": "git",

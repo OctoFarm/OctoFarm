@@ -1,46 +1,46 @@
 /**
- * Default model properties for history entries saved to database
+ * Default model properties for history entry saved to database
  * @returns {{fileName: string, notes: string, endDate: string, spoolUsed: string, success: boolean, filePath: string, printerName: string, printerIndex: number, filamentLength: number, startDate: string, printTime: string, filamentVolume: number}}
  */
 function getDefaultHistoryEntry() {
   return {
     printerIndex: 0,
-    printerName: "",
+    printerName: '',
     success: true,
-    fileName: "",
-    filePath: "",
-    startDate: "",
-    endDate: "",
-    printTime: "",
-    spoolUsed: "",
+    fileName: '',
+    filePath: '',
+    startDate: '',
+    endDate: '',
+    printTime: '',
+    spoolUsed: '',
     filamentLength: 0,
     filamentVolume: 0,
-    notes: ""
+    notes: '',
   };
 }
 
 const getWolPowerSubSettingsDefault = () => {
   return {
     enabled: false,
-    ip: "255.255.255.0",
-    packets: "3",
-    port: "9",
-    interval: "100",
-    MAC: ""
+    ip: '255.255.255.0',
+    packets: '3',
+    port: '9',
+    interval: '100',
+    MAC: '',
   };
 };
 
 const getPowerSettingsDefault = () => {
   return {
-    powerOnCommand: "",
-    powerOnURL: "",
-    powerOffCommand: "",
-    powerOffURL: "",
-    powerToggleCommand: "",
-    powerToggleURL: "",
-    powerStatusCommand: "",
-    powerStatusURL: "",
-    wol: getWolPowerSubSettingsDefault()
+    powerOnCommand: '',
+    powerOnURL: '',
+    powerOffCommand: '',
+    powerOffURL: '',
+    powerToggleCommand: '',
+    powerToggleURL: '',
+    powerStatusCommand: '',
+    powerStatusURL: '',
+    wol: getWolPowerSubSettingsDefault(),
   };
 };
 
@@ -50,14 +50,14 @@ const getCostSettingsDefault = () => {
     electricityCosts: 0.15,
     purchasePrice: 500,
     estimateLifespan: 43800,
-    maintenanceCosts: 0.25
+    maintenanceCosts: 0.25,
   };
 };
 
 function getTempTriggersDefault() {
   return {
     heatingVariation: 1,
-    coolDown: 30
+    coolDown: 30,
   };
 }
 
@@ -67,7 +67,7 @@ function getFileListDefault() {
     files: undefined,
     fileCount: 0,
     folders: undefined,
-    folderCount: 0
+    folderCount: 0,
   };
 }
 
@@ -76,7 +76,7 @@ function getDefaultPrinterEntry() {
     costSettings: getCostSettingsDefault(),
     powerSettings: getPowerSettingsDefault(),
     tempTriggers: getTempTriggersDefault(),
-    fileList: getFileListDefault()
+    fileList: getFileListDefault(),
   };
 }
 
@@ -89,5 +89,5 @@ module.exports = {
   getFileListDefault,
   getDefaultHistoryEntry,
   getDefaultPrinterEntry,
-  UUID_LENGTH
+  UUID_LENGTH,
 };

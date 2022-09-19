@@ -4,7 +4,6 @@
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
-    "webpack": "webpack",
     "dev": "webpack --watch"
   },
   "repository": {
@@ -29,17 +28,24 @@
   "license": "ISC",
   "devDependencies": {
     "apexcharts": "^3.35.0",
-    "popper.js": "^1.16.1",
     "axios": "^0.21.1",
+    "before-build-webpack": "^0.2.12",
     "bootbox": "^5.5.2",
     "bootstrap": "^4.3.1",
+    "css-loader": "^6.7.1",
+    "css-minimizer-webpack-plugin": "^4.1.0",
     "flatted": "^3.1.1",
     "gridstack": "^4.2.2",
-    "jquery": "^3.5.1",
+    "jquery": "^3.6.1",
     "litepicker": "^2.0.12",
     "lodash": "^4.17.21",
+    "mini-css-extract-plugin": "^2.6.1",
     "noty": "^3.2.0-beta",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "popper.js": "^1.16.1",
+    "source-map-loader": "^4.0.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   },
   "engine-strict": true,
   "engines": {

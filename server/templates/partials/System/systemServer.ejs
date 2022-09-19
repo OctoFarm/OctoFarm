@@ -1,0 +1,1036 @@
+<% const base = '../' %>
+<% const modal = base + '/octofarm-modal.ejs' %>
+
+<% const instructionsURL = "https://docs.octofarm.net/installation/setup-service.html" %>
+<% const updateURL = "https://docs.octofarm.net/getting-started/octofarm-updating.html" %>
+<% const installationURL = "https://docs.octofarm.net/installation/" %>
+
+<% let updateDisabled = "disabled"; %>
+
+<% if( serviceInformation?.update?.update_available ) { updateDisabled = "" } %>
+
+<% if(systemInformation?.warnings?.status){ %>
+    <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
+        <%= systemInformation.warnings?.message; %>
+    </div>
+<% } %>
+<% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        Your system is not running with PM2! Some commands below may not work... Please
+        setup your system correctly as instructed here: <a
+                rel=”noopener” href='<%= instructionsURL %>' target='_blank'>Click Here</a>
+    </div>
+<% } %>
+<% if(serviceInformation?.isNodemon){ %>
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-heart text-danger"></i> Hey lovely developer! Thanks for helping make OctoFarm great!
+    </div>
+<% } %>
+<% let systemButtonsDisabled = false; %>
+<% if(serviceInformation?.isDockerContainer){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to
+        Docker having it's own update mechanism
+        Please check the <a
+                rel=”noopener” href="<%= updateURL %>">Installation
+            Instructions</a> for more information on how to update
+        your docker container.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to not been
+        able to detect the use of the pm2 process manager.
+        Please re-install OctoFarm following the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
+            Instructions</a>.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<% if(!areWeGitRepo && !serviceInformation?.isDockerContainer){ %>
+    <div class="alert alert-warning text-dark" role="alert">
+        The "Update OctoFarm" function has been disabled due to not been
+        able to detect a git repository.
+        Please check the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
+            Instructions</a> for more information on how to set this
+        up.
+    </div>
+    <% systemButtonsDisabled = true; %>
+<% } %>
+<div class="row">
+    <div class="col-12">
+        <button title="Performs a restart of the OctoFarm service"
+                id="restartOctoFarmBtn" type="button"
+                class="btn btn-danger mr-3 btn-lg">
+            <i class="fas fa-sync"></i> Restart
+        </button>
+        <button title="Performs a check for latest updates of OctoFarm"
+                id="checkUpdatesForOctoFarmBtn" type="button"
+                class="btn btn-info ml-3 float-right btn-lg">
+            <i class="fab fa-github"></i> Check for Update
+        </button>
+        <button title="Performs an update command on OctoFarm to the latest version"
+                id="updateOctoFarmBtn" type="button"
+                class="btn btn-success ml-3 float-right btn-lg"
+                <% updateDisabled %>>
+            <i class="fas fa-thumbs-up"></i> Update OctoFarm
+        </button>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active"
+               id="client-settings-list" data-toggle="list" href="#client-settings"
+               role="tab" aria-controls="system"><i class="fas fa-desktop"></i> General</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-settings-list" data-toggle="list" href="#server-settings"
+               role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i>
+                System</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-timeout-list" data-toggle="list" href="#server-timeout"
+               role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i>
+                Timeout</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-timeout-list" data-toggle="list" href="#server-views"
+               role="tab" aria-controls="listview"><i class="fas fa-eye"></i>
+                Monitoring Views</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-history-list" data-toggle="list" href="#server-history"
+               role="tab" aria-controls="listview"><i class="fas fa-history"></i>
+                History</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-filament-list" data-toggle="list" href="#server-filament"
+               role="tab" aria-controls="listview"><i
+                        class="fas fa-toilet-paper"></i> Filament Manager</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-influx-list" data-toggle="list" href="#server-influx"
+               role="tab" aria-controls="listview"><i class="fas fa-database"></i>
+                InfluxDB Export</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
+               id="server-camera-list" data-toggle="list" href="#server-camera"
+               role="tab" aria-controls="listview"><i class="fa-solid fa-camera"></i>
+                Cameras</a>
+        </li>
+    </ul>
+    <div class="col-12">
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="client-settings"
+                 role="tabpanel" aria-labelledby="client-settings-list">
+                <div class="row">
+                    <div class="col-12 col-md-4">
+                        <p class="font-weight-bold">Change Background</p>
+                        <p>Click the button below to upload your background
+                            image.</p>
+                        <small>NOTE: You may need to refresh your browser cache if
+                            this doesn't apply straight away.</small>
+                        <form action="/settings/backgroundUpload"
+                              enctype="multipart/form-data" method="POST">
+                            <input class="btn bg-secondary" type="file"
+                                   name="myFile"
+                                   accept="image/jpeg,image/png,image/jpg"/>
+                            <input id="backgroundSubmit" class="btn btn-primary"
+                                   type="submit" value="Upload"
+                                   accept="image/jpeg,image/png">
+                        </form>
+                        <p> Supports <code>PNG, JPG</code></p>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <img width="100%" src="/images/bg.jpg">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-settings"
+                 role="tabpanel" aria-labelledby="server-settings-list">
+                <p class="font-weight-bold">Server Port</p>
+                <p>The port that OctoFarm will accept connections from for it's
+                    inbuilt client. Use the .env file in your OctoFarm folder to change...</p>
+                <p><b>Default</b>: 4000</p>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Port (disabled):</span>
+                    </div>
+                    <input id="serverPortNo" type="number" class="form-control"
+                           placeholder="6" aria-label="Refresh Rate"
+                           disabled
+                           value="4000" step="1">
+
+                </div>
+                <small class="form-text text-muted">Requires a server
+                    restart</small>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <p class="font-weight-bold">Login and Registration</p>
+                        <p>Change OctoFarm login/registration requirements. These
+                            are both defaulted as true.</p>
+                    </div>
+
+                    <div class="col-md-12 col-lg-6">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="requireLogin" required <%= (serverSettings.server.loginRequired) ? "checked" : "" %>
+                                >
+                                <label class="custom-control-label"
+                                       for="requireLogin">Require a login</label>
+                                <div class="valid-feedback">Login turned on</div>
+                                <div class="invalid-feedback">Login turned off</div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-12 col-lg-6">
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="requireRegistration" required <%= (serverSettings.server.registration) ? "checked" : "" %>
+                                >
+                                <label class="custom-control-label"
+                                       for="requireRegistration">Registration</label>
+                                <div class="valid-feedback">Registration is turned
+                                    on
+                                </div>
+                                <div class="invalid-feedback">Registration is turned
+                                    off
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-timeout" role="tabpanel"
+                 aria-labelledby="server-timeout">
+                <small class="form-text text-muted">Does not require a server
+                    restart</small>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6">
+                        <p class="font-weight-bold">Websocket Retry</p>
+                        <p>The interval in which OctoFarm will re-poll the websocket
+                            when it detects a lost connection during operation. It
+                            will re-poll at this rate until re-established.</p>
+
+                        <p><b>Min</b>: 5 seconds (Default), <b>Max:</b> 30 seconds
+                        </p>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Websocket Retry:</span>
+                            </div>
+                            <input id="webSocketRetry" type="number"
+                                   class="form-control" placeholder="6"
+                                   aria-label="Refresh Rate"
+                                   value="<%= serverSettings.timeout.webSocketRetry/1000 %>" min="5" max="30" step="0.5">
+                            <div class="input-group-append">
+                                <span class="input-group-text">Seconds</span>
+                            </div>
+
+                        </div>
+                        <small id="emailHelp" class="form-text text-muted">Requires
+                            a server restart</small>
+                        <hr>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                        <p class="font-weight-bold">API Retry</p>
+                        <p>The interval that OctoFarm will attempt another
+                            connection to OctoPrint. Only really applicable if your
+                            printer is offline when added to the farm.</p>
+                        <p><b>Min</b>: 30 seconds (Default), <b>Max:</b> 60 seconds
+                        </p>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">API Retry:</span>
+                            </div>
+                            <input id="APIRetry" type="number" class="form-control"
+                                   placeholder="6" aria-label="Refresh Rate"
+                                   value="<%= serverSettings.timeout.apiRetry/1000 %>" min="30" max="60"
+                                   step="0.5">
+                            <div class="input-group-append">
+                                <span class="input-group-text">Seconds</span>
+                            </div>
+
+                        </div>
+                        <small id="emailHelp" class="form-text text-muted">Requires
+                            a server restart</small>
+                        <hr>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tab-pane fade" id="server-filament" role="tabpanel"
+                 aria-labelledby="server-filament-list">
+                <div id="filamentManagerSetup" class="row">
+                    <div class="col-lg-2">
+                        <h5>Check Spool?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            OctoFarm will throw a nag screen when trying to start a print without a spool attached.
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="checkFilament" required <%= (serverSettings.filament.filamentCheck) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="checkFilament">Filament Check</label>
+                                <div class="valid-feedback">Check for spool
+                                </div>
+                                <div class="invalid-feedback">Ignore check for spool
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-2">
+                        <h5>Hide Empty Spools?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            Any spool going below 0 will be hidden from the interfaces select menu's.
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="hideEmpty" required <%= (serverSettings.filament.hideEmpty) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="hideEmpty">Hide Empty</label>
+                                <div class="valid-feedback">Hide empty spools
+                                </div>
+                                <div class="invalid-feedback">Show empty spools
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <% let disableDownDate = false %>
+                    <% let disableDownDateMessage = "" %>
+                    <% if (serverSettings.filamentManager){ %>
+                        <% disableDownDate = true; %>
+                        <% disableDownDateMessage = `This is disabled as you have Filament Manager Plugin Sync activated!` %>
+                    <% } %>
+                        <div class="col-lg-2">
+                            <h5>Downdate Successful Usage?</h5>
+                            <div class="alert alert-info small" role="alert">
+                                On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
+                            </div>
+                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <%= disableDownDateMessage %>
+                            </div>
+                            <form class="was-validated">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input" <%= (disableDownDate) ? "disabled" : "" %>
+                                           id="downDateSuccess" required <%= (serverSettings?.filament?.downDateSuccess) ? "checked" : "" %>>
+                                    <label class="custom-control-label"
+                                           for="downDateSuccess">Downdate Successful</label>
+                                    <div class="valid-feedback">Downdate usage
+                                    </div>
+                                    <div class="invalid-feedback">Ignore usage
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-2">
+                        <h5>Downdate Failed/Cancelled Usage?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                            <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                        </div>
+                        <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                            <%= disableDownDateMessage %>
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                       id="downDateFailed" required <%= (serverSettings?.filament?.downDateFailed) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="downDateFailed">Downdate failed/cancelled</label>
+                                <div class="valid-feedback">Downdate usage
+                                </div>
+                                <div class="invalid-feedback">Ignore usage
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                        <div class="col-lg-2">
+                            <h5>Allow Single Spools on Multiple Printers?</h5>
+                            <div class="alert alert-info small" role="alert">
+                                Allow the selection of single spools on multiple printers. Great if your only tracking filament by type.. you can have 1 spool attached to multiple printers to get more accurate grams calculations this way.
+                            </div>
+                            <% let multiSelectOff = "d-none"; %>
+                            <% if(serverSettings?.filament?.allowMultiSelect) { %>
+                                <% multiSelectOff = "" %>
+                            <% }%>
+                            <div class="alert alert-warning small text-dark <%= multiSelectOff %>" role="alert">
+                                Turning this off will remove all your current filament assignments.
+                            </div>
+                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
+                                <%= disableDownDateMessage %>
+                            </div>
+                            <form class="was-validated">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                           id="allowMultiSelect" required <%= (serverSettings?.filament?.allowMultiSelect) ? "checked" : "" %>>
+                                    <label class="custom-control-label"
+                                           for="allowMultiSelect">Allow Multiple Select</label>
+                                    <div class="valid-feedback">Select multiple
+                                    </div>
+                                    <div class="invalid-feedback">Select single
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-12">
+                            <h5>Filament Manager Sync</h5>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="alert alert-info" role="alert">
+                                        <h5>Update your instances settings</h5>
+                                        The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.</div>
+                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
+                                            class="btn btn-outline-warning btn-block mt-1">
+                                        Setup Your Farm!
+                                    </button>
+                                </div>
+                                <div class="col-lg-8 text-center">
+                                    <% if(!serverSettings.filamentManager){ %>
+                                    <div class="alert alert-info" role="alert">
+                                        <p class="mb-1">Click the button below to activate filament
+                                            manager plugin and link it to OctoFarm. Please read the
+                                            notes below before proceeding.</p></div>
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-danger" role="alert">
+                                                <span>OctoFarm expects filament manager
+                                                    installed on every instance. If it isn't, and you
+                                                    activate it you run the risk of some updates/selections
+                                                    failing to register.</span></div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <span>You must also have all these instances
+                                                    setup with a postgres database. Without this you will
+                                                    not be able to select filament on every instance.</span></div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div class="alert alert-warning text-dark" role="alert">
+                                                <span>Any spool within OctoFarm will be deleted
+                                                    upon successful sync and replaced with those on your filament manager database...</span></div>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                        <div id="filamentManagerButton">
+
+                                        </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-views" role="tabpanel"
+                 aria-labelledby="server-timeout">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                            Below are some options to enable and disable certain monitoring views across the user interface.
+                            <hr>
+                            <b>Panel:</b> This view is OctoFarms standard view where each printer has it's own card. It allows for full control and monitoring of your farm.<br>
+                            <b>List:</b> This view is a table view where each printer is on a row of the table. It allows for full control and status monitoring of your farm due to no camera slot.<br>
+                            <b>Camera:</b> This view is similar to the panel view but has the cameras as a main focus. A bit like a NVR for your farm with full control.<br>
+                            <b>Group:</b> This view will organise your printers by common groups you have assigned. This view is great for bulk grouped control over your prints, but has limited monitoring. <br>
+                            <b>Current Operations:</b> This view is a cut down view with just basic print information. Great for a large status screen or keeping an eye on your farms status. There is no control and limited status.<br>
+                            <b>Super List:</b> This view is a list table view combining camera/list and panel views. It allows for full monitoring and control.<br>
+
+                        </div>
+                    </div>
+                </div>
+                 <div class="row">
+                         <% const viewNames = [ "Panel", "List", "Camera", "Group", "Current Operations", "Super List" ] %>
+                         <% Object.keys(serverSettings.monitoringViews.toJSON()).forEach((key, index) => { %>
+                             <div class="col-md-4 col-lg-2">
+                                 <form class="was-validated">
+                                     <div class="custom-control custom-checkbox mb-3">
+                                         <input type="checkbox" class="custom-control-input"
+                                                id="monitoring-<%= key %>" required <%= serverSettings.monitoringViews[key] ? "checked" : "" %>
+                                         >
+                                         <label class="custom-control-label"
+                                                for="monitoring-<%= key %>"><%= viewNames[index] %> View</label>
+                                         <div class="valid-feedback"><%= viewNames[index] %> View Enabled</div>
+                                         <div class="invalid-feedback"><%= viewNames[index] %> View Disabled</div>
+                                     </div>
+                                 </form>
+                             </div>
+                         <% }) %>
+                 </div>
+            </div>
+            <div class="tab-pane fade" id="server-history" role="tabpanel"
+                 aria-labelledby="server-history-list">
+                <div class="alert alert-secondary" role="alert">
+                    OctoFarm has the ability to save a snapshot/thumbnail into
+                    History. These options are turned on by default as it will check
+                    if the thumbnail/camera url exist before actually saving.
+                </div>
+                <div class="alert alert-warning text-dark text-dark" role="alert">
+                    If your running on Docker, make sure to mount "/app/images"
+                    otherwise these will not persist reboots/upgrades.
+                </div>
+                <div id="filamentManagerSetup" class="row">
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                        <h6>Timelapse Capture</h6>
+                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                            Timelapse must be turned on in OctoPrint for this to
+                            work, then activated below. It is not turned on by
+                            default and does not react to your OctoPrint setting.
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            <h5>Update your instances settings</h5>
+                            This only works with the ".mp4" format for video types.
+                            OctoPrint defaults to ".mpg". You can update this under
+                            "Advanced Settings" in your OctoPrint instances "Webcam
+                            & Timelapse" setting. Change the setting to "libx264".
+                            You can also choose between Z or Times triggers in the drop downs.
+                            <button id="setupTimelapseOctoPrint" type="button"
+                                    class="btn btn-outline-dark btn-block mt-1">
+                                Setup Your Farm!
+                            </button>
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="timelapseOnComplete" required <%= (serverSettings.history.timelapse.onComplete) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="timelapseOnComplete">On
+                                    Completion</label>
+                                <div class="valid-feedback">On Complete timelapse
+                                    will be downloaded to OctoPrint
+                                </div>
+                                <div class="invalid-feedback">On Complete timelapse
+                                    is ignored
+                                </div>
+                            </div>
+                        </form>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="timelapseOnFailure" required  <%= (serverSettings.history.timelapse.onFailure) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="timelapseOnFailure">On Failure</label>
+                                <div class="valid-feedback">On Failure timelapse
+                                    will be downloaded to OctoPrint
+                                </div>
+                                <div class="invalid-feedback">On Failure timelapse
+                                    is ignored
+                                </div>
+                            </div>
+                        </form>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="timelapseDelete" required <%= (serverSettings.history.timelapse.deleteAfter) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="timelapseDelete">Delete from
+                                    OctoPrint</label>
+                                <div class="valid-feedback">Timelapses will be
+                                    deleted once captured
+                                </div>
+                                <div class="invalid-feedback">Timelapses are not
+                                    removed from OctoPrints storage
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                        <h6>Printer snapshot capture</h6>
+                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                            Requires an active camera URL in OctoFarm.
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="snapOnComplete" required <%= (serverSettings.history.snapshot.onComplete) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="snapOnComplete">On Complete</label>
+                                <div class="valid-feedback">On Complete snapshot
+                                    turned on
+                                </div>
+                                <div class="invalid-feedback">On Complete snapshot
+                                    turned off
+                                </div>
+                            </div>
+                        </form>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="snapOnFailure" required <%= (serverSettings.history.snapshot.onFailure) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="snapOnFailure">On Failure</label>
+                                <div class="valid-feedback">On Failure snapshot
+                                    turned on
+                                </div>
+                                <div class="invalid-feedback">On Failure snapshot
+                                    turned off
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                        <h6>Prusa/Cura slicer thumbnailcapture</h6>
+                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                            Requires either the Prusa / Cura thumbnail plugins to be
+                            installed on OctoPrint.
+                        </div>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="thumbOnComplete" required <%= (serverSettings.history.thumbnails.onComplete) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="thumbOnComplete">On Complete</label>
+                                <div class="valid-feedback">On Complete snapshot
+                                    turned on
+                                </div>
+                                <div class="invalid-feedback">On Complete snapshot
+                                    turned off
+                                </div>
+                            </div>
+                        </form>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="thumbOnFailure" required <%= (serverSettings.history.thumbnails.onFailure) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="thumbOnFailure">On Failure</label>
+                                <div class="valid-feedback">On Failure snapshot
+                                    turned on
+                                </div>
+                                <div class="invalid-feedback">On Failure snapshot
+                                    turned off
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-influx" role="tabpanel"
+                 aria-labelledby="server-influx-list">
+                <h5>InfluxDB Export (v1.x)</h5>
+                <hr>
+                <div class="alert alert-secondary" role="alert">
+                    OctoFarm can export your printer data to a time series database
+                    called InfluxDB. You can use this data to create yourself a
+                    dashboard in an application called Grafana or InfluxDB itself.
+                    Other options are also available. This option is for power users
+                    who would like to get more information from the data stored in
+                    OctoFarm.
+                </div>
+                <div class="alert alert-warning text-dark" role="alert">
+                    You must already have influxDB setup and working to be able to
+                    use this feature. A restart will be required after saving the
+                    settings to correctly enable.
+                </div>
+                <div class="alert alert-info" role="alert">
+                    You can find a sample grafana.json file to import to get you started from here:
+                </div>
+                <div class="alert alert-secondary" role="alert" id="influxParent">
+                    <p>This will activate the exporting of the following
+                        measurements you can grab from InfluxDB: (click a button to
+                        expand data view)</p>
+                    <p>
+                        <button class="btn btn-primary" type="button"
+                                data-toggle="collapse"
+                                data-target="#collapseExample1"
+                                aria-expanded="false"
+                                aria-controls="collapseExample1">
+                            Live Printer Data
+                        </button>
+                        <button class="btn btn-primary" type="button"
+                                data-toggle="collapse"
+                                data-target="#collapseExample2"
+                                aria-expanded="false"
+                                aria-controls="collapseExample2">
+                           Finished Print Data
+                        </button>
+                        <button class="btn btn-primary" type="button"
+                                data-toggle="collapse"
+                                data-target="#collapseExample3"
+                                aria-expanded="false"
+                                aria-controls="collapseExample3">
+                            Material Data
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapseExample1"
+                         data-parent="#influxParent">
+                        <div class="alert alert-dark" role="alert">
+                            Printer information is dumped every 5000ms (5 seconds).
+                            This will dump a record for each printer in your farm
+                            with the information below.
+                        </div>
+                        <h3>Available Tags:</h3>
+                        <code>
+                            name:<br>
+                            group:<br>
+                            url:<br>
+                            state:<br>
+                            stateCategory:<br>
+                            host_state:<br>
+                            websocket_state:<br>
+                            octoprint_version: <br>
+                        </code>
+                        <h3>Information:</h3>
+                        <code>
+                            name: 'Printer Name'<br>
+                            group: 'A group'<br>
+                            url: 'http://10.50.1.175:5000'<br>
+                            state: 'Complete'<br>
+                            host_state: 'Online'<br>
+                            websocket_state: 'success'<br>
+                            octoprint_version: '1.8.0rc5'<br>
+                            state_category: 'Complete'<br>
+                            current_idle_time: 168870000<br>
+                            current_active_time: 13920000<br>
+                            current_offline_time: 0<br>
+                            storage_free: 21702098944<br>
+                            storage_total: 41214558208<br>
+                            timestamp: 1651633430978<br>
+                            job_resends_transmitted: 82776<br>
+                            job_resends_count: 4<br>
+                            job_resends_ratio: 0<br>
+                            job_progress: 100<br>
+                            job_file_name: 'Thumbnail_2%_Checker.gcode'<br>
+                            job_file_display: 'Thumbnail 2% Checker.gcode'<br>
+                            job_file_path: 'Thumbnail_2%_Checker.gcode'<br>
+                            job_expected_print_time: 0<br>
+                            job_expected_print_cost: 0.5432814980499949<br>
+                            job_expected_total_cost: 0.54<br>
+                            job_expected_total_volume: 44.87<br>
+                            job_expected_total_length: 18.66<br>
+                            job_expected_total_weight: 55.64<br>
+                            job_expected_total_spool_cost: 0<br>
+                            job_expected_maintenance_cost: 0.42216309146063397<br>
+                            job_expected_electricity_cost: 0.12111840658936093<br>
+                            job_current_z: 16.04<br>
+                            job_print_time_elapsed: 385<br>
+                            job_print_time_remaining: 0<br>
+                            job_average_print_time: 385.5016649959998<br>
+                            job_last_print_time: 385.5016649959998<br>
+                            job_thumbnail: 'http://10.50.1.175:5000/plugin/prusaslicerthumbnails/thumbnail/Thumbnail_2%_Checker.png?20220503013230'<br>
+                            tool0_actual: 180.94<br>
+                            tool0_target: 0<br>
+                            bed_actual: 21.78<br>
+                            bed_target: 0<br>
+                            chamber_actual: 0<br>
+                            chamber_target: 0<br>
+                        </code>
+                    </div>
+                    <div class="collapse" id="collapseExample2"
+                         data-parent="#influxParent">
+                        <div class="alert alert-dark" role="alert">
+                            History information will be sent when a print is logged
+                            as completed or failed (cancelled / error).
+                        </div>
+                        <h3>Available Tags:</h3>
+                        <code>
+                            printer_name: <br>
+                            group: <br>
+                            history_state: <br>
+                            file_name: <br>
+                        </code>
+                        <h3>Information:</h3>
+                        <code>
+                            id: '627208b58d771b4f22efadff' <br>
+                            state: 'Cancelled' <br>
+                            printer_name: 'Fixed Printer Name' <br>
+                            start_date: 1651640496731 <br>
+                            end_date: 1651640501686 <br>
+                            print_time: 5 <br>
+                            file_name: 'AshTray Holder Topper - PetG.gcode' <br>
+                            file_upload_date: 1650561180 <br>
+                            file_path: 'AshTray Holder Topper - PetG.gcode' <br>
+                            file_size: 2759245 <br>
+                            job_estimated_print_time: 5499.021155098422 <br>
+                            job_actual_print_time: 5 <br>
+                            cost_printer: 0 <br>
+                            cost_spool: 0 <br>
+                            cost_total: 0 <br>
+                            cost_maintenance: 0.0003630771182141045 <br>
+                            cost_electricity: 0.00010416666666666667 <br>
+                            total_volume: 0 <br>
+                            total_length: 0.24 <br>
+                            total_weight: 0.72 <br>
+                            file_average_print_time: 388.6593348096244 <br>
+                            file_last_print_time: 386.071344932001 <br>
+                        </code>
+                    </div>
+                    <div class="collapse" id="collapseExample3"
+                         data-parent="#influxParent">
+                        <div class="alert alert-dark" role="alert">
+                            Spool information will be logged everytime a print has
+                            completed.
+                        </div>
+                        <div class="alert alert-warning text-dark text-dark" role="alert">
+                            If you don't use the Filament Manager plugin or have "Downdate" settings enabled, then there
+                            will be 0 grams in the "used_difference" and
+                            "used_spool" fields as it is not tracked without that.
+                        </div>
+                        <h3>Available Tags:</h3>
+                        <code>
+                            state: <br>
+                            printer_name: <br>
+                            file_name: <br>
+                            group: <br>
+                            spool_manufacturer: 'Eryone',<br>
+                            spool_material: 'PETG',<br>
+                        </code>
+                        <h3>Information:</h3>
+                        <code>
+                            name: 'Spooler',<br>
+                            price: 25,<br>
+                            weight: 1000,<br>
+                            used_difference: 15.55, <br>
+                            used_spool: 225.45, <br>
+                            temp_offset: 0,<br>
+                            spool_manufacturer: 'Eryone',<br>
+                            spool_material: 'PETG',<br>
+                            spool_density: 1.27,<br>
+                            spool_diameter: 1.75<br>
+
+                        </code>
+                    </div>
+                    <!-- File Manager: -->
+                </div>
+
+                <div id="filamentManagerSetup" class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                        <h6>Activate</h6>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="infActivateInfluxExport" required <%= (serverSettings.influxExport.active) ? "checked" : "" %>>
+                                <label class="custom-control-label"
+                                       for="infActivateInfluxExport">Activated?</label>
+                                <div class="valid-feedback">InfluxDB Export is
+                                    activated.
+                                </div>
+                                <div class="invalid-feedback">InfluxDB Export is
+                                    de-activated.
+                                </div>
+                            </div>
+                        </form>
+                        <form>
+                            <h6>Connection Settings</h6>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                                                <span class="input-group-text"
+                                                                                      id="infHostIPe">Host IP Address: </span>
+                                        </div>
+                                        <input id="infHostIP" type="text"
+                                               class="form-control"
+                                               value="<%= (serverSettings?.influxExport.host) ? serverSettings.influxExport.host : "" %>"
+                                               placeholder="192.168.1.5"
+                                               aria-label="Username"
+                                               aria-describedby="infHostIPe">
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+                                                              id="infHostPorte">Host Port: </span>
+                                        </div>
+                                        <input id="infHostPort" type="text"
+                                               value="<%= (serverSettings?.influxExport.port) ? serverSettings.influxExport.port : "" %>"
+                                               class="form-control"
+                                               placeholder="8086"
+                                               aria-label="Username"
+                                               aria-describedby="infHostPorte">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+                                                              id="infUsernamee">Username: </span>
+                                        </div>
+                                        <input id="infUsername" type="text"
+                                               value="<%= (serverSettings?.influxExport.username) ? serverSettings.influxExport.username : "" %>"
+                                               class="form-control" placeholder=""
+                                               aria-label="Username"
+                                               aria-describedby="infUsernamee">
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+
+                                                              id="infPassworde">Password: </span>
+                                        </div>
+                                        <input id="infPassword" type="text"
+                                               class="form-control" placeholder=""
+                                               aria-label="Username"
+                                               aria-describedby="infPassworde"
+                                               value="<%= (serverSettings?.influxExport.password) ? serverSettings.influxExport.password : "" %>">
+                                    </div>
+                                </div>
+                            </div>
+                            <h6>Database Settings</h6>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+
+                                                              id="infDatabasee">Database Name: </span>
+                                        </div>
+                                        <input id="infDatabase" type="text"
+                                               class="form-control"
+                                               placeholder="OctoFarmExport"
+                                               aria-label="Username"
+                                               aria-describedby="infDatabasee"
+                                               value="<%= (serverSettings?.influxExport.database) ? serverSettings.influxExport.database : "" %>">
+                                    </div>
+                                </div>
+                            </div>
+                            <h6>Retention Policy (Advanced)</h6>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+                                                              id="infDuration">Duration: </span>
+                                        </div>
+                                        <input type="text" class="form-control"
+                                               placeholder="365d"
+                                               aria-label="Username"
+                                               aria-describedby="infDuration"
+                                               value="<%= (serverSettings?.influxExport.retentionPolicy.duration) ? serverSettings.influxExport.retentionPolicy.duration : "" %>">
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                                        <span class="input-group-text"
+                                                              id="infReplication">Replication: </span>
+                                        </div>
+                                        <input type="text" class="form-control"
+                                               placeholder="1" aria-label="Username"
+                                               aria-describedby="infReplication"
+                                               value="<%= (serverSettings?.influxExport.retentionPolicy.replication) ? serverSettings.influxExport.retentionPolicy.replication : "" %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="infRetention" required <%= (!serverSettings?.influxExport.retentionPolicy.duration) ? "checked": "" %>>
+                                <label class="custom-control-label"
+                                       for="infRetention">Default Retention?</label>
+                                <div class="valid-feedback">Using default retention
+                                    settings.
+                                </div>
+                                <div class="invalid-feedback">Not using default
+                                    retention settings.
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="server-camera" role="tabpanel"
+                 aria-labelledby="server-influx-list">
+                <h5>Global Camera Settings</h5>
+                <hr>
+                <div class="alert alert-secondary" role="alert">
+                    These settings apply to all of the camera feed within OctoFarm.
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-6">
+                        <h5>Proxy</h5>
+                        <hr>
+                        <div class="alert alert-info" role="alert">
+                            OctoFarm can proxy all of your camera's through it's server. This is great for reverse proxy setups, or setups where your OctoPrint's are not accessible from the network your on.
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <form class="was-validated">
+                                    <div class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" class="custom-control-input"
+                                               id="cameraProxyActive" required <%= (serverSettings.cameras.proxyEnabled) ? "checked" : "" %>>
+                                        <label class="custom-control-label"
+                                               for="cameraProxyActive">Activated?</label>
+                                        <div class="valid-feedback">Camera Proxy is enabled
+                                        </div>
+                                        <div class="invalid-feedback">Camera Proxy is disabled
+                                        </div>
+                                    </div>
+                                </form>
+                            <small id="helpCam" class="form-text text-muted">Requires
+                                a server restart</small>
+                            <h5 class="font-weight-bold">Update Interval</h5>
+                            <hr>
+                            <p>The interval in which OctoFarm will capture a frame from your camera. (only applies to the proxy)</p>
+
+                            <p><b>Min</b>: 1 seconds, <b>Max:</b> 10 seconds (Default)
+                            </p>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Interval:</span>
+                                </div>
+                                <input id="cameraUpdateInterval" type="number"
+                                       class="form-control" placeholder="6"
+                                       aria-label="Refresh Rate"
+                                       value="<%= serverSettings.cameras.updateInterval/1000 %>" min="1" max="10" step="0.5">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Seconds</span>
+                                </div>
+
+                            </div>
+                            <small id="helpProxy" class="form-text text-muted">Requires
+                                a server restart</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <h5>Display</h5>
+                        <hr>
+                        <p>The aspect ratio OctoFarm will display the cameras in. (Applies to all camera streams)</p>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="cameraAspectRatio">Aspect Ratio</label>
+                            </div>
+                            <select class="custom-select" id="cameraAspectRatio">
+                                <option value="0" <%= serverSettings.cameras.aspectRatio === "0" ? "selected" : "" %>>Stream Default</option>
+                                <option value="1x1" <%= serverSettings.cameras.aspectRatio === "1x1" ? "selected" : "" %>>1x1</option>
+                                <option value="4x3" <%= serverSettings.cameras.aspectRatio === "4x3" ? "selected" : "" %>>4x3</option>
+                                <option value="16x9" <%= serverSettings.cameras.aspectRatio === "16x9" ? "selected" : "" %>>16x9</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button type="button" class="btn btn-success btn-block"
+        id="saveServerSettings" data-dismiss="modal">Save
+</button>
+<%- include(modal, {
+modal:{
+id:"filamentManagerPluginSetup", title:"Setup Filament Manager Plugin", size: "modal-sm"
+},
+bodyFile:'./System/UserModals/filamentManagerSetup.ejs'
+})
+%>

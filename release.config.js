@@ -91,7 +91,7 @@ module.exports = {
       '@semantic-release/exec',
       {
         // eslint-disable-next-line no-template-curly-in-string
-        prepareCmd: 'VERSION=${nextRelease.version} npm run bump',
+        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../',
       },
     ],
     [
@@ -105,6 +105,7 @@ module.exports = {
           'server/package-lock.json',
           'client/package.json',
           'client/package-lock.json',
+          'server/assets/**/*'
         ],
       },
     ],

@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const ClientSettingsDB = require("../models/ClientSettings.js");
-const ServerSettingsDB = require("../models/ServerSettings.js");
-const { findIndex } = require("lodash");
-const { SERVER_ISSUES } = require("../constants/server-issues.constants");
+const ClientSettingsDB = require('../models/ClientSettings.js');
+const ServerSettingsDB = require('../models/ServerSettings.js');
+const { findIndex } = require('lodash');
+const { SERVER_ISSUES } = require('../constants/server-issues.constants');
 
 let systemClean = [];
 let clientClean = [];
@@ -36,7 +36,7 @@ class SettingsCleanerService {
   static returnCameraSettings() {
     return {
       updateInterval: systemClean.cameras.updateInterval,
-      aspectRatio: systemClean.cameras.aspectRatio
+      aspectRatio: systemClean.cameras.aspectRatio,
     };
   }
 
@@ -53,7 +53,7 @@ class SettingsCleanerService {
   }
 
   /**
-   * Fetch the first client and server settings entries from database
+   * Fetch the first client and server settings entry from database
    * @returns {Promise<void>}
    */
   static async start() {
@@ -103,5 +103,5 @@ class SettingsCleanerService {
 }
 
 module.exports = {
-  SettingsClean: SettingsCleanerService
+  SettingsClean: SettingsCleanerService,
 };
