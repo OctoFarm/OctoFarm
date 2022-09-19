@@ -42,29 +42,12 @@ body:
     placeholder: "e.g. Raspberry Pi OS, Ubuntu, Windows"
   validations:
     required: true
-- type: input
-  id: plugins-octoprint
-  attributes:
-    label: OctoPrint Plugins
-    placeholder: "e.g. bed visualiser, octoklipper, printtimegenius"
-- type: dropdown
-  id: current-location
-  attributes:
-    label: "Location of the problem"
-    options:
-      - Server
-      - MongoDb
-      - Web Interface
-      - Not sure
-  validations:
-    required: true
 - type: textarea
   id: problem-desc
   attributes:
     label: Description of the problem
-    description: Also tell us, what did you expect to happen?
+    description: tell us, what did you expect to happen?
     placeholder: Tell us what you see!
-    render: markdown
   validations:
     required: true
 - type: textarea
@@ -79,26 +62,14 @@ body:
       ...
   validations:
     required: true
-- type: textarea
-  id: epected-behaviour
-  attributes:
-    label: What did you expect to happen
-    placeholder: |
-      ...
-  validations:
-    required: true
-- type: textarea
-  id: avoid-problem
-  attributes:
-    label: To avoid the problem I had to
-    placeholder: |
-      ...
 - type: markdown
   attributes:
     value: |
       ### Logs
       If you've got access to the System screen it's better to just upload the log dump file as it will
       contain all relevant information for the developers.
+      
+      System -> Logs -> Generate a log dump
 
       1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
       (How to: https://javascript.info/devtools)
