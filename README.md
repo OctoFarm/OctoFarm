@@ -63,9 +63,9 @@ Built by a maker, for makers to get more out of their OctoPrint run farms.
 
 Feel free to join any of the OctoFarm communities or follow OctoFarms progress on it's blog.
 
-- [OctoFarms Website](https://octofarm.net/)
+- [OctoFarms Website](https://octofarm.net/) - Having issues...
 - [OctoFarms Documentation](https://docs.octofarm.net/)
-- [OctoFarm Blog](https://octofarm.net/blog/)
+- [OctoFarm Blog](https://octofarm.net/blog/) - Having issues...
 - [Community Support on Facebook](https://www.facebook.com/groups/octofarm/)
 - [Community Support on Discord](https://discord.gg/vjabMUn/)
 - [General Question or Feature Request?](https://github.com/OctoFarm/OctoFarm/discussionss/)
