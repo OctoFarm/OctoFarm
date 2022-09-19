@@ -1,0 +1,64 @@
+<div class="col-12">
+<!--    <h6 role="alert">-->
+<!--        You can either choose files that already exist on your instances or upload a new file.-->
+<!--    </h6>-->
+    <div class="row">
+        <div class="col-12">
+            <div class="accordion" id="accordionExample">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                File Select
+                            </button>
+                        </h2>
+                    </div>
+
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                        <div class="card-body" id="bpFilesSelectElement">
+
+                        </div>
+                        <small class="form-text text-muted">Choose the printers this button is visible to. <br>
+                            <kbd>CTRL + A</kbd> to select all <br>
+                            <kbd>CTRL + Left Click</kbd> to select multiple
+                        </small>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" size="7">
+                                Upload File(s)
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+                        <div class="card-body" id="bpuploadFilesElement">
+
+                        </div>
+                        <div class="card-body">
+                            <p>Please choose a folder below!</p>
+                            <div class="input-group mb-3">
+                                <select class="form-control bg-dark text-light mt-2" id="multiNewFolder">
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <h6 role="alert">
+            Selected printers and their files...
+        </h6>
+        <div class="col-12">
+            <div id="bpSelectedPrintersAndFiles" class="row">
+
+            </div>
+        </div>
+        <div id="bpActionButtonElement" class="col-12">
+
+        </div>
+    </div>
+</div>

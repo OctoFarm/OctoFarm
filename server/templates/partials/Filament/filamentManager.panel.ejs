@@ -1,0 +1,27 @@
+<% let displayNone = "d-none" %>
+<% if(serverSettings.filamentManager){ %>
+    <% displayNone = ""; %>
+<% } %>
+<div class="text-center p-1">
+    <b>Profiles:</b> <span id="filamentProfileTotals" class="badge badge-info"><%= statistics.profileCount %></span>
+    <b>Spools:</b> <span id="filamentSpoolsTotals" class="badge badge-info"><%= statistics.spoolCount %></span>
+    <b>Active:</b> <span id="filamentSpoolsActiveTotals" class="badge badge-warning"><%= statistics.activeSpoolCount %></span>
+    <button title="Setup and edit your filament profiles."
+            type="button" class="btn btn-secondary m-2" data-toggle="modal" data-target="#profileManagerModal">
+        <i class="far fa-id-card"></i> Profile Manager
+    </button>
+    <button title="Setup and manage your filament spools."
+            type="button" class="btn btn-secondary m-2" data-toggle="modal" data-target="#spoolManagerModal">
+        <i class="fas fa-toilet-paper"></i> Spool Manager
+    </button>
+    <button title="See the current list of materials available to OctoFarm..."
+            type="button" class="btn btn-secondary m-2" data-toggle="modal" data-target="#materialsListModal">
+        <i class="fa-solid fa-brush"></i> Materials List
+    </button>
+    <button title="Updates OctoFarms Spools and Profiles database with the filament manager plugin."
+            id="resyncFilamentManagerBtn"
+            type="button"
+            class="btn btn-primary m-2 <%= displayNone %>">
+        <i class="fas fa-sync"></i> Re-Sync Spools / Profiles
+    </button>
+</div>

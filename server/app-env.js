@@ -1,26 +1,26 @@
-const fs = require("fs");
-const path = require("path");
-const { execSync } = require("child_process");
-const isDocker = require("is-docker");
-const envUtils = require("./utils/env.utils");
-const dotenv = require("dotenv");
-const { AppConstants } = require("./constants/app.constants");
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+const isDocker = require('is-docker');
+const envUtils = require('./utils/env.utils');
+const dotenv = require('dotenv');
+const { AppConstants } = require('./constants/app.constants');
 
-const Logger = require("./handlers/logger.js");
-const { status, up } = require("migrate-mongo");
-const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+const Logger = require('./handlers/logger.js');
+const { status, up } = require('migrate-mongo');
+const { LOGGER_ROUTE_KEYS } = require('./constants/logger.constants');
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_ENVIRONMENT, false);
 
 // Constants and definition
-const instructionsReferralURL = "https://docs.octofarm.net/installation/setup-environment.html";
-const deprecatedConfigFolder = "../middleware";
-const deprecatedConfigFilePath = deprecatedConfigFolder + "db.js";
-const packageJsonPath = path.join(__dirname, "../package.json");
-const packageLockPath = path.join(__dirname, "../package-lock.json");
+const instructionsReferralURL = 'https://docs.octofarm.net/installation/setup-environment.html';
+const deprecatedConfigFolder = '../middleware';
+const deprecatedConfigFilePath = deprecatedConfigFolder + 'db.js';
+const packageJsonPath = path.join(__dirname, '../package.json');
+const packageLockPath = path.join(__dirname, '../package-lock.json');
 const packageLockFile = require(packageLockPath);
 let currentClientVersion;
-const dotEnvPath = path.join(__dirname, "../.env");
+const dotEnvPath = path.join(__dirname, '../.env');
 
 /**
  * Set and write the environment name to file, if applicable
@@ -55,7 +55,7 @@ function ensureEnvNpmVersionSet() {
   const packageJsonVersion = require(packageJsonPath).version;
   if (!process.env[AppConstants.VERSION_KEY]) {
     process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
-    process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
+    process.env[AppConstants.NON_NPM_MODE_KEY] = 'true';
     logger.info(
       `✓ Running OctoFarm version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`
     );
@@ -78,8 +78,8 @@ function ensureEnvNpmVersionSet() {
  * @param reason
  */
 function removePm2Service(reason) {
-  logger.error("Removing PM2 service as OctoFarm failed to start", reason);
-  execSync("pm2 delete OctoFarm");
+  logger.error('Removing PM2 service as OctoFarm failed to start', reason);
+  execSync('pm2 delete OctoFarm');
 }
 
 /**
@@ -100,12 +100,12 @@ function removeFolderIfEmpty(folder) {
  *
  */
 function setupPackageJsonVersionOrThrow() {
-  const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, "../server"));
+  const result = envUtils.verifyPackageJsonRequirements(path.join(__dirname, '../server'));
   if (!result) {
     if (envUtils.isPm2()) {
-      removePm2Service("didnt pass startup validation (package.json)");
+      removePm2Service('didnt pass startup validation (package.json)');
     }
-    throw new Error("Aborting OctoFarm server.");
+    throw new Error('Aborting OctoFarm server.');
   }
 }
 
@@ -271,7 +271,7 @@ function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
     // This needs to be CWD of app.js, so be careful not to move this call.
     dotenv.config({ path: dotEnvPath });
-    logger.info("✓ Parsed environment and (optional) .env file");
+    logger.info('✓ Parsed environment and (optional) .env file');
   }
 
   ensureNodeEnvSet();
@@ -290,8 +290,8 @@ function setupEnvConfig(skipDotEnv = false) {
  * @returns {string}
  */
 function getViewsPath() {
-  logger.debug("Running in directory:", { dirname: __dirname });
-  const viewsPath = path.join(__dirname, "views");
+  logger.debug('Running in directory:', { dirname: __dirname });
+  const viewsPath = path.join(__dirname, 'templates');
   if (!fs.existsSync(viewsPath)) {
     if (isDocker()) {
       throw new Error(
@@ -311,7 +311,7 @@ function getViewsPath() {
       );
     }
   } else {
-    logger.debug("✓ Views folder found:", { path: viewsPath });
+    logger.debug('✓ Views folder found:', { path: viewsPath });
   }
   return viewsPath;
 }
@@ -324,7 +324,7 @@ function getViewsPath() {
  */
 async function runMigrations(db, client) {
   const migrationsStatus = await status(db);
-  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
+  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === 'PENDING');
 
   if (pendingMigrations.length) {
     logger.info(
@@ -366,9 +366,9 @@ function isEnvProd() {
 function fetchClientVersion() {
   if (!currentClientVersion) {
     currentClientVersion =
-      packageLockFile?.dependencies["@notexpectedyet/octofarm-client"]?.version || "unknown";
-    if (currentClientVersion === "unknown") {
-      logger.error("Unable to parse package-lock file... please check installation!");
+      packageLockFile?.dependencies['@notexpectedyet/octofarm-client']?.version || 'unknown';
+    if (currentClientVersion === 'unknown') {
+      logger.error('Unable to parse package-lock file... please check installation!');
     }
   }
   return currentClientVersion;
@@ -404,5 +404,5 @@ module.exports = {
   fetchOctoFarmPort,
   getViewsPath,
   fetchClientVersion,
-  fetchSuperSecretKey
+  fetchSuperSecretKey,
 };

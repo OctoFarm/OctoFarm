@@ -15,3 +15,4 @@ octofarm.zip
 
 *.tgz
 pnpm-lock.yaml
+/client/build/

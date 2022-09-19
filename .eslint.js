@@ -1,8 +1,5 @@
 module.exports = {
   root: true,
-  env: {
-    amd: true,
-  },
   extends: ['airbnb-base', 'plugin:prettier/recommended'],
   plugins: ['prettier'],
   rules: {
