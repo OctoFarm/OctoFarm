@@ -1236,18 +1236,18 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
 
       if (!document.getElementById('panel-' + p._id)) {
         printerArea.insertAdjacentHTML('beforeend', printerHTML);
-      }
 
-      //Setup Action Buttons
-      actionButtonInit(p, `printerActionBtns-${p._id}`);
-      //Add page listeners
-      await addListeners(p);
-      //Grab elements
-      grabElements(p);
-      //Initialise Drag and Drop
-      dragAndDropEnable(document.getElementById('panel-' + p._id), p);
-      if (!dragCheck()) {
-        updateState(p, clientSettings, view, p.sortIndex);
+        //Setup Action Buttons
+        actionButtonInit(p, `printerActionBtns-${p._id}`);
+        //Add page listeners
+        await addListeners(p);
+        //Grab elements
+        grabElements(p);
+        //Initialise Drag and Drop
+        dragAndDropEnable(document.getElementById('panel-' + p._id), p);
+        if (!dragCheck()) {
+          updateState(p, clientSettings, view, p.sortIndex);
+        }
       }
     }
   }
@@ -1255,10 +1255,7 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
 
 const updatePrinterPanels = (view, printers, clientSettings) => {
   for (const p of printers) {
-    console.log('DRAG ', dragCheck());
-    console.log('VIEW', isInViewport(document.getElementById('printerFilesBtn-' + p._id)));
     if (!dragCheck()) {
-      console.log('Updating');
       updateState(p, clientSettings, view, p.sortIndex);
     }
   }
@@ -1309,16 +1306,8 @@ export async function initMonitoring(printers, clientSettings, view) {
       const drawnPrinters = printers.filter((p) => {
         return document.getElementById('panel-' + p._id);
       });
-      console.log(drawnPrinters);
-      const viewablePrinters = drawnPrinters.filter((p) => {
-        return p;
-        // console.log('RES', isInViewport(document.getElementById('panel-' + p._id)));
-        // return isInViewport(document.getElementById('panel-' + p._id));
-      });
 
-      console.log(drawnPrinters.length, viewablePrinters.length);
-
-      updatePrinterPanels(view, viewablePrinters, clientSettings);
+      updatePrinterPanels(view, drawnPrinters, clientSettings);
       break;
   }
 }
