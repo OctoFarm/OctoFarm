@@ -151,7 +151,7 @@
                         <p> Supports <code>PNG, JPG</code></p>
                     </div>
                     <div class="col-12 col-md-4">
-                        <img width="100%" src="/images/bg.jpg">
+                        <img width="100%" src="assets/images/bg.jpg">
                     </div>
                 </div>
             </div>
@@ -311,23 +311,14 @@
                             </div>
                         </form>
                     </div>
-                    <% let disableDownDate = false %>
-                    <% let disableDownDateMessage = "" %>
-                    <% if (serverSettings.filamentManager){ %>
-                        <% disableDownDate = true; %>
-                        <% disableDownDateMessage = `This is disabled as you have Filament Manager Plugin Sync activated!` %>
-                    <% } %>
                         <div class="col-lg-2">
                             <h5>Downdate Successful Usage?</h5>
                             <div class="alert alert-info small" role="alert">
                                 On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
                             </div>
-                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
-                            <%= disableDownDateMessage %>
-                            </div>
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
-                                    <input type="checkbox" class="custom-control-input" <%= (disableDownDate) ? "disabled" : "" %>
+                                    <input type="checkbox" class="custom-control-input"%>
                                            id="downDateSuccess" required <%= (serverSettings?.filament?.downDateSuccess) ? "checked" : "" %>>
                                     <label class="custom-control-label"
                                            for="downDateSuccess">Downdate Successful</label>
@@ -344,12 +335,9 @@
                             On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
                             <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
                         </div>
-                        <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
-                            <%= disableDownDateMessage %>
-                        </div>
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
-                                <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                <input type="checkbox" class="custom-control-input"
                                        id="downDateFailed" required <%= (serverSettings?.filament?.downDateFailed) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="downDateFailed">Downdate failed/cancelled</label>
@@ -372,12 +360,9 @@
                             <div class="alert alert-warning small text-dark <%= multiSelectOff %>" role="alert">
                                 Turning this off will remove all your current filament assignments.
                             </div>
-                            <div class="alert alert-warning small text-dark <%= (disableDownDate) ? "" : "d-none" %>" role="alert">
-                                <%= disableDownDateMessage %>
-                            </div>
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
-                                    <input type="checkbox" class="custom-control-input"  <%= (disableDownDate) ? "disabled" : "" %>
+                                    <input type="checkbox" class="custom-control-input"
                                            id="allowMultiSelect" required <%= (serverSettings?.filament?.allowMultiSelect) ? "checked" : "" %>>
                                     <label class="custom-control-label"
                                            for="allowMultiSelect">Allow Multiple Select</label>
@@ -388,51 +373,6 @@
                                 </div>
                             </form>
                         </div>
-                        <div class="col-lg-12">
-                            <h5>Filament Manager Sync</h5>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="alert alert-info" role="alert">
-                                        <h5>Update your instances settings</h5>
-                                        The button below will ask you for your postgres details and update it to all online OctoPrint instances settings.</div>
-                                    <button id="setupFilamentManagerBtn" type="button" data-toggle="modal" data-target="#filamentManagerPluginSetupModal"
-                                            class="btn btn-outline-warning btn-block mt-1">
-                                        Setup Your Farm!
-                                    </button>
-                                </div>
-                                <div class="col-lg-8 text-center">
-                                    <% if(!serverSettings.filamentManager){ %>
-                                    <div class="alert alert-info" role="alert">
-                                        <p class="mb-1">Click the button below to activate filament
-                                            manager plugin and link it to OctoFarm. Please read the
-                                            notes below before proceeding.</p></div>
-                                        <div class="row">
-                                            <div class="col-lg-4">
-                                                <div class="alert alert-danger" role="alert">
-                                                <span>OctoFarm expects filament manager
-                                                    installed on every instance. If it isn't, and you
-                                                    activate it you run the risk of some updates/selections
-                                                    failing to register.</span></div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="alert alert-warning text-dark" role="alert">
-                                                <span>You must also have all these instances
-                                                    setup with a postgres database. Without this you will
-                                                    not be able to select filament on every instance.</span></div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div class="alert alert-warning text-dark" role="alert">
-                                                <span>Any spool within OctoFarm will be deleted
-                                                    upon successful sync and replaced with those on your filament manager database...</span></div>
-                                            </div>
-                                        </div>
-                                        <% } %>
-                                        <div id="filamentManagerButton">
-
-                                        </div>
-                                </div>
-                            </div>
-                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="server-views" role="tabpanel"

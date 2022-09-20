@@ -1,4 +1,3 @@
-import { setupFilamentManagerReSyncBtn } from '../js/services/octoprint/filament-manager-plugin.service';
 import {
   loadPageStatistics,
   renderFilamentUsageCharts,
@@ -31,8 +30,6 @@ async function init() {
 
   await updateProfileDrop();
   await updatePrinterDrops();
-
-  await setupFilamentManagerReSyncBtn();
 
   renderMaterialsList();
 
