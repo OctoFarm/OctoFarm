@@ -74,7 +74,7 @@
     "simple-git": "^3.7.1",
     "sockjs-client": "^1.6.1",
     "swagger-jsdoc": "^6.1.0",
-    "swagger-ui-express": "^4.3.0",
+    "swagger-ui-express": "^4.5.0",
     "systeminformation": "^5.11.8",
     "table": "^6.8.0",
     "toad-scheduler": "^1.6.0",
