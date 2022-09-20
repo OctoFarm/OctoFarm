@@ -104,6 +104,6 @@
   "devDependencies": {
     "@release-it/conventional-changelog": "^5.0.0",
     "nodemon": "^2.0.16",
-    "release-it": "^15.0.0"
+    "release-it": "^15.4.2"
   }
 }
