@@ -125,7 +125,7 @@ textarea{
 body {
   background-color: black;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("/images/bg.jpg");
+    url("/assets/images/bg.jpg");
   background-attachment: fixed;
   background-repeat: no-repeat;
   -webkit-background-size: cover;
