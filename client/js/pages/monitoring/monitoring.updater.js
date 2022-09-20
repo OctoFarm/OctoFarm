@@ -465,6 +465,7 @@ function updateState(printer, clientSettings, view, index) {
   if (stateCategory === 'Error!') {
     stateCategory = 'Offline';
   }
+
   UI.doesElementNeedUpdating(printer.printerName, elements.name, 'innerHTML');
 
   switch (view) {
@@ -484,6 +485,9 @@ function updateState(printer, clientSettings, view, index) {
         elements.cameraContain,
         'classList'
       );
+      break;
+    case 'combined':
+      UI.doesElementNeedUpdating(`btn btn-block ${stateCategory}`, elements.state, 'classList');
       break;
   }
 
@@ -1242,16 +1246,19 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
       grabElements(p);
       //Initialise Drag and Drop
       dragAndDropEnable(document.getElementById('panel-' + p._id), p);
-      // if (!dragCheck()) {
-      //   updateState(p, clientSettings, view, p.sortIndex);
-      // }
+      if (!dragCheck()) {
+        updateState(p, clientSettings, view, p.sortIndex);
+      }
     }
   }
 };
 
 const updatePrinterPanels = (view, printers, clientSettings) => {
   for (const p of printers) {
+    console.log('DRAG ', dragCheck());
+    console.log('VIEW', isInViewport(document.getElementById('printerFilesBtn-' + p._id)));
     if (!dragCheck()) {
+      console.log('Updating');
       updateState(p, clientSettings, view, p.sortIndex);
     }
   }
@@ -1302,12 +1309,14 @@ export async function initMonitoring(printers, clientSettings, view) {
       const drawnPrinters = printers.filter((p) => {
         return document.getElementById('panel-' + p._id);
       });
-
+      console.log(drawnPrinters);
       const viewablePrinters = drawnPrinters.filter((p) => {
-        return isInViewport(document.getElementById('panel-' + p._id));
+        return p;
+        // console.log('RES', isInViewport(document.getElementById('panel-' + p._id)));
+        // return isInViewport(document.getElementById('panel-' + p._id));
       });
 
-      console.log(drawnPrinters, viewablePrinters);
+      console.log(drawnPrinters.length, viewablePrinters.length);
 
       updatePrinterPanels(view, viewablePrinters, clientSettings);
       break;
