@@ -78,7 +78,7 @@ export function createPrinterAddInstructions() {
                     <p>1. Make sure CORS is switched on and OctoPrint has been restarted...</p>
                 </div>
                 <div class="col-md-9">
-                    <img width="100%" src="/images/userCORSOctoPrint.png">
+                    <img width="100%" src="/assets/images/userCORSOctoPrint.png">
                 </div>
             </div>
             <div class="row">
@@ -90,7 +90,7 @@ export function createPrinterAddInstructions() {
                         OctoPrint.</code>
                 </div>
                 <div class="col-md-3">
-                    <img src="/images/userSettingsOctoPrint.png">
+                    <img src="/assets/images/userSettingsOctoPrint.png">
                 </div>
             </div>
             <div class="row">
@@ -100,7 +100,7 @@ export function createPrinterAddInstructions() {
                         the first user you have created.</code>
                 </div>
                 <div class="col-md-7">
-                    <img src="/images/userAPIKEYOctoPrint.png">
+                    <img src="/assets/images/userAPIKEYOctoPrint.png">
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@ export function createPrinterAddInstructions() {
                     first user you have created.</code>
             </div>
             <div class="col-md-7">
-                <img src="/images/userApplicationKeyOctoPrint.png">
+                <img src="/assets/images/userApplicationKeyOctoPrint.png">
             </div>
         </div>
     </div>

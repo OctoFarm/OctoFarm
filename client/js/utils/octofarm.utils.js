@@ -1,4 +1,4 @@
-import { drawCamera } from "../templates/camera.template";
+import { drawCamera } from '../templates/camera.template';
 
 /**
  *
@@ -7,12 +7,12 @@ import { drawCamera } from "../templates/camera.template";
  */
 export function getNameColour(colour) {
   let colourStyle = `background-color: ${colour} !important;`;
-  let buttonStyle = "btn-outline-dark";
-  if (colour === "default") {
-    colourStyle = "";
-    buttonStyle = "btn-secondary";
-  } else if (colour === "black") {
-    buttonStyle = "btn-outline-light";
+  let buttonStyle = 'btn-outline-dark';
+  if (colour === 'default') {
+    colourStyle = '';
+    buttonStyle = 'btn-secondary';
+  } else if (colour === 'black') {
+    buttonStyle = 'btn-outline-light';
   }
   return {
     colourStyle,
@@ -26,19 +26,19 @@ export function getNameColour(colour) {
  * @returns {{flipV: string, rotate90: string, flipH: string}}
  */
 export function isRotated(otherSettings) {
-  let flipH = "";
-  let flipV = "";
-  let rotate90 = "";
+  let flipH = '';
+  let flipV = '';
+  let rotate90 = '';
 
   if (!!otherSettings) {
     if (otherSettings.webCamSettings.flipH) {
-      flipH = "rotateY(180deg)";
+      flipH = 'rotateY(180deg)';
     }
     if (otherSettings.webCamSettings.flipV) {
-      flipV = "rotateX(180deg)";
+      flipV = 'rotateX(180deg)';
     }
     if (otherSettings.webCamSettings.rotate90) {
-      rotate90 = "rotate(90deg)";
+      rotate90 = 'rotate(90deg)';
     }
   }
   return { flipH, flipV, rotate90 };
@@ -51,14 +51,11 @@ export function isRotated(otherSettings) {
  * @returns {string}
  */
 export function isHidden(state, clientSettings) {
-  let hidden = "";
-  if (state === "Offline" && clientSettings.views.showOffline) {
-    hidden = "hidden";
-  } else if (
-    state === "Disconnected" &&
-    clientSettings.views.showDisconnected
-  ) {
-    hidden = "hidden";
+  let hidden = '';
+  if (state === 'Offline' && clientSettings.views.showOffline) {
+    hidden = 'hidden';
+  } else if (state === 'Disconnected' && clientSettings.views.showDisconnected) {
+    hidden = 'hidden';
   }
   return hidden;
 }
@@ -95,9 +92,9 @@ export function checkGroupColumns(clientSettings) {
  * @param doNotDisplay
  * @returns {string}
  */
-export function imageOrCamera(printer, doNotDisplay = false, modal = "") {
+export function imageOrCamera(printer, doNotDisplay = false, modal = '') {
   if (doNotDisplay) {
-    return "";
+    return '';
   }
 
   const flip = isRotated(printer.otherSettings);
@@ -108,62 +105,56 @@ export function imageOrCamera(printer, doNotDisplay = false, modal = "") {
   //Is octoprints camera settings enabled?
   if (!!printer.otherSettings) {
     //Check if URL actually exists...
-    if (printer.camURL !== "") {
+    if (printer.camURL !== '') {
       return drawCamera(printer._id, {
         url: printer.camURL,
         flipV,
         flipH,
         rotate90,
         aspectRatio: printer.aspectRatio,
-        modal
+        modal,
       });
     } else {
-      if (
-        typeof printer.currentJob !== "undefined" &&
-        printer.currentJob.thumbnail != null
-      ) {
+      if (typeof printer.currentJob !== 'undefined' && printer.currentJob.thumbnail != null) {
         return drawCamera(printer._id, {
-          url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+          url: printer.printerURL + '/' + printer.currentJob.thumbnail,
           flipV,
           flipH,
           rotate90,
           aspectRatio: printer.aspectRatio,
-          modal
+          modal,
         });
       } else {
         return drawCamera(printer._id, {
-          url: "../images/noCamera.jpg",
+          url: '../assets/images/noCamera.jpg',
           flipV,
           flipH,
           rotate90,
           aspectRatio: printer.aspectRatio,
-          modal
+          modal,
         });
       }
     }
   } else {
-    if (
-      typeof printer.currentJob !== "undefined" &&
-      printer.currentJob.thumbnail != null
-    ) {
+    if (typeof printer.currentJob !== 'undefined' && printer.currentJob.thumbnail != null) {
       return drawCamera(printer._id, {
-        url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+        url: printer.printerURL + '/' + printer.currentJob.thumbnail,
         flipV,
         flipH,
         rotate90,
         aspectRatio: printer.aspectRatio,
-        modal
+        modal,
       });
     } else {
       hidden = true;
       return drawCamera(printer._id, {
-        url: "",
+        url: '',
         flipV,
         flipH,
         rotate90,
         hidden,
         aspectRatio: printer.aspectRatio,
-        modal
+        modal,
       });
     }
   }
@@ -178,19 +169,13 @@ export function checkCameraState(printer) {
   //Is octoprints camera settings enabled?
   if (!!printer.otherSettings) {
     //Check if URL actually exists...
-    if (printer.camURL !== "") {
+    if (printer.camURL !== '') {
       return true;
     } else {
-      return (
-        typeof printer.currentJob !== "undefined" &&
-        printer.currentJob.thumbnail != null
-      );
+      return typeof printer.currentJob !== 'undefined' && printer.currentJob.thumbnail != null;
     }
   } else {
-    return (
-      typeof printer.currentJob !== "undefined" &&
-      printer.currentJob.thumbnail != null
-    );
+    return typeof printer.currentJob !== 'undefined' && printer.currentJob.thumbnail != null;
   }
 }
 
@@ -211,12 +196,12 @@ export function printerIsDisabled(printer) {
 
 export function printerIsOffline(printer) {
   const category = getPrinterCategory(printer);
-  return category === "Offline";
+  return category === 'Offline';
 }
 
 export function printerIsSearching(printer) {
   const category = getPrinterCategory(printer);
-  return category === "Info";
+  return category === 'Info';
 }
 
 /**
@@ -244,7 +229,7 @@ export function printerIsPrintingOrComplete(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category === "Active" || category === "Complete";
+  return category === 'Active' || category === 'Complete';
 }
 
 export function printerIsPrinting(printer) {
@@ -254,7 +239,7 @@ export function printerIsPrinting(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category === "Active";
+  return category === 'Active';
 }
 
 export function isPrinterFullyScanned(printer) {
@@ -291,7 +276,7 @@ export function isPrinterDisconnected(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category === "Disconnected";
+  return category === 'Disconnected';
 }
 
 export function isPrinterInErrorState(printer) {
@@ -301,7 +286,7 @@ export function isPrinterInErrorState(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category.includes("Error") || category.includes("error");
+  return category.includes('Error') || category.includes('error');
 }
 
 export function printerIsIdle(printer) {
@@ -311,60 +296,57 @@ export function printerIsIdle(printer) {
 
   const category = getPrinterCategory(printer);
 
-  return category === "Idle" || category === "Complete";
+  return category === 'Idle' || category === 'Complete';
 }
 
 export function closePrinterManagerModalIfOffline(printer) {
   if (!printerIsOnline(printer)) {
-    $("#printerManagerModal").modal("hide");
+    $('#printerManagerModal').modal('hide');
   }
   return !printerIsOnline(printer);
 }
 
 export function closePrinterManagerModalIfDisconnected(printer) {
   if (isPrinterDisconnected(printer)) {
-    $("#printerManagerModal").modal("hide");
+    $('#printerManagerModal').modal('hide');
   }
   return isPrinterDisconnected(printer);
 }
 
 export function canWeRestartOctoPrint(printer) {
-  const { otherSettings: { commands: { serverRestartCommand } = {} } = {} } =
-    printer || {};
+  const { otherSettings: { commands: { serverRestartCommand } = {} } = {} } = printer || {};
 
-  return !!serverRestartCommand || serverRestartCommand !== "";
+  return !!serverRestartCommand || serverRestartCommand !== '';
 }
 
 export function canWeRestartOctoPrintHost(printer) {
-  const { otherSettings: { commands: { systemRestartCommand } = {} } = {} } =
-    printer || {};
+  const { otherSettings: { commands: { systemRestartCommand } = {} } = {} } = printer || {};
 
-  return !!systemRestartCommand || systemRestartCommand !== "";
+  return !!systemRestartCommand || systemRestartCommand !== '';
 }
 
 export function canWeShutdownOctoPrintHost(printer) {
-  const { otherSettings: { commands: { systemShutdownCommand } = {} } = {} } =
-    printer || {};
+  const { otherSettings: { commands: { systemShutdownCommand } = {} } = {} } = printer || {};
 
-  return !!systemShutdownCommand || systemShutdownCommand !== "";
+  return !!systemShutdownCommand || systemShutdownCommand !== '';
 }
 
 export function canWeShutdownThePrinter(printer) {
   const { powerSettings: { powerOffCommand } = {} } = printer || {};
 
-  return !!powerOffCommand || powerOffCommand !== "";
+  return !!powerOffCommand || powerOffCommand !== '';
 }
 
 export function canWeTurnOnThePrinter(printer) {
   const { powerSettings: { powerOnCommand } = {} } = printer || {};
 
-  return !!powerOnCommand || powerOnCommand !== "";
+  return !!powerOnCommand || powerOnCommand !== '';
 }
 
 export function canWeTurnOffThePrinter(printer) {
   const { powerSettings: { powerOffCommand } = {} } = printer || {};
 
-  return !!powerOffCommand || powerOffCommand !== "";
+  return !!powerOffCommand || powerOffCommand !== '';
 }
 
 export function canWeDetectPrintersPowerState(powerStatusURL) {
