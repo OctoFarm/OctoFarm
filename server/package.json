@@ -79,7 +79,7 @@
     "table": "^6.8.0",
     "toad-scheduler": "^1.6.0",
     "wake_on_lan": "^1.0.0",
-    "winston": "^3.6.0",
+    "winston": "^3.8.2",
     "ws": "^8.5.0",
     "xml2js": "^0.4.23"
   },
