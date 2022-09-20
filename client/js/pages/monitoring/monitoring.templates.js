@@ -1,26 +1,23 @@
-import { sortAlphaNum } from "../system/utils/array.utils";
+import { sortAlphaNum } from '../system/utils/array.utils';
 import {
   checkPrinterRows,
   checkCameraState,
   imageOrCamera,
   checkGroupColumns,
   isHidden,
-} from "../../utils/octofarm.utils";
-import { getPrinterNameBadge } from "../../templates/printer.templates";
-import { returnMiniFilamentSelectorTemplate } from "../../services/printer-filament-selector.service";
+} from '../../utils/octofarm.utils';
+import { getPrinterNameBadge } from '../../templates/printer.templates';
+import { returnMiniFilamentSelectorTemplate } from '../../services/printer-filament-selector.service';
 
 export function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
-  let toolList = "";
-  let environment = "";
+  let toolList = '';
+  let environment = '';
   if (!!printer?.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
     }
-    if (
-      printer.currentProfile.heatedBed &&
-      printer.currentProfile.heatedChamber
-    ) {
+    if (printer.currentProfile.heatedBed && printer.currentProfile.heatedChamber) {
       environment = `<small
       id="badTemp-${printer._id}"
     class="mb-0"
@@ -45,8 +42,8 @@ export function drawListView(printer, clientSettings) {
     }
   }
   let stateCategory = printer.printerState.colour.category;
-  if (stateCategory === "Error!") {
-    stateCategory = "Offline";
+  if (stateCategory === 'Error!') {
+    stateCategory = 'Offline';
   }
 
   return `
@@ -54,11 +51,7 @@ export function drawListView(printer, clientSettings) {
           class="p-0 ${stateCategory} ${hidden}"
           id="panel-${printer._id}">
           <td class="text-center" style="max-width:200px;">
-               ${getPrinterNameBadge(
-                 printer._id,
-                 printer.settingsAppearance.color,
-                 "center"
-               )}
+               ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, 'center')}
           </td>
           <td id="state-${printer._id}" class="py-auto">
            ${printer.printerState.state}
@@ -167,13 +160,9 @@ export function drawListView(printer, clientSettings) {
 
           </td> 
           <td class="py-auto">
-          <p id="currentFile-${
-            printer._id
-          }" title="Loading..." class="mb-1 tag">
+          <p id="currentFile-${printer._id}" title="Loading..." class="mb-1 tag">
             <i class="fas fa-file-code"></i> No File Selected </p>
-            <div id="filesViewProgressWrapper-${
-              printer._id
-            }" class="progress d-none">
+            <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                 <div id="filesViewProgressBar-${
                   printer._id
                 }" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -208,8 +197,8 @@ export function drawListView(printer, clientSettings) {
 export function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   let cameraElement = imageOrCamera(printer);
-  let toolList = "";
-  let environment = "";
+  let toolList = '';
+  let environment = '';
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
@@ -230,29 +219,20 @@ export function drawPanelView(printer, clientSettings) {
   }
 
   return `
-        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${
-    printer._id
-  }">
+        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
           <div class="row">
             <div class="col-lg-12">
-              ${getPrinterNameBadge(
-                printer._id,
-                printer.settingsAppearance.color
-              )}
-               <small id="printerActionBtns-${
-                 printer._id
-               }" class="float-right">   </small>
+              ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
+               <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
           </div>
 
 
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
-          <div id="filesViewProgressWrapper-${
-            printer._id
-          }" class="progress d-none">
+          <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
             <div id="filesViewProgressBar-${
               printer._id
             }" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -289,9 +269,7 @@ export function drawPanelView(printer, clientSettings) {
             <button
               id="state-${printer._id}"
               type="button"
-              class="btn btn-block mb-1 mt-1 btn-sm ${
-                printer.printerState.colour.category
-              }"
+              class="btn btn-block mb-1 mt-1 btn-sm ${printer.printerState.colour.category}"
               role="button"
               disabled
             >
@@ -423,16 +401,16 @@ export function drawPanelView(printer, clientSettings) {
 
 export function drawCameraView(printer, clientSettings) {
   let hidden = isHidden(printer, clientSettings);
-  if (printer.camURL === "") {
-    hidden = "hidden";
+  if (printer.camURL === '') {
+    hidden = 'hidden';
   }
 
   const printerRows = checkPrinterRows(clientSettings);
 
   let cameraElement = imageOrCamera(printer);
 
-  let toolList = "";
-  let environment = "";
+  let toolList = '';
+  let environment = '';
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
@@ -462,13 +440,8 @@ export function drawCameraView(printer, clientSettings) {
         >
         <div class="row">
             <div class="col-lg-12">
-              ${getPrinterNameBadge(
-                printer._id,
-                printer.settingsAppearance.color
-              )}
-               <small id="printerActionBtns-${
-                 printer._id
-               }" class="float-right">   </small>
+              ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
+               <small id="printerActionBtns-${printer._id}" class="float-right">   </small>
             </div>
         </div>
         </div>
@@ -483,9 +456,7 @@ export function drawCameraView(printer, clientSettings) {
             >
               <i class="fas fa-file-code"></i> Loading... 
             </small>
-            <div id="filesViewProgressWrapper-${
-              printer._id
-            }" class="progress d-none">
+            <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                 <div id="filesViewProgressBar-${
                   printer._id
                 }" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -495,14 +466,10 @@ export function drawCameraView(printer, clientSettings) {
           <div class="camExtra">
             <div class=" row">
               <div class="col-6">
-                 <span class="mb-0 text-center" id="printTimeElapsed-${
-                   printer._id
-                 }"></span>
+                 <span class="mb-0 text-center" id="printTimeElapsed-${printer._id}"></span>
               </div>
               <div class="col-6">
-                <span class="mb-0 text-center" id="remainingTime-${
-                  printer._id
-                }"></span>
+                <span class="mb-0 text-center" id="remainingTime-${printer._id}"></span>
               </div>
             </div>
           </div>
@@ -646,8 +613,8 @@ export function drawCombinedView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
 
   let cameraElement = imageOrCamera(printer);
-  let toolList = "";
-  let environment = "";
+  let toolList = '';
+  let environment = '';
   if (!!printer.currentProfile) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
       toolList += returnMiniFilamentSelectorTemplate(printer._id, e);
@@ -655,39 +622,35 @@ export function drawCombinedView(printer, clientSettings) {
 
     if (printer.currentProfile.heatedBed) {
       environment +=
-        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
+        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Bed: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
-      environment += "</div>";
+      environment += '</div>';
     }
     if (printer.currentProfile.heatedChamber) {
       environment +=
-        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
+        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Chamber: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
-      environment += "</div>";
+      environment += '</div>';
     }
   }
 
   const cameraCheck = checkCameraState(printer);
 
   const columns = {
-    cameraColumn: "col-sm-12 col-md-5 col-lg-4 col-xl-3",
-    mainColumn: "col-sm-12 col-md-7 col-lg-8 col-xl-9",
+    cameraColumn: 'col-sm-12 col-md-5 col-lg-4 col-xl-3',
+    mainColumn: 'col-sm-12 col-md-7 col-lg-8 col-xl-9',
   };
   if (!cameraCheck) {
-    columns.cameraColumn = "d-none";
-    columns.mainColumn = "col-12";
+    columns.cameraColumn = 'd-none';
+    columns.mainColumn = 'col-12';
   }
 
   return `
-     <div class="card ${hidden} mb-3" id="panel-${printer._id}">
+     <div class="card ${hidden} mb-3 col-12" id="panel-${printer._id}">
+       <div class="row">
         <div class="d-none index">${printer.sortIndex}</div>
-        <div class="col-12">
-            <div class="row">
-             
                 <div class="${columns.cameraColumn}">
-                   <div id="cameraContain-${
-                     printer._id
-                   }" class="noBlue text-center">
+                   <div id="cameraContain-${printer._id}" class="noBlue text-center">
                       <div style="width:90%;" class=" m-auto">
                         ${cameraElement}
                       </div>
@@ -697,18 +660,13 @@ export function drawCombinedView(printer, clientSettings) {
      
                    <div class="row">
                         <div class="col-sm-12 col-md-12 col-lg-6">
-                          ${getPrinterNameBadge(
-                            printer._id,
-                            printer.settingsAppearance.color
-                          )}
+                          ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color)}
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4">
                           <button
                             id="state-${printer._id}"
                             type="button"
-                            class="btn btn-block btn-sm ${
-                              printer.printerState.colour.category
-                            }"
+                            class="btn btn-block ${printer.printerState.colour.category}"
                             role="button"
                             disabled
                           >
@@ -716,9 +674,7 @@ export function drawCombinedView(printer, clientSettings) {
                           </button>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-2">
-                         <small class="float-right" id="printerActionBtns-${
-                           printer._id
-                         }">
+                         <small class="float-right" id="printerActionBtns-${printer._id}">
 
                           </small>
                         </div>
@@ -755,9 +711,7 @@ export function drawCombinedView(printer, clientSettings) {
                         >
                             <i class="fas fa-file-code" ></i> No File Selected
                         </button>
-                        <div id="filesViewProgressWrapper-${
-                          printer._id
-                        }" class="progress d-none">
+                        <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                             <div id="filesViewProgressBar-${
                               printer._id
                             }" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
@@ -859,14 +813,10 @@ export function drawCombinedView(printer, clientSettings) {
                         <div class="col-sm-12 col-md-6 col-lg-6 text-center">
                            <div class="row">
                             <div class="col-12">
-                              <small id="displayLayerProgressData-${
-                                printer._id
-                              }"></small>
+                              <small id="displayLayerProgressData-${printer._id}"></small>
                              </div>
                             <div class="col-6">
-                                <span id="printTimeElapsed-${
-                                  printer._id
-                                }">Loading...</span>
+                                <span id="printTimeElapsed-${printer._id}">Loading...</span>
                             </div>
                             <div class="col-6">
                                       <span id="remainingTime-${printer._id}">
@@ -897,18 +847,16 @@ export function drawCombinedView(printer, clientSettings) {
 }
 
 export function drawGroupViewContainers(printers, printerArea, clientSettings) {
-  const uniqueGroupList = [
-    ...new Set(printers.map((printer) => printer.group)),
-  ];
+  const uniqueGroupList = [...new Set(printers.map((printer) => printer.group))];
   const sortedUniqueGroupList = uniqueGroupList.sort(sortAlphaNum);
   const groupColumns = checkGroupColumns(clientSettings);
   sortedUniqueGroupList.forEach((group) => {
-    if (group !== "") {
+    if (group !== '') {
       const cleanGroup = encodeURIComponent(group);
       const skipElement = document.getElementById(`Group-${cleanGroup}`);
       if (!skipElement) {
         printerArea.insertAdjacentHTML(
-          "beforeend",
+          'beforeend',
           `
             <div id="dropPanel-${cleanGroup}" class="col-sm-12 col-lg-${groupColumns}">
               <div class="card">
@@ -1017,7 +965,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
 
 export function drawGroupViewPrinters(printers, clientSettings) {
   printers.forEach((printer) => {
-    if (printer.group !== "") {
+    if (printer.group !== '') {
       const cleanGroup = encodeURIComponent(printer.group);
       const groupContainer = document.getElementById(`Group-${cleanGroup}`);
       const skipElement = document.getElementById(`panel-${printer._id}`);
@@ -1047,21 +995,13 @@ export function drawGroupViewPrinters(printers, clientSettings) {
       }
       if (!skipElement) {
         groupContainer.insertAdjacentHTML(
-          "beforeend",
+          'beforeend',
           `
-        <div id="panel-${
-          printer._id
-        }" class="col-sm-12 col-md-6 col-lg-${panelColumns}">
+        <div id="panel-${printer._id}" class="col-sm-12 col-md-6 col-lg-${panelColumns}">
           <div  class="card text-white bg-dark">
             <div class="card-header dashHeader text-truncate">
-                ${getPrinterNameBadge(
-                  printer._id,
-                  printer.settingsAppearance.color,
-                  "center"
-                )}
-                <div id="filesViewProgressWrapper-${
-                  printer._id
-                }" class="progress d-none">
+                ${getPrinterNameBadge(printer._id, printer.settingsAppearance.color, 'center')}
+                <div id="filesViewProgressWrapper-${printer._id}" class="progress d-none">
                     <div id="filesViewProgressBar-${
                       printer._id
                     }" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
