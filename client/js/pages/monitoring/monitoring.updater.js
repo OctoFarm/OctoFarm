@@ -424,6 +424,8 @@ function updateState(printer, clientSettings, view, index) {
   const elements = grabElements(printer);
   //Check sorting order and update if required...
 
+  if (!elements.row) return;
+
   elements.row.style.order = index;
 
   //Check display and skip if not displayed...
@@ -1245,9 +1247,9 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
         grabElements(p);
         //Initialise Drag and Drop
         dragAndDropEnable(document.getElementById('panel-' + p._id), p);
-        if (!dragCheck()) {
-          updateState(p, clientSettings, view, p.sortIndex);
-        }
+      }
+      if (!dragCheck()) {
+        updateState(p, clientSettings, view, p.sortIndex);
       }
     }
   }

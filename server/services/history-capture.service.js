@@ -492,7 +492,7 @@ class HistoryCaptureService {
 
   async downDateWeight() {
     // Complete guess at a heat up time... deffo no filament used by this time, or very unimportant amounts.
-    if (!this.#success && this.#payload.time < 60) {
+    if (!this.#success && this.#payload.time < 150) {
       logger.warning('Not downdating failed print as shorter than 1 minute...');
       return;
     }
