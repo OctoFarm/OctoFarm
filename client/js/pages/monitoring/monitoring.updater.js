@@ -1217,8 +1217,6 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
     return !document.getElementById('panel-' + p._id);
   });
 
-  console.log(notDrawnPrinters);
-
   for (const p of notDrawnPrinters) {
     if (printerIsAvailableToView(p)) {
       let printerHTML;
@@ -1244,9 +1242,9 @@ const drawPrinterPanels = async (view, printers, clientSettings) => {
       grabElements(p);
       //Initialise Drag and Drop
       dragAndDropEnable(document.getElementById('panel-' + p._id), p);
-      if (!dragCheck()) {
-        updateState(p, clientSettings, view, p.sortIndex);
-      }
+      // if (!dragCheck()) {
+      //   updateState(p, clientSettings, view, p.sortIndex);
+      // }
     }
   }
 };
@@ -1299,19 +1297,19 @@ export async function initMonitoring(printers, clientSettings, view) {
         }
         return;
       }
-      //
-      // const drawnPrinters = printers.filter((p) => {
-      //   return document.getElementById('panel-' + p._id);
-      // });
-      // console.log(drawnPrinters.length);
-      // const viewablePrinters = drawnPrinters.filter((p) => {
-      //   return !isInViewport(document.getElementById('panel-' + p._id));
-      // });
-      //
-      // console.log(viewablePrinters.length);
-
       await drawPrinterPanels(view, printers, clientSettings);
-      updatePrinterPanels(view, printers, clientSettings);
+
+      const drawnPrinters = printers.filter((p) => {
+        return document.getElementById('panel-' + p._id);
+      });
+
+      const viewablePrinters = drawnPrinters.filter((p) => {
+        return isInViewport(document.getElementById('panel-' + p._id));
+      });
+
+      console.log(drawnPrinters, viewablePrinters);
+
+      updatePrinterPanels(view, viewablePrinters, clientSettings);
       break;
   }
 }

@@ -7,41 +7,21 @@ export const reloadWindow = async () => {
   }
 };
 
-function posY(elm) {
-  var test = elm,
-    top = 0;
-
-  while (!!test && test.tagName.toLowerCase() !== 'body') {
-    top += test.offsetTop;
-    test = test.offsetParent;
-  }
-
-  return top;
-}
-
-function viewPortHeight() {
-  var de = document.documentElement;
-
-  if (!!window.innerWidth) {
-    return window.innerHeight;
-  } else if (de && !isNaN(de.clientHeight)) {
-    return de.clientHeight;
-  }
-
-  return 0;
-}
-
-function scrollY() {
-  if (window.pageYOffset) {
-    return window.pageYOffset;
-  }
-  return Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-}
-
 export const isInViewport = (el) => {
-  var vpH = viewPortHeight(), // Viewport Height
-    st = scrollY(), // Scroll Top
-    y = posY(el);
+  const rect = el.getBoundingClientRect(),
+    vWidth = window.innerWidth || document.documentElement.clientWidth,
+    vHeight = window.innerHeight || document.documentElement.clientHeight,
+    efp = function (x, y) {
+      return document.elementFromPoint(x, y);
+    };
 
-  return y > vpH + st;
+  // Return false if it's not in the viewport
+  if (rect.right < 0 || rect.bottom < 0 || rect.left > vWidth || rect.top > vHeight) return false;
+
+  return (
+    el.contains(efp(rect.left, rect.top)) ||
+    el.contains(efp(rect.right, rect.top)) ||
+    el.contains(efp(rect.right, rect.bottom)) ||
+    el.contains(efp(rect.left, rect.bottom))
+  );
 };
