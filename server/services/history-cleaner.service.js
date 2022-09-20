@@ -1,23 +1,23 @@
-"use strict";
+'use strict';
 
-const { arrayCounts, checkNested, checkNestedIndex } = require("../utils/array.util");
-const { getElectricityCosts, getMaintenanceCosts } = require("../utils/print-cost.util");
+const { arrayCounts, checkNested, checkNestedIndex } = require('../utils/array.util');
+const { getElectricityCosts, getMaintenanceCosts } = require('../utils/print-cost.util');
 const {
   getDefaultHistoryStatistics,
   ALL_MONTHS,
   DEFAULT_SPOOL_RATIO,
-  DEFAULT_SPOOL_DENSITY
-} = require("../constants/cleaner.constants");
-const historyService = require("./history.service");
-const Logger = require("../handlers/logger.js");
-const { stateToHtml } = require("../utils/html.util");
-const { toDefinedKeyValue } = require("../utils/property.util");
-const { floatOrZero } = require("../utils/number.util");
-const { toTimeFormat } = require("../utils/time.util");
-const { last12Month } = require("../utils/date.utils");
-const { orderBy } = require("lodash");
-const { SettingsClean } = require("./settings-cleaner.service");
-const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+  DEFAULT_SPOOL_DENSITY,
+} = require('../constants/cleaner.constants');
+const historyService = require('./history.service');
+const Logger = require('../handlers/logger.js');
+const { stateToHtml } = require('../utils/html.util');
+const { toDefinedKeyValue } = require('../utils/property.util');
+const { floatOrZero } = require('../utils/number.util');
+const { toTimeFormat } = require('../utils/time.util');
+const { last12Month } = require('../utils/date.utils');
+const { orderBy } = require('lodash');
+const { SettingsClean } = require('./settings-cleaner.service');
+const { LOGGER_ROUTE_KEYS } = require('../constants/logger.constants');
 let logger;
 
 class HistoryCleanerService {
@@ -30,7 +30,7 @@ class HistoryCleanerService {
   monthlyStatistics = [];
   dailyStatistics = [];
 
-  constructor(enableFileLogging = false, logLevel = "warn") {
+  constructor(enableFileLogging = false, logLevel = 'warn') {
     this.historyService = historyService;
     this.logger = new Logger(
       LOGGER_ROUTE_KEYS.SERVICE_HISTORY_CLEANER,
@@ -70,17 +70,15 @@ class HistoryCleanerService {
       return null;
     }
 
-    let spoolLeftoverConditional = "";
-    if (serverSettingsCache.filamentManager) {
-      const spoolWeight = (spool.weight - spool.used).toFixed(0);
-      spoolLeftoverConditional = `(${spoolWeight}g)`;
-    }
+    let spoolLeftoverConditional = '';
+    const spoolWeight = (spool.weight - spool.used).toFixed(0);
+    spoolLeftoverConditional = `(${spoolWeight}g)`;
     return `${spool.name} ${spoolLeftoverConditional} - ${spool.profile?.material}`;
   }
 
   static getCostAsString(grams, spool, completionRatio) {
     if (!spool) {
-      return "0.00";
+      return '0.00';
     }
     return completionRatio * ((spool.spools.price / spool.spools.weight) * grams).toFixed(2);
   }
@@ -91,7 +89,7 @@ class HistoryCleanerService {
           actualPrintTime: printTime,
           estimatedPrintTime: job.estimatedPrintTime,
           printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000,
-          user: job?.user ? job.user : "No OP User"
+          user: job?.user ? job.user : 'No OP User',
         }
       : null;
   }
@@ -106,7 +104,7 @@ class HistoryCleanerService {
     input.forEach((dv) => (dates[dv.x.toDateString()] = (dates[dv.x.toDateString()] || 0) + dv.y));
     return Object.keys(dates).map((date) => ({
       x: new Date(date),
-      y: dates[date]
+      y: dates[date],
     }));
   }
 
@@ -120,7 +118,7 @@ class HistoryCleanerService {
       let usageWeightCalc = 0;
       let newObj = [];
       for (let i = 0; i < input.length; i++) {
-        if (typeof newObj[i - 1] !== "undefined") {
+        if (typeof newObj[i - 1] !== 'undefined') {
           usageWeightCalc = newObj[i - 1].y + input[i].y;
         } else {
           usageWeightCalc = input[i].y;
@@ -129,7 +127,7 @@ class HistoryCleanerService {
       }
       return newObj;
     } catch (e) {
-      logger.error(e, "ERROR with convert incremental");
+      logger.error(e, 'ERROR with convert incremental');
     }
   }
 
@@ -171,7 +169,7 @@ class HistoryCleanerService {
         const spoolName = HistoryCleanerService.getSpoolLabel(filamentEntry);
         spools.push({
           [key]: {
-            toolName: "Tool " + key.substring(4, 5),
+            toolName: 'Tool ' + key.substring(4, 5),
             spoolName,
             spoolId: filamentEntry?._id || null,
             volume: (completionRatio * metric.volume).toFixed(2),
@@ -182,9 +180,9 @@ class HistoryCleanerService {
               filamentEntry,
               completionRatio
             ),
-            type: filamentEntry?.spools?.profile?.material || "",
-            manufacturer: filamentEntry?.spools?.profile?.manufacturer || ""
-          }
+            type: filamentEntry?.spools?.profile?.material || '',
+            manufacturer: filamentEntry?.spools?.profile?.manufacturer || '',
+          },
         });
       }
     }
@@ -200,15 +198,15 @@ class HistoryCleanerService {
         const keys = Object.keys(spool);
         for (const key of keys) {
           // Check if type exists
-          let searchKeyword = "";
+          let searchKeyword = '';
           let checkNestedResult = checkNested(spool[key].type, totalByDay);
           if (!!checkNestedResult) {
-            if (historyState.includes("success")) {
-              searchKeyword = "Success";
-            } else if (historyState.includes("warning")) {
-              searchKeyword = "Cancelled";
-            } else if (historyState.includes("danger")) {
-              searchKeyword = "Failed";
+            if (historyState.includes('success')) {
+              searchKeyword = 'Success';
+            } else if (historyState.includes('warning')) {
+              searchKeyword = 'Cancelled';
+            } else if (historyState.includes('danger')) {
+              searchKeyword = 'Failed';
             } else {
               return;
             }
@@ -228,24 +226,24 @@ class HistoryCleanerService {
               // Check if more than 90 days ago...
               totalByDay[checkedIndex].data.push({
                 x: historyCleanEntry.endDate,
-                y: weightCalcSan
+                y: weightCalcSan,
               });
               usageOverTime[checkedIndex].data.push({
                 x: historyCleanEntry.endDate,
-                y: weightCalcSan
+                y: weightCalcSan,
               });
             }
           } else {
-            if (spool[key].type !== "") {
+            if (spool[key].type !== '') {
               totalByDay.push({
                 name: spool[key].type,
-                data: []
+                data: [],
               });
             }
-            if (spool[key].type !== "") {
+            if (spool[key].type !== '') {
               usageOverTime.push({
                 name: spool[key].type,
-                data: []
+                data: [],
               });
             }
           }
@@ -255,7 +253,7 @@ class HistoryCleanerService {
 
     return {
       usageOverTime,
-      totalByDay
+      totalByDay,
     };
   }
 
@@ -263,13 +261,13 @@ class HistoryCleanerService {
     const historyState = historyCleanEntry.state;
 
     // Check if type exists
-    let searchKeyword = "";
-    if (historyState.includes("success")) {
-      searchKeyword = "Success";
-    } else if (historyState.includes("warning")) {
-      searchKeyword = "Cancelled";
-    } else if (historyState.includes("danger")) {
-      searchKeyword = "Failed";
+    let searchKeyword = '';
+    if (historyState.includes('success')) {
+      searchKeyword = 'Success';
+    } else if (historyState.includes('warning')) {
+      searchKeyword = 'Cancelled';
+    } else if (historyState.includes('danger')) {
+      searchKeyword = 'Failed';
     } else {
       return;
     }
@@ -281,46 +279,46 @@ class HistoryCleanerService {
     if (!!checkNestedResult) {
       historyByDay[checkNestedIndexHistoryRates].data.push({
         x: historyCleanEntry.endDate,
-        y: 1
+        y: 1,
       });
       totalOverTime[checkNestedIndexOverTimeRates].data.push({
         x: historyCleanEntry.endDate,
-        y: 1
+        y: 1,
       });
     } else {
       if (!historyByDay[0]) {
         historyByDay.push({
-          name: "Success",
-          data: []
+          name: 'Success',
+          data: [],
         });
         historyByDay.push({
-          name: "Failed",
-          data: []
+          name: 'Failed',
+          data: [],
         });
         historyByDay.push({
-          name: "Cancelled",
-          data: []
+          name: 'Cancelled',
+          data: [],
         });
       }
       if (!totalOverTime[0]) {
         totalOverTime.push({
-          name: "Success",
-          data: []
+          name: 'Success',
+          data: [],
         });
         totalOverTime.push({
-          name: "Failed",
-          data: []
+          name: 'Failed',
+          data: [],
         });
         totalOverTime.push({
-          name: "Cancelled",
-          data: []
+          name: 'Cancelled',
+          data: [],
         });
       }
     }
 
     return {
       historyByDay,
-      totalOverTime
+      totalOverTime,
     };
   }
 
@@ -352,7 +350,7 @@ class HistoryCleanerService {
       currentHistory = historyData;
     }
 
-    currentHistory = orderBy(currentHistory, ["endDate"], ["asc"]);
+    currentHistory = orderBy(currentHistory, ['endDate'], ['asc']);
 
     for (let h = 0; h < currentHistory.length; h++) {
       const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
@@ -360,14 +358,14 @@ class HistoryCleanerService {
       const topPrinterState = {
         printTime,
         printerName: printer,
-        state: "success"
+        state: 'success',
       };
       const topFileState = {
         file: file.name,
-        state: "success",
-        printTime
+        state: 'success',
+        printTime,
       };
-      if (state.includes("success")) {
+      if (state.includes('success')) {
         completedJobsCount++;
         printTimes.push(printTime);
         successPrintTimes.push(printTime);
@@ -376,18 +374,18 @@ class HistoryCleanerService {
         filamentWeight.push(totalWeight);
         filamentLength.push(totalLength);
         printCost.push(parseFloat(printerCost));
-      } else if (state.includes("warning")) {
+      } else if (state.includes('warning')) {
         cancelledCount++;
         printTimes.push(printTime);
         failedPrintTime.push(printTime);
-        topPrinterState.state = "cancelled";
-        topFileState.state = "cancelled";
-      } else if (state.includes("danger")) {
+        topPrinterState.state = 'cancelled';
+        topFileState.state = 'cancelled';
+      } else if (state.includes('danger')) {
         failedCount++;
         printTimes.push(printTime);
         failedPrintTime.push(printTime);
-        topPrinterState.state = "failed";
-        topFileState.state = "failed";
+        topPrinterState.state = 'failed';
+        topFileState.state = 'failed';
       }
       topFilesList.push(topFileState);
       topPrinterList.push(topPrinterState);
@@ -401,15 +399,15 @@ class HistoryCleanerService {
     const totalPrintTime = printTimes.reduce((a, b) => a + b, 0);
     const totalSuccessPrintTimes = successPrintTimes.reduce((a, b) => a + b, 0);
     const filesArray = arrayCounts(fileNames);
-    let mostPrintedFile = "No Files";
+    let mostPrintedFile = 'No Files';
     if (filesArray[0].length !== 0) {
       const countFilesArray = filesArray[1].indexOf(Math.max(...filesArray[1]));
       mostPrintedFile = filesArray[0][countFilesArray];
-      mostPrintedFile = mostPrintedFile.replace(/_/g, " ");
+      mostPrintedFile = mostPrintedFile.replace(/_/g, ' ');
     }
     const printerNamesArray = arrayCounts(printerNames);
-    let mostUsedPrinter = "No Printers";
-    let leastUsedPrinter = "No Printers";
+    let mostUsedPrinter = 'No Printers';
+    let leastUsedPrinter = 'No Printers';
     if (printerNamesArray[0].length !== 0) {
       const maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
       const minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
@@ -449,21 +447,21 @@ class HistoryCleanerService {
         return sum + 1;
       }, 0);
       const sumOfCancelled = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "cancelled") {
+        if (currentValue.state === 'cancelled') {
           return sum + 1;
         } else {
           return sum + 0;
         }
       }, 0);
       const sumOfFailed = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "failed") {
+        if (currentValue.state === 'failed') {
           return sum + 1;
         } else {
           return sum + 0;
         }
       }, 0);
       const sumOfSuccess = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "success") {
+        if (currentValue.state === 'success') {
           return sum + 1;
         } else {
           return sum + 0;
@@ -476,7 +474,7 @@ class HistoryCleanerService {
         prints: sumOfPrints,
         cancelledCount: sumOfCancelled || 0,
         failedCount: sumOfFailed || 0,
-        successCount: sumOfSuccess || 0
+        successCount: sumOfSuccess || 0,
       });
     });
     const groupedFilesList = topFilesList.reduce(function (r, a) {
@@ -493,21 +491,21 @@ class HistoryCleanerService {
         return sum + 1;
       }, 0);
       const sumOfCancelled = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "cancelled") {
+        if (currentValue.state === 'cancelled') {
           return sum + 1;
         } else {
           return sum + 0;
         }
       }, 0);
       const sumOfFailed = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "failed") {
+        if (currentValue.state === 'failed') {
           return sum + 1;
         } else {
           return sum + 0;
         }
       }, 0);
       const sumOfSuccess = value.reduce((sum, currentValue) => {
-        if (currentValue.state === "success") {
+        if (currentValue.state === 'success') {
           return sum + 1;
         } else {
           return sum + 0;
@@ -520,14 +518,14 @@ class HistoryCleanerService {
         cancelledCount: sumOfCancelled || 0,
         failedCount: sumOfFailed || 0,
         successCount: sumOfSuccess || 0,
-        sumOfPrintTime: sumOfPrintTime || 0
+        sumOfPrintTime: sumOfPrintTime || 0,
       });
     });
 
     return {
-      sortedTopFilesList: orderBy(sortedTopFilesList, ["prints"], ["desc"]),
-      sortedTopPrinterList: orderBy(sortedTopPrinterList, ["time"], ["desc"]),
-      sortedTopSuccessPrinterList: orderBy(sortedTopPrinterList, ["successCount"], ["desc"]),
+      sortedTopFilesList: orderBy(sortedTopFilesList, ['prints'], ['desc']),
+      sortedTopPrinterList: orderBy(sortedTopPrinterList, ['time'], ['desc']),
+      sortedTopSuccessPrinterList: orderBy(sortedTopPrinterList, ['successCount'], ['desc']),
       totalSuccessPrintTimes,
       completed: completedJobsCount,
       cancelled: cancelledCount,
@@ -543,22 +541,22 @@ class HistoryCleanerService {
       printerLoad: leastUsedPrinter,
       totalPrintTime,
       totalFilamentUsage:
-        totalFilamentWeight.toFixed(2) + "g / " + totalFilamentLength.toFixed(2) + "m",
+        totalFilamentWeight.toFixed(2) + 'g / ' + totalFilamentLength.toFixed(2) + 'm',
       averageFilamentUsage:
         (totalFilamentWeight / filamentWeight.length).toFixed(2) +
-        "g / " +
+        'g / ' +
         (totalFilamentLength / filamentLength.length).toFixed(2) +
-        "m",
+        'm',
       highestFilamentUsage:
         Math.max(...filamentWeight).toFixed(2) +
-        "g / " +
+        'g / ' +
         Math.max(...filamentLength).toFixed(2) +
-        "m",
+        'm',
       lowestFilamentUsage:
         Math.min(...filamentWeight).toFixed(2) +
-        "g / " +
+        'g / ' +
         Math.min(...filamentLength).toFixed(2) +
-        "m",
+        'm',
       totalSpoolCost: filamentCost.reduce((a, b) => a + b, 0).toFixed(2),
       highestSpoolCost: Math.max(...filamentCost).toFixed(2),
       totalPrinterCost: printCost.reduce((a, b) => a + b, 0).toFixed(2),
@@ -571,7 +569,7 @@ class HistoryCleanerService {
       totalByDay: totalByDay,
       usageOverTime: usageOverTime,
       historyByDay: historyByDay,
-      totalOverTime
+      totalOverTime,
     };
   }
 
@@ -587,10 +585,10 @@ class HistoryCleanerService {
       const lastDate = new Date(firstDate.getFullYear(), firstDate.getMonth() + 1, 0);
       const { itemList } = await this.historyService.find(
         {
-          "printHistory.endDate": {
+          'printHistory.endDate': {
             $gte: firstDate,
-            $lte: lastDate
-          }
+            $lte: lastDate,
+          },
         },
         { pagination: false }
       );
@@ -601,7 +599,7 @@ class HistoryCleanerService {
       }
       workingData.push({
         date: firstDate,
-        data: printSummary
+        data: printSummary,
       });
     }
     const returnData = [];
@@ -611,18 +609,18 @@ class HistoryCleanerService {
         let parsedObject = {
           month:
             ALL_MONTHS[currentMonthsData.date.getMonth()] +
-            " " +
+            ' ' +
             currentMonthsData.date.getFullYear(),
-          statistics: this.generateStatistics(currentMonthsData.data)
+          statistics: this.generateStatistics(currentMonthsData.data),
         };
         returnData.push(parsedObject);
       } else {
         let parsedObject = {
           month:
             ALL_MONTHS[currentMonthsData.date.getMonth()] +
-            " " +
+            ' ' +
             currentMonthsData.date.getFullYear(),
-          statistics: {}
+          statistics: {},
         };
         returnData.push(parsedObject);
       }
@@ -631,7 +629,7 @@ class HistoryCleanerService {
 
     this.monthlyStatistics = returnData;
     return {
-      returnData
+      returnData,
     };
   }
 
@@ -644,14 +642,14 @@ class HistoryCleanerService {
     const historySpoolsMat = [];
     if (history) {
       history.forEach((hist) => {
-        historyPrinterNames.push(hist.printer.replace(/ /g, "_"));
+        historyPrinterNames.push(hist.printer.replace(/ /g, '_'));
         if (hist?.printerGroup) {
           historyPrinterGroups.push(hist.printerGroup);
         }
         if (hist?.file?.name) {
-          historyFileNames.push(hist.file.name.replace(".gcode", ""));
-          const path = hist.file.path.substring(0, hist.file.path.lastIndexOf("/"));
-          if (path !== "") {
+          historyFileNames.push(hist.file.name.replace('.gcode', ''));
+          const path = hist.file.path.substring(0, hist.file.path.lastIndexOf('/'));
+          if (path !== '') {
             historyFilePaths.push(path);
           }
           if (hist?.spools && hist.spools.length > 0) {
@@ -686,7 +684,7 @@ class HistoryCleanerService {
       }),
       spoolsManu: historySpoolsManu.filter(function (item, i, ar) {
         return ar.indexOf(item) === i;
-      })
+      }),
     };
   };
 
@@ -729,16 +727,16 @@ class HistoryCleanerService {
         totalVolume: 0,
         totalLength: 0,
         totalWeight: 0,
-        ...toDefinedKeyValue(printHistory.resends, "resend"),
-        ...toDefinedKeyValue(printHistory.snapshot, "snapshot"),
-        ...toDefinedKeyValue(printHistory.timelapse, "timelapse"),
-        activeControlUser: printHistory.activeControlUser
+        ...toDefinedKeyValue(printHistory.resends, 'resend'),
+        ...toDefinedKeyValue(printHistory.snapshot, 'snapshot'),
+        ...toDefinedKeyValue(printHistory.timelapse, 'timelapse'),
+        activeControlUser: printHistory.activeControlUser,
       };
 
       if (!!printSummary.spools) {
         const keys = Object.keys(printSummary.spools);
         for (let s = 0; s < printSummary.spools.length; s++) {
-          const toolProp = "tool" + keys[s];
+          const toolProp = 'tool' + keys[s];
           const spoolTool = printSummary.spools[s][toolProp];
           if (!!spoolTool) {
             printSummary.spoolCost += floatOrZero(spoolTool.cost);
@@ -787,12 +785,12 @@ class HistoryCleanerService {
       return {
         historyClean: historyArray,
         statisticsClean: this.generateStatistics(historyArray),
-        pagination
+        pagination,
       };
     }
   }
 }
 
 module.exports = {
-  HistoryClean: HistoryCleanerService
+  HistoryClean: HistoryCleanerService,
 };
