@@ -40,7 +40,7 @@
     "ejs": "^3.1.8",
     "express": "^4.17.3",
     "express-ejs-layouts": "^2.5.1",
-    "express-rate-limit": "^6.3.0",
+    "express-rate-limit": "^6.6.0",
     "express-session": "^1.17.2",
     "flatted": "^3.2.5",
     "helmet": "^5.0.2",
