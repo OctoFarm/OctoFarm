@@ -28,7 +28,7 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
-    "apexcharts": "^3.35.0",
+    "apexcharts": "^3.35.5",
     "axios": "^0.21.1",
     "before-build-webpack": "^0.2.11",
     "bootbox": "^5.5.2",
