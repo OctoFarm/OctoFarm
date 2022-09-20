@@ -1,33 +1,32 @@
-const { OPClientErrors } = require("./constants/octoprint-service.constants");
-const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
-const { OctoprintApiService } = require("./octoprint-api.service");
+const { OPClientErrors } = require('./constants/octoprint-service.constants');
+const { checkPluginManagerAPIDeprecation } = require('../../utils/compatibility.utils');
+const { OctoprintApiService } = require('./octoprint-api.service');
 
-const octoPrintBase = "/";
-const apiBase = octoPrintBase + "api";
-const apiSettingsPart = apiBase + "/settings";
-const apiFile = (path) => apiBase + "/files/local/" + encodeURI(path);
-const apiFiles = (recursive = true) => apiBase + "/files?recursive=" + recursive;
-const apiConnection = apiBase + "/connection";
-const apiPrinterProfiles = apiBase + "/printerprofiles";
-const apiSystem = apiBase + "/system";
-const apiSystemInfo = apiSystem + "/info";
-const apiSystemCommands = apiSystem + "/commands";
-const apiVersion = apiBase + "/version";
-const apiUsers = apiBase + "/users";
-const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=true" : "");
-const apiProfiles = apiBase + "/printerprofiles/"; //expects a profile id param
-const apiSettings = apiBase + "/settings";
+const octoPrintBase = '/';
+const apiBase = octoPrintBase + 'api';
+const apiSettingsPart = apiBase + '/settings';
+const apiFile = (path) => apiBase + '/files/local/' + encodeURI(path);
+const apiFiles = (recursive = true) => apiBase + '/files?recursive=' + recursive;
+const apiConnection = apiBase + '/connection';
+const apiPrinterProfiles = apiBase + '/printerprofiles';
+const apiSystem = apiBase + '/system';
+const apiSystemInfo = apiSystem + '/info';
+const apiSystemCommands = apiSystem + '/commands';
+const apiVersion = apiBase + '/version';
+const apiUsers = apiBase + '/users';
+const apiLogin = (passive = true) => apiBase + '/login' + (passive ? '?passive=true' : '');
+const apiProfiles = apiBase + '/printerprofiles/'; //expects a profile id param
+const apiSettings = apiBase + '/settings';
 
-const apiPluginManager = apiBase + "/plugin/pluginmanager";
-const apiPluginManagerRepository1_6_0 = apiBase + "/plugin/pluginmanager";
+const apiPluginManager = apiBase + '/plugin/pluginmanager';
+const apiPluginManagerRepository1_6_0 = apiBase + '/plugin/pluginmanager';
 // const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository"; // This doesn't work... wow... did he even check it?
 const apiSoftwareUpdateCheck = (force) =>
-  octoPrintBase + "plugin/softwareupdate/check" + (force ? "" : "");
-const apiPluginPiSupport = apiBase + "/plugin/pi_support";
-const apiPluginFilamentManagerSpecificSpool = "/plugin/filamentmanager/spools";
+  octoPrintBase + 'plugin/softwareupdate/check' + (force ? '' : '');
+const apiPluginPiSupport = apiBase + '/plugin/pi_support';
 const apiTimelapse = (unrendered = true) =>
-  apiBase + "/timelapse" + (unrendered ? "?unrendered=true" : "");
-const printerValidationErrorMessage = "printer apiKey or URL undefined";
+  apiBase + '/timelapse' + (unrendered ? '?unrendered=true' : '');
+const printerValidationErrorMessage = 'printer apiKey or URL undefined';
 
 class OctoprintApiClientService extends OctoprintApiService {
   constructor(printerURL, apikey, timeoutSettings) {
@@ -35,7 +34,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async pingTest() {
-    return this.get("/", 5000);
+    return this.get('/', 5000);
   }
 
   async grabInformation(api) {
@@ -90,7 +89,7 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getPluginManager(octoPrintVersion = undefined) {
-    if (!octoPrintVersion) throw new Error("Version not supplied...");
+    if (!octoPrintVersion) throw new Error('Version not supplied...');
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(octoPrintVersion);
     const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
 
@@ -107,18 +106,6 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getPluginPiSupport() {
     return this.get(apiPluginPiSupport);
-  }
-
-  async getPluginFilamentManagerFilament(filamentID) {
-    // filamentID needs to be INT numeric
-    // https://github.com/malnvenshorn/OctoPrint-FilamentManager/blob/647af691d6081df2f16d400e834f12f11f6eea56/octoprint_filamentmanager/data/__init__.py#L84
-    const parsedFilamentID = Number.parseFloat(filamentID);
-    if (isNaN(filamentID)) {
-      throw OPClientErrors.filamentIDNotANumber;
-    }
-    const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
-
-    return this.get(getURL);
   }
 
   async login(passive = true) {
@@ -147,5 +134,5 @@ class OctoprintApiClientService extends OctoprintApiService {
 }
 
 module.exports = {
-  OctoprintApiClientService
+  OctoprintApiClientService,
 };

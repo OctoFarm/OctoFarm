@@ -40,7 +40,7 @@ async function generateSystemInformationContents() {
   const docker = 'Docker container?\n';
   const loginRequires = 'Login Required?\n';
   const registration = 'Registration On?\n';
-  const filamentManagerPlugin = 'Filament manager plugin enabled?\n';
+
   const yes = ' ✓  \n';
   const no = ' ✘ \n';
   const truth = ' ✓';
@@ -112,7 +112,7 @@ async function generateSystemInformationContents() {
 
   systemInformationContents += `TimeZone \n ${systemInformation.timezoneName} (${systemInformation.timezone}) \n\n`;
 
-  const { server, timeout, history, filamentManager } = SettingsClean.returnSystemSettings();
+  const { server, timeout, history } = SettingsClean.returnSystemSettings();
   // System settings section
 
   systemInformationContents += '--- OctoFarm System Settings ---\n\n';
@@ -127,11 +127,7 @@ async function generateSystemInformationContents() {
   } else {
     systemInformationContents += `${registration} ${no}`;
   }
-  if (filamentManager) {
-    systemInformationContents += `${filamentManagerPlugin} ${yes}\n`;
-  } else {
-    systemInformationContents += `${filamentManagerPlugin} ${no}\n`;
-  }
+
   systemInformationContents += '-- History Settings --\n\n';
   for (const key in history) {
     if (history.hasOwnProperty(key)) {
