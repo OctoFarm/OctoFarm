@@ -1,22 +1,22 @@
-const Logger = require("../handlers/logger");
-const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const Logger = require('../handlers/logger');
+const { LOGGER_ROUTE_KEYS } = require('../constants/logger.constants');
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SSE);
 
-const { stringify } = require("flatted");
+const { stringify } = require('flatted');
 let clientList = [];
-const UNKNOWN_USER = "Administrator";
+const UNKNOWN_USER = 'Administrator';
 
 const addClientConnection = (req, res) => {
   // Set necessary headers to establish a stream of events
   const headers = {
-    "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
-    Pragma: "no-cache",
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+    Pragma: 'no-cache',
     Expires: 0,
-    Connection: "keep-alive"
+    Connection: 'keep-alive',
   };
   res.writeHead(200, headers);
-  res.write("\n");
+  res.write('\n');
 
   // Add a new client that just connected
   // Store the id and the whole response object with a clone of the user information
@@ -31,8 +31,9 @@ const addClientConnection = (req, res) => {
     id,
     res,
     user: JSON.parse(JSON.stringify(req?.user)),
-    endpoint: req.url ? JSON.parse(JSON.stringify(req.url)) : "unknown endpoint",
-    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress
+    endpoint: req.url ? JSON.parse(JSON.stringify(req.url)) : 'unknown endpoint',
+    ip: req.socket.remoteAddress,
+    forwardIp: req.headers['x-forwarded-for'],
   };
   clientList.push(client);
 
@@ -41,14 +42,14 @@ const addClientConnection = (req, res) => {
   );
 
   // When the connection is closed, remove the client from the subscribers
-  req.on("close", () => {
-    logger.info(
+  req.on('close', () => {
+    logger.warning(
       `${client?.user?.name ? client.user.name : UNKNOWN_USER} has disconnected from the endpoint.`
     );
     removeClient(id);
   });
 
-  req.on("error", (e) => {
+  req.on('error', (e) => {
     logger.warning(
       `${
         client?.user?.name ? client.user.name : UNKNOWN_USER
@@ -69,7 +70,8 @@ const listActiveClientsRes = (_req, res) => {
       userName: client?.user?.name ? client.user.name : UNKNOWN_USER,
       group: client.user.group,
       endpoint: client.endpoint,
-      ip: client.ip
+      ip: client.ip,
+      forwardIp: client.forwardIp,
     };
   });
   return res.json(currentActiveClientList);
@@ -85,13 +87,13 @@ const listActiveClientsCount = () => {
  * @param printerInfo If required by message values, then send printer info. Not a required key...
  */
 const notifySubscribers = (id, type, message, printerInfo = undefined) => {
-  if ((typeof message === "object" || Array.isArray(message)) && message !== null) {
+  if ((typeof message === 'object' || Array.isArray(message)) && message !== null) {
     // Send a message to each subscriber
     const payload = {
       type,
       id,
       message,
-      printerInfo
+      printerInfo,
     };
 
     clientList.forEach((client) => {
@@ -105,5 +107,5 @@ module.exports = {
   addClientConnection,
   notifySubscribers,
   listActiveClientsRes,
-  listActiveClientsCount
+  listActiveClientsCount,
 };

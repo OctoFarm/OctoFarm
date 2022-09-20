@@ -8,7 +8,6 @@ import {
   userActionElements,
 } from '../js/pages/system/server.options';
 import {
-  checkFilamentManagerPluginState,
   checkForOctoFarmUpdates,
   clearOldLogs,
   createNewUser,
@@ -22,7 +21,6 @@ import {
   renderSystemCharts,
   resetUserPassword,
   restartOctoFarmServer,
-  setupOPFilamentManagerPluginSettings,
   startUpdateInfoRunner,
   startUpdateTasksRunner,
   updateOctoFarmCommand,
@@ -82,7 +80,6 @@ for (const key in serverDatabaseKeys) {
 }
 // HACK Filament Manager and Script functions do not need to be coupled to LOG_DUMP element.
 if (serverActionsElements.LOG_DUMP_GENERATE) {
-  checkFilamentManagerPluginState().then();
   grabOctoFarmLogList().then();
   Script.get().then();
 }
@@ -104,12 +101,6 @@ if (serverActionsElements.CLEAR_OLD_LOGS) {
 if (serverActionsElements.OP_TIMELAPSE_SETUP) {
   serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener('click', async () => {
     bootbox.dialog(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
-  });
-}
-
-if (serverActionsElements.OP_FILAMENT_SETUP) {
-  serverActionsElements.OP_FILAMENT_SETUP.addEventListener('click', async () => {
-    await setupOPFilamentManagerPluginSettings();
   });
 }
 
