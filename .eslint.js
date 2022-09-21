@@ -1,25 +1,30 @@
 module.exports = {
   root: true,
-  extends: ['airbnb-base', 'plugin:prettier/recommended'],
-  plugins: ['prettier'],
-  rules: {
-    'linebreak-style': 0,
-    'no-console': 0,
-    'no-plusplus': 0,
-    'max-len': 0,
-    'no-return-assign': 0,
-    'no-await-in-loop': 0,
-    indent: 0, // Allowing prettier to handle this
-    'consistent-return': 0,
-    'comma-dangle': 0,
-    'operator-linebreak': 0,
-    'implicit-arrow-linebreak': 0,
-    'function-paren-newline': 0,
-    'object-curly-newline': 0,
-    'newline-per-chained-call': 0,
-    'prettier/prettier': 'error',
-    'no-param-reassign': 0,
-    'no-restricted-syntax': 0,
-    'no-nested-ternary': 0,
+  env: {
+    browser: true,
+    node: true,
+    es2021: true
   },
+  extends: ["plugin:prettier/recommended"],
+  plugins: ["prettier"],
+  parser: "@babel/eslint-parser",
+  parserOptions: {
+    ecmaVersion: 12,
+    sourceType: "module"
+  },
+  rules: {
+    "prettier/prettier": "error",
+    "max-len": [
+      "error",
+      {
+        code: 300,
+        ignoreComments: true,
+        ignoreUrls: true
+      }
+    ],
+    "global-require": "off",
+    quotes: ["error", "double"],
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
+  }
 };
