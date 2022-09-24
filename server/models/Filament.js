@@ -6,6 +6,10 @@ const SpoolSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    colour: {
+      type: String,
+      required: true,
+    },
     profile: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Profiles',
