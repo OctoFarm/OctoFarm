@@ -146,7 +146,6 @@ class HistoryCaptureService {
     const saveHistory = new History({
       printHistory,
     });
-
     this.#historyRecordID = saveHistory._id.toString();
     // Save the initial value of the record...
     await saveHistory.save().catch((e) => {

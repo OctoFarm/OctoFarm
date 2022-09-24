@@ -15,16 +15,17 @@ export const returnHistoryTableRow = function (record) {
   const spoolType = [];
   if (!!record?.spools) {
     record.spools.forEach((tool, index) => {
+      console.log(tool);
       const weight = tool['tool' + index]?.weight ? tool['tool' + index]?.weight : false;
       const type = tool['tool' + index]?.type ? tool['tool' + index]?.type : false;
-      let spoolString = 'Unknown Spool';
+      let spoolString = `${index}: No Spool`;
       if (!!weight && !!type) {
         spoolString = index + ': ' + type + ' - ' + weight + 'g';
       }
       spoolType.push(spoolString);
     });
   } else {
-    spoolType.push('0: No Spool<br>');
+    spoolType.push('0: No Spool');
   }
   const spoolString = [];
   spoolType.forEach((spool) => {

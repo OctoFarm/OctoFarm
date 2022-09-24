@@ -1338,7 +1338,6 @@ class PrinterStore {
     if (!multiSelectEnabled) {
       this.deattachSpoolFromAllPrinters(spoolID);
     }
-
     // Asign new printer id's;
     for (let id of printerIDs) {
       // No tool is de-attach request
@@ -1352,7 +1351,10 @@ class PrinterStore {
       });
       if (spoolID !== '0') {
         const spool = await Filament.findById(spoolID);
-        farmPrinters[printerIndex].selectedFilament[tool] = await attachProfileToSpool(spool);
+        let editableSpool = JSON.parse(JSON.stringify(spool));
+        farmPrinters[printerIndex].selectedFilament[tool] = editableSpool;
+        const profile = await attachProfileToSpool(spool.spools.profile);
+        farmPrinters[printerIndex].selectedFilament[tool].spools.profile = profile;
       } else {
         farmPrinters[printerIndex].selectedFilament[tool] = null;
       }
