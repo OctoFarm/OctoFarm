@@ -24,7 +24,7 @@ jobs:
         run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git && npm run install-client
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_ACTION }}
           GIT_AUTHOR_NAME: James Mackay
           GIT_AUTHOR_EMAIL: online@notexpectedyet.com
           GIT_COMMITTER_NAME: James Mackay
