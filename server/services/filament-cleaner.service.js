@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
-const Logger = require("../handlers/logger.js");
-const Spools = require("../models/Filament.js");
-const Profiles = require("../models/Profiles.js");
-const { SettingsClean } = require("./settings-cleaner.service");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
-const { findIndex } = require("lodash");
+const _ = require('lodash');
+const Logger = require('../handlers/logger.js');
+const Spools = require('../models/Filament.js');
+const Profiles = require('../models/Profiles.js');
+const { SettingsClean } = require('./settings-cleaner.service');
+const { getPrinterStoreCache } = require('../cache/printer-store.cache');
+const { LOGGER_ROUTE_KEYS } = require('../constants/logger.constants');
+const { findIndex } = require('lodash');
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_FILAMENT_CLEANER);
 
 let spoolsClean = [];
@@ -16,7 +16,7 @@ let statisticsClean = [];
 let selectedFilamentList = [];
 let dropDownList = {
   normalDropDown: [],
-  historyDropDown: []
+  historyDropDown: [],
 };
 
 class FilamentCleanerService {
@@ -53,7 +53,7 @@ class FilamentCleanerService {
         manufacturer: pr.profile.manufacturer,
         material: pr.profile.material,
         density: pr.profile.density,
-        diameter: pr.profile.diameter
+        diameter: pr.profile.diameter,
       };
       profilesArray.push(profile);
     }
@@ -70,7 +70,7 @@ class FilamentCleanerService {
         tempOffset: sp.spools.tempOffset,
         bedOffset: sp.spools.bedOffset,
         printerAssignment: FilamentCleanerService.getPrinterAssignment(sp._id, farmPrinters),
-        fmID: sp.spools.fmID
+        fmID: sp.spools.fmID,
       };
       spoolsArray.push(spool);
     }
@@ -98,7 +98,7 @@ class FilamentCleanerService {
       }
     });
     FilamentCleanerService.start().catch((e) => {
-      logger.error("Unable to clean filament", e.toString());
+      logger.error('Unable to clean filament', e.toString());
     });
   }
 
@@ -118,15 +118,15 @@ class FilamentCleanerService {
       });
 
       if (profileId < 0) {
-        logger.error("Unable to match profile to spool!", spool);
+        logger.error('Unable to match profile to spool!', spool);
       }
 
       if (profileId >= 0) {
         const amountLeft = parseInt(spool.spools.weight) - parseInt(spool.spools.used);
 
-        logger.debug("Seeings for spool", {
+        logger.debug('Seeings for spool', {
           hideEmpty,
-          amountLeft
+          amountLeft,
         });
 
         let showSpool = true;
@@ -145,7 +145,7 @@ class FilamentCleanerService {
             spoolRemain: amountLeft,
             spoolMaterial: profiles[profileId].profile.material,
             spoolManufacturer: profiles[profileId].profile.manufacturer,
-            selected: index > -1
+            selected: index > -1,
           });
         }
       }
@@ -156,7 +156,7 @@ class FilamentCleanerService {
   static async selectedFilament(printers) {
     const selectedArray = [];
     for (const printer of printers) {
-      if (typeof printer !== "undefined" && Array.isArray(printer.selectedFilament)) {
+      if (typeof printer !== 'undefined' && Array.isArray(printer.selectedFilament)) {
         for (const [f, selectedFilament] of printer.selectedFilament.entries()) {
           if (selectedFilament !== null) {
             selectedArray.push(printer.selectedFilament[f]._id);
@@ -176,7 +176,7 @@ class FilamentCleanerService {
         name: element.material,
         weight: [],
         used: [],
-        price: []
+        price: [],
       };
       materialBreak.push(material);
     }
@@ -212,7 +212,7 @@ class FilamentCleanerService {
         name: element.name,
         used: element.used.reduce((a, b) => a + b, 0),
         total: element.weight.reduce((a, b) => a + b, 0),
-        price: element.price.reduce((a, b) => a + b, 0)
+        price: element.price.reduce((a, b) => a + b, 0),
       };
       materialBreakDown.push(mat);
     }
@@ -227,7 +227,7 @@ class FilamentCleanerService {
       spoolCount: spools.length,
       activeSpools: usedFilamentList,
       activeSpoolCount: usedFilamentList.length,
-      materialBreakDown
+      materialBreakDown,
     };
   }
 
@@ -241,7 +241,7 @@ class FilamentCleanerService {
               const printerAssignment = {
                 id: printer._id,
                 tool: s,
-                name: printer.printerName
+                name: printer.printerName,
               };
               assignments.push(printerAssignment);
             }
@@ -279,7 +279,7 @@ class FilamentCleanerService {
     const assignedPrinters = this.getPrinterAssignmentList();
 
     for (const printer of farmPrinters) {
-      if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
+      if (typeof printer.currentProfile !== 'undefined' && printer.currentProfile !== null) {
         for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
           if (assignedPrinters.includes(`${printer._id}-${i}`)) {
             printerList.push(
@@ -287,8 +287,8 @@ class FilamentCleanerService {
             );
           } else {
             if (
-              printer.printerState.colour.category === "Offline" ||
-              (printer.printerState.colour.category === "Active" &&
+              printer.printerState.colour.category === 'Offline' ||
+              (printer.printerState.colour.category === 'Active' &&
                 assignedPrinters.includes(`${printer._id}-${i}`))
             ) {
               printerList.push(
@@ -308,5 +308,5 @@ class FilamentCleanerService {
 }
 
 module.exports = {
-  FilamentClean: FilamentCleanerService
+  FilamentClean: FilamentCleanerService,
 };
