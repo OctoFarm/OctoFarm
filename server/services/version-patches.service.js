@@ -50,15 +50,18 @@ const selectedFilamentNotArrayPatch = (printer) => {
   }
 };
 
-const collateSelectedFilament = async (selectedFilament) => {
+const collateSelectedFilament = async (printer) => {
+  const selectedFilament = printer?.selectedFilament ? printer.selectedFilament : [];
   if (Array.isArray(selectedFilament)) {
     for (let i = 0; i < selectedFilament.length; i++) {
-      const spool = selectedFilament[i];
-      let checkForValidMongoDbID = /^[0-9a-fA-F]{24}$/;
-      if (checkForValidMongoDbID.test(spool.profile)) {
-        this.selectedFilament[i].profile = await attachProfileToSpool(spool.profile);
-      } else {
-        this.selectedFilament[i] = selectedFilament[i];
+      if (!!selectedFilament[i]) {
+        const spool = selectedFilament[i];
+        let checkForValidMongoDbID = /^[0-9a-fA-F]{24}$/;
+        if (checkForValidMongoDbID.test(spool.spools.profile)) {
+          printer.selectedFilament[i].profile = await attachProfileToSpool(spool.spools.profile);
+        } else {
+          printer.selectedFilament[i] = selectedFilament[i];
+        }
       }
     }
   }
