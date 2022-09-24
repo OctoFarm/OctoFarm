@@ -1,34 +1,34 @@
-import UI from "../../utils/ui";
+import UI from '../../utils/ui';
 
 const drawActiveUser = (record) => {
-  const noUser = "Unknown";
+  const noUser = 'Unknown';
   let userTemplate = record?.activeControlUser ? record.activeControlUser : noUser;
 
-  if(userTemplate === noUser){
-    userTemplate = `OctoPrint: ${record?.job?.user ? record.job.user : noUser }`
+  if (userTemplate === noUser) {
+    userTemplate = `OctoPrint: ${record?.job?.user ? record.job.user : noUser}`;
   }
 
-  return userTemplate
-}
+  return userTemplate;
+};
 
 export const returnHistoryTableRow = function (record) {
   const spoolType = [];
   if (!!record?.spools) {
     record.spools.forEach((tool, index) => {
-      const weight = tool["tool" + index]?.weight ? tool["tool" + index]?.weight : false
-      const type =  tool["tool" + index]?.type ? tool["tool" + index]?.type : false
-      let spoolString = "Unknown Spool";
-      if(!!weight && !!type){
-       spoolString = index + ": " + type + " - " + weight + "g";
+      const weight = tool['tool' + index]?.weight ? tool['tool' + index]?.weight : false;
+      const type = tool['tool' + index]?.type ? tool['tool' + index]?.type : false;
+      let spoolString = 'Unknown Spool';
+      if (!!weight && !!type) {
+        spoolString = index + ': ' + type + ' - ' + weight + 'g';
       }
       spoolType.push(spoolString);
     });
   } else {
-    spoolType.push("0: No Spool<br>");
+    spoolType.push('0: No Spool<br>');
   }
   const spoolString = [];
   spoolType.forEach((spool) => {
-    spoolString.push(spool + "<br>");
+    spoolString.push(spool + '<br>');
   });
   return `
        <tr>
@@ -44,13 +44,13 @@ export const returnHistoryTableRow = function (record) {
           <td>
             ${drawActiveUser(record)}
           </td>
-          <td title="${record.file.path.replace(/_/g, " ")}">
-            ${record.file.name.replace(/_/g, " ")}
+          <td title="${record.file.path.replace(/_/g, ' ')}">
+            ${record.file.name.replace(/_/g, ' ')}
           </td>
           <td>
             ${
               new Date(record.startDate).toLocaleDateString() +
-              " " +
+              ' ' +
               new Date(record.startDate).toLocaleTimeString()
             }
           </td>
@@ -60,7 +60,7 @@ export const returnHistoryTableRow = function (record) {
           <td>
                         ${
                           new Date(record.endDate).toLocaleDateString() +
-                          " " +
+                          ' ' +
                           new Date(record.endDate).toLocaleTimeString()
                         }
           </td>
@@ -98,9 +98,9 @@ export const returnHistoryTableRow = function (record) {
 
 const isDisabled = function (boolean) {
   if (boolean) {
-    return "disabled";
+    return 'disabled';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -118,19 +118,12 @@ const returnSkipPageNumber = function () {
 };
 
 export const returnHistoryPagination = function (pagination) {
-  const {
-    hasPrevPage,
-    hasNextPage,
-    pageCount,
-    currentPage,
-    itemCount,
-    perPage,
-  } = pagination;
-  let pageList = "";
+  const { hasPrevPage, hasNextPage, pageCount, currentPage, itemCount, perPage } = pagination;
+  let pageList = '';
   let itemsOutOf = `${perPage} Items of ${itemCount}`;
 
   if (perPage === 9007199254740991) {
-    itemsOutOf = "ALL of " + itemCount + " items...";
+    itemsOutOf = 'ALL of ' + itemCount + ' items...';
   }
 
   let pagesToDraw = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -156,7 +149,7 @@ export const returnHistoryPagination = function (pagination) {
         pageList += returnPageNumber(page);
       }
     } else {
-      if (!pageList.includes("skipPage")) {
+      if (!pageList.includes('skipPage')) {
         pageList += returnSkipPageNumber();
       }
     }
