@@ -1,19 +1,19 @@
-const Logger = require("../handlers/logger.js");
+const Logger = require('../handlers/logger.js');
 
-const PrinterService = require("./printer.service");
-const { OctoPrintPrinter } = require("../services/printers/create-octoprint.service");
-const { CATEGORIES } = require("./printers/constants/printer-state.constants");
-const { getPrinterStoreCache } = require("../cache/printer-store.cache");
-const { patchPrinterValues } = require("../services/version-patches.service");
-const { isEmpty } = require("lodash");
+const PrinterService = require('./printer.service');
+const { OctoPrintPrinter } = require('../services/printers/create-octoprint.service');
+const { CATEGORIES } = require('./printers/constants/printer-state.constants');
+const { getPrinterStoreCache } = require('../cache/printer-store.cache');
+const { patchPrinterValues } = require('../services/version-patches.service');
+const { isEmpty } = require('lodash');
 
-const Filament = require("../models/Filament");
-const Printers = require("../models/Printer");
-const { FileClean } = require("./file-cleaner.service");
-const { generatePrinterStatistics } = require("../services/printer-statistics.service");
-const { deleteTemperatureData } = require("./octoprint/utils/octoprint-websocket-helpers.utils");
-const { SettingsClean } = require("./settings-cleaner.service");
-const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const Filament = require('../models/Filament');
+const Printers = require('../models/Printer');
+const { FileClean } = require('./file-cleaner.service');
+const { generatePrinterStatistics } = require('../services/printer-statistics.service');
+const { deleteTemperatureData } = require('./octoprint/utils/octoprint-websocket-helpers.utils');
+const { SettingsClean } = require('./settings-cleaner.service');
+const { LOGGER_ROUTE_KEYS } = require('../constants/logger.constants');
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_PRINTER_MANAGER);
 
@@ -34,7 +34,7 @@ class PrinterManagerService {
     this.loadPrinterTimeoutSettings();
     // Grab printers from database
     const pList = await PrinterService.list();
-    logger.info("Initialising " + pList.length + " printers");
+    logger.info('Initialising ' + pList.length + ' printers');
     //Parse out enabled printers and disable any disabled printers straight away...
     for (let p of pList) {
       await patchPrinterValues(p);
@@ -75,7 +75,7 @@ class PrinterManagerService {
     this.#enablePrintersQueue.push(newPrinter._id);
 
     return {
-      printerURL: newPrinter.printerURL
+      printerURL: newPrinter.printerURL,
     };
   }
 
@@ -96,7 +96,7 @@ class PrinterManagerService {
 
   clearPrinterQueuesTimeout() {
     clearTimeout(this.#printerEnableTimeout);
-    return "Killed Printer Onboard Queues";
+    return 'Killed Printer Onboard Queues';
   }
 
   async startPrinterEnableQueue() {
@@ -133,7 +133,7 @@ class PrinterManagerService {
     for (const printer of printersList) {
       const disabled = printer?.disabled;
       const category = printer?.printerState?.colour?.category;
-      if (!disabled && category !== "Offline" && category !== "Info") {
+      if (!disabled && category !== 'Offline' && category !== 'Info') {
         printer.ping();
       }
     }
@@ -141,9 +141,9 @@ class PrinterManagerService {
 
   updateStateCounters() {
     const printerList = getPrinterStoreCache().listPrinters();
-    logger.debug(printerList.length + " printers updating state counters...");
+    logger.debug(printerList.length + ' printers updating state counters...');
     for (const printer of printerList) {
-      if (!printer.disabled && printer?.printerState?.colour?.category !== "Offline") {
+      if (!printer.disabled && printer?.printerState?.colour?.category !== 'Offline') {
         switch (printer.printerState.colour.category) {
           case CATEGORIES.ACTIVE:
             this.updateStateCounterCategory(CATEGORIES.ACTIVE, printer);
@@ -173,12 +173,12 @@ class PrinterManagerService {
   }
 
   updateStateCounterCategory(category, printer) {
-    logger.debug("Updating " + category + " counter", {
-      before: printer["current" + category],
-      after: printer["current" + category] + 30000
+    logger.debug('Updating ' + category + ' counter', {
+      before: printer['current' + category],
+      after: printer['current' + category] + 30000,
     });
-    printer["current" + category] = printer["current" + category] + 30000;
-    printer.updateStateTrackingCounters(category, printer["current" + category]);
+    printer['current' + category] = printer['current' + category] + 30000;
+    printer.updateStateTrackingCounters(category, printer['current' + category]);
   }
 
   bulkUpdateBasicPrinterInformation(newPrintersInformation) {
@@ -204,7 +204,7 @@ class PrinterManagerService {
       await getPrinterStoreCache().deletePrinter(printer._id);
       removedPrinterList.push({
         printerURL: JSON.parse(JSON.stringify(printer.printerURL)),
-        printerId: JSON.parse(JSON.stringify(printer._id))
+        printerId: JSON.parse(JSON.stringify(printer._id)),
       });
       await deleteTemperatureData(printer._id);
     }
@@ -234,26 +234,26 @@ class PrinterManagerService {
     if (!!idList) {
       for (let i = 0; i < idList.length; i++) {
         const orderedID = idList[i];
-        logger.debug("Updating printers sort index", i);
+        logger.debug('Updating printers sort index', i);
         getPrinterStoreCache().updatePrinterLiveValue(orderedID, {
           order: i,
-          sortIndex: i
+          sortIndex: i,
         });
         // We have to bypass the database object here and go straight to the printer service as the printer might not have this existing.
         await PrinterService.findOneAndUpdate(orderedID, { sortIndex: i });
       }
-      return "Regenerated sortIndex for all printers...";
+      return 'Regenerated sortIndex for all printers...';
     }
   }
 
   updateGroupList() {
     this.#printerGroupList = [];
     const defaultGroupList = [
-      "All Printers",
-      "State: Idle",
-      "State: Active",
-      "State: Complete",
-      "State: Disconnected"
+      'All Printers',
+      'State: Idle',
+      'State: Active',
+      'State: Complete',
+      'State: Disconnected',
     ];
 
     defaultGroupList.forEach((group) => {
@@ -285,7 +285,7 @@ class PrinterManagerService {
       //No id, full scan requested..
       const printerList = getPrinterStoreCache().listPrinters();
       await this.batchReScanAPI(force, printerList, 10);
-      return "Successfully rescanned all APIs, please check connection log";
+      return 'Successfully rescanned all APIs, please check connection log';
     } else {
       const printer = getPrinterStoreCache().getPrinter(id);
       return printer.reScanAPI(force);
@@ -368,7 +368,7 @@ class PrinterManagerService {
 
   async checkForOctoPrintUpdates() {
     const printerList = getPrinterStoreCache().listPrintersInformation();
-    logger.debug(printerList.length + " checking for any octoprint updates");
+    logger.debug(printerList.length + ' checking for any octoprint updates');
     for (let printer of printerList) {
       if (printer.printerState.colour.category !== CATEGORIES.OFFLINE) {
         await getPrinterStoreCache().checkOctoPrintForUpdates(printer._id);
@@ -383,7 +383,7 @@ class PrinterManagerService {
       printerControlList.push({
         printerName: sortedPrinter.printerName,
         printerID: sortedPrinter._id,
-        state: sortedPrinter.printerState.colour
+        state: sortedPrinter.printerState.colour,
       });
     });
     this.#printerControlList = printerControlList;
@@ -404,13 +404,13 @@ class PrinterManagerService {
   }
 
   killAllConnections() {
-    logger.debug("Killing all printer connections...");
+    logger.debug('Killing all printer connections...');
     getPrinterStoreCache()
       .listPrinters()
       .forEach((printer) => {
         printer.killAllConnections();
       });
-    return "Killed Current Connections";
+    return 'Killed Current Connections';
   }
 
   async checkPrinterPowerStates() {
@@ -418,8 +418,8 @@ class PrinterManagerService {
     for (const printer of printers) {
       if (
         !printer.disabled &&
-        printer?.printerState?.colour?.category !== "Offline" &&
-        printer?.printerState?.colour?.category !== "Info"
+        printer?.printerState?.colour?.category !== 'Offline' &&
+        printer?.printerState?.colour?.category !== 'Info'
       ) {
         await printer.acquirePrinterPowerState();
       }
