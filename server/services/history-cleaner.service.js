@@ -166,7 +166,6 @@ class HistoryCleanerService {
           completionRatio
         );
         const spoolName = HistoryCleanerService.getSpoolLabel(filamentEntry);
-
         spools.push({
           [key]: {
             toolName: 'Tool ' + key.substring(4, 5),

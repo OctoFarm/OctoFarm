@@ -1,10 +1,10 @@
 const {
   ALL_MONTHS,
   DEFAULT_SPOOL_RATIO,
-  DEFAULT_SPOOL_DENSITY
-} = require("../constants/cleaner.constants");
-const { checkNested, checkNestedIndex } = require("./array.util");
-const Profiles = require("../models/Profiles");
+  DEFAULT_SPOOL_DENSITY,
+} = require('../constants/cleaner.constants');
+const { checkNested, checkNestedIndex } = require('./array.util');
+const Profiles = require('../models/Profiles');
 
 /**
  * Calculate spool weight static
@@ -31,7 +31,7 @@ function calcSpoolWeightAsString(length, filament, completionRatio) {
 
 function getCostAsString(grams, spool, completionRatio) {
   if (!spool) {
-    return "0.00";
+    return '0.00';
   }
   return completionRatio * ((spool.spools.price / spool.spools.weight) * grams).toFixed(2);
 }
@@ -42,7 +42,7 @@ function getSpoolLabel(id) {
     return null;
   }
 
-  let spoolLeftoverConditional = "";
+  let spoolLeftoverConditional = '';
   // if (this.#settingsStore.isFilamentEnabled()) {
   //   const spoolWeight = (spool.weight - spool.used).toFixed(0);
   //   spoolLeftoverConditional = `(${spoolWeight}g)`;
@@ -80,15 +80,15 @@ function getSpool(filamentSelection, job, success, time) {
     const spoolName = getSpoolLabel(filamentEntry);
     spools.push({
       [key]: {
-        toolName: "Tool " + key.substring(4, 5),
+        toolName: 'Tool ' + key.substring(4, 5),
         spoolName,
         spoolId: filamentEntry?._id || null,
         volume: (completionRatio * metric.volume).toFixed(2),
         length: ((completionRatio * metric.length) / 1000).toFixed(2),
         weight: spoolWeight,
         cost: getCostAsString(spoolWeight, filamentEntry, completionRatio),
-        type: filamentEntry?.spools?.profile?.material || ""
-      }
+        type: filamentEntry?.spools?.profile?.material || '',
+      },
     });
   }
   return spools;
@@ -106,16 +106,16 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
       const keys = Object.keys(spool);
       for (const key of keys) {
         // Check if type exists
-        let searchKeyword = "";
+        let searchKeyword = '';
         let checkNestedResult = checkNested(spool[key].type, totalByDay);
         if (!!checkNestedResult) {
           let checkNestedIndexHistoryRates = null;
-          if (historyState.includes("success")) {
-            searchKeyword = "Success";
-          } else if (historyState.includes("warning")) {
-            searchKeyword = "Cancelled";
-          } else if (historyState.includes("danger")) {
-            searchKeyword = "Failed";
+          if (historyState.includes('success')) {
+            searchKeyword = 'Success';
+          } else if (historyState.includes('warning')) {
+            searchKeyword = 'Cancelled';
+          } else if (historyState.includes('danger')) {
+            searchKeyword = 'Failed';
           } else {
             return;
           }
@@ -136,7 +136,7 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
           // Don't include 0 weights
           if (weightCalcSan > 0) {
             let historyDate = historyCleanEntry.endDate;
-            let dateSplit = historyDate.split(" ");
+            let dateSplit = historyDate.split(' ');
             let month = ALL_MONTHS.indexOf(dateSplit[1]);
             let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
             let dateParse = new Date(dateString);
@@ -144,43 +144,43 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
             if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
               totalByDay[checkedIndex].data.push({
                 x: dateParse,
-                y: weightCalcSan
+                y: weightCalcSan,
               });
               usageOverTime[checkedIndex].data.push({
                 x: dateParse,
-                y: weightCalcSan
+                y: weightCalcSan,
               });
               historyByDay[checkNestedIndexHistoryRates].data.push({
                 x: dateParse,
-                y: 1
+                y: 1,
               });
             }
           }
         } else {
-          if (spool[key].type !== "") {
+          if (spool[key].type !== '') {
             totalByDay.push({
               name: spool[key].type,
-              data: []
+              data: [],
             });
           }
-          if (spool[key].type !== "") {
+          if (spool[key].type !== '') {
             usageOverTime.push({
               name: spool[key].type,
-              data: []
+              data: [],
             });
           }
           if (!historyByDay[0]) {
             historyByDay.push({
-              name: "Success",
-              data: []
+              name: 'Success',
+              data: [],
             });
             historyByDay.push({
-              name: "Failed",
-              data: []
+              name: 'Failed',
+              data: [],
             });
             historyByDay.push({
-              name: "Cancelled",
-              data: []
+              name: 'Cancelled',
+              data: [],
             });
           }
         }
@@ -191,7 +191,7 @@ function processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, hist
   return {
     usageOverTime,
     totalByDay,
-    historyByDay
+    historyByDay,
   };
 }
 
@@ -207,7 +207,7 @@ function getUnits(filamentSelection, fileLength) {
   if (!!fileLength) {
     for (let l = 0; l < fileLength.length; l++) {
       const length = fileLength[l] / 1000;
-      if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
+      if (typeof filamentSelection !== 'undefined' && Array.isArray(filamentSelection)) {
         if (filamentSelection[l] === null) {
           const radius = 1.75 / 2;
           const volume = length * Math.PI * radius * radius;
@@ -215,7 +215,7 @@ function getUnits(filamentSelection, fileLength) {
           lengthArray.push(length);
           weightArray.push(usage);
           strings.push(`<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`);
-        } else if (typeof filamentSelection[l] !== "undefined") {
+        } else if (typeof filamentSelection[l] !== 'undefined') {
           const radius = parseFloat(filamentSelection[l].spools.profile.diameter) / 2;
           const volume = length * Math.PI * radius * radius;
           const usage = volume * parseFloat(filamentSelection[l].spools.profile.density);
@@ -258,14 +258,14 @@ function getCost(filamentSelection, units) {
   const strings = [];
   const costArray = [];
   filamentSelection = JSON.parse(JSON.stringify(filamentSelection));
-  filamentSelection.unshift("SKIP");
+  filamentSelection.unshift('SKIP');
   for (let u = 0; u < units.length; u++) {
-    if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
-      if (filamentSelection[u] === "SKIP") {
-      } else if (typeof filamentSelection[u] !== "undefined" && filamentSelection[u] !== null) {
-        let newUnit = units[u].split(" / ");
-        newUnit = newUnit[1].replace("g", "");
-        if (!units[u].includes("Total")) {
+    if (typeof filamentSelection !== 'undefined' && Array.isArray(filamentSelection)) {
+      if (filamentSelection[u] === 'SKIP') {
+      } else if (typeof filamentSelection[u] !== 'undefined' && filamentSelection[u] !== null) {
+        let newUnit = units[u].split(' / ');
+        newUnit = newUnit[1].replace('g', '');
+        if (!units[u].includes('Total')) {
           const cost = (
             (filamentSelection[u].spools.price / filamentSelection[u].spools.weight) *
             parseFloat(newUnit)
@@ -275,11 +275,11 @@ function getCost(filamentSelection, units) {
         }
       } else {
         costArray.push(0);
-        strings.push("(No Spool)");
+        strings.push('(No Spool)');
       }
     } else {
       costArray.push(0);
-      strings.push("(No Spool)");
+      strings.push('(No Spool)');
     }
   }
   const totalCost = costArray.reduce((a, b) => a + b, 0);
@@ -287,11 +287,9 @@ function getCost(filamentSelection, units) {
   return strings;
 }
 
-const attachProfileToSpool = async (spool) => {
-  let profile = null;
-  profile = await Profiles.findById(spool.spools.profile);
-  spool.spools.profile = profile.profile;
-  return spool;
+const attachProfileToSpool = async (id) => {
+  const profile = await Profiles.findById(id);
+  return profile.profile;
 };
 
 module.exports = {
@@ -301,5 +299,5 @@ module.exports = {
   getUnits,
   getCost,
   getCostAsString,
-  attachProfileToSpool
+  attachProfileToSpool,
 };
