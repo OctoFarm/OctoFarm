@@ -8,7 +8,7 @@ const SpoolSchema = new mongoose.Schema({
     },
     colour: {
       type: String,
-      required: true,
+      required: false,
     },
     profile: {
       type: mongoose.Schema.Types.ObjectId,
