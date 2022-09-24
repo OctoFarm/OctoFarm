@@ -64,7 +64,6 @@ class HistoryCleanerService {
   }
 
   static getSpoolLabel(id) {
-    const serverSettingsCache = SettingsClean.returnSystemSettings();
     const spool = id?.spools;
     if (!spool) {
       return null;
@@ -167,6 +166,7 @@ class HistoryCleanerService {
           completionRatio
         );
         const spoolName = HistoryCleanerService.getSpoolLabel(filamentEntry);
+
         spools.push({
           [key]: {
             toolName: 'Tool ' + key.substring(4, 5),
@@ -180,8 +180,8 @@ class HistoryCleanerService {
               filamentEntry,
               completionRatio
             ),
-            type: filamentEntry?.spools?.profile?.material || '',
-            manufacturer: filamentEntry?.spools?.profile?.manufacturer || '',
+            type: filamentEntry?.spools?.profile?.material,
+            manufacturer: filamentEntry?.spools?.profile?.manufacturer,
           },
         });
       }
@@ -693,6 +693,7 @@ class HistoryCleanerService {
 
     for (let hist of data) {
       const printHistory = hist.printHistory;
+
       const electricityCosts = getElectricityCosts(
         printHistory.printTime,
         printHistory.costSettings
@@ -704,7 +705,6 @@ class HistoryCleanerService {
       const printCost = electricityCosts + maintenanceCosts;
       const printSummary = {
         _id: hist._id,
-        index: printHistory.historyIndex,
         state: stateToHtml(printHistory.success, printHistory?.reason),
         printer: printHistory.printerName,
         file: this.historyService.getFileFromHistoricJob(printHistory),

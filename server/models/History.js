@@ -61,7 +61,7 @@ const HistorySchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
-    filamentSection: [
+    filamentSelection: [
       {
         _id: {
           type: String,
