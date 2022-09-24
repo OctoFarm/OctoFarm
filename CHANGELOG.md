@@ -1,3 +1,50 @@
+### [1.6.8](https://github.com/OctoFarm/OctoFarm/compare/v1.6.7...v1.6.8) (2022-09-24)
+
+
+### :x: Removed :x:
+
+* **client:** remove filament manage plugin branches from client ([eae5419](https://github.com/OctoFarm/OctoFarm/commit/eae5419b4b7a8408e2a1523084e69ebff66bef63))
+* **server:** all filament manager plugin functionality ([57233ad](https://github.com/OctoFarm/OctoFarm/commit/57233ad1af400fb940887eb0430162cde22c5273))
+* **server:** disable octofarm api information grab until server can be fixed ([6621388](https://github.com/OctoFarm/OctoFarm/commit/66213883a44ba638ec1ad7a47098d37ce8e453f9))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** display forwared for ip if available ([8a78587](https://github.com/OctoFarm/OctoFarm/commit/8a78587c5c943136095426f923423a12d328eda2))
+* **server:** add in models for spools,profiles and history ([0db0a62](https://github.com/OctoFarm/OctoFarm/commit/0db0a622ac0b9705e79969ae85bd4292b8961eb9))
+* **server:** change regex on search to be case-insensitive ([a78e20e](https://github.com/OctoFarm/OctoFarm/commit/a78e20ef759c741f3d4a15029f339795146c40e7))
+* **server:** history spool removal ignore at 2.5 minutes, not 1 ([655f610](https://github.com/OctoFarm/OctoFarm/commit/655f61048d8caea6f5af2360bfa15d02903ddd36))
+* **server:** include 'colour' key in filament model ([ceb0b8f](https://github.com/OctoFarm/OctoFarm/commit/ceb0b8fb0cf8fa3b0a0387b5bc0d0d8c9f44d88f))
+* **server:** migration to finalise removal of filament manager plugin support please see [#1202](https://github.com/OctoFarm/OctoFarm/issues/1202) ([8869eb7](https://github.com/OctoFarm/OctoFarm/commit/8869eb7a436c3239074835314d0e9b159bb72ac7))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **client:** client drawing blank printers that didn't exist ([8a91598](https://github.com/OctoFarm/OctoFarm/commit/8a91598d273eddeb1f175b34cd8ec8538aaa7faf))
+* **client:** multiple button listeners would be added to views ([823c183](https://github.com/OctoFarm/OctoFarm/commit/823c1837c0dadb2dba2605681f82c1cfbe5a134e))
+* **client:** printer pages not correctly testing visibility of printer ([7e85d4a](https://github.com/OctoFarm/OctoFarm/commit/7e85d4a057272f86592591737c3017aafdc446c9)), closes [#1192](https://github.com/OctoFarm/OctoFarm/issues/1192)
+* **client:** super list view wouldn't update state colour ([ea8cf26](https://github.com/OctoFarm/OctoFarm/commit/ea8cf26e733b3c493c65c9139615a977b77311c8))
+* **server:** generating spool information correctly for materials and weight when sending to client ([d71cb53](https://github.com/OctoFarm/OctoFarm/commit/d71cb536000a9cbb4785cd9647a7b92c66cfe2a1))
+* **server:** server not correctly attaching spools on old instances ([738615c](https://github.com/OctoFarm/OctoFarm/commit/738615c43c1a41f1e1d338601fab2bc6ffd15457))
+* **server:** server would crash when receiving an unexpected response from websocket ([30c2282](https://github.com/OctoFarm/OctoFarm/commit/30c2282bfacbd13d81722d79e40d57dd42b79248))
+* **server:** spools were not attaching profiles properly ([cea1c82](https://github.com/OctoFarm/OctoFarm/commit/cea1c82efa03c7396c0cdf02c67e55fe19a5e78d)), closes [#1199](https://github.com/OctoFarm/OctoFarm/issues/1199)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **client:** re-arranged client files ([e390f24](https://github.com/OctoFarm/OctoFarm/commit/e390f24a319f792e6159a7b2186d9723e321adf0))
+* **client:** reorganize and refactor client building ([fc2271b](https://github.com/OctoFarm/OctoFarm/commit/fc2271b0f2a756e0ff1e64fcf804d908469d1e26))
+* **client:** replace file path for dashboard css ([350db82](https://github.com/OctoFarm/OctoFarm/commit/350db822519f93f1d1ecad9fb2056db2c9bba93e))
+* **client:** replace some images paths for new server path ([ed197c5](https://github.com/OctoFarm/OctoFarm/commit/ed197c58cda61a5c5486a9009da92c4a1104614c))
+* **docker:** trigger docker builds after new release method ([5caf24e](https://github.com/OctoFarm/OctoFarm/commit/5caf24eb484e4203d6e07f1f27e79406ce880c97))
+* **main:** added note to readme about octofarm website issues ([f0dd0c0](https://github.com/OctoFarm/OctoFarm/commit/f0dd0c07988d715d100ad6f5f60da8b42b54fdd7))
+* **main:** fix incorrect token on release ([4a2b62a](https://github.com/OctoFarm/OctoFarm/commit/4a2b62a18b0e3e35d17dafcce409e3e3c90e518b))
+* **main:** fix release deps not installing ([029cb1f](https://github.com/OctoFarm/OctoFarm/commit/029cb1f3f8ece0d5a8ccf2ba625809a6d737af35))
+* **main:** readme type-o ([8223b10](https://github.com/OctoFarm/OctoFarm/commit/8223b101dab954835cff4bf47e8fbd18fc0be109))
+* **main:** simplify issue report ([2af5ba1](https://github.com/OctoFarm/OctoFarm/commit/2af5ba10c37e4e7cb8ad7db0d8a328a664a30d8a))
+* **main:** swap release-it with semantic-release ([073b17e](https://github.com/OctoFarm/OctoFarm/commit/073b17e9cf54219aa31ae6bcd79a78adf0d6f3dc))
+* **main:** updated eslint configuration ([125a26f](https://github.com/OctoFarm/OctoFarm/commit/125a26f5351817bf6034de654efc16624dc2315e))
+
 # :octopus: :octopus: OctoFarm's Changelog :octopus: :octopus:
 
 ### [1.6.6](https://github.com/OctoFarm/OctoFarm/compare/1.6.5...1.6.6) (2022-09-04)
