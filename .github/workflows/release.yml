@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 16
       - name: Install dependencies
-        run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git
+        run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git && npm run install-client
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
