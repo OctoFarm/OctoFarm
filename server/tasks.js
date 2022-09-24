@@ -1,35 +1,35 @@
-const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { FilamentClean } = require("./services/filament-cleaner.service");
-const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
-const { TaskPresets } = require("./constants/task.constants");
-const { SystemRunner } = require("./services/system-information.service");
-const { grabLatestPatreonData } = require("./services/patreon.service");
-const { detectFarmPi } = require("./services/farmpi-detection.service");
-const { getPrinterManagerCache } = require("./cache/printer-manager.cache");
-const { getPrinterStoreCache } = require("./cache/printer-store.cache");
-const { getEventEmitterCache } = require("./cache/event-emitter.cache");
-const { updatePrinterHealthChecks } = require("./store/printer-health-checks.store");
+const softwareUpdateChecker = require('./services/octofarm-update.service');
+const { FilamentClean } = require('./services/filament-cleaner.service');
+const { initHistoryCache, getHistoryCache } = require('./cache/history.cache');
+const { TaskPresets } = require('./constants/task.constants');
+const { SystemRunner } = require('./services/system-information.service');
+const { grabLatestPatreonData } = require('./services/patreon.service');
+const { detectFarmPi } = require('./services/farmpi-detection.service');
+const { getPrinterManagerCache } = require('./cache/printer-manager.cache');
+const { getPrinterStoreCache } = require('./cache/printer-store.cache');
+const { getEventEmitterCache } = require('./cache/event-emitter.cache');
+const { updatePrinterHealthChecks } = require('./store/printer-health-checks.store');
 const {
   updatePluginNoticesStore,
-  updatePluginStore
-} = require("./store/octoprint-plugin-list.store");
-const { getInfluxCleanerCache } = require("./cache/influx-export.cache");
-const { FileClean } = require("./services/file-cleaner.service");
-const { sortCurrentOperations } = require("./services/current-operations.service");
-const { generatePrinterHeatMap } = require("./services/printer-statistics.service");
-const { initFarmInformation } = require("./services/farm-information.service");
-const { notifySubscribers } = require("./services/server-side-events.service");
-const { MESSAGE_TYPES } = require("./constants/sse.constants");
-const { LOGGER_ROUTE_KEYS } = require("./constants/logger.constants");
+  updatePluginStore,
+} = require('./store/octoprint-plugin-list.store');
+const { getInfluxCleanerCache } = require('./cache/influx-export.cache');
+const { FileClean } = require('./services/file-cleaner.service');
+const { sortCurrentOperations } = require('./services/current-operations.service');
+const { generatePrinterHeatMap } = require('./services/printer-statistics.service');
+const { initFarmInformation } = require('./services/farm-information.service');
+const { notifySubscribers } = require('./services/server-side-events.service');
+const { MESSAGE_TYPES } = require('./constants/sse.constants');
+const { LOGGER_ROUTE_KEYS } = require('./constants/logger.constants');
 
-const Logger = require("./handlers/logger");
-const { SettingsClean } = require("./services/settings-cleaner.service");
+const Logger = require('./handlers/logger');
+const { SettingsClean } = require('./services/settings-cleaner.service');
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_TASKS);
 
 const I_AM_ALIVE = () => {
-  notifySubscribers("iAmAlive", MESSAGE_TYPES.AM_I_ALIVE, {
+  notifySubscribers('iAmAlive', MESSAGE_TYPES.AM_I_ALIVE, {
     ok: true,
-    loginRequired: SettingsClean.isLogonRequired()
+    loginRequired: SettingsClean.isLogonRequired(),
   });
 };
 
@@ -41,7 +41,7 @@ const INITIALISE_PRINTERS_TASK = async () => {
     await getPrinterStoreCache(),
     await getEventEmitterCache(),
     await initHistoryCache(),
-    await getInfluxCleanerCache()
+    await getInfluxCleanerCache(),
   ]);
   const pList = getPrinterStoreCache().listPrintersInformation();
   await Promise.allSettled([
@@ -53,7 +53,7 @@ const INITIALISE_PRINTERS_TASK = async () => {
     await getPrinterManagerCache().generatePrintersControlDropList(),
     FileClean.statistics(pList),
     await sortCurrentOperations(pList),
-    await getPrinterManagerCache().startPrinterEnableQueue()
+    await getPrinterManagerCache().startPrinterEnableQueue(),
   ]);
 
   setTimeout(async () => {
@@ -67,12 +67,12 @@ const SERVER_BOOT_TASK = async () => {
     await detectFarmPi(),
     await SystemRunner.profileCPUUsagePercent(),
     SystemRunner.profileMemoryUsagePercent(),
-    await grabLatestPatreonData(),
+    // await grabLatestPatreonData(),
     await updatePluginNoticesStore(),
     await updatePluginStore(),
     await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
       softwareUpdateChecker.checkReleaseAndLogUpdate();
-    })
+    }),
   ]);
 };
 
@@ -86,7 +86,7 @@ const GENERATE_PRINTER_HEAT_MAP = async () => {
 };
 
 const CRASH_TEST_TASK = async () => {
-  throw new Error("big error");
+  throw new Error('big error');
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
@@ -165,7 +165,7 @@ function TaskStart(task, preset, milliseconds = 0) {
   return {
     id: task.name,
     task,
-    preset
+    preset,
   };
 }
 
@@ -192,11 +192,11 @@ class OctoFarmTasks {
     TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
-    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS)
+    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
     // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
 
 module.exports = {
-  OctoFarmTasks
+  OctoFarmTasks,
 };
