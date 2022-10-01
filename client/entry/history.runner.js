@@ -1014,7 +1014,7 @@ class History {
     this.hideGalleryLabels(history);
   }
 
-  static async hideGalleryLabels(history){
+  static hideGalleryLabels(history){
     const timelapseCount = history.filter((record) => {
       return !!record?.timelapse && record.timelapse.length > 0;
     })
