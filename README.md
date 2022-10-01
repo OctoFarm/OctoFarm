@@ -12,7 +12,7 @@
 
 <div align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
-    <img src="https://github.com/OctoFarm/OctoFarm/blob/master/server/views/images/logo.png?raw=true" alt="Logo" width="400px">
+    <img src="https://github.com/OctoFarm/OctoFarm/blob/master/server/assets/images/logo.png?raw=true" alt="Logo" width="400px">
   </a>
 
   <p align="center">
