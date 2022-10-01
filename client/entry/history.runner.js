@@ -28,7 +28,11 @@ document.getElementById('historyTable').addEventListener('click', (e) => {
   e.preventDefault();
   History.edit(e);
 });
-
+document.getElementById('historyTable').addEventListener('click', (e) => {
+  // Remove from UI
+  e.preventDefault();
+  History.gallery(e);
+});
 $('#historyModal').on('hidden.bs.modal', function (e) {
   document.getElementById('historySaveBtn').remove();
   document.getElementById('historyUpdateCostBtn').remove();
@@ -1099,97 +1103,6 @@ class History {
         }
       }
 
-      let thbs = false;
-      let counter = 0;
-      let active = 'active';
-
-      if (
-        typeof current.snapshot !== 'undefined' &&
-        current.snapshot !== '' &&
-        current.snapshot !== null
-      ) {
-        thumbnailIndicators.insertAdjacentHTML(
-          'beforeend',
-          `
-           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
-        `
-        );
-        thumbnail.insertAdjacentHTML(
-          'beforeend',
-          `
-              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${encodeURI(
-            current.snapshot
-          )}')">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h6>Camera Snapshot</h6>
-                  </div>
-                </div>
-          `
-        );
-        thbs = true;
-        counter = counter + 1;
-        active = '';
-      }
-
-      if (
-        typeof current.thumbnail !== 'undefined' &&
-        current.thumbnail != null &&
-        current.thumbnail !== ''
-      ) {
-        thumbnailIndicators.insertAdjacentHTML(
-          'beforeend',
-          `
-           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
-        `
-        );
-        thumbnail.insertAdjacentHTML(
-          'beforeend',
-          `
-              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${encodeURI(
-            current.thumbnail
-          )}')">
-                  <div class="carousel-caption d-none d-md-block">
-                    <h6>Slicer Thumbnail</h6>
-                  </div>
-                </div>
-          `
-        );
-        thbs = true;
-        active = '';
-        counter = counter + 1;
-      }
-      if (
-        typeof current.timelapse !== 'undefined' &&
-        current.timelapse !== '' &&
-        current.timelapse !== null
-      ) {
-        thumbnailIndicators.insertAdjacentHTML(
-          'beforeend',
-          `
-           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
-        `
-        );
-        thumbnail.insertAdjacentHTML(
-          'beforeend',
-          `
-            <div class="carousel-item ${active} text-center" style="height:200px;">
-                <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls" style="height:350px;">
-                    <source src='${encodeURI(current.timelapse)}'>
-                </video>
-                  <div class="carousel-caption d-none d-md-block">
-                    <h6>Timelapse</h6>
-                  </div>
-            </div>
-          `
-        );
-        thbs = true;
-      }
-      if (thbs) {
-        document.getElementById('galleryElements').style.display = 'block';
-      } else {
-        document.getElementById('galleryElements').style.display = 'none';
-      }
-
       startDate.innerHTML = `<b>Started</b><hr>${new Date(
         current.startDate
       ).toLocaleDateString()} - ${new Date(current.startDate).toLocaleTimeString()}`;
@@ -1215,68 +1128,68 @@ class History {
 
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
-      const toolsArray = [];
-      if (!!current?.spools) {
-        for (const [i, spool] of current.spools.entries()) {
-          const sp = Object.keys(spool)[0];
-          const spoolSelector = returnBigFilamentSelectorTemplate(i);
-          toolsArray.push(sp);
-          viewTable.insertAdjacentHTML(
-            'beforeend',
-            `
-          <tr>
-              <td>
-                ${spoolSelector}
-              </td>
-              <td>
-              ${spool[sp]?.volume ? spool[sp]?.volume : 0}m3
-              </td>
-              <td>
-              ${spool[sp]?.length ? spool[sp]?.length : 0}m
-              </td>
-              <td>
-                 ${spool[sp]?.weight ? spool[sp]?.weight : 0}g
-              </td>
-              <td>
-                 ${spool[sp]?.cost ? spool[sp]?.cost.toFixed(2) : 0}
-              </td>
-              </tr>
-          </tr>
-        `
-          );
-          await drawHistoryDropDown(
-            document.getElementById(`tool-${i}-bigFilamentSelect`),
-            spool[sp]?.spoolId
-          );
-        }
-      } else {
-        const spoolSelector = returnBigFilamentSelectorTemplate(0);
-        toolsArray.push(0);
-        viewTable.insertAdjacentHTML(
-          'beforeend',
-          `
-          <tr>
-              <td>
-                ${spoolSelector}
-              </td>
-              <td>
-              0m3
-              </td>
-              <td>
-              0m
-              </td>
-              <td>
-              0g
-              </td>
-              <td>
-               0
-              </td>
-              </tr>
-          </tr>
-        `
-        );
-        await drawHistoryDropDown(document.getElementById(`tool-0-bigFilamentSelect`), 0);
-      }
+      // const toolsArray = [];
+      // if (!!current?.spools) {
+      //   for (const [i, spool] of current.spools.entries()) {
+      //     const sp = Object.keys(spool)[0];
+      //     const spoolSelector = returnBigFilamentSelectorTemplate(i);
+      //     toolsArray.push(sp);
+      //     viewTable.insertAdjacentHTML(
+      //       'beforeend',
+      //       `
+      //     <tr>
+      //         <td>
+      //           ${spoolSelector}
+      //         </td>
+      //         <td>
+      //         ${spool[sp]?.volume ? spool[sp]?.volume : 0}m3
+      //         </td>
+      //         <td>
+      //         ${spool[sp]?.length ? spool[sp]?.length : 0}m
+      //         </td>
+      //         <td>
+      //            ${spool[sp]?.weight ? spool[sp]?.weight : 0}g
+      //         </td>
+      //         <td>
+      //            ${spool[sp]?.cost ? spool[sp]?.cost.toFixed(2) : 0}
+      //         </td>
+      //         </tr>
+      //     </tr>
+      //   `
+      //     );
+      //     await drawHistoryDropDown(
+      //       document.getElementById(`tool-${i}-bigFilamentSelect`),
+      //       spool[sp]?.spoolId
+      //     );
+      //   }
+      // } else {
+      //   const spoolSelector = returnBigFilamentSelectorTemplate(0);
+      //   toolsArray.push(0);
+      //   viewTable.insertAdjacentHTML(
+      //     'beforeend',
+      //     `
+      //     <tr>
+      //         <td>
+      //           ${spoolSelector}
+      //         </td>
+      //         <td>
+      //         0m3
+      //         </td>
+      //         <td>
+      //         0m
+      //         </td>
+      //         <td>
+      //         0g
+      //         </td>
+      //         <td>
+      //          0
+      //         </td>
+      //         </tr>
+      //     </tr>
+      //   `
+      //   );
+      //   await drawHistoryDropDown(document.getElementById(`tool-0-bigFilamentSelect`), 0);
+      // }
 
       viewTable.insertAdjacentHTML(
         'beforeend',
@@ -1300,6 +1213,123 @@ class History {
         </tr>
       `
       );
+    }
+  }
+
+  static async gallery(e){
+    if (e.target.classList.contains('historyGallery')) {
+      // Grab elements
+      const printerName = document.getElementById('printerGalleryName');
+      const fileName = document.getElementById('fileGalleryName');
+      const status = document.getElementById('printGalleryStatus');
+
+      printerName.innerHTML = ' - ';
+      fileName.innerHTML = ' - ';
+      status.innerHTML = ' - ';
+
+      const thumbnail = document.getElementById('thumbnails');
+      const thumbnailIndicators = document.getElementById('thumbnails-indicators');
+      thumbnail.innerHTML = '';
+      thumbnailIndicators.innerHTML = '';
+      const split = e.target.id.split('-');
+      const index = _.findIndex(this.historyList, function (o) {
+        return o._id == split[1];
+      });
+      const current = this.historyList[index];
+      printerName.innerHTML = current.printer;
+      fileName.innerHTML = current.file.name;
+      status.innerHTML = `${current.state}`;
+      let thbs = false;
+      let counter = 0;
+      let active = 'active';
+
+      if (
+          typeof current.snapshot !== 'undefined' &&
+          current.snapshot !== '' &&
+          current.snapshot !== null
+      ) {
+        thumbnailIndicators.insertAdjacentHTML(
+            'beforeend',
+            `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+            'beforeend',
+            `
+              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${encodeURI(
+                current.snapshot
+            )}')">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Camera Snapshot</h6>
+                  </div>
+                </div>
+          `
+        );
+        thbs = true;
+        counter = counter + 1;
+        active = '';
+      }
+
+      if (
+          typeof current.thumbnail !== 'undefined' &&
+          current.thumbnail != null &&
+          current.thumbnail !== ''
+      ) {
+        thumbnailIndicators.insertAdjacentHTML(
+            'beforeend',
+            `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+            'beforeend',
+            `
+              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${encodeURI(
+                current.thumbnail
+            )}')">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Slicer Thumbnail</h6>
+                  </div>
+                </div>
+          `
+        );
+        thbs = true;
+        active = '';
+        counter = counter + 1;
+      }
+      if (
+          typeof current.timelapse !== 'undefined' &&
+          current.timelapse !== '' &&
+          current.timelapse !== null
+      ) {
+        thumbnailIndicators.insertAdjacentHTML(
+            'beforeend',
+            `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+            'beforeend',
+            `
+            <div class="carousel-item ${active} text-center" style="height:200px;">
+                <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls" style="height:350px;">
+                    <source src='${encodeURI(current.timelapse)}'>
+                </video>
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Timelapse</h6>
+                  </div>
+            </div>
+          `
+        );
+        thbs = true;
+      }
+      if (thbs) {
+        document.getElementById('galleryElements').style.display = 'block';
+      } else {
+        document.getElementById('galleryElements').style.display = 'none';
+      }
+
     }
   }
 
