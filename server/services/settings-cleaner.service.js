@@ -22,7 +22,7 @@ class SettingsCleanerService {
   }
 
   static returnDisplayDashboardSettings(){
-    return systemClean.dashboardDisplay;
+    return systemClean.displayView.enabled;
   }
 
   static returnFilamentManagerSettings() {

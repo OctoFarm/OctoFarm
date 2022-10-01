@@ -82,6 +82,7 @@ if(dashboardDisplayEnabled){
     let dashboardSettings = req.user.clientSettings?.dashboard || getDefaultDashboardSettings();
 
     res.render('dashboard', {
+      layout: "layout_no_nav.ejs",
       name: req.user.name,
       userGroup: req.user.group,
       version,
