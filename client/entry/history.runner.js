@@ -32,7 +32,7 @@ timelapseButton.addEventListener('click', () => {
 
   thumbnailCount.forEach((history) => {
     let days_between_text = ""
-    const days_between_count = days_between(history.startDate, history.endDate)
+    const days_between_count = days_between(history.endDate, new Date())
     if(days_between_count <= 0){
       days_between_text = "today!";
     }else if(days_between_count > 365){
@@ -63,7 +63,7 @@ snapshotsButton.addEventListener('click', () => {
 
   thumbnailCount.forEach((history) => {
     let days_between_text = ""
-    const days_between_count = days_between(history.startDate, history.endDate)
+    const days_between_count = days_between(history.endDate, new Date())
     if(days_between_count <= 0){
       days_between_text = "today!";
     }else if(days_between_count > 365){
@@ -92,7 +92,7 @@ function days_between(date1, date2) {
   const ONE_DAY = 1000 * 60 * 60 * 24;
 
   // Calculate the difference in milliseconds
-  const differenceMs = Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
+  const differenceMs = Math.abs(new Date(date1).getTime() - date2.getTime());
 
   // Convert back to days and return
   return Math.round(differenceMs / ONE_DAY);
@@ -106,7 +106,7 @@ thumbnailButton.addEventListener('click', () => {
 
   thumbnailCount.forEach((history) => {
     let days_between_text = ""
-    const days_between_count = days_between(history.startDate, history.endDate)
+    const days_between_count = days_between(history.endDate, new Date())
     if(days_between_count <= 0){
       days_between_text = "today!";
     }else if(days_between_count > 365){
