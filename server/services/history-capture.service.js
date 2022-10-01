@@ -512,7 +512,6 @@ class HistoryCaptureService {
     }
 
     let completionRatio = this.#success ? 1.0 : printPercentage / 100;
-
     for (let s = 0; s < this.#filamentSelection.length; s++) {
       const currentSpool = this.#filamentSelection[s];
       if (!!currentSpool || this.#job?.filament['tool' + s]) {
@@ -534,7 +533,7 @@ class HistoryCaptureService {
                 logger.info('Successfully downdated spool data!', res);
               })
               .catch((e) => {
-                logger.error('Unable to update spool data!', e);
+                logger.error('Unable to update spool data!', e.toString());
               });
             currentSpool.spools.used = currentUsed + parseFloat(currentGram);
             getInfluxCleanerCache().cleanAndWriteMaterialsInformationForInflux(
