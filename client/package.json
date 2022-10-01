@@ -32,7 +32,7 @@
     "axios": "^0.21.1",
     "before-build-webpack": "^0.2.11",
     "bootbox": "^5.5.2",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^5.2.1",
     "css-loader": "^5.2.4",
     "css-minimizer-webpack-plugin": "^2.0.0",
     "file-loader": "^6.2.0",
