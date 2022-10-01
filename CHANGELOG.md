@@ -1,3 +1,10 @@
+## [1.7.0-development.2](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.1...v1.7.0-development.2) (2022-10-01)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **client:** history gallery days would always display as today printed ([4eb415a](https://github.com/OctoFarm/OctoFarm/commit/4eb415afc782783a16098c27cbd75817940039df))
+
 ## [1.7.0-development.1](https://github.com/OctoFarm/OctoFarm/compare/v1.6.9...v1.7.0-development.1) (2022-10-01)
 
 
