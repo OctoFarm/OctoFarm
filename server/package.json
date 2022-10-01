@@ -68,7 +68,7 @@
     "primus": "^8.0.6",
     "pws": "^5.0.2",
     "request": "^2.88.2",
-    "sanitize": "^2.1.0",
+    "sanitize": "^2.1.2",
     "semver": "^7.3.5",
     "sharp": "^0.30.7",
     "simple-git": "^3.7.1",
