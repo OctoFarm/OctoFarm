@@ -27,11 +27,15 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.3",
     "apexcharts": "^3.35.0",
     "axios": "^0.21.1",
+    "babel-loader": "^8.2.5",
     "before-build-webpack": "^0.2.12",
     "bootbox": "^5.5.2",
     "bootstrap": "^4.3.1",
+    "browserlist": "^1.0.1",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^4.1.0",
     "flatted": "^3.1.1",
@@ -59,6 +63,9 @@
     "extends": [
       "eslint:recommended"
     ],
+    "babel": {
+      "presets": ["@babel/preset-env"]
+    },
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },

@@ -49,6 +49,7 @@ module.exports = (env, options) => {
     },
     mode: isProd ? 'production' : 'development',
     devtool: 'source-map',
+    target: "web",
     node: {
       global: false,
       __filename: false,
@@ -68,6 +69,11 @@ module.exports = (env, options) => {
     },
     module: {
       rules: [
+        {
+          test: /\.(js)$/,
+          exclude: /node_modules/,
+          use: ['babel-loader']
+        },
         {
           test: /\.js$/,
           enforce: 'pre',
