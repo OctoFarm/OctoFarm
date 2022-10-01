@@ -43,7 +43,7 @@
     "express-rate-limit": "^6.3.0",
     "express-session": "^1.17.2",
     "flatted": "^3.2.5",
-    "helmet": "^5.0.2",
+    "helmet": "^6.0.0",
     "influx": "^5.9.3",
     "is-docker": "2.2.1",
     "jsonwebtoken": "^8.5.1",
