@@ -173,6 +173,11 @@ const ServerSettingsSchema = new mongoose.Schema({
       default: 10000,
     },
   },
+  dashboardDisplay: {
+    type: Boolean,
+    required: true,
+    default: false
+  }
 });
 
 const ServerSettings = mongoose.model('ServerSettings', ServerSettingsSchema);
