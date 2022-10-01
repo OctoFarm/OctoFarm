@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-#      - development - not used for now
+      - development
 
 jobs:
   release:
