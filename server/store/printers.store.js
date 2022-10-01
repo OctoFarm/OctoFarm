@@ -196,7 +196,8 @@ class PrinterStore {
     const printer = this.#findMePrinter(id);
     await printer.acquireOctoPrintUpdatesData(true);
     await printer.acquireOctoPrintPluginsListData(true);
-    if (Object.keys(printer.octoPi).length !== 0) {
+
+    if (!!printer?.octoPi && Object.keys(printer.octoPi).length !== 0) {
       await printer.acquireOctoPrintPiPluginData(true);
     }
   }
@@ -1351,10 +1352,8 @@ class PrinterStore {
       });
       if (spoolID !== '0') {
         const spool = await Filament.findById(spoolID);
-        let editableSpool = JSON.parse(JSON.stringify(spool));
-        farmPrinters[printerIndex].selectedFilament[tool] = editableSpool;
-        const profile = await attachProfileToSpool(spool.spools.profile);
-        farmPrinters[printerIndex].selectedFilament[tool].spools.profile = profile;
+        farmPrinters[printerIndex].selectedFilament[tool] = JSON.parse(JSON.stringify(spool));
+        farmPrinters[printerIndex].selectedFilament[tool].spools.profile = await attachProfileToSpool(spool.spools.profile);
       } else {
         farmPrinters[printerIndex].selectedFilament[tool] = null;
       }
