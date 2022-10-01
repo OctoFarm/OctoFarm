@@ -80,6 +80,9 @@ export default class UI {
   }
 
   static doesElementNeedUpdating(value, element, meta) {
+    if(!value || !element || !meta){
+      return;
+    }
     //Quick check to see if the UI value differs, if so update.
     if (element) {
       if (JSON.stringify(value) !== JSON.stringify(element[meta])) {

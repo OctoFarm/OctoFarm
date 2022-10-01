@@ -55,6 +55,17 @@
   "engines": {
     "npm": ">= 6.10.0"
   },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "useBuiltIns": "entry",
+          "corejs": 3
+        }
+      ]
+    ]
+  },
   "eslintConfig": {
     "root": true,
     "env": {
@@ -63,16 +74,6 @@
     "extends": [
       "eslint:recommended"
     ],
-    "babel": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "useBuiltIns": "entry"
-          }
-        ]
-      ]
-    },
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
@@ -82,5 +83,8 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "dependencies": {
+    "core-js": "^3.25.3"
+  }
 }
