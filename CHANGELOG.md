@@ -1,3 +1,43 @@
+### [1.6.9](https://github.com/OctoFarm/OctoFarm/compare/v1.6.8...v1.6.9) (2022-10-01)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **client:** compile client down with babel support ([46015fb](https://github.com/OctoFarm/OctoFarm/commit/46015fb7fccbe63aa3dc2edaf20e54a0d5d89384))
+* **client:** improve babel config ([300ba56](https://github.com/OctoFarm/OctoFarm/commit/300ba56ae2dcbb3123148e89e859a08de6a78e43))
+* **main:** add git ignore for new client development path ([719b9b6](https://github.com/OctoFarm/OctoFarm/commit/719b9b64d605d478d3ee73b4021b250347a70f3a))
+* **main:** fix development version assets not been found ([5c83d17](https://github.com/OctoFarm/OctoFarm/commit/5c83d1774db81a3804d46451c7c8f5fdc0bc652f))
+* **main:** fix eslint rules triggering on top level reserved words ([b91bce4](https://github.com/OctoFarm/OctoFarm/commit/b91bce4583f798540a2da10a97653663819ec6de))
+* **main:** update dependencies ([d98cb3e](https://github.com/OctoFarm/OctoFarm/commit/d98cb3e68cc1f9fa7c16ebbc20227f88ac719f74))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **client:** conflict between current operation id and main views ([1ed2977](https://github.com/OctoFarm/OctoFarm/commit/1ed29776122d4164d45528044f39a2604bd9d4bb)), closes [#1227](https://github.com/OctoFarm/OctoFarm/issues/1227)
+* **client:** fix current operations sorting ([4ee3517](https://github.com/OctoFarm/OctoFarm/commit/4ee3517aa4f076ebbdcbca5a3a2f85d0eec73322)), closes [#1218](https://github.com/OctoFarm/OctoFarm/issues/1218)
+* **client:** fix dashboard resizing ([ef022a0](https://github.com/OctoFarm/OctoFarm/commit/ef022a0d8d619683adff91826b8a637451bb3cda))
+* **client:** incorrect path for background image ([a3091e5](https://github.com/OctoFarm/OctoFarm/commit/a3091e5b1b3f74c620fe9c23c76b0323653dc4db)), closes [#1234](https://github.com/OctoFarm/OctoFarm/issues/1234)
+* **client:** unable to create new folders on op client ([61d4653](https://github.com/OctoFarm/OctoFarm/commit/61d4653f76b788441c9af7efe514c4164f246eed)), closes [#1226](https://github.com/OctoFarm/OctoFarm/issues/1226)
+* **server:** a failed ip match would still attempt to be read ([89e543f](https://github.com/OctoFarm/OctoFarm/commit/89e543f71f11557892d4bbf7cd4131c7c26ee50e))
+* **server:** couldn't parse octopi token when didn't exist ([00ceee7](https://github.com/OctoFarm/OctoFarm/commit/00ceee7eac71c258275210ebabc8af16461008a2))
+* **server:** normalise filenames before comparing for uniqeness ([e05c984](https://github.com/OctoFarm/OctoFarm/commit/e05c984ba4650c992e06082ea3e62ac1071c677d)), closes [#1233](https://github.com/OctoFarm/OctoFarm/issues/1233)
+* **server:** unable to detach spools from printer ([20c3489](https://github.com/OctoFarm/OctoFarm/commit/20c34893b3e4704005e23e3540440ce946447519)), closes [#1232](https://github.com/OctoFarm/OctoFarm/issues/1232)
+
+
+### :dress: UI! :dress:
+
+* **client:** split "view" button into "info" and "gallery" ([b3a1b0f](https://github.com/OctoFarm/OctoFarm/commit/b3a1b0f4f16c093a6e17f655505f0ed2ef9d7c89))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** increase length rounding so smaller values are displayed ([548cc98](https://github.com/OctoFarm/OctoFarm/commit/548cc9811d06bb21334a3c1177bff0c0426f6d6e))
+
+
+### :x: Removed :x:
+
+* **client:** disable ability to edit and save spool changes ([b584d74](https://github.com/OctoFarm/OctoFarm/commit/b584d74d2132bd777afe51b82eada9622bf6392e)), closes [#1217](https://github.com/OctoFarm/OctoFarm/issues/1217)
+
 ### [1.6.8](https://github.com/OctoFarm/OctoFarm/compare/v1.6.7...v1.6.8) (2022-09-24)
 
 
