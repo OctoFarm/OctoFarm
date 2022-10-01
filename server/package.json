@@ -60,7 +60,7 @@
     "node-fetch": "2.6.7",
     "node-input-validator": "^4.5.0",
     "node-upnp-ssdp": "^0.1.1",
-    "passport": "0.4.1",
+    "passport": "0.6.0",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "primus": "^8.0.6",
