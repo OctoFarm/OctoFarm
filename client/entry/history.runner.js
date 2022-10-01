@@ -1202,7 +1202,7 @@ class History {
         ${current.totalVolume.toFixed(2)}m3
         </td>
         <td>
-        ${(current.totalLength / 1000).toFixed(2)}m
+        ${(current.totalLength / 1000).toFixed(4)}m
         </td>
         <td>
         ${current.totalWeight.toFixed(2)}g
