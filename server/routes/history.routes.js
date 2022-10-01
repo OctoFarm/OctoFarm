@@ -23,6 +23,7 @@ router.post('/update', ensureAuthenticated, async (req, res) => {
   if (history.printHistory.notes !== note) {
     history.printHistory.notes = note;
   }
+
   for (let f = 0; f < filamentId.length; f++) {
     if (Array.isArray(history.printHistory.filamentSelection)) {
       if (
@@ -44,6 +45,7 @@ router.post('/update', ensureAuthenticated, async (req, res) => {
         }
       }
     } else {
+      console.log(filamentId[f])
       if (
         history.printHistory.filamentSelection !== null &&
         history.printHistory.filamentSelection._id == filamentId
