@@ -17,7 +17,118 @@ import { daysBetweenTwoDates, getFirstDayOfLastMonth } from '../js/utils/date.ut
 import Litepicker from 'litepicker';
 import { dashboardOptions } from '../js/pages/charts/dashboard.options';
 
+let timelapseCount;
+let snapshotCount;
+let thumbnailCount;
+
+const timelapseButton = document.getElementById("timelapseGallery")
+const snapshotsButton = document.getElementById("snapshotGallery")
+const thumbnailButton = document.getElementById("thumbnailGallery")
+
 // Setup history listeners
+timelapseButton.addEventListener('click', () => {
+  let gallery = "";
+  const galleryItemsElement = document.getElementById("galleryItems")
+
+  thumbnailCount.forEach((history) => {
+    let days_between_text = ""
+    const days_between_count = days_between(history.startDate, history.endDate)
+    if(days_between_count <= 0){
+      days_between_text = "today!";
+    }else if(days_between_count > 365){
+      days_between_text = (days_between_count / 365).toFixed(0) + " years ago";
+    }else{
+      days_between_text = days_between_count + " days ago";
+    }
+    gallery += `
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <div class="card mb-3">
+          <video loop="loop" controls="controls" style="width: 100%;">
+            <source src='${encodeURI(history.timelapse)}'>
+          </video>
+          <div class="card-body">
+            <h6 class="card-text text-truncate">${history.file.name}</h6>
+            <p class="card-text"><small class="text-muted">Printed ${days_between_text}</small></p>
+          </div>
+        </div>
+      </div>
+    `
+  })
+  galleryItemsElement.innerHTML = gallery;
+})
+
+snapshotsButton.addEventListener('click', () => {
+  let gallery = "";
+  const galleryItemsElement = document.getElementById("galleryItems")
+
+  thumbnailCount.forEach((history) => {
+    let days_between_text = ""
+    const days_between_count = days_between(history.startDate, history.endDate)
+    if(days_between_count <= 0){
+      days_between_text = "today!";
+    }else if(days_between_count > 365){
+      days_between_text = (days_between_count / 365).toFixed(0) + " years ago";
+    }else{
+      days_between_text = days_between_count + " days ago";
+    }
+    gallery += `
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <div class="card mb-3">
+          <img src="${history.snapshot}" class="card-img-top" alt="">
+          <div class="card-body">
+            <h6 class="card-text text-truncate">${history.file.name}</h6>
+            <p class="card-text"><small class="text-muted">Printed ${days_between_text}</small></p>
+          </div>
+        </div>
+      </div>
+    `
+  })
+  galleryItemsElement.innerHTML = gallery;
+})
+
+function days_between(date1, date2) {
+
+  // The number of milliseconds in one day
+  const ONE_DAY = 1000 * 60 * 60 * 24;
+
+  // Calculate the difference in milliseconds
+  const differenceMs = Math.abs(new Date(date1).getTime() - new Date(date2).getTime());
+
+  // Convert back to days and return
+  return Math.round(differenceMs / ONE_DAY);
+
+}
+
+
+thumbnailButton.addEventListener('click', () => {
+  let gallery = "";
+  const galleryItemsElement = document.getElementById("galleryItems")
+
+  thumbnailCount.forEach((history) => {
+    let days_between_text = ""
+    const days_between_count = days_between(history.startDate, history.endDate)
+    if(days_between_count <= 0){
+      days_between_text = "today!";
+    }else if(days_between_count > 365){
+      days_between_text = (days_between_count / 365).toFixed(0) + " years ago";
+    }else{
+      days_between_text = days_between_count + " days ago";
+    }
+    gallery += `
+      <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+        <div class="card mb-3">
+          <img src="${history.thumbnail}" class="card-img-top" alt="">
+          <div class="card-body">
+            <h6 class="card-text text-truncate">${history.file.name}</h6>
+            <p class="card-text"><small class="text-muted">Printed ${days_between_text}</small></p>
+          </div>
+        </div>
+      </div>
+    `
+  })
+  galleryItemsElement.innerHTML = gallery;
+})
+
 document.getElementById('historyTable').addEventListener('click', (e) => {
   // Remove from UI
   e.preventDefault();
@@ -1015,33 +1126,33 @@ class History {
   }
 
   static hideGalleryLabels(history){
-    const timelapseCount = history.filter((record) => {
+    timelapseCount = history.filter((record) => {
       return !!record?.timelapse && record.timelapse.length > 0;
     })
-    const snapshotCount = history.filter((record) => {
+    snapshotCount = history.filter((record) => {
       return !!record?.snapshot && record.snapshot.length > 0;
     })
-    const thumbnailCount = history.filter((record) => {
+    thumbnailCount = history.filter((record) => {
       return !!record?.thumbnail && record.thumbnail.length > 0;
     })
 
-    const timelapseButton = document.getElementById("timelapseGallery")
+
     if(timelapseCount.length > 0){
       timelapseButton.classList.remove("d-none")
     }else{
       timelapseButton.classList.add("d-none")
     }
-    const snapshotsButton = document.getElementById("snapshotGallery")
+
     if(snapshotCount.length > 0){
       snapshotsButton.classList.remove("d-none")
     }else{
       snapshotsButton.classList.add("d-none")
     }
-    const thubnailButton = document.getElementById("thumbnailGallery")
+
     if(thumbnailCount.length > 0){
-      thubnailButton.classList.remove("d-none")
+      thumbnailButton.classList.remove("d-none")
     }else{
-      thubnailButton.classList.add("d-none")
+      thumbnailButton.classList.add("d-none")
     }
 
     const noGalleryLabel = document.getElementById("noGalleryLabel");
