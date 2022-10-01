@@ -1128,68 +1128,62 @@ class History {
 
       averagePrintTime.value = Calc.generateTime(current.file.averagePrintTime);
       lastPrintTime.value = Calc.generateTime(current.file.lastPrintTime);
-      // const toolsArray = [];
-      // if (!!current?.spools) {
-      //   for (const [i, spool] of current.spools.entries()) {
-      //     const sp = Object.keys(spool)[0];
-      //     const spoolSelector = returnBigFilamentSelectorTemplate(i);
-      //     toolsArray.push(sp);
-      //     viewTable.insertAdjacentHTML(
-      //       'beforeend',
-      //       `
-      //     <tr>
-      //         <td>
-      //           ${spoolSelector}
-      //         </td>
-      //         <td>
-      //         ${spool[sp]?.volume ? spool[sp]?.volume : 0}m3
-      //         </td>
-      //         <td>
-      //         ${spool[sp]?.length ? spool[sp]?.length : 0}m
-      //         </td>
-      //         <td>
-      //            ${spool[sp]?.weight ? spool[sp]?.weight : 0}g
-      //         </td>
-      //         <td>
-      //            ${spool[sp]?.cost ? spool[sp]?.cost.toFixed(2) : 0}
-      //         </td>
-      //         </tr>
-      //     </tr>
-      //   `
-      //     );
-      //     await drawHistoryDropDown(
-      //       document.getElementById(`tool-${i}-bigFilamentSelect`),
-      //       spool[sp]?.spoolId
-      //     );
-      //   }
-      // } else {
-      //   const spoolSelector = returnBigFilamentSelectorTemplate(0);
-      //   toolsArray.push(0);
-      //   viewTable.insertAdjacentHTML(
-      //     'beforeend',
-      //     `
-      //     <tr>
-      //         <td>
-      //           ${spoolSelector}
-      //         </td>
-      //         <td>
-      //         0m3
-      //         </td>
-      //         <td>
-      //         0m
-      //         </td>
-      //         <td>
-      //         0g
-      //         </td>
-      //         <td>
-      //          0
-      //         </td>
-      //         </tr>
-      //     </tr>
-      //   `
-      //   );
-      //   await drawHistoryDropDown(document.getElementById(`tool-0-bigFilamentSelect`), 0);
-      // }
+      const toolsArray = [];
+      if (!!current?.spools) {
+        for (const spool of current.spools) {
+          const sp = Object.keys(spool)[0];
+            toolsArray.push(sp);
+            viewTable.insertAdjacentHTML(
+                'beforeend',
+                `
+          <tr>
+              <td>
+              ${!!spool[sp]?.toolName ? spool[sp]?.toolName : "0"}: ${!!spool[sp]?.spoolName ? spool[sp].spoolName : "No Spool"}
+              </td>
+              <td>
+              ${!!spool[sp]?.volume ? spool[sp]?.volume : 0}m3
+              </td>
+              <td>
+              ${!!spool[sp]?.length ? spool[sp]?.length : 0}m
+              </td>
+              <td>
+                 ${!!spool[sp]?.weight ? spool[sp]?.weight : 0}g
+              </td>
+              <td>
+                 ${!!spool[sp]?.cost ? spool[sp]?.cost : 0}
+              </td>
+              </tr>
+          </tr>
+        `
+            );
+
+        }
+      } else {
+        toolsArray.push(0);
+        viewTable.insertAdjacentHTML(
+          'beforeend',
+          `
+          <tr>
+              <td>
+                No Spool
+              </td>
+              <td>
+              0m3
+              </td>
+              <td>
+              0m
+              </td>
+              <td>
+              0g
+              </td>
+              <td>
+               0
+              </td>
+              </tr>
+          </tr>
+        `
+        );
+      }
 
       viewTable.insertAdjacentHTML(
         'beforeend',
@@ -1199,7 +1193,7 @@ class History {
         Totals
         </td>
         <td>
-        ${current.totalVolume.toFixed(2)}m3
+        ${current.totalVolume.toFixed(4)}m3
         </td>
         <td>
         ${(current.totalLength / 1000).toFixed(4)}m
