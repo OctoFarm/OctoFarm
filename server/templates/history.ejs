@@ -48,7 +48,59 @@
 </div>
 
 <div class="row">
-  <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-2 col-xl-2 mb-2 mb-2">
+  <div id="dashboardInfo" class="col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-2 mb-2">
+    <div class="card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fa-solid fa-images"></i> Galleries
+        </button>
+      </div>
+      <div class="card-body pt-2 pb-0 text-center">
+        <button
+                title="View a gallery of your timelapses"
+                id="timelapseGallery"
+                type="button"
+                class="btn btn-success mb-2 d-none"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#imageGalleryModal"
+        >
+          <i class="fas fa-chart-pie"></i> Timelapses
+        </button><br>
+        <button
+                title="View a gallery of your snapshots"
+                type="button"
+                id="snapshotGallery"
+                class="btn btn-warning text-dark mb-2 d-none"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#imageGalleryModal"
+        >
+          <i class="fas fa-dollar-sign"></i> Snapshots
+        </button><br>
+        <button
+                title="View a gallery of your thumbnails"
+                type="button"
+                id="thumbnailGallery"
+                class="btn btn-info mb-2 d-none"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#imageGalleryModal"
+        >
+          <i class="fas fa-print"></i> Thumbnails
+        </button>
+        <h5 id="noGalleryLabel" class="d-none">No galleries available</h5>
+      </div>
+
+    </div>
+  </div>
+  <div id="dashboardInfo" class="col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-2 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -106,7 +158,7 @@
 
     </div>
   </div>
-  <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-10 col-xl-10 mb-2">
+  <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-8 col-xl-8 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -1240,6 +1292,31 @@
             Close
           </button>
         </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="imageGalleryModal" tabindex="0" role="dialog" aria-labelledby="galleryModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="imageGalleryModalLabel">
+          <span id="imageGalleryType"></span> Gallery
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="text-white" aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-dismiss="modal">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>

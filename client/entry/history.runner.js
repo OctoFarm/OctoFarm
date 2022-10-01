@@ -1010,6 +1010,59 @@ class History {
 
     // Load statistics totals
     this.drawStatisticsTotals(statisticsClean);
+
+    this.hideGalleryLabels(history);
+  }
+
+  static async hideGalleryLabels(history){
+    const timelapseCount = history.filter((record) => {
+      return !!record?.timelapse && record.timelapse.length > 0;
+    })
+    const snapshotCount = history.filter((record) => {
+      return !!record?.snapshot && record.snapshot.length > 0;
+    })
+    const thumbnailCount = history.filter((record) => {
+      return !!record?.thumbnail && record.thumbnail.length > 0;
+    })
+
+    const timelapseButton = document.getElementById("timelapseGallery")
+    if(timelapseCount.length > 0){
+      timelapseButton.classList.remove("d-none")
+    }else{
+      timelapseButton.classList.add("d-none")
+    }
+    const snapshotsButton = document.getElementById("snapshotGallery")
+    if(snapshotCount.length > 0){
+      snapshotsButton.classList.remove("d-none")
+    }else{
+      snapshotsButton.classList.add("d-none")
+    }
+    const thubnailButton = document.getElementById("thumbnailGallery")
+    if(thumbnailCount.length > 0){
+      thubnailButton.classList.remove("d-none")
+    }else{
+      thubnailButton.classList.add("d-none")
+    }
+
+    const noGalleryLabel = document.getElementById("noGalleryLabel");
+    if(timelapseCount.length === 0 && snapshotCount.length === 0 && thumbnailCount.length === 0){
+      noGalleryLabel.classList.remove("d-none")
+    }else{
+      noGalleryLabel.classList.add("d-none")
+    }
+  }
+
+  static async loadTimelapseGallery(){
+
+  }
+
+  static async loadSnapshotGallery(){
+
+  }
+
+
+  static async loadThumbnailsGallery(){
+
   }
 
   static async edit(e) {
