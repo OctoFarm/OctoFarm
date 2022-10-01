@@ -48,7 +48,7 @@
     "semantic-release": "^19.0.2",
     "source-map-loader": "^2.0.1",
     "webpack": "5.36.2",
-    "webpack-cli": "^4.7.2"
+    "webpack-cli": "^4.10.0"
   },
   "engine-strict": true,
   "engines": {
