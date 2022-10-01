@@ -110,5 +110,29 @@ module.exports = {
       },
     ],
     '@semantic-release/github',
+    ['@codedependant/semantic-release-docker', {
+      dockerTags: ['latest', '{{version}}', '{{major}}-latest', '{{major}}.{{minor}}'],
+      dockerImage: 'octofarm',
+      dockerFile: 'Dockerfile',
+      dockerRegistry: null,
+      dockerProject: 'octofarm',
+      dockerArgs: {
+        API_TOKEN: true
+        , RELEASE_DATE: new Date().toISOString()
+        , RELEASE_VERSION: '{{next.version}}'
+      }
+    }],
+    ['@codedependant/semantic-release-docker', {
+      dockerTags: ['monolithic-latest', 'monolithic-{{version}}', 'monolithic-{{major}}-latest', 'monolithic-{{major}}.{{minor}}'],
+      dockerImage: 'octofarm',
+      dockerFile: 'monolithic.Dockerfile',
+      dockerRegistry: null,
+      dockerProject: 'octofarm',
+      dockerArgs: {
+        API_TOKEN: true
+        , RELEASE_DATE: new Date().toISOString()
+        , RELEASE_VERSION: '{{next.version}}'
+      }
+    }],
   ],
 };
