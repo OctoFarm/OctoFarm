@@ -1,5 +1,5 @@
 function isValidHttpUrl(string) {
-  let url;
+  let url = null;
   try {
     url = new URL(string);
   } catch (e) {
@@ -31,8 +31,13 @@ function parseOutIPAddress(string) {
 
     const t = string.match(r);
 
+    if(Array.isArray(t)){
+      return false
+    }
+
     return t[0];
   }
+  return false
 }
 
 function convertHttpUrlToWebsocket(url) {
