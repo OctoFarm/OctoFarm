@@ -1,3 +1,27 @@
+## [1.7.0-development.1](https://github.com/OctoFarm/OctoFarm/compare/v1.6.9...v1.7.0-development.1) (2022-10-01)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** allow pre-release on dev ([#1249](https://github.com/OctoFarm/OctoFarm/issues/1249)) ([9b0443f](https://github.com/OctoFarm/OctoFarm/commit/9b0443f39541b7be37b2b3356f9cb9288710f571))
+* **main:** update read me logo path ([#1248](https://github.com/OctoFarm/OctoFarm/issues/1248)) ([5565879](https://github.com/OctoFarm/OctoFarm/commit/5565879bf74cc103efb149bb18f33613bb8ad970))
+
+
+### :stars: New Feature :stars:
+
+* **client:** new gallery modals in history for snapshot, timelapse and thumbnails ([d833a9b](https://github.com/OctoFarm/OctoFarm/commit/d833a9ba1c5bcac1635ac28a064bfff4aca4548d))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **server:** try/catch steps after history capture so one doesnt cancel another ([14bbc7c](https://github.com/OctoFarm/OctoFarm/commit/14bbc7c671e88d78465c2b71611b4fbd4ef6294c))
+
+
+### :dress: UI! :dress:
+
+* **client:** added new buttons to history for thumbnail, snapshot and timelapse galleries ([09e6cc2](https://github.com/OctoFarm/OctoFarm/commit/09e6cc240220874fa94f91db891b3b4bd670f1ca))
+* **client:** new on demand gallery modals for thumbnail, snapshot and timelapse buttons ([680ca23](https://github.com/OctoFarm/OctoFarm/commit/680ca23ff77f22a052fba4edede617c34baa3ad0))
+
 ### [1.6.9](https://github.com/OctoFarm/OctoFarm/compare/v1.6.8...v1.6.9) (2022-10-01)
 
 
