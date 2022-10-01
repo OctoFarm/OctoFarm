@@ -1,6 +1,5 @@
 import { DashboardStorage } from "./dashboard.storage";
 import "gridstack/dist/gridstack.min.css";
-import "gridstack/dist/h5/gridstack-dd-native";
 import { GridStack } from "gridstack";
 
 const gridStack = GridStack.init({
