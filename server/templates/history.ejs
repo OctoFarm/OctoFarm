@@ -1026,172 +1026,141 @@
   </div>
 <% } %>
 <div class="modal fade" id="historyModal" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
-  <div class="modal-dialog modal-xl" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
-            <span id="printerName"></span> - <span id="fileName"></span>
-          </button></h3>
+
+        <h5 class="modal-title" id="historyModalLabel">
+          <button id="printStatus" type="button" class="btn btn-secondary btn-sm" href="#" aria-expanded="false" disabled=""></button>      <span id="printerName"></span> - <span id="fileName"></span>
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span class="text-white" aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-0 m-0">
-            <div class="row">
-              <div class="col-lg-6">
-                <div class="row">
-                  <div class="col-lg-4 text-center">
-                    <h5 class="mb-1">State</h5><hr>
-                    <button id="printStatus" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled=""></button>
-                  </div>
-                  <div class="col-lg-8 text-center">
-                    <h5 class="mb-1">Date and Time</h5><hr>
-                    <button id="startDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+          <div class="col-12 col-sm-12 col-md-8 col-lg-6 p-0 m-0 text-center">
+            <h5 class="mb-1">Date and Time</h5><hr>
+            <button id="startDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-                    </button>
-                    <button id="printTime" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+            </button>
+            <button id="printTime" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-                    </button>
-                    <button id="endDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+            </button>
+            <button id="endDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-                    </button>
-                  </div>
-                </div>
-                <div class="row mt-3">
-                  <div class="col-12 col-sm-12 col-md-12 col-lg-6">
-                    <h5 class="mb-1 text-left">Job Information</h5><hr>
-                    <div class="col p-0">
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Printer Cost</span>
-                        </div>
-                        <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                        <!--                      <div class="input-group-append">-->
-                        <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-                        <!--                      </div>-->
-                      </div>
-                    </div>
-                    <div class="col p-0">
-                      <div id="resendsTitle" class="input-group mb-1 input-group-sm d-none">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Resends</span>
-                        </div>
-                        <input id="resendStats" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      </div>
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Estimated Print Time</span>
-                        </div>
-                        <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      </div>
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Actual Print Time</span>
-                        </div>
-                        <input id="printerTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                        <!--                      <div class="input-group-append">-->
-                        <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-                        <!--                      </div>-->
-                      </div>
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Print Time Accuracy</span>
-                        </div>
-                        <input id="printTimeAccuracy" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      </div>
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Total Job Cost</span>
-                        </div>
-                        <input id="jobCosting" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Hourly Cost</span>
-                        </div>
-                        <input id="jobHourlyCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      </div>
-                      <div class="input-group mb-1 input-group-sm">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Electricity Cost</span>
-                        </div>
-                        <input id="jobElectricityCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">Maintenance Cost</span>
-                        </div>
-                        <input id="jobMaintenanceCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      </div>
-                    </div>
-
-                  </div>
-                  <div class="col-12 col-sm-12 col-md-12 col-lg-6">
-                    <h5 class="mb-1 text-left">File Information</h5><hr>
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Upload Date</span>
-                      </div>
-                      <input id="dateUploaded" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                    </div>
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Path</span>
-                      </div>
-                      <input id="path" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                    </div>
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Size</span>
-                      </div>
-                      <input id="size" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">MB</span>
-                      </div>
-                    </div>
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Average Print Time</span>
-                      </div>
-                      <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                    </div>
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Last Print Time</span>
-                      </div>
-                      <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-
-                    </div>
-
-                  </div>
-                </div>
-
+            </button>
+          </div>
+          <div class="col-12 col-sm-12 col-md-8 col-lg-6 p-0 m-0 text-center">
+            <h5 class="mb-1">Cost</h5><hr>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Total Job Cost</span>
               </div>
-              <div class="col-lg-6">
-                <div class="row">
-                  <div class="col-lg-12 text-center" id="galleryElements" style="display: none;">
-                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="false">
-                      <ol class="carousel-indicators" id="thumbnails-indicators">
-
-                      </ol>
-                      <div class="carousel-inner" role="listbox" id="thumbnails">
-
-                      </div>
-                      <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                      </a>
-                      <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
+              <input id="jobCosting" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              <div class="input-group-prepend">
+                <span class="input-group-text">Hourly Cost</span>
               </div>
+              <input id="jobHourlyCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Electricity Cost</span>
+              </div>
+              <input id="jobElectricityCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              <div class="input-group-prepend">
+                <span class="input-group-text">Maintenance Cost</span>
+              </div>
+              <input id="jobMaintenanceCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
             </div>
           </div>
         </div>
+        <div class="row mt-3">
+          <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+            <h5 class="mb-1 text-left">Job Information</h5><hr>
+            <div class="col p-0">
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Printer Cost</span>
+                </div>
+                <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
+            </div>
+            <div class="col p-0">
+              <div id="resendsTitle" class="input-group mb-1 input-group-sm d-none">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Resends</span>
+                </div>
+                <input id="resendStats" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Estimated Print Time</span>
+                </div>
+                <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Actual Print Time</span>
+                </div>
+                <input id="printerTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Print Time Accuracy</span>
+                </div>
+                <input id="printTimeAccuracy" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+            <h5 class="mb-1 text-left">File Information</h5><hr>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Upload Date</span>
+              </div>
+              <input id="dateUploaded" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Path</span>
+              </div>
+              <input id="path" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Size</span>
+              </div>
+              <input id="size" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">MB</span>
+              </div>
+            </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Average Print Time</span>
+              </div>
+              <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Last Print Time</span>
+              </div>
+              <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+
+            </div>
+
+          </div>
+        </div>
         <div class="row">
-          <div class="col-lg-8">
+          <div class="col-lg-12">
             <div class="row  table-responsive">
               <div class="col-lg-12"><h5 class="mb-1 text-left">Tools</h5><hr></div>
               <div class="col-lg-12">
@@ -1213,9 +1182,9 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-12">
             <h5 class="mb-1 text-left">Notes</h5>
-            <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 220px;"></textarea>
+            <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 150px;"></textarea>
           </div>
         </div>
 
@@ -1232,4 +1201,45 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="galleryModal" tabindex="0" role="dialog" aria-labelledby="galleryModal" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
 
+        <h5 class="modal-title" id="galleryModalLabel">
+          <button id="printGalleryStatus" type="button" class="btn btn-secondary btn-sm" href="#" aria-expanded="false" disabled=""></button>      <span id="printerGalleryName"></span> - <span id="fileGalleryName"></span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="text-white" aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-lg-12 text-center" id="galleryElements" style="display: none;">
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="false">
+              <ol class="carousel-indicators" id="thumbnails-indicators">
+
+              </ol>
+              <div class="carousel-inner" role="listbox" id="thumbnails">
+
+              </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+    </div>
+  </div>
+</div>

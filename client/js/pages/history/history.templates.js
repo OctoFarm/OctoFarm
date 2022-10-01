@@ -12,10 +12,28 @@ const drawActiveUser = (record) => {
 };
 
 export const returnHistoryTableRow = function (record) {
+
+  let galleryButton = ""
+
+
+
+  if(record?.snapshot?.length > 0 || record?.timelapse?.length > 0 || record?.thumbnail?.length > 0){
+    galleryButton = `
+              <button
+                      type="button"
+                      class="btn btn-warning btn-small historyGallery"
+                      id="view-${record._id}"
+                      data-toggle="modal"
+                      data-target="#galleryModal"
+              >
+                <i class="fa-regular fa-images"></i>
+              </button>
+    `
+  }
+
   const spoolType = [];
   if (!!record?.spools) {
     record.spools.forEach((tool, index) => {
-      console.log(tool);
       const weight = tool['tool' + index]?.weight ? tool['tool' + index]?.weight : false;
       const type = tool['tool' + index]?.type ? tool['tool' + index]?.type : false;
       let spoolString = `${index}: No Spool`;
@@ -45,7 +63,7 @@ export const returnHistoryTableRow = function (record) {
           <td>
             ${drawActiveUser(record)}
           </td>
-          <td title="${record.file.path.replace(/_/g, ' ')}">
+          <td class="text-wrap" title="${record.file.path.replace(/_/g, ' ')}">
             ${record.file.name.replace(/_/g, ' ')}
           </td>
           <td>
@@ -82,9 +100,9 @@ export const returnHistoryTableRow = function (record) {
                       data-toggle="modal"
                       data-target="#historyModal"
               >
-                <i class="fas fa-eye"></i>
+                <i class="fa-solid fa-circle-info"></i>
               </button>
-
+              ${galleryButton}  
               <button
                       type="button"
                       class="btn btn-danger btn-small historyDelete"
