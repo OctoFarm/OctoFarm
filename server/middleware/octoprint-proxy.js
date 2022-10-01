@@ -15,11 +15,16 @@ module.exports = {
 
     const redirectUrl = `${printerURL}/${item}`;
     if (req.headers["content-type"] && req.headers["content-type"].match(/^multipart\/form-data/)) {
+      let defaultHeaders = {
+        "X-Api-Key": apikey
+      }
+      const headers = Object.assign(req.headers, defaultHeaders);
+
       redirectedRequest = request({
         url: redirectUrl,
         method: req.method,
         body: req.readable ? undefined : req.body,
-        headers: req.headers,
+        headers,
         json: !req.readable,
         qs: req.query,
         // Pass redirect back to the browser
