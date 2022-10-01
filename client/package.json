@@ -64,7 +64,14 @@
       "eslint:recommended"
     ],
     "babel": {
-      "presets": ["@babel/preset-env"]
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "useBuiltIns": "entry"
+          }
+        ]
+      ]
     },
     "parserOptions": {
       "parser": "@babel/eslint-parser"
