@@ -49,7 +49,6 @@ router.get('/get/dropDownList', ensureAuthenticated, async (_req, res) => {
 router.post('/assign', ensureAuthenticated, async (req, res) => {
   logger.info('Request to change selected spool:', req.body.printers);
   const multiSelectEnabled = SettingsClean.isMultipleSelectEnabled();
-
   await getPrinterStoreCache().assignSpoolToPrinters(
     req.body.printers,
     req.bodyString('spoolId'),

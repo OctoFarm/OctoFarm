@@ -1457,7 +1457,7 @@ class OctoPrintPrinter {
 
   updatePrinterData(data) {
     logger.silly('Updating printer database: ', data);
-    this.#db.update(data);
+    this?.#db?.update(data);
   }
 
   resetApiTimeout() {
