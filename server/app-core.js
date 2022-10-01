@@ -65,10 +65,11 @@ function setupExpressServer() {
   app.use(express.static(viewsPath));
 
   app.use('/images', express.static('../images'));
-  app.use('/assets', express.static('./assets'));
+
   if (process.env.NODE_ENV === 'development') {
-    app.use('/assets/js', express.static('../client/build/js'));
-    app.use('/assets/css', express.static('../client/build/css'));
+    app.use('/assets', express.static('../client/assets'));
+  }else{
+    app.use('/assets', express.static('./assets'));
   }
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false, limit: '2mb' }));

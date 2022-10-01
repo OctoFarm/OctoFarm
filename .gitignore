@@ -17,3 +17,5 @@ octofarm.zip
 pnpm-lock.yaml
 /client/assets/js
 /client/assets/css
+/client/build/*
+
