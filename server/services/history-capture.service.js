@@ -579,26 +579,35 @@ class HistoryCaptureService {
 
   async checkForAdditionalSuccessProperties() {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
-
     if (serverSettingsCache.filament.downDateSuccess) {
       // Capture success amount
-      await this.downDateWeight();
+      try {
+        await this.downDateWeight();
+      } catch (e) {
+        logger.error("Unable to downdate weight on success", e.toString())
+      }
     }
 
     if (serverSettingsCache.history.thumbnails.onComplete) {
-      this.#thumbnail = await this.thumbnailCheck();
-      await History.findByIdAndUpdate(this.#historyRecordID, {
-        $set: { 'printHistory.thumbnail': this.#thumbnail },
-      })
-        .then(async () => {
-          await getHistoryCache().initCache();
+      try {
+        this.#thumbnail = await this.thumbnailCheck();
+        await History.findByIdAndUpdate(this.#historyRecordID, {
+          $set: { 'printHistory.thumbnail': this.#thumbnail },
         })
-        .catch((e) => {
-          logger.error('Unable to update history filament record: ', e.toString());
-        });
+          .then(async () => {
+            await getHistoryCache().initCache();
+          })
+          .catch((e) => {
+            logger.error('Unable to update history filament record: ', e.toString());
+          });
+      } catch (e) {
+        logger.error("Unable to grab thumbnail on failure", e.toString())
+      }
     }
 
+
     if (serverSettingsCache.history.snapshot.onComplete) {
+      try {
       this.#snapshot = await this.snapshotCheck();
       await History.findByIdAndUpdate(this.#historyRecordID, {
         $set: { 'printHistory.snapshot': this.#snapshot },
@@ -609,10 +618,17 @@ class HistoryCaptureService {
         .catch((e) => {
           logger.error('Unable to update history filament record: ', e.toString());
         });
+      } catch (e) {
+        logger.error("Unable to grab snapshot on failure", e.toString())
+      }
     }
 
     if (serverSettingsCache.history.timelapse.onComplete) {
+      try {
       await this.timelapseCheck();
+      } catch (e) {
+        logger.error("Unable to grab timelapse on failure", e.toString())
+      }
     }
   }
 
@@ -620,6 +636,7 @@ class HistoryCaptureService {
     const serverSettingsCache = SettingsClean.returnSystemSettings();
 
     if (serverSettingsCache.filament.downDateFailed) {
+      try {
       // No point even trying to down date failed without these...
       if (!this.#job?.estimatedPrintTime && !this.#job?.lastPrintTime) {
         logger.error(
@@ -630,9 +647,13 @@ class HistoryCaptureService {
       }
       // Capture failed amount
       await this.downDateWeight();
+      } catch (e) {
+        logger.error("Unable to downdate weight on failure", e.toString())
+      }
     }
 
     if (serverSettingsCache.history.thumbnails.onFailure) {
+      try {
       this.#thumbnail = await this.thumbnailCheck();
       await History.findByIdAndUpdate(this.#historyRecordID, {
         $set: { 'printHistory.thumbnail': this.#thumbnail },
@@ -643,8 +664,12 @@ class HistoryCaptureService {
         .catch((e) => {
           logger.error('Unable to update history filament record: ', e.toString());
         });
+      } catch (e) {
+        logger.error("Unable to grab thumbnail on failure", e.toString())
+      }
     }
     if (serverSettingsCache.history.snapshot.onFailure) {
+      try {
       this.#snapshot = await this.snapshotCheck();
       await History.findByIdAndUpdate(this.#historyRecordID, {
         $set: { 'printHistory.snapshot': this.#snapshot },
@@ -655,10 +680,17 @@ class HistoryCaptureService {
         .catch((e) => {
           logger.error('Unable to update history filament record: ', e.toString());
         });
+      } catch (e) {
+        logger.error("Unable to grab snapshot on failure", e.toString())
+      }
     }
 
     if (serverSettingsCache.history.timelapse.onFailure) {
-      await this.timelapseCheck();
+      try {
+        await this.timelapseCheck();
+      } catch (e) {
+        logger.error("Unable to grab timelapse on failure", e.toString())
+      }
     }
   }
 }
