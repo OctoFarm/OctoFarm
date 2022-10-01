@@ -10,6 +10,7 @@ export async function selectFilament(spools, id) {
   let printerIds = [];
   for (const spool of spools) {
     const meta = spool.split("-");
+
     printerIds.push({
       printer: meta[0],
       tool: meta[1],

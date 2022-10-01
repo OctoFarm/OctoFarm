@@ -1343,6 +1343,7 @@ class PrinterStore {
     for (let id of printerIDs) {
       // No tool is de-attach request
       if (!id?.tool) {
+        this.deattachSpoolFromAllPrinters(spoolID);
         break;
       }
       const tool = id.tool;
@@ -1350,6 +1351,7 @@ class PrinterStore {
       const printerIndex = findIndex(farmPrinters, function (o) {
         return o._id === printerID;
       });
+
       if (spoolID !== '0') {
         const spool = await Filament.findById(spoolID);
         farmPrinters[printerIndex].selectedFilament[tool] = JSON.parse(JSON.stringify(spool));
