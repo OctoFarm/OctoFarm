@@ -19,7 +19,7 @@ const packageJsonVersion = require(packageJsonPath).version;
 
 // Target
 const buildDirProd = '../server/assets/';
-const buildDirDev = basePath + 'build/';
+const buildDirDev = basePath + 'assets/';
 
 const webpackEntries = fromPairs(
   dirContents

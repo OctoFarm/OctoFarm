@@ -238,6 +238,7 @@ export default function currentOperationsPanelService(
               const progress = document.getElementById(
                   "currentProgress-" + current.index
               );
+              document.getElementById("currentOpFile-"+current.index).innerHTML = fileName
               document.getElementById("currentTime-" + current.index).innerHTML =
                   Calc.generateTime(current.timeRemaining);
               document.getElementById("futureDate-" + current.index).innerHTML = dateComplete
@@ -262,7 +263,7 @@ export default function currentOperationsPanelService(
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">
                      ${current.name}</div>
                   <div class="card-body  pb-0 pt-2 pl-2 pr-2">
-                  <h6 id="currentFile-${
+                  <h6 id="currentOpFile-${
                       current.index
                   }" class="pb-0 text-center" style="font-size:0.6rem;"> ${fileName} </h6>
                   <h6 id="currentRestart-${
