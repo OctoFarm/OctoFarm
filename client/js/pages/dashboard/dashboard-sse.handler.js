@@ -8,6 +8,7 @@ export async function dashboardSSEventHandler(data) {
   if (data) {
     const dashboard = data.dashStatistics;
     const dashboardSettings = data.dashboardSettings;
+    const cameraList = data.cameraList
 
     DashUpdate.farmInformation(
       dashboard.timeEstimates,
@@ -45,6 +46,9 @@ export async function dashboardSSEventHandler(data) {
     }
     if (dashboardSettings.other.timeAndDate) {
       DashUpdate.dateAndTime();
+    }
+    if(dashboardSettings.other.cameraCarousel){
+      DashUpdate.cameraCarousel(cameraList);
     }
   } else {
     UI.createAlert(
