@@ -3,6 +3,39 @@ html {
   height: 100%;
 }
 
+.full-display-element {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  object-fit: cover;
+  background-color: black;
+  display: flex;
+  justify-content: center;/*define the horizontally centering*/
+  align-items: center;/*define the vertically centering*/
+  pointer-events: all;
+}
+
+.transition-display-none {
+  opacity: 0;
+  transition: opacity 1s linear;
+  -webkit-transition: opacity 1s linear;
+  -moz-transition: opacity 1s linear;
+  -o-transition: opacity 1s linear;
+  -ms-transition: opacity 1s linear;
+}
+
+.overlayFullCameraStatus {
+  background-color: black;
+  position: fixed;
+  bottom:45px;
+  right:35px;
+}
+
 .sixteen-by-nine {
   object-fit: cover;
   aspect-ratio: 16/9;
