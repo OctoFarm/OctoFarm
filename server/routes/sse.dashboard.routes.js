@@ -46,6 +46,13 @@ async function sendData() {
   const dashStatistics = getDashboardStatistics();
   const printerInformation = getPrinterStoreCache().listPrintersInformation();
 
+  const cameraList = [];
+
+  printerInformation.forEach(p => {
+    if(!!p?.camURL && p.camURL.length > 0){
+      cameraList.push(p.camURL)
+    }
+  })
   for (clientId in clients) {
     let clientsSettingsCache = await SettingsClean.returnClientSettings(
       clients[clientId]?.req?.user?.clientSettings?._id || null
@@ -65,7 +72,8 @@ async function sendData() {
     const infoDrop = {
       printerInformation,
       dashStatistics,
-      dashboardSettings
+      dashboardSettings,
+      cameraList
     };
 
     clientInformation = stringify(infoDrop);
