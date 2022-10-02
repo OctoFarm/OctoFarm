@@ -8,6 +8,26 @@ import {
 } from "../charts/chart.utils";
 
 let environmentDataChartExists = false;
+let cameraCarouselExists = false;
+let cameraInterval = false;
+
+let cameraIndex = -1;
+let currentSlidesArray = [];
+
+function advanceCameraItem() {
+  ++cameraIndex;
+  if (cameraIndex >= currentSlidesArray.length) {
+    cameraIndex = 0;
+  }
+  document.getElementById("cameraCarouselBody").style = `
+        height:auto; 
+        width: 100%; 
+        background-image: url('${encodeURI(currentSlidesArray[cameraIndex])}');
+        background-repeat:no-repeat;
+        background-size:cover;
+        background-position:center;
+        `;
+}
 
 export class DashUpdate {
   static insertIterable(elementId, data) {
@@ -52,6 +72,27 @@ export class DashUpdate {
     this.updateHtml(element, `${fixedTemp} °C`);
   }
 
+  static cameraCarousel(cameraList) {
+    if(cameraList.length !== currentSlidesArray.length){
+      currentSlidesArray = cameraList;
+    }
+    if (!cameraCarouselExists) {
+      cameraCarouselExists = true;
+      if (!cameraInterval) {
+        document.getElementById("cameraCarouselBody").style = `
+        height:auto; 
+        width: 100%; 
+        background-image: url('${encodeURI(currentSlidesArray[currentSlidesArray.length-1])}');
+        background-repeat:no-repeat;
+        background-size:cover;
+        background-position:center;
+        `;
+        cameraInterval = setInterval(() => {
+          advanceCameraItem()
+        }, 10000)
+      }
+    }
+  }
   static farmInformation(
     {
       averageEstimated: avgEstim,
@@ -140,10 +181,10 @@ export class DashUpdate {
     `;
   }
 
-  static async environmentalData(data) {
+  static async environmentalData(datadata) {
     let analyzedLabels = [];
     if (!environmentDataChartExists) {
-      for (const data of data.length) {
+      for (const data of datadata.length) {
         if (data.data.length !== 0) {
           if (data.name === "Temperature") {
             analyzedLabels.push(temperatureLabel);

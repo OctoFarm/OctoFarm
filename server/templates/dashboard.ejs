@@ -2,7 +2,9 @@
 <% let itemPath = base + '/grid-stack-item.template.ejs' %>
 
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
-
+    <link rel="stylesheet" href="/assets/css/dashboard.runner.<%= clientVersion %>.css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/swiper-bundle.css"/>
+    <script src="/assets/js/dashboard.runner.<%= clientVersion %>.min.js" type="module"></script>
     <% if(dashboardSettings?.farmActivity.currentOperations){ %>
         <div class="row">
             <div class="col-12">
@@ -158,15 +160,21 @@
         <% if(dashboardSettings?.other?.timeAndDate){ %>
             <%- include(itemPath, {
             tile:{
-            w:2,h:5,mw:2,mh:5,maxh:4,id:"timeAndDate",bodyId:"timeAndDateBody",title:"Date And Time",i:"fa-clock",c:"pt-2 text-center"
+            w:2,h:5,mw:1,mh:2,maxh:5,id:"timeAndDate",bodyId:"timeAndDateBody",title:"Date And Time",i:"fa-clock",c:"pt-2 text-center"
+            }
+            })
+            %>
+        <% } %>
+        <% if(dashboardSettings?.other?.cameraCarousel){ %>
+            <%- include(itemPath, {
+            tile:{
+            w:2,h:6,mw:1,mh:3,maxh:21,maxw:9,id:"printerCameraCarousel",bodyId:"cameraCarouselBody",title:"Cameras",i:"fa-video",c:"m-0 p-0",
+                customBody: "customBody"
             }
             })
             %>
         <% } %>
     </div>
-
-    <link rel="stylesheet" href="/assets/css/dashboard.runner.<%= clientVersion %>.css"/>
-    <script src="/assets/js/dashboard.runner.<%= clientVersion %>.min.js" type="module"></script>
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>
 <% } %>
