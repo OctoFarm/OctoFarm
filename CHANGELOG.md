@@ -1,3 +1,30 @@
+## [1.7.0-development.3](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.2...v1.7.0-development.3) (2022-10-02)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** add docker usename and password keys for building ([e05b803](https://github.com/OctoFarm/OctoFarm/commit/e05b803026b45e3ab81073431ebdbdf34e5a9784))
+* **main:** clean old files from build dirs before producing new client build ([46066ce](https://github.com/OctoFarm/OctoFarm/commit/46066cebde0e0015a2ec533d63e5d8d487b3c986)), closes [#1251](https://github.com/OctoFarm/OctoFarm/issues/1251)
+* **main:** move docker builds over to semantic release ([b45ebb8](https://github.com/OctoFarm/OctoFarm/commit/b45ebb813bb73e5615dcb1f66caf7e3efd89a015))
+
+
+### :dress: UI! :dress:
+
+* **client:** space out the dashboard system menu better ([392d5cd](https://github.com/OctoFarm/OctoFarm/commit/392d5cdbc1d9d7351ffc0a001793918658c9bc3a))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** change dashboard template to allow custom bodys ([d1971b9](https://github.com/OctoFarm/OctoFarm/commit/d1971b914df44398f5012b06a438cac72a08f2c7))
+* **server:** database key value for tracking camera widget ([8e75cc5](https://github.com/OctoFarm/OctoFarm/commit/8e75cc55e851879de330f54c373d11836ab2c2eb))
+* **server:** send camera list with dashboard sse data ([9ef240a](https://github.com/OctoFarm/OctoFarm/commit/9ef240a71d623c35d06ed238c69669d2e442f7b3))
+
+
+### :stars: New Feature :stars:
+
+* **client:** new full screen camera implementation with print state ([369cd53](https://github.com/OctoFarm/OctoFarm/commit/369cd5348a0cf50496d31ab081598583212a5b6e)), closes [#1257](https://github.com/OctoFarm/OctoFarm/issues/1257)
+* **client:** new widget for dashboard page, can be enabled in System -> Dashboard -> Other ([6fe7a87](https://github.com/OctoFarm/OctoFarm/commit/6fe7a87f834865024099851bd520aa872d3b4863))
+
 ## [1.7.0-development.2](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.1...v1.7.0-development.2) (2022-10-01)
 
 
