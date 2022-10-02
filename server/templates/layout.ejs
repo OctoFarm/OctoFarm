@@ -1,6 +1,7 @@
 <% const base = './partials' %>
 <% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
 <% const modal = base + '/octofarm-modal.ejs' %>
+<% const fullScreenPrinter = base + '/full-screen-printer.ejs' %>
 <% let currentUserGroup = "User" %>
 <% if(typeof userGroup !== "undefined") { %>
     <% currentUserGroup = userGroup %>
@@ -11,7 +12,7 @@
 <% } %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html id="octofarm_html" lang="en">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -267,6 +268,7 @@
             </div>
         </div>
     </div>
+    <%- include(fullScreenPrinter) %>
     <%- include(modal, {
     modal:{
     id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true", zIndex: 99999
