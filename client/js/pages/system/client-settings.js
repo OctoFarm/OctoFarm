@@ -65,6 +65,7 @@ export default class ClientSettings {
       document.getElementById('filamentUsageOverTimeCheck').checked =
         clientSettings.dashboard.historical.filamentUsageOverTime;
       document.getElementById('dateAndTime').checked = clientSettings.dashboard.other.timeAndDate;
+      document.getElementById('cameraCarousel').checked = clientSettings.dashboard.other.cameraCarousel;
     }
   }
 
@@ -134,6 +135,7 @@ export default class ClientSettings {
         },
         other: {
           timeAndDate: document.getElementById('dateAndTime').checked,
+          cameraCarousel: document.getElementById('cameraCarousel').checked
         },
       },
       printerManager: {

@@ -26,18 +26,24 @@
                 <%- include(titleFile) %>
             <% } %>
         </div>
-
-        <div class="card-body pb-0 <%= tile.c %>">
-            <% if (!!tile.bodyId) { %>
-                <div id="<%= tile.bodyId %>"></div>
-            <% } else { %>
-                <% if (!bodyFile) { %>
-                    <em> This widget failed to render due to missing 'tile.bodyId' or 'bodyFile' alternative </em>
+        <% if (!!tile.customBody) { %>
+            <div class="card-body <%= tile.c %>" id="<%= tile.bodyId %>"></div>
+        <% } else { %>
+            <div class="card-body pb-0 <%= tile.c %>">
+                <% if (!!tile.bodyId) { %>
+                    <div id="<%= tile.bodyId %>"></div>
                 <% } else { %>
-                    <%# More complex card-body content %>
-                    <%- include(bodyFile) %>
+                    <% if (!bodyFile) { %>
+                        <em> This widget failed to render due to missing 'tile.bodyId' or 'bodyFile' alternative </em>
+                    <% } else { %>
+                        <%# More complex card-body content %>
+                        <%- include(bodyFile) %>
+                    <% } %>
                 <% } %>
-            <% } %>
-        </div>
+            </div>
+        <% } %>
+
+
+
     </div>
 </div>
