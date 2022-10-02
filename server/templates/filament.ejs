@@ -440,21 +440,15 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-12">
                         <div class="alert alert-info" role="alert">
                             <p>Below is a list of OctoFarm's pre-defined materials. When creating a spool the information below will be used to automatically update a spool's density for you.</p>
 
                             <p>The density is used in calculations across OctoFarms interface, especially history, to make a best guess at usage from the length provided from OctoPrint.</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
 
-                        <div class="alert alert-success" role="alert">
-                            <p>Always entering custom materials? would you like to help build this list?</p>
+                            <p>Please feel free to make your own or edit a personal list below.</p>
 
-                            <p>Then please make a P.R at OctoFarms github repository on the file /client/pages/filament-manager.utils.js on the array called "materialsList".</p>
-
-                            <a target="_blank" href="https://github.com/OctoFarm/OctoFarm/edit/master/client/js/pages/filament-manager.utils.js#L8"> Click here to edit! </a>
+                            <p>If you fill in the temperature fields those can be used with the "Pre-Heat" button on the views.</p>
                         </div>
                     </div>
                     <div class="col-12">
@@ -466,6 +460,8 @@
                                 <th scope="col">Material</th>
                                 <th scope="col">Abbreviation</th>
                                 <th scope="col">Density</th>
+                                <th scope="col">Tool Temperature</th>
+                                <th scope="col">Bed Temperature</th>
                             </tr>
                             </thead>
                             <tbody id="materialsListTable">
