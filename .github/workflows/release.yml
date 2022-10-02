@@ -22,6 +22,8 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git @codedependant/semantic-release-docker && npm run install-client
+      - name: Clean old build files...
+        run: rm -Rf server/js/* && rm -Rf client/css/*
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_ACTION }}
