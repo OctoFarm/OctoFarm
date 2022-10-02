@@ -122,6 +122,11 @@ const ClientSettingsSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+      },
+      cameraCarousel: {
+        type: Boolean,
+        required: true,
+        default: false
       }
     }
   },
