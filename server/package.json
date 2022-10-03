@@ -68,7 +68,7 @@
     "request": "^2.88.2",
     "sanitize": "^2.1.2",
     "semver": "^7.3.5",
-    "sharp": "^0.30.7",
+    "sharp": "^0.31.1",
     "simple-git": "^3.14.1",
     "systeminformation": "^5.12.6",
     "table": "^6.8.0",
