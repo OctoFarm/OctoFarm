@@ -19,6 +19,7 @@ const { sortCurrentOperations } = require('./services/current-operations.service
 const { generatePrinterHeatMap } = require('./services/printer-statistics.service');
 const { initFarmInformation } = require('./services/farm-information.service');
 const { notifySubscribers } = require('./services/server-side-events.service');
+const multiFileUploadQueueCache = require("./modules/multi-file-upload-queue.module");
 const { MESSAGE_TYPES } = require('./constants/sse.constants');
 const { LOGGER_ROUTE_KEYS } = require('./constants/logger.constants');
 
@@ -73,6 +74,7 @@ const SERVER_BOOT_TASK = async () => {
     await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
       softwareUpdateChecker.checkReleaseAndLogUpdate();
     }),
+    await INITIALISE_FILE_UPLOAD_QUEUE()
   ]);
 };
 
@@ -153,6 +155,10 @@ const FILAMENT_CLEAN_TASK = async () => {
   await FilamentClean.start();
 };
 
+const INITIALISE_FILE_UPLOAD_QUEUE = async () => {
+  multiFileUploadQueueCache.start();
+}
+
 /**
  * @param task
  * @param preset
@@ -193,7 +199,6 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
     TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
-    // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
 
