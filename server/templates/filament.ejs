@@ -451,6 +451,16 @@
                             <p>If you fill in the temperature fields those can be used with the "Pre-Heat" button on the views.</p>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+                        <div class="form-group">
+                            <label for="fallbackMaterialSelect">Fallback material</label>
+                            <div class="alert alert-info" role="alert">
+                                <p>Set a fallback material. If no spool is selected the pre-heat command will utilise this material instead.</p>
+                            </div>
+                            <select class="form-control" id="fallbackMaterialSelect">
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-12">
                         <table class="table-hover table table-responsive-sm table-responsive-md">
                             <thead>
@@ -462,6 +472,7 @@
                                 <th scope="col">Density</th>
                                 <th scope="col">Tool Temperature</th>
                                 <th scope="col">Bed Temperature</th>
+                                <th scope="col">Actions</th>
                             </tr>
                             </thead>
                             <tbody id="materialsListTable">
