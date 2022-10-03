@@ -57,7 +57,7 @@
     "mongoose-paginate-v2": "^1.7.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "node-fetch": "2.6.7",
+    "node-fetch": "3.2.10",
     "node-input-validator": "^4.5.0",
     "node-upnp-ssdp": "^0.1.1",
     "passport": "0.4.1",
