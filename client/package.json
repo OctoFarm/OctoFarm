@@ -85,6 +85,6 @@
     "not dead"
   ],
   "dependencies": {
-    "core-js": "^3.25.3"
+    "core-js": "^3.25.4"
   }
 }
