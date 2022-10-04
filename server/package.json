@@ -53,7 +53,7 @@
     "mjpeg-camera": "^2.0.1",
     "mjpeg-consumer": "^2.0.0",
     "mjpeg-decoder": "^1.0.3",
-    "mongoose": "^6.6.3",
+    "mongoose": "^6.6.4",
     "mongoose-paginate-v2": "^1.7.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
