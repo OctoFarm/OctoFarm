@@ -1,3 +1,84 @@
+## [1.7.0](https://github.com/OctoFarm/OctoFarm/compare/v1.6.9...v1.7.0) (2022-10-04)
+
+
+### :dress: UI! :dress:
+
+* **client:** added new buttons to history for thumbnail, snapshot and timelapse galleries ([189325a](https://github.com/OctoFarm/OctoFarm/commit/189325a8ad2510609cbfed04b6845db30858b0be))
+* **client:** added new buttons to history for thumbnail, snapshot and timelapse galleries ([09e6cc2](https://github.com/OctoFarm/OctoFarm/commit/09e6cc240220874fa94f91db891b3b4bd670f1ca))
+* **client:** new on demand gallery modals for thumbnail, snapshot and timelapse buttons ([38feea7](https://github.com/OctoFarm/OctoFarm/commit/38feea72ceaf7a2d7c8c9e5ed4bce5d121c5c996))
+* **client:** new on demand gallery modals for thumbnail, snapshot and timelapse buttons ([680ca23](https://github.com/OctoFarm/OctoFarm/commit/680ca23ff77f22a052fba4edede617c34baa3ad0))
+* **client:** space out the dashboard system menu better ([df6f6f0](https://github.com/OctoFarm/OctoFarm/commit/df6f6f0739893da986250b3932d9b973ff7aa762))
+* **client:** space out the dashboard system menu better ([392d5cd](https://github.com/OctoFarm/OctoFarm/commit/392d5cdbc1d9d7351ffc0a001793918658c9bc3a))
+
+
+### :stars: New Feature :stars:
+
+* **client:** new full screen camera implementation with print state ([777c87a](https://github.com/OctoFarm/OctoFarm/commit/777c87afe518f2d7bdf83e7299b3482e11faa95e)), closes [#1257](https://github.com/OctoFarm/OctoFarm/issues/1257)
+* **client:** new full screen camera implementation with print state ([369cd53](https://github.com/OctoFarm/OctoFarm/commit/369cd5348a0cf50496d31ab081598583212a5b6e)), closes [#1257](https://github.com/OctoFarm/OctoFarm/issues/1257)
+* **client:** new gallery modals in history for snapshot, timelapse and thumbnails ([2134a32](https://github.com/OctoFarm/OctoFarm/commit/2134a328d562c8d440e3e38a8b21ceab9420319d))
+* **client:** new gallery modals in history for snapshot, timelapse and thumbnails ([d833a9b](https://github.com/OctoFarm/OctoFarm/commit/d833a9ba1c5bcac1635ac28a064bfff4aca4548d))
+* **client:** new widget for dashboard page, can be enabled in System -> Dashboard -> Other ([2d8f9bc](https://github.com/OctoFarm/OctoFarm/commit/2d8f9bcacaf6229f22fba2ce165b5081a6e8cf59))
+* **client:** new widget for dashboard page, can be enabled in System -> Dashboard -> Other ([6fe7a87](https://github.com/OctoFarm/OctoFarm/commit/6fe7a87f834865024099851bd520aa872d3b4863))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **client:** history gallery days would always display as today printed ([516ed06](https://github.com/OctoFarm/OctoFarm/commit/516ed060a042a594e40aa426882b71f144691d9b))
+* **client:** history gallery days would always display as today printed ([4eb415a](https://github.com/OctoFarm/OctoFarm/commit/4eb415afc782783a16098c27cbd75817940039df))
+* **main:** fix yaml syntax on release workflow ([6da0a26](https://github.com/OctoFarm/OctoFarm/commit/6da0a261cdb817abe01aaa8b04f4fbce0fd08143))
+* **main:** fix yaml syntax on release workflow ([df40bcd](https://github.com/OctoFarm/OctoFarm/commit/df40bcdde5062e8c07154e9c1ae60e1b3663fe02))
+* **server:** try/catch steps after history capture so one doesnt cancel another ([e491080](https://github.com/OctoFarm/OctoFarm/commit/e491080303f601ee39a3b4845757f5d624d802eb))
+* **server:** try/catch steps after history capture so one doesnt cancel another ([14bbc7c](https://github.com/OctoFarm/OctoFarm/commit/14bbc7c671e88d78465c2b71611b4fbd4ef6294c))
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** add codacy github action for code scanning and quality check ([67109c9](https://github.com/OctoFarm/OctoFarm/commit/67109c996169cac1cb9f47b3995fc5637d13d675))
+* **main:** add codacy github action for code scanning and quality check ([5295a8f](https://github.com/OctoFarm/OctoFarm/commit/5295a8fe23ed0bb48d4038841f9a427763368907))
+* **main:** add docker usename and password keys for building ([76e048b](https://github.com/OctoFarm/OctoFarm/commit/76e048b181c8b0571d7ff78e56a24d7ea00117ef))
+* **main:** add docker usename and password keys for building ([e05b803](https://github.com/OctoFarm/OctoFarm/commit/e05b803026b45e3ab81073431ebdbdf34e5a9784))
+* **main:** allow pre-release on dev ([#1249](https://github.com/OctoFarm/OctoFarm/issues/1249)) ([b7d4273](https://github.com/OctoFarm/OctoFarm/commit/b7d4273e6bfb249e94637b06f50b7860a955cba8))
+* **main:** allow pre-release on dev ([#1249](https://github.com/OctoFarm/OctoFarm/issues/1249)) ([9b0443f](https://github.com/OctoFarm/OctoFarm/commit/9b0443f39541b7be37b2b3356f9cb9288710f571))
+* **main:** clean old files from build dirs before producing new client build ([7c6a7c8](https://github.com/OctoFarm/OctoFarm/commit/7c6a7c8f95a293e26ab11d3452e9ecd1c5e47002)), closes [#1251](https://github.com/OctoFarm/OctoFarm/issues/1251)
+* **main:** clean old files from build dirs before producing new client build ([46066ce](https://github.com/OctoFarm/OctoFarm/commit/46066cebde0e0015a2ec533d63e5d8d487b3c986)), closes [#1251](https://github.com/OctoFarm/OctoFarm/issues/1251)
+* **main:** fix path cleaning on ci-di build ([13be0c0](https://github.com/OctoFarm/OctoFarm/commit/13be0c039d83ce8e0017e644625f0494ff4f7f9e))
+* **main:** fix path cleaning on ci-di build ([ac2f3fb](https://github.com/OctoFarm/OctoFarm/commit/ac2f3fbe64a45a9f2fca25c76971031594faf02b))
+* **main:** general readme tweaks ([28be845](https://github.com/OctoFarm/OctoFarm/commit/28be8454c88d132a86a1767ce255b8ed63c07324))
+* **main:** general readme tweaks ([111b65c](https://github.com/OctoFarm/OctoFarm/commit/111b65c1234ee742131a79acf29f39ae2017c811))
+* **main:** make sure releases only run on relevant code base changes ([a13dfee](https://github.com/OctoFarm/OctoFarm/commit/a13dfee53199cc25b78baeb11109d9d0a1e16b71))
+* **main:** make sure releases only run on relevant code base changes ([951c677](https://github.com/OctoFarm/OctoFarm/commit/951c67703e996b7d9ec009eb343920e423c91f54))
+* **main:** move docker builds over to semantic release ([b88f0be](https://github.com/OctoFarm/OctoFarm/commit/b88f0be1f0169bfac7e0c659fbfb0acdc5a34a1d))
+* **main:** move docker builds over to semantic release ([b45ebb8](https://github.com/OctoFarm/OctoFarm/commit/b45ebb813bb73e5615dcb1f66caf7e3efd89a015))
+* **main:** remove semantic release docker builds ([f61fd2d](https://github.com/OctoFarm/OctoFarm/commit/f61fd2d7d4365adb318c152723ed5a1b76e11118))
+* **main:** remove semantic release docker builds ([62ba711](https://github.com/OctoFarm/OctoFarm/commit/62ba7117ad9d1010546a64c7e78951c651c52eff))
+* **main:** remove sonar analysis ([0dba474](https://github.com/OctoFarm/OctoFarm/commit/0dba474dece2531b7e4059e0bda080b25f562335))
+* **main:** remove sonar analysis ([76506ec](https://github.com/OctoFarm/OctoFarm/commit/76506eceee6d7acb90c4842d8680e9ecea817a41))
+* **main:** remove un-required versioning from docker release configuration ([cd83816](https://github.com/OctoFarm/OctoFarm/commit/cd83816828ea415caee24e552a8b3d7c179b73f2))
+* **main:** remove un-required versioning from docker release configuration ([1571627](https://github.com/OctoFarm/OctoFarm/commit/15716273332fb1c0fcfbc4f0c994e02ad462f2f3))
+* **main:** repair docker builds and image production for development and master ([ee0d9b5](https://github.com/OctoFarm/OctoFarm/commit/ee0d9b58312fc2a3e841a630cff467de0a8605b2))
+* **main:** repair docker builds and image production for development and master ([0d11be6](https://github.com/OctoFarm/OctoFarm/commit/0d11be67de3a27528317a40c722818c7c345aaf0))
+* **main:** update read me logo path ([#1248](https://github.com/OctoFarm/OctoFarm/issues/1248)) ([34e7139](https://github.com/OctoFarm/OctoFarm/commit/34e71391992ea16e0ee42d1ea35a6fa269f6af46))
+* **main:** update read me logo path ([#1248](https://github.com/OctoFarm/OctoFarm/issues/1248)) ([5565879](https://github.com/OctoFarm/OctoFarm/commit/5565879bf74cc103efb149bb18f33613bb8ad970))
+* **release:** 1.7.0-development.1 [skip ci] ([213ba95](https://github.com/OctoFarm/OctoFarm/commit/213ba95943f6f83ba3b2bfdbf0d68ada1bf17edf)), closes [#1249](https://github.com/OctoFarm/OctoFarm/issues/1249) [#1248](https://github.com/OctoFarm/OctoFarm/issues/1248)
+* **release:** 1.7.0-development.1 [skip ci] ([6e622ac](https://github.com/OctoFarm/OctoFarm/commit/6e622acd3fc526a69ca465de0dbce32455d615c6)), closes [#1249](https://github.com/OctoFarm/OctoFarm/issues/1249) [#1248](https://github.com/OctoFarm/OctoFarm/issues/1248)
+* **release:** 1.7.0-development.2 [skip ci] ([11c94e0](https://github.com/OctoFarm/OctoFarm/commit/11c94e0e4734dfb0c0a79cb82660e9704d7614da))
+* **release:** 1.7.0-development.2 [skip ci] ([be45e2e](https://github.com/OctoFarm/OctoFarm/commit/be45e2e3a36d205f8b902ee6cc40b684d1669620))
+* **release:** 1.7.0-development.3 [skip ci] ([07fe46e](https://github.com/OctoFarm/OctoFarm/commit/07fe46e1e4e8faae1f19d4417b35f606140ca65e)), closes [#1251](https://github.com/OctoFarm/OctoFarm/issues/1251) [#1257](https://github.com/OctoFarm/OctoFarm/issues/1257)
+* **release:** 1.7.0-development.3 [skip ci] ([ca49d37](https://github.com/OctoFarm/OctoFarm/commit/ca49d37d44cd9f5177bd76d81ff6a071b7aeb4f4)), closes [#1251](https://github.com/OctoFarm/OctoFarm/issues/1251) [#1257](https://github.com/OctoFarm/OctoFarm/issues/1257)
+* **release:** 1.7.0-development.4 [skip ci] ([8db59c7](https://github.com/OctoFarm/OctoFarm/commit/8db59c746801de8b8c0c2dd59697522b0fd3d21a))
+* **release:** 1.7.0-development.4 [skip ci] ([efd2d3b](https://github.com/OctoFarm/OctoFarm/commit/efd2d3baddeed5990d7d60fdc6ef9fba75282b54))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** change dashboard template to allow custom bodys ([a8203cf](https://github.com/OctoFarm/OctoFarm/commit/a8203cf2a0fa8bec43dc5c146781ae7f7f52af1d))
+* **client:** change dashboard template to allow custom bodys ([d1971b9](https://github.com/OctoFarm/OctoFarm/commit/d1971b914df44398f5012b06a438cac72a08f2c7))
+* **server:** database key value for tracking camera widget ([50fda13](https://github.com/OctoFarm/OctoFarm/commit/50fda13cd09de298a6310e1a4839be8346640676))
+* **server:** database key value for tracking camera widget ([8e75cc5](https://github.com/OctoFarm/OctoFarm/commit/8e75cc55e851879de330f54c373d11836ab2c2eb))
+* **server:** remove uneeded console logging ([#1281](https://github.com/OctoFarm/OctoFarm/issues/1281)) ([#1282](https://github.com/OctoFarm/OctoFarm/issues/1282)) ([bf0a772](https://github.com/OctoFarm/OctoFarm/commit/bf0a7725f0d82dba64eec64ce5f8593622ec6296))
+* **server:** send camera list with dashboard sse data ([203556d](https://github.com/OctoFarm/OctoFarm/commit/203556d1d9fb40b3c0c9b4d19fbb5abd40c346f3))
+* **server:** send camera list with dashboard sse data ([9ef240a](https://github.com/OctoFarm/OctoFarm/commit/9ef240a71d623c35d06ed238c69669d2e442f7b3))
+
 ## [1.7.0-development.4](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.3...v1.7.0-development.4) (2022-10-04)
 
 
