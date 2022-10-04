@@ -1,3 +1,21 @@
+### [1.7.3](https://github.com/OctoFarm/OctoFarm/compare/v1.7.2...v1.7.3) (2022-10-04)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** change login note ([463c0cd](https://github.com/OctoFarm/OctoFarm/commit/463c0cd71277b6a75666bdbf9df18c12f062ed17))
+* **main:** change pre-release branch to beta ([ce753c8](https://github.com/OctoFarm/OctoFarm/commit/ce753c8b1c226b5582979305886203bfd8864c63))
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** remove monolithic docker building for arm ([16dbc35](https://github.com/OctoFarm/OctoFarm/commit/16dbc35c986c686d364ad8015946ccd314bf25b2))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **server:** use paths for multi-print file list combines instead of file name ([9a4e420](https://github.com/OctoFarm/OctoFarm/commit/9a4e42073600234a3a0ee6d6865246753b52865f))
+
 ### [1.7.2](https://github.com/OctoFarm/OctoFarm/compare/v1.7.1...v1.7.2) (2022-10-04)
 
 
