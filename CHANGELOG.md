@@ -1,3 +1,22 @@
+## [1.7.0-development.4](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.3...v1.7.0-development.4) (2022-10-04)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** add codacy github action for code scanning and quality check ([5295a8f](https://github.com/OctoFarm/OctoFarm/commit/5295a8fe23ed0bb48d4038841f9a427763368907))
+* **main:** fix path cleaning on ci-di build ([ac2f3fb](https://github.com/OctoFarm/OctoFarm/commit/ac2f3fbe64a45a9f2fca25c76971031594faf02b))
+* **main:** general readme tweaks ([111b65c](https://github.com/OctoFarm/OctoFarm/commit/111b65c1234ee742131a79acf29f39ae2017c811))
+* **main:** make sure releases only run on relevant code base changes ([951c677](https://github.com/OctoFarm/OctoFarm/commit/951c67703e996b7d9ec009eb343920e423c91f54))
+* **main:** remove semantic release docker builds ([62ba711](https://github.com/OctoFarm/OctoFarm/commit/62ba7117ad9d1010546a64c7e78951c651c52eff))
+* **main:** remove sonar analysis ([76506ec](https://github.com/OctoFarm/OctoFarm/commit/76506eceee6d7acb90c4842d8680e9ecea817a41))
+* **main:** remove un-required versioning from docker release configuration ([1571627](https://github.com/OctoFarm/OctoFarm/commit/15716273332fb1c0fcfbc4f0c994e02ad462f2f3))
+* **main:** repair docker builds and image production for development and master ([0d11be6](https://github.com/OctoFarm/OctoFarm/commit/0d11be67de3a27528317a40c722818c7c345aaf0))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **main:** fix yaml syntax on release workflow ([df40bcd](https://github.com/OctoFarm/OctoFarm/commit/df40bcdde5062e8c07154e9c1ae60e1b3663fe02))
+
 ## [1.7.0-development.3](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0-development.2...v1.7.0-development.3) (2022-10-02)
 
 
