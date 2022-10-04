@@ -82,6 +82,12 @@ Check out the OctoFarm documentation website for installation instructions on va
 [Getting Started](https://docs.octofarm.net/installation/)
 
 ## Installation Development
+### Requirements
+- Git
+- NodeJS > v14
+- npm
+
+
 1. Clone the OctoFarm
 
 ```sh
@@ -125,10 +131,21 @@ npm run server-dev
 ```
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
+## Contributing
+
+I don't mind taking contributions to the code. Just be warned OctoFarm is an ever evolving environment due to how it was originally a learning project for myself and JavaScript. 
+
+It's a great repository if anyone would like to practice their code clean-up and refactoring skills. 
+
+Currently I'm planning to fix this with V2.0 but that is held on a private repository. 
+
+If you'd like to contribute something, then please take a look at the open project on this repository, or feel free to open a discussion with your plans. 
 
 ## License
 
 This work [is licensed](https://github.com/OctoFarm/OctoFarm/blob/master/LICENSE.txt) under the [GNU Affero General Public License v3](https://www.gnu.org/licenses/agpl-3.0.html).
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ## Contact
 
@@ -139,9 +156,6 @@ You can contact me at [info@notexpectedyet.com](mailto:info@notexpectedyet.com)
 - [My Patreons](https://www.patreon.com/NotExpectedYet) - You all keep me going and afford me a financial incentive to keep OctoFarm up to date with new features and fixes! Biggest thanks of all.
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
   of Gina and everyone who helps out with that.
-- [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
-  of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
-  support.
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with
   developing my application. Their IDE is top notch!
 
