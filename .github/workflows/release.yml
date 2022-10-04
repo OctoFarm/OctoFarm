@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - development
+      - pre
 
 jobs:
   release:
@@ -69,6 +69,4 @@ jobs:
           GIT_AUTHOR_EMAIL: online@notexpectedyet.com
           GIT_COMMITTER_NAME: James Mackay
           GIT_COMMITTER_EMAIL: online@notexpectedyet.com
-          DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-          DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
         run: npx semantic-release
