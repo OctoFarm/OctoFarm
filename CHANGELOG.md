@@ -1,3 +1,11 @@
+### [1.7.2](https://github.com/OctoFarm/OctoFarm/compare/v1.7.1...v1.7.2) (2022-10-04)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** change login note ([6516ff4](https://github.com/OctoFarm/OctoFarm/commit/6516ff4cc2e6b299141d67a77e812ed39a08fb45))
+* **main:** change pre-release branch to beta ([977fff7](https://github.com/OctoFarm/OctoFarm/commit/977fff7973ac45eafb6fdc0db15096647b24d7b0))
+
 ### [1.7.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0...v1.7.1) (2022-10-04)
 
 
