@@ -1080,8 +1080,6 @@ class PrinterStore {
           const index = findIndex(uniqueFilesListFromAllPrinters, function (o) {
             const cleanNameFromList = o.name.replace(/ /g, "_")
             const cleanFileName = file.name.replace(/ /g, "_")
-            console.log(cleanNameFromList)
-            console.log(cleanFileName)
             return cleanNameFromList === cleanFileName;
           });
           if (index === -1) {
