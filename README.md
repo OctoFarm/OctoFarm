@@ -7,6 +7,7 @@
 ![GitHub issues](https://img.shields.io/github/issues/octofarm/octofarm?color=green&style=appveyor)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=appveyor)](https://GitHub.com/octofarm/octofarm/graphs/commit-activity)
 [![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=appveyor)](https://hub.docker.com/r/octofarm/octofarm)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ba07a0c4e607424c9a87bf2156417872)](https://www.codacy.com/gh/OctoFarm/OctoFarm/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OctoFarm/OctoFarm&amp;utm_campaign=Badge_Grade)
 
 # OctoFarm [![Latest Release](https://img.shields.io/github/release/octofarm/octofarm)](https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date)
 
