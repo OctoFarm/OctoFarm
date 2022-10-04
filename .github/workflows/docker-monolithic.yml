@@ -13,10 +13,10 @@ jobs:
       - name: "Decide tags to use"
         run: |
           if ${{ github.ref == 'refs/heads/master' }} == true; then
-            echo 'TAG_EDGE=latest' >> $GITHUB_ENV
+            echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
           fi
           if ${{ github.ref == 'refs/heads/beta' }} == true; then
-            echo 'TAG_EDGE=beta' >> $GITHUB_ENV
+            echo 'TAG_EDGE=monolithic-beta' >> $GITHUB_ENV
           fi
       - name: Docker meta
         id: docker_meta
