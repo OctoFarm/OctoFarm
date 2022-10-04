@@ -1078,8 +1078,10 @@ class PrinterStore {
       if (fileList) {
         for (let file of fileList) {
           const index = findIndex(uniqueFilesListFromAllPrinters, function (o) {
-            const cleanNameFromList = o.name.replace(/ /g, "_")
-            const cleanFileName = file.name.replace(/ /g, "_")
+            console.log(o)
+            console.log(o)
+            const cleanNameFromList = o.path.replace(/ /g, "_")
+            const cleanFileName = file.path.replace(/ /g, "_")
             return cleanNameFromList === cleanFileName;
           });
           if (index === -1) {
@@ -1096,7 +1098,7 @@ class PrinterStore {
         const currentPrinter = this.#findMePrinter(id);
         const fileList = currentPrinter?.fileList?.fileList;
         if (!!fileList) {
-          fileChecks.push(fileList.some((el) => el.name.replace(/ /g, "_") === fileToCheck.name.replace(/ /g, "_")));
+          fileChecks.push(fileList.some((el) => el.path.replace(/ /g, "_") === fileToCheck.path.replace(/ /g, "_")));
         }
       }
       if (
