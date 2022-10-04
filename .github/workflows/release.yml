@@ -16,15 +16,53 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      # Check to see if changes have occurred in client / server directories
+      - name: Detecting changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            app:
+            - 'server/app.js'
+            - 'server/app-core.js'
+            - 'server/app-env.js'
+            - 'server/app-fallbacks.js'
+            - 'server/migrate-mongo-config.js'
+            - 'server/tasks.js'
+            - 'server/cache/**'
+            - 'server/constants/**'
+            - 'server/exceptions/**'
+            - 'server/modules/**'
+            - 'server/handlers/**'
+            - 'server/middleware/**'
+            - 'server/migrations/**'
+            - 'server/models/**'
+            - 'server/routes/**'
+            - 'server/services/**'
+            - 'server/store/**'
+            - 'server/utils/**'
+            - 'server/templates/**'
+            - 'server/*.json'
+            - 'client/index.js'
+            - 'client/webpack.config.js'
+            - 'client/css/**'
+            - 'client/js/**'
+            - 'client/assets/**'
+            - 'client/entry/**'
+            - 'client/*.json'
       - name: Setup Node.js
+        if: steps.filter.outputs.app == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 16
       - name: Install dependencies
+          if: steps.filter.outputs.app == 'true'
         run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git && npm run install-client
       - name: Clean old build files...
-        run: rm -Rf server/assets/js/* && rm -Rf client/assets/css/*
+          if: steps.filter.outputs.app == 'true'
+        run: rm -Rf server/assets/js/* && rm -Rf server/assets/css/*
       - name: Release
+        if: steps.filter.outputs.app == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_ACTION }}
           GIT_AUTHOR_NAME: James Mackay
