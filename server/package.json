@@ -98,6 +98,6 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20",
-    "release-it": "^15.0.0"
+    "release-it": "^15.4.3"
   }
 }
