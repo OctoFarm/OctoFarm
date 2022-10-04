@@ -1,3 +1,10 @@
+### [1.7.1-development.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0...v1.7.1-development.1) (2022-10-04)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **server:** remove old history generate function to force a build ([6d8c5d0](https://github.com/OctoFarm/OctoFarm/commit/6d8c5d0de73483af8ec0fea28861c4c7cba3dcfa))
+
 ## [1.7.0](https://github.com/OctoFarm/OctoFarm/compare/v1.6.9...v1.7.0) (2022-10-04)
 
 
