@@ -1,3 +1,10 @@
+### [1.7.2-development.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.1...v1.7.2-development.1) (2022-10-04)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **server:** remove duplicated utilities ([9684c72](https://github.com/OctoFarm/OctoFarm/commit/9684c726f18147390b8a5b25bbc2d8feb5696fa4))
+
 ### [1.7.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.0...v1.7.1) (2022-10-04)
 
 
