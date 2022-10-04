@@ -1,6 +1,6 @@
 {
   "name": "octofarm-client",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack --mode=production",
