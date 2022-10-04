@@ -56,10 +56,10 @@ jobs:
         with:
           node-version: 16
       - name: Install dependencies
-          if: steps.filter.outputs.app == 'true'
+        if: steps.filter.outputs.app == 'true'
         run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git && npm run install-client
       - name: Clean old build files...
-          if: steps.filter.outputs.app == 'true'
+        if: steps.filter.outputs.app == 'true'
         run: rm -Rf server/assets/js/* && rm -Rf server/assets/css/*
       - name: Release
         if: steps.filter.outputs.app == 'true'
