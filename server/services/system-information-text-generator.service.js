@@ -6,7 +6,7 @@ const { getLogsPath } = require('../utils/system-paths.utils.js');
 const { isPm2, isNodemon, isNode } = require('../utils/env.utils.js');
 
 const isDocker = require('is-docker');
-const { getUpdateNotificationIfAny } = require('./octofarm-update.service.js');
+const { getUpdateNotificationIfAny } = require('../modules/InlineUpdater/octofarm-update.service.js');
 
 const { SystemRunner } = require('./system-information.service.js');
 const prettyHelpers = require('../templates/partials/functions/pretty.js');

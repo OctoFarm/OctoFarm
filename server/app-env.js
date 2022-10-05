@@ -361,6 +361,22 @@ function isEnvProd() {
 
 /**
  *
+ * @returns {string} If available
+ */
+function getGithubTokenIfAvailable() {
+  return process.env[AppConstants.GITHUB_TOKEN_KEY];
+}
+
+/**
+ *
+ * @returns {string} If available
+ */
+function getAirgappedSettingIfAvailable() {
+  return process.env[AppConstants.AIR_GAPPED_KEY];
+}
+
+/**
+ *
  * @returns {string} Client version number #.#.#
  */
 function fetchClientVersion() {
@@ -405,4 +421,6 @@ module.exports = {
   getViewsPath,
   fetchClientVersion,
   fetchSuperSecretKey,
+  getGithubTokenIfAvailable,
+  getAirgappedSettingIfAvailable
 };

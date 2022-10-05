@@ -7,6 +7,8 @@ const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
 const LOG_LEVEL = "LOG_LEVEL";
 const NODE_ENV_KEY = "NODE_ENV";
 const SUPER_SECRET_KEY = "SUPER_SECRET_KEY";
+const GITHUB_TOKEN_KEY = "GITHUB_TOKEN";
+const AIR_GAPPED_KEY = "AIR_GAPPED";
 
 const VERSION_KEY = "npm_package_version";
 
@@ -102,6 +104,14 @@ class AppConstants {
 
   static get SUPER_SECRET_KEY() {
     return SUPER_SECRET_KEY;
+  }
+
+  static get GITHUB_TOKEN_KEY() {
+    return GITHUB_TOKEN_KEY;
+  }
+
+  static get AIR_GAPPED_KEY() {
+    return AIR_GAPPED_KEY;
   }
 }
 

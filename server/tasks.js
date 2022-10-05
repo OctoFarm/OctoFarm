@@ -1,4 +1,4 @@
-const softwareUpdateChecker = require('./services/octofarm-update.service');
+const softwareUpdateChecker = require('./modules/InlineUpdater/octofarm-update.service');
 const { FilamentClean } = require('./services/filament-cleaner.service');
 const { initHistoryCache, getHistoryCache } = require('./cache/history.cache');
 const { TaskPresets } = require('./constants/task.constants');
@@ -19,6 +19,7 @@ const { sortCurrentOperations } = require('./services/current-operations.service
 const { generatePrinterHeatMap } = require('./services/printer-statistics.service');
 const { initFarmInformation } = require('./services/farm-information.service');
 const { notifySubscribers } = require('./services/server-side-events.service');
+const { onlineChecker } = require("./modules/OnlineChecker/index.js");
 const { MESSAGE_TYPES } = require('./constants/sse.constants');
 const { LOGGER_ROUTE_KEYS } = require('./constants/logger.constants');
 
@@ -63,6 +64,7 @@ const INITIALISE_PRINTERS_TASK = async () => {
 
 const SERVER_BOOT_TASK = async () => {
   await Promise.allSettled([
+    await onlineChecker.check(),
     await SystemRunner.initialiseSystemInformation(),
     await detectFarmPi(),
     await SystemRunner.profileCPUUsagePercent(),
@@ -70,9 +72,9 @@ const SERVER_BOOT_TASK = async () => {
     // await grabLatestPatreonData(),
     await updatePluginNoticesStore(),
     await updatePluginStore(),
-    await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-      softwareUpdateChecker.checkReleaseAndLogUpdate();
-    }),
+    // await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
+    //   softwareUpdateChecker.checkReleaseAndLogUpdate();
+    // }),
   ]);
 };
 
@@ -193,7 +195,6 @@ class OctoFarmTasks {
     TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
     TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
     TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
-    // TaskStart(INIT_FILE_UPLOAD_QUEUE, TaskPresets.PERIODIC_2500MS)
   ];
 }
 

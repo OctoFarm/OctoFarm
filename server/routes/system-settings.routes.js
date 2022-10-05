@@ -27,7 +27,7 @@ const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny,
   syncLatestOctoFarmRelease,
-} = require('../services/octofarm-update.service.js');
+} = require('../modules/InlineUpdater/octofarm-update.service.js');
 const { getPrinterManagerCache } = require('../cache/printer-manager.cache');
 const { getImagesPath, getLogsPath } = require('../utils/system-paths.utils');
 const S_VALID = require('../constants/validate-settings.constants');

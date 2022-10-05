@@ -1,7 +1,9 @@
-const Logger = require("../handlers/logger.js");
-const { AppConstants } = require("../constants/app.constants");
+const Logger = require("../../handlers/logger.js");
+const { AppConstants } = require("../../constants/app.constants");
 const { getGithubReleasesPromise } = require("./github-client.service");
-const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const {getGithubTokenIfAvailable} = require("../../app-env");
+const fetch = require("node-fetch");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SERVER_UPDATE);
 let lastSuccessfulReleaseCheckMoment = null;
@@ -12,6 +14,20 @@ let airGapped = null;
 let loadedWithPrereleases = null;
 let installedReleaseFound = null;
 let notificationReady = false;
+
+let octofarmUpdateServiceCache;
+
+class OctoFarmUpdateService{
+  #air_gapped = false;
+
+
+}
+
+if(!octofarmUpdateServiceCache){
+  octofarmUpdateServiceCache = new OctoFarmUpdateService(getGithubTokenIfAvailable());
+}
+
+module.exports = octofarmUpdateServiceCache;
 
 function findGithubRelease(releases, prerelease = false, tag_name = null) {
   return releases.find(

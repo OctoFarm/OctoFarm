@@ -24,7 +24,7 @@ const {
   canWeDetectPrintersPowerState,
 } = require('../octoprint/utils/printer-power-plugins.utils');
 const { notifySubscribers } = require('../../services/server-side-events.service');
-const softwareUpdateChecker = require('../../services/octofarm-update.service');
+const softwareUpdateChecker = require('../../modules/InlineUpdater/octofarm-update.service');
 const WebSocketClient = require('../octoprint/octoprint-websocket-client.service');
 const { handleMessage } = require('../octoprint/octoprint-websocket-message.service');
 const { PrinterTicker } = require('../printer-connection-log.service');
