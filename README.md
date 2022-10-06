@@ -156,14 +156,17 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 ## Contact
 
-You can contact me at <info@notexpectedyet.com>
+You can contact me at [info@notexpectedyet.com](mailto:info@notexpectedyet.com)
 
 ## Acknowledgements
 
 *   [My Patreons](https://www.patreon.com/NotExpectedYet) - You all keep me going and afford me a financial incentive to keep OctoFarm up to date with new features and fixes! Biggest thanks of all.
+
 *   [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work
     of Gina and everyone who helps out with that.
+
 *   [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with
     developing my application. Their IDE is top notch!
+
 
 [DashboardScreenshot]: https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png?raw=true
