@@ -68,7 +68,7 @@ const SERVER_BOOT_TASK = async () => {
     await SystemRunner.initialiseSystemInformation(),
     await detectFarmPi(),
     await SystemRunner.profileCPUUsagePercent(),
-    SystemRunner.profileMemoryUsagePercent(),
+    await SystemRunner.profileMemoryUsagePercent(),
     // await grabLatestPatreonData(),
     await updatePluginNoticesStore(),
     await updatePluginStore(),

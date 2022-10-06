@@ -18,8 +18,6 @@ let notificationReady = false;
 let octofarmUpdateServiceCache;
 
 class OctoFarmUpdateService{
-  #air_gapped = false;
-
 
 }
 
