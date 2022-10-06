@@ -20,6 +20,7 @@ const { generatePrinterHeatMap } = require('./services/printer-statistics.servic
 const { initFarmInformation } = require('./services/farm-information.service');
 const { notifySubscribers } = require('./services/server-side-events.service');
 const { onlineChecker } = require("./modules/OnlineChecker/index.js");
+const { githubService } = require("./modules/InlineUpdater");
 const { MESSAGE_TYPES } = require('./constants/sse.constants');
 const { LOGGER_ROUTE_KEYS } = require('./constants/logger.constants');
 
@@ -65,16 +66,14 @@ const INITIALISE_PRINTERS_TASK = async () => {
 const SERVER_BOOT_TASK = async () => {
   await Promise.allSettled([
     await onlineChecker.check(),
+    await githubService.requestGithubReleaseData(),
     await SystemRunner.initialiseSystemInformation(),
     await detectFarmPi(),
     await SystemRunner.profileCPUUsagePercent(),
     await SystemRunner.profileMemoryUsagePercent(),
     // await grabLatestPatreonData(),
     await updatePluginNoticesStore(),
-    await updatePluginStore(),
-    // await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-    //   softwareUpdateChecker.checkReleaseAndLogUpdate();
-    // }),
+    await updatePluginStore()
   ]);
 };
 
