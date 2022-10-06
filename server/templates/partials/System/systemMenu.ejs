@@ -8,13 +8,6 @@
                 bodyClass: "col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10",
                 listItems: [
                     {
-                        id: "system-information",
-                        name: "Information",
-                        icon: "fas fa-info-circle",
-                        permissionGroup: "",
-                        bodyFile: "./System/systemInformation.ejs"
-                    },
-                    {
                         id: "system-client",
                         name: "Client",
                         icon: "fas fa-desktop",
@@ -41,6 +34,13 @@
                         icon: "fas fa-users",
                         permissionGroup: "Administrator",
                         bodyFile: "./System/systemUsers.ejs"
+                    },
+                    {
+                    id: "system-information",
+                    name: "System Information",
+                    icon: "fas fa-info-circle",
+                    permissionGroup: "Administrator",
+                    bodyFile: "./System/systemInformation.ejs"
                     },
                     {
                         id: "system-tasks",
