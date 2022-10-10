@@ -11,6 +11,7 @@ import {
 import { ClientErrors } from '../js/exceptions/octofarm-client.exceptions';
 import { ApplicationError } from '../js/exceptions/application-error.handler';
 import { updateCameraImage } from '../js/services/proxy-camera.service';
+const pageParam = `?currentPage=`
 
 // Keeping hold of this, may return a use for later...
 // function checkUpdateAndNotify(updateResponse) {
@@ -95,8 +96,13 @@ const reconnectFunc = debounce(
   }
 );
 
+
+function buildEventsURL(){
+  return `/events${pageParam}${encodeURI(window.location.pathname)}`
+}
+
 function setupEventSource() {
-  evtSource = new EventSource('/events');
+  evtSource = new EventSource(buildEventsURL());
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
     if (type === MESSAGE_TYPES.AM_I_ALIVE) {
