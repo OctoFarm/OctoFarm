@@ -21,6 +21,10 @@ class SettingsCleanerService {
     return systemClean.timeout;
   }
 
+  static returnDisplayDashboardSettings(){
+    return systemClean.displayView.enabled;
+  }
+
   static returnFilamentManagerSettings() {
     return systemClean.filamentManager;
   }

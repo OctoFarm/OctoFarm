@@ -153,6 +153,25 @@
                     <div class="col-12 col-md-4">
                         <img width="100%" src="images/bg.jpg">
                     </div>
+                </div><hr>
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <p class="font-weight-bold">Display Dashboard</p>
+                        <p>The display dashboard is an unathenticated route you can access from <a href="/display">/display</a> when it is enabled.</p>
+                        <p>You can set it up just the same as the dashboard using the below configuration panel.</p>
+                        <small>NOTE: The endpoint is un-authenticated anyone can access the endpoint.</small>
+                        <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input type="checkbox" class="custom-control-input"
+                                       id="requireLogin" required <%= (serverSettings.displayView.enabled) ? "checked" : "" %>
+                                >
+                                <label class="custom-control-label"
+                                       for="requireLogin">Enabled</label>
+                                <div class="valid-feedback">Display dashboard turned on</div>
+                                <div class="invalid-feedback">Display dashboard turned off</div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="server-settings"

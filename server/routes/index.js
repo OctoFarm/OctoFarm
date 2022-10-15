@@ -72,6 +72,33 @@ router.get('/dashboard', ensureAuthenticated, ensureCurrentUserAndGroup, async (
     clientSettings: req.user.clientSettings,
   });
 });
+
+const dashboardDisplayEnabled = SettingsClean.returnDisplayDashboardSettings();
+if(dashboardDisplayEnabled){
+  router.get('/display', ensureCurrentUserAndGroup, async (req, res) => {
+    const printers = getPrinterStoreCache().listPrintersInformation();
+    const serverSettings = SettingsClean.returnSystemSettings();
+    const dashStatistics = getDashboardStatistics();
+    let dashboardSettings = req.user.clientSettings?.dashboard || getDefaultDashboardSettings();
+
+    res.render('dashboard', {
+      layout: "layout_no_nav.ejs",
+      name: req.user.name,
+      userGroup: req.user.group,
+      version,
+      printerCount: printers.length,
+      page: 'Display Dashboard',
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      helpers: prettyHelpers,
+      dashboardSettings: dashboardSettings,
+      dashboardStatistics: dashStatistics,
+      serverSettings,
+      clientSettings: req.user.clientSettings,
+    });
+  });
+}
+
+
 router.get('/printers', ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = getPrinterStoreCache().listPrintersInformation();
   const serverSettings = SettingsClean.returnSystemSettings();
