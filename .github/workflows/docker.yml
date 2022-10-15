@@ -12,11 +12,11 @@ jobs:
     steps:
       - name: "Decide tags to use"
         run: |
-          if ${{ github.ref == 'refs/heads/releases/**' }} == true; then
-            echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
+          if ${{ github.ref == 'refs/heads/master' }} == true; then
+            echo 'TAG_LATEST=latest' >> $GITHUB_ENV
           fi
           if ${{ github.ref == 'refs/heads/betas/**' }} == true; then
-            echo 'TAG_EDGE=monolithic-beta' >> $GITHUB_ENV
+            echo 'TAG_LATEST=beta' >> $GITHUB_ENV
           fi
       - name: Checkout
         uses: actions/checkout@v2
@@ -66,7 +66,8 @@ jobs:
           # x.y.z versioning (not strictly 'vx.y.z' semver)
           tag-match: ^(\d+\.)?(\d+\.)?(\*|\d+)$
           tag-custom: |
-            ${{env.TAG_EDGE}}-{{version}}
+            ${{env.TAG_LATEST}}
+            ${{version}}
       - name: Set up QEMU
         if: steps.filter.outputs.app == 'true'
         uses: docker/setup-qemu-action@v1
