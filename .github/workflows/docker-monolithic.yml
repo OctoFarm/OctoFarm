@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: "Decide tags to use"
         run: |
-          if ${{ github.ref == 'refs/heads/releases/**' }} == true; then
+          if ${{ github.ref == 'refs/heads/master' }} == true; then
             echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
           fi
           if ${{ github.ref == 'refs/heads/betas/**' }} == true; then
