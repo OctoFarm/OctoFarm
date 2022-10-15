@@ -1,6 +1,7 @@
 const Logger = require('../handlers/logger');
 const { LOGGER_ROUTE_KEYS } = require('../constants/logger.constants');
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_SSE);
+const {capitaliseFirstLetter} = require("../utils/string.utils")
 
 const { stringify } = require('flatted');
 let clientList = [];
@@ -31,7 +32,7 @@ const addClientConnection = (req, res) => {
     id,
     res,
     user: JSON.parse(JSON.stringify(req?.user)),
-    endpoint: req.url ? JSON.parse(JSON.stringify(req.url)) : 'unknown endpoint',
+    endpoint: req.query.currentPage ? JSON.parse(JSON.stringify(capitaliseFirstLetter(req.query.currentPage.replace("/", "")))) : 'unknown endpoint',
     ip: req.socket.remoteAddress,
     forwardIp: req.headers['x-forwarded-for'],
   };
