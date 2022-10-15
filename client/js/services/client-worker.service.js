@@ -8,8 +8,11 @@ let savedWorkerEventFunction = null;
 let currentFileURL = null;
 const workerResource = `/assets/js/sse.client.${packageJson.version}.min.js`;
 
+
 function webWorkerFunction(url, workerEventFunction) {
   worker = new Worker(workerResource);
+
+
   worker.postMessage({ url: url });
   worker.onmessage = function (event) {
     if (!!event.data) {

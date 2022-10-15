@@ -1,6 +1,6 @@
 
 module.exports = {
-  branches: ['release/**', { name: 'beta/**', prerelease: true }],
+  branches: ['master', { name: 'releases/release-**', prerelease: false }, { name: 'betas/beta-**', prerelease: "beta" }],
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -111,7 +111,7 @@ module.exports = {
     ],
     ['@semantic-release/github', {
       "assets": [
-        {"path": "server", "label": "Server Distribution"}
+        {"path": "server/", "label": "Server Distribution"}
       ]
     }]
   ],
