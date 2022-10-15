@@ -91,7 +91,7 @@ module.exports = {
       '@semantic-release/exec',
       {
         // eslint-disable-next-line no-template-curly-in-string
-        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../',
+        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../ && chmod +x scripts/create-release-zip.sh',
       },
     ],
     [
