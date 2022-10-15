@@ -1,16 +1,17 @@
 [comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/octofarm/octofarm?style=appveyor&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
-![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
 [![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/network)
 [![GitHub license](https://img.shields.io/github/license/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/octofarm/blob/master/LICENSE.txt)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/octofarm/octofarm/ci?style=appveyor)
 ![GitHub issues](https://img.shields.io/github/issues/octofarm/octofarm?color=green&style=appveyor)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=appveyor)](https://GitHub.com/octofarm/octofarm/graphs/commit-activity)
 [![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=appveyor)](https://hub.docker.com/r/octofarm/octofarm)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/ba07a0c4e607424c9a87bf2156417872)](https://www.codacy.com/gh/OctoFarm/OctoFarm/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OctoFarm/OctoFarm&amp;utm_campaign=Badge_Grade)
+![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
+[![Docker](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker.yml)
+[![Docker Monolithic](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker-monolithic.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker-monolithic.yml)
+[![Node.js CI](https://github.com/OctoFarm/OctoFarm/actions/workflows/nodejs.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/nodejs.yml)
+[![release](https://github.com/OctoFarm/OctoFarm/actions/workflows/release.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/release.yml)
 
 # OctoFarm [![Latest Release](https://img.shields.io/github/release/octofarm/octofarm)](https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date)
-
 <div align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
     <img src="https://github.com/OctoFarm/OctoFarm/blob/master/server/assets/images/logo.png?raw=true" alt="Logo" width="400px">
