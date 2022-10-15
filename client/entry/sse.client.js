@@ -28,6 +28,7 @@ function setupEventSource(url) {
   } else {
     url = evtURL;
   }
+
   evtSource = new EventSource(url);
   evtSource.onmessage = async function (e) {
     if (!!e.data) {
