@@ -1,3 +1,24 @@
+## [1.8.0-beta.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.3...v1.8.0-beta.1) (2022-10-15)
+
+
+### :stars: New Feature :stars:
+
+* **client:** show the current page of user on active sessions ([2150123](https://github.com/OctoFarm/OctoFarm/commit/2150123990ed3c993cd7f0edabc2e710c5e27d67))
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** code-ql scanning tool ([db44f19](https://github.com/OctoFarm/OctoFarm/commit/db44f195fbcf6ad28c2fe73727fe67503c75e5bf))
+* **main:** create monolithic docker tags for beta/master ([5b2bc7d](https://github.com/OctoFarm/OctoFarm/commit/5b2bc7d4a23d32617b2c66d858c60013b0e772fa))
+* **main:** create monolithic docker tags for beta/master ([d82fe20](https://github.com/OctoFarm/OctoFarm/commit/d82fe20b71f4db8d40c28a10e4a2db486452d1fd))
+* **main:** create monolithic docker tags for beta/master ([85157ff](https://github.com/OctoFarm/OctoFarm/commit/85157ff51e920608840c6e8465c10bc36d3b15bd))
+* **main:** further tweaks to pre-releasing ([38e9fbb](https://github.com/OctoFarm/OctoFarm/commit/38e9fbb3d946ff9d12bb9880d8f9006ab3a7c8f3))
+* **main:** further tweaks to pre-releasing ([f267bc0](https://github.com/OctoFarm/OctoFarm/commit/f267bc08a552660dbfd19c6883496c3637c736bc))
+* **main:** further tweaks to pre-releasing ([308dfdc](https://github.com/OctoFarm/OctoFarm/commit/308dfdc05cf0adbce5cef267b47f3a980d20727b))
+* **main:** refactor release flows for release/** beta/** globs ([b33f081](https://github.com/OctoFarm/OctoFarm/commit/b33f0815f495ab25bb7f9b3507b2f86262c9843b))
+* **main:** remove codacy badge ([f22996b](https://github.com/OctoFarm/OctoFarm/commit/f22996b739b4c2285e7d342a026e86058d91c519))
+* **main:** replace codacy code scanning tool ([15b01ca](https://github.com/OctoFarm/OctoFarm/commit/15b01ca0176c89e1f14cbde32ccf83468920c94e))
+
 ### [1.7.3](https://github.com/OctoFarm/OctoFarm/compare/v1.7.2...v1.7.3) (2022-10-04)
 
 

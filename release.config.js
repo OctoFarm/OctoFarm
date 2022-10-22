@@ -1,6 +1,6 @@
 
 module.exports = {
-  branches: ['release/**', { name: 'beta/**', prerelease: true }],
+  branches: ['master', { name: 'betas/beta-**', prerelease: "beta" }],
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -91,7 +91,7 @@ module.exports = {
       '@semantic-release/exec',
       {
         // eslint-disable-next-line no-template-curly-in-string
-        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../',
+        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../ && chmod +x scripts/create-release-zip.sh',
       },
     ],
     [
@@ -111,7 +111,7 @@ module.exports = {
     ],
     ['@semantic-release/github', {
       "assets": [
-        {"path": "server", "label": "Server Distribution"}
+        {"path": "octofarm.zip", "label": "OctoFarm"}
       ]
     }]
   ],
