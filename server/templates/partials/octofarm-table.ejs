@@ -3,11 +3,15 @@
     <% hideTable = " d-none" %>
 <% } %>
 <div class="col-lg-12 mt-2 table-responsive-sm table-responsive-md">
-    <table id="<%= table.id %>" class="table table-dark table-striped text-center <%= hideTable %>">
+    <table id="<%= table.id %>" class="table table-dark table-striped text-center <%= hideTable %> tablesort">
         <thead>
         <tr>
             <% table.headers.forEach(header => { %>
-                <th scope="col" class="sticky-table table-dark" style="<%= header.style %>"><%- header.title %></th>
+                <% let sortTable = "" %>
+                <% if(header.sort) {%>
+                    <% sortTable = header.sort %>
+                <% } %>
+                <th scope="col" class="sticky-table table-dark" style="<%= header.style %>" data-tablesort-type="<%= sortTable %>"><%- header.title %></th>
             <% }) %>
         </tr>
         </thead>
