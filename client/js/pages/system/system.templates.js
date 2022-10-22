@@ -6,7 +6,7 @@ export const activeUserListRowTemplate = (user) => {
     forwardedIpAddress = `<h6><i class="fa-solid fa-network-wired"></i> ${user.forwardIp}</h6>`;
   }
   return `
-      <div class="col-sm-12 col-md-4 col-lg-2">
+      <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card text-white bg-dark mb-3">
           <div class="card-header"><i class="fa-solid fa-user"></i> ${user.userName}</div>
           <div class="card-body">
