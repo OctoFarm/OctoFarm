@@ -768,8 +768,7 @@ class OctoPrintPrinter {
 
   async getSessionkey() {
     const session = await this.acquireOctoPrintSessionKey();
-
-    if (typeof session !== 'string') {
+    if (typeof session !== 'string' && session.length === 32) {
       // Couldn't setup websocket
       const sessionKeyFail = {
         state: 'Offline',
