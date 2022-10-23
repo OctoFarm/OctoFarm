@@ -56,4 +56,4 @@ jobs:
           # to also validate the commit message for one commit PRs.
           validateSingleCommit: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_ACTION }}
