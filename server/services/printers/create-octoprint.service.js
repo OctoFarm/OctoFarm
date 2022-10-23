@@ -24,7 +24,7 @@ const {
   canWeDetectPrintersPowerState,
 } = require('../octoprint/utils/printer-power-plugins.utils');
 const { notifySubscribers } = require('../../services/server-side-events.service');
-const softwareUpdateChecker = require('../../modules/InlineUpdater/octofarm-update.service');
+const { onlineChecker } = require('../../modules/OnlineChecker/index.js');
 const WebSocketClient = require('../octoprint/octoprint-websocket-client.service');
 const { handleMessage } = require('../octoprint/octoprint-websocket-message.service');
 const { PrinterTicker } = require('../printer-connection-log.service');
@@ -1143,7 +1143,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintPluginsListData(force = true) {
-    if (!!softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
+    if (!!onlineChecker.airGapped) {
       this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().PLUGINS, 'danger');
       return false;
     }
@@ -1187,7 +1187,7 @@ class OctoPrintPrinter {
   }
 
   async acquireOctoPrintUpdatesData(force = false) {
-    if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) return false;
+    if (onlineChecker.airGapped) return false;
     this.#apiPrinterTickerWrap('Acquiring OctoPrint updates data', 'Info');
     this.#apiChecksUpdateWrap(ALLOWED_SYSTEM_CHECKS().UPDATES, 'warning');
     if (

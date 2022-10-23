@@ -111,7 +111,7 @@ module.exports = {
     ],
     ['@semantic-release/github', {
       "assets": [
-        {"path": "octofarm.zip", "label": "OctoFarm"}
+        {"path": "octofarm-*.zip", "label": "OctoFarm"}
       ]
     }]
   ],

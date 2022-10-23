@@ -6,7 +6,7 @@ const { getLogsPath } = require('../utils/system-paths.utils.js');
 const { isPm2, isNodemon, isNode } = require('../utils/env.utils.js');
 
 const isDocker = require('is-docker');
-const { getUpdateNotificationIfAny } = require('../modules/InlineUpdater/octofarm-update.service.js');
+const { onlineChecker } = require('../modules/OnlineChecker/index.js');
 
 const { SystemRunner } = require('./system-information.service.js');
 const prettyHelpers = require('../templates/partials/functions/pretty.js');
@@ -48,7 +48,7 @@ async function generateSystemInformationContents() {
 
   const updateNotification = getUpdateNotificationIfAny();
 
-  if (!updateNotification?.air_gapped) {
+  if (!onlineChecker?.airGapped) {
     systemInformationContents += `${airGapped} ${yes}`;
   } else {
     systemInformationContents += `${airGapped} ${no}`;

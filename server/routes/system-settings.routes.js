@@ -23,11 +23,7 @@ const { SettingsClean } = require('../services/settings-cleaner.service.js');
 const { Logs } = require('../services/server-logs.service.js');
 const { SystemCommands } = require('../services/server-commands.service.js');
 const { fetchUsers } = require('../services/users.service');
-const {
-  checkReleaseAndLogUpdate,
-  getUpdateNotificationIfAny,
-  syncLatestOctoFarmRelease,
-} = require('../modules/InlineUpdater/octofarm-update.service.js');
+
 const { getPrinterManagerCache } = require('../cache/printer-manager.cache');
 const { getImagesPath, getLogsPath } = require('../utils/system-paths.utils');
 const S_VALID = require('../constants/validate-settings.constants');
@@ -233,10 +229,10 @@ router.post(
   }
 );
 router.get('/server/update/check', ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  await syncLatestOctoFarmRelease(false);
-  checkReleaseAndLogUpdate();
-  const softwareUpdateNotification = getUpdateNotificationIfAny();
-  res.send(softwareUpdateNotification);
+  // await syncLatestOctoFarmRelease(false);
+  // checkReleaseAndLogUpdate();
+  // const softwareUpdateNotification = getUpdateNotificationIfAny();
+  // res.send(softwareUpdateNotification);
 });
 router.get('/client/get', ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
   ClientSettingsDB.findById(req.user.clientSettings).then((checked) => {

@@ -1,4 +1,3 @@
-const softwareUpdateChecker = require('./modules/InlineUpdater/octofarm-update.service');
 const { FilamentClean } = require('./services/filament-cleaner.service');
 const { initHistoryCache, getHistoryCache } = require('./cache/history.cache');
 const { TaskPresets } = require('./constants/task.constants');
@@ -91,9 +90,7 @@ const CRASH_TEST_TASK = async () => {
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
-  await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-    softwareUpdateChecker.checkReleaseAndLogUpdate();
-  });
+  await githubService.requestGithubReleaseData()
 };
 
 const CPU_PROFILING_TASK = async () => {
