@@ -10,7 +10,6 @@
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
-    "prettier": "prettier --write \"./server/**/*.js\" \"./client/**/*.js\"",
     "install-server": "cd server && npm ci",
     "install-client": "cd client && npm ci",
     "dev-server": "cd server && pnpm run dev",
@@ -20,11 +19,36 @@
     "update-octofarm": "git pull && npm run install-server && pm2 restart OctoFarm",
     "prepare": "husky install",
     "bump": "npm version $VERSION --no-git-tag-version --allow-same-version && cd ./server && npm version $VERSION --no-git-tag-version --allow-same-version && cd ../client && npm version $VERSION --no-git-tag-version --allow-same-version",
-    "build": "cd client && npm install && npm run build"
+    "build": "cd client && npm install && npm run build",
+    "lint:md": "remark . --quiet --frail",
+    "lint:md:format": "remark . --quiet --frail --output",
+    "lint:prettier": "prettier --write \"./server/**/*.js\" \"./client/**/*.js\""
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/OctoFarm/OctoFarm"
+  },
+  "remarkConfig": {
+    "settings": {
+      "emphasis": "*",
+      "strong": "*"
+    },
+    "plugins": [
+      "remark-preset-lint-consistent",
+      "remark-preset-lint-recommended",
+      [
+        "remark-lint-list-item-indent",
+        "space"
+      ],
+      [
+        "remark-lint-emphasis-marker",
+        "*"
+      ],
+      [
+        "remark-lint-strong-marker",
+        "*"
+      ]
+    ]
   },
   "license": "ISC",
   "devDependencies": {
@@ -37,8 +61,13 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^8.0.0",
-    "prettier": "^2.6.0",
     "nodemon": "^2.0.20",
-    "release-it": "^15.2.0"
+    "prettier": "^2.6.0",
+    "remark-cli": "^11.0.0",
+    "remark-lint-emphasis-marker": "^3.1.1",
+    "remark-lint-list-item-indent": "^3.1.1",
+    "remark-lint-strong-marker": "^3.1.1",
+    "remark-preset-lint-consistent": "^5.1.1",
+    "remark-preset-lint-recommended": "^6.1.2"
   }
 }

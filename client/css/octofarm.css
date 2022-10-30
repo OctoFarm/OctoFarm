@@ -51,54 +51,6 @@ html {
   aspect-ratio: 1/1;
 }
 
-.bg-colour-1 {
-  background-color: #375a7f;
-  border-color: #375a7f;
-}
-.bg-colour-1:hover {
-  background-color: #28415b;
-  border-color: #243a53;
-}
-.bg-colour-1:disabled {
-  background-color: #28415b;
-  border-color: #243a53;
-}
-.bg-colour-2 {
-  background-color: #444;
-  border-color: #444;
-}
-.bg-colour-2:hover {
-  background-color: #313131;
-  border-color: #2b2a2a;
-}
-.bg-colour-2:disabled {
-  background-color: #313131;
-  border-color: #2b2a2a;
-}
-.bg-colour-3 {
-  background-color: #f39c12;
-  border-color: #f39c12;
-}
-.bg-colour-3:hover {
-  background-color: #d4860b;
-  border-color: #c87f0a;
-}
-.bg-colour-3:disabled {
-  background-color: #d4860b;
-  border-color: #c87f0a;
-}
-.bg-colour-4 {
-  background-color: #00bc8c;
-  border-color: #00bc8c;
-}
-.bg-colour-4:hover {
-  background-color: #008966;
-  border-color: #007c5d;
-}
-.bg-colour-4:disabled {
-  background-color: #008966;
-  border-color: #007c5d;
-}
 textarea{
   font-family: monospace;
 }
@@ -118,6 +70,7 @@ textarea{
   margin: 0 auto;
   max-width: 2000px;
 }
+
 .heatMapRight {
   width:19px;
   height:40px;
