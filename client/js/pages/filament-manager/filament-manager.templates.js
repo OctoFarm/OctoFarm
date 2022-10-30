@@ -128,9 +128,44 @@ export const materialsFilterList = (material) => {
 export const materialsListTableRow = (material) => {
   return `
         <td><i class="fa-solid fa-brush"></i></td>
-        <td>${material.code}</td>
-        <td>${material.display}</td>
-        <td>${material.abbr}</td>
-        <td>${material.density}</td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="${material.code}" value="${material.code}" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            </div>
+        </td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="${material.display}" value="${material.display}" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            </div>
+        </td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="${material.abbr}" value="${material.abbr}" aria-label="Recipient's username" aria-describedby="basic-addon2">
+            </div>
+        </td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="${material.density}" value="${material.density}"  aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">g/cm3</span>
+              </div>
+            </div>
+        </td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="0" value="0" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">°C</span>
+              </div>
+            </div>
+        </td>
+        <td>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="0" value="0" aria-label="Recipient's username" aria-describedby="basic-addon2">
+              <div class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">°C</span>
+              </div>
+            </div>
+        </td>
     `;
 };
