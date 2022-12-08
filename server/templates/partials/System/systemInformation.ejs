@@ -46,9 +46,9 @@
                             </div>
                             <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
                                 <% if(areWeGitRepo){ %>
-                                    <p class="text-light"><i class="fab fa-github text-success"></i> Detected git repository</p>
+                                    <p class="text-light"><i class="fab fa-github text-success"></i> Detected git repo</p>
                                 <% }else{ %>
-                                    <p class="text-light"><i class="fab fa-github text-danger"></i> Couldn't detect git</p>
+                                    <p class="text-light"><i class="fab fa-github text-danger"></i> Couldn't detect git repo</p>
                                 <%   } %>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> Current Version: <a
-                                 title="OctoFarm current version, will take you to github releases page"
+                                 title="OctoFarm current version, will take you to Github release page"
                                  class="text-light"
                                  rel=”noopener”
                                  href="<%= releasesURL + serviceInformation?.update?.current_version %>"
@@ -75,14 +75,14 @@
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <% if(!serviceInformation?.update?.latestReleaseKnown){ %>
                              <i class="fas fa-code-branch"></i> Latest Server Version: <a
-                                     title="OctoFarm latest version, will take you to github releases page"
+                                     title="OctoFarm latest available version, will take you to Github release page"
                                      class="text-light"
                                      rel=”noopener”
                                      href="<%= releasesURL + serviceInformation?.update?.current_version %>"
                                      target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
                          <% }else{ %>
                              <i class="fas fa-code-branch"></i> Latest Version:
-                             <a title="OctoFarm latest version, will take you to github releases page"
+                             <a title="OctoFarm latest version, will take you to Github release page"
                                 class="text-light"
                                 rel=”noopener”
                                 href="<%= serviceInformation?.update?.latestReleaseKnown.html_url; %>"
@@ -93,14 +93,14 @@
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> GitHub Branch: <a
-                                 title="OctoFarm current version, will take you to github releases page"
+                                 title="Current Git branch OctoFarm is running from"
                                  class="text-light"
                                  rel=”noopener”
                                  target="_blank"><br><%= currentGitBranch?.current ? currentGitBranch.current : "Not a repository"; %></a>
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> Node Environment: <a
-                                 title="OctoFarm current version, will take you to github releases page"
+                                 title="NodeJS environment name"
                                  class="text-light"
                                  rel=”noopener”
                                  target="_blank"><br><%= systemEnvironment; %></a>
@@ -156,7 +156,7 @@
                     <h5>Active Sessions: <span id="activeUserCount"><i class="fa-solid fa-spinner fa-spin"></i></span></h5>
                     <div id="activeUserListContainer" class="text-center row">
                         <div class="col-lg-12">
-                            <i class="fa-solid fa-spinner fa-spin"></i><br> Loading Active Sessions List...
+                            <i class="fa-solid fa-spinner fa-spin"></i><br> Loading active sessions list...
                         </div>
                     </div>
                 </div>
@@ -166,8 +166,8 @@
 <% }else{ %>
         <div class="row">
             <div class="col-12 text-center">
-                <h5> It seems the required information for this page could not be found...  </h5>
+                <h5>It seems the required information for this page could not be found.</h5>
                 <h5>Is OctoFarm still booting? Please refresh if so.</h5>
-                <h5>If the issue persists then please log an issue on our github!</h5>
+                <h5>If the issue persists then please log an issue on our Github!</h5>
             </div>
         <% } %>

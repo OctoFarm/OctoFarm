@@ -12,12 +12,12 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <h6 class="dropdown-header">Manage</h6>
-                        <a class="dropdown-item" title="Add Printer to your Farm"
+                        <a class="dropdown-item" title="Add a printer to your farm"
                            id="addPrinterBtn"
                            href="#"
                            aria-expanded="false"><i class="fas fa-plus fa-sm text-success"></i> Add</a>
 
-                        <a class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark" title="Bulk edit your printers connection settings"
+                        <a class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark" title="Bulk edit your printer connection settings"
                            data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit text-info"></i> Bulk Edit</a>
 
                         <a class="dropdown-item" title="Bulk delete printers from your farm"
@@ -37,7 +37,7 @@
                                    type="file"
                                    id="importPrinterBtn"
                                    accept=".json" style="display: none;">
-                            <a title="Import printers from a json file" class="dropdown-item"><i
+                            <a title="Import printers from a JSON file" class="dropdown-item"><i
                                         class="fas fa-file-import text-info"></i> Bulk Import</a>
                         </label>
                         <a class="dropdown-item" title="Export printers from OctoFarm"
@@ -74,7 +74,7 @@
                 </div>
                 <%- include('./octoPrintActionBtns.ejs') %>
                 <button
-                        title="Reconnect all of your OctoPrint websocket connections."
+                        title="Reconnect all OctoPrint websocket connections."
                         id="reSyncSockets"
                         type="button"
                         class="btn btn-outline-warning ml-1"

@@ -69,7 +69,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fa-solid fa-circle-info"></i>
                           </button>
                             <button
-                            title="Select and Manager your printers files"
+                            title="Manage your printer's files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
@@ -93,7 +93,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-print"></i>
                           </button>
                           <button  
-                           title="Printers Terminal"
+                           title="Printer terminal"
                            id="printerTerminalButton-${printer._id}"
                            type="button"
                            class="tag btn btn-outline-info btn-sm"
@@ -106,7 +106,7 @@ export function drawListView(printer, clientSettings) {
                     </td>
                     <td class="py-auto">
                     <button
-                            title="Start your currently selected print"
+                            title="Start your selected print"
                             id="play-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 btn-sm"
@@ -116,7 +116,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-play-circle"></i>
                           </button>
                           <button
-                                  title="Pause your current print"
+                                  title="Pause your print"
                             id="pause-${printer._id}"
                             type="button"
                             class="tag btn btn-light mt-1 mb-1 btn-sm"
@@ -126,7 +126,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-pause"></i>
                           </button>
                           <button
-                            title="Restart your current print"
+                            title="Restart your print"
                             id="restart-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
@@ -136,7 +136,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-undo"></i>
                           </button>
                           <button
-                                  title="Resume your current print"
+                                  title="Resume your print"
                             id="resume-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
@@ -146,7 +146,7 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-redo"></i>
                           </button>
                           <button
-                                  title="Stop your current print"
+                                  title="Stop your print"
                             id="cancel-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 btn-sm"
@@ -277,7 +277,7 @@ export function drawPanelView(printer, clientSettings) {
             </button>
             <center>
                                      <button
-                            title="Start your currently selected print"
+                            title="Start your selected print"
                             id="play-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 btn-sm"
@@ -287,7 +287,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fas fa-play-circle"></i> Print
                           </button>
                           <button
-                                  title="Pause your current print"
+                                  title="Pause your print"
                             id="pause-${printer._id}"
                             type="button"
                             class="tag btn btn-light mt-1 mb-1 btn-sm"
@@ -297,7 +297,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fas fa-pause"></i> Pause
                           </button>
                           <button
-                            title="Restart your current print"
+                            title="Restart your print"
                             id="restart-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
@@ -307,7 +307,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fas fa-undo"></i> Restart
                           </button>
                           <button
-                                  title="Resume your current print"
+                                  title="Resume your print"
                             id="resume-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
@@ -317,7 +317,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fas fa-redo"></i> Resume
                           </button>
                           <button
-                                  title="Stop your current print"
+                                  title="Stop your print"
                             id="cancel-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 btn-sm"
@@ -337,7 +337,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fa-solid fa-circle-info"></i> Job
                           </button>
                           <button
-                            title="Select and Manager your printers files"
+                            title="Manage your printer's files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
@@ -359,7 +359,7 @@ export function drawPanelView(printer, clientSettings) {
                             <i class="fas fa-print"></i> Control
                           </button>
                           <button  
-                           title="Printers Terminal"
+                           title="Printer terminal"
                            id="printerTerminalButton-${printer._id}"
                            type="button"
                            class="tag btn btn-outline-info btn-sm"
@@ -495,7 +495,7 @@ export function drawCameraView(printer, clientSettings) {
             <div class="col-lg-12 camButtons">
                         <small class="float-right pr-2">
                          <button
-                            title="Start your currently selected print"
+                            title="Start your selected print"
                             id="play-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
@@ -505,7 +505,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fas fa-play-circle"></i>
                           </button>
                           <button
-                                  title="Pause your current print"
+                                  title="Pause your print"
                             id="pause-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-light mt-1 mb-1 hidden btn-sm"
@@ -515,7 +515,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fas fa-pause"></i>
                           </button>
                           <button
-                            title="Restart your current print"
+                            title="Restart your print"
                             id="restart-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-danger mt-1 mb-1 hidden btn-sm"
@@ -525,7 +525,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fas fa-undo"></i>
                           </button>
                           <button
-                                  title="Resume your current print"
+                                  title="Resume your print"
                             id="resume-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-success mt-1 mb-1 hidden btn-sm"
@@ -535,7 +535,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fas fa-redo"></i>
                           </button>
                           <button
-                                  title="Stop your current print"
+                                  title="Stop your print"
                             id="cancel-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-danger mt-1 mb-1 btn-sm"
@@ -557,7 +557,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fa-solid fa-circle-info"></i>
                           </button>
                           <button
-                            title="Select and Manager your printers files"
+                            title="Manage your printer's files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
@@ -579,7 +579,7 @@ export function drawCameraView(printer, clientSettings) {
                             <i class="fas fa-print"></i>
                           </button>
                           <button  
-                           title="Printers Terminal"
+                           title="Printer terminal"
                            id="printerTerminalButton-${printer._id}"
                            type="button"
                            class="tag btn btn-outline-info btn-sm"
@@ -719,7 +719,7 @@ export function drawCombinedView(printer, clientSettings) {
                         <div class="row">
                         <div class="col-sm-12 col-md-6 col-lg-6 text-center">
                           <button
-                            title="Start your currently selected print"
+                            title="Start your selected print"
                             id="play-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 btn-sm"
@@ -729,7 +729,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-play-circle"></i> Print
                           </button>
                           <button
-                                  title="Pause your current print"
+                                  title="Pause your print"
                             id="pause-${printer._id}"
                             type="button"
                             class="tag btn btn-light mt-1 mb-1 btn-sm"
@@ -739,7 +739,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-pause"></i> Pause
                           </button>
                           <button
-                            title="Restart your current print"
+                            title="Restart your print"
                             id="restart-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
@@ -749,7 +749,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-undo"></i> Restart
                           </button>
                           <button
-                                  title="Resume your current print"
+                                  title="Resume your print"
                             id="resume-${printer._id}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
@@ -759,7 +759,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-redo"></i> Resume
                           </button>
                           <button
-                                  title="Stop your current print"
+                                  title="Stop your print"
                             id="cancel-${printer._id}"
                             type="button"
                             class="tag btn btn-danger mt-1 mb-1 btn-sm"
@@ -778,7 +778,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fa-solid fa-circle-info"></i> Job
                           </button>
                           <button
-                            title="Select and Manager your printers files"
+                            title="Manage your printer's files"
                             id="printerFilesBtn-${printer._id}"
                             type="button"
                             class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
@@ -800,7 +800,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-print"></i> Control
                           </button>
                           <button  
-                           title="Printers Terminal"
+                           title="Printer terminal"
                            id="printerTerminalButton-${printer._id}"
                            type="button"
                            class="tag btn btn-outline-info btn-sm"
@@ -889,7 +889,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
         
                     <div class="col-12 text-center">   
                       <button
-                            title="Start your currently selected print"
+                            title="Start your selected print"
                             id="play-${cleanGroup}"
                             type="button"
                             class="tag btn btn-success mt-1 mb-1 btn-sm"
@@ -899,7 +899,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                             <i class="fas fa-play-circle"></i> Print
                           </button>
                       <button
-                                  title="Pause your current print"
+                                  title="Pause your print"
                             id="pause-${cleanGroup}"
                             type="button"
                             class="tag btn btn-light mt-1 mb-1 btn-sm"
@@ -909,7 +909,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                             <i class="fas fa-pause"></i> Pause
                           </button>
                       <button
-                          title="Restart your current print"
+                          title="Restart your print"
                           id="restart-${cleanGroup}"
                           type="button"
                           class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
@@ -919,7 +919,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                           <i class="fas fa-undo"></i> Restart
                         </button>
                       <button
-                                title="Resume your current print"
+                                title="Resume your print"
                           id="resume-${cleanGroup}"
                           type="button"
                           class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
@@ -929,7 +929,7 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
                           <i class="fas fa-redo"></i> Resume
                         </button>
                       <button
-                                title="Stop your current print"
+                                title="Stop your print"
                           id="cancel-${cleanGroup}"
                           type="button"
                           class="tag btn btn-danger mt-1 mb-1 btn-sm"

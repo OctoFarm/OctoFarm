@@ -16,9 +16,9 @@
 <% } %>
 <% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
     <div class="alert alert-warning text-dark" role="alert">
-        Your system is not running with PM2! Some commands below may not work... Please
-        setup your system correctly as instructed here: <a
-                rel=”noopener” href='<%= instructionsURL %>' target='_blank'>Click Here</a>
+        Your system is not running with PM2! Some commands below may not work. Please
+        configure your system correctly as <a
+                rel=”noopener” href='<%= instructionsURL %>' target='_blank'>instructed here</a>.
     </div>
 <% } %>
 <% if(serviceInformation?.isNodemon){ %>
@@ -30,46 +30,44 @@
 <% if(serviceInformation?.isDockerContainer){ %>
     <div class="alert alert-warning text-dark" role="alert">
         The "Update OctoFarm" function has been disabled due to
-        Docker having it's own update mechanism
+        Docker having its own update mechanism
         Please check the <a
-                rel=”noopener” href="<%= updateURL %>">Installation
-            Instructions</a> for more information on how to update
-        your docker container.
+                rel=”noopener” href="<%= updateURL %>">installation
+            instructions</a> for more information on how to update your Docker container.
     </div>
     <% systemButtonsDisabled = true; %>
 <% } %>
 <% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
     <div class="alert alert-warning text-dark" role="alert">
-        The "Update OctoFarm" function has been disabled due to not been
-        able to detect the use of the pm2 process manager.
-        Please re-install OctoFarm following the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
-            Instructions</a>.
+        The "Update OctoFarm" function has been disabled because
+        the pm2 process manager was not identified.
+        Please re-install OctoFarm following the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">installation
+            instructions</a>.
     </div>
     <% systemButtonsDisabled = true; %>
 <% } %>
 <% if(!areWeGitRepo && !serviceInformation?.isDockerContainer){ %>
     <div class="alert alert-warning text-dark" role="alert">
-        The "Update OctoFarm" function has been disabled due to not been
-        able to detect a git repository.
-        Please check the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">Installation
-            Instructions</a> for more information on how to set this
-        up.
+        The "Update OctoFarm" function has been disabled because
+        a git repository was not identified.
+        Please check the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">installation
+            instructions</a> to set this up.
     </div>
     <% systemButtonsDisabled = true; %>
 <% } %>
 <div class="row">
     <div class="col-12">
-        <button title="Performs a restart of the OctoFarm service"
+        <button title="Restarts the OctoFarm service"
                 id="restartOctoFarmBtn" type="button"
                 class="btn btn-danger mr-3 btn-lg">
             <i class="fas fa-sync"></i> Restart
         </button>
-        <button title="Performs a check for latest updates of OctoFarm"
+        <button title="Checks for OctoFarm updates"
                 id="checkUpdatesForOctoFarmBtn" type="button"
                 class="btn btn-info ml-3 float-right btn-lg">
             <i class="fab fa-github"></i> Check for Update
         </button>
-        <button title="Performs an update command on OctoFarm to the latest version"
+        <button title="Updates OctoFarm to the latest version"
                 id="updateOctoFarmBtn" type="button"
                 class="btn btn-success ml-3 float-right btn-lg"
                 <% updateDisabled %>>
@@ -158,8 +156,8 @@
             <div class="tab-pane fade" id="server-settings"
                  role="tabpanel" aria-labelledby="server-settings-list">
                 <p class="font-weight-bold">Server Port</p>
-                <p>The port that OctoFarm will accept connections from for it's
-                    inbuilt client. Use the .env file in your OctoFarm folder to change...</p>
+                <p>The port on which OctoFarm listens for connections.
+                   Use the .env file in your OctoFarm folder to change.</p>
                 <p><b>Default</b>: 4000</p>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -221,9 +219,9 @@
                 <div class="row">
                     <div class="col-md-12 col-lg-6">
                         <p class="font-weight-bold">Websocket Retry</p>
-                        <p>The interval in which OctoFarm will re-poll the websocket
-                            when it detects a lost connection during operation. It
-                            will re-poll at this rate until re-established.</p>
+                        <p>The interval on which OctoFarm will re-poll the websocket
+                            when a connection is lost. It will re-poll at this rate 
+                            until the connection is re-established.</p>
 
                         <p><b>Min</b>: 5 seconds (Default), <b>Max:</b> 30 seconds
                         </p>
@@ -246,8 +244,8 @@
                     </div>
                     <div class="col-md-6 col-lg-6">
                         <p class="font-weight-bold">API Retry</p>
-                        <p>The interval that OctoFarm will attempt another
-                            connection to OctoPrint. Only really applicable if your
+                        <p>The interval on which OctoFarm will attempt another
+                            connection to OctoPrint. Only applicable if your
                             printer is offline when added to the farm.</p>
                         <p><b>Min</b>: 30 seconds (Default), <b>Max:</b> 60 seconds
                         </p>
@@ -278,7 +276,7 @@
                     <div class="col-lg-2">
                         <h5>Check Spool?</h5>
                         <div class="alert alert-info small" role="alert">
-                            OctoFarm will throw a nag screen when trying to start a print without a spool attached.
+                            OctoFarm will nag you when trying to start a print without a spool attached.
                         </div>
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
@@ -296,7 +294,7 @@
                     <div class="col-lg-2">
                         <h5>Hide Empty Spools?</h5>
                         <div class="alert alert-info small" role="alert">
-                            Any spool going below 0 will be hidden from the interfaces select menu's.
+                            Any spool going below 0 will be hidden from the interface.
                         </div>
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
@@ -314,7 +312,7 @@
                         <div class="col-lg-2">
                             <h5>Downdate Successful Usage?</h5>
                             <div class="alert alert-info small" role="alert">
-                                On a successful print completion OctoFarm will use OctoPrints filament metadata and downdate the currently selected spool with that amount.
+                                On a successful print completion OctoFarm will use OctoPrint's filament metadata and downdate the currently selected spool by that amount.
                             </div>
                             <form class="was-validated">
                                 <div class="custom-control custom-checkbox mb-3">
@@ -332,8 +330,8 @@
                         <div class="col-lg-2">
                         <h5>Downdate Failed/Cancelled Usage?</h5>
                         <div class="alert alert-info small" role="alert">
-                            On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
-                            <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                            On failed/cancelled print completion OctoFarm will use OctoPrint's filament metadata and downdate the currently selected spool by that amount.
+                            <b>NOTE: </b> This is a best guess calculation, it is unlikely to be accurate.
                         </div>
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
@@ -351,7 +349,7 @@
                         <div class="col-lg-2">
                             <h5>Allow Single Spools on Multiple Printers?</h5>
                             <div class="alert alert-info small" role="alert">
-                                Allow the selection of single spools on multiple printers. Great if your only tracking filament by type.. you can have 1 spool attached to multiple printers to get more accurate grams calculations this way.
+                                Allow the selection of single spools on multiple printers. Great if you're only tracking filament by type. You can have 1 spool attached to multiple printers to get more accurate weight calculations this way.
                             </div>
                             <% let multiSelectOff = "d-none"; %>
                             <% if(serverSettings?.filament?.allowMultiSelect) { %>
@@ -382,12 +380,12 @@
                         <div class="alert alert-warning text-dark text-dark" role="alert">
                             Below are some options to enable and disable certain monitoring views across the user interface.
                             <hr>
-                            <b>Panel:</b> This view is OctoFarms standard view where each printer has it's own card. It allows for full control and monitoring of your farm.<br>
-                            <b>List:</b> This view is a table view where each printer is on a row of the table. It allows for full control and status monitoring of your farm due to no camera slot.<br>
-                            <b>Camera:</b> This view is similar to the panel view but has the cameras as a main focus. A bit like a NVR for your farm with full control.<br>
-                            <b>Group:</b> This view will organise your printers by common groups you have assigned. This view is great for bulk grouped control over your prints, but has limited monitoring. <br>
-                            <b>Current Operations:</b> This view is a cut down view with just basic print information. Great for a large status screen or keeping an eye on your farms status. There is no control and limited status.<br>
-                            <b>Super List:</b> This view is a list table view combining camera/list and panel views. It allows for full monitoring and control.<br>
+                            <b>Panel:</b> OctoFarm's standard view where each printer has its own card. It allows for full control and monitoring of your farm.<br>
+                            <b>List:</b> Table view where each printer is on a row of the table. It allows for full control and status monitoring of your farm due to no camera slot.<br>
+                            <b>Camera:</b> Similar to panel view but has cameras as a main focus. A bit like a NVR for your farm with full control.<br>
+                            <b>Group:</b> Display your printers by common assigned groups. This view is great for bulk grouped control over your prints, but has limited monitoring. <br>
+                            <b>Current Operations:</b> Cut-down view with basic print information. Great for a large status screen or keeping an eye on your farm's status. There is no control and limited status.<br>
+                            <b>Super List:</b> List table view combining camera/list and panel views. It allows for full monitoring and control.<br>
 
                         </div>
                     </div>
@@ -419,8 +417,8 @@
                     if the thumbnail/camera url exist before actually saving.
                 </div>
                 <div class="alert alert-warning text-dark text-dark" role="alert">
-                    If your running on Docker, make sure to mount "/app/images"
-                    otherwise these will not persist reboots/upgrades.
+                    If you're running on Docker, make sure to mount "/app/images"
+                    otherwise these will not persist across reboots/upgrades.
                 </div>
                 <div id="filamentManagerSetup" class="row">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
@@ -449,10 +447,10 @@
                                 <label class="custom-control-label"
                                        for="timelapseOnComplete">On
                                     Completion</label>
-                                <div class="valid-feedback">On Complete timelapse
+                                <div class="valid-feedback">On completion, timelapse
                                     will be downloaded to OctoPrint
                                 </div>
-                                <div class="invalid-feedback">On Complete timelapse
+                                <div class="invalid-feedback">On completion, timelapse
                                     is ignored
                                 </div>
                             </div>
@@ -463,10 +461,10 @@
                                        id="timelapseOnFailure" required  <%= (serverSettings.history.timelapse.onFailure) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="timelapseOnFailure">On Failure</label>
-                                <div class="valid-feedback">On Failure timelapse
+                                <div class="valid-feedback">On failure, timelapse
                                     will be downloaded to OctoPrint
                                 </div>
-                                <div class="invalid-feedback">On Failure timelapse
+                                <div class="invalid-feedback">On failure, timelapse
                                     is ignored
                                 </div>
                             </div>
@@ -482,7 +480,7 @@
                                     deleted once captured
                                 </div>
                                 <div class="invalid-feedback">Timelapses are not
-                                    removed from OctoPrints storage
+                                    removed from OctoPrint's storage
                                 </div>
                             </div>
                         </form>
@@ -563,15 +561,15 @@
                 <h5>InfluxDB Export (v1.x)</h5>
                 <hr>
                 <div class="alert alert-secondary" role="alert">
-                    OctoFarm can export your printer data to a time series database
-                    called InfluxDB. You can use this data to create yourself a
-                    dashboard in an application called Grafana or InfluxDB itself.
-                    Other options are also available. This option is for power users
-                    who would like to get more information from the data stored in
-                    OctoFarm.
+                    OctoFarm can export your printer data to an InfluxDB
+                    time-series database.  You can use this data to, for
+                    example, create yourself a dashboard using Grafana
+                    or InfluxDB itself.  This option is for power users
+                    who would like to get more information from the data
+                    stored in OctoFarm.
                 </div>
                 <div class="alert alert-warning text-dark" role="alert">
-                    You must already have influxDB setup and working to be able to
+                    You must already have InfluxDB set up and working to be able to
                     use this feature. A restart will be required after saving the
                     settings to correctly enable.
                 </div>
@@ -894,14 +892,14 @@
                 <h5>Global Camera Settings</h5>
                 <hr>
                 <div class="alert alert-secondary" role="alert">
-                    These settings apply to all of the camera feed within OctoFarm.
+                    These settings apply to all camera feeds in OctoFarm.
                 </div>
                 <div class="row">
                     <div class="col-12 col-lg-6">
                         <h5>Proxy</h5>
                         <hr>
                         <div class="alert alert-info" role="alert">
-                            OctoFarm can proxy all of your camera's through it's server. This is great for reverse proxy setups, or setups where your OctoPrint's are not accessible from the network your on.
+                            OctoFarm can proxy all your cameras through its server. This is great for reverse proxy setups, or setups where your OctoPrints are not accessible from the network you're on.
                         </div>
                         <div class="row">
                             <div class="col-12">
