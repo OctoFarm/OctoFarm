@@ -1,3 +1,16 @@
+## [1.8.0-beta.2](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.1...v1.8.0-beta.2) (2022-12-10)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** finalise master and beta releasing schedule ([#1313](https://github.com/OctoFarm/OctoFarm/issues/1313)) ([599da3e](https://github.com/OctoFarm/OctoFarm/commit/599da3e7c3d14b18760d54c811d0796b7533e602))
+* **main:** finalise release mechanism for beta and master ([#1327](https://github.com/OctoFarm/OctoFarm/issues/1327)) ([48f225b](https://github.com/OctoFarm/OctoFarm/commit/48f225b77e26897e1dd621db969fddaa3ed0d63e))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** language, grammar and text clarity updates [@mikeymakesit](https://github.com/mikeymakesit) ([#1343](https://github.com/OctoFarm/OctoFarm/issues/1343)) ([adc3fad](https://github.com/OctoFarm/OctoFarm/commit/adc3fadcb9464e1f8cd1092d1df86a150d325f1b))
+
 ## [1.8.0-beta.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.3...v1.8.0-beta.1) (2022-10-15)
 
 
