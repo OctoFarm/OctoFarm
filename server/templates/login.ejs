@@ -29,13 +29,13 @@
           <div class="custom-control custom-checkbox mb-3">
             <input title="This does not persist server reboots" type="checkbox" class="custom-control-input" type="checkbox" name="remember_me" value="yes" id="rememberMe" required>
             <label class="custom-control-label" for="rememberMe">Remember Me!</label>
-            <div class="valid-feedback">Will remember your user session... </div>
+            <div class="valid-feedback">Will remember your user session. </div>
             <div class="invalid-feedback">Not remembering user session.</div>
           </div>
         <button type="submit" class="btn btn-primary btn-block bg-colour-1" formnovalidate>Login</button>
       </form>
       <p class="lead mt-4">
-        <% if(registration){ %> No Account? Please <a href="/users/register">Register</a> one here!
+        <% if(registration){ %> No Account? Please <a href="/users/register">register</a> one here!
         <% } %>
       </p>
     </div>

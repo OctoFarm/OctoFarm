@@ -317,7 +317,7 @@ export function addHealthCheckListeners(check) {
   if (!check.printerChecks.match) {
     document.getElementById(E.MATCH + pClean).addEventListener("click", () => {
       returnBootBox(
-        "Your socket url and printer url don't match... either the IP/PORT/URL or the http -> ws / https -> ws protocol doesn't match.",
+        "Your socket URL and printer URL don't match. Either the IP/Port/URL or the http -> ws / https -> ws protocol don't match.",
         "Use either the Printer Settings / Bulk Printer editor and update your printer URL. This should match them both back up.",
         null,
         "This can cause data issues, especially if both are different but from working printers!"
@@ -329,9 +329,9 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.WEBSOCKET + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "Your socket url isn't a valid url format.",
-          "Use either the Printer Settings / Bulk Printer editor and update your printer URL.",
-          "This will not allow OctoFarm to make a connection to OctoPrints websocket."
+          "Your socket URL isn't a valid URL format.",
+          "Use either the Printer Settings / Bulk Printer editor to update your printer URL.",
+          "This will prevent OctoFarm from connecting to OctoPrint's websocket."
         );
       });
   }
@@ -340,9 +340,9 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.PRINTER_URL + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "Your printer url isn't a valid url format.",
-          "Use either the Printer Settings / Bulk Printer editor and update your printer URL.",
-          "This will not allow OctoFarm to establish a connection to OctoPrints API."
+          "Your printer URL isn't a valid URL format.",
+          "Use either the Printer Settings / Bulk Printer editor to update your printer URL.",
+          "This will prevent OctoFarm from connecting to OctoPrint's API."
         );
       });
   }
@@ -366,22 +366,22 @@ export function addHealthCheckListeners(check) {
         returnBootBox(
           "Your socket connection has failed the Ping/Pong check " +
             check.websocketChecks.totalPingPong +
-            " times. Ping/Pongs are sent every 20 seconds to ensure there are no drops in the network which can cause a socket to stall.",
+            " times. Pings/Pongs are sent every 20 seconds to ensure there are no drops in the network which can cause a socket to stall.",
           "Investigate the logs and see why the ping pong checks are failing for your printer.",
-          "OctoFarm will automatically recover from these issues but it's best to rectify your underlying network issues to resolve this problem. OctoFarm could be reconnecting whilst a print is finishing causing the print capture to fail."
+          "OctoFarm will automatically recover from these issues but it's best to rectify your underlying network issues to resolve this problem. OctoFarm could be reconnecting whilst a print is finishing, causing the print capture to fail."
         );
       });
   }
 
   const apiFixText =
-    "Check the logs for network / api and any connection issues that might have occured.";
+    "Check the logs for network/API or other connection issues that might have occurred.";
   const fullyFunctioningText =
     "This endpoint is required to have a fully functioning printer on OctoFarm. Your printer will fail to initialise without it.";
 
   if (!check.apiChecksRequired.userCheck) {
     document.getElementById(E.USER + pClean).addEventListener("click", () => {
       returnBootBox(
-        "OctoFarm failed to acquire OctoPrints user information.",
+        "OctoFarm failed to acquire OctoPrint's user information.",
         apiFixText,
         null,
         "OctoFarm will fail hard without this information! You won't be able to continue and receive printer data."
@@ -391,7 +391,7 @@ export function addHealthCheckListeners(check) {
   if (!check.apiChecksRequired.stateCheck) {
     document.getElementById(E.STATE + pClean).addEventListener("click", () => {
       returnBootBox(
-        "OctoFarm uses the state endpoint to correctly understand some settings defaults if you have them setup on OctoPrint.",
+        "OctoFarm uses the state endpoint to identify settings you have configured in OctoPrint.",
         apiFixText,
         null,
         fullyFunctioningText
@@ -403,7 +403,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.SETTINGS + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoFarm uses the profile to correctly understand your printer specific functionality and allow to connect to the printer from the UI.",
+          "OctoFarm uses the printer profile enpoint to identify your printer-specific functionality and enable connecting to the printer from the UI.",
           apiFixText,
           null,
           fullyFunctioningText
@@ -413,7 +413,7 @@ export function addHealthCheckListeners(check) {
   if (!check.apiChecksRequired.systemCheck) {
     document.getElementById(E.SYSTEM + pClean).addEventListener("click", () => {
       returnBootBox(
-        "OctoFarm uses a lot of OctoPrints settings to base it's setup on and will also use this endpoint to react to Plugin settings that you might have.",
+        "OctoFarm uses many OctoPrint settings to base its setup on and will also use this endpoint to react to relevant plugin settings.",
         apiFixText,
         null,
         fullyFunctioningText
@@ -425,7 +425,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.SETTINGS + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoFarm uses a lot of OctoPrints settings to base it's setup on and will also use this endpoint to react to Plugin settings that you might have.",
+          "OctoFarm uses many OctoPrint settings to base its setup on and will also use this endpoint to react to relevant plugin settings.",
           apiFixText,
           null,
           fullyFunctioningText
@@ -435,7 +435,7 @@ export function addHealthCheckListeners(check) {
   if (!check.apiChecksOptional.filesCheck) {
     document.getElementById(E.FILES + pClean).addEventListener("click", () => {
       returnBootBox(
-        "This endpoint is not required unless you want to use OctoFarm to action Prints and manage files. The system will handle no files been available.",
+        "This endpoint is not required unless you want to use OctoFarm to action prints and manage files. OctoFarm will handle no files when unavailable.",
         apiFixText
       );
     });
@@ -445,7 +445,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.OP_PLUGIN + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "This endpoint will require OctoPrint to have some active internet connection, without it OctoFarm will not scan. The information is only used to alert OctoFarm users of plugin updates and allow the installation of plugins through OctoFarm, it's not required.",
+          "When used, this optional endpoint requires OctoPrint to have an active internet connection. Without it OctoFarm will not scan. The information is only used to alert OctoFarm users of plugin updates and allow the installation of plugins through OctoFarm.",
           apiFixText
         );
       });
@@ -456,7 +456,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.OP_SYS_INFO + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "This endpoint only exists in OctoPrint after V1.4.2, if you have a version below that this will skip the check entirely. The information is only used in Printer Manager and when generating a log dump, it's not required.",
+          "This optional endpoint only exists in OctoPrint after v1.4.2; if you have a version below that this will skip the check entirely. The information is only used in Printer Manager and when generating a log dump.",
           apiFixText
         );
       });
@@ -466,7 +466,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.OP_UPDATES + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "This endpoint will require OctoPrint to have some active internet connection, without it OctoFarm will not scan. The information is only used to alert OctoFarm users of updates for the OctoPrint service, it's not required.",
+          "This optional endpoint will require OctoPrint to have an active internet connection. Without it OctoFarm will not scan. The information is only used to alert OctoFarm users of updates for the OctoPrint service.",
           apiFixText
         );
       });
@@ -475,12 +475,12 @@ export function addHealthCheckListeners(check) {
   const profileWarning =
     "This will not affect the normal operation of OctoFarm but you won't be able to use the quick connect functionality. ";
   const profileFix =
-    "Either save the values in OctoPrint and do a forced Re-Scan of your API, or use OctoFarm printer settings modal to update both.";
+    "Either save the values in OctoPrint and do a forced Re-Scan of your API, or use OctoFarm printer settings to update both.";
 
   if (!check.connectionChecks.baud) {
     document.getElementById(E.BAUD + pClean).addEventListener("click", () => {
       returnBootBox(
-        "OctoFarm has no saved baud rate it's aware of.",
+        "OctoFarm has no saved baud rate.",
         profileFix,
         profileWarning
       );
@@ -490,7 +490,7 @@ export function addHealthCheckListeners(check) {
   if (!check.connectionChecks.port) {
     document.getElementById(E.PORT + pClean).addEventListener("click", () => {
       returnBootBox(
-        "OctoFarm has no saved printer port it's aware of.",
+        "OctoFarm has no saved printer port.",
         profileFix,
         profileWarning
       );
@@ -502,7 +502,7 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.PPROFILE + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoFarm has no saved printer profile it's aware of.",
+          "OctoFarm has no saved printer profile.",
           profileFix,
           profileWarning
         );
@@ -514,10 +514,10 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.PROFILE_CHECK + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoFarm has no save Printer profile from OctoPrint.",
-          "Double check your API settings and that a profile actually exists on OctoPrint.",
+          "OctoFarm has no saved printer profile from OctoPrint.",
+          "Double check your API settings and ensure that a profile actually exists in OctoPrint.",
           null,
-          "The profile is used for quite a lot within OctoFarm, especially file manager and displaying the correct amount of tools. Your printer will hard fail until this is rectified."
+          "The profile is used for quite a lot within OctoFarm, especially file manager and displaying the correct number of tools. Your printer will hard fail until this is rectified."
         );
       });
   }
@@ -526,7 +526,7 @@ export function addHealthCheckListeners(check) {
     document.getElementById(E.WEBCAM + pClean).addEventListener("click", () => {
       returnBootBox(
         "Your webcam settings from OctoPrint do not match your values in OctoFarm.",
-        "If you have no camera url inputted into OctoFarm then please turn off the 'Enable Webcam' setting in OctoFarms printer settings modal.",
+        "If you have no camera URL configured in OctoFarm then please turn off the 'Enable Webcam' setting in OctoFarm's printer settings.",
         "Nothing bad will happen, you will just see the awful little <img src='http://nono.com/no.jpg'> icon in the relevant views."
       );
     });
@@ -540,9 +540,9 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.H_FFMPEG + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoPrint hasn't got an FFMPEG path setup and your settings in history are utilising the timelapse functionality.",
-          "Either enter into OctoPrint your FFMPEG path and do a forced API Re-Scan, or use the functionality System -> Server -> History to update your instances on mass.",
-          "There's checks in place to stop this from affecting your history, but you are making OctoFarm do pointless API calls if left."
+          "OctoPrint hasn't got an FFMPEG path set up and your settings in history are utilising the timelapse functionality.",
+          "Either enter into OctoPrint your FFMPEG path and do a forced API rescan, or use the functionality System -> Server -> History to update your instances en masse.",
+          "There are checks in place to stop this from affecting your history, but OctoFarm is making pointless API calls if left."
         );
       });
   }
@@ -551,9 +551,9 @@ export function addHealthCheckListeners(check) {
       .getElementById(E.H_CODEC + pClean)
       .addEventListener("click", () => {
         returnBootBox(
-          "OctoPrint hasn't got the correct codec setup and your settings in history are utilising the timelapse functionality.",
-          "Either select the correct .mp4 codec in OctoPrint and do a forced API Re-Scan, or use the functionality System -> Server -> History to update your instances on mass.",
-          "There's checks in place to stop this from affecting your history, but you are making OctoFarm do pointless API calls if left."
+          "OctoPrint hasn't got the correct codec set up and your settings in history are utilising the timelapse functionality.",
+          "Either select the correct .mp4 codec in OctoPrint and do a forced API rescan, or use the functionality System -> Server -> History to update your instances en masse.",
+          "There are checks in place to stop this from affecting your history, but OctoFarm is making pointless API calls if left."
         );
       });
   }
@@ -563,8 +563,8 @@ export function addHealthCheckListeners(check) {
       .addEventListener("click", () => {
         returnBootBox(
           "OctoPrint hasn't got the timelapse functionality enabled and your settings in history are utilising the timelapse functionality.",
-          "Either enable the feature on OctoPrint do a forced API Re-Scan, or use the functionality System -> Server -> History to update your instances on mass.",
-          "There's checks in place to stop this from affecting your history, but you are making OctoFarm do pointless API calls if left."
+          "Either enable the feature in OctoPrint and do a forced API rescan, or use the functionality System -> Server -> History to update your instances en masse.",
+          "There are checks in place to stop this from affecting your history, but OctoFarm is making pointless API calls if left."
         );
       });
   }
@@ -597,12 +597,12 @@ export function returnFarmOverviewTableRow(
       }</td>
       <td>${
         throttle_state?.current_overheat
-          ? "<i title=\"OctoPi is reporting an overheating issue! Blow on it and ReScan the API!\" class=\"fa-solid fa-fire text-danger\"></i>"
+          ? "<i title=\"OctoPi is reporting an overheating issue! Blow on it and rescan the API!\" class=\"fa-solid fa-fire text-danger\"></i>"
           : "<i title=\"OctoPi is running cool!\" class=\"fa-solid fa-fire text-success\"></i>"
       }</td>
       <td>${
         throttle_state?.current_undervoltage
-          ? "<i title=\"OctoPi is reporting that it's undervoltaged! Fix your PSU and Re-Scan the API.\" class=\"fa-solid fa-plug-circle-bolt text-danger\"></i>"
+          ? "<i title=\"OctoPi is reporting under voltage! Fix your PSU and rescan the API.\" class=\"fa-solid fa-plug-circle-bolt text-danger\"></i>"
           : "<i title=\"OctoPi is juiced up!\" class=\"fa-solid fa-plug-circle-bolt text-success\"></i>"
       }</td>
     `;
@@ -651,7 +651,7 @@ export function returnFarmOverviewTableRow(
       }  </td>
       <td>${
         octoSysInfo?.["octoprint.safe_mode"]
-          ? "<i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-down text-danger\"></i>"
+          ? "<i title=\"Something may be wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-down text-danger\"></i>"
           : "<i title=\"You are not in safe mode, all is fine\" class=\"fas fa-thumbs-up text-success\"></i>"
       } </td>
       <td>
