@@ -1,3 +1,10 @@
+## [1.8.0-beta.3](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.2...v1.8.0-beta.3) (2022-12-11)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** update relative logo uris to be explicit [@mikeymakesit](https://github.com/mikeymakesit) ([#1345](https://github.com/OctoFarm/OctoFarm/issues/1345)) ([b17bfac](https://github.com/OctoFarm/OctoFarm/commit/b17bfac867097f61734d497bcf0ffe2fae330314))
+
 ## [1.8.0-beta.2](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.1...v1.8.0-beta.2) (2022-12-10)
 
 
