@@ -62,8 +62,17 @@ const INITIALISE_PRINTERS_TASK = async () => {
 };
 
 const SERVER_BOOT_TASK = async () => {
+  await onlineChecker.check();
+  if(onlineChecker.airGapped){
+    await Promise.allSettled([
+      await SystemRunner.initialiseSystemInformation(),
+      await detectFarmPi(),
+      await SystemRunner.profileCPUUsagePercent(),
+      await SystemRunner.profileMemoryUsagePercent(),
+    ]);
+    return;
+  }
   await Promise.allSettled([
-    await onlineChecker.check(),
     await githubService.requestGithubReleaseData(),
     await SystemRunner.initialiseSystemInformation(),
     await detectFarmPi(),
@@ -72,6 +81,8 @@ const SERVER_BOOT_TASK = async () => {
     await updatePluginNoticesStore(),
     await updatePluginStore()
   ]);
+
+
 };
 
 const SORT_CURRENT_OPERATIONS = async () => {
@@ -166,25 +177,47 @@ class OctoFarmTasks {
 
   static PRINTER_INITIALISE_TASK = TaskStart(INITIALISE_PRINTERS_TASK, TaskPresets.RUNONCE);
 
-  static RECURRING_BOOT_TASKS = [
-    TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_DAY),
-    TaskStart(UPDATE_OCTOPRINT_PLUGINS_LIST, TaskPresets.PERIODIC_DAY),
-    TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
-    TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
-    TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
-    TaskStart(GENERATE_PRINTER_HEAT_MAP, TaskPresets.PERIODIC_1000MS),
-    TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
-    TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    TaskStart(CHECK_PRINTERS_POWER_STATES, TaskPresets.PERIODIC, 30000),
-    TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.PERIODIC_600000MS),
-    TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.PERIODIC, 30000),
-    TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
-    TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
-    TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
-    TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
-  ];
+  static get RECURRING_BOOT_TASKS(){
+    if(onlineChecker.airGapped){
+      return [
+        TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+        TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+        TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
+        TaskStart(GENERATE_PRINTER_HEAT_MAP, TaskPresets.PERIODIC_1000MS),
+        TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
+        TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+        TaskStart(CHECK_PRINTERS_POWER_STATES, TaskPresets.PERIODIC, 30000),
+        TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_600000MS),
+        TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.PERIODIC_600000MS),
+        TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
+        TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.PERIODIC, 30000),
+        TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
+        TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
+        TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
+        TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
+      ];
+    }
+    return [
+      TaskStart(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_DAY),
+      TaskStart(UPDATE_OCTOPRINT_PLUGINS_LIST, TaskPresets.PERIODIC_DAY),
+      TaskStart(CPU_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+      TaskStart(MEMORY_PROFILING_TASK, TaskPresets.PERIODIC_10000MS),
+      TaskStart(SORT_CURRENT_OPERATIONS, TaskPresets.PERIODIC_1000MS),
+      TaskStart(GENERATE_PRINTER_HEAT_MAP, TaskPresets.PERIODIC_1000MS),
+      TaskStart(GENERATE_PRINTER_CONTROL_LIST, TaskPresets.PERIODIC_5000MS),
+      TaskStart(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+      TaskStart(CHECK_PRINTERS_POWER_STATES, TaskPresets.PERIODIC, 30000),
+      TaskStart(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_600000MS),
+      TaskStart(FILAMENT_CLEAN_TASK, TaskPresets.PERIODIC_600000MS),
+      TaskStart(RUN_PRINTER_HEALTH_CHECKS, TaskPresets.PERIODIC_600000MS),
+      TaskStart(GENERATE_FILE_STATISTICS, TaskPresets.PERIODIC, 30000),
+      TaskStart(CHECK_FOR_OCTOPRINT_UPDATES, TaskPresets.PERIODIC_DAY),
+      TaskStart(GENERATE_PRINTER_SPECIFIC_STATISTICS, TaskPresets.PERIODIC_600000MS),
+      TaskStart(I_AM_ALIVE, TaskPresets.PERIODIC_IMMEDIATE_5000_MS),
+      TaskStart(PING_PONG_CHECK, TaskPresets.PERIODIC_10000MS),
+    ];
+  }
+
 }
 
 module.exports = {
