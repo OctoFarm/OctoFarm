@@ -1,3 +1,10 @@
+## [1.8.0-beta.6](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.5...v1.8.0-beta.6) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** build path regression ([9772b38](https://github.com/OctoFarm/OctoFarm/commit/9772b38e67adfa828f9c1605c1332cdd9fc76986))
+
 ## [1.8.0-beta.5](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.4...v1.8.0-beta.5) (2022-12-26)
 
 
