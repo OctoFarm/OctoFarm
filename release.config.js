@@ -91,7 +91,7 @@ module.exports = {
       '@semantic-release/exec',
       {
         // eslint-disable-next-line no-template-curly-in-string
-        prepareCmd: 'VERSION=${nextRelease.version} && chmod +x scripts/run-build-sequence.sh && scripts/run-build-sequence.sh',
+        prepareCmd: 'VERSION=${nextRelease.version} && chmod +x scripts/run-build-sequence.sh && scripts/run-build-sequence.sh ${nextRelease.version}',
       },
     ],
     [
@@ -122,18 +122,6 @@ module.exports = {
           "namespace": "octofarm",
           "repository": "octofarm",
           "tag": "latest"
-        },
-        "publishChannelTag": false
-      }
-    ],
-    [
-      "@semantic-release-plus/docker",
-      {
-        "name": {
-          "registry": "docker.io",
-          "namespace": "octofarm",
-          "repository": "octofarm",
-          "tag": "monolithic-latest"
         },
         "publishChannelTag": false
       }
