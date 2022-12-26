@@ -1,3 +1,17 @@
+## [1.8.0-beta.5](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.4...v1.8.0-beta.5) (2022-12-26)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **main:** make docker workflows build tests ([59bfcb5](https://github.com/OctoFarm/OctoFarm/commit/59bfcb5c5372f41a861723cb1ad9b87a32134dbd))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** build dockers manually and release with semantic release and version tags ([7845ae0](https://github.com/OctoFarm/OctoFarm/commit/7845ae01a3385d01d371114f601a25b817a71351))
+* **docker:** incorrect username/password secrets regression ([076dbfb](https://github.com/OctoFarm/OctoFarm/commit/076dbfbe2b690117e457ab4511e3d73cbffa13df))
+* **main:** fix nodejs tests, skip 17 ([7a00611](https://github.com/OctoFarm/OctoFarm/commit/7a0061183015bacc7cc6076da5e23075fef1a72c))
+
 ## [1.8.0-beta.4](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.3...v1.8.0-beta.4) (2022-12-26)
 
 
