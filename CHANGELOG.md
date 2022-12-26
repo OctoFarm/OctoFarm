@@ -1,3 +1,11 @@
+## [1.8.0-beta.8](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.7...v1.8.0-beta.8) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** dont publish channel tags ([4a0c2e8](https://github.com/OctoFarm/OctoFarm/commit/4a0c2e82f702ab97209d0f434304342f4e8916e9))
+* **docker:** update dockerfiles to nodejs v18 bases ([4639189](https://github.com/OctoFarm/OctoFarm/commit/4639189e4312a9dd8fbd85c23cfad9da05e9ed81))
+
 ## [1.8.0-beta.7](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.6...v1.8.0-beta.7) (2022-12-26)
 
 
