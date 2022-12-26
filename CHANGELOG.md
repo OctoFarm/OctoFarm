@@ -1,3 +1,10 @@
+## [1.8.0-beta.9](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.8...v1.8.0-beta.9) (2022-12-26)
+
+
+### :x: Removed :x:
+
+* **docker:** monolithic docker container ([9db0b29](https://github.com/OctoFarm/OctoFarm/commit/9db0b2925d5c43951e8ab2de9575913298b2acae))
+
 ## [1.8.0-beta.8](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.7...v1.8.0-beta.8) (2022-12-26)
 
 
