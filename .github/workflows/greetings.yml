@@ -26,3 +26,10 @@ jobs:
           Big thanks for submitting this PR and making OctoFarm grow! 
           
           Your review will be coming shortly!
+          
+          Please note the following:
+          
+          - Make sure to format your PR title accordingly! https://github.com/conventional-changelog/commitlint
+          - If you'd like your name in the release, please @username your commits.
+          - If you're fixing a bug, then please reference the issue number in the description
+          - If you're adding a new feature, then please check with @notexpectedyet that it will be accepted.
