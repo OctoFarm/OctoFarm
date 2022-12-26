@@ -1,3 +1,15 @@
+## [1.8.0-beta.4](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.3...v1.8.0-beta.4) (2022-12-26)
+
+
+### :curly_loop: Continuous Integration :curly_loop:
+
+* **main:** allow releases from releases/ branch folders, ignore master pushes ([671a55b](https://github.com/OctoFarm/OctoFarm/commit/671a55b7e2e32c9e58d60ca87a506abcf1b99b43))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **main:** actually run the release package script after client build ([2b9152d](https://github.com/OctoFarm/OctoFarm/commit/2b9152d89efa802973f45f462c056dd1bb8f9ddb))
+
 ## [1.8.0-beta.3](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.2...v1.8.0-beta.3) (2022-12-11)
 
 
