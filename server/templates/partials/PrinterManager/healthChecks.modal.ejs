@@ -12,40 +12,37 @@
         <div class="col-lg-12">
             <div class="collapse" id="collapseExample">
                 <div class="alert alert-secondary" role="alert" id="healthChecksHelpText">
-                    <p>OctoFarm will periodically run a few checks on your printers just to make sure nothing is out of
+                    <p>OctoFarm will periodically run checks on your printers to make sure nothing is out of
                         whack! Each check will either pass (Green icon) or fail (Red icon). Clicking a red icon will
-                        give you an information box on the problem, OctoFarms reaction and finally what solution you can
+                        give you information about the problem, OctoFarm's reaction, and finally what solution you can
                         take.</p>
                     <p><b>Printer Settings</b></p>
-                    <p>Checks to see if the Printer URL, Websocket URL and Camera URL are all valid. It will also check
-                        to see if your websocket url and printer url match each other.</p>
+                    <p>Checks if the printer, websocket, and camera URLs are all valid. It will also check
+                        to see if your websocket and printer URLs match.</p>
                     <hr>
                     <p><b>Websocket Connection</b></p>
-                    <p>Checks to see if there's been any recent Ping/Pong failures on the connection.</p>
+                    <p>Checks if there's been any recent ping/pong failures on the connection.</p>
                     <hr>
                     <p><b>Required API</b></p>
-                    <p>Checks to see if OctoFarm has data available for each required api endpoint</p>
+                    <p>Checks if OctoFarm has data available for each required API endpoint.</p>
                     <hr>
                     <p><b>Optional API</b></p>
-                    <p>Checks to see if OctoFarm has data available for each optional api endpoint. Can be largely
-                        ignored unless your missing a specific feature related to these endpoints. They do not trigger
-                        an health check alert.</p>
+                    <p>Checks if OctoFarm has data available for each optional API endpoint. Can be largely
+                        ignored unless you're missing a specific feature related to these endpoints. They do not trigger
+                        a health check alert.</p>
                     <hr>
                     <p><b>Printer Connection Defaults</b></p>
-                    <p>Checks to see if OctoFarm knows your printers Baudrate, Port and Profile settings so printer
-                        connecting is seamless.</p>
+                    <p>Checks if OctoFarm knows the printer baudrate, port, and profile settings.</p>
                     <hr>
                     <p><b>Printer Profile</b></p>
-                    <p>Checks to see if OctoFarm has a valid printer profile with all required data. This does not check
+                    <p>Checks if OctoFarm has a valid printer profile with all required data. This does not check
                         if it actually matches your physical printer.</p>
                     <hr>
                     <p><b>Webcam Settings</b></p>
-                    <p>Checks to see if your printer webcam settings are setup correctly and correspond to what data
-                        OctoFarm has.</p>
+                    <p>Checks if your printer webcam settings are set up correctly and correspond to OctoFarm's data.</p>
                     <hr>
-                    <p><b>HistoryRoutes Settings</b></p>
-                    <p>Checks to see if OctoPrints settings are correctly setup for OctoFarms history collection
-                        settings.</p>
+                    <p><b>HistoryRoutes Collection Settings</b></p>
+                    <p>Checks if OctoPrint's settings are correctly setup for OctoFarm's history collection settings.</p>
                     <hr>
                 </div>
             </div>

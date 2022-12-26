@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches:
-      - 'master'
+      - 'releases/release-**'
       - 'betas/beta-**'
 
 jobs:
@@ -54,13 +54,13 @@ jobs:
         if: steps.filter.outputs.app == 'true'
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 18
       - name: Clean old build files...
         if: steps.filter.outputs.app == 'true'
         run: rm -Rf server/assets/js/* && rm -Rf server/assets/css/*
       - name: Install dependencies
         if: steps.filter.outputs.app == 'true'
-        run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git && npm run install-client
+        run: npm i --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git @semantic-release-plus/docker && npm run install-client
       - name: Release
         if: steps.filter.outputs.app == 'true'
         env:
@@ -69,4 +69,6 @@ jobs:
           GIT_AUTHOR_EMAIL: online@notexpectedyet.com
           GIT_COMMITTER_NAME: James Mackay
           GIT_COMMITTER_EMAIL: online@notexpectedyet.com
+          DOCKER_USERNAME: ${{ secrets.DOCKER_REGISTRY_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
         run: npx semantic-release

@@ -1,11 +1,11 @@
 import { getPrinterNameBadge } from "../../../templates/printer.templates";
 const returnAlerts = (id, printerURL) => {
   return `
-    <button title="No OctoPrint updates available!" id="octoprintUpdate-${id}"
+    <button title="No OctoPrint updates available" id="octoprintUpdate-${id}"
             class='tag btn btn-outline-info btn-sm d-none' ><i class="fab fa-raspberry-pi"></i></button>
     <button title="No OctoPrint plugin updates available" id="octoprintPluginUpdate-${id}"
             class='tag btn btn-outline-success btn-sm d-none' ><i class="fas fa-plug"></i></button>
-    <button title="No issue from scanning OctoPrints API"
+    <button title="No issue from scanning OctoPrint API"
             id="scanningIssues-${id}"
             type="button"
             class="tag btn btn-outline-danger btn-sm d-none"
@@ -13,7 +13,7 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fas fa-exclamation-triangle"></i>
     </button>
-    <button title="No current printer health issues!"
+    <button title="No current printer health issues"
             id="healthIssues-${id}"
             type="button"
             class="tag btn btn-outline-warning btn-sm d-none"
@@ -22,14 +22,14 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fas fa-heartbeat"></i>
     </button>
-    <button title="A restart is required on your OctoPrint instance!"
+    <button title="A restart is required on your OctoPrint instance"
             type="button"
             class="tag btn btn-outline-danger btn-sm d-none"
             id="restartRequired-${id}"  
     >
         <i class="fas fa-power-off"></i>
     </button>
-    <button title="Multiple user issue detected! Please open settings and choose one..."
+    <button title="Multiple user issue detected! Please open settings and choose a user."
             type="button"
             class="tag btn btn-outline-primary btn-sm d-none"
             data-toggle="modal"
@@ -38,7 +38,7 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fas fa-users"></i>
     </button>
-        <button title="Printer Events Registered"
+        <button title="Printer events registered"
             type="button"
             class="tag btn btn-outline-info btn-sm d-none"
             data-toggle="modal"
@@ -47,7 +47,7 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fa-solid fa-calendar-check"></i> <span id="printerEventsCount-${id}"></span>
     </button>
-    <a title="CORS is not enable on OctoPrint!"
+    <a title="CORS is not enabled in OctoPrint"
             type="button"
             class="tag btn btn-outline-danger btn-sm d-none"
             id="corsIssue-${id}" 
@@ -56,49 +56,49 @@ const returnAlerts = (id, printerURL) => {
     >
         <i class="fas fa-crosshairs"></i>
     </a>
-    <button  title="Offline Setup Scan Planned"
+    <button  title="Offline setup scan planned"
                  id="printerAPIScanning-${id}"
                  type="button"
                  class="tag btn btn-outline-danger btn-sm d-none"
                 >
                <span id="apiReScanIcon-${id}"><i class="fas fa-redo fa-sm"></i></span><span id="apiReScanText-${id}"></span> 
     </button>
-        <button  title="Offline Websocket Scan Planned"
+        <button  title="Offline websocket scan planned"
                  id="printerWebsocketScanning-${id}"
                  type="button"
                  class="tag btn btn-outline-warning btn-sm d-none"
                 >
                <span id="webosocketScanIcon-${id}"><i class="fas fa-sync-alt fa-sm"></i></span><span id="websocketScanText-${id}"></span> 
     </button>
-    <button  title="Safe mode triggered!"
+    <button  title="Safe mode triggered"
          id="printerSafeMode-${id}"
          type="button"
          class="tag btn btn-outline-warning btn-sm d-none"
         >
         <i class="fa-solid fa-shield-heart"></i>
     </button>
-    <button  title="Your Pi is undervoltaged!"
+    <button  title="Your Pi is under voltage"
          id="printerUnderVoltaged-${id}"
          type="button"
          class="tag btn btn-outline-warning btn-sm d-none"
         >
        <i class="fa-solid fa-plug-circle-bolt"></i>
     </button>
-    <button  title="Your Pi is overheating!"
+    <button  title="Your Pi is overheating"
          id="printerOverHeating-${id}"
          type="button"
          class="tag btn btn-outline-danger btn-sm d-none"
         >
        <i class="fa-solid fa-fire"></i>
     </button>
-        <button  title="Your connection is throttled!"
+        <button  title="Your connection is throttled"
          id="printerConnectionThrottled-${id}"
          type="button"
          class="tag btn btn-outline-info btn-sm d-none"
         >
        <i class="fa-solid fa-toilet"></i> <span id="printerConnectionThrottledCount-${id}"></span>
     </button>
-    <button title="OctoPrints CPU Usage | OctoPrint System CPU Usage | OctoPrints System Memory Usage"
+    <button title="OctoPrint CPU Usage | OctoPrint System CPU Usage | OctoPrint System Memory Usage"
             id="octoPrintsUsage-${id}"
             type="button"
             class="tag btn btn-outline-info btn-sm d-none"
@@ -138,7 +138,7 @@ function returnPrinterManageDropDown(id, disabled) {
           </button>
           <div class="dropdown-menu">
           <h6 class="dropdown-header">Connection</h6>
-          <button  title="Change your Printer Settings"
+          <button  title="Change your printer settings"
                  id="printerEdit-${id}"
                  type="button"
                  class="btn btn-primary dropdown-item"
@@ -158,7 +158,7 @@ function returnPrinterManageDropDown(id, disabled) {
             ${printerDisabledButton}
             <hr>
             <h6 class="dropdown-header">Printer</h6>
-            <button  title="Change your Printer Settings"
+            <button  title="Change your printer settings"
                  id="printerSettings-${id}"
                  type="button"
                  class="btn btn-primary dropdown-item"
@@ -178,7 +178,7 @@ function returnPrinterManageDropDown(id, disabled) {
             </button>
             <hr>
             <h6 class="dropdown-header">Other</h6>
-             <button title="View individual Printer Statistics"
+             <button title="View individual printer statistics"
                      id="printerStatistics-${id}"
                      type="button"
                      class="tag btn btn-warning dropdown-item"
@@ -187,7 +187,7 @@ function returnPrinterManageDropDown(id, disabled) {
                 >
                 <i class="fas fa-chart-pie text-warning"></i> Statistics
               </button>
-               <button  title="Setup and track Maintenance Issues with Printers"
+               <button  title="Setup and track maintenance issues with printers"
                      id="printerMaintenance-${id}"
                      type="button"
                      class="tag btn btn-secondary dropdown-item d-none"
@@ -206,7 +206,7 @@ export function returnPrinterTableRow(printer) {
   return `
         <tr class="" id="printerCard-${printer._id}">
         <td class="align-middle">
-            <span title="Drag and Change your Printers sorting"  id="printerSortIndex-${
+            <span title="Drag and change printer sorting"  id="printerSortIndex-${
               printer._id
             }"
                    class="btn btn-light btn-sm sortableList" style="vertical-align: middle"><i class="fas fa-spinner fa-spin"></i>
@@ -282,7 +282,7 @@ export function returnDisabledPrinterTableRow(printer) {
   return `
    <tr class="printerDisabled" id="printerCard-${printer._id}">
         <td class="align-middle">
-            <span title="Drag and Change your Printers sorting"  id="printerSortIndex-${
+            <span title="Drag and change your printers sorting"  id="printerSortIndex-${
               printer._id
             }"
                    class="btn btn-light btn-sm sortableList" style="vertical-align: middle"><i class="fas fa-spinner fa-spin"></i>

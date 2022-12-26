@@ -1,6 +1,6 @@
 
 module.exports = {
-  branches: ['master', { name: 'betas/beta-**', prerelease: "beta" }],
+  branches: ['master', { name: 'releases/releases-**', prerelease: false }, { name: 'betas/beta-**', prerelease: "beta" }],
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -91,7 +91,7 @@ module.exports = {
       '@semantic-release/exec',
       {
         // eslint-disable-next-line no-template-curly-in-string
-        prepareCmd: 'VERSION=${nextRelease.version} npm run bump && cd client && npm run build && cd ../ && chmod +x scripts/create-release-zip.sh',
+        prepareCmd: 'VERSION=${nextRelease.version} && chmod +x scripts/run-build-sequence.sh && scripts/run-build-sequence.sh ${nextRelease.version}',
       },
     ],
     [
@@ -113,6 +113,18 @@ module.exports = {
       "assets": [
         {"path": "octofarm-*.zip", "label": "OctoFarm"}
       ]
-    }]
+    }],
+    [
+      "@semantic-release-plus/docker",
+      {
+        "name": {
+          "registry": "docker.io",
+          "namespace": "octofarm",
+          "repository": "octofarm",
+          "tag": "latest"
+        },
+        "publishChannelTag": false
+      }
+    ]
   ],
 };

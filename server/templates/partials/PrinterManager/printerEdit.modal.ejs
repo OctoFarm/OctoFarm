@@ -1,7 +1,7 @@
 <div class="col-12 col-sm-12 col-md-12">
     <h5>OctoPrint Host</h5>
     <hr>
-    <p>Set your OctoPrint Host connection details</p>
+    <p>Set your OctoPrint host connection details</p>
     <div id="psPrinterConnection">
         <form>
             <div class="row pb-1">
@@ -14,15 +14,15 @@
 
                         </div>
                     </div>
-                    <small class="form-text text-muted">Your current Printer Name. Use the generate button or update manually to create a new one</small>
+                    <small class="form-text text-muted">Your current printer name. Use the generate button or update manually to create a new one.</small>
 
                     <small>Note: <code>This is not saved back to OctoPrint!</code></small>
                 </div>
                 <div class="col-12 col-md-6">
                     <label for="psPrinterGroup">Printer Group:</label>
                     <input id="psPrinterGroup" type="text" class="form-control"
-                           placeholder="Printer Name">
-                    <small class="form-text text-muted">Group the printer belongs too.</small>
+                           placeholder="Printer Group">
+                    <small class="form-text text-muted">Group the printer belongs to.</small>
                 </div>
             </div>
             <div class="row pb-1">
@@ -30,7 +30,7 @@
                     <label for="psPrinterURL">Printer URL:</label>
                     <input id="psPrinterURL" type="text" class="form-control"
                            placeholder="Printer URL">
-                    <small class="form-text text-muted">URL of OctoPrint Host inc. port.
+                    <small class="form-text text-muted">URL of OctoPrint host including port.
                         Defaults to "http://" if not specified.</small>
                     <small>Example: <code>http://192.168.1.5:81</code></small>
                 </div>
@@ -38,17 +38,17 @@
                     <label for="psAPIKEY">API Key:</label>
                     <input id="psAPIKEY" type="text" class="form-control"
                            placeholder="API Key">
-                    <small class="form-text text-muted">OctoPrints API Key. It's
-                        recquired to use the User/Application API Key for OctoPrint
-                        version 1.4.1+.</small>
+                    <small class="form-text text-muted">OctoPrint's API Key. You are
+                        required to use a user/application API key for OctoPrint
+                        versions 1.4.1+.</small>
                 </div>
                 <div class="col-12 col-md-2">
                     <label for="psOctoPrintUser">OctoPrint User:</label>
                     <select id="psOctoPrintUser" class="custom-select">
 
                     </select>
-                    <small class="form-text text-muted">Current OctoPrint User that
-                        OctoFarm is using to connect with.</small>
+                    <small class="form-text text-muted">OctoPrint user for whom the application 
+                        API key was generated.</small>
                 </div>
 
             </div>
@@ -68,7 +68,7 @@
                         <option value="ws://">ws://</option>
                         <option value="wss://">wss://</option>
                     </select>
-                    <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on http/https value in Printer URL. (disabled)</small>
+                    <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on http/https value in printer URL. (disabled)</small>
                     <small>Example: <code>"ws:// (http) " or "wss:// (https)" </code></small>
                 </div>
             </div>
