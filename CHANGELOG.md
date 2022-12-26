@@ -1,3 +1,10 @@
+## [1.8.0-beta.10](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.9...v1.8.0-beta.10) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **main:** release zip not getting version numbe ([6b099d0](https://github.com/OctoFarm/OctoFarm/commit/6b099d03606ee94dbc49fe77b4453d91fd4704f2))
+
 ## [1.8.0-beta.9](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.8...v1.8.0-beta.9) (2022-12-26)
 
 
