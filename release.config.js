@@ -122,7 +122,8 @@ module.exports = {
           "namespace": "octofarm",
           "repository": "octofarm",
           "tag": "latest"
-        }
+        },
+        "publishChannelTag": false
       }
     ],
     [
@@ -133,7 +134,8 @@ module.exports = {
           "namespace": "octofarm",
           "repository": "octofarm",
           "tag": "monolithic-latest"
-        }
+        },
+        "publishChannelTag": false
       }
     ]
   ],
