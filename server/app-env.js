@@ -16,9 +16,7 @@ const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_ENVIRONMENT, false);
 const instructionsReferralURL = 'https://docs.octofarm.net/installation/setup-environment.html';
 const deprecatedConfigFolder = '../middleware';
 const deprecatedConfigFilePath = deprecatedConfigFolder + 'db.js';
-const packageJsonPath = path.join(__dirname, '../package.json');
-const packageLockPath = path.join(__dirname, '../package-lock.json');
-const packageLockFile = require(packageLockPath);
+const packageJsonPath = path.join(__dirname, './package.json');
 let currentClientVersion;
 const dotEnvPath = path.join(__dirname, '../.env');
 

@@ -355,8 +355,6 @@ router.get('/system', ensureAuthenticated, ensureCurrentUserAndGroup, async (req
       isNode: isNode(),
       isPm2: isPm2()
     },
-    currentGitBranch: await getCurrentBranch(),
-    areWeGitRepo: checkIfWereInAGitRepo(),
     systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
     patreonData: returnPatreonData(),
     currentUsers,

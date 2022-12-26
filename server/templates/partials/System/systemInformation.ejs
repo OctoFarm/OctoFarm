@@ -2,18 +2,6 @@
 <% const npmURL = "https://www.npmjs.com/package/@notexpectedyet/octofarm-client" %>
 <% if(Object.keys(systemInformation).length > 0 && Object.keys(serviceInformation).length > 0){ %>
         <div class="row">
-        <div class="col-3 text-center">
-            <div id="cpuUsageDonut"></div>
-        </div>
-        <div class="col-3 text-center">
-            <div id="memoryUsageDonut"></div>
-        </div>
-        <div class="col-6 text-center">
-            <div id="historicUsageGraph"></div>
-        </div>
-    </div>
-        <hr>
-        <div class="row">
                     <div class="col-12 text-center">
                         <div class="row">
                             <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-34">
@@ -43,13 +31,6 @@
                                 <% if(serviceInformation?.isNodemon){ %>
                                     <p class="text-light"><i class="far fa-eye text-info"></i> Running under nodemon</p>
                                 <% } %>
-                            </div>
-                            <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-                                <% if(areWeGitRepo){ %>
-                                    <p class="text-light"><i class="fab fa-github text-success"></i> Detected git repo</p>
-                                <% }else{ %>
-                                    <p class="text-light"><i class="fab fa-github text-danger"></i> Couldn't detect git repo</p>
-                                <%   } %>
                             </div>
                         </div>
                     </div>
@@ -90,13 +71,6 @@
                                  <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
                              </a>
                          <% } %>
-                     </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                         <i class="fas fa-code-branch"></i> GitHub Branch: <a
-                                 title="Current Git branch OctoFarm is running from"
-                                 class="text-light"
-                                 rel=”noopener”
-                                 target="_blank"><br><%= currentGitBranch?.current ? currentGitBranch.current : "Not a repository"; %></a>
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                          <i class="fas fa-code-branch"></i> Node Environment: <a
@@ -150,18 +124,18 @@
                     </div>
         </div>
         <hr>
-        <% if(userGroup === "Administrator"){ %>
-            <div id="activeUsersRow" class="row">
-                <div class="col-lg-12">
-                    <h5>Active Sessions: <span id="activeUserCount"><i class="fa-solid fa-spinner fa-spin"></i></span></h5>
-                    <div id="activeUserListContainer" class="text-center row">
-                        <div class="col-lg-12">
-                            <i class="fa-solid fa-spinner fa-spin"></i><br> Loading active sessions list...
-                        </div>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-3 text-center">
+                <div id="cpuUsageDonut"></div>
             </div>
-        <% } %>
+            <div class="col-3 text-center">
+                <div id="memoryUsageDonut"></div>
+            </div>
+            <div class="col-6 text-center">
+                <div id="historicUsageGraph"></div>
+            </div>
+        </div>
+
 <% }else{ %>
         <div class="row">
             <div class="col-12 text-center">

@@ -52,7 +52,7 @@ async function fetchPatreons() {
 const writeToConstantsFile = async () => {
     try{
         console.table(pledgesList)
-        await fs.writeFileSync("../../server/constants/patreon.constants.js", `modules.exports = ${JSON.stringify(pledgesList)}`, 'utf-8')
+        await fs.writeFileSync("../../server/constants/patreon.constants.js", `module.exports = ${JSON.stringify(pledgesList)}`, 'utf-8')
     }catch(e){
         console.error(e)
     }

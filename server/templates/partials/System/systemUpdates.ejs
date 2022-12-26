@@ -1,0 +1,49 @@
+<% const releasesURL = "https://github.com/OctoFarm/OctoFarm/releases/tag/" %>
+<div class="row">
+    <div class="col-12">
+        <h4 class="float-left">Server Updates</h4>
+        <button title="Checks for OctoFarm updates"
+                id="checkUpdatesForOctoFarmBtn" type="button"
+                class="btn btn-info ml-3 float-right btn-lg">
+            <i class="fab fa-github"></i> Check for Update
+        </button>
+        <button title="Updates OctoFarm to the latest version"
+                id="updateOctoFarmBtn" type="button"
+                class="btn btn-success ml-3 float-right btn-lg">
+            <i class="fas fa-thumbs-up"></i> Update OctoFarm
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 text-center">
+        <div class="alert alert-dark text-danger" role="alert">
+            <i class="fa-solid fa-skull-crossbones fa-2xl pb-3"></i><br>
+
+            Your server is currently disconnected from the internet... The following page is disabled!
+
+            Please connect your server to the internet and restart OctoFarm to enable the page
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 text-center">
+        <div class="alert  alert-dark text-success" role="alert">
+            <i class="fa-solid fa-thumbs-up fa-2xl pb-3"></i><br>
+            There is nothing for you to do, your server is currently fully up to date!
+        </div>
+    </div>
+    <div class="col-12">
+        <h5>Current Release Notes</h5>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 text-center">
+        <div class="alert alert-dark text-warning" role="alert">
+            <i class="fa-solid fa-code-merge fa-2xl pb-3"></i><br>
+            New release detected! Please check the change log below before updating! Notices and a brief description of the releases focus is at the top.
+        </div>
+    </div>
+    <div class="col-12">
+        <h5>Next Version Changelog</h5>
+    </div>
+</div>
