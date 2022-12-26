@@ -1,3 +1,10 @@
+## [1.8.0-beta.7](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.6...v1.8.0-beta.7) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** double build path regression of the regression fix ([75c03cc](https://github.com/OctoFarm/OctoFarm/commit/75c03cc92a5da2a08fa40b5770f6fcfa72a92a6d))
+
 ## [1.8.0-beta.6](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.5...v1.8.0-beta.6) (2022-12-26)
 
 
