@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches:
-      - 'master'
+      - 'releases/release-**'
       - 'betas/beta-**'
 
 jobs:
@@ -54,7 +54,7 @@ jobs:
         if: steps.filter.outputs.app == 'true'
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: 18
       - name: Clean old build files...
         if: steps.filter.outputs.app == 'true'
         run: rm -Rf server/assets/js/* && rm -Rf server/assets/css/*
