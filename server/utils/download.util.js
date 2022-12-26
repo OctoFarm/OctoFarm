@@ -31,7 +31,34 @@ const downloadImage = async (url, path, apiKey, callback) => {
   });
 };
 
+const downloadGitZip = async (url, path, headers, callback) => {
+  console.log(url, path, callback)
+  console.log(headers)
+  var req = request({
+    method: 'GET',
+    uri: url,
+    headers
+  });
+
+  req.pipe(fs.createWriteStream(path)).on("close", callback);
+
+  var body = "";
+  var cur = 0;
+  var total = 16384 / 1048576; //1048576 - bytes in  1Megabyte
+  req.on('data', function (chunk) {
+    body += chunk;
+    cur += chunk.length;
+    console.log("Downloading " + (100.0 * cur / 16384).toFixed(2) + "% " + (cur / 16384).toFixed(2) + " mb\r" + ".<br/> Total size: " + total.toFixed(2) + " mb")
+  });
+
+  req.on('end', function() {
+    //Do something
+  });
+
+};
+
 module.exports = {
   downloadFromOctoPrint,
-  downloadImage
+  downloadImage,
+  downloadGitZip
 };

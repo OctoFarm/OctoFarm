@@ -116,10 +116,30 @@ const generateMilisecondsTime = function (miliseconds) {
   }
 };
 
+const replaceGithubIcons = (text) => {
+  return text
+      .replace(/:hammer:/g, '<i class="fa-solid fa-hammer text-purple"></i>')
+      .replace(/:stars:/g, '<i class="fa-solid fa-star text-purple"></i>')
+      .replace(/:persevere:/g, '<i class="fa-solid fa-dove text-purple"></i>')
+      .replace(/:dash:/g, '<i class="fa-solid fa-person-running text-purple"></i>')
+      .replace(/:link:/g, '<i class="fa-solid fa-link text-purple"></i>')
+      .replace(/:boom:/g, '<i class="fa-solid fa-bomb text-purple"></i>')
+      .replace(/:scroll:/g, '<i class="fa-solid fa-arrow-rotate-left text-purple"></i>')
+      .replace(/:key:/g, '<i class="fa-solid fa-key text-purple"></i>')
+      .replace(/:curly_loop:/g, '<i class="fa-solid fa-hand-fist text-purple"></i>')
+      .replace(/:dress:/g, '<i class="fa-solid fa-paint-roller text-purple"></i>')
+      .replace(/:x:/g, '<i class="fa-solid fa-xmark text-purple"></i>')
+      .replace(/<strong>main:/g, '<strong><i class="fa-solid fa-code-branch text-purple"></i>')
+      .replace(/<strong>client:/g, '<strong><i class="fa-solid fa-server text-purple"></i>')
+      .replace(/<strong>docker:/g, '<strong><i class="fa-brands fa-docker text-purple"></i>')
+      .replace(/<strong>server:/g, '<strong><i class="fa-solid fa-desktop text-purple"></i>');
+};
+
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
   generateMilisecondsTime,
-  returnProgressColour
+  returnProgressColour,
+  replaceGithubIcons
 };

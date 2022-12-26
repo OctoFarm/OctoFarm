@@ -19,3 +19,4 @@ pnpm-lock.yaml
 /client/assets/css
 /client/build/*
 
+/updater/octofarm-*.zip

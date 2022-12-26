@@ -12,6 +12,7 @@ const { AppConstants } = require('../constants/app.constants');
 const { getDefaultDashboardSettings } = require('../constants/settings.constants');
 const { getHistoryCache } = require('../cache/history.cache');
 const { onlineChecker } = require('../modules/OnlineChecker/index.js');
+const { githubService } = require('../modules/InlineUpdater/index.js');
 const { getPrinterStoreCache } = require('../cache/printer-store.cache');
 const { getPrinterManagerCache } = require('../cache/printer-manager.cache');
 const { TaskManager } = require('../services/task-manager.service');
@@ -24,7 +25,6 @@ const { fetchUsers } = require('../services/users.service');
 const { fetchMongoDBConnectionString } = require('../app-env');
 const isDocker = require('is-docker');
 const { isNodemon, isNode, isPm2 } = require('../utils/env.utils');
-const { getCurrentBranch, checkIfWereInAGitRepo } = require('../utils/git.utils');
 const { returnPatreonData } = require('../services/patreon.service');
 
 const version = process.env[AppConstants.VERSION_KEY];
@@ -359,6 +359,8 @@ router.get('/system', ensureAuthenticated, ensureCurrentUserAndGroup, async (req
     patreonData: returnPatreonData(),
     currentUsers,
     taskManagerState: TaskManager.getTaskState(),
+    airGapped: onlineChecker.airGapped,
+    releaseInformation: githubService.releaseInformation
   });
 });
 

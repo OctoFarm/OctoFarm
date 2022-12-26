@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const { getGithubTokenIfAvailable } = require("../../app-env")
+const { downloadGitZip } = require("../../utils/download.util");
 const { onlineChecker } = require("../OnlineChecker/index")
 const semver = require("semver");
 const marked = require("marked");
@@ -22,6 +23,7 @@ class GithubReleaseChecker{
   #rate_limited = false;
   #pre_release = false;
   #default_request_headers = {"Content-Type": "application/json"};
+  #zip_download_path = '../../../updater';
 
   constructor(token = undefined, pre_release = undefined) {
     if(!!token){
@@ -34,12 +36,9 @@ class GithubReleaseChecker{
   }
 
   #checkAndParseWantedReleaseNotes(releases){
-    const filteredReleaseNotes = releases.filter((release) =>
-        semver.satisfies(release.tag_name, "> " + this.#current_version, {
+    const filteredReleaseNotes = releases.filter((release) => semver.satisfies(release.tag_name, "< " + this.#current_version.replace("-beta.10", ""), {
           includePrerelease: true
-        })
-    );
-
+        }));
     const latestRelease = releases.find(
         (r) =>
             r.draft === false &&
@@ -47,6 +46,7 @@ class GithubReleaseChecker{
     );
     this.#latest_version = latestRelease.tag_name
     this.#latest_release_notes = marked.parse(latestRelease.body);
+    this.#latest_asset_url = filteredReleaseNotes[0].assets[0]?.browser_download_url;
 
     for (const release of filteredReleaseNotes) {
       this.#other_relevant_release_notes.push({
@@ -113,6 +113,14 @@ class GithubReleaseChecker{
       latest_asset_url: this.#latest_asset_url,
       other_relevant_release_notes: this.#other_relevant_release_notes
     }
+  }
+
+  async startUpdateProcess(){
+    console.log("Zip downloaded, starting the seperate updater process")
+  }
+
+  async downloadLatestReleaseZip(){
+    return downloadGitZip(this.#latest_asset_url, this.#zip_download_path, { "Authorization": this.#default_request_headers["Authorization"] }, this.startUpdateProcess);
   }
 }
 
