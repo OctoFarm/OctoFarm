@@ -62,13 +62,13 @@ const unzipFileToTemporaryDirectory = (callback) => {
 }
 
 const backupOldServerDirectory = (callback) => {
-    fs.rename("../server2", "../temp/backup", async () => {
+    fs.rename("../server", "../temp/backup", async () => {
         await callback();
     })
 }
 
 const moveNewFilesToServerDirectory = (callback) => {
-    fs.rename("../temp/server", "../server2", async () => {
+    fs.rename("../temp/server", "../server", async () => {
         await callback();
     })
 }

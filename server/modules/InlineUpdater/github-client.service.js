@@ -38,7 +38,7 @@ class GithubReleaseChecker{
   }
 
   #checkAndParseWantedReleaseNotes(releases){
-    const filteredReleaseNotes = releases.filter((release) => semver.satisfies(release.tag_name, "< " + this.#current_version.replace("-beta.10", ""), {
+    const filteredReleaseNotes = releases.filter((release) => semver.satisfies(release.tag_name, "> " + this.#current_version, {
           includePrerelease: true
         }));
     const latestRelease = releases.find(

@@ -34,4 +34,5 @@ const handleServerMessage = (message) => {
     getServerChildProcess().start(handleServerMessage);
 })();
 
-
+//TODO create messaging system between processes
+//TODO split server up into multiple processes. Statistics/API/Printer Connector/System
