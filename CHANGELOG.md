@@ -1,3 +1,15 @@
+## [1.8.0-beta.11](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.10...v1.8.0-beta.11) (2022-12-28)
+
+
+### :stars: New Feature :stars:
+
+* **server, client:** new inline upgrader mechanism, replaces git pull ([#1315](https://github.com/OctoFarm/OctoFarm/issues/1315)) ([8abc5ea](https://github.com/OctoFarm/OctoFarm/commit/8abc5ea5b49944701d94202f18eac4b18fb6571b)), closes [#1299](https://github.com/OctoFarm/OctoFarm/issues/1299)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main, server, client:** clean up of code after release feature ([#1367](https://github.com/OctoFarm/OctoFarm/issues/1367)) ([20bc2e5](https://github.com/OctoFarm/OctoFarm/commit/20bc2e5a774ffe094f8b048a1f4cddaf958e8d8c)), closes [#1299](https://github.com/OctoFarm/OctoFarm/issues/1299)
+
 ## [1.8.0-beta.10](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.9...v1.8.0-beta.10) (2022-12-26)
 
 
