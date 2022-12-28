@@ -1,6 +1,7 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<div class="row position-absolute top-50 start-50 translate-middle">
+  <div class="col-md-8 m-auto">
     <div class="card card-body">
+      <h1 class="text-center mb-3"><img width="40%" src="/assets/images/logo.png" /></h1>
       <h1 class="text-center mb-3">
         <i class="fas fa-user-plus"></i> Register
       </h1>
@@ -31,9 +32,12 @@
           <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
             value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
         </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" onSubmit="this.disabled=true; this.value='Registering…';">
-          Register
-        </button>
+        <div class="d-grid gap-2 mt-5">
+          <button type="submit" class="btn btn-outline-success" onSubmit="this.disabled=true; this.value='Registering…';">
+            Register
+          </button>
+        </div>
+
       </form>
       <% if(userCount === 0){ %>
         <p class="lead mt-4">Have an account? <a href="/users/login">Login</a></p>

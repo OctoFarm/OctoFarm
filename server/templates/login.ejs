@@ -1,6 +1,7 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<div class="row position-absolute top-50 start-50 translate-middle">
+  <div class="col-md-8 m-auto">
     <div class="card card-body">
+      <h1 class="text-center mb-3"><img width="40%" src="/assets/images/logo.png" /></h1>
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Login</h1>
       <%- include('./partials/messages') %>
       <form action="/users/login" method="POST" class="was-validated">
@@ -32,7 +33,10 @@
             <div class="valid-feedback">Will remember your user session. </div>
             <div class="invalid-feedback">Not remembering user session.</div>
           </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" formnovalidate>Login</button>
+        <div class="d-grid gap-2 mt-5">
+          <button type="submit" class="btn btn-success" formnovalidate>Login</button>
+        </div>
+
       </form>
       <p class="lead mt-4">
         <% if(registration){ %> No Account? Please <a href="/users/register">register</a> one here!

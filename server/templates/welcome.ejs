@@ -1,18 +1,24 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<div class="row position-absolute top-50 start-50 translate-middle">
+  <div class="col-md-8 m-auto">
     <div class="card card-body text-center">
-      <h1>Welcome to OctoFarm</h1>
+      <h1 class="text-center mb-3"><img width="40%" src="/assets/images/logo.png" /></h1>
+      <h1 class="text-center mb-3">Welcome to OctoFarm</h1>
       <p>
         The all-in-one monitoring solution for multiple OctoPrint instances.
       </p>
-      <h1><img width="50%" src="/assets/images/logo.png" /></h1>
       <% if(registration){%>
       <p>Create an account or login</p>
-      <a href="/users/register" class="btn btn-primary btn-block mb-2 bg-colour-1"
-      >Register</a
-      >
+        <div class="d-grid gap-2 mt-5">
+          <a href="/users/register" class="btn btn-outline-primary"
+          >Register</a
+          >
+        </div>
+
       <% }%>
-      <a href="/users/login" class="btn btn-secondary btn-block bg-colour-2">Login</a>
+      <div class="d-grid gap-2 mt-2">
+        <a href="/users/login" class="btn btn-outline-success">Login</a>
+      </div>
+
     </div>
   </div>
 </div>

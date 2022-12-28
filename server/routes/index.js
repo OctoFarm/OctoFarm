@@ -43,6 +43,7 @@ router.get('/', async (req, res) => {
     } else {
       res.render('welcome', {
         page: 'Welcome',
+        layout: 'layout-nonav.ejs',
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
         registration,
         serverSettings: serverSettings,
