@@ -26,7 +26,6 @@ const handleServerMessage = (message) => {
             getServerChildProcess().end();
             getUpdaterChildProcess().start(handleUpdaterMessage);
         }
-
     }
 }
 
