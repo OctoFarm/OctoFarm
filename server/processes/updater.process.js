@@ -77,9 +77,13 @@ const updateNodeJSModules = async () => {
     try {
         await exec("npm ci", {
             cwd: '../server'
+        }, function(error, stdout, stderr) {
+            if(error) throw new Error("Error with exec command npm ci! " + error)
+            if(stdout) logger.info(stdout)
+            if(stderr) throw new Error("STDERR triggered from npm ci! " + stderr)
         });
     } catch (e) {
-        throw `Error running installation command | ${e}`;
+        logger.error(e)
     }
 }
 
@@ -109,6 +113,5 @@ const runAfterUnZip = () => {
 (async function() {
     logger.info("Starting OctoFarm's update server!");
     await isZipFileTasty();
-    await updateNodeJSModules();
-    //unzipFileToTemporaryDirectory(runAfterUnZip);
+    unzipFileToTemporaryDirectory(runAfterUnZip);
 })();
