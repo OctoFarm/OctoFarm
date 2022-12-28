@@ -5,10 +5,6 @@
 <% const updateURL = "https://docs.octofarm.net/getting-started/octofarm-updating.html" %>
 <% const installationURL = "https://docs.octofarm.net/installation/" %>
 
-<% let updateDisabled = "disabled"; %>
-
-<% if( serviceInformation?.update?.update_available ) { updateDisabled = "" } %>
-
 <% if(systemInformation?.warnings?.status){ %>
     <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
         <%= systemInformation.warnings?.message; %>
@@ -26,52 +22,12 @@
         <i class="fas fa-heart text-danger"></i> Hey lovely developer! Thanks for helping make OctoFarm great!
     </div>
 <% } %>
-<% let systemButtonsDisabled = false; %>
-<% if(serviceInformation?.isDockerContainer){ %>
-    <div class="alert alert-warning text-dark" role="alert">
-        The "Update OctoFarm" function has been disabled due to
-        Docker having its own update mechanism
-        Please check the <a
-                rel=”noopener” href="<%= updateURL %>">installation
-            instructions</a> for more information on how to update your Docker container.
-    </div>
-    <% systemButtonsDisabled = true; %>
-<% } %>
-<% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
-    <div class="alert alert-warning text-dark" role="alert">
-        The "Update OctoFarm" function has been disabled because
-        the pm2 process manager was not identified.
-        Please re-install OctoFarm following the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">installation
-            instructions</a>.
-    </div>
-    <% systemButtonsDisabled = true; %>
-<% } %>
-<% if(!areWeGitRepo && !serviceInformation?.isDockerContainer){ %>
-    <div class="alert alert-warning text-dark" role="alert">
-        The "Update OctoFarm" function has been disabled because
-        a git repository was not identified.
-        Please check the <a rel=”noopener” target="_blank" href="<%= instructionsURL %>">installation
-            instructions</a> to set this up.
-    </div>
-    <% systemButtonsDisabled = true; %>
-<% } %>
 <div class="row">
     <div class="col-12">
         <button title="Restarts the OctoFarm service"
                 id="restartOctoFarmBtn" type="button"
                 class="btn btn-danger mr-3 btn-lg">
             <i class="fas fa-sync"></i> Restart
-        </button>
-        <button title="Checks for OctoFarm updates"
-                id="checkUpdatesForOctoFarmBtn" type="button"
-                class="btn btn-info ml-3 float-right btn-lg">
-            <i class="fab fa-github"></i> Check for Update
-        </button>
-        <button title="Updates OctoFarm to the latest version"
-                id="updateOctoFarmBtn" type="button"
-                class="btn btn-success ml-3 float-right btn-lg"
-                <% updateDisabled %>>
-            <i class="fas fa-thumbs-up"></i> Update OctoFarm
         </button>
     </div>
 </div>
@@ -82,18 +38,6 @@
             <a class="nav-link active"
                id="client-settings-list" data-toggle="list" href="#client-settings"
                role="tab" aria-controls="system"><i class="fas fa-desktop"></i> General</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link"
-               id="server-settings-list" data-toggle="list" href="#server-settings"
-               role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i>
-                System</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link"
-               id="server-timeout-list" data-toggle="list" href="#server-timeout"
-               role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i>
-                Timeout</a>
         </li>
         <li class="nav-item">
             <a class="nav-link"
@@ -131,55 +75,12 @@
             <div class="tab-pane fade show active" id="client-settings"
                  role="tabpanel" aria-labelledby="client-settings-list">
                 <div class="row">
-                    <div class="col-12 col-md-4">
-                        <p class="font-weight-bold">Change Background</p>
-                        <p>Click the button below to upload your background
-                            image.</p>
-                        <small>NOTE: You may need to refresh your browser cache if
-                            this doesn't apply straight away.</small>
-                        <form action="/settings/backgroundUpload"
-                              enctype="multipart/form-data" method="POST">
-                            <input class="btn bg-secondary" type="file"
-                                   name="myFile"
-                                   accept="image/jpeg,image/png,image/jpg"/>
-                            <input id="backgroundSubmit" class="btn btn-primary"
-                                   type="submit" value="Upload"
-                                   accept="image/jpeg,image/png">
-                        </form>
-                        <p> Supports <code>PNG, JPG</code></p>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <img width="100%" src="images/bg.jpg">
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="server-settings"
-                 role="tabpanel" aria-labelledby="server-settings-list">
-                <p class="font-weight-bold">Server Port</p>
-                <p>The port on which OctoFarm listens for connections.
-                   Use the .env file in your OctoFarm folder to change.</p>
-                <p><b>Default</b>: 4000</p>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Port (disabled):</span>
-                    </div>
-                    <input id="serverPortNo" type="number" class="form-control"
-                           placeholder="6" aria-label="Refresh Rate"
-                           disabled
-                           value="4000" step="1">
-
-                </div>
-                <small class="form-text text-muted">Requires a server
-                    restart</small>
-                <hr>
-                <div class="row">
                     <div class="col-12">
-                        <p class="font-weight-bold">Login and Registration</p>
-                        <p>Change OctoFarm login/registration requirements. These
-                            are both defaulted as true.</p>
+                        <h4 class="font-weight-bold">Login and Registration</h4>
+                        <p>Change OctoFarm login/registration requirements.</p>
                     </div>
 
-                    <div class="col-md-12 col-lg-6">
+                    <div class="col-md-12 col-lg-2">
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
@@ -192,14 +93,14 @@
                             </div>
                         </form>
                     </div>
-                    <div class="col-md-12 col-lg-6">
+                    <div class="col-md-12 col-lg-2">
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
                                        id="requireRegistration" required <%= (serverSettings.server.registration) ? "checked" : "" %>
                                 >
                                 <label class="custom-control-label"
-                                       for="requireRegistration">Registration</label>
+                                       for="requireRegistration">Registration Allowed</label>
                                 <div class="valid-feedback">Registration is turned
                                     on
                                 </div>
@@ -210,17 +111,12 @@
                         </form>
                     </div>
                 </div>
-            </div>
-            <div class="tab-pane fade" id="server-timeout" role="tabpanel"
-                 aria-labelledby="server-timeout">
-                <small class="form-text text-muted">Does not require a server
-                    restart</small>
                 <hr>
                 <div class="row">
                     <div class="col-md-12 col-lg-6">
-                        <p class="font-weight-bold">Websocket Retry</p>
+                        <h4 class="font-weight-bold">Websocket Retry</h4>
                         <p>The interval on which OctoFarm will re-poll the websocket
-                            when a connection is lost. It will re-poll at this rate 
+                            when a connection is lost. It will re-poll at this rate
                             until the connection is re-established.</p>
 
                         <p><b>Min</b>: 5 seconds (Default), <b>Max:</b> 30 seconds
@@ -240,10 +136,9 @@
                         </div>
                         <small id="emailHelp" class="form-text text-muted">Requires
                             a server restart</small>
-                        <hr>
                     </div>
                     <div class="col-md-6 col-lg-6">
-                        <p class="font-weight-bold">API Retry</p>
+                        <h4 class="font-weight-bold">API Retry</h4>
                         <p>The interval on which OctoFarm will attempt another
                             connection to OctoPrint. Only applicable if your
                             printer is offline when added to the farm.</p>
@@ -264,11 +159,31 @@
                         </div>
                         <small id="emailHelp" class="form-text text-muted">Requires
                             a server restart</small>
-                        <hr>
                     </div>
                 </div>
-
-
+                <hr>
+                <div class="row">
+                    <div class="col-12 col-md-3">
+                        <h4 class="font-weight-bold">Change Background</h4>
+                        <p>Click the button below to upload your background
+                            image.</p>
+                        <form action="/settings/backgroundUpload"
+                              enctype="multipart/form-data" method="POST">
+                            <input class="btn bg-secondary" type="file"
+                                   name="myFile"
+                                   accept="image/jpeg,image/png,image/jpg"/>
+                            <input id="backgroundSubmit" class="btn btn-primary"
+                                   type="submit" value="Upload"
+                                   accept="image/jpeg,image/png">
+                        </form>
+                        <p> Supports <code>PNG, JPG</code></p>
+                        <small id="emailHelp" class="form-text text-muted">You may need to refresh your browser cache if
+                            this doesn't apply straight away.</small>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <img width="100%" src="images/bg.jpg">
+                    </div>
+                </div>
             </div>
             <div class="tab-pane fade" id="server-filament" role="tabpanel"
                  aria-labelledby="server-filament-list">

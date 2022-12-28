@@ -16,9 +16,7 @@ const logger = new Logger(LOGGER_ROUTE_KEYS.SERVER_ENVIRONMENT, false);
 const instructionsReferralURL = 'https://docs.octofarm.net/installation/setup-environment.html';
 const deprecatedConfigFolder = '../middleware';
 const deprecatedConfigFilePath = deprecatedConfigFolder + 'db.js';
-const packageJsonPath = path.join(__dirname, '../package.json');
-const packageLockPath = path.join(__dirname, '../package-lock.json');
-const packageLockFile = require(packageLockPath);
+const packageJsonPath = path.join(__dirname, './package.json');
 let currentClientVersion;
 const dotEnvPath = path.join(__dirname, '../.env');
 
@@ -361,6 +359,22 @@ function isEnvProd() {
 
 /**
  *
+ * @returns {string} If available
+ */
+function getGithubTokenIfAvailable() {
+  return process.env[AppConstants.GITHUB_TOKEN_KEY];
+}
+
+/**
+ *
+ * @returns {string} If available
+ */
+function getAirgappedSettingIfAvailable() {
+  return process.env[AppConstants.AIR_GAPPED_KEY];
+}
+
+/**
+ *
  * @returns {string} Client version number #.#.#
  */
 function fetchClientVersion() {
@@ -405,4 +419,6 @@ module.exports = {
   getViewsPath,
   fetchClientVersion,
   fetchSuperSecretKey,
+  getGithubTokenIfAvailable,
+  getAirgappedSettingIfAvailable
 };

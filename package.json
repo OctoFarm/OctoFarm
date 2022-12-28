@@ -37,8 +37,9 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^8.0.0",
-    "prettier": "^2.6.0",
     "nodemon": "^2.0.20",
+    "pkg": "^5.8.0",
+    "prettier": "^2.6.0",
     "release-it": "^15.2.0"
   }
 }

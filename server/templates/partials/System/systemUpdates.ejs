@@ -1,0 +1,105 @@
+<% const releasesURL = "https://github.com/OctoFarm/OctoFarm/releases/tag/" %>
+
+<% let airGappedFarm = "d-none"; %>
+<% let notAirGapped = "" %>
+
+<% if(airGapped){ %>
+    <% airGappedFarm = "" %>
+    <% notAirGapped = "d-none" %>
+<% } %>
+
+<% let upToDate = "" %>
+<% let notUpToDate = "d-none" %>
+
+<% if(releaseInformation.latestVersion !== `v${version}`){ %>
+    <% upToDate = "d-none" %>
+    <% notUpToDate = "" %>
+<% } %>
+
+<div class="row <%= notAirGapped %>">
+    <div class="col-12">
+        <h4 class="float-left">Server Updates</h4>
+        <button title="Checks for OctoFarm updates"
+                id="checkUpdatesForOctoFarmBtn" type="button"
+                class="btn btn-warning ml-3 float-right btn-lg">
+            <i class="fab fa-github"></i> Check for Update
+        </button>
+        <button title="Updates OctoFarm to the latest version"
+                id="updateOctoFarmBtn" type="button"
+                class="btn btn-success ml-3 float-right btn-lg" >
+            <i class="fa-solid fa-code-pull-request"></i> Update OctoFarm
+        </button>
+        <button class="btn btn-info ml-3 float-right btn-lg" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+            <i class="fa-solid fa-question"></i>
+        </button>
+    </div>
+</div>
+<div class="collapse" id="collapseExample">
+    <p>At the top of any major or breaking release there will be a note explaining what this releases focus was on. I will note any issues / things people might not expect in here to try and give you some forewarning without having to check github.</p>
+
+    <div class="row">
+        <div class="col-6">
+            <h5>Icons:</h5>
+            <p class="mb-0"><i class="fa-solid fa-code-branch text-purple"></i> Main: A change on the github repository only. You are most welcomed to skip these completely!</p>
+            <p class="mb-0"><i class="fa-solid fa-desktop text-purple"></i> Client: A change on the front end code.</p>
+            <p class="mb-0"><i class="fa-solid fa-server text-purple"></i> Server: A change on the back end code.</p>
+            <p class="mb-0"><i class="fa-brands fa-docker text-purple"></i> Docker: A change to the docker containers, only relevant to docker users.</p>
+        </div>
+        <div class="col-6">
+            <h5>Sections:</h5>
+            <p class="mb-0"><i class="fa-solid fa-hammer text-purple"></i> Fix: A notorious bug has been fixed.</p>
+            <p class="mb-0"><i class="fa-solid fa-star text-purple"></i> Feature: A glorious new feature has arrived.</p>
+            <p class="mb-0"><i class="fa-solid fa-dove text-purple"></i> Refactor: Some code was changed and nothing else really happened.</p>
+            <p class="mb-0"><i class="fa-solid fa-bomb text-purple"></i> Breaking: A breaking change happened, going to this version will stop you rolling back.</p>
+            <p class="mb-0"><i class="fa-solid fa-key text-purple"></i> Security: A security loop hole was closed for good.</p>
+            <p class="mb-0"><i class="fa-solid fa-xmark text-purple"></i> Removed: Functionality that previously existed was removed.</p>
+            <p class="mb-0"><i class="fa-solid fa-hand-fist text-purple"></i> CI: Something happening on the github repo or to releases.</p>
+            <p class="mb-0"><i class="fa-solid fa-hand-fist text-purple"></i> Chore: Something more boring than a refactor.</p>
+            <p><i class="fa-solid fa-paint-roller text-purple"></i> Style: A move of a UI item, or styling change for the app. Can also include general page refactors.</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 text-center <%= airGappedFarm %>">
+        <div class="alert alert-dark text-danger" role="alert">
+            <i class="fa-solid fa-skull-crossbones fa-2xl pb-3"></i><br>
+
+            Your server is currently disconnected from the internet... The following page is disabled!
+
+            Please connect your server to the internet and restart OctoFarm to enable the page
+        </div>
+    </div>
+</div>
+
+<div class="row <%= upToDate %> <%= notAirGapped %>">
+    <div class="col-12 text-center">
+        <div class="alert  alert-dark text-success" role="alert">
+            <i class="fa-solid fa-thumbs-up fa-2xl pb-3"></i><br>
+            There is nothing for you to do, your server is fully up to date!
+        </div>
+    </div>
+    <div class="col-12 bullet-remove-below">
+        <h4>Current Release Notes</h4>
+        <%- helpers.replaceGithubIcons(releaseInformation.latest_release_notes) %>
+    </div>
+</div>
+<div class="row <%= notUpToDate %> <%= notAirGapped %>">
+    <div class="col-12 text-center">
+        <div class="alert alert-dark text-warning" role="alert">
+            <i class="fa-solid fa-code-merge fa-2xl pb-3"></i><br>
+            New release detected! Please check the change log below before updating! Notices and a brief description of the releases focus is at the top of all major releases.
+        </div>
+    </div>
+    <div class="col-12 bullet-remove-below">
+        <h4>Next Version(s) Changelog</h4>
+        <% releaseInformation.other_relevant_release_notes.forEach(note => { %>
+          <%- helpers.replaceGithubIcons(note.body) %>
+        <% }) %>
+    </div>
+</div>
+
+You have selected to "Update OctoFarm" are you sure?
+
+When you click "I am sure" OctoFarms server process will be ended, another process will become live to handle the update.
+
+A pop up should appear with the current state of the upgrade process, and once done the OctoFarm server will be restarted for you.

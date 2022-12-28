@@ -23,11 +23,7 @@ const { SettingsClean } = require('../services/settings-cleaner.service.js');
 const { Logs } = require('../services/server-logs.service.js');
 const { SystemCommands } = require('../services/server-commands.service.js');
 const { fetchUsers } = require('../services/users.service');
-const {
-  checkReleaseAndLogUpdate,
-  getUpdateNotificationIfAny,
-  syncLatestOctoFarmRelease,
-} = require('../services/octofarm-update.service.js');
+
 const { getPrinterManagerCache } = require('../cache/printer-manager.cache');
 const { getImagesPath, getLogsPath } = require('../utils/system-paths.utils');
 const S_VALID = require('../constants/validate-settings.constants');
@@ -40,6 +36,7 @@ const { SystemRunner } = require('../services/system-information.service');
 const { listActiveClientsRes } = require('../services/server-side-events.service');
 const { getPrinterStoreCache } = require('../cache/printer-store.cache');
 const { FilamentClean } = require('../services/filament-cleaner.service');
+const {githubService} = require("../modules/InlineUpdater");
 
 module.exports = router;
 
@@ -203,40 +200,13 @@ router.post(
   ensureAuthenticated,
   ensureAdministrator,
   async (req, res) => {
-    let clientResponse = {
-      haveWeSuccessfullyUpdatedOctoFarm: false,
-      statusTypeForUser: 'error',
-      message: '',
-    };
-    const force = req.body;
-    if (
-      !force ||
-      typeof force?.forcePull !== 'boolean' ||
-      typeof force?.doWeInstallPackages !== 'boolean'
-    ) {
-      res.sendStatus(400);
-      throw new Error('forceCheck object not correctly provided or not boolean');
-    }
-
-    try {
-      clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        clientResponse,
-        force
-      );
-    } catch (e) {
-      clientResponse.message = 'Issue with updating | ' + e?.message.replace(/(<([^>]+)>)/gi, '');
-      // Log error with html tags removed if contained in response message
-      logger.error('Issue with updating | ', e?.message.replace(/(<([^>]+)>)/gi, ''));
-    } finally {
-      res.send(clientResponse);
-    }
+    await githubService.downloadLatestReleaseZip();
+    res.send({message: "Started Upgrade Process, will begin downloading the latest version!"})
   }
 );
 router.get('/server/update/check', ensureAuthenticated, ensureAdministrator, async (req, res) => {
-  await syncLatestOctoFarmRelease(false);
-  checkReleaseAndLogUpdate();
-  const softwareUpdateNotification = getUpdateNotificationIfAny();
-  res.send(softwareUpdateNotification);
+  await githubService.requestGithubReleaseData(),
+  res.send(githubService.releaseInformation);
 });
 router.get('/client/get', ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
   ClientSettingsDB.findById(req.user.clientSettings).then((checked) => {

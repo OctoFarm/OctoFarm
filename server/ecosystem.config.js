@@ -6,11 +6,12 @@ module.exports = {
       listen_timeout: 10000,
       exp_backoff_restart_delay: 1500,
       restart_delay: 1000,
+      // no_treekill: true,
       wait_ready: true,
       time: true,
       shutdown_with_message: true,
       update_env: true,
-      out_file: "../logs/pm2.out.log",
+      // out_file: "../logs/pm2.out.log", //Taken care of by application logging
       error_file: "../logs/pm2.error.log"
     }
   ]

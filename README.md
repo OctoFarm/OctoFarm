@@ -160,4 +160,23 @@ You can contact me at [info@notexpectedyet.com](mailto:info@notexpectedyet.com)
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with
   developing my application. Their IDE is top notch!
 
-[DashboardScreenshot]: https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png?raw=true
+## Sponsors!
+### Patreons ####
+- Guy Barton
+- EIPS
+- Will Nelson
+- Scott Windmiller
+- Curtis Brooks
+- Chadd Giesing
+- Josheua R Mascote
+- Tideline3D
+- geekfisher
+- Nick Darrow
+- N.R
+- Mohammad Mansour
+- Feldherr
+- Pat Davidse
+- David Z
+- David Peters
+- Joey Cortez
+- Sven Meendermann 
