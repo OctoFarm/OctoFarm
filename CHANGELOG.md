@@ -1,3 +1,118 @@
+## [1.8.0-beta.11](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.10...v1.8.0-beta.11) (2022-12-28)
+
+
+### :stars: New Feature :stars:
+
+* **server, client:** new inline upgrader mechanism, replaces git pull ([#1315](https://github.com/OctoFarm/OctoFarm/issues/1315)) ([8abc5ea](https://github.com/OctoFarm/OctoFarm/commit/8abc5ea5b49944701d94202f18eac4b18fb6571b)), closes [#1299](https://github.com/OctoFarm/OctoFarm/issues/1299)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main, server, client:** clean up of code after release feature ([#1367](https://github.com/OctoFarm/OctoFarm/issues/1367)) ([20bc2e5](https://github.com/OctoFarm/OctoFarm/commit/20bc2e5a774ffe094f8b048a1f4cddaf958e8d8c)), closes [#1299](https://github.com/OctoFarm/OctoFarm/issues/1299)
+
+## [1.8.0-beta.10](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.9...v1.8.0-beta.10) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **main:** release zip not getting version numbe ([6b099d0](https://github.com/OctoFarm/OctoFarm/commit/6b099d03606ee94dbc49fe77b4453d91fd4704f2))
+
+## [1.8.0-beta.9](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.8...v1.8.0-beta.9) (2022-12-26)
+
+
+### :x: Removed :x:
+
+* **docker:** monolithic docker container ([9db0b29](https://github.com/OctoFarm/OctoFarm/commit/9db0b2925d5c43951e8ab2de9575913298b2acae))
+
+## [1.8.0-beta.8](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.7...v1.8.0-beta.8) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** dont publish channel tags ([4a0c2e8](https://github.com/OctoFarm/OctoFarm/commit/4a0c2e82f702ab97209d0f434304342f4e8916e9))
+* **docker:** update dockerfiles to nodejs v18 bases ([4639189](https://github.com/OctoFarm/OctoFarm/commit/4639189e4312a9dd8fbd85c23cfad9da05e9ed81))
+
+## [1.8.0-beta.7](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.6...v1.8.0-beta.7) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** double build path regression of the regression fix ([75c03cc](https://github.com/OctoFarm/OctoFarm/commit/75c03cc92a5da2a08fa40b5770f6fcfa72a92a6d))
+
+## [1.8.0-beta.6](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.5...v1.8.0-beta.6) (2022-12-26)
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** build path regression ([9772b38](https://github.com/OctoFarm/OctoFarm/commit/9772b38e67adfa828f9c1605c1332cdd9fc76986))
+
+## [1.8.0-beta.5](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.4...v1.8.0-beta.5) (2022-12-26)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **main:** make docker workflows build tests ([59bfcb5](https://github.com/OctoFarm/OctoFarm/commit/59bfcb5c5372f41a861723cb1ad9b87a32134dbd))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **docker:** build dockers manually and release with semantic release and version tags ([7845ae0](https://github.com/OctoFarm/OctoFarm/commit/7845ae01a3385d01d371114f601a25b817a71351))
+* **docker:** incorrect username/password secrets regression ([076dbfb](https://github.com/OctoFarm/OctoFarm/commit/076dbfbe2b690117e457ab4511e3d73cbffa13df))
+* **main:** fix nodejs tests, skip 17 ([7a00611](https://github.com/OctoFarm/OctoFarm/commit/7a0061183015bacc7cc6076da5e23075fef1a72c))
+
+## [1.8.0-beta.4](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.3...v1.8.0-beta.4) (2022-12-26)
+
+
+### :curly_loop: Continuous Integration :curly_loop:
+
+* **main:** allow releases from releases/ branch folders, ignore master pushes ([671a55b](https://github.com/OctoFarm/OctoFarm/commit/671a55b7e2e32c9e58d60ca87a506abcf1b99b43))
+
+
+### :hammer: Bug Fix :hammer:
+
+* **main:** actually run the release package script after client build ([2b9152d](https://github.com/OctoFarm/OctoFarm/commit/2b9152d89efa802973f45f462c056dd1bb8f9ddb))
+
+## [1.8.0-beta.3](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.2...v1.8.0-beta.3) (2022-12-11)
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** update relative logo uris to be explicit [@mikeymakesit](https://github.com/mikeymakesit) ([#1345](https://github.com/OctoFarm/OctoFarm/issues/1345)) ([b17bfac](https://github.com/OctoFarm/OctoFarm/commit/b17bfac867097f61734d497bcf0ffe2fae330314))
+
+## [1.8.0-beta.2](https://github.com/OctoFarm/OctoFarm/compare/v1.8.0-beta.1...v1.8.0-beta.2) (2022-12-10)
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** finalise master and beta releasing schedule ([#1313](https://github.com/OctoFarm/OctoFarm/issues/1313)) ([599da3e](https://github.com/OctoFarm/OctoFarm/commit/599da3e7c3d14b18760d54c811d0796b7533e602))
+* **main:** finalise release mechanism for beta and master ([#1327](https://github.com/OctoFarm/OctoFarm/issues/1327)) ([48f225b](https://github.com/OctoFarm/OctoFarm/commit/48f225b77e26897e1dd621db969fddaa3ed0d63e))
+
+
+### :persevere: Code Refactor :persevere:
+
+* **client:** language, grammar and text clarity updates [@mikeymakesit](https://github.com/mikeymakesit) ([#1343](https://github.com/OctoFarm/OctoFarm/issues/1343)) ([adc3fad](https://github.com/OctoFarm/OctoFarm/commit/adc3fadcb9464e1f8cd1092d1df86a150d325f1b))
+
+## [1.8.0-beta.1](https://github.com/OctoFarm/OctoFarm/compare/v1.7.3...v1.8.0-beta.1) (2022-10-15)
+
+
+### :stars: New Feature :stars:
+
+* **client:** show the current page of user on active sessions ([2150123](https://github.com/OctoFarm/OctoFarm/commit/2150123990ed3c993cd7f0edabc2e710c5e27d67))
+
+
+### :curly_loop: What a drag! :curly_loop:
+
+* **main:** code-ql scanning tool ([db44f19](https://github.com/OctoFarm/OctoFarm/commit/db44f195fbcf6ad28c2fe73727fe67503c75e5bf))
+* **main:** create monolithic docker tags for beta/master ([5b2bc7d](https://github.com/OctoFarm/OctoFarm/commit/5b2bc7d4a23d32617b2c66d858c60013b0e772fa))
+* **main:** create monolithic docker tags for beta/master ([d82fe20](https://github.com/OctoFarm/OctoFarm/commit/d82fe20b71f4db8d40c28a10e4a2db486452d1fd))
+* **main:** create monolithic docker tags for beta/master ([85157ff](https://github.com/OctoFarm/OctoFarm/commit/85157ff51e920608840c6e8465c10bc36d3b15bd))
+* **main:** further tweaks to pre-releasing ([38e9fbb](https://github.com/OctoFarm/OctoFarm/commit/38e9fbb3d946ff9d12bb9880d8f9006ab3a7c8f3))
+* **main:** further tweaks to pre-releasing ([f267bc0](https://github.com/OctoFarm/OctoFarm/commit/f267bc08a552660dbfd19c6883496c3637c736bc))
+* **main:** further tweaks to pre-releasing ([308dfdc](https://github.com/OctoFarm/OctoFarm/commit/308dfdc05cf0adbce5cef267b47f3a980d20727b))
+* **main:** refactor release flows for release/** beta/** globs ([b33f081](https://github.com/OctoFarm/OctoFarm/commit/b33f0815f495ab25bb7f9b3507b2f86262c9843b))
+* **main:** remove codacy badge ([f22996b](https://github.com/OctoFarm/OctoFarm/commit/f22996b739b4c2285e7d342a026e86058d91c519))
+* **main:** replace codacy code scanning tool ([15b01ca](https://github.com/OctoFarm/OctoFarm/commit/15b01ca0176c89e1f14cbde32ccf83468920c94e))
+
 ### [1.7.3](https://github.com/OctoFarm/OctoFarm/compare/v1.7.2...v1.7.3) (2022-10-04)
 
 

@@ -1,0 +1,46 @@
+name: Node.js CI
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  nodejs-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Read sponsors.md
+        id: sponsors
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./SPONSORS.md
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+        env:
+          PATREON_CAMPAIGN_ID: ${{ secrets.PATREON_CAMPAIGN_ID }}
+          PATREON_TOKEN: ${{ secrets.PATREON_TOKEN }}
+      - run: cd server/
+      - run: npm install
+      - run: cd ../scripts/patreon
+      - run: node update-current-supporters.js $PATREON_CAMPAIGN_ID $PATREON_TOKEN
+      - name: Replace sponsors in Readme
+        uses: mingjun97/regex-property-action@v1
+        with:
+          regex: '(## Sponsors.)(^.*)(##)'
+          replacement: '$1${{ steps.sponsors.outputs.content }}$3'
+          include: 'README.md'
+          flags: 'gsm'
+      - name: commit-changes-made
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: master
+          commit_message: "ci(main) - update sponsors list [skip ci]"
+          commit_user_name: NotExpectedYet
+          commit_user_email: online@notexpectedyet.com
+          commit_author: James Mackay <online@notexpectedyet.com>
+          ## This action should only ever commit these two files!
+          file_pattern: SPONSORS.md README.md

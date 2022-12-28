@@ -115,7 +115,7 @@
       </div>
       <div class="card-body pt-2 pb-0 text-center">
         <button
-                title="View statistics for the currently selected period"
+                title="View statistics for the selected period"
                 type="button"
                 class="btn btn-success mb-2"
                 href="#"
@@ -125,7 +125,7 @@
           <i class="fas fa-chart-pie"></i> State
         </button><br>
         <button
-                title="View statistics for the currently selected period"
+                title="View statistics for the selected period"
                 type="button"
                 class="btn btn-warning text-dark mb-2"
                 href="#"
@@ -488,19 +488,19 @@
   </div>
 </div>
 <div class="row">
-  <div id="wrapper" class="col-lg-12 table-responsive-sm table-responsive-md pt-0">
+  <div id="wrapper" class="col-lg-12 table-responsive-sm table-responsive-md pt-0 tablesort">
     <table id="historyTableTop" class="table table-dark text-center">
       <thead>
       <tr>
         <th class="table-dark sticky-table table-dark" scope="col">State</th>
-        <th class="table-dark sticky-table table-dark" scope="col">Printer</th>
-        <th class="table-dark sticky-table table-dark" scope="col">User</th>
-        <th class="table-dark sticky-table table-dark" scope="col">File Name</th>
+        <th class="table-dark sticky-table table-dark" scope="col" data-tablesort-type="string">Printer</th>
+        <th class="table-dark sticky-table table-dark" scope="col" data-tablesort-type="string">User</th>
+        <th class="table-dark sticky-table table-dark" scope="col" data-tablesort-type="string">File Name</th>
         <th class="table-dark sticky-table table-dark" scope="col">Start Date</th>
         <th class="table-dark sticky-table table-dark" scope="col">Duration</th>
         <th class="table-dark sticky-table table-dark" scope="col">End Date</th>
-        <th class="table-dark sticky-table table-dark" scope="col">Filament</th>
-        <th class="table-dark sticky-table table-dark" scope="col">Total Cost</th>
+        <th class="table-dark sticky-table table-dark" scope="col" data-tablesort-type="string">Filament</th>
+        <th class="table-dark sticky-table table-dark" scope="col" data-tablesort-type="int">Total Cost</th>
         <th class="table-dark sticky-table table-dark" scope="col">Hourly Cost</th>
         <th class="sticky-table table-dark" scope="col">Actions</th>
       </tr>
@@ -1072,7 +1072,7 @@
         <p>
           Come back here when you've completed some prints.
         </p>
-        <h1><img width="500px" src="assets/images/logo.png" /></h1>
+        <h1><img width="500px" src="/assets/images/logo.png" /></h1>
       </div>
     </div>
   </div>

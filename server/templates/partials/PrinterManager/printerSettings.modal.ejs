@@ -40,20 +40,20 @@
                 <div class="col-12 col-sm-12 col-md-12 col-lg-4">
                     <button id="psHost" type="button" class="btn btn-warning mb-1"
                             href="#" target="_blank" disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
+                                class="fas fa-spinner fa-spin"></i> Checking...
                     </button>
                 </div>
                 <div class="col-12 col-sm-12 col-md-12 col-lg-4">
                     <button id="psStatus" type="button" class="btn btn-warning mb-1"
                             href="#" target="_blank" disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
+                                class="fas fa-spinner fa-spin"></i> Checking...
                     </button>
                 </div>
                 <div class="col-12 col-sm-12 col-md-12 col-lg-4">
                     <button id="psWebSocket" type="button"
                             class="btn btn-warning mb-1" href="#" target="_blank"
                             disabled> <i
-                                class="fas fa-spinner fa-spin"></i> Checking..
+                                class="fas fa-spinner fa-spin"></i> Checking...
                     </button>
                 </div>
             </div>
@@ -109,7 +109,7 @@
             <h5>Serial Defaults</h5>
             <hr>
             <p id="portNotAvailableMessage"></p>
-            <p>Set OctoPrints default serial connection settings. These will be saved to your
+            <p>Set OctoPrint's default serial connection settings. These will be saved to your
                 OctoPrint instance so it will always use these when connecting to your
                 printer.</p>
             <div id="psConnectionDefaults" class="row">
@@ -131,9 +131,9 @@
                 <div class="col-12">
                     Set your quick connection button settings.<br>
 
-                    <b>Connected/Disconnect: </b> When this is enabled the button will attempt to establish a connection between OctoPrint and your Printer.<br>
-                    <b>Power On/Off: </b>  When this is enabled the button will try and power your printer On, before connect attempt and off after a disconnect attempt.<br>
-                    <code>Requires an OctoPrint power plugin and power tab setting up to toggle printers power!</code>
+                    <b>Connect/Disconnect:</b> When this is enabled the button will attempt to establish a connection between OctoPrint and your printer.<br>
+                    <b>Power On/Off:</b> When this is enabled the button will try and power your printer on before connecting and off after disconnecting.<br>
+                    <code>Requires an OctoPrint power plugin and power tab setup to toggle printer power!</code>
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-4">
                     <form class="was-validated">
@@ -150,8 +150,8 @@
                         <div class="custom-control custom-checkbox mb-3">
                             <input type="checkbox" class="custom-control-input" id="psQuickPower" required>
                             <label class="custom-control-label" for="psQuickPower">Power On/Off</label>
-                            <div class="valid-feedback">Will try to power on/off printer</div>
-                            <div class="invalid-feedback">Will skip powering on/off printer</div>
+                            <div class="valid-feedback">Will try to power on/off</div>
+                            <div class="invalid-feedback">Will skip powering on/off</div>
                         </div>
                     </form>
                 </div>
@@ -189,8 +189,8 @@
              aria-labelledby="system-panel-view-list">
             <h5>Printer Profiles</h5>
             <hr>
-            <p>Below is your current selected printer profile information. You may make edits to
-                it here and have it saved back in OctoPrint.</p>
+            <p>Below is your currently selected printer profile. Edits 
+                here will be saved to the profile in OctoPrint.</p>
             <div id="psPrinterProfiles" class="row">
 
             </div>
@@ -235,7 +235,7 @@
              aria-labelledby="system-panel-view-list">
             <h5>Power Commands</h5>
             <hr>
-            <p>Setup your host/printer power commands here. Enabling these will add a Power menu
+            <p>Set up your host/printer power commands here. Enabling these will add a Power menu
                 button next to printer control on all views.</p>
             <div class="alert alert-warning text-dark" role="alert">
                 You will need to refresh the web interface for these settings to take effect!

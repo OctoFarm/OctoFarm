@@ -1,15 +1,17 @@
 [comment]: <> ([![Latest Release]&#40;https://img.shields.io/github/release/octofarm/octofarm?style=appveyor&#41;]&#40;https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date&#41;)
-![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
 [![GitHub stars](https://img.shields.io/github/stars/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/OctoFarm/network)
 [![GitHub license](https://img.shields.io/github/license/octofarm/octofarm?style=appveyor)](https://github.com/NotExpectedYet/octofarm/blob/master/LICENSE.txt)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/octofarm/octofarm/ci?style=appveyor)
 ![GitHub issues](https://img.shields.io/github/issues/octofarm/octofarm?color=green&style=appveyor)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=appveyor)](https://GitHub.com/octofarm/octofarm/graphs/commit-activity)
 [![Download Dockerhub](https://img.shields.io/badge/DOCKERHUB-OCTOFARM-<COLOR>.svg?style=appveyor)](https://hub.docker.com/r/octofarm/octofarm)
+![Docker Pulls](https://img.shields.io/docker/pulls/octofarm/octofarm?style=appveyor)
+[![Docker](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker.yml)
+[![Docker Monolithic](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker-monolithic.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/docker-monolithic.yml)
+[![Node.js CI](https://github.com/OctoFarm/OctoFarm/actions/workflows/nodejs.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/nodejs.yml)
+[![release](https://github.com/OctoFarm/OctoFarm/actions/workflows/release.yml/badge.svg)](https://github.com/OctoFarm/OctoFarm/actions/workflows/release.yml)
 
 # OctoFarm [![Latest Release](https://img.shields.io/github/release/octofarm/octofarm)](https://img.shields.io/github/v/tag/octofarm/octofarm?sort=date)
-
 <div align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
     <img src="https://github.com/OctoFarm/OctoFarm/blob/master/server/assets/images/logo.png?raw=true" alt="Logo" width="400px">
@@ -158,4 +160,23 @@ You can contact me at [info@notexpectedyet.com](mailto:info@notexpectedyet.com)
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with
   developing my application. Their IDE is top notch!
 
-[DashboardScreenshot]: https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png?raw=true
+## Sponsors!
+### Patreons ####
+- Guy Barton
+- EIPS
+- Will Nelson
+- Scott Windmiller
+- Curtis Brooks
+- Chadd Giesing
+- Josheua R Mascote
+- Tideline3D
+- geekfisher
+- Nick Darrow
+- N.R
+- Mohammad Mansour
+- Feldherr
+- Pat Davidse
+- David Z
+- David Peters
+- Joey Cortez
+- Sven Meendermann 

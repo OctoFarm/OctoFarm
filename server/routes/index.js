@@ -11,7 +11,8 @@ const { getSorting, getFilter } = require('../services/front-end-sorting.service
 const { AppConstants } = require('../constants/app.constants');
 const { getDefaultDashboardSettings } = require('../constants/settings.constants');
 const { getHistoryCache } = require('../cache/history.cache');
-const softwareUpdateChecker = require('../services/octofarm-update.service');
+const { onlineChecker } = require('../modules/OnlineChecker/index.js');
+const { githubService } = require('../modules/InlineUpdater/index.js');
 const { getPrinterStoreCache } = require('../cache/printer-store.cache');
 const { getPrinterManagerCache } = require('../cache/printer-manager.cache');
 const { TaskManager } = require('../services/task-manager.service');
@@ -24,7 +25,6 @@ const { fetchUsers } = require('../services/users.service');
 const { fetchMongoDBConnectionString } = require('../app-env');
 const isDocker = require('is-docker');
 const { isNodemon, isNode, isPm2 } = require('../utils/env.utils');
-const { getCurrentBranch, checkIfWereInAGitRepo } = require('../utils/git.utils');
 const { returnPatreonData } = require('../services/patreon.service');
 
 const version = process.env[AppConstants.VERSION_KEY];
@@ -85,7 +85,7 @@ router.get('/printers', ensureAuthenticated, ensureCurrentUserAndGroup, async (r
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     printerCount: printers.length,
     helpers: prettyHelpers,
-    air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped,
+    air_gapped: onlineChecker.airGapped,
     serverSettings,
     clientSettings: req.user.clientSettings,
     development_mode,
@@ -333,7 +333,6 @@ router.get('/system', ensureAuthenticated, ensureCurrentUserAndGroup, async (req
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = SettingsClean.returnSystemSettings();
   const systemInformation = SystemRunner.returnInfo();
-  const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
   const currentUsers = await fetchUsers();
 
@@ -354,15 +353,14 @@ router.get('/system', ensureAuthenticated, ensureCurrentUserAndGroup, async (req
       isDockerContainer: isDocker(),
       isNodemon: isNodemon(),
       isNode: isNode(),
-      isPm2: isPm2(),
-      update: softwareUpdateNotification,
+      isPm2: isPm2()
     },
-    currentGitBranch: await getCurrentBranch(),
-    areWeGitRepo: checkIfWereInAGitRepo(),
     systemEnvironment: process.env[AppConstants.NODE_ENV_KEY],
     patreonData: returnPatreonData(),
     currentUsers,
     taskManagerState: TaskManager.getTaskState(),
+    airGapped: onlineChecker.airGapped,
+    releaseInformation: githubService.releaseInformation
   });
 });
 

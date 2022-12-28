@@ -11,17 +11,15 @@
             </div>
         <% } %>
     </div>
-    <div class="col-12">
-        <div class="float-left">
-            <h4>User Manager</h4>
-        </div>
-        <div class="float-right">
-            <button id="createUserBtn" type="button" class="btn btn-success" data-toggle="modal" data-target="#userCreateModal" <%=disabledUsers%>><i class="fas fa-user-plus"></i> New User</button>
-        </div>
-    </div>
 </div>
 <div class="row">
-    <div class="col-lg-12 mt-2 table-responsive-sm table-responsive-md">
+    <div class="col-sm-12 col-md-6 col-lg-8 mt-2 table-responsive-sm table-responsive-md">
+        <div class="float-left mb-2">
+            <h4>User Manager</h4>
+        </div>
+        <div class="float-right mb-2">
+            <button id="createUserBtn" type="button" class="btn btn-success" data-toggle="modal" data-target="#userCreateModal" <%=disabledUsers%>><i class="fas fa-user-plus"></i> New User</button>
+        </div>
         <table id="" class="table table-dark table-striped text-center">
             <thead>
             <tr>
@@ -64,6 +62,22 @@
                 <% }) %>
             </tbody>
         </table>
+    </div>
+    <div class="col-sm-12 col-md-6 col-lg-4">
+        <% if(userGroup === "Administrator"){ %>
+            <div id="activeUsersRow" class="row">
+                <div class="col-lg-12">
+                    <div class="float-left mb-2">
+                        <h4>Active Sessions: <span id="activeUserCount"><i class="fa-solid fa-spinner fa-spin"></i></span></h4>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div id="activeUserListContainer" class="text-center row">
+                            <i class="fa-solid fa-spinner fa-spin"></i><br> Loading Active Sessions List...
+                    </div>
+                </div>
+            </div>
+        <% } %>
     </div>
 </div>
 

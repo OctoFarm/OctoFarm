@@ -51,6 +51,15 @@ html {
   aspect-ratio: 1/1;
 }
 
+.text-purple {
+  color: #8E24AA;
+}
+
+.bullet-remove-below li {
+  list-style-type: none;
+
+}
+
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;

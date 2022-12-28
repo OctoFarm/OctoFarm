@@ -161,7 +161,7 @@ const printersTable = `
     <div id="actionBtn" class="col-md-3  text-center">
     </div>
 </div>
-<table class="table table-dark">
+<table class="table table-dark tablesort">
   <thead>
     <tr>
       <th id="selectColumn" scope="col">Select</th>

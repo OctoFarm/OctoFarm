@@ -57,13 +57,13 @@
         table:{
             id:"filamentOverviewTable", contentId:"filamentOverviewList", hide:false, headers: [
                 { title:"", style:"" },
-                { title:"Spool Name", style:"min-width:50px;" },
-                { title:"Material", style:"" },
-                { title:"Manufacturer", style:"min-width:300px;" },
-                { title:"Spool Weight", style:"min-width:200px;" },
-                { title:"Remaining", style:"min-width:50px;" },
-                { title:"Tool Offset", style:"min-width:150px;" },
-                { title:"Bed Offset", style:"min-width:150px;" },
+                { title:"Spool Name", style:"min-width:50px;", sort:"string" },
+                { title:"Material", style:"", sort:"string" },
+                { title:"Manufacturer", style:"min-width:300px;", sort:"string" },
+                { title:"Spool Weight", style:"min-width:200px;", sort:"int" },
+                { title:"Remaining", style:"min-width:50px;", sort:"int" },
+                { title:"Tool Offset", style:"min-width:150px;", sort:"int" },
+                { title:"Bed Offset", style:"min-width:150px;", sort:"int" },
                 { title:"Assigned Printer", style:"min-width:10px;" }
             ]
             },
@@ -167,13 +167,13 @@
                         </nav>
                     </div>
                     <div class="col-12">
-                        <table class="table-hover table table-responsive-sm table-responsive-md">
+                        <table class="table-hover table table-responsive-sm table-responsive-md tablesort">
                             <thead>
                             <tr>
-                                <th scope="col" style="min-width: 250px">Manufacturer</th>
-                                <th scope="col" style="min-width: 250px">Material</th>
-                                <th scope="col" style="max-width: 50px">Density</th>
-                                <th scope="col" style="max-width: 50px">Diameter</th>
+                                <th scope="col" style="min-width: 250px" data-tablesort-type="string">Manufacturer</th>
+                                <th scope="col" style="min-width: 250px" data-tablesort-type="string">Material</th>
+                                <th scope="col" style="max-width: 50px" data-tablesort-type="int">Density</th>
+                                <th scope="col" style="max-width: 50px" data-tablesort-type="int">Diameter</th>
                                 <th scope="col" style="min-width: 250px"></th>
                             </tr>
                             </thead>
@@ -403,16 +403,16 @@
                         </table>
                     </div>
                 </div>
-                <table class="table-hover table table-responsive-sm table-responsive-md col-lg-12">
+                <table class="table-hover table table-responsive-sm table-responsive-md col-lg-12 tablesort">
                     <thead>
                     <tr>
-                        <th scope="col" style="min-width: 250px;">Name</th>
-                        <th scope="col" style="min-width: 200px">Profile</th>
-                        <th scope="col" style="max-width: 50px">Price</th>
-                        <th scope="col" style="max-width: 100px">Weight (g)</th>
-                        <th scope="col" style="max-width: 100px">Used (g)</th>
-                        <th scope="col" style="max-width: 50px">Tool Offset (°C)</th>
-                        <th scope="col" style="max-width: 50px">Bed Offset (°C)</th>
+                        <th scope="col" style="min-width: 250px;" data-tablesort-type="string">Name</th>
+                        <th scope="col" style="min-width: 200px" data-tablesort-type="string">Profile</th>
+                        <th scope="col" style="max-width: 50px" data-tablesort-type="int">Price</th>
+                        <th scope="col" style="max-width: 100px" data-tablesort-type="int">Weight (g)</th>
+                        <th scope="col" style="max-width: 100px" data-tablesort-type="int">Used (g)</th>
+                        <th scope="col" style="max-width: 50px" data-tablesort-type="int">Tool Offset (°C)</th>
+                        <th scope="col" style="max-width: 50px" data-tablesort-type="int">Bed Offset (°C)</th>
                         <th scope="col" style="min-width: 300px">Printer Assignment</th>
                         <th scope="col" style="min-width: 200px"></th>
                     </tr>
@@ -444,15 +444,15 @@
                         <div class="alert alert-info" role="alert">
                             <p>Below is a list of OctoFarm's pre-defined materials. When creating a spool the information below will be used to automatically update a spool's density for you.</p>
 
-                            <p>The density is used in calculations across OctoFarms interface, especially history, to make a best guess at usage from the length provided from OctoPrint.</p>
+                            <p>The density is used in calculations across OctoFarm's interface, especially history, to make a best guess at usage from the length provided by OctoPrint.</p>
                         </div>
                     </div>
                     <div class="col-6">
 
                         <div class="alert alert-success" role="alert">
-                            <p>Always entering custom materials? would you like to help build this list?</p>
+                            <p>Always entering custom materials? Would you like to help build this list?</p>
 
-                            <p>Then please make a P.R at OctoFarms github repository on the file /client/pages/filament-manager.utils.js on the array called "materialsList".</p>
+                            <p>Please make a PR at OctoFarms Github repository on the file /client/pages/filament-manager.utils.js on the array called "materialsList".</p>
 
                             <a target="_blank" href="https://github.com/OctoFarm/OctoFarm/edit/master/client/js/pages/filament-manager.utils.js#L8"> Click here to edit! </a>
                         </div>

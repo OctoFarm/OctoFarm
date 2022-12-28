@@ -7,18 +7,18 @@
       <%- include('./partials/messages') %>
       <% if(userCount === 0){ %>
         <div class="alert alert-warning text-dark" role="alert">
-          This will create an Administrator... After you have registered, registration will be disabled and you can either enable it again or manage your users on the "System" page.
+          This will create an Administrator. After you have registered, registration will be disabled and you can either enable it again or manage your users on the "System" page.
         </div>
       <% } %>
       <form action="/users/register" method="POST">
         <div class="form-group">
           <label for="name">Name</label>
-          <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
+          <input type="name" id="name" name="name" class="form-control" placeholder="Create Name"
             value="<%= typeof name != 'undefined' ? name : '' %>" />
         </div>
         <div class="form-group">
           <label for="username">Username</label>
-          <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
+          <input type="username" id="username" name="username" class="form-control" placeholder="Create Username"
             value="<%= typeof username != 'undefined' ? username : '' %>" />
         </div>
         <div class="form-group">
@@ -36,7 +36,7 @@
         </button>
       </form>
       <% if(userCount === 0){ %>
-        <p class="lead mt-4">Have An Account? <a href="/users/login">Login</a></p>
+        <p class="lead mt-4">Have an account? <a href="/users/login">Login</a></p>
       <% } %>
     </div>
   </div>
