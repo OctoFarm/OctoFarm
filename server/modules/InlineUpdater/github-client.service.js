@@ -7,6 +7,8 @@ const marked = require("marked");
 const Logger = require("../../handlers/logger");
 const { AppConstants } = require("../../constants/app.constants.js");
 const { LOGGER_ROUTE_KEYS } = require("../../constants/logger.constants");
+const { join } = require("path");
+const fs = require('fs');
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.SERVICE_GITHUB_CLIENT);
 
@@ -23,7 +25,7 @@ class GithubReleaseChecker{
   #rate_limited = false;
   #pre_release = false;
   #default_request_headers = {"Content-Type": "application/json"};
-  #zip_download_path = '../../../updater';
+  #zip_download_path = '../updater/octofarm.zip';
 
   constructor(token = undefined, pre_release = undefined) {
     if(!!token){
@@ -116,11 +118,17 @@ class GithubReleaseChecker{
   }
 
   async startUpdateProcess(){
-    console.log("Zip downloaded, starting the seperate updater process")
+    const { spawn } = require('child_process');
+    const subprocess = spawn('node', [`${join(__dirname, "../../../" ,"updater", "updater.process.js")}`], {
+      detached: true,
+      stdio: [ 'ignore' ]
+    });
+    subprocess.unref();
   }
 
   async downloadLatestReleaseZip(){
-    return downloadGitZip(this.#latest_asset_url, this.#zip_download_path, { "Authorization": this.#default_request_headers["Authorization"] }, this.startUpdateProcess);
+    return this.startUpdateProcess();
+    //return downloadGitZip(this.#latest_asset_url, this.#zip_download_path, { "Authorization": this.#default_request_headers["Authorization"] }, this.startUpdateProcess);
   }
 }
 
