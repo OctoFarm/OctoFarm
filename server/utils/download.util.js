@@ -47,11 +47,35 @@ const downloadGitZip = async (url, path, headers, callback) => {
   logger.warning("Downloading file from github", {
     url, path, callback
   })
-  return request.head(url, (err, res) => {
-    res.headers = headers;
-    request(url).pipe(fs.createWriteStream(path)).on("close", callback);
-  });
 
+  let received_bytes = 0;
+  let total_bytes = 0;
+  let lastPercentLogged = 0;
+  const fileStream = fs.createWriteStream(path).on("close", async () => {
+    console.log("WRITE DONE calling")
+    await callback();
+  })
+
+  return request
+      .get(url, null, null)
+      .on('error', function(err) {
+        logger.error("Unable to download remote zip file!", err)
+      })
+      .on('response', function(data) {
+        total_bytes = parseInt(data.headers['content-length']);
+      })
+      .on('data', function(chunk) {
+        received_bytes += chunk.length;
+        const percent = ((received_bytes * 100) / total_bytes).toFixed(2)
+        if(lastPercentLogged !== percent){
+          lastPercentLogged = percent;
+          logger.warning(`Downloaded: ${percent}%`, {
+            received_bytes, total_bytes
+          })
+        }
+
+      })
+      .pipe(fileStream);
 };
 
 module.exports = {

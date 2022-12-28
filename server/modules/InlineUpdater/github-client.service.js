@@ -25,7 +25,7 @@ class GithubReleaseChecker{
   #rate_limited = false;
   #pre_release = false;
   #default_request_headers = {"Content-Type": "application/json"};
-  #zip_download_path = '../updater/octofarm.zip';
+  #zip_download_path = '../temp/octofarm.zip';
 
   constructor(token = undefined, pre_release = undefined) {
     if(!!token){
@@ -118,16 +118,11 @@ class GithubReleaseChecker{
   }
 
   async startUpdateProcess(){
-    const { spawn } = require('child_process');
-    const subprocess = spawn('node', [`${join(__dirname, "../../../" ,"updater", "updater.process.js")}`], {
-      detached: true,
-      stdio: [ 'ignore' ]
-    });
-    subprocess.unref();
+    process.send({command: "upgrade"})
   }
 
   async downloadLatestReleaseZip(){
-    return this.startUpdateProcess();
+    await this.startUpdateProcess();
     //return downloadGitZip(this.#latest_asset_url, this.#zip_download_path, { "Authorization": this.#default_request_headers["Authorization"] }, this.startUpdateProcess);
   }
 }

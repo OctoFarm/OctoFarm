@@ -201,7 +201,7 @@ router.post(
   ensureAdministrator,
   async (req, res) => {
     await githubService.downloadLatestReleaseZip();
-    res.send({})
+    res.send({message: "Started Upgrade Process, will begin downloading the latest version!"})
   }
 );
 router.get('/server/update/check', ensureAuthenticated, ensureAdministrator, async (req, res) => {

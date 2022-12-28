@@ -1,54 +1,86 @@
-const zip = require("../server/node_modules/yauzl");
-const { LOGGER_ROUTE_KEYS } = require("../server/constants/logger.constants");
-const Logger = require("../server/handlers/logger");
+const zip = require("yauzl");
+const { join, dirname } = require("path");
+const { LOGGER_ROUTE_KEYS } = require("../constants/logger.constants");
+const Logger = require("../handlers/logger");
+const fs = require("fs");
+const util = require("util");
+const exec = util.promisify(require("child_process").exec);
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.PROCESS_ONLINE_UPDATER);
 // Stop the OctoFarm process
-let ERROR_TRIGGERED = false;
-
-const stopOctoFarmProcess = () => {
-    var exec = require('child_process').exec;
-    var cmd = 'pm2 stop OctoFarm --no-treekill';
-    logger.info("Stopping the octofarm process...")
-    exec(cmd, function(error, stdout, stderr) {
-        logger.info(stdout)
-        if(stderr) ERROR_TRIGGERED = true;
-        logger.error(stderr)
-    });
-}
 
 const isZipFileTasty = async () => {
     logger.info("Checking to see if zip file exists and is not corrupt")
     try{
-        await zip.open("octofarm.zip", {lazyEntries: true})
+        await zip.open("../temp/octofarm.zip", {lazyEntries: true})
         logger.info("Zip file is tasty, continuing with upgrade!")
     }catch(e){
         logger.error("Unable to confirm zip file tastyness...")
-        ERROR_TRIGGERED = true;
+        process.send({ command: "done" })
     }
-
-
 }
 
-const unzipFileToTemporaryDirectory = async () => {
-    const zipFile = await zip.open("octofarm.zip", {lazyEntries: true})
-    logger.info(zipFile)
+const unzipFileToTemporaryDirectory = (callback) => {
+    zip.open("../temp/octofarm.zip", {lazyEntries: true}, function(err, zipfile) {
+        if (err) throw err;
+        zipfile.readEntry();
+        zipfile.on("entry", function(entry) {
+            console.log(entry)
+            if (/\/$/.test(entry.fileName)) {
+                // Directory file names end with '/'.
+                // Note that entries for directories themselves are optional.
+                // An entry's fileName implicitly requires its parent directories to exist.
+                console.log("This is a folder", entry.fileName, "Create folder...")
+                zipfile.readEntry();
+            } else {
+                // file entry
+                console.log("This is a file", entry.fileName, "Copy into created folder")
+                fs.mkdir(
+                    join("../temp", dirname(entry.fileName)),
+                    { recursive: true },
+                    (err) => {
+                        if (err) throw err;
+                        zipfile.openReadStream(entry, function (err, readStream) {
+                            if (err) throw err;
+                            readStream.on("end", function () {
+                                zipfile.readEntry();
+                            });
+                            const writer = fs.createWriteStream(
+                                join("../temp", entry.fileName)
+                            );
+                            readStream.pipe(writer);
+                        });
+                    }
+                );
+            }
+        });
+        zipfile.once("end", async function() {
+            zipfile.close();
+            await callback();
+        });
+    });
 }
 
-const backupOldServerDirectory = () => {
-
+const backupOldServerDirectory = (callback) => {
+    fs.rename("../server2", "../temp/backup", async () => {
+        await callback();
+    })
 }
 
-const clearCurrentServerDirectory = () => {
-
+const moveNewFilesToServerDirectory = (callback) => {
+    fs.rename("../temp/server", "../server2", async () => {
+        await callback();
+    })
 }
 
-const moveNewFilesToServerDirectory = () => {
-
-}
-
-const updateNodeJSModules = () => {
-
+const updateNodeJSModules = async () => {
+    try {
+        await exec("npm ci", {
+            cwd: '../server'
+        });
+    } catch (e) {
+        throw `Error running installation command | ${e}`;
+    }
 }
 
 const compareNewAndZipFiles = () => {
@@ -56,46 +88,27 @@ const compareNewAndZipFiles = () => {
 }
 
 
-// Spin up websocket connection to allow monitoring in UI
-
-// UnZip the contents of the release zip into updater
-
-// Remove the old server/ folder
-
-// Move the new server/ folder into the upper directory.
-
-// Restart the OctoFarm process
-const startOctoFarmProcess = () => {
-    var exec = require('child_process').exec;
-    var cmd = 'pm2 start OctoFarm --no-treekill';
-    logger.info("Restarting the OctoFarm process");
-    exec(cmd, function(error, stdout, stderr) {
-        logger.info(stdout)
-        if(stderr) ERROR_TRIGGERED = true;
-        logger.error(stderr)
-    });
-
-    process.exit(0);
-}
-
-// Clean up updater folder
-
-// Destroy self
-const thousand = 100000
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+const runAfterMoveNewFilesToServerDirectory = async () => {
+    await updateNodeJSModules;
+    process.send({ command: "done" })
+}
+
+const runAfterBackup = () => {
+    moveNewFilesToServerDirectory(runAfterMoveNewFilesToServerDirectory);
+}
+
+const runAfterUnZip = () => {
+    backupOldServerDirectory(runAfterBackup);
+}
 
 // Sequence
 (async function() {
-    logger.info("Starting OctoFarm's update server!")
-    //stopOctoFarmProcess();
-    //if(ERROR_TRIGGERED) startOctoFarmProcess();
+    logger.info("Starting OctoFarm's update server!");
     await isZipFileTasty();
-    //if(ERROR_TRIGGERED) startOctoFarmProcess();
-    await unzipFileToTemporaryDirectory();
-    //startOctoFarmProcess();
-    process.exit(0);
+    await updateNodeJSModules();
+    //unzipFileToTemporaryDirectory(runAfterUnZip);
 })();
