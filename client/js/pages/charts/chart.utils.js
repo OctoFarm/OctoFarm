@@ -96,7 +96,7 @@ export function defaultDarkColor() {
 
 export function defaultBackground() {
   return {
-    background: defaultDarkColor(),
+    background: '0',
   };
 }
 

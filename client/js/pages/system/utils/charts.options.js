@@ -21,7 +21,7 @@ const chart = {
   animations: {
     enabled: false,
   },
-  background: "#303030",
+  background: '0'
 };
 
 const theme = {
