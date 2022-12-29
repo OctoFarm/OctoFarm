@@ -5,6 +5,7 @@ const Logger = require("../handlers/logger");
 const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
+const { UPDATER_PATHS } = require("../constants/path.constants");
 
 const logger = new Logger(LOGGER_ROUTE_KEYS.PROCESS_ONLINE_UPDATER);
 // Stop the OctoFarm process
@@ -21,7 +22,7 @@ const isZipFileTasty = async () => {
 }
 
 const unzipFileToTemporaryDirectory = (callback) => {
-    zip.open("../temp/octofarm.zip", {lazyEntries: true}, function(err, zipfile) {
+    zip.open(UPDATER_PATHS.REL_UPDATE_ZIP, {lazyEntries: true}, function(err, zipfile) {
         if (err) throw err;
         zipfile.readEntry();
         zipfile.on("entry", function(entry) {
@@ -30,13 +31,11 @@ const unzipFileToTemporaryDirectory = (callback) => {
                 // Directory file names end with '/'.
                 // Note that entries for directories themselves are optional.
                 // An entry's fileName implicitly requires its parent directories to exist.
-                console.log("This is a folder", entry.fileName, "Create folder...")
                 zipfile.readEntry();
             } else {
                 // file entry
-                console.log("This is a file", entry.fileName, "Copy into created folder")
                 fs.mkdir(
-                    join("../temp", dirname(entry.fileName)),
+                    join(UPDATER_PATHS.REL_TEMP, dirname(entry.fileName)),
                     { recursive: true },
                     (err) => {
                         if (err) throw err;
@@ -46,7 +45,7 @@ const unzipFileToTemporaryDirectory = (callback) => {
                                 zipfile.readEntry();
                             });
                             const writer = fs.createWriteStream(
-                                join("../temp", entry.fileName)
+                                join(UPDATER_PATHS.REL_TEMP, entry.fileName)
                             );
                             readStream.pipe(writer);
                         });
@@ -62,13 +61,13 @@ const unzipFileToTemporaryDirectory = (callback) => {
 }
 
 const backupOldServerDirectory = (callback) => {
-    fs.rename("../server2", "../temp/backup", async () => {
+    fs.rename(UPDATER_PATHS.REL_SERVER, UPDATER_PATHS.REL_BACKUP_SERVER, async () => {
         await callback();
     })
 }
 
 const moveNewFilesToServerDirectory = (callback) => {
-    fs.rename("../temp/server", "../server2", async () => {
+    fs.rename(UPDATER_PATHS.REL_UPDATED_SERVER, UPDATER_PATHS.REL_SERVER, async () => {
         await callback();
     })
 }
@@ -76,7 +75,7 @@ const moveNewFilesToServerDirectory = (callback) => {
 const updateNodeJSModules = async () => {
     try {
         await exec("npm ci", {
-            cwd: '../server'
+            cwd: UPDATER_PATHS.REL_SERVER
         }, function(error, stdout, stderr) {
             if(error) throw new Error("Error with exec command npm ci! " + error)
             if(stdout) logger.info(stdout)
