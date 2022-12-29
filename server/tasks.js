@@ -11,6 +11,7 @@ const {
   updatePluginNoticesStore,
   updatePluginStore,
 } = require('./store/octoprint-plugin-list.store');
+const { createMissingSystemPaths } = require("./utils/system-paths.utils");
 const { getInfluxCleanerCache } = require('./cache/influx-export.cache');
 const { FileClean } = require('./services/file-cleaner.service');
 const { sortCurrentOperations } = require('./services/current-operations.service');
@@ -63,6 +64,7 @@ const INITIALISE_PRINTERS_TASK = async () => {
 
 const SERVER_BOOT_TASK = async () => {
   await onlineChecker.check();
+  createMissingSystemPaths();
   if(onlineChecker.airGapped){
     await Promise.allSettled([
       await SystemRunner.initialiseSystemInformation(),
