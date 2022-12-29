@@ -1,0 +1,11 @@
+<% const base = './' %>
+<% const monitoringViews = base + '/monitoringViews.ejs' %>
+<% const userDropDown = base + '/userDropDown.ejs' %>
+<% const notificationDropDown = base + '/alertsPanel.ejs' %>
+
+<header class="header t-navbar" id="header">
+    <button type="button" class="header-toggle btn-sm btn btn-outline-purple" id="header-toggle"><i class="fa-solid fa-bars fs-5" id="header-icon"></i></button>
+    <%- include(monitoringViews) -%>
+    <div class="header_user_menu "></div>
+    <%- include(userDropDown, { currentUserGroup }) -%>
+</header>

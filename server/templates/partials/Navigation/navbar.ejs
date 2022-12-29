@@ -1,0 +1,18 @@
+<% const base = './' %>
+<% const navbarLogo = base + '/navbarLogo.ejs' %>
+<% const versionInformation = base + '/versionInformation.ejs' %>
+<% const navLinks = base + '/navLinks.ejs' %>
+
+<div class="l-navbar" id="nav-bar">
+    <nav class="nav">
+        <div class="nav_list">
+            <a href="https://octofarm.net" target="_blank" id="navTitle" class="nav_logo slow-hide">
+                <h4 class="text-purple text-uppercase mb-1"><%= octoFarmPageTitle %></h4>
+            </a>
+            <%- include(navLinks, { currentUserGroup }) -%>
+        </div>
+
+        <%- include(versionInformation) -%>
+    </nav>
+
+</div>

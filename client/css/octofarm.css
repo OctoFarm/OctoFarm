@@ -1,3 +1,4 @@
+/* BODY  */
 body {
   background-color: black;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
@@ -11,4 +12,32 @@ body {
   background-position: center;
   color: grey;
   height:100%;
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+
+/* ABOUT MODAL */
+.patreon-user {
+  height: 75px;
+  width: 75px;
+  clear: both;
+  margin: 0 auto;
+  display: block;
+  overflow: hidden;
+  border-radius: 100%;
+  box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0px 3px 10px 0 rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+.patreon-img {
+  height: auto;
+  width: 100%;
+  border-radius: 100%;
 }
