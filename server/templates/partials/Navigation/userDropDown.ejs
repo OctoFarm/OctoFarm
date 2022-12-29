@@ -1,0 +1,34 @@
+<% if(serverSettings.server.loginRequired){ %>
+    <div class="dropdown-center">
+        <button class="btn btn-outline-purple dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-user"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <div class="ps-4 pe-4 text-center">
+                <p class="mb-1"><i class="far fa-user text-purple fa-2xl m-3"></i></p>
+                <p class="mb-2"><%= name; %></p>
+                <p class=" text-muted"> <%= userGroup; %></p>
+            </div>
+            <!--        <li><hr class="dropdown-divider"></li>-->
+            <!--        <li><h6 class="dropdown-header">Settings</h6></li>-->
+            <!--        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#userSettingsModal"><i class="far fa-user text-purple text-purple"></i> User</a></li>-->
+            <!--        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clientSettingsModal"><i class="fa-solid fa-display text-purple"></i> Client</a></li>-->
+            <% if(userGroup === "Administrator"){ %>
+                <!--            <li><h6 class="dropdown-header">Admin</h6></li>-->
+                <!--            <li><a class="dropdown-item" href="/administration"><i class="fa-solid fa-screwdriver-wrench text-purple"></i> Administration</a></li>-->
+                <!--            <li><a class="dropdown-item" href="/automations"><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> Automations</a></li>-->
+                <!--            <li><a class="dropdown-item" href="/users"><i class="fa-solid fa-users text-purple"></i> Users</a></li>-->
+            <% } %>
+            <!--        <li><h6 class="dropdown-header">Information</h6></li>-->
+            <% if(userGroup === "Administrator"){ %>
+                <!--            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#informationSystemModal"><i class="fas fa-info-circle text-purple"></i>  System</a></li>-->
+                <!--            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#informationLogsModal"><i class="fa-solid fa-clipboard text-purple"></i> Logs</a></li>-->
+            <% } %>
+            <!--        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#aboutModal"><i class="fa-solid fa-address-card text-purple"></i> About</a></li>-->
+
+            <li><hr class="dropdown-divider"></li>
+            <li><a type="button" class="dropdown-item" href="/users/logout"><i class="fas fa-sign-out-alt text-purple"></i> Sign Out</a></li>
+
+        </ul>
+    </div>
+<% } %>
