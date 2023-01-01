@@ -7,6 +7,8 @@ const warningBackgroundColour = getComputedStyle(document.documentElement).getPr
 const successBackgroundColour = getComputedStyle(document.documentElement).getPropertyValue('--bs-success-border-subtle')
 const warningBackgroundColourText = getComputedStyle(document.documentElement).getPropertyValue('--bs-warning-text')
 const successBackgroundColourText = getComputedStyle(document.documentElement).getPropertyValue('--bs-success-text')
+const NO_PRINTS = "Nothing is due to finish";
+
 const resetFile = async function (id) {
   const printer = await OctoFarmClient.getPrinter(id);
   await OctoPrintClient.file(printer, printer.currentJob.filePath, "load");
@@ -338,36 +340,52 @@ const createStatisticsRow = (stat) => {
     return `<div style="width: 100%; font-size:11px;"> ${calculateFinishTimeString(stat)} | ${stat.name}: ${stat.fileName} </div>`
 }
 
-
-
-const drawStatistics = (today, tomorrow) => {
-    const NO_PRINTS = "Nothing is due to finish"
-    let todayElements = "";
-    for (const stat of today) {
-        todayElements += createStatisticsRow(stat)
-    }
-    if(today.length < 1) todayElements = NO_PRINTS;
-    document.getElementById("co-finish-today-list").innerHTML = todayElements;
-    const latestTime = today.reduce((a, b) => (a.timeRemaining > b.timeRemaining ? a : b))
-    document.getElementById("co-latest-finish-time-today").innerHTML = `@ ${calculateFinishTimeString(latestTime).replace("Today @", "")}`;
-
+const drawTomorrowStats = (tomorrow) => {
     let tomorrowElements = "";
     for (const stat of tomorrow) {
         tomorrowElements += createStatisticsRow(stat)
     }
-    if(tomorrow.length < 1) tomorrowElements = NO_PRINTS;
+    if(tomorrow.length < 1) {
+        tomorrowElements = NO_PRINTS;
+        document.getElementById("co-finish-tomorrow-list").innerHTML = tomorrowElements;
+        return;
+    };
     document.getElementById("co-finish-tomorrow-list").innerHTML = tomorrowElements;
     const tomorrowTime = tomorrow.reduce((a, b) => (a.timeRemaining > b.timeRemaining ? a : b))
     document.getElementById("co-latest-finish-time-tomorrow").innerHTML = `@ ${calculateFinishTimeString(tomorrowTime).replace("Today @", "")}`;
 }
 
+const drawTodayStats = (today) => {
+    let todayElements = "";
+    for (const stat of today) {
+        todayElements += createStatisticsRow(stat)
+    }
+    if(today.length < 1) {
+        todayElements = NO_PRINTS;
+        document.getElementById("co-finish-today-list").innerHTML = todayElements;
+        return;
+    };
+    document.getElementById("co-finish-today-list").innerHTML = todayElements;
+    const latestTime = today.reduce((a, b) => (a.timeRemaining > b.timeRemaining ? a : b))
+    document.getElementById("co-latest-finish-time-today").innerHTML = `@ ${calculateFinishTimeString(latestTime).replace("Today @", "")}`;
+}
+
+
+const drawStatistics = (today, tomorrow) => {
+    drawTodayStats(today);
+    drawTomorrowStats(tomorrow);
+}
+
 const cleanUpCards = (currentOperations) => {
+    // Nothing in current operations remove all cards
     const currentCards = document.querySelectorAll("[id^='co-card-']");
     if (!currentOperations || currentOperations.length === 0) {
       currentCards.forEach((card) => {
         card.remove();
       });
     }
+    // Compare screen current operations to server current operations
+    // Remove values that don't exist
     const curr = [];
     currentOperations.forEach((cur) => {
         curr.push(cur.id);
