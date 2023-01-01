@@ -1,7 +1,9 @@
 import { asyncParse, debounce } from '../js/utils/sse.utils';
 import { MESSAGE_TYPES } from '../../server/constants/sse.constants';
 import { updateLiveFileInformation } from '../js/pages/file-manager/file-manager-sse.handler';
-import currentOperationsPanelService from '../js/services/current-operations-panel.service';
+import {
+  updateCurrentOperationsState
+} from '../js/services/current-operations-panel.service';
 import {
   triggerCountDownTimer,
   drawModal,
@@ -105,6 +107,7 @@ function setupEventSource() {
   evtSource = new EventSource(buildEventsURL());
   evtSource.onmessage = async function (e) {
     const { type, message, id } = await asyncParse(e.data);
+
     if (type === MESSAGE_TYPES.AM_I_ALIVE) {
       await setServerAlive(message);
     }
@@ -115,7 +118,7 @@ function setupEventSource() {
 
     if (type === MESSAGE_TYPES.CURRENT_OPERATIONS) {
       const { operations, count } = message;
-      await currentOperationsPanelService(operations, count);
+      await updateCurrentOperationsState(operations, count);
     }
 
     if (type === MESSAGE_TYPES.NEW_CAMERA_IMAGE) {

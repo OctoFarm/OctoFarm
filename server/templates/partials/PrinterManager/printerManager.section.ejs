@@ -1,0 +1,78 @@
+<% let base = '..' %>
+<% let table = base + '/octofarm-table.ejs' %>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-outline-secondary" title="Add a printer to your farm"
+                        id="addPrinterBtn"
+                        href="#"
+                        aria-expanded="false"><i class="fas fa-plus fa-sm  text-success"></i> Add</button>
+                <button class="btn btn-outline-secondary" id="editPrinterBtn" type="button" title="Bulk edit your printer connection settings"
+                        data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit  text-info"></i> Edit</button>
+                <button class="btn btn-outline-secondary" title="Bulk delete printers from your farm"
+                        id="deletePrintersBtn"
+                        data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash  text-danger"></i> Delete</button>
+                <label>
+                    <input class="fileElem"
+                           type="file"
+                           id="importPrinterBtn"
+                           accept=".json" style="display: none;">
+                    <button title="Import printers from a JSON file" class="btn btn-outline-secondary"><i
+                                class="fas fa-file-import text-info"></i> Imports</button>
+                </label>
+                <button class="btn btn-outline-secondary" title="Export printers from OctoFarm"
+                        id="exportPrinterBtn">
+                    <i class="fas fa-file-export text-warning"></i> Export</button>
+                <a class="btn btn-outline-secondary"
+                   title="Add printers by scanning your network for online OctoPrint instances."
+                   id="scanNetworkBtn">
+                    <i class="fas fa-wifi text-purple"></i> Scan Network
+                </a>
+
+                <button class="btn btn-outline-secondary float-end" title="Bulk disable printers on your farm"
+                        id="disablePrintersBtn"
+                        data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-wheelchair text-danger"></i> Disable</button>
+                <button class="btn btn-outline-secondary float-end me-1" title="Bulk enable disabled printers on your farm"
+                        id="enablePrintersBtn"
+                        data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-running text-success"></i> Enable</button>
+                <button
+                        title="Reconnect all OctoPrint websocket connections."
+                        id="reSyncSockets"
+                        type="button"
+                        class="btn btn-outline-secondary me-1 float-end"
+                        href="#"
+                >
+                    <i class="fas fa-sync-alt fa-sm text-warning"></i> Reconnect Sockets
+                </button>
+            </div>
+            <%- include(table, {
+            table:{
+            id:"printerNewTable", contentId:"printerNewList", hide:true, headers: [
+            { title:"Name", style:"" },
+            { title:"Group", style:"min-width:190px;" },
+            { title:"Printer URL", style:"" },
+            { title:"Camera URL", style:"" },
+            { title:"API KEY", style:"" },
+            { title:'<button id="saveAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-save"></i></button>', style:"max-width:50px;" },
+            { title:'<button id="delAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>', style:"max-width:50px;" }
+            ]
+            }
+            })
+            %>
+            <%- include(table, {
+            table:{
+            id:"printerTable", contentId:"printerList", headers: [
+            { title:"Sort Index", sort: "int" },
+            { title:"Name" ,style:"", wrap:" text-wrap", sort: "string" },
+            { title:"OctoPrint User", sort: "string" },
+            { title:"Connection State", sort: "string" },
+            { title:"Web" }
+            ]
+            }
+            })
+            %>
+        </div>
+    </div>
+</div>

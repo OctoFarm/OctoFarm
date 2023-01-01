@@ -5,10 +5,12 @@
 
 <div class="l-navbar" id="nav-bar">
     <nav class="nav">
-        <div class="nav_list">
+        <div class="text-center ">
             <a href="https://octofarm.net" target="_blank" id="navTitle" class="nav_logo slow-hide">
-                <h4 class="text-purple text-uppercase mb-1"><%= octoFarmPageTitle %></h4>
+                <h4 class="text-purple mb-1"><%= octoFarmPageTitle %></h4>
             </a>
+        </div>
+        <div class="nav_list">
             <%- include(navLinks, { currentUserGroup }) -%>
         </div>
 

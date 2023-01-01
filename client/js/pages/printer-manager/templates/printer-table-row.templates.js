@@ -220,30 +220,7 @@ export function returnPrinterTableRow(printer) {
              )}
         </td>
         <td class="align-middle">
-            <span id="printerURL-${printer._id}"></span>
-        </td>
-        <td class="align-middle">
             <span id="printerOctoPrintUser-${printer._id}"></span>
-        </td>
-                <td class="align-middle">
-            <small>
-                <span data-title="${printer.hostState.desc}" id="hostBadge-${
-    printer._id
-  }" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
-                    ${printer.hostState.state}
-                </span>
-            </small>
-        </td>
-        <td class="align-middle">
-            <small>
-                <span data-title="${
-                  printer.printerState.desc
-                }" id="printerBadge-${printer._id}" class="tag badge badge-${
-    printer.printerState.colour.name
-  } badge-pill">
-                    ${printer.printerState.state}
-                </span>
-            </small>
         </td>
         <td class="align-middle">
             <small>
@@ -256,23 +233,10 @@ export function returnPrinterTableRow(printer) {
                 </span>
             </small>
         </td>
-
-        <td class="align-middle" id="printerGroup-${printer._id}"></td>
-         <td class="align-middle">
-            <span id="printerControlUser-${printer._id}"></span>
-        </td>
         <td class="align-middle" id="printerActionBtns-${printer._id}">
 
         </td>
-        <td class="align-middle" id="printerManageBtns-${printer._id}">
-            ${returnPrinterManageDropDown(printer._id, printer.disabled)}
-        </td>
-        <td class="align-middle" id="printerLastStatus-${printer._id}">
-            
-        </td>
-        <td class="align-middle" id="printerAlertsBtns-${printer._id}">
-            ${returnAlerts(printer._id, printer.printerURL)}
-        </td>
+
 
     </tr>
     `;

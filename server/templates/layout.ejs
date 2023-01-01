@@ -1,4 +1,5 @@
 <% const base = './partials' %>
+
 <% const navigation = base + '/Navigation' %>
 
 <% const header = navigation + '/header.ejs' %>
@@ -38,15 +39,15 @@
     <link rel="mask-icon" href="/assets/config/safari-pinned-tab.svg" color="#5bbad5">
     <style>
         :root {
-            --octofarm-highlight-colour: #D500F9;
-            --octofarm-main-colour: #8E24AA;
+            --octofarm-highlight-colour: rgb(163, 112, 247);
+            --octofarm-main-colour: rgb(133, 64, 245);
             --sidebar-colour-dark: #212121;
             --navbar-colour-dark: rgb(33, 37, 41, 0.9);
             --sidebar-colour-light: #E0E0E0;
             --navbar-colour-light: #BDBDBD;
             --white-colour: #ffffff;
             --header-height: 2rem;
-            --nav-width: 68px;
+            --nav-width: 50px;
             --z-fixed: 100;
         }
     </style>
@@ -67,7 +68,6 @@
     <script src="/assets/js/vendor.<%= clientVersion %>.min.js"></script>
     <script src="/assets/js/navbar.utils.<%= clientVersion %>.min.js"></script>
     <script src="/assets/js/events.service.<%= clientVersion %>.min.js"></script>
-
 </head>
 <body id="body-pd">
 <%- include(header, { monitoringSettings, currentUserGroup }) -%>
@@ -75,8 +75,130 @@
 <!--Container Main start-->
 <div class="grid" style="margin-top: 60px;">
     <%- body %>
-</div>
+    <%- include(octofarmErrorModal) %>
+    <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
+         aria-labelledby="printerManagerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header px-3 pt-3 pb-2">
+                    <div id="printerSelectionWrapper" class="input-group mb-0" style="width:600px">
+                        <div class="input-group-prepend">
+                            <label id="printerManagerModalTitle" class="input-group-text p-1" for="printerSelection"></label>
+                        </div>
+                        <select class="custom-select p-1" id="printerSelection">
 
-<%- include(octofarmErrorModal) %>
+                        </select>
+                    </div>
+                    <span id="printerIndex" value="" style="display: none;"></span>
+                    <button id="printerManagerModalBtn" type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="connectionRow" class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2 mb-0 text-center" id="status">
+                            <button id="pmStatus" type="button" class="btn btn-secondary mb-1" href="#"
+                                    target="_blank" disabled><i class="fas fa-spinner fa-spin"></i></button>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 mb-0" id="printerPortDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-0" id="printerBaudDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 mb-0" id="printerProfileDrop">
+
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2 mb-0" id="printerConnect">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div id="printerControls"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" id="printerManagerFooter">
+                    <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="lostServerConnection"><i class="fa-solid fa-satellite-dish"></i> Lost Connection to Server...</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+                                <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
+                                <p id="lostConnectionText">Attempting to reconnect in... <span id="lostServerConnectionTimer"></span></p>
+                                <button class="btn btn-outline-success" id="forceRefreshPageButton"><i class="fas fa-redo"></i> Refresh Page</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="connectionModal" tabindex="0" role="dialog" aria-labelledby="connectionModal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="connectionModalLabel">Printer Connect/Disconnect</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div id="printerConnection" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include(modal, {
+    modal:{
+    id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true", zIndex: 99999
+    },
+    bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
+    })
+    %>
+    <%- include(modal, {
+    modal:{
+    id:"printerSelect", title:"Printer Select: "
+    },
+    bodyFile:'./PrinterManager/printerSelect.modal.ejs'
+    })
+    %>
+    <%- include(modal, {
+    modal:{
+    id:"bulkPrintSetup", title:"Multi-Print Setup: "
+    },
+    bodyFile:'./PrinterManager/bulkPrintSetup.modal.ejs'
+    })
+    %>
+</div>
 </body>
 </html>

@@ -2,15 +2,21 @@
 <% let card = base + '/octofarm-card.ejs' %>
 <% let modal = base + '/octofarm-modal.ejs' %>
 <% let table = base + '/octofarm-table.ejs' %>
+<% const disable_btn_air_gapped = (air_gapped) ? "disabled" : "" %>
+<% const tabMenu = base + '/octofarm-side-tab-menu.ejs' %>
+<% const tabContent = base + '/octofarm-side-tab-content.ejs' %>
+<% const bootstrapMenuGrid = "col-12 col-sm-12 col-md-3 col-lg-4 col-xl-2 col-xxl-2"; %>
+<% const bootstrapContentGrid = "col-12 col-sm-12 col-md-9 col-lg-8 col-xl-10 col-xxl-10"; %>
+
 
 <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
 <div class="row">
     <% if(clientSettings.printerManager.currentOperations){%> <%-
-    include('./partials/currentOperations.ejs') %>
+    include('./partials/current-operations-panel.ejs') %>
     <% }%>
 </div>
 <div class="row">
-    <div class="col-sm-12 col-md-4 col-lg-6">
+    <div class="col-12 col-md-6 col-lg-8 col-xl-8 col-xxl-8">
         <%- include(card, {
         tile:{
         id:"printerManagmentConnectionLog",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
@@ -24,7 +30,7 @@
         })
         %>
     </div>
-    <div class="col-sm-12 col-md-4 col-lg-3">
+    <div class="col-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <%- include(card, {
         tile:{
         id:"userActionsLog",i:"fa-user-tag",title:"User Actions Log",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
@@ -38,65 +44,81 @@
         })
         %>
     </div>
-    <div class="col-sm-12 col-md-4 col-lg-3">
-        <%- include(card, {
-        tile:{
-        id:"printerManagementAlertsLog",i:"fa-bell",title:"Recent Alerts",class:"col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
-        },
-        status: {
-        id: "printerManagementAlertsLogStatus",
-        icon: "fa-bell",
-        title: "Alerts: "
-        },
-        bodyFile:'./PrinterManager/printerAlertsLog.ejs'
+<% } %>
+</div>
+
+<% const printerManagerPath = "./PrinterManager/" %>
+<% const commonEnd = ".section.ejs" %>
+<% const listItems = [
+    {
+        id: "pm-printer-manager",
+        name: "Printer Manager",
+        icon: "fa-solid fa-print",
+        permissionGroup: "Administrator",
+        notification: "pm-printer-manager-notification",
+        bodyFile: `${printerManagerPath}printerManager${commonEnd}`
+    },
+    {
+        id: "pm-octoprint-manager",
+        name: "OctoPrint Manager",
+        icon: "fa-brands fa-octopus-deploy",
+        permissionGroup: "Administrator",
+        notification: "pm-octoprint-manager-notification",
+        bodyFile: `${printerManagerPath}octoPrintManager${commonEnd}`
+    },
+    {
+        id: "pm-connection-overview",
+        name: "Connections Overview",
+        icon: "fa-solid fa-network-wired",
+        permissionGroup: "Administrator",
+        notification: "pm-connection-overview-notification",
+        bodyFile: `${printerManagerPath}connectionOverview${commonEnd}`
+    },
+    {
+        id: "pm-printer-overview",
+        name: "Printer Overview",
+        icon: "fa-solid fa-binoculars",
+        permissionGroup: "Administrator",
+        notification: "pm-printer-overview-notification",
+        bodyFile: `${printerManagerPath}printerOverview${commonEnd}`
+    },
+    {
+        id: "pm-health-overview",
+        name: "Health Checks",
+        icon: "fa-solid fa-heart-pulse",
+        permissionGroup: "Administrator",
+        notification: "pm-health-overview-notification",
+        bodyFile: `${printerManagerPath}healthChecks${commonEnd}`
+    },
+    {
+        id: "pm-developers-menu",
+        name: "Developers Menu",
+        icon: "fa-solid fa-code-pull-request",
+        permissionGroup: "Administrator", //TODO this should work with developer checks - infact developer should override all permissions
+        notification: "pm-developers-menu-notification",
+        bodyFile: `${printerManagerPath}developerMenu${commonEnd}`
+    }
+] %>
+
+<div class="row">
+    <div class="<%= bootstrapMenuGrid %>">
+        <%- include(tabMenu, {
+        list:{
+        listItems: listItems
+        }
         })
         %>
     </div>
-
-<% } %>
-</div>
-<div class="row">
-    <%- include(table, {
-    table:{
-    id:"printerNewTable", contentId:"printerNewList", hide:true, headers: [
-    { title:"Name", style:"" },
-    { title:"Group", style:"min-width:190px;" },
-    { title:"Printer URL", style:"" },
-    { title:"Camera URL", style:"" },
-    { title:"API KEY", style:"" },
-    { title:'<button id="saveAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-save"></i></button>', style:"max-width:50px;" },
-    { title:'<button id="delAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>', style:"max-width:50px;" }
-    ]
-    }
-    })
-    %>
-</div>
-<div class="row">
-    <%- include('./partials/PrinterManager/printerManagementBtns.ejs') %>
+    <div class="<%= bootstrapContentGrid %>">
+        <%- include(tabContent, {
+        list:{
+        listItems: listItems
+        }
+        })
+        %>
+    </div>
 </div>
 
-<div class="row">
-    <%- include(table, {
-    table:{
-    id:"printerTable", contentId:"printerList", headers: [
-    { title:"Sort <br>Index", style:"max-width:25px;", sort: "int" },
-    { title:"Name" ,style:"", wrap:" text-wrap", sort: "string" },
-    { title:"Printer <br>URL" ,style:"", wrap:" text-wrap", sort: "string" },
-    { title:"OctoPrint<br>User" ,style:"max-width:10px;", sort: "string" },
-    { title:"OctoPrint<br>API" ,style:"max-width:50px;", sort: "string" },
-    { title:"Printer <br>State" ,style:"max-width:50px;", sort: "string" },
-    { title:"OctoPrint <br>WebSocket" ,style:"max-width:50px;", sort: "string" },
-    { title:"Group" ,style:"min-width:10px;", sort: "string" },
-    { title:"Control<br>User" ,style:"max-width:10px;", sort: "string" },
-    { title:"Quick<br>Actions" ,style:"min-width:150px;" },
-    { title:"Manage" ,style:"min-width:100px;" },
-    { title:"Last<br>Status" ,style:"min-width:150px; max-width: 150px;", wrap:" text-wrap"  },
-    { title:"Alerts" ,style:"min-width:300px;" },
-    ]
-    }
-    })
-    %>
-</div>
 <%- include(modal, {
     modal:{
     id:"bulkUpdateOctoPrintSettings", title:"Bulk Updating OctoPrint Settings"

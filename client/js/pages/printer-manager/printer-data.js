@@ -134,16 +134,16 @@ function checkIfPrinterHealthOK(printer) {
   const healthAlert = document.getElementById(`healthIssues-${printer._id}`);
   if (printer?.healthChecksPass === false) {
     UI.removeDisplayNoneFromElement(healthAlert);
-    updateLogLine(
-      "healthCheck-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "healthCheck-" + printer._id,
-        name: "Failed health check!",
-        printerName: printer.printerName,
-        colour: "Active",
-      })
-    );
+    // updateLogLine(
+    //   "healthCheck-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "healthCheck-" + printer._id,
+    //     name: "Failed health check!",
+    //     printerName: printer.printerName,
+    //     colour: "Active",
+    //   })
+    // );
   } else {
     UI.addDisplayNoneToElement(healthAlert);
     removeLogLine({ id: "healthCheck-" + printer._id });
@@ -158,16 +158,16 @@ function checkIfPrinterHasEvents(printer) {
     `printerEventsCount-${printer._id}`
   );
   if (printer?.registeredEvents.length > 0) {
-    updateLogLine(
-      "printerEvents-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "printerEvents-" + printer._id,
-        name: "Printer events are registered!",
-        printerName: printer.printerName,
-        colour: "Info",
-      })
-    );
+    // updateLogLine(
+    //   "printerEvents-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "printerEvents-" + printer._id,
+    //     name: "Printer events are registered!",
+    //     printerName: printer.printerName,
+    //     colour: "Info",
+    //   })
+    // );
     printerEventsCount.innerHTML = printer.registeredEvents.length;
     UI.removeDisplayNoneFromElement(eventsAlerts);
     return;
@@ -291,16 +291,16 @@ function checkForOctoPrintUpdate(printer) {
 
   if (printer?.octoPrintUpdate?.updateAvailable) {
     UI.removeDisplayNoneFromElement(updateButton);
-    updateLogLine(
-      "opUpdate-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "opUpdate-" + printer._id,
-        name: "OctoPrint update available!",
-        printerName: printer.printerName,
-        colour: "Info",
-      })
-    );
+    // updateLogLine(
+    //   "opUpdate-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "opUpdate-" + printer._id,
+    //     name: "OctoPrint update available!",
+    //     printerName: printer.printerName,
+    //     colour: "Info",
+    //   })
+    // );
     updateButton.setAttribute(
       "title",
       "You have an OctoPrint Update to install!"
@@ -322,16 +322,16 @@ function checkForOctoPrintPluginUpdates(printer) {
     printer.octoPrintPluginUpdates.length > 0
   ) {
     UI.removeDisplayNoneFromElement(updatePluginButton);
-    updateLogLine(
-      "pluginUpdate-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "pluginUpdate-" + printer._id,
-        name: "OctoPrint plugin update(s) available!",
-        printerName: printer.printerName,
-        colour: "Info",
-      })
-    );
+    // updateLogLine(
+    //   "pluginUpdate-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "pluginUpdate-" + printer._id,
+    //     name: "OctoPrint plugin update(s) available!",
+    //     printerName: printer.printerName,
+    //     colour: "Info",
+    //   })
+    // );
     updatePluginButton.title = "You have OctoPrint plugin updates to install!";
   } else {
     UI.addDisplayNoneToElement(updatePluginButton);
@@ -345,16 +345,16 @@ function checkIfRestartRequired(printer) {
     `restartRequired-${printer._id}`
   );
   if (restartRequiredTag && printer?.restartRequired) {
-    updateLogLine(
-      "restartWaiting-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "restartWaiting-" + printer._id,
-        name: "Waiting for OctoPrint restart",
-        printerName: printer.printerName,
-        colour: "Active",
-      })
-    );
+    // updateLogLine(
+    //   "restartWaiting-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "restartWaiting-" + printer._id,
+    //     name: "Waiting for OctoPrint restart",
+    //     printerName: printer.printerName,
+    //     colour: "Active",
+    //   })
+    // );
     UI.removeDisplayNoneFromElement(restartRequiredTag);
   } else {
     removeLogLine({ id: "restartWaiting-" + printer._id });
@@ -367,16 +367,16 @@ function checkIfMultiUserIssueFlagged(printer) {
     "multiUserIssue-" + printer._id
   );
   if (printer?.multiUserIssue && !printerIsSearching()) {
-    updateLogLine(
-      "userIssue-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "userIssue-" + printer._id,
-        name: "Couldn't determine which user to use!",
-        printerName: printer.printerName,
-        colour: "Offline",
-      })
-    );
+    // updateLogLine(
+    //   "userIssue-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "userIssue-" + printer._id,
+    //     name: "Couldn't determine which user to use!",
+    //     printerName: printer.printerName,
+    //     colour: "Offline",
+    //   })
+    // );
     UI.removeDisplayNoneFromElement(multiUserIssueAlert);
   } else {
     removeLogLine({ id: "userIssue-" + printer._id });
@@ -395,16 +395,16 @@ function checkIfUnderVoltagedPi(printer) {
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_undervoltage) {
-    updateLogLine(
-      "underVoltageIssue-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "underVoltageIssue-" + printer._id,
-        name: "Pi is reporting been undervoltaged!",
-        printerName: printer.printerName,
-        colour: "Offline",
-      })
-    );
+    // updateLogLine(
+    //   "underVoltageIssue-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "underVoltageIssue-" + printer._id,
+    //     name: "Pi is reporting been undervoltaged!",
+    //     printerName: printer.printerName,
+    //     colour: "Offline",
+    //   })
+    // );
     UI.removeDisplayNoneFromElement(printerUnderVoltaged);
   } else {
     removeLogLine({ id: "underVoltageIssue-" + printer._id });
@@ -423,16 +423,16 @@ function checkIfOverheatingPi(printer) {
   );
   const { throttle_state } = octoPi;
   if (throttle_state.current_overheat) {
-    updateLogLine(
-      "overheatingIssue-" + printer._id,
-      alertsLogMesssageBox,
-      createAlertsLogString({
-        id: "overheatingIssue-" + printer._id,
-        name: "Pi is reporting it is overheating!",
-        printerName: printer.printerName,
-        colour: "Offline",
-      })
-    );
+    // updateLogLine(
+    //   "overheatingIssue-" + printer._id,
+    //   alertsLogMesssageBox,
+    //   createAlertsLogString({
+    //     id: "overheatingIssue-" + printer._id,
+    //     name: "Pi is reporting it is overheating!",
+    //     printerName: printer.printerName,
+    //     colour: "Offline",
+    //   })
+    // );
     UI.removeDisplayNoneFromElement(printerOverHeating);
   } else {
     removeLogLine({ id: "overheatingIssue-" + printer._id });
@@ -464,16 +464,16 @@ function checkForApiErrors(printer) {
       }
 
       if (apiErrors > 0) {
-        updateLogLine(
-            "apiIssue-" + printer._id,
-            alertsLogMesssageBox,
-            createAlertsLogString({
-              id: "apiIssue-" + printer._id,
-              name: "API Scan has issues!",
-              printerName: printer.printerName,
-              colour: "Offline",
-            })
-        );
+        // updateLogLine(
+        //     "apiIssue-" + printer._id,
+        //     alertsLogMesssageBox,
+        //     createAlertsLogString({
+        //       id: "apiIssue-" + printer._id,
+        //       name: "API Scan has issues!",
+        //       printerName: printer.printerName,
+        //       colour: "Offline",
+        //     })
+        // );
         UI.removeDisplayNoneFromElement(apiErrorTag);
       }else{
         removeLogLine({ id: "apiIssue-" + printer._id });

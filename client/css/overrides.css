@@ -43,6 +43,11 @@ a {
     border-color: var(--octofarm-highlight-colour) !important;
 }
 
+.nav-link.active {
+    background-color: var(--octofarm-main-colour) !important;
+    border-color: var(--octofarm-highlight-colour) !important;
+}
+
 /* CARD */
 .card {
     opacity: 0.9 !important;

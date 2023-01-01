@@ -20,8 +20,26 @@ body {
   box-sizing: border-box;
 }
 
+/* ANIMATIONS */
+@keyframes fadeIn {
+  0%   {opacity: 0;}
+  20%  {opacity: 0.2;}
+  40%  {opacity: 0.4;}
+  60%  {opacity: 0.6;}
+  80%  {opacity: 0.8;}
+  100% {opacity: 1;}
+}
 
-/* ABOUT MODAL */
+@keyframes fadeOut {
+  0%   {opacity: 1;}
+  20%  {opacity: 0.8;}
+  40%  {opacity: 0.6;}
+  60%  {opacity: 0.4;}
+  80%  {opacity: 0.2;}
+  100% {opacity: 0;}
+}
+
+/* SYSTEM - ABOUT */
 .patreon-user {
   height: 75px;
   width: 75px;
@@ -41,3 +59,71 @@ body {
   width: 100%;
   border-radius: 100%;
 }
+
+/* CURRENT OPERATIONS PANEL */
+.current-operations-panel {
+  display: block;
+}
+
+.reveal-hover:hover > .co-finished-print-menu{
+  visibility: visible !important;
+}
+
+.svg-item {
+  display: flex;
+  margin-left: 5px;
+  min-width: 15rem;
+  max-width:15rem;
+}
+
+/* Draw the state circle */
+.svg-indicator-status {
+  fill: var(--bs-dark);
+  cx: 0;
+  cy: 50%;
+  r: 25px;
+}
+
+.svg-indicator-track,
+.svg-indicator-indication,
+.svg-indicator-cut {
+  fill: transparent;
+  cx: 0;
+  cy: 50%;
+  r: 25px;
+}
+
+.svg-indicator-status-icon {
+  fill: var(--bs-light)
+}
+
+.svg-indicator-text {
+  fill: var(--bs-light);
+  font-size: 0.7rem;
+}
+
+.svg-indicator-text-small {
+  fill: var(--octofarm-highlight-colour);
+  font-size: 0.6rem;
+}
+
+.svg-indicator-track {
+  stroke-width: 6px;
+  stroke: var(--bs-tertiary-color);
+}
+
+.svg-indicator-indication {
+  stroke-width: 5px;
+  stroke: var(--bs-success);
+  stroke-dashoffset: 0;
+}
+
+.svg-indicator-cut {
+  stroke-width: 6px;
+  stroke: var(--bs-dark);
+  stroke-dasharray: 6 7;
+  border: 1px;
+}
+
+
+
