@@ -103,7 +103,7 @@ body {
 }
 
 .svg-indicator-text-small {
-  fill: var(--octofarm-highlight-colour);
+  fill: var(--of-text);
   font-size: 0.6rem;
 }
 
