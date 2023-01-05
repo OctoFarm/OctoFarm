@@ -28,7 +28,7 @@ router.get("/login", async (_req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   res.render("login", {
     page: "Login",
-    layout: 'layout-nonav.ejs',
+    layout: "layouts/no-navigation.ejs",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     registration: serverSettings.server.registration,
     serverSettings: serverSettings
@@ -81,7 +81,7 @@ router.get("/register", async (_req, res) => {
   let currentUsers = await fetchUsers();
   res.render("register", {
     page: "Register",
-    layout: 'layout-nonav.ejs',
+    layout: "layouts/no-navigation.ejs",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     serverSettings: serverSettings,
     userCount: currentUsers.length
@@ -118,7 +118,7 @@ router.post("/register", async (req, res) => {
   if (errors.length > 0) {
     res.render("register", {
       page: "Login",
-      layout: 'layout-nonav.ejs',
+      layout: "layouts/no-navigation.ejs",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: serverSettings.server.registration,
       serverSettings: serverSettings,
@@ -136,7 +136,7 @@ router.post("/register", async (req, res) => {
         // User exists
         errors.push({ msg: "Username is already registered" });
         res.render("register", {
-          layout: 'layout-nonav.ejs',
+          layout: "layouts/no-navigation.ejs",
           page: "Login",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
           registration: serverSettings.server.registration,
