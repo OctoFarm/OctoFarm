@@ -202,12 +202,13 @@ function returnPrinterManageDropDown(id, disabled) {
     `;
 }
 
-export function returnPrinterTableRow({ _id, printerURL, webSocketState }) {
+export function returnPrinterTableRow({ _id, printerURL, webSocketState, disabled }) {
   return `
-        <tr class="" id="printerRow-${_id}">
+        <trid="printerRow-${_id}">
         <td class="align-middle">
             <span title="Drag and change printer sorting"  id="printerSortIndex-${_id}"
-                   class="btn btn-light btn-sm sortableList" style="vertical-align: middle"><i class="fas fa-spinner fa-spin"></i>
+                   class="btn btn-light btn-sm sortableList" style="vertical-align: middle">
+                   <i class="fas fa-spinner fa-spin"></i>
             </span>
         </td>
         <td class="align-middle">
