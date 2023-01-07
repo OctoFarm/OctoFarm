@@ -80,7 +80,7 @@ export default class UI {
   }
 
   static doesElementNeedUpdating(value, element, meta) {
-    if(!value || !element || !meta){
+    if(!element || !meta){
       return;
     }
     //Quick check to see if the UI value differs, if so update.

@@ -1,38 +1,40 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
+<div class="row position-absolute top-50 start-50 translate-middle">
+  <div class="col-md-8 m-auto">
     <div class="card card-body">
+      <h1 class="text-center mb-3"><img id="login-octofarm-logo" width="40%" src="/assets/images/logo.png" /></h1>
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i> Login</h1>
       <%- include('./partials/messages') %>
       <form action="/users/login" method="POST" class="was-validated">
-        <div class="form-group">
+        <div class="form-floating mb-3">
           <label for="username">Username</label>
           <input
-            type="text"
-            id="username"
-            name="username"
-            class="form-control"
-            placeholder="Enter Username"
-            autocomplete="username"
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control"
+                  placeholder="Enter Username"
+                  autocomplete="username"
           />
         </div>
-        <div class="form-group">
+        <div class="form-floating mb-3">
           <label for="password">Password</label>
           <input
-            type="password"
-            id="password"
-            name="password"
-            class="form-control"
-            placeholder="Enter Password"
-            autocomplete="current-password"
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Enter Password"
+                  autocomplete="current-password"
           />
         </div>
-          <div class="custom-control custom-checkbox mb-3">
-            <input title="This does not persist server reboots" type="checkbox" class="custom-control-input" type="checkbox" name="remember_me" value="yes" id="rememberMe" required>
-            <label class="custom-control-label" for="rememberMe">Remember Me!</label>
-            <div class="valid-feedback">Will remember your user session. </div>
-            <div class="invalid-feedback">Not remembering user session.</div>
-          </div>
-        <button type="submit" class="btn btn-primary btn-block bg-colour-1" formnovalidate>Login</button>
+        <div id="login-remember-me-wrapper" class="form-check form-switch mt-2">
+          <input title="This does not persist server reboots" class="form-check-input" type="checkbox" role="switch" name="remember_me" value="yes" id="rememberMe">
+          <label class="form-check-label" for="flexSwitchCheckDefault">Remember Me!</label>
+        </div>
+        <div class="d-grid gap-2 mt-2">
+          <button type="submit" class="btn btn-outline-success" formnovalidate>Login</button>
+        </div>
+
       </form>
       <p class="lead mt-4">
         <% if(registration){ %> No Account? Please <a href="/users/register">register</a> one here!
@@ -40,4 +42,29 @@
       </p>
     </div>
   </div>
+
 </div>
+<script>
+  const octofarmLogo = document.getElementById("login-octofarm-logo");
+  const rememberMeButton = document.getElementById("login-remember-me-wrapper");
+  const REMEMBER_ME_GIF = "/assets/images/eggs/remember-me-futurama.gif";
+  let isHovering = false;
+
+  rememberMeButton.addEventListener("mouseover", (e) => {
+    isHovering = true;
+    setTimeout(() => {
+      if(isHovering && !octofarmLogo.src.includes(REMEMBER_ME_GIF)){
+        octofarmLogo.style.animation="fadeOut 1s linear";
+        setTimeout(() => {
+          octofarmLogo.style.width = "100%";
+          octofarmLogo.src = REMEMBER_ME_GIF;
+          octofarmLogo.style.animation="fadeIn 1s linear";
+        }, 1000)
+      }
+    }, 2000)
+  })
+  rememberMeButton.addEventListener("mouseout", (e) => {
+    isHovering = false;
+  })
+
+</script>

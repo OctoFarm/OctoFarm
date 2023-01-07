@@ -1,0 +1,139 @@
+<div class="col-12">
+  <div class="card mb-4 mt-2">
+    <div class="card-body p-2 bg-dark">
+      <div>
+        <div>
+          <h2 id="headingOne">
+            <div class="btn-group" style="position: absolute; z-index: 1000; top: 0; right:0; height: 93px;">
+              <button type="button" class="btn btn-dark btn-sm px-1" data-bs-toggle="collapse" data-bs-target="#co-extra-info">
+                <b id="co-active-print-count" class="text-warning-emphasis">
+<!--                  <i class="fa-solid fa-wave-square text-warning fa-1x"></i>-->
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </b> Active<br>
+                  <b id="co-complete-print-count" class="text-success-emphasis">
+<!--                    <i class="fa-solid fa-thumbs-up text-success"></i>-->
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </b> Complete
+                  <br>
+              </button>
+              <button type="button" class="btn btn-dark btn-sm px-2" data-bs-toggle="collapse" data-bs-target="#co-settings" aria-expanded="true" aria-controls="co-settings">
+                <i class="fa-solid fa-caret-down"></i>
+              </button>
+              <!--        <div class="dropdown-menu">-->
+              <!--          <a id="ci-progress-up" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <a id="ci-progress-down" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <div class="dropdown-divider"></div>-->
+              <!--          <a id="ci-time-up" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <a id="ci-time-down" class="dropdown-item small p-0 px-2" href="#"><</a>-->
+              <!--          <div class="dropdown-divider"></div>-->
+              <!--          <a id="ci-file-up" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <a id="ci-file-down" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <div class="dropdown-divider"></div>-->
+              <!--          <a id="ci-index-up" class="dropdown-item small p-0 px-2" href="#"></a>-->
+              <!--          <a id="ci-index-down" class="dropdown-item small p-0 px-2" href="#">/a>-->
+              <!--        </div>-->
+            </div>
+
+            <div id="currentOperationsBody" class="d-flex flex-row overflow-scroll" style="min-height: 70px">
+
+            </div>
+          </h2>
+          <div id="co-extra-info" class="accordion-collapse collapse" aria-labelledby="co-extra-info" data-bs-parent="#co-extra-info">
+              <div class="row mt-3">
+                  <div class="col-12 col-md-6 col-lg-6">
+                      <div class="alert alert-danger p-1 m-0" style="font-size:1rem; opacity: 0.9;">
+                          <small><b class="p-0">Finishing Today</b></small>
+                          <small id="co-latest-finish-time-today"><b></b></small>
+                      </div>
+                      <div id="co-finish-today-list"
+                           style="height:6rem; width:100%; overflow-y: scroll; font-family: monospace;">
+
+                      </div>
+                  </div>
+                  <div class="col-12 col-md-6 col-lg-6">
+                      <div class="alert alert-warning p-1 m-0" style="font-size:1rem; opacity: 0.9;">
+                          <small><b class="p-0">Finishing Tomorrow</b></small>
+                          <small id="co-latest-finish-time-tomorrow"><b></b></small>
+                      </div>
+                      <div id="co-finish-tomorrow-list"
+                           style="height:6rem; width:100%; overflow-y: scroll; font-family: monospace;">
+
+                      </div>
+                  </div>
+              </div>
+            </div>
+          <div id="co-settings" class="accordion-collapse collapse" aria-labelledby="co-settings" data-bs-parent="#co-settings">
+            <div class="row mt-3">
+              <h4>Sorting</h4><hr>
+              <div class="col">
+                <div class="form-check">
+                  <input id="ci-progress-up" class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+                  <label class="form-check-label" for="exampleRadios1">
+                    <i class="fas fa-sort-numeric-up"></i> Progress
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+                  <label class="form-check-label" for="exampleRadios2">
+                    <i class="fas fa-sort-numeric-down"></i> Progress
+                  </label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
+                  <label class="form-check-label" for="exampleRadios3">
+                    <i class="fas fa-sort-numeric-up"></i> Time Remaining
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios4" value="option4">
+                  <label class="form-check-label" for="exampleRadios4">
+                    <i class="fas fa-sort-numeric-down"></i> Time Remaining
+                  </label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios5" value="option5">
+                  <label class="form-check-label" for="exampleRadios5">
+                    <i class="fas fa-sort-alpha-up"></i> File Name
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios6" value="option6">
+                  <label class="form-check-label" for="exampleRadios6">
+                    <i class="fas fa-sort-alpha-down"></i> File Name
+                  </label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios7" value="option7">
+                  <label class="form-check-label" for="exampleRadios7">
+                    <i class="fas fa-sort-numeric-up"></i> Sort Index
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios8" value="option8">
+                  <label class="form-check-label" for="exampleRadios8">
+                    <i class="fas fa-sort-numeric-down"></i> Sort Index
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div>

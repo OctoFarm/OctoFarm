@@ -63,8 +63,8 @@ export function updateConnectionLog(
 }
 
 export function updateAlertsLog(messageBox, countElement, loaderElement) {
-  clearConnectionLoader(loaderElement, messageBox, currentAlerts.length);
-  updateStatus(countElement, currentAlerts.length);
+  //clearConnectionLoader(loaderElement, messageBox, currentAlerts.length);
+  //updateStatus(countElement, currentAlerts.length);
 }
 
 export function updateLogLine(id, messageBox, string) {

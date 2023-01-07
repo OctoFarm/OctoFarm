@@ -1,0 +1,99 @@
+<% const base = './partials' %>
+<% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
+<% const modal = base + '/octofarm-modal.ejs' %>
+<% const fullScreenPrinter = base + '/full-screen-printer.ejs' %>
+<% let currentUserGroup = "User" %>
+<% if(typeof userGroup !== "undefined") { %>
+    <% currentUserGroup = userGroup %>
+<% } %>
+<% let monitoringSettings; %>
+<% if(typeof serverSettings !== "undefined") { %>
+    <% monitoringSettings = serverSettings.monitoringViews %>
+<% } %>
+
+<!DOCTYPE html>
+<html id="octofarm_html" lang="en" lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+    <link rel="manifest" href="/assets/config/site.webmanifest">
+    <link rel="mask-icon" href="/assets/config/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="stylesheet" href="/assets/vendor/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/noty.css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/balloon.css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/jplist.css"/>
+    <link rel="stylesheet" href="/assets/vendor/css/fa-all.min.css"/>
+    <link rel="stylesheet" href="/assets/css/octofarm.<%= clientVersion %>.css"/>
+    <title><%= octoFarmPageTitle %>: <%= page %></title>
+    <script src="/assets/js/client-error.modal.<%= clientVersion %>.min.js?"></script>
+    <script src="/assets/vendor/js/jquery.js"></script>
+    <script src="/assets/vendor/js/bootbox.js"></script>
+    <script src="/assets/vendor/js/auto-tables.js"></script>
+    <script src="/assets/js/bootstrap.<%= clientVersion %>.min.js"></script>
+    <script src="/assets/js/vendor.<%= clientVersion %>.min.js"></script>
+    <script src="/assets/js/events.service.<%= clientVersion %>.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <%- body %>
+
+    <%- include(octofarmErrorModal) %>
+    <div class="modal fade" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection"
+         aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="lostServerConnection"><i class="fa-solid fa-satellite-dish"></i> Lost Connection to Server...</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+                                <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
+                                <p id="lostConnectionText">Attempting to reconnect in... <span id="lostServerConnectionTimer"></span></p>
+                                <button class="btn btn-outline-success" id="forceRefreshPageButton"><i class="fas fa-redo"></i> Refresh Page</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="connectionModal" tabindex="0" role="dialog" aria-labelledby="connectionModal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="connectionModalLabel">Printer Connect/Disconnect</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div id="printerConnection" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include(fullScreenPrinter) %>
+</div>
+</body>
+</html>

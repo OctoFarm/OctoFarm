@@ -1,10 +1,12 @@
 <% const releasesURL = "https://github.com/OctoFarm/OctoFarm/releases/tag/" %>
 <% const npmURL = "https://www.npmjs.com/package/@notexpectedyet/octofarm-client" %>
 <% if(Object.keys(systemInformation).length > 0 && Object.keys(serviceInformation).length > 0){ %>
+<div class="card text-center">
+    <div class="card-body">
         <div class="row">
                     <div class="col-12 text-center">
                         <div class="row">
-                            <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-34">
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
                                 <% if(serviceInformation?.air_gapped){ %>
                                     <p class="text-light mb-0"><i class="fas fa-heartbeat text-danger"></i> Farm is
                                         currently air gapped</p>
@@ -15,16 +17,16 @@
                                 <% } %>
                             </div>
                             <% if(serviceInformation?.isNode){ %>
-                                <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-                                    <p class="text-light">Powered by <i class="fab fa-node text-success"></i></p>
+                                <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
+                                    <p class="text-light">Powered by <i class="fab fa-node text-success fa-2xl"></i></p>
                                 </div>
                             <% } %>
                             <% if(serviceInformation?.isDockerContainer){ %>
-                                <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                                <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
                                     <p class="text-light"><i class="fab fa-docker text-info"></i> Running under docker</p>
                                 </div>
                             <% } %>
-                            <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+                            <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
                                 <% if(serviceInformation?.isPm2){ %>
                                     <p class="text-light"><i class="far fa-eye text-info"></i> Running under pm2</p>
                                 <% } %>
@@ -39,13 +41,13 @@
          <div class="row">
              <div class="col-12 text-center">
                  <div class="row">
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                     <div class="col-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                          <i class="fas fa-hourglass-half"></i> OctoFarm Uptime: <br>
                          <span class="text-light" id="processUpdate" style="font-size:0.8rem;">
                                <%= helpers.generateTime(systemInformation.uptime); %>
                         </span>
                      </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                     <div class="col-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                          <i class="fas fa-code-branch"></i> Current Version: <a
                                  title="OctoFarm current version, will take you to Github release page"
                                  class="text-light"
@@ -53,9 +55,9 @@
                                  href="<%= releasesURL + serviceInformation?.update?.current_version %>"
                                  target="_blank"><br><%= serviceInformation?.update?.current_version; %></a>
                      </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                     <div class="col-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                          <% if(!serviceInformation?.update?.latestReleaseKnown){ %>
-                             <i class="fas fa-code-branch"></i> Latest Server Version: <a
+                             <i class="fas fa-code-branch"></i> Latest Version: <a
                                      title="OctoFarm latest available version, will take you to Github release page"
                                      class="text-light"
                                      rel=”noopener”
@@ -72,7 +74,7 @@
                              </a>
                          <% } %>
                      </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                     <div class="col-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
                          <i class="fas fa-code-branch"></i> Node Environment: <a
                                  title="NodeJS environment name"
                                  class="text-light"
@@ -125,13 +127,13 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col-3 text-center">
+            <div class="col-6 text-center">
                 <div id="cpuUsageDonut"></div>
             </div>
-            <div class="col-3 text-center">
+            <div class="col-6 text-center">
                 <div id="memoryUsageDonut"></div>
             </div>
-            <div class="col-6 text-center">
+            <div class="col-12 text-center">
                 <div id="historicUsageGraph"></div>
             </div>
         </div>
@@ -144,3 +146,5 @@
                 <h5>If the issue persists then please log an issue on our Github!</h5>
             </div>
         <% } %>
+        </div>
+    </div>

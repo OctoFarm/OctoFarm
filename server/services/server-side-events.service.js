@@ -93,9 +93,12 @@ const notifySubscribers = (id, type, message, printerInfo = undefined) => {
     const payload = {
       type,
       id,
+      dataLength: null,
       message,
-      printerInfo,
+      printerInfo
     };
+
+    const stringifiedLoad = stringify(payload);
 
     clientList.forEach((client) => {
       client.res.write(`retry: ${10000}\n`);

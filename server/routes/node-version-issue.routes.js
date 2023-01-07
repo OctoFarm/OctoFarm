@@ -14,6 +14,7 @@ const isPm2Safe =
  */
 router.get("/", (req, res) =>
   res.render("nodeVersionIssue", {
+      layout: "layouts/default.ejs",
     page: "Node Version Issue",
     octoFarmPageTitle:
       process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] || AppConstants.defaultOctoFarmPageTitle,

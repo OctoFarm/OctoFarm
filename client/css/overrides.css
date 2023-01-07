@@ -1,0 +1,87 @@
+a {
+    text-decoration: none !important;
+}
+
+/* COLOURS */
+.text-purple {
+    color: var(--of-main) !important;
+}
+
+.link-purple {
+    color: var(--of-main) !important;
+}
+.link-purple:hover, .link-purple:focus {
+    color: var(--of-text) !important;
+}
+
+.active-monitoring {
+    color: var(--of-text) !important;
+}
+
+.btn-outline-purple {
+    background-color: var(--of-bg-subtle) !important;
+    color: var(--of-main) !important;
+    border-color: var(--of-main) !important;
+
+}
+
+.btn-outline-purple:hover {
+    color: var(--of-text) !important;
+    border-color: var(--of-text) !important;
+}
+
+.list-group-item.active {
+    background-color: var(--of-bg-subtle) !important;
+    border-color: var(--of-border-subtle) !important;
+}
+
+.nav-link.active {
+    background-color: var(--of-bg-subtle) !important;
+    border-color: var(--of-border-subtle) !important;
+}
+
+.alert-purple {
+    --bs-alert-color: var(--of-text) !important;
+    --bs-alert-bg: var(--of-bg-subtle) !important;
+    --bs-alert-border-color: var(--of-border-subtle) !important;
+    --bs-alert-link-color: var(--of-text) !important;
+}
+
+/* BUTTONS */
+.btn-circle.btn-sm {
+    width: 20px;
+    height: 20px;
+    padding: 2px 0;
+    border-radius: 15px;
+    font-size: 10px;
+    text-align: center;
+}
+
+
+/* CARD */
+.card {
+    opacity: 0.9 !important;
+}
+
+/* SCROLL BAR */
+::-webkit-scrollbar {
+    width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--navbar-colour-dark) !important;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--navbar-colour-light) !important;
+}
+
+
+[data-bs-theme=dark] ::-webkit-scrollbar-thumb {
+    background: var(--sidebar-colour-dark) !important;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--of-text) !important;
+}

@@ -1,0 +1,86 @@
+<% const disable_btn_air_gapped = (air_gapped) ? "disabled" : "" %>
+<% let base = '..' %>
+<% let table = base + '/octofarm-table.ejs' %>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button
+                        title="Update multiple OctoPrints at once."
+                        id="blkOctoPrintUpdate"
+                        type="button"
+                        class="btn btn-outline-secondary mr-1 float-end"
+                        href="#"
+                        <%= disable_btn_air_gapped %>
+                >
+                    <i class="fab fa-raspberry-pi text-success"></i> Update Clients
+                </button>
+                <button
+                        title="Install multiple plugins at once."
+                        id="blkPluginsInstallBtn"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        href="#"
+                        <%= disable_btn_air_gapped %>
+                >
+                <i class="fas fa-download text-info"></i> Install Plugins
+                </button>
+                <button
+                        title="Uninstall multiple plugins at once."
+                        id="blkPluginsUnInstallBtn"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        href="#"
+                        aria-expanded="false"
+                        data-toggle="modal" data-target="#printerSelectModal"
+                >
+
+
+                    <i class="fas fa-trash text-danger"></i> Uninstall Plugins
+                </button>
+                <button
+                        title="Enable multiple plugins at once."
+                        id="blkPluginsEnableBtn"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        href="#"
+                        aria-expanded="false"
+                        data-toggle="modal" data-target="#printerSelectModal"
+                >
+                    <i class="fas fa-toggle-on text-info"></i> Enable Plugin
+                </button>
+                <button
+                        title="Disable multiple plugins at once."
+                        id="blkPluginsDisableBtn"
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        href="#"
+                        aria-expanded="false"
+                        data-toggle="modal" data-target="#printerSelectModal"
+                >
+                    <i class="fas fa-toggle-off text-warning"></i> Disable Plugin
+                </button>
+                <button
+                        title="Update multiple OctoPrint plugins at once."
+                        id="blkUpdatePluginsBtn"
+                        type="button"
+                        class="btn btn-outline-secondary float-end"
+                        href="#"
+                >
+                    <i class="fas fa-sync text-success"></i> Update Plugins <%= disable_btn_air_gapped %>
+                </button>
+            </div>
+            <%- include(table, {
+            table:{
+            id:"octoprinterTable", contentId:"printerList", headers: [
+            { title:"Name", sort: "int" },
+            { title:"API User" ,style:"", wrap:" text-wrap", sort: "string" },
+            { title:"Version", sort: "string" },
+            { title:"Installed Plugins", sort: "string" },
+            ]
+            }
+            })
+            %>
+        </div>
+    </div>
+</div>

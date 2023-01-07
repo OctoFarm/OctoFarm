@@ -15,7 +15,8 @@
     <% upToDate = "d-none" %>
     <% notUpToDate = "" %>
 <% } %>
-
+<div class="card text-center">
+    <div class="card-body">
 <div class="row <%= notAirGapped %>">
     <div class="col-12">
         <h4 class="float-left">Server Updates</h4>
@@ -97,9 +98,5 @@
         <% }) %>
     </div>
 </div>
-
-You have selected to "Update OctoFarm" are you sure?
-
-When you click "I am sure" OctoFarms server process will be ended, another process will become live to handle the update.
-
-A pop up should appear with the current state of the upgrade process, and once done the OctoFarm server will be restarted for you.
+    </div>
+</div>

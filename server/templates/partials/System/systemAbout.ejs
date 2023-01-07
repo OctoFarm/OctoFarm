@@ -1,7 +1,9 @@
+<div class="card text-center">
+    <div class="card-body">
 <div class="row">
     <div class="col-lg-12 text-center">
         <div class="row">
-            <div class="col-sm-12 col-md-3">
+            <div class="col-sm-12 col-md-12">
                 <h4>About OctoFarm</h4><hr>
                 <p>OctoFarm is the creation of James Mackay from NotExpectedYet which
                     is also one of his personal projects. It was designed after using
@@ -16,7 +18,8 @@
                     him a donation using the
                     buttons on this page, or come along to one of our wonderful growing communities.</p>
             </div>
-            <div class="col-sm-12 col-md-3">
+            <hr>
+            <div class="col-sm-12 col-md-4">
                 <h4>Community</h4><hr>
                 <a type="button" class="btn btn-primary mb-2" href="https://www.facebook.com/groups/octofarm" target="_blank"><i class="fab fa-facebook-square"></i> Facebook</a><br>
                 <a type="button" class="btn btn-outline-light mb-2" href="https://discord.gg/vjabMUn" target="_blank"><i class="fab fa-discord"></i> Discord</a><br>
@@ -25,13 +28,13 @@
                 <a type="button" class="btn btn-danger mb-2" href="https://www.youtube.com/channel/UClQWO3lxmQRreJVpjTrxELA" target="_blank"><i class="fab fa-youtube"></i> Youtube</a><br>
                 <a type="button" class="btn btn-outline-dark" href="https://octofarm.net/blog" target="_blank"><i class="fas fa-rss"></i> Blog</a>
             </div>
-            <div class="col-sm-12 col-md-3">
+            <div class="col-sm-12 col-md-4">
                 <h4>Sponsor Links</h4><hr>
                 <a type="button" class="btn btn-danger mb-2" href="https://www.patreon.com/NotExpectedYet" target="_blank"><i class="fab fa-patreon"></i> Patreon</a><br>
                 <a type="button" class="btn btn-info mb-2" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url" target="_blank"><i class="fab fa-paypal"></i> Paypal</a><br>
                 <a type="button" class="btn btn-primary" href="https://buymeacoffee.com/OctoFarm" target="_blank"><i class="fas fa-mug-hot"></i> Buy Me a Coffee!</a>
             </div>
-            <div class="col-sm-12 col-md-3">
+            <div class="col-sm-12 col-md-4">
                 <h4>Documentation</h4><hr>
                 <a type="button" class="btn btn-warning dark-text mb-2" href="https://docs.octofarm.net/getting-started/" target="_blank"><i class="fas fa-play-circle"></i> Getting Started</a><br>
                 <a type="button" class="btn btn-info mb-2" href="https://docs.octofarm.net/installation/" target="_blank"><i class="fas fa-cloud-download-alt"></i> Installation</a><br>
@@ -40,23 +43,7 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-12">
-            <div class="row">
-                <div class="col-12">
-                    <h5>Big thanks to the following Supporters!</h5><hr>
-                </div>
-                        <% patreonData.forEach(patreon => { %>
-                            <div class="col-12 col-sm-6 col-md-3 col-lg-2 text-center">
-                                <li class="list-group-item">
-                                    <div class="userpic"> <img class="userimg" src="<%= patreon.thumb %>"></div>
-                                    <i style="color:gold;" class="fas fa-trophy"></i>
-                                        <%= patreon.name %>
-                                    <i style="color:gold;" class="fas fa-trophy"></i>
-                                </li>
-                            </div>
-                        <% }) %>
-                </div>
-            </div>
-    </div>
 </div>
 
+    </div>
+</div>

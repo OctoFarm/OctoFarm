@@ -1,0 +1,81 @@
+<div class="card">
+    <div class="card-body">
+        <div class="row" id="printerHealthChecksBody">
+            <div class="col-lg-12">
+                <p>
+                    <a class="btn btn-info float-left" data-toggle="collapse" href="#collapseExample" role="button"
+                       aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fas fa-info"></i> Help
+                    </a>
+                </p>
+                <h5 class="float-right">Last Updated:<span id="lastUpdatedDate"></span></h5>
+            </div>
+            <div class="col-lg-12">
+                <div class="collapse" id="collapseExample">
+                    <div class="alert alert-secondary" role="alert" id="healthChecksHelpText">
+                        <p>OctoFarm will periodically run checks on your printers to make sure nothing is out of
+                            whack! Each check will either pass (Green icon) or fail (Red icon). Clicking a red icon will
+                            give you information about the problem, OctoFarm's reaction, and finally what solution you can
+                            take.</p>
+                        <p><b>Printer Settings</b></p>
+                        <p>Checks if the printer, websocket, and camera URLs are all valid. It will also check
+                            to see if your websocket and printer URLs match.</p>
+                        <hr>
+                        <p><b>Websocket Connection</b></p>
+                        <p>Checks if there's been any recent ping/pong failures on the connection.</p>
+                        <hr>
+                        <p><b>Required API</b></p>
+                        <p>Checks if OctoFarm has data available for each required API endpoint.</p>
+                        <hr>
+                        <p><b>Optional API</b></p>
+                        <p>Checks if OctoFarm has data available for each optional API endpoint. Can be largely
+                            ignored unless you're missing a specific feature related to these endpoints. They do not trigger
+                            a health check alert.</p>
+                        <hr>
+                        <p><b>Printer Connection Defaults</b></p>
+                        <p>Checks if OctoFarm knows the printer baudrate, port, and profile settings.</p>
+                        <hr>
+                        <p><b>Printer Profile</b></p>
+                        <p>Checks if OctoFarm has a valid printer profile with all required data. This does not check
+                            if it actually matches your physical printer.</p>
+                        <hr>
+                        <p><b>Webcam Settings</b></p>
+                        <p>Checks if your printer webcam settings are set up correctly and correspond to OctoFarm's data.</p>
+                        <hr>
+                        <p><b>HistoryRoutes Collection Settings</b></p>
+                        <p>Checks if OctoPrint's settings are correctly setup for OctoFarm's history collection settings.</p>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-12 table-responsive-sm table-responsive-md">
+                    <table id="" class="table table-dark table-striped text-center">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="sticky-table table-dark" style="width:150px;">Printer Name</th>
+                            <!--                                Printer Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Printer Settings</th>
+                            <!--                                Webscket Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Websocket Checks</th>
+                            <!--                                API Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Required API</th>
+                            <!--                                API Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Optional API</th>
+                            <!--                                Connection Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Printer Connection Defaults</th>
+                            <!--                                Profile Checks-->
+                            <th scope="col" class="sticky-table table-dark" style="">Printer Profile</th>
+                            <!--                                Webcam Settings-->
+                            <th scope="col" class="sticky-table table-dark" style="">Webcam Settings</th>
+                            <th scope="col" class="sticky-table table-dark" style="">HistoryRoutes Collection Settings</th>
+                        </tr>
+                        </thead>
+                        <tbody id="healthChecksTable" style="height:100%; overflow-y:auto;">
+
+                        </tbody>
+                    </table>
+                </div>
+
+        </div>
+    </div>
+</div>

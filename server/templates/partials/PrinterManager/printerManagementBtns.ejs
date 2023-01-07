@@ -12,76 +12,16 @@
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <h6 class="dropdown-header">Manage</h6>
-                        <a class="dropdown-item" title="Add a printer to your farm"
-                           id="addPrinterBtn"
-                           href="#"
-                           aria-expanded="false"><i class="fas fa-plus fa-sm text-success"></i> Add</a>
 
-                        <a class="dropdown-item" id="editPrinterBtn" type="button" class="btn btn-warning text-dark" title="Bulk edit your printer connection settings"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-edit text-info"></i> Bulk Edit</a>
 
-                        <a class="dropdown-item" title="Bulk delete printers from your farm"
-                           id="deletePrintersBtn"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-trash text-danger"></i> Bulk Delete</a>
 
-                        <a class="dropdown-item" title="Bulk enable disabled printers on your farm"
-                           id="enablePrintersBtn"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-running text-success"></i> Bulk Enable</a>
-
-                        <a class="dropdown-item" title="Bulk disable printers on your farm"
-                           id="disablePrintersBtn"
-                           data-toggle="modal" data-target="#printerSelectModal"><i class="fas fa-wheelchair"></i> Bulk Disable</a>
                         <h6 class="dropdown-header">Actions</h6>
-                        <label>
-                            <input class="fileElem"
-                                   type="file"
-                                   id="importPrinterBtn"
-                                   accept=".json" style="display: none;">
-                            <a title="Import printers from a JSON file" class="dropdown-item"><i
-                                        class="fas fa-file-import text-info"></i> Bulk Import</a>
-                        </label>
-                        <a class="dropdown-item" title="Export printers from OctoFarm"
-                           id="exportPrinterBtn">
-                            <i class="fas fa-file-export text-warning"></i> Bulk Export</a>
-                        <a class="dropdown-item"
-                           title="Add printers by scanning your network for online OctoPrint instances."
-                           id="scanNetworkBtn">
-                            <i class="fas fa-wifi"></i> Scan Network
-                        </a>
                         <h6 class="dropdown-header">Printer Commands</h6>
-                        <a class="dropdown-item"
-                           title="Connect OctoPrint to a bulk set of printers"
-                           id="bulkConnectBtn"
-                           aria-expanded="false"
-                           data-toggle="modal" data-target="#printerSelectModal">
-                            <i class="fas fa-link text-success"></i> Bulk Connect
-                        </a>
-                        <a class="dropdown-item"
-                           title="Disconnect OctoPrint from a bulk set of printers"
-                           id="bulkDisconnectBtn"
-                           aria-expanded="false"
-                           data-toggle="modal" data-target="#printerSelectModal">
-                            <i class="fas fa-unlink text-danger"></i> Bulk Disconnect
-                        </a>
-                        <a class="dropdown-item"
-                           title="Bulk power actions to OctoPrint instances."
-                           id="bulkPowerBtn" data-toggle="modal" data-target="#printerSelectModal">
-                            <i class="fas fa-power-off text-danger"
-                               aria-expanded="false"
-                               ></i> Bulk Power
-                        </a>
+
                     </div>
                 </div>
                 <%- include('./octoPrintActionBtns.ejs') %>
-                <button
-                        title="Reconnect all OctoPrint websocket connections."
-                        id="reSyncSockets"
-                        type="button"
-                        class="btn btn-outline-warning ml-1"
-                        href="#"
-                >
-                    <i class="fas fa-sync-alt fa-sm"></i> Reconnect Sockets
-                </button>
+
                 <%- include('./devOctoPrintActionBtns.ejs') %>
                 <button id="connectionsOverviewModalBtn" type="button" class="btn btn-info float-right mr-1" data-toggle="modal"
                         data-target="#connectionsOverviewModal">

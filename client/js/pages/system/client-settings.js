@@ -6,7 +6,7 @@ export default class ClientSettings {
     const clientSettings = await OctoFarmClient.get('settings/client/get');
 
     document.getElementById('panelCurrentOpOn').checked = clientSettings.views.currentOperations;
-    document.getElementById('panelHideOffline').checked = clientSettings.views.showOffline;
+    // document.getElementById('panelHideOffline').checked = clientSettings.views.showOffline;
     document.getElementById('panelHideClosed').checked = clientSettings.views.showDisconnected;
     document.getElementById('printerManagerCurrentOp').checked =
       clientSettings.printerManager.currentOperations;
@@ -22,11 +22,11 @@ export default class ClientSettings {
       document.getElementById('selectCameraGrid').value = 2;
     }
 
-    if (clientSettings.views.groupColumns) {
-      document.getElementById('selectGroupGrid').value = clientSettings.views.groupColumns;
-    } else {
-      document.getElementById('selectGroupGrid').value = 2;
-    }
+    // if (clientSettings.views.groupColumns) {
+    //   document.getElementById('selectGroupGrid').value = clientSettings.views.groupColumns;
+    // } else {
+    //   document.getElementById('selectGroupGrid').value = 2;
+    // }
 
     if (clientSettings.dashboard) {
       document.getElementById('panelCurrentOpOn').checked =
@@ -44,8 +44,8 @@ export default class ClientSettings {
         clientSettings.dashboard.printerStates.printerUtilisation;
       document.getElementById('printerProgress').checked =
         clientSettings.dashboard.printerStates.printerProgress;
-      document.getElementById('currentStatus').checked =
-        clientSettings.dashboard.printerStates.currentStatus;
+      // document.getElementById('currentStatus').checked =
+      //   clientSettings.dashboard.printerStates.currentStatus;
 
       document.getElementById('currentUtilisation').checked =
         clientSettings.dashboard.farmUtilisation.currentUtilisation;
@@ -62,8 +62,8 @@ export default class ClientSettings {
         clientSettings.dashboard.historical.filamentUsageByDay;
       document.getElementById('printCompletionCheck').checked =
         clientSettings.dashboard.historical.historyCompletionByDay;
-      document.getElementById('filamentUsageOverTimeCheck').checked =
-        clientSettings.dashboard.historical.filamentUsageOverTime;
+      // document.getElementById('filamentUsageOverTimeCheck').checked =
+      //   clientSettings.dashboard.historical.filamentUsageOverTime;
       document.getElementById('dateAndTime').checked = clientSettings.dashboard.other.timeAndDate;
       document.getElementById('cameraCarousel').checked = clientSettings.dashboard.other.cameraCarousel;
     }

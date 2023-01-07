@@ -1,0 +1,49 @@
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <p>
+                    <a class="btn btn-info float-left" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fas fa-info"></i> Help
+                    </a>
+                </p>
+                <h5 class="float-right">Last Updated: <span id="lastUpdateConnectionOverview"></span></h5>
+            </div>
+            <div class="col-lg-12">
+                <div class="collapse" id="collapseExample">
+                    <div class="alert alert-secondary" role="alert">
+                        <p> This is an overview of the current connection responses OctoFarm gets from OctoPrint</p>
+                        <hr>
+                        <b>Average Response Time: </b> <p>Average time your printer takes to respond to a request. </p>
+                        <hr>
+                        <b>Success Percentage: </b> <p>Percentage of Successful vs. Failed requests.  </p>
+                        <hr>
+                        <b>API Timeout Retries: </b> <p>How many times your timeout settings stalled a connection attempt.</p>
+                        <hr>
+                        <b>API Connection Errors: </b> <p>How many times the connection resulted in a total error. Usually from the OctoPrint host / incorrect printer settings.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <table id="" class="table table-dark table-striped text-center">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col" class="sticky-table table-dark" style="">URL</th>
+                        <th scope="col" class="sticky-table table-dark" style="">Average Response Time</th>
+                        <th scope="col" class="sticky-table table-dark" style="">Success Percentage</th>
+                        <th scope="col" class="sticky-table table-dark" style="">API Timeout Retry</th>
+                        <th scope="col" class="sticky-table table-dark" style="">API Connection Errors</th>
+                        <th scope="col" class="sticky-table table-dark" style="">WebSocket Ping/Pong Failure Count</th>
+                    </tr>
+                    </thead>
+                    <tbody id="connectionOverViewTableBody" style="height:100%; overflow-y:auto;">
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

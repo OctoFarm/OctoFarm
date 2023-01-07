@@ -1,0 +1,26 @@
+<a title="Farm Dashboard" href="/dashboard" class="nav_link <%= page === 'Dashboard' && 'active-nav' %>">
+    <i class="fas fa-tachometer-alt text-purple"></i>
+    <span class="nav_name  link-purple">Dashboard</span>
+</a>
+<a title="File Management" href="/filemanager" class="nav_link text-purple <%= page === 'File Manager' && 'active-nav' %>">
+    <i class="fas fa-folder-open text-purple"></i>
+    <span class="nav_name  link-purple">File Manager</span>
+</a>
+<a title="Print History" href="/history" class="nav_link <%= page === 'History' && 'active-nav' %>">
+    <i class="fa-solid fa-timeline text-purple"></i>
+    <span class="nav_name  link-purple">History</span>
+</a>
+<a title="Filament Management" href="/filament" class="nav_link link-purple <%= page === 'Filament Manager' && 'active-nav' %>">
+    <i class="fas fa-toilet-paper text-purple"></i>
+    <span class="nav_name link-purple">Filament</span>
+</a>
+<% if(currentUserGroup === "Administrator"){ %>
+    <a title="Printer Management" href="/printers" class="nav_link link-purple <%= page === 'Printer Manager' && 'active-nav' %>">
+        <i class="fas fa-print text-purple"></i>
+        <span class="nav_name  link-purple">Printers</span>
+    </a>
+<% } %>
+<a title="System Settings" href="/system" class="nav_link link-purple <%= page === 'Systemr' && 'active-nav' %>">
+    <i class="fas fa-cogs text-purple"></i>
+    <span class="nav_name link-purple">System</span>
+</a>

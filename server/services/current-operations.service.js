@@ -49,10 +49,9 @@ const sortCurrentOperations = async () => {
             complete.push(printer._id);
             progress.push(printer.currentJob.progress);
             operations.push({
-              index: id,
-              sortIndex: printer.sortIndex,
+              id: id,
               name,
-              progress: Math.floor(printer.currentJob.progress),
+              progress: printer.currentJob.progress,
               progressColour: "success",
               timeRemaining: printer.currentJob.printTimeRemaining,
               fileName: printer.currentJob.fileDisplay
@@ -66,10 +65,9 @@ const sortCurrentOperations = async () => {
             active.push(printer._id);
             progress.push(printer.currentJob.progress);
             operations.push({
-              index: id,
-              sortIndex: printer.sortIndex,
+              id: id,
               name,
-              progress: Math.floor(printer.currentJob.progress),
+              progress: printer.currentJob.progress,
               progressColour: "warning",
               timeRemaining: printer.currentJob.printTimeRemaining,
               fileName: printer.currentJob.fileDisplay

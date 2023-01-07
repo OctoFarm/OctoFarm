@@ -1,17 +1,135 @@
 <!--// Settings Panel-->
-<% let base = './partials' %>
-<% let card = base + '/octofarm-card.ejs' %>
+<% const base = './partials' %>
+<% const system = '/System' %>
+<% const card = base + '/octofarm-card.ejs' %>
+<% const tabMenu = base + '/octofarm-side-tab-menu.ejs' %>
+<% const tabContent = base + '/octofarm-side-tab-content.ejs' %>
+<% const bootstrapMenuGrid = "col-12 col-sm-12 col-md-3 col-lg-4 col-xl-2 col-xxl-2"; %>
+<% const bootstrapContentGrid = "col-12 col-sm-12 col-md-9 col-lg-8 col-xl-10 col-xxl-10"; %>
+
+<% const listItems = [
+    {
+        id: "system-client",
+        name: "Client Settings",
+        icon: "fas fa-desktop",
+        permissionGroup: "",
+        bodyFile: "./System/systemClient.ejs"
+    },
+    {
+        id: "system-settings",
+        name: "Server Settings",
+        icon: "fas fa-server",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemServer.ejs"
+    },
+    {
+        id: "system-alerts",
+        name: "Alert Manager",
+        icon: "far fa-bell",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemAlerts.ejs"
+    },
+    {
+        id: "system-users",
+        name: "User Manager",
+        icon: "fas fa-users",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemUsers.ejs"
+    },
+    {
+        id: "system-information",
+        name: "System Information",
+        icon: "fas fa-info-circle",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemInformation.ejs"
+    },
+    {
+        id: "system-updates",
+        name: "Server Updates",
+        icon: "fa-solid fa-code-pull-request",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemUpdates.ejs"
+    },
+    {
+        id: "system-tasks",
+        name: "Tasks",
+        icon: "fas fa-tasks",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemTasks.ejs"
+    },
+    {
+        id: "system-database",
+        name: "Database",
+        icon: "fas fa-database",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemDatabase.ejs"
+    },
+    {
+        id: "system-activity",
+        name: "System Activity",
+        icon: "fas fa-clipboard-list",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemActivity.ejs"
+    },
+    {
+        id: "system-logs",
+        name: "Logs",
+        icon: "fas fa-clipboard-list",
+        permissionGroup: "Administrator",
+        bodyFile: "./System/systemLogs.ejs"
+    },
+    {
+        id: "system-about",
+        name: "About",
+        icon: "fas fa-address-card",
+        permissionGroup: "",
+        bodyFile: "./System/systemAbout.ejs"
+    },
+    {
+        id: "system-sponsorship",
+        name: "Sponsorship",
+        icon: "fa-solid fa-award",
+        permissionGroup: "",
+        bodyFile: "./System/systemSponsorship.ejs"
+    }
+] %>
+
+<% if(systemInformation?.warnings?.status){ %>
+    <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
+        <%= systemInformation.warnings?.message; %>
+    </div>
+<% } %>
+<% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
+    <div class="alert alert-warning" role="alert">
+        No pm2 process manager detected... results may vary and are not currently supported. Please
+        configure your system correctly as <a
+                rel=”noopener” href='<%= instructionsURL %>' target='_blank'>instructed here</a>.
+    </div>
+<% } %>
+<% if(serviceInformation?.isNodemon){ %>
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-heart text-danger"></i> Hey lovely developer! Thanks for helping make OctoFarm great!
+    </div>
+<% } %>
 
 <div class="row">
-    <div class="col-lg-12 h-100">
-        <%- include(card, {
-            tile:{
-            id:"systemSettings",i:"fa-tools",title:"System Management",class:"col-lg-12",
-            },
-            bodyFile:'./System/systemMenu.ejs'
+    <div class="<%= bootstrapMenuGrid %>">
+        <%- include(tabMenu, {
+        list:{
+            listItems: listItems
+        }
+        })
+        %>
+    </div>
+    <div class="<%= bootstrapContentGrid %>">
+        <%- include(tabContent, {
+        list:{
+        listItems: listItems
+        }
         })
         %>
     </div>
 </div>
+
 <script src="/assets/js/system.runner.<%= clientVersion %>.min.js" type="module"></script>
 

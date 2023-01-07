@@ -28,6 +28,7 @@ function validateMongoURL(mongoURL) {
 
 router.get("/", (req, res) =>
   res.render("databaseIssue", {
+    layout: "layouts/default.ejs",
     page: "Database Warning",
     octoFarmPageTitle:
       process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] || AppConstants.defaultOctoFarmPageTitle,

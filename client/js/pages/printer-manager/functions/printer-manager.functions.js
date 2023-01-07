@@ -1,11 +1,6 @@
 import UI from "../../../utils/ui";
 import OctoFarmClient from "../../../services/octofarm-client.service.js";
-import {
-  updateActionLog,
-  updateConnectionLog,
-  updateAlertsLog,
-} from "../log-tickers.functions";
-import { createOrUpdatePrinterTableRow } from "../printer-data";
+import { updateActionLog, updateConnectionLog, updateAlertsLog } from "../log-tickers.functions";
 import PrinterControlManagerService from "../../monitoring/services/printer-control-manager.service";
 import { updatePrinterSettingsModal } from "../services/printer-settings.service";
 import Validate from "../../../utils/validate";
@@ -19,32 +14,19 @@ import {
   returnFarmOverviewTableRow,
   returnHealthCheckRow,
 } from "../templates/health-checks-table-row.templates";
-import {
-  collapsableContent,
-  collapsableRow,
-} from "../templates/connection-overview.templates";
+import { collapsableContent, collapsableRow } from "../templates/connection-overview.templates";
 import PrinterTerminalManagerService from "../../monitoring/services/printer-terminal-manager.service";
 
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
-const connectionLogMessageBox = document.getElementById(
-  "printerTickerMessageBox"
-);
-const connectionLogMessageCount = document.getElementById(
-  "printerManagementConnectionLogStatus"
-);
+const connectionLogMessageBox = document.getElementById("printerTickerMessageBox");
+const connectionLogMessageCount = document.getElementById("printerManagementConnectionLogStatus");
 const connectionLogLoader = document.getElementById("printerTickerLoader");
 const alertsLogMesssageBox = document.getElementById("printerAlertsMessageBox");
-const alertsLogMessageCount = document.getElementById(
-  "printerManagementAlertsLogStatus"
-);
+const alertsLogMessageCount = document.getElementById("printerManagementAlertsLogStatus");
 const alertsLogMessageLoader = document.getElementById("printerAlertsLoader");
 const userActionsLogMessageBox = document.getElementById("userActionsLogTable");
-const userActionsLogMessageCount = document.getElementById(
-  "printerManagementUserActionsStatus"
-);
-const userActionsLogMessageLoader = document.getElementById(
-  "printerActionsLoader"
-);
+const userActionsLogMessageCount = document.getElementById("printerManagementUserActionsStatus");
+const userActionsLogMessageLoader = document.getElementById("printerActionsLoader");
 
 export function workerEventFunction(data) {
   if (data) {
@@ -63,37 +45,17 @@ export function workerEventFunction(data) {
         connectionLogMessageCount,
         connectionLogLoader
       );
-      updateAlertsLog(
-        alertsLogMesssageBox,
-        alertsLogMessageCount,
-        alertsLogMessageLoader
-      );
+      updateAlertsLog(alertsLogMesssageBox, alertsLogMessageCount, alertsLogMessageLoader);
       if (data.printersInformation.length > 0) {
-        createOrUpdatePrinterTableRow(
-          data.printersInformation,
-          data.printerControlList
-        );
       }
     } else {
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {
         if (currentOpenModal.innerHTML.includes("Files")) {
-          PrinterFileManagerService.init(
-            "",
-            data.printersInformation,
-            data.printerControlList
-          );
+          PrinterFileManagerService.init("", data.printersInformation, data.printerControlList);
         } else if (currentOpenModal.innerHTML.includes("Control")) {
-          PrinterControlManagerService.init(
-            "",
-            data.printersInformation,
-            data.printerControlList
-          );
+          PrinterControlManagerService.init("", data.printersInformation, data.printerControlList);
         } else if (currentOpenModal.innerHTML.includes("Terminal")) {
-          PrinterTerminalManagerService.init(
-            "",
-            data.printersInformation,
-            data.printerControlList
-          );
+          PrinterTerminalManagerService.init("", data.printersInformation, data.printerControlList);
         }
       }
 
@@ -136,11 +98,7 @@ export async function loadPrintersRegisteredEvents(id) {
 
 export async function scanNetworkForDevices(e) {
   e.target.disabled = true;
-  UI.createAlert(
-    "info",
-    "Scanning your network for new devices now... Please wait!",
-    20000
-  );
+  UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
   const scannedPrinters = await OctoFarmClient.get("printers/scanNetwork");
   for (const scannedPrinter of scannedPrinters) {
     const printer = {
@@ -176,8 +134,7 @@ export async function reSyncAPI(force = false, id = null) {
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  reSyncAPIBtn.innerHTML =
-    '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Scanning APIs...';
   const { msg } = await OctoFarmClient.post("printers/reSyncAPI", {
     id: id,
     force: force,
@@ -189,8 +146,7 @@ export async function reSyncAPI(force = false, id = null) {
   }
 
   UI.createAlert(success, msg, 3000, "Clicked");
-  reSyncAPIBtn.innerHTML =
-    '<i class="fas fa-redo fa-sm"></i> ReScan All API\'s';
+  reSyncAPIBtn.innerHTML = '<i class="fas fa-redo fa-sm"></i> ReScan All API\'s';
   reSyncAPIBtn.disabled = false;
 }
 export async function reSyncWebsockets() {
@@ -201,20 +157,13 @@ export async function reSyncWebsockets() {
     "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
-  reSyncSocketsBtn.innerHTML =
-    '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing Sockets...';
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing Sockets...';
   await OctoFarmClient.post("printers/reSyncSockets", {
     id: null,
   });
   alert.close();
-  UI.createAlert(
-    "success",
-    "Background sync started successfully!",
-    3000,
-    "clicked"
-  );
-  reSyncSocketsBtn.innerHTML =
-    '<i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets';
+  UI.createAlert("success", "Background sync started successfully!", 3000, "clicked");
+  reSyncSocketsBtn.innerHTML = '<i class="fas fa-sync-alt fa-sm"></i> Reconnect All Sockets';
   reSyncSocketsBtn.disabled = false;
 }
 
@@ -228,15 +177,9 @@ export async function bulkEditPrinters() {
       printerID = printerID[1];
 
       const printerURL = document.getElementById(`editInputURL-${printerID}`);
-      const printerCamURL = document.getElementById(
-        `editInputCamera-${printerID}`
-      );
-      const printerAPIKEY = document.getElementById(
-        `editInputApikey-${printerID}`
-      );
-      const printerGroup = document.getElementById(
-        `editInputGroup-${printerID}`
-      );
+      const printerCamURL = document.getElementById(`editInputCamera-${printerID}`);
+      const printerAPIKEY = document.getElementById(`editInputApikey-${printerID}`);
+      const printerGroup = document.getElementById(`editInputGroup-${printerID}`);
       const printerName = document.getElementById(`editInputName-${printerID}`);
       //Check if value updated, if not fill in the old value from placeholder
       if (
@@ -330,10 +273,8 @@ export async function importPrintersFromJsonFile(file) {
 }
 
 export function addBlankPrinterToTable() {
-  const currentPrinterCount =
-    document.getElementById("printerTable").rows.length;
-  const newPrinterCount =
-    document.getElementById("printerNewTable").rows.length;
+  const currentPrinterCount = document.getElementById("printerTable").rows.length;
+  const newPrinterCount = document.getElementById("printerNewTable").rows.length;
   if (currentPrinterCount === 1 && newPrinterCount === 1) {
     bootbox.alert({
       message: createPrinterAddInstructions(),
@@ -381,7 +322,7 @@ export async function loadPrinterHealthChecks(id = undefined) {
   const healthChecks = await OctoFarmClient.getHealthChecks();
   const table = document.getElementById("healthChecksTable");
   table.innerHTML = "";
-  if (!!id) {
+  if (id) {
     const filteredCheck = healthChecks.filter(function (check) {
       return check.printerID === id;
     });
@@ -398,9 +339,7 @@ export async function loadPrinterHealthChecks(id = undefined) {
 }
 
 export async function loadFarmOverviewInformation() {
-  const farmOverviewInformation = document.getElementById(
-    "farmOverviewInformation"
-  );
+  const farmOverviewInformation = document.getElementById("farmOverviewInformation");
   farmOverviewInformation.innerHTML =
     "<tr><td></td><td></td><td></td><td></td><td></td><td></td><td>" +
     '<i class="fas fa-sync fa-spin"></i> Generating records, please wait...' +
@@ -410,25 +349,21 @@ export async function loadFarmOverviewInformation() {
   farmOverviewInformation.innerHTML = "";
   farmOverview.forEach((printer) => {
     const currentPrinter = printer.statistics;
-    if (!!currentPrinter) {
+    if (currentPrinter) {
       const printTotal =
         currentPrinter.printSuccessTotal +
         currentPrinter.printCancelTotal +
         currentPrinter.printErrorTotal;
-      const printerSuccessRate =
-        (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
-      const printerCancelRate =
-        (currentPrinter.printCancelTotal * 100) / printTotal || 0;
-      const printerErrorRate =
-        (currentPrinter.printErrorTotal * 100) / printTotal || 0;
+      const printerSuccessRate = (currentPrinter.printSuccessTotal * 100) / printTotal || 0;
+      const printerCancelRate = (currentPrinter.printCancelTotal * 100) / printTotal || 0;
+      const printerErrorRate = (currentPrinter.printErrorTotal * 100) / printTotal || 0;
       const printUtilisationTotal =
         currentPrinter.activeTimeTotal +
         currentPrinter.idleTimeTotal +
         currentPrinter.offlineTimeTotal;
       const printerActivityRate =
         (currentPrinter.activeTimeTotal * 100) / printUtilisationTotal || 0;
-      const printerIdleRate =
-        (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
+      const printerIdleRate = (currentPrinter.idleTimeTotal * 100) / printUtilisationTotal || 0;
       const printerOfflineRate =
         (currentPrinter.offlineTimeTotal * 100) / printUtilisationTotal || 0;
       const octoSysInfo = currentPrinter.octoPrintSystemInfo;
@@ -455,15 +390,12 @@ export async function loadFarmOverviewInformation() {
 export async function loadConnectionOverViewInformation() {
   const printerConnectionStats = await OctoFarmClient.getConnectionOverview();
 
-  const connectionOverViewTableBody = document.getElementById(
-    "connectionOverViewTableBody"
-  );
+  const connectionOverViewTableBody = document.getElementById("connectionOverViewTableBody");
 
   connectionOverViewTableBody.innerHTML = "";
 
   const today = new Date();
-  document.getElementById("lastUpdateConnectionOverview").innerHTML =
-    today.toLocaleTimeString();
+  document.getElementById("lastUpdateConnectionOverview").innerHTML = today.toLocaleTimeString();
 
   const totalsArray = [];
   printerConnectionStats.forEach((url, index) => {
@@ -471,12 +403,9 @@ export async function loadConnectionOverViewInformation() {
     const toCalc = [];
     currentPrinter.connections.forEach((con) => {
       const log = con.log;
-      const totalConnections =
-        log.totalRequestsSuccess + log.totalRequestsFailed;
-      const totalResponse =
-        log.lastResponseTimes.reduce((a, b) => a + b, 0) / totalConnections;
-      const successPercentage =
-        (log.totalRequestsSuccess * 100) / totalConnections;
+      const totalConnections = log.totalRequestsSuccess + log.totalRequestsFailed;
+      const totalResponse = log.lastResponseTimes.reduce((a, b) => a + b, 0) / totalConnections;
+      const successPercentage = (log.totalRequestsSuccess * 100) / totalConnections;
       const failedPercent = (log.totalRequestsFailed * 100) / totalConnections;
       const apiFailures = log.connectionFailures;
       const retryCount = log.totalRetries;
@@ -504,8 +433,7 @@ export async function loadConnectionOverViewInformation() {
     const totalFailedPercent = totalsArray[index].reduce(function (a, b) {
       return a + b["failedPercent"];
     }, 0);
-    const actualSuccessPercent =
-      totalSuccessPercent / totalsArray[index].length;
+    const actualSuccessPercent = totalSuccessPercent / totalsArray[index].length;
     const actualFailedPercent = totalFailedPercent / totalsArray[index].length;
     let averageTotalCountLength = 0;
     const averageTotalCount =
@@ -532,47 +460,29 @@ export async function loadConnectionOverViewInformation() {
       totalPingPongFails
     );
 
-    connectionOverViewTableBody.insertAdjacentHTML(
-      "beforeend",
-      collapseableRow
-    );
+    connectionOverViewTableBody.insertAdjacentHTML("beforeend", collapseableRow);
 
     currentPrinter.connections.forEach((con) => {
       let currentURL = con.url;
       const log = con.log;
       if (currentURL.includes("http")) {
         if (currentURL.includes("https")) {
-          currentURL = currentURL.replace(
-            "https://" + currentPrinter.printerURL,
-            ""
-          );
+          currentURL = currentURL.replace("https://" + currentPrinter.printerURL, "");
         } else {
-          currentURL = currentURL.replace(
-            "http://" + currentPrinter.printerURL,
-            ""
-          );
+          currentURL = currentURL.replace("http://" + currentPrinter.printerURL, "");
         }
       } else if (currentURL.includes("ws")) {
         if (currentURL.includes("wss")) {
-          currentURL = currentURL.replace(
-            "wss://" + currentPrinter.printerURL,
-            ""
-          );
+          currentURL = currentURL.replace("wss://" + currentPrinter.printerURL, "");
         } else {
-          currentURL = currentURL.replace(
-            "ws://" + currentPrinter.printerURL,
-            ""
-          );
+          currentURL = currentURL.replace("ws://" + currentPrinter.printerURL, "");
         }
       }
 
       const averageCount = log.lastResponseTimes.reduce((a, b) => a + b, 0);
-      const averageCalculation =
-        (averageCount / log.lastResponseTimes.length).toFixed(2) || 0;
-      const totalConnections =
-        log.totalRequestsSuccess + log.totalRequestsFailed;
-      const successPercent =
-        (log.totalRequestsSuccess * 100) / totalConnections;
+      const averageCalculation = (averageCount / log.lastResponseTimes.length).toFixed(2) || 0;
+      const totalConnections = log.totalRequestsSuccess + log.totalRequestsFailed;
+      const successPercent = (log.totalRequestsSuccess * 100) / totalConnections;
       const failedPercent = (log.totalRequestsFailed * 100) / totalConnections;
       const connectionInnerElement = collapsableContent(
         index,
@@ -583,10 +493,7 @@ export async function loadConnectionOverViewInformation() {
         log
       );
 
-      connectionOverViewTableBody.insertAdjacentHTML(
-        "beforeend",
-        connectionInnerElement
-      );
+      connectionOverViewTableBody.insertAdjacentHTML("beforeend", connectionInnerElement);
     });
   });
 }

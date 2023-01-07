@@ -10,17 +10,6 @@
      gs-min-w="<%= tile.mw %>">
     <div class="grid-stack-item-content card text-white bg-dark">
         <div class="card-header dashHeader p-0">
-            <button class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
-                    type="button"
-                    href="#"
-                    aria-expanded="false"
-                    disabled>
-                <i class="fas <%= tile.i %>"></i>&nbsp;<%= tile.title %>
-            </button>
-            <span title="Drag to move this panel about" class="tag sortableList btn btn-light btn-sm float-right">
-                <i class="fas fa-grip-vertical"></i>
-            </span>
-
             <% if (!!locals.titleFile) { %>
                 <%# Extra title elements %>
                 <%- include(titleFile) %>
