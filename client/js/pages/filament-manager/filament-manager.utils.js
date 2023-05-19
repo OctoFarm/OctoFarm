@@ -54,8 +54,8 @@ const materialsList = [
   },
   {
     code: "pc",
-    display: "PC",
-    abbr: "Polycarbonate",
+    display: "Polycarbonate",
+    abbr: "PC",
     density: "1.3",
   },
   {
